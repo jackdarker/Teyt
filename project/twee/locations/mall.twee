@@ -6,17 +6,19 @@ You are actually at [[<%=s.player.location%>]].</br>
 As you wander around you find a [[Bookstore]], a fine grocerie , [[Boots and Shoes]].</br>
 If you need some tools for your hobby you should check the [[craft store]].</br>
 There are also [[Restrooms]].</br>
-<div id="choice"></div>
-<%=window.gm.printShopBuyEntry("lube",4,cbCanBuy=window.gm.defaultCanBuy,cbAfterPickup=null)%>
-<%=window.gm.printShopBuyEntry("batteries",4,cbCanBuy=window.gm.defaultCanBuy,cbAfterPickup=null)%>
-<a href="javascript:void(0)" id="lube" onclick='choice(this,"div#choice")'>Lube</a></br>
-<a href="javascript:void(0)" id="batteries" onclick='choice(this,"div#choice")'>Batteries</a></br>
+<div id="choice"></div></br>
+<%=window.gm.printShopBuyEntry("Lube",4,cbCanBuy=(function(itemid){return window.gm.cbCanBuyPerverse(itemid,15,10)}),cbPostBuy=(function(itemid){window.gm.defaultPostBuy(itemid,15)}))%>
+<%=window.gm.printShopBuyEntry("Batteries",40,cbCanBuy=(function(itemid){return window.gm.defaultCanBuy(itemid,6)}),cbPostBuy=(function(itemid){window.gm.defaultPostBuy(itemid,6)}))%>
+</br>
 Where would you like to go from here?</br>
 [[Mall 1F|Mall Floor 1]]
 [[Mall -1F|Mall Floor -1]]
 [[Exit|Into the city]]
 </article><%=window.story.render("LogPanel")%></section>
 <script> 
+function foo() {
+    alert('clcik');
+}
 function choice(elmt,replaceThis) {
     var msg ='';
     var enoughMoney=false;

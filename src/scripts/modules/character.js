@@ -23,6 +23,7 @@ export class Character {
         this.Effects = new Effects(this,this._data.effects);
         this.Rel = new StatsDictionary(this,this._data.rel); //Todo Relation similiar to stats?
         //create basic stats
+        stPerversion.setup(this.Stats,1,15),stArousal.setup(this.Stats,1,100);
         stHealth.setup(this.Stats,50,60),stEnergy.setup(this.Stats,30,100),stPAttack.setup(this.Stats,4,100),stPDefense.setup(this.Stats,4,100),
         stAgility.setup(this.Stats,3,100),stStrength.setup(this.Stats,3,100),stEndurance.setup(this.Stats,3,100);
 

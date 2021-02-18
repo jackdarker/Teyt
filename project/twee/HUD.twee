@@ -6,7 +6,7 @@
 <%=window.gm.getTimeString()%> <%=window.gm.getDateString()%></br>
 Energy: <%=window.gm.player.energy().value%>/<%=window.gm.player.energy().max%></br>
 Health: <%=window.gm.player.health().value%>/<%=window.gm.player.health().max%></br>
-Money: <%=s.player.money %></br>
+Money: <%=window.gm.player.Inv.countItem('Money') %></br>
 </div>
 </hr>
 <form>

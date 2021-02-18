@@ -164,7 +164,7 @@ class stPerversion {
         if(context.findItemSlot(_n.id)<0) context.list.push(_n);
         stPerversion.Calc(context);
     }
-    static Calc(context) { Stat.Calc(context,'energy');  }
+    static Calc(context) { Stat.Calc(context,'perversion');  }
     static updateModifier(context) {};
 }
 class stAgility { // core attribute

@@ -11,6 +11,14 @@ qLaptop=0x<%=s.vars.qLaptop.toString(16)%></br>
 :: debug_cheat [back]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
-Cheat buttons:
-[[Back|_back]]</br>
+Cheat buttons:</br>
+<a href="javascript:void(0)" onclick='window.gm.player.Inv.addItem("Money",200);window.gm.refreshScreen();'>Get 200$</a></br>
+</br>
+<a href="javascript:void(0)" onclick='window.gm.player.Stats.increment("health",25);window.gm.refreshScreen();'>Health +25</a></br>
+<a href="javascript:void(0)" onclick='window.gm.player.Stats.increment("energy",25);window.gm.refreshScreen();'>Energy +25</a></br>
+<a href="javascript:void(0)" onclick='window.gm.player.Stats.increment("perversion",25);window.gm.refreshScreen();'>Perversion +25</a>
+<a href="javascript:void(0)" onclick='window.gm.player.Stats.increment("perversion",-25);window.gm.refreshScreen();'>Perversion -25</a></br>
+<a href="javascript:void(0)" onclick='window.gm.player.Stats.increment("arousal",25);window.gm.refreshScreen();'>Arousal +25</a>
+<a href="javascript:void(0)" onclick='window.gm.player.Stats.increment("arousal",-25);window.gm.refreshScreen();'>Arousal -25</a></br>
+</br>[[Back|_back]]</br>
 </article><%=window.story.render("LogPanel")%></section>

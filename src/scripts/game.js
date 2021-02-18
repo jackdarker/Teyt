@@ -26,6 +26,7 @@ window.gm.initGame= function(forceReset) {
     });
     // Render the passage named HUD into the element todo replace with <%=%>??
     $(document).on('sm.passage.shown', function (ev,eventObject) {renderToSelector("#sidebar", "sidebar");  });
+    
     var s = window.story.state; //s in template is window.story.state from snowman!
     if (!s.vars||forceReset) { // storage of variables that doesnt fit player
         s.vars = {

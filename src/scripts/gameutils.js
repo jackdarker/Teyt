@@ -45,35 +45,51 @@ window.gm.printPassageLink= function(label,target) {
     return("<a href=\"javascript:void(0)\" data-passage=\""+target+"\">"+label+"</a></br>");
 };
 
-window.gm.printShopBuyEntry= function(itemid,itemleft,cbCanBuy,cbAfterPickup=null){
-    var elmt=itemid+ 'out of stock';
+window.gm.printShopBuyEntry= function(itemid,itemleft,cbCanBuy,cbPostBuy=null){
+    var elmt=itemid+ 'out of stock</br>';
     if(!(itemleft>0)) return(elmt);
     var result = cbCanBuy(itemid);
     var desc2 = itemid+" ("+itemleft+" left)";
     if(result.OK===false) {
-        elmt = desc2 + " "+ result.msg;
+        elmt = desc2 + " "+ result.msg+"</br>";
     } else {
         desc2+= " "+result.msg;
-        elmt +="<a0 id='"+itemid+"' onclick='(function($event){window.gm.buyFromShop(\""+itemid+"\", \""+desc+"\","+itemleft+","+cbAfterPickup+")})(this);'>"+desc2+"</a></br>";
+        elmt ="<a0 id='"+itemid+"' onclick='(function($event){window.gm.buyFromShop(\""+itemid+"\", "+itemleft+","+cbPostBuy+")})(this);'>"+desc2+"</a></br>";
     }
     return(elmt);
 }
-window.gm.defaultCanBuy =function(itemid){
+//a callback function to check if you can buy something;
+//should return {OK:true,msg:''} where message will be displayed either as reason why you cannot buy or as cost
+//this implementation checks: money
+window.gm.defaultCanBuy =function(itemid,cost){
     var result ={OK:true,msg:''};
     var money= window.gm.player.Inv.countItem('Money');
-    if(money>5) {
-
+    if(money>=cost) {
+        result.msg='buy for '+cost+'$';
     } else {
         result.OK=false;
-        result.msg='not enough money'
+        result.msg='requires '+cost+'$';
     };
     return(result);
 }
-window.gm.buyFromShop=function(itemid, desc,itemleft,cbAfterPickup=null) {
-    window.gm.player.Inv.addItem(itemid);
-    window.gm.pushLog("added "+itemid+" to inventory.</br>");
-    if(cbAfterPickup) cbAfterPickup.call();
-    window.story.show(window.passage.name);
+//requires a <div id='choice'> </div>
+window.gm.defaultPostBuy =function(itemid,cost){
+    window.gm.player.Inv.removeItem('Money',cost);
+    $("div#choice")[0].innerHTML='You bought '+ itemid; 
+}
+window.gm.cbCanBuyPerverse = function(itemid,cost,pervcost) {
+    var result = window.gm.defaultCanBuy(itemid,5);
+    if(window.gm.player.Stats.get('perversion').value<pervcost) {
+        result.msg += ' ; requires Perversion> '+pervcost;
+        result.OK=false;
+    }
+    return(result);
+}
+window.gm.buyFromShop=function(itemid, itemleft,cbPostBuy=null) {
+    window.gm.player.Inv.addItem(itemid);   //Todo item or wardrobe
+    if(cbPostBuy) cbPostBuy(itemid);
+    //window.gm.refreshScreen(); dont refresh fullscreen or might reset modified textoutput
+    renderToSelector("#sidebar", "sidebar"); //just update sidebar for moneychange
 };
 //prints a link that when clicked picksup an item and places it in the inventory, if itemleft is <0, no link appears
 window.gm.printPickupAndClear= function(itemid, desc,itemleft,cbAfterPickup=null) {
@@ -89,7 +105,7 @@ window.gm.pickupAndClear=function(itemid, desc,itemleft,cbAfterPickup=null) {
     window.gm.player.Inv.addItem(itemid);
     window.gm.pushLog("added "+itemid+" to inventory.</br>");
     if(cbAfterPickup) cbAfterPickup.call();
-    window.story.show(window.passage.name);
+    window.gm.refreshScreen();
 };
 //prints an item with description; used in inventory
 window.gm.printItem= function( id,descr) {
