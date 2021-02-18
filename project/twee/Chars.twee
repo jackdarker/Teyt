@@ -1,0 +1,21 @@
+:: Info_Jake [back]
+<section> 
+<aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+Jake is here.</br>
+You barely know anything about him.</br>
+
+[[Back|_back]]</br></br>
+</article></section>
+
+
+:: Info_Mom [back]
+<section> 
+<aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+Your mom is here.</br>
+<% if(window.gm.player.Rel.get('mom').value>10) { %>
+She gives you a hug.
+<% }%>
+</br>
+
+[[Back|_back]]</br></br>
+</article></section>

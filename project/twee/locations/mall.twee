@@ -1,0 +1,93 @@
+:: Mall Floor 0
+<section> 
+<aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+<%s.player.location=window.passage.name;%>
+You are actually at [[<%=s.player.location%>]].</br>
+As you wander around you find a [[Bookstore]], a fine grocerie , [[Boots and Shoes]].</br>
+If you need some tools for your hobby you should check the [[craft store]].</br>
+There are also [[Restrooms]].</br>
+<div id="choice"></div>
+<%=window.gm.printShopBuyEntry("lube",4,cbCanBuy=window.gm.defaultCanBuy,cbAfterPickup=null)%>
+<%=window.gm.printShopBuyEntry("batteries",4,cbCanBuy=window.gm.defaultCanBuy,cbAfterPickup=null)%>
+<a href="javascript:void(0)" id="lube" onclick='choice(this,"div#choice")'>Lube</a></br>
+<a href="javascript:void(0)" id="batteries" onclick='choice(this,"div#choice")'>Batteries</a></br>
+Where would you like to go from here?</br>
+[[Mall 1F|Mall Floor 1]]
+[[Mall -1F|Mall Floor -1]]
+[[Exit|Into the city]]
+</article><%=window.story.render("LogPanel")%></section>
+<script> 
+function choice(elmt,replaceThis) {
+    var msg ='';
+    var enoughMoney=false;
+	if(elmt.id==="lube") {
+        msg = "Buy lube?.";
+    } else if (elmt.id==="batteries"){
+        enoughMoney = true;
+        msg = "";
+    } 
+    if(enoughMoney===false) {
+        msg+= "not enough money";
+    } else {
+        msg+= "<a href=\"javascript:void(0)\" id=\""+elmt.id+"\" onclick=\"buy(\""+elmt.id+"\")\">Buy</a>";
+    } 
+    elmt.innerHTML=(msg);}
+function buy(what) {
+    alert(what);
+}
+</script>
+
+:: Mall Floor 1
+<section> 
+<aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+<%s.player.location=window.passage.name;%>
+You are actually at [[<%=s.player.location%>]].</br>
+Several snack bars and smaller shops are cirling around the wall side of the mall.</br> 
+One of them is [[Alice treasures]], a place where women can buy more private cloths.</br>
+In a more shady corner you find a shop whose windows are just coverd with dark red and black foils. 
+Its name is 'Adult books and tools' and there is an "adults only" sign at the entrance.</br>
+if(window.gm.player.Stats.get('perversion').value<=10) {%>
+<p class='talkplayer'>No way I'm going in to that smut-shop. Only perverts do that. </p>
+<%} else {%> [[Adult books and tools]] </br> <%} %>
+Where would you like to go from here?</br>
+[[Mall 0F|Mall Floor 0]]
+</article><%=window.story.render("LogPanel")%></section>
+
+:: Mall Floor -1
+<section> 
+<aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+<%s.player.location=window.passage.name;%>
+You are actually at [[<%=s.player.location%>]].</br>
+This level of the mall seems to be reserved for the less fancy business. </br> 
+Most of the space is occupied by the usual [[electronics store]] and a [[food store]].
+Where would you like to go from here?</br>
+[[Mall 0F|Mall Floor 0]]
+</article><%=window.story.render("LogPanel")%></section>
+
+:: Adult books and tools
+<section> 
+<aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+<%s.player.location=window.passage.name;%>
+You are actually at [[<%=s.player.location%>]].</br>
+Various Items are on sale: </br>
+<div id="choice"></div>
+<a href="javascript:void(0)" id="lube" onclick='choice(this,"div#choice")'>Lube</a></br>
+if(window.gm.player.Stats.get('perversion').value<=15) {%>
+No way I'm going in to that smut-shop. Only perverts do that. </br>
+<%} else {%>
+<%} %>
+Several snack bars and smaller shops are cirling around the wall side of the mall.</br> 
+One of them is [[Alice treasures]], a place where women can buy more private cloths.</br>
+In a more shady corner you find a shop whose windows are just coverd with dark red and black foils. 
+Its name is [[Adult books and tools]] and there is an "adults only" sign at the entrance.</br>
+Where would you like to go from here?</br>
+[[Mall 0F|Mall Floor 0]]
+</article><%=window.story.render("LogPanel")%></section>
+
+
+:: Buy [back]
+<section> 
+<aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+
+[[Back|_back]]</br>
+</article><%=window.story.render("LogPanel")%></section>

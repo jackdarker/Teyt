@@ -1,0 +1,28 @@
+:: StoryTitle
+teyt
+
+
+:: StoryData
+{
+	"ifid": "90EFC306-4C57-4786-8CD3-9789B523C8AF",
+	"format": "Snowman",
+	"format-version": "2.0.2",
+	"Start": "Intro",
+	"tag-colors": {
+		"template": "orange"
+	},
+	"zoom": 1
+}
+
+:: Story JavaScript [script]
+
+:: Start
+Select a Link:
+<ul>
+    <li>[[_SuperSimpleStory_]]</li>
+	  <li>[[_ImagesAndOtherMedia_]]</li>
+    <li>[[_VariablesAndScript_]]</li>
+    <li>[[_Inventory_]]</li>
+    <li>[[_SaveAndRestore_]]</li>
+    <li>[[StartPage]]</li>
+</ul>

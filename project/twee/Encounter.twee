@@ -1,0 +1,51 @@
+:: Encounter
+<section> 
+<aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+Get ready...
+<%window.gm.initCombat('Mole');%>
+A <%=window.story.state.enemy.name%> appears ! </br>
+[[Next|EncounterStartTurn]]
+</article><%=window.story.render("LogPanel")%></section>
+
+:: EncounterStartTurn
+<section> 
+<!--<aside id="sidebar"></aside>-->
+<article><%=window.story.render("CenterDialogs") %>
+<div id='combatCanvas' style='height:300px; background: url(<%=s.enemy.pic%>) no-repeat center,url(<%=s.combat.scenePic%>) no-repeat center;color:black;'></div>
+<!--filled by printCombatHud-->
+<div id="playerstats">you</div> 
+<div id="enemystats">tey</div>
+<% 
+    if(s.vars.combatState==='fleeing') {%>
+        <%='You sucessfully escaped '+s.enemy.name%></br>
+        [[Next|<%=s.player.location%>]]</br>
+    <%} else if(window.gm.enemy.health().value<=0) {
+        s.vars.combatState = 'victory';
+    %>
+    <%='You defeated '+s.enemy.name%></br>
+    [[Next|<%s.player.location%>]]</br>
+    
+<% }else if(window.gm.player.health().value<=0){ 
+    s.vars.combatState = 'defeat';    
+%>
+    <%='You were defeated by '+s.enemy.name%></br>
+    [[GameOver]]</br>
+<% }else{ %>
+   <% if(s.combat.activeTurn) {%>
+    <%=window.gm.calcEnemyCombat()%>
+    [[Next|EncounterStartTurn]]</br>
+    <% }else{ %>
+    <%=window.gm.printCombatOption()%>
+<%}}%>
+
+<div><output></output></div></br>   <!--message is rendered here-->
+</article><%=window.story.render("LogPanel")%>
+<script>
+window.gm.printCombatHud();
+</script>
+</section>
+
+:: GameOver
+Game Over. I hope you learned something.</br>
+</br>
+[[New Game|Start]]
