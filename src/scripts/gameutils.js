@@ -44,47 +44,61 @@ window.gm.printOutput= function(text) {
 window.gm.printPassageLink= function(label,target) {
     return("<a href=\"javascript:void(0)\" data-passage=\""+target+"\">"+label+"</a></br>");
 };
-
+//dynamically build a link representing a buy option including display of cost and restriction
+//cbCanBuy points to a function fn(itemid) that returns if can buy {OK:false,msg:'too expensive'} 
+//cbPostBuy points to a function fn(itemid) that is called after buying ; 
 window.gm.printShopBuyEntry= function(itemid,itemleft,cbCanBuy,cbPostBuy=null){
-    var elmt=itemid+ 'out of stock</br>';
-    if(!(itemleft>0)) return(elmt);
-    var result = cbCanBuy(itemid);
-    var desc2 = itemid+" ("+itemleft+" left)";
-    if(result.OK===false) {
-        elmt = desc2 + " "+ result.msg+"</br>";
-    } else {
-        desc2+= " "+result.msg;
-        elmt ="<a0 id='"+itemid+"' onclick='(function($event){window.gm.buyFromShop(\""+itemid+"\", "+itemleft+","+cbPostBuy+")})(this);'>"+desc2+"</a></br>";
+    var desc2=itemid+ 'out of stock</br>';
+    var entry = document.createElement('a');
+    entry.id=itemid;
+    entry.href='javascript:void(0)';
+    if(itemleft>0) {
+        var result = cbCanBuy(itemid);
+        desc2 = itemid+" ("+itemleft+" left)";
+        if(result.OK===false) {
+            desc2 = desc2 + " "+ result.msg;
+        } else {
+            desc2+= " "+result.msg;
+            var foo = function($event){window.gm.buyFromShop(itemid,itemleft,cbPostBuy)};//(function(item){result.postBuy.fn(itemid,result.postBuy.cost)}))};
+            entry.addEventListener("click", foo, false);
+        }
     }
-    return(elmt);
-}
+    entry.textContent=desc2;
+    $("div#panel")[0].appendChild(entry);
+    $("div#panel")[0].appendChild(document.createElement('br'));
+};
+
 //a callback function to check if you can buy something;
-//should return {OK:true,msg:''} where message will be displayed either as reason why you cannot buy or as cost
+//should return {OK:true,msg:'',postBuy:null} where message will be displayed either as reason why you cannot buy or cost
+//unused because makes it unoverridable ->postboy is {fn:foo, cost:x} where fn points to a function that is called after buying (fn(itemid,x));  
 //this implementation checks: money
 window.gm.defaultCanBuy =function(itemid,cost){
-    var result ={OK:true,msg:''};
+    var result ={OK:true,msg:''};//, postBuy:null};
     var money= window.gm.player.Inv.countItem('Money');
     if(money>=cost) {
         result.msg='buy for '+cost+'$';
+        //result.postBuy = function(x){ return (function(item,y=x){window.gm.defaultPostBuy(item,y);})}(cost);
+        //result.postBuy = {fn:window.gm.defaultPostBuy, cost:cost};
     } else {
         result.OK=false;
         result.msg='requires '+cost+'$';
     };
     return(result);
-}
-//requires a <div id='choice'> </div>
+};
+//requires a <div id='choice'> </div> for displaying bought-message
 window.gm.defaultPostBuy =function(itemid,cost){
     window.gm.player.Inv.removeItem('Money',cost);
     $("div#choice")[0].innerHTML='You bought '+ itemid; 
-}
+};
 window.gm.cbCanBuyPerverse = function(itemid,cost,pervcost) {
-    var result = window.gm.defaultCanBuy(itemid,5);
+    var result = window.gm.defaultCanBuy(itemid,cost);
     if(window.gm.player.Stats.get('perversion').value<pervcost) {
         result.msg += ' ; requires Perversion> '+pervcost;
         result.OK=false;
     }
     return(result);
-}
+};
+//this will add item to player; money-deduct or other cost has to be done in cbPostBuy ! 
 window.gm.buyFromShop=function(itemid, itemleft,cbPostBuy=null) {
     window.gm.player.Inv.addItem(itemid);   //Todo item or wardrobe
     if(cbPostBuy) cbPostBuy(itemid);

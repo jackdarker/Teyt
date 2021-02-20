@@ -7,18 +7,21 @@ As you wander around you find a [[Bookstore]], a fine grocerie , [[Boots and Sho
 If you need some tools for your hobby you should check the [[craft store]].</br>
 There are also [[Restrooms]].</br>
 <div id="choice"></div></br>
-<%=window.gm.printShopBuyEntry("Lube",4,cbCanBuy=(function(itemid){return window.gm.cbCanBuyPerverse(itemid,15,10)}),cbPostBuy=(function(itemid){window.gm.defaultPostBuy(itemid,15)}))%>
-<%=window.gm.printShopBuyEntry("Batteries",40,cbCanBuy=(function(itemid){return window.gm.defaultCanBuy(itemid,6)}),cbPostBuy=(function(itemid){window.gm.defaultPostBuy(itemid,6)}))%>
+</br>
+<div id="panel"></div></br>
 </br>
 Where would you like to go from here?</br>
 [[Mall 1F|Mall Floor 1]]
 [[Mall -1F|Mall Floor -1]]
 [[Exit|Into the city]]
 </article><%=window.story.render("LogPanel")%></section>
-<script> 
-function foo() {
-    alert('clcik');
-}
+<script>
+var id="Dildo";
+var cost =25;
+var costPerv=13;
+window.gm.printShopBuyEntry(id,1,cbCanBuy=(function(itemid){return window.gm.cbCanBuyPerverse(itemid,cost,costPerv)}),cbPostBuy=(function(itemid){window.gm.defaultPostBuy(itemid,cost)}));
+window.gm.printShopBuyEntry("Lube",4,cbCanBuy=(function(itemid){return window.gm.cbCanBuyPerverse(itemid,15,10)}),cbPostBuy=(function(itemid){window.gm.defaultPostBuy(itemid,15)}));
+window.gm.printShopBuyEntry("Batteries",40,cbCanBuy=(function(itemid){return window.gm.defaultCanBuy(itemid,6)}),cbPostBuy=(function(itemid){window.gm.defaultPostBuy(itemid,6)}));
 function choice(elmt,replaceThis) {
     var msg ='';
     var enoughMoney=false;
@@ -43,6 +46,8 @@ function buy(what) {
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 <%s.player.location=window.passage.name;%>
+<%window.gm.printShopBuyEntry("Lube",4,cbCanBuy=(function(itemid){return window.gm.cbCanBuyPerverse(itemid,15,10)}),cbPostBuy=(function(itemid){window.gm.defaultPostBuy(itemid,15)}))%>
+<%window.gm.printShopBuyEntry("Batteries",40,cbCanBuy=(function(itemid){return window.gm.defaultCanBuy(itemid,6)}),cbPostBuy=(function(itemid){window.gm.defaultPostBuy(itemid,6)}))%>
 You are actually at [[<%=s.player.location%>]].</br>
 Several snack bars and smaller shops are cirling around the wall side of the mall.</br> 
 One of them is [[Alice treasures]], a place where women can buy more private cloths.</br>
