@@ -34,7 +34,24 @@ class LaptopPS extends Item {
         this.desc = 'Power converter for laptop.';
     }
 };
-
+class Dildo_small extends Item {
+    constructor() {
+        super('Dildo_small');
+        this.desc = 'A dildo, smaller than an average dong, made from rubbery plastic.';
+    }
+};
+class Lube extends Item {
+    constructor() {
+        super('Lube');
+        this.desc = 'Slippery lubricant for personal use.';
+    }
+};
+class Battery extends Item {
+    constructor() {
+        super('Battery');
+        this.desc = 'Provides electricity for devices.';
+    }
+};
 class CanOfCoffee extends Item {
     constructor() {
         super('Can of coffee');

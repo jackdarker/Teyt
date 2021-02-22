@@ -50,11 +50,9 @@ Enemys health:<%=window.gm.enemy.health().value%></br>
 
 
 :: LogPanel
-<article class='logpanel'>
 <div class="scroll" style="font-size: smaller;"><%=window.gm.getLog()%></br></br></div>
 <button type="button" id="toggleview" onclick=toggleview()>toggle View</button>
 <button type="button" id="clearview" onclick=clearview()>clear View</button>
-</article>
 <script>
 function toggleview(){
   document.querySelector("section").classList.toggle("section_swap");
@@ -149,7 +147,7 @@ for(var i=0;i<maxSlots;i++){
   %><%=window.gm.printItem(id,inv.countItem(id).toString()+'x '+inv.getItem(id).desc+' '+inv.getItem(id).usable(inv).msg)%><%
 } 
 %>
-</article><%=window.story.render("LogPanel")%></section>
+</article><article class="logpanel" id="LogPanel"></article></section>
 
 
 :: Relations [back]
@@ -158,7 +156,7 @@ for(var i=0;i<maxSlots;i++){
 [[Back|_back]]</br>
 <%=s.player.name%> relations: </br></br>
 <%=window.gm.printRelationSummary()%>
-</article><%=window.story.render("LogPanel")%></section>
+</article><article class="logpanel" id="LogPanel"></article></section>
 
 
 :: Player_Dashboard [back]
@@ -168,7 +166,7 @@ for(var i=0;i<maxSlots;i++){
 Here you can check and modify several options: </br>
 Your outfit can only be changed by using a wardrobe.</br>
 [[Close|_back]] [[Status]] [[Relations]] [[Inventory]] [[TodoList]]</br>
-</article><%=window.story.render("LogPanel")%></section>
+</article><article class="logpanel" id="LogPanel"></article></section>
 
 
 :: Wardrobe [back]
@@ -187,7 +185,7 @@ for(var i=0;i<maxSlots;i++){
   %><%=window.gm.printEquipment(id,inv.getItem(id).desc)%><%
 } 
 %>
-</article><%=window.story.render("LogPanel")%></section>
+</article><article class="logpanel" id="LogPanel"></article></section>
 
 :: Settings [back]
 <section> 
@@ -196,7 +194,7 @@ for(var i=0;i<maxSlots;i++){
 <button onclick='window.gm.printCombatScreen()'>test a</button>
 <button onclick='onimage("assets/favicon.png")'>test b</button>
 [[Back|_back]]</br>
-</article><%=window.story.render("LogPanel")%></section>
+</article><article class="logpanel" id="LogPanel"></article></section>
 
 :: Settings2 [back]
 <section> 
@@ -217,7 +215,7 @@ img.src = imgsrc;//'https://twinery.org/homepage/img/logo.svg';   //todo the loa
       onimage("assets/bird.gif");
     </script>
 [[Back|_back]]</br>
-</article><%=window.story.render("LogPanel")%></section>
+</article><article class="logpanel" id="LogPanel"></article></section>
 
 
 :: Status [back]
@@ -226,7 +224,7 @@ img.src = imgsrc;//'https://twinery.org/homepage/img/logo.svg';   //todo the loa
 Status of <%=s.player.name%>:</br> 
 <%=window.gm.printEffectSummary()%>
 [[Back|_back]]</br>
-</article><%=window.story.render("LogPanel")%></section>
+</article><article class="logpanel" id="LogPanel"></article></section>
 
 
 :: PassageTemplate [template] {"position":"253,496.5","size":"100,100"}
@@ -234,11 +232,11 @@ The page should be setup like this:
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 content here !
-</article><%=window.story.render("LogPanel")%></section>
+</article><article class="logpanel" id="LogPanel"></article></section>
 
 :: SubpanelTemplate [back]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 If this is a subpanel you can use back-tag and _back-Link
 [[Back|_back]]</br>
-</article><%=window.story.render("LogPanel")%></section>
+</article><article class="logpanel" id="LogPanel"></article></section>

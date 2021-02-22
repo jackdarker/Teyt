@@ -9,7 +9,7 @@ Where would you like to go from here?</br>
 <%  if(s.vars.qUnlockPark>0) {      %>[[Park]]</br>
 <%}; if(s.vars.qUnlockMall>0) {     %>[[Mall]]</br>
 <%};%>
-</article><%=window.story.render("LogPanel")%></section>
+</article><article class="logpanel" id="LogPanel"></article></section>
 
 :: Mall
 <section> 
@@ -25,7 +25,7 @@ Where would you like to go from here?</br>
 <%  if(s.vars.qUnlockPark>0) {      %>[[Park]]</br>
 <%}; if(s.vars.qUnlockBeach>0) {      %>[[Beach]]</br>
 <%};%>
-</article><%=window.story.render("LogPanel")%></section>
+</article><article class="logpanel" id="LogPanel"></article></section>
 
 :: Park
 <section> 
@@ -47,7 +47,7 @@ Where would you like to go from here?</br>
 [[Home]]</br>
 <%  if(s.vars.qUnlockMall>0) {      %>[[Mall]]</br>
 <%};%>
-</article><%=window.story.render("LogPanel")%></section>
+</article><article class="logpanel" id="LogPanel"></article></section>
 
 :: Park_Jogging [back]
 <section> 
@@ -68,7 +68,7 @@ After a quick warmup and stretching you take a fast pace jog around the outer pa
     This time you didnt feel that kind of exhausted euphoria. Maybe you have to work harder. Or you are as fit as you can get with this workout. </br> 
 <%}}%>
 </br>[[Back|_back]]</br>
-</article><%=window.story.render("LogPanel")%></section>
+</article><article class="logpanel" id="LogPanel"></article></section>
 
 :: Beach
 <section> 
@@ -87,7 +87,7 @@ Where would you like to go from here?</br>
 [[Home]]</br>
 <%  if(s.vars.qUnlockMall>0) {      %>[[Mall]]</br>
 <%};%>
-</article><%=window.story.render("LogPanel")%></section>
+</article><article class="logpanel" id="LogPanel"></article></section>
 
 
 :: Downtown
@@ -100,4 +100,4 @@ Where would you like to go from here?</br>
 [[Home]]</br>
 <%  if(s.vars.qUnlockMall>0) {      %>[[Mall]]</br>
 <%};%>
-</article><%=window.story.render("LogPanel")%></section>
+</article><article class="logpanel" id="LogPanel"></article></section>

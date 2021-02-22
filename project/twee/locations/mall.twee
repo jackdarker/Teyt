@@ -14,31 +14,21 @@ Where would you like to go from here?</br>
 [[Mall 1F|Mall Floor 1]]
 [[Mall -1F|Mall Floor -1]]
 [[Exit|Into the city]]
-</article><%=window.story.render("LogPanel")%></section>
+</article><article class="logpanel" id="LogPanel"></article></section>
 <script>
-var id="Dildo";
-var cost =25;
-var costPerv=13;
-window.gm.printShopBuyEntry(id,1,cbCanBuy=(function(itemid){return window.gm.cbCanBuyPerverse(itemid,cost,costPerv)}),cbPostBuy=(function(itemid){window.gm.defaultPostBuy(itemid,cost)}));
-window.gm.printShopBuyEntry("Lube",4,cbCanBuy=(function(itemid){return window.gm.cbCanBuyPerverse(itemid,15,10)}),cbPostBuy=(function(itemid){window.gm.defaultPostBuy(itemid,15)}));
-window.gm.printShopBuyEntry("Batteries",40,cbCanBuy=(function(itemid){return window.gm.defaultCanBuy(itemid,6)}),cbPostBuy=(function(itemid){window.gm.defaultPostBuy(itemid,6)}));
-function choice(elmt,replaceThis) {
-    var msg ='';
-    var enoughMoney=false;
-	if(elmt.id==="lube") {
-        msg = "Buy lube?.";
-    } else if (elmt.id==="batteries"){
-        enoughMoney = true;
-        msg = "";
-    } 
-    if(enoughMoney===false) {
-        msg+= "not enough money";
-    } else {
-        msg+= "<a href=\"javascript:void(0)\" id=\""+elmt.id+"\" onclick=\"buy(\""+elmt.id+"\")\">Buy</a>";
-    } 
-    elmt.innerHTML=(msg);}
-function buy(what) {
-    alert(what);
+var _Entrys = [];
+_Entrys.push({id:"Lube",count:10,cost:4,costPerv:10});
+_Entrys.push({id:"Battery",count:4,cost:4,costPerv:0});
+_Entrys.push({id:"Dildo_small",count:1,cost:25,costPerv:14});
+//
+for(var i=0;_Entrys.length>i;i++) {
+    var entry=_Entrys[i];
+    let _id = entry.id;
+    let _cost=entry.cost;
+    let _costPerv = entry.costPerv;
+    window.gm.printShopBuyEntry(_id,entry.count,
+    cbCanBuy=(function(itemid){return window.gm.cbCanBuyPerverse(itemid,_cost,_costPerv)}),
+    cbPostBuy=(function(itemid){window.gm.defaultPostBuy(itemid,_cost)}));
 }
 </script>
 
@@ -58,7 +48,7 @@ if(window.gm.player.Stats.get('perversion').value<=10) {%>
 <%} else {%> [[Adult books and tools]] </br> <%} %>
 Where would you like to go from here?</br>
 [[Mall 0F|Mall Floor 0]]
-</article><%=window.story.render("LogPanel")%></section>
+</article><article class="logpanel" id="LogPanel"></article></section>
 
 :: Mall Floor -1
 <section> 
@@ -69,7 +59,7 @@ This level of the mall seems to be reserved for the less fancy business. </br>
 Most of the space is occupied by the usual [[electronics store]] and a [[food store]].
 Where would you like to go from here?</br>
 [[Mall 0F|Mall Floor 0]]
-</article><%=window.story.render("LogPanel")%></section>
+</article><article class="logpanel" id="LogPanel"></article></section>
 
 :: Adult books and tools
 <section> 
@@ -89,7 +79,7 @@ In a more shady corner you find a shop whose windows are just coverd with dark r
 Its name is [[Adult books and tools]] and there is an "adults only" sign at the entrance.</br>
 Where would you like to go from here?</br>
 [[Mall 0F|Mall Floor 0]]
-</article><%=window.story.render("LogPanel")%></section>
+</article><article class="logpanel" id="LogPanel"></article></section>
 
 
 :: Buy [back]
@@ -97,4 +87,4 @@ Where would you like to go from here?</br>
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 
 [[Back|_back]]</br>
-</article><%=window.story.render("LogPanel")%></section>
+</article><article class="logpanel" id="LogPanel"></article></section>

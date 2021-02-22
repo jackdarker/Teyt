@@ -1,11 +1,14 @@
 "use strict";
 /* bundles some utility operations*/
 window.gm = window.gm || {};
-
+//updates all panels
 window.gm.refreshScreen= function() {
     window.story.show(window.passage.name);
 };
-
+//updates only sidepanle,logpanel
+window.gm.updateOtherPanels = function(){
+    renderToSelector("#sidebar", "sidebar");renderToSelector("#LogPanel", "LogPanel"); 
+};
 window.gm.pushLog=function(msg) {
     var log = window.story.state.vars.log;
     log.unshift(msg);
@@ -47,25 +50,39 @@ window.gm.printPassageLink= function(label,target) {
 //dynamically build a link representing a buy option including display of cost and restriction
 //cbCanBuy points to a function fn(itemid) that returns if can buy {OK:false,msg:'too expensive'} 
 //cbPostBuy points to a function fn(itemid) that is called after buying ; 
-window.gm.printShopBuyEntry= function(itemid,itemleft,cbCanBuy,cbPostBuy=null){
+window.gm.printShopBuyEntry= function(itemid,count,cbCanBuy,cbPostBuy=null){
     var desc2=itemid+ 'out of stock</br>';
     var entry = document.createElement('a');
     entry.id=itemid;
     entry.href='javascript:void(0)';
-    if(itemleft>0) {
+    var showDesc=function($event){var elmt =document.querySelector("div#"+$event.srcElement.id);
+        elmt.innerHTML =window.gm.ItemsLib[$event.srcElement.id].desc+"</br>";
+        elmt.toggleAttribute("hidden");};
+    entry.addEventListener("click", showDesc, false);
+    var div = document.createElement('div');
+    div.id=itemid;
+    div.hidden=true;
+    var entryBuy = document.createElement('a');
+    entryBuy.id=itemid;
+    entryBuy.href='javascript:void(0)';
+    entryBuy.textContent="Buy";
+    if(count>0) {
         var result = cbCanBuy(itemid);
-        desc2 = itemid+" ("+itemleft+" left)";
+        desc2 = itemid+" (x"+count+")";
         if(result.OK===false) {
             desc2 = desc2 + " "+ result.msg;
         } else {
             desc2+= " "+result.msg;
-            var foo = function($event){window.gm.buyFromShop(itemid,itemleft,cbPostBuy)};//(function(item){result.postBuy.fn(itemid,result.postBuy.cost)}))};
-            entry.addEventListener("click", foo, false);
+            var foo = function($event){window.gm.buyFromShop(itemid,count,cbPostBuy)};
+            entryBuy.addEventListener("click", foo, false);
         }
     }
     entry.textContent=desc2;
     $("div#panel")[0].appendChild(entry);
+    $("div#panel")[0].appendChild(entryBuy);
     $("div#panel")[0].appendChild(document.createElement('br'));
+    $("div#panel")[0].appendChild(document.createElement('br'));
+    $("div#panel")[0].appendChild(div);
 };
 
 //a callback function to check if you can buy something;
@@ -89,6 +106,9 @@ window.gm.defaultCanBuy =function(itemid,cost){
 window.gm.defaultPostBuy =function(itemid,cost){
     window.gm.player.Inv.removeItem('Money',cost);
     $("div#choice")[0].innerHTML='You bought '+ itemid; 
+    $("div#choice")[0].classList.remove("div_alarm");
+    $("div#choice")[0].offsetWidth; //this forces the browser to notice the class removal
+    $("div#choice")[0].classList.add("div_alarm");
 };
 window.gm.cbCanBuyPerverse = function(itemid,cost,pervcost) {
     var result = window.gm.defaultCanBuy(itemid,cost);
@@ -99,11 +119,11 @@ window.gm.cbCanBuyPerverse = function(itemid,cost,pervcost) {
     return(result);
 };
 //this will add item to player; money-deduct or other cost has to be done in cbPostBuy ! 
-window.gm.buyFromShop=function(itemid, itemleft,cbPostBuy=null) {
-    window.gm.player.Inv.addItem(itemid);   //Todo item or wardrobe
+window.gm.buyFromShop=function(itemid, count,cbPostBuy=null) {
+    window.gm.player.Inv.addItem(itemid,count);   //Todo item or wardrobe
     if(cbPostBuy) cbPostBuy(itemid);
     //window.gm.refreshScreen(); dont refresh fullscreen or might reset modified textoutput
-    renderToSelector("#sidebar", "sidebar"); //just update sidebar for moneychange
+    window.gm.updateOtherPanels(); //just update other panels
 };
 //prints a link that when clicked picksup an item and places it in the inventory, if itemleft is <0, no link appears
 window.gm.printPickupAndClear= function(itemid, desc,itemleft,cbAfterPickup=null) {
@@ -117,7 +137,7 @@ window.gm.printPickupAndClear= function(itemid, desc,itemleft,cbAfterPickup=null
 };
 window.gm.pickupAndClear=function(itemid, desc,itemleft,cbAfterPickup=null) {
     window.gm.player.Inv.addItem(itemid);
-    window.gm.pushLog("added "+itemid+" to inventory.</br>");
+    //window.gm.pushLog("added "+itemid+" to inventory.</br>");
     if(cbAfterPickup) cbAfterPickup.call();
     window.gm.refreshScreen();
 };

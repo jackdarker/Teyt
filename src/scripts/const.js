@@ -12,6 +12,10 @@ function createItemLookups(){
     window.gm.ItemsLib['Money'] = new Money();
     window.gm.ItemsLib['LighterDad'] = new LighterDad();// { name: 'Lighter from Dad', desc: 'I got this lighter from my real dad.', usable:defaultCanUse, use:defaultOnUse },
     window.gm.ItemsLib['LaptopPS'] = new LaptopPS();//{name: 'Laptop-PS', desc:'Power converter for laptop.', usable: function(){return ({OK: false, msg:'not usable on its own'})},use: defaultNoUse};
+    window.gm.ItemsLib['Battery'] = new Battery();
+    window.gm.ItemsLib['Dildo_small'] = new Dildo_small();
+    // consumables
+    window.gm.ItemsLib['Lube'] = new Lube();
     window.gm.ItemsLib['CanOfCoffee'] = new CanOfCoffee(); // {name: 'Can of coffee', desc: 'Cold coffee in a can. Tasty? Not really!', usable:canConsumeCoffee, use:onUseCoffee };
     window.gm.ItemsLib['SimpleFood'] = new SimpleFood(); //{name: 'food ration', desc: 'You can eat this.', usable:defaultCanUse, use:defaultOnUse };
     //.. and Wardrobe
