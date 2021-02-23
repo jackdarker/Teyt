@@ -6,7 +6,7 @@ At the doorsteps of your home. </br>
 <div>Where would you like to go?</br>
 [[Living_Room]]   [[Your Bedroom]]  [[Moms Bedroom]] [[Kitchen]]  [[Garden]] </br>
 [[Into the city]]</br></div>
-</article><article class="logpanel" id="LogPanel"></article></section>
+</article><article id="LogPanel"></article></section>
 
 
 :: Kitchen {"position":"1231,613","size":"100,100"}
@@ -27,7 +27,7 @@ Mom will take care to resupply the fridge. But she might be disappointed if you 
 <%}%>
 Where would you like to go?</br>
 [[Living_Room]]   [[Hallway|Home]]</br>
-</article><article class="logpanel" id="LogPanel"></article></section>
+</article><article id="LogPanel"></article></section>
 
 
 :: Moms Bedroom
@@ -38,7 +38,7 @@ This is the bedroom of your mom.
 A double bed is there with [[nightstands|moms_treasure]] on each side. <br>
 <a0 onclick='switchChar(this)'>Switch Char</a></br>
 [[Hallway|Home]]</br>
-</article><article class="logpanel" id="LogPanel"></article></section>
+</article><article id="LogPanel"></article></section>
 <script>
 function switchChar(elmnt) {
 	if(window.story.state.vars.activePlayer ==='Ratchel') {
@@ -57,7 +57,7 @@ function switchChar(elmnt) {
 In one of the nightstand you find some handcuffs.They look thorough but you think they just might be used for some bedplay.</br>
 <a0 onclick='useHandcuff(this)'>Play with them</a></br>
 [[Back|_back]]</br>
-</article><article class="logpanel" id="LogPanel"></article></section>
+</article><article id="LogPanel"></article></section>
 <script>
 function useHandcuff(elmnt) {
 	window.gm.player.Wardrobe.addItem('Handcuffs');
@@ -89,7 +89,7 @@ Where do you want to go ? </br>
 <div class="red">You should at least cover up your unmentionables before leaving your room.</div></br>
 <% } else { %>
 [[Hallway|Home]]</br> <%}%>
-</article><article class="logpanel" id="LogPanel"></article></section>
+</article><article id="LogPanel"></article></section>
 
 :: SleepHour
 <section> 
@@ -97,7 +97,7 @@ Where do you want to go ? </br>
 You slept for an hour.</br>
 <% window.gm.sleep((window.gm.getTimeStruct().hour+1)*100);%>
 [[Next|<%=s.player.location%>]]</br>
-</article><article class="logpanel" id="LogPanel"></article></section>
+</article><article id="LogPanel"></article></section>
 
 
 :: SleepUntilMorning
@@ -106,7 +106,7 @@ You slept for an hour.</br>
 You fall into your bedsheets and sleep until your smartphone buzzes you out of your dreams.</br>
 <%window.gm.sleep(700);%>
 [[Next|<%=s.player.location%>]]</br>
-</article><article class="logpanel" id="LogPanel"></article></section>
+</article><article id="LogPanel"></article></section>
 
 
 :: SleepUntilEvening
@@ -115,7 +115,7 @@ You fall into your bedsheets and sleep until your smartphone buzzes you out of y
 You fall into your bedsheets and sleep until your smartphone buzzes you out of your dreams.</br>
 <%window.gm.sleep(1800);%>
 [[Next|<%=s.player.location%>]]</br>
-</article><article class="logpanel" id="LogPanel"></article></section>
+</article><article id="LogPanel"></article></section>
 
 
 :: TodoList
@@ -125,7 +125,7 @@ Picking up your Todo-List you read:</br>
 <%=window.gm.printTodoList()%>
 <%=window.story.render('qLaptop_Status')%>
 [[Next|<%=s.player.location%>]]</br>
-</article><article class="logpanel" id="LogPanel"></article></section>
+</article><article id="LogPanel"></article></section>
 
 
 :: Living_Room
@@ -143,18 +143,18 @@ Your phone rings with an unknown number. [[Answer call|Dogsit_FirstCallBack]]
 
 Where would you like to go?</br>
 [[Kitchen]] [[Hallway|Home]] </br>
-</article><article class="logpanel" id="LogPanel"></article><script>
+</article><article id="LogPanel"></article><script>
 function getMoney(elmnt,val) {
 	elmnt.replaceWith("You shouldnt steal that money, should you?");
 }
 </script></section>
 
-:: Cabinet {"position":"960,752.3000030517578","size":"100,100"}
+:: Cabinet
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 There is nothing here
 [[Living_Room]]
-</article><article class="logpanel" id="LogPanel"></article></section>
+</article><article id="LogPanel"></article></section>
 
 
 :: Garden
@@ -174,4 +174,4 @@ You remeber that you took the shovel from here.</br>
 <%}%>
 Where would you like to go?</br>
 [[Hallway|Home]]</br>
-</article><article class="logpanel" id="LogPanel"></article></section>
+</article><article id="LogPanel"></article></section>

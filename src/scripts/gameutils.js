@@ -48,11 +48,12 @@ window.gm.printPassageLink= function(label,target) {
     return("<a href=\"javascript:void(0)\" data-passage=\""+target+"\">"+label+"</a></br>");
 };
 //dynamically build a link representing a buy option including display of cost and restriction
+//count specifys how any items you get for cost
 //cbCanBuy points to a function fn(itemid) that returns if can buy {OK:false,msg:'too expensive'} 
 //cbPostBuy points to a function fn(itemid) that is called after buying ; 
 window.gm.printShopBuyEntry= function(itemid,count,cbCanBuy,cbPostBuy=null){
     var desc2=itemid+ 'out of stock</br>';
-    var entry = document.createElement('a');
+    var entry = document.createElement('a');    // entry is a link that will expand to item description
     entry.id=itemid;
     entry.href='javascript:void(0)';
     var showDesc=function($event){var elmt =document.querySelector("div#"+$event.srcElement.id);
@@ -62,7 +63,7 @@ window.gm.printShopBuyEntry= function(itemid,count,cbCanBuy,cbPostBuy=null){
     var div = document.createElement('div');
     div.id=itemid;
     div.hidden=true;
-    var entryBuy = document.createElement('a');
+    var entryBuy = document.createElement('a'); //entryBuy is a link that actual buys something or shows why not
     entryBuy.id=itemid;
     entryBuy.href='javascript:void(0)';
     entryBuy.textContent="Buy";
@@ -102,6 +103,19 @@ window.gm.defaultCanBuy =function(itemid,cost){
     };
     return(result);
 };
+window.gm.defaultCanSell =function(itemid,cost){
+    var result ={OK:true,msg:''};   //todo check equipped item
+    result.msg='sell for '+cost+'$';
+    return(result);
+};
+//requires a <div id='choice'> </div> for displaying bought-message
+window.gm.defaultPostSell =function(itemid,cost){
+    window.gm.player.Inv.addItem('Money',cost);
+    $("div#choice")[0].innerHTML='You sold '+ itemid; 
+    $("div#choice")[0].classList.remove("div_alarm");
+    $("div#choice")[0].offsetWidth; //this forces the browser to notice the class removal
+    $("div#choice")[0].classList.add("div_alarm");
+};
 //requires a <div id='choice'> </div> for displaying bought-message
 window.gm.defaultPostBuy =function(itemid,cost){
     window.gm.player.Inv.removeItem('Money',cost);
@@ -119,11 +133,58 @@ window.gm.cbCanBuyPerverse = function(itemid,cost,pervcost) {
     return(result);
 };
 //this will add item to player; money-deduct or other cost has to be done in cbPostBuy ! 
-window.gm.buyFromShop=function(itemid, count,cbPostBuy=null) {
+window.gm.buyFromShop=function(itemid, count,cbPostBuy) {
     window.gm.player.Inv.addItem(itemid,count);   //Todo item or wardrobe
     if(cbPostBuy) cbPostBuy(itemid);
     //window.gm.refreshScreen(); dont refresh fullscreen or might reset modified textoutput
     window.gm.updateOtherPanels(); //just update other panels
+    renderToSelector("#panel", "listsell");
+};
+//this will remove item from player; money-deduct or other cost has to be done in cbPostSell ! 
+window.gm.sellToShop=function(itemid, count,cbPostSell) {
+    window.gm.player.Inv.removeItem(itemid,count);
+    if(cbPostSell) cbPostSell(itemid);
+    //window.gm.refreshScreen(); dont refresh fullscreen or might reset modified textoutput
+    window.gm.updateOtherPanels(); //just update other panels
+    renderToSelector("#panel", "listsell");
+};
+//dynamically build a link representing a sell option including display of cost
+//count defines how many of this item you have to trade in
+window.gm.printShopSellEntry= function(itemid,count,cbCanSell,cbPostSell){
+    var _available = window.gm.player.Inv.countItem(itemid); //only items the player has can be sold
+    if(_available<=0) return; 
+    var entry = document.createElement('a');
+    entry.id=itemid;
+    entry.href='javascript:void(0)';
+    var showDesc=function($event){var elmt =document.querySelector("div#"+$event.srcElement.id);
+        elmt.innerHTML =window.gm.ItemsLib[$event.srcElement.id].desc+"</br>";
+        elmt.toggleAttribute("hidden");};
+    entry.addEventListener("click", showDesc, false);
+    var div = document.createElement('div');
+    div.id=itemid;
+    div.hidden=true;
+    var entrySell = document.createElement('a'); //a link where you can sell
+    entrySell.id=itemid;
+    entrySell.href='javascript:void(0)';
+    entrySell.textContent="Sell";
+    var desc2 = itemid+" (x"+count+")";
+    if(_available>=count) {
+        var result = cbCanSell(itemid);
+        if(result.OK===false) {
+            desc2 = desc2 + " "+ result.msg;
+        } else {
+            desc2+= " "+result.msg;
+            var foo = function($event){window.gm.sellToShop(itemid,count,cbPostSell)};
+            entrySell.addEventListener("click", foo, false);
+        }
+    } else desc2 = desc2 + " not enough items"
+
+    entry.textContent=desc2;
+    $("div#panel")[0].appendChild(entry);
+    $("div#panel")[0].appendChild(entrySell);
+    $("div#panel")[0].appendChild(document.createElement('br'));
+    $("div#panel")[0].appendChild(document.createElement('br'));
+    $("div#panel")[0].appendChild(div);
 };
 //prints a link that when clicked picksup an item and places it in the inventory, if itemleft is <0, no link appears
 window.gm.printPickupAndClear= function(itemid, desc,itemleft,cbAfterPickup=null) {

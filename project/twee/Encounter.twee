@@ -5,7 +5,7 @@ Get ready...
 <%window.gm.initCombat('Mole');%>
 A <%=window.story.state.enemy.name%> appears ! </br>
 [[Next|EncounterStartTurn]]
-</article><article class="logpanel" id="LogPanel"></article></section>
+</article><article id="LogPanel"></article></section>
 
 :: EncounterStartTurn
 <section> 
@@ -39,7 +39,7 @@ A <%=window.story.state.enemy.name%> appears ! </br>
 <%}}%>
 
 <div><output></output></div></br>   <!--message is rendered here-->
-</article><article class="logpanel" id="LogPanel"></article>
+</article><article id="LogPanel"></article>
 <script>
 window.gm.printCombatHud();
 </script>

@@ -147,7 +147,7 @@ for(var i=0;i<maxSlots;i++){
   %><%=window.gm.printItem(id,inv.countItem(id).toString()+'x '+inv.getItem(id).desc+' '+inv.getItem(id).usable(inv).msg)%><%
 } 
 %>
-</article><article class="logpanel" id="LogPanel"></article></section>
+</article><article id="LogPanel"></article></section>
 
 
 :: Relations [back]
@@ -156,7 +156,7 @@ for(var i=0;i<maxSlots;i++){
 [[Back|_back]]</br>
 <%=s.player.name%> relations: </br></br>
 <%=window.gm.printRelationSummary()%>
-</article><article class="logpanel" id="LogPanel"></article></section>
+</article><article id="LogPanel"></article></section>
 
 
 :: Player_Dashboard [back]
@@ -166,7 +166,7 @@ for(var i=0;i<maxSlots;i++){
 Here you can check and modify several options: </br>
 Your outfit can only be changed by using a wardrobe.</br>
 [[Close|_back]] [[Status]] [[Relations]] [[Inventory]] [[TodoList]]</br>
-</article><article class="logpanel" id="LogPanel"></article></section>
+</article><article id="LogPanel"></article></section>
 
 
 :: Wardrobe [back]
@@ -185,7 +185,7 @@ for(var i=0;i<maxSlots;i++){
   %><%=window.gm.printEquipment(id,inv.getItem(id).desc)%><%
 } 
 %>
-</article><article class="logpanel" id="LogPanel"></article></section>
+</article><article id="LogPanel"></article></section>
 
 :: Settings [back]
 <section> 
@@ -194,7 +194,7 @@ for(var i=0;i<maxSlots;i++){
 <button onclick='window.gm.printCombatScreen()'>test a</button>
 <button onclick='onimage("assets/favicon.png")'>test b</button>
 [[Back|_back]]</br>
-</article><article class="logpanel" id="LogPanel"></article></section>
+</article><article id="LogPanel"></article></section>
 
 :: Settings2 [back]
 <section> 
@@ -215,7 +215,7 @@ img.src = imgsrc;//'https://twinery.org/homepage/img/logo.svg';   //todo the loa
       onimage("assets/bird.gif");
     </script>
 [[Back|_back]]</br>
-</article><article class="logpanel" id="LogPanel"></article></section>
+</article><article id="LogPanel"></article></section>
 
 
 :: Status [back]
@@ -224,19 +224,59 @@ img.src = imgsrc;//'https://twinery.org/homepage/img/logo.svg';   //todo the loa
 Status of <%=s.player.name%>:</br> 
 <%=window.gm.printEffectSummary()%>
 [[Back|_back]]</br>
-</article><article class="logpanel" id="LogPanel"></article></section>
+</article><article id="LogPanel"></article></section>
 
+
+:: listsell
+<!--this fragment can be used to setup a list of items to sell:
+add into passage: <div id="choice"></div></br></br> <div id="panel"></div></br></br>   
+in <script> define variable _Entrys and specify wares to sell
+and run renderToSelector("#panel", "listsell"); 
+-->
+<script>
+//define _Entrys in your passage lile this:
+//var _Entrys = [{id:"Crowbar",count:1,cost:25})];
+for(var i=0;_Entrys.length>i;i++) {
+    var entry=_Entrys[i];
+    let _id = entry.id;
+    let _cost=entry.cost;
+    window.gm.printShopSellEntry(_id,entry.count,
+    cbCanBuy=(function(itemid){return window.gm.defaultCanSell(itemid,_cost)}),
+    cbPostBuy=(function(itemid){window.gm.defaultPostSell(itemid,_cost)}));
+}
+</script>
+
+
+:: listbuy
+<!--this fragment can be used to setup a list of items to buy:
+add into passage: <div id="choice"></div></br></br> <div id="panel"></div></br></br>   
+in <script> define variable _Entrys and specify wares to buy
+and run renderToSelector("#panel", "listbuy"); 
+-->
+<script>
+//define _Entrys in your passage lile this:
+//var _Entrys = [{id:"Dildo_small",count:1,cost:25,costPerv:14}];
+for(var i=0;_Entrys.length>i;i++) {
+    var entry=_Entrys[i];
+    let _id = entry.id;
+    let _cost=entry.cost;
+    let _costPerv = entry.costPerv;
+    window.gm.printShopBuyEntry(_id,entry.count,
+    cbCanBuy=(function(itemid){return window.gm.cbCanBuyPerverse(itemid,_cost,_costPerv)}),
+    cbPostBuy=(function(itemid){window.gm.defaultPostBuy(itemid,_cost)}));
+}
+</script>
 
 :: PassageTemplate [template] {"position":"253,496.5","size":"100,100"}
 The page should be setup like this:
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 content here !
-</article><article class="logpanel" id="LogPanel"></article></section>
+</article><article id="LogPanel"></article></section>
 
 :: SubpanelTemplate [back]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 If this is a subpanel you can use back-tag and _back-Link
 [[Back|_back]]</br>
-</article><article class="logpanel" id="LogPanel"></article></section>
+</article><article id="LogPanel"></article></section>

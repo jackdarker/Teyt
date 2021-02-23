@@ -6,30 +6,19 @@ You are actually at [[<%=s.player.location%>]].</br>
 As you wander around you find a [[Bookstore]], a fine grocerie , [[Boots and Shoes]].</br>
 If you need some tools for your hobby you should check the [[craft store]].</br>
 There are also [[Restrooms]].</br>
-<div id="choice"></div></br>
-</br>
-<div id="panel"></div></br>
-</br>
+<div id="choice"></div></br></br>   <!--display buy message-->
+<div id="panel"></div></br></br>    <!--display wares list-->
 Where would you like to go from here?</br>
 [[Mall 1F|Mall Floor 1]]
 [[Mall -1F|Mall Floor -1]]
 [[Exit|Into the city]]
-</article><article class="logpanel" id="LogPanel"></article></section>
+</article><article id="LogPanel"></article></section>
 <script>
 var _Entrys = [];
 _Entrys.push({id:"Lube",count:10,cost:4,costPerv:10});
 _Entrys.push({id:"Battery",count:4,cost:4,costPerv:0});
 _Entrys.push({id:"Dildo_small",count:1,cost:25,costPerv:14});
-//
-for(var i=0;_Entrys.length>i;i++) {
-    var entry=_Entrys[i];
-    let _id = entry.id;
-    let _cost=entry.cost;
-    let _costPerv = entry.costPerv;
-    window.gm.printShopBuyEntry(_id,entry.count,
-    cbCanBuy=(function(itemid){return window.gm.cbCanBuyPerverse(itemid,_cost,_costPerv)}),
-    cbPostBuy=(function(itemid){window.gm.defaultPostBuy(itemid,_cost)}));
-}
+renderToSelector("#panel", "listbuy"); 
 </script>
 
 :: Mall Floor 1
@@ -48,7 +37,7 @@ if(window.gm.player.Stats.get('perversion').value<=10) {%>
 <%} else {%> [[Adult books and tools]] </br> <%} %>
 Where would you like to go from here?</br>
 [[Mall 0F|Mall Floor 0]]
-</article><article class="logpanel" id="LogPanel"></article></section>
+</article><article id="LogPanel"></article></section>
 
 :: Mall Floor -1
 <section> 
@@ -59,7 +48,7 @@ This level of the mall seems to be reserved for the less fancy business. </br>
 Most of the space is occupied by the usual [[electronics store]] and a [[food store]].
 Where would you like to go from here?</br>
 [[Mall 0F|Mall Floor 0]]
-</article><article class="logpanel" id="LogPanel"></article></section>
+</article><article id="LogPanel"></article></section>
 
 :: Adult books and tools
 <section> 
@@ -79,7 +68,7 @@ In a more shady corner you find a shop whose windows are just coverd with dark r
 Its name is [[Adult books and tools]] and there is an "adults only" sign at the entrance.</br>
 Where would you like to go from here?</br>
 [[Mall 0F|Mall Floor 0]]
-</article><article class="logpanel" id="LogPanel"></article></section>
+</article><article id="LogPanel"></article></section>
 
 
 :: Buy [back]
@@ -87,4 +76,4 @@ Where would you like to go from here?</br>
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 
 [[Back|_back]]</br>
-</article><article class="logpanel" id="LogPanel"></article></section>
+</article><article id="LogPanel"></article></section>

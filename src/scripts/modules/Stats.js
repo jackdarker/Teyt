@@ -74,10 +74,11 @@ export class StatsDictionary extends Inventory {  //Todo a collection of Stats i
 //class for an Attribute
 class Stat {
     static dataPrototype() {    
-        return({id: '', base: 0,value: 0, limits: [],modifier:[], modifys:[]});
+        return({id: '', base: 0,value: 0, limits: [],modifier:[], modifys:[], hidden:0});
         //limit = {id: min: max:}   limit to apply to value and base
         //modifier {id: calc:}      Stat that modifys value, calc is function(context,data)=> newvalue
         //modifys {id:}         point to the Stats that have modifiers from this stat
+        //hidden 0 = visible, 1= name unreadable, 2= value unreadable, 4= hidden
     }
     //this is called to update value of the stat and will trigger calculation of dependend stats 
     static Calc(context, id) {
@@ -279,7 +280,7 @@ export class Effects extends Inventory {  //Todo a collection of Stats is simili
                 return;
             }  
         }
-        //or if there are similiar effects try to erge with them
+        //or if there are similiar effects try to merge with them
         var _k = this.findEffect(effect.name);
         for(var i=0;i<_k.length;i++) {
             res =window.gm.EffectLib[this.list[__k].name].merge(this,this.list[_i],effect,effect.dataPrototype());
@@ -329,7 +330,8 @@ class Effect {
     //static get name() { return('Effect');}
     //static get desc() {return(Effect.name);}
     static dataPrototype() {
-        return({id:'xxx', name: Effect.name, ts: 0, duration:0});
+        return({id:'xxx', name: Effect.name, ts: 0, duration:0,hidden:0});
+        //hidden 0 = visible, 1= name unreadable, 2= value unreadable, 4= hidden
     }
     //is called when a effect is applied to check if the new effect can be combined with an exisitng one
     //return null if no merge occured
@@ -386,7 +388,7 @@ class effNotTired extends Effect {
     static get name() { return('NotTired');}
     static get desc() {return(effNotTired.name);}
     static dataPrototype() {
-        return({id:effNotTired.name, name: effNotTired.name, time: 0, duration:120});
+        return({id:effNotTired.name, name: effNotTired.name, time: 0, duration:120,hidden:4});
     }
     static onTimeChange(context,data,time) {
         //Tired after xxh
@@ -419,7 +421,7 @@ class effTired extends Effect {
     static get name() { return('Tired');}
     static get desc() {return(effTired.name);}
     static dataPrototype() {
-        return({id:effTired.name, name: effTired.name, time: 0, duration:120});
+        return({id:effTired.name, name: effTired.name, time: 0, duration:120,hidden:0});
     }
     static onTimeChange(context,data,time) {  
         //duration not used -> will never expire unless replaced
@@ -451,7 +453,7 @@ class skCooking extends Effect {
     static get name() { return('Cooking');}
     static get desc() {return(skCooking.name);}
     static dataPrototype() {
-        return({id:skCooking.name, name: skCooking.name, time: 0, duration:0});
+        return({id:skCooking.name, name: skCooking.name, time: 0, duration:0,hidden:0});
     }
     static onTimeChange(context,data,time) {    }
     static onApply(context,data){    }
@@ -466,7 +468,7 @@ class skAnalReceiving extends Effect {
     static get name() { return('AnalReceiving');}
     static get desc() {return(skAnalReceiving.name);}
     static dataPrototype() {
-        return({id:skAnalReceiving.name, name: skAnalReceiving.name, time: 0, duration:0});
+        return({id:skAnalReceiving.name, name: skAnalReceiving.name, time: 0, duration:0,hidden:0});
     }
     static onTimeChange(context,data,time) {    }
     static onApply(context,data){    }

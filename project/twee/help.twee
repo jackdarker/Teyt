@@ -6,7 +6,7 @@ Here you can find some information about the gameplay.</br></br>
 [[Basics|Help_Basics]]</br>
 [[What should I do, where should I go|Help_Quest]]</br>
 [[Im stuck!|Help_Fixes]]</br>
-</article><article class="logpanel" id="LogPanel"></article></section>
+</article><article id="LogPanel"></article></section>
 
 
 :: Help_Background
@@ -23,7 +23,7 @@ Here is a task-list for you: </br>
 5. dont eat yellow snow</br>
 </br>
 [[Next|<%=s.player.location%>]]</br>
-</article><article class="logpanel" id="LogPanel"></article></section>
+</article><article id="LogPanel"></article></section>
 
 
 :: Help_Basics
@@ -34,7 +34,7 @@ Energy can be recovered by sleeping. Also some activities, food or drugs can res
 Use the sleep-option in your own bedroom to rest.</br>
 </br>
 [[Next|<%=s.player.location%>]]</br>
-</article><article class="logpanel" id="LogPanel"></article></section>
+</article><article id="LogPanel"></article></section>
 
 
 :: Help_Quest
@@ -44,7 +44,7 @@ In your bedroom on your desk you can find a todo-list that gives some hint on wh
 For the beginning try to explore the city.</br>
 TODO: There isnt much more content right now!</br>
 [[Next|<%=s.player.location%>]]</br>
-</article><article class="logpanel" id="LogPanel"></article></section>
+</article><article id="LogPanel"></article></section>
 
 
 :: Help_Fixes
@@ -55,6 +55,6 @@ If you are even unable to get to this page because you see a weird plain textmes
 Im sorry but no one can help you. I will try to add some debug-log that shows some more information that you can send me.</br>
 Then I might be abel to backtrack the error.</br>
 [[Next|<%=s.player.location%>]]</br>
-</article><article class="logpanel" id="LogPanel"></article></section>
+</article><article id="LogPanel"></article></section>
 
 

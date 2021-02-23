@@ -127,7 +127,7 @@ div.scroll {
 	  grid-column: 2;
 	  grid-column-end: -1;
   }
-  .logpanel {
+  #LogPanel {
     background: #e4e4e4;
   }
 

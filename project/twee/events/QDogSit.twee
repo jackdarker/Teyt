@@ -25,7 +25,7 @@ if(s.vars.qDogSit<0x200) { s.vars.qDogSit=0x100; %>
     [[Call Dogsit|Dogsit_NewCall]]</br>
 <% } %>
 [[Ignore the ad|Park]]</br>
-</article><article class="logpanel" id="LogPanel"></article></section>
+</article><article id="LogPanel"></article></section>
 
 
 :: Dogsit_FirstCall
@@ -37,7 +37,7 @@ The ringing-sound is repeated several times but there is no one picking up the c
 After entering the number manually (just to make sure) you again got no connection.<br>
 Darn. Maybe they are all busy caring for dogs. </br>
 [[Ignore the ad|Park]]</br>
-</article><article class="logpanel" id="LogPanel"></article> 
+</article><article id="LogPanel"></article> 
 </section>
 
 :: Dogsit_FirstCallBack
@@ -53,7 +53,7 @@ Todo: explain job</br>
 <a href="javascript:void(0)" id="no" onclick='choice(this,"div#choice")'>I not sure about this.</a></br>
 </div>
 [[Ignore the ad|<%=s.player.location%>]]</br>
-</article><article class="logpanel" id="LogPanel"></article></section>
+</article><article id="LogPanel"></article></section>
 <script>
 function choice(elmt,replaceThis) {
 	var msg ='';
@@ -75,4 +75,4 @@ function choice(elmt,replaceThis) {
 <% s.player.location=window.passage.name;%>
 Ask for a new job.
 [[Ignore the ad|Park]]</br>
-</article><article class="logpanel" id="LogPanel"></article></section>
+</article><article id="LogPanel"></article></section>

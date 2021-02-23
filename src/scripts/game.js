@@ -43,6 +43,8 @@ window.gm.initGame= function(forceReset) {
         qExploredCity : 0,  //see passage into city
         qUnlockPark : 0,
         qUnlockMall : 0,
+        qUnlockBeach : 0,
+        qUnlockDowntown : 0,
         qUnlockRedlight : 0,
         qUnlockBeach : 0
         }; 
@@ -205,13 +207,17 @@ window.gm.sleep=function(until) {
 //Todo
 window.gm.rollExplore= function() {
   var s=window.story.state;
-  var places=[];    
+  var places=[];   
+  var r = _.random(0,100);
   //todo:depending of your actual location you have a chance to find connected locations or end up in a known one
   if(s.player.location=='Park')   places = ['Mall','Beach'];
   if(s.player.location=='Mall')   places = ['Park','Beach','Downtown']; 
   if(s.player.location=='Beach')   places = ['Park','Mall']; 
-  if(places.length==0) places = ['Park']; //fallback if unspeced location
-  var r = _.random(1, places.length)-1; //chances are equal
+  if(s.player.location=='Downtown')   {
+    places.push('Pawn shop'); 
+  }
+  if(places.length==0) places = [s.player.location]; //fallback if unspeced location
+  r = _.random(1, places.length)-1; //chances are equal
   window.gm.addTime(20);
   window.story.show(places[r]);
 };
