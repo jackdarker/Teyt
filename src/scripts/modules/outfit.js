@@ -115,7 +115,10 @@ export class Outfit {
                 this.list.push({id:''});        // {id:'Leggings'}
             }
         }
+        //window.storage.registerConstructor(Outfit);
     }
+    //toJSON() {return window.storage.Generic_toJSON("Outfit", this); };
+    //static fromJSON(value) { return window.storage.Generic_fromJSON(Outfit, value.data);};
     postItemChange(inv,id,operation,msg) {
         window.gm.pushLog('Outfit: '+operation+' '+id+' '+msg+'</br>');
     }

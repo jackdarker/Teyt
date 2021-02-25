@@ -1,12 +1,13 @@
 "use strict";
-
-
-
+//an Inventory-Component to store items
 class Inventory {
     constructor(owner,externlist) {
-        this.parent = owner;
+        this.parent = owner;        //todo stattdessen get parent() {this._parent()} ??
         this.list = externlist ? externlist : [];
+      //  window.storage.registerConstructor(Inventory);
     }
+    //toJSON() {return window.storage.Generic_toJSON("Inventory", this); };
+    //static fromJSON(value) { return window.storage.Generic_fromJSON(Inventory, value.data);};
     postItemChange(inv,id,operation,msg) {
         window.gm.pushLog('Inventory: '+operation+' '+id+' '+msg+'</br>');
     }

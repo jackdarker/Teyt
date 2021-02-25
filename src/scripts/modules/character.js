@@ -28,10 +28,18 @@ export class Character {
         stAgility.setup(this.Stats,3,100),stStrength.setup(this.Stats,3,100),stEndurance.setup(this.Stats,3,100);
 
         this.Effects.addItem('Tired',window.gm.EffectLib.NotTired); //depending on sleep Tired will be set to NotTired or Tired
+        //window.storage.registerConstructor(Character);
     }
+    //toJSON() {return window.storage.Generic_toJSON("Character", this); };
+    //static fromJSON(value) { return window.storage.Generic_fromJSON(Character, value.data);};
     get name() {
         return(this._data.name);    
     }
+    set name(name) {this._data.name=name;}
+    get location() {
+        return(this._data.location);    
+    }
+    set location(name) {this._data.location=name;}
     health() {
         return({value:this.Stats.get('health').value, max:this.Stats.get('healthMax').value, min:0});
     }
