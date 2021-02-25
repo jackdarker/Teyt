@@ -9,9 +9,29 @@ window.gm.getSaveVersion= function(){
   var version = [0,1,0];
     return(version);    
 };
+class Bar {
+  constructor(x) {
+    this.__type="Bar";
+    this._x = x;
+  }
+ toJSON() {return window.storage.Generic_toJSON("Bar", this); };
+ static fromJSON(value) { return window.storage.Generic_fromJSON(Bar, value.data);};
+}
 
+class Foo {
+  constructor(a, b) {
+    this.__type = 'Foo';
+    this.a = a, this.b = b;
+    this._bar = new Bar('fooboo');
+  }
+  toJSON() {return window.storage.Generic_toJSON("Foo", this); };
+  static fromJSON(value) { return window.storage.Generic_fromJSON(Foo, value.data);};
+  setA(a) {   this.a = -1 * a;  };
+  print() {      console.log(this.a);    };
+}
 window.gm.initGame= function(forceReset) {
   createItemLookups();
+  window.gm.testsaveReviver();
     //this does not work because hidden is called to late
     /*$(window).on('sm.passage.hidden', function(event, eventObject) {
       
@@ -39,8 +59,8 @@ window.gm.initGame= function(forceReset) {
         activePlayer : 'Ratchel', //id of the character that the player controls currently
         //queststates
         qLaptop : 0,   // see passage _Laptop_
-        qDogSit : 0,   // see 
-        qExploredCity : 0,  //see passage into city
+        qDogSit : 0,   // see park
+        qUnlockCampus : 0,  //see passage into city
         qUnlockPark : 0,
         qUnlockMall : 0,
         qUnlockBeach : 0,

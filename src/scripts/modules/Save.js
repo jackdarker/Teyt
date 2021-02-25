@@ -2,12 +2,60 @@
 
 //operations for save/reload
 
-window.onload = function() {
-  
-  
+// ??window.onload = function() {};
+
+// reviver demo 
+//*
+
+
+window.gm.testsaveReviver = function () {
+  window.storage.constructors.Bar = Bar;
+  window.storage.constructors.Foo = Foo;
+  var before = {
+    foo: new Foo(21, 44)
+  };
+  before.foo.print(); // Stringify it with a replacer:
+  var str = JSON.stringify(before); // Show that
+  console.log(str); // Re-create it with use of a "reviver" function
+  var after = JSON.parse(str, window.storage.Reviver);
+  after.foo.print();
 };
+/*window.gm.testsaveAssign = function () {
+  var before = {
+    foo: new Foo(21, 44)
+  };
+  before.foo.print(); // Stringify it with a replacer:
+  var str = JSON.stringify(before); // Show that
+  console.log(str); // Re-create it with use of a "reviver" function
+  var after = window.storage.assignType(str);
+  after.foo.print();
+};*/
 
 window.storage = {  
+  /*assignType: function(object){
+    if(object && typeof(object) === 'object' && window[object.__type]) {
+        object = window.storage.assignTypeRecursion(object.__type, object);
+    }
+    return object;
+  },
+  assignTypeRecursion: function(type, object){
+    for (var key in object) {
+        if (object.hasOwnProperty(key)) {
+            var obj = object[key];
+            if(Array.isArray(obj)){
+                 for(var i = 0; i < obj.length; ++i){
+                     var arrItem = obj[i];
+                     if(arrItem && typeof(arrItem) === 'object' && window[arrItem.__type]) {
+                         obj[i] = window.storage.assignTypeRecursion(arrItem.__type, arrItem);
+                     }
+                 }
+            } else  if(obj && typeof(obj) === 'object' && window[obj.__type]) {
+                object[key] = window.storage.assignTypeRecursion(obj.__type, obj);
+            }
+        }
+    }
+    return Object.assign(new window[type](), object);
+  },*/
   // A list of constructors the smart reviver should know about  
   // you need to register the class of each object that you want to serialize to this list
   // and each class also has to have a method toJSON and static method fromJSON (calling Generic_-versions, see below )
