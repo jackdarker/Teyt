@@ -47,15 +47,16 @@ window.gm.initGame= function(forceReset) {
         qUnlockDowntown : 0,
         qUnlockRedlight : 0,
         qUnlockBeach : 0,
-        debugInv: new Inventory(null)
+        debugInv: new Inventory()
         }; 
+        s.vars.debugInv._parent = (function(){ return function(){return null;}}());
         s.vars.debugInv.addItem('Money',200);
 
     }
     if (!s.enemy||forceReset) { //actual/last enemy
       s.enemy = Character.defaultData();
-      s.enemy.pic = 'assets/mole.jpg';
-      window.gm.enemy = new Character(s.enemy);
+      //window.gm.enemy = new Character(s.enemy);
+      s.enemy = window.gm.enemy = new Character();
     }
     if (!s.combat||forceReset) { //see encounter & combat.js
       s.combat = {
@@ -73,37 +74,30 @@ window.gm.initGame= function(forceReset) {
       };
     }
     if (!s.Cyril||forceReset) {  //alternative player character
-      s.Cyril = Character.defaultData(); //get default struct and add some special data
-      s.Cyril.name = 'Cyril',
-      s.Cyril.skillPoints = 0,    //no. of free skillpoints on game-start
-      //perklevels ,name should match perkId
-      s.Cyril.skSporty = 0,
-      s.Cyril.skCook = 0,
-      s.Cyril.skSlacker = 0,
-      s.Cyril.skMoneymaker = 0,
-      s.Cyril.skTechy = 0,
-
-      window.gm.Cyril = new Character(s.Cyril);
+      //s.Cyril = Character.defaultData(); //get default struct and add some special data
+      //s.Cyril.name = 'Cyril';
+      //window.gm.Cyril = new Character(s.Cyril);
+      window.gm.Cyril = new Character()
       //add some basic inventory
       window.gm.Cyril.Wardrobe.addItem('Jeans');
       window.gm.Cyril.Wardrobe.addItem('Tank-shirt');
       window.gm.Cyril.Outfit.addItem('Jeans');
       window.gm.Cyril.Outfit.addItem('Tank-shirt');
       window.gm.Cyril.Stats.increment('strength',3);
-      //delete window.gm.Cyril;     Todo we could delete the character-object after story-data is initialized but then we cannot use object-methods on it
+      s.Cyril = window.gm.Cyril;
+      //delete window.gm.Cyril; 
     }
     if (!s.Ratchel||forceReset) {  
-        s.Ratchel = Character.defaultData(); //get default struct and add some special data
+        /*s.Ratchel = Character.defaultData(); //get default struct and add some special data
         s.Ratchel.name = 'Ratchel',
-        s.Ratchel.skillPoints = 2,    //no. of free skillpoints on game-start
-        //perklevels ,name should match perkId
-        s.Ratchel.skSporty = 0,
+        s.Ratchel.skillPoints = 2,    //no. of free skillpoints on game-start  
+        s.Ratchel.skSporty = 0,//perklevels ,name should match perkId
         s.Ratchel.skCook = 0,
         s.Ratchel.skSlacker = 0,
         s.Ratchel.skMoneymaker = 0,
-        s.Ratchel.skTechy = 0;
-
-        window.gm.Ratchel = new Character(s.Ratchel);
+        s.Ratchel.skTechy = 0;*/
+        //window.gm.Ratchel = new Character(s.Ratchel);
+        window.gm.Ratchel = new Character();
         window.gm.Ratchel.name="Ratchel";
         window.gm.Ratchel.Effects.addItem('Cooking',window.gm.EffectLib.Cooking);
         //add some basic inventory
@@ -115,20 +109,21 @@ window.gm.initGame= function(forceReset) {
         window.gm.Ratchel.Wardrobe.addItem('Pullover');
         window.gm.Ratchel.Outfit.addItem('Jeans');
         window.gm.Ratchel.Outfit.addItem('Pullover');
+        s.Ratchel=window.gm.Ratchel;
         //delete window.gm.Ratchel;
     }      
     window.gm.switchPlayer(s.Ratchel.name); //start-player
 }
 window.gm.switchPlayer = function(playername) {
   var s = window.story.state;
-  s.player = s[playername]; 
-  window.gm.player = new Character(s.player);
+  window.gm.player= s.player = s[playername]; 
+  //window.gm.player = new Character(s.player);
   s.vars.activePlayer = playername;
 }
 window.gm.rebuildObjects= function(){ //Reconnect the objects after load!  
   var s = window.story.state;
-  window.gm.Ratchel = new Character(s.Ratchel);
-  window.gm.Cyril = new Character(s.Cyril);
+  //window.gm.Ratchel = new Character(s.Ratchel);
+  //window.gm.Cyril = new Character(s.Cyril);
   window.gm.switchPlayer(s.vars.activePlayer);
 }
 //returns timestamp sine start of game

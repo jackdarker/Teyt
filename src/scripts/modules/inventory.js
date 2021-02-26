@@ -1,13 +1,13 @@
 "use strict";
 //an Inventory-Component to store items
 class Inventory {
-    constructor(owner,externlist) {
-        this.parent = owner;        //todo stattdessen get parent() {this._parent()} ??
+    constructor(externlist) {  
         this.list = externlist ? externlist : [];
-      //  window.storage.registerConstructor(Inventory);
+      window.storage.registerConstructor(Inventory);
     }
-    //toJSON() {return window.storage.Generic_toJSON("Inventory", this); };
-    //static fromJSON(value) { return window.storage.Generic_fromJSON(Inventory, value.data);};
+    get parent() {return this._parent();}
+    toJSON() {return window.storage.Generic_toJSON("Inventory", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(Inventory, value.data);};
     postItemChange(inv,id,operation,msg) {
         window.gm.pushLog('Inventory: '+operation+' '+id+' '+msg+'</br>');
     }
@@ -30,6 +30,14 @@ class Inventory {
         var _item = window.gm.ItemsLib[id];
         if(!_item) throw new Error('unknown item: '+id);
         return (window.gm.ItemsLib[id]);
+    }
+    //returns all Ids in list
+    getAllIds() {   
+        var ids=[];
+        for(var i=0;i<this.list.length;i++) {
+            ids.push(this.list[i].id);
+        }
+        return(ids);
     }
     addItem(id,count=1) {
         var _i = this.findItemSlot(id);

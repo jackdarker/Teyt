@@ -62,7 +62,7 @@ function createItemLookups(){
     };
   
     window.gm.EnemyLib = {
-        'Mole': {name: 'Mole',pic:'assets/mole.jpg'},
+        'Mole': {name: 'Mole',pic:'assets/mole.jpg'}, //new Mole(),
         'Mechanic' : {name: 'Mechanic-Guy',pic:'assets/mechanic.jpg'}
     }
     //mapping from passage-locations to background images

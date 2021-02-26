@@ -1,9 +1,11 @@
 "use strict";
 /* bundles some operations related to combat */
 window.gm = window.gm || {};
-window.gm.initCombat = function(id) { //setup enemy for encounter
+window.gm.initCombat = function(combatSetup) { //setup enemy for encounter
     var s=window.story.state;
-    s.enemy.name = id;
+    window.gm.enemy = combatSetup();
+    s.enemy.name = window.gm.enemy.name;  
+    s.enemy.pic = window.gm.enemy.pic;
     s.combat.activeTurn =false;
     s.combat.combatState='battling';
 };
@@ -21,7 +23,8 @@ window.gm.printCombatOption= function() { //creates a list of possible moves
   return(elmt);
 
 };
-window.gm.printCombatScreen = function() { //prints scene-bg and enemy to canvas 
+//UNUSED
+window.gm.printCombatScreen = function() { //prints scene-bg and enemy to canvas      
   var canvas = document.getElementById("exampleCanvas");
   var ctx = canvas.getContext("2d");
   var img = new Image();
@@ -40,16 +43,17 @@ window.gm.triggerCombat= function(id) {  //called by combatmenu-buttons
 };
 window.gm.calcEnemyCombat= function() { //calculates which combat-cmd the enemy should execute
   var rnd = _.random(1,100);
-  var enemy = window.story.state.enemy;
+  var enemy = window.gm.enemy;
   var msg = '';
-  if(rnd>30) {
+  var move = enemy.calcCombatMove();
+  /*if(rnd>30) {
     msg +=enemy.name+" try to attack you.</br>";
     msg +=window.gm.execCombatCmd('Attack');
   } else {
     msg +=enemy.name+" takes a defensive stance.</br>";
     msg +=window.gm.execCombatCmd('Guard');
-  }
-  return(msg+"</br>");
+  }*/
+  return(move.msg+"</br>");
 };
 window.gm.execCombatCmd = function(id) { //executes a combat-cmd
   var enemy = window.gm.enemy;

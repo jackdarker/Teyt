@@ -2,7 +2,6 @@
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 Get ready...
-<%window.gm.initCombat('Mole');%>
 A <%=window.story.state.enemy.name%> appears ! </br>
 [[Next|EncounterStartTurn]]
 </article><article id="LogPanel"></article></section>

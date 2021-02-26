@@ -263,21 +263,27 @@ window.gm.printRelationSummary= function() {
     result+='</table>';
     return(result);
 };
-//prints a string listing equipped items
-window.gm.printEffectSummary= function() {
+//prints a string listing stats and effects
+window.gm.printEffectSummary= function(who='player') {
     var elmt='';
     var s= window.story.state;
     var result ='';
     var ids = [];
     result+='<table>';
-    for(var k=0;k<window.gm.player.Stats.count();k++){
-        var data = window.gm.player.Stats.get(window.gm.player.Stats.getItemId(k));
-        result+='<tr><td>'+data.id+':</td><td>'+data.value+'</td></tr>';
+    var ids =window.gm[who].Stats.getAllIds();
+    ids.sort(); //Todo better sort
+    for(var k=0;k<ids.length;k++){
+        var data = window.gm[who].Stats.get(ids[k])
+        if(data.hidden!==4) {
+            result+='<tr><td>'+((data.hidden & 0x1)?'???':data.id)+':</td><td>'+((data.hidden & 0x2)?'???':data.value)+'</td></tr>';
+        }
     }
     result+='</table>';
     result+='</br>Active Effects:<table>'
-    for(var i=0;i<window.gm.player.Effects.count();i++){
-        var data = window.gm.player.Effects.getData(i);
+    ids = window.gm[who].Effects.getAllIds();
+    ids.sort(); //Todo better sort
+    for(var i=0;i<ids.length;i++){
+        var data = window.gm[who].Effects.get(ids[i]);
         result+='<tr><td>'+data.id+':</td><td>'+data.name+'</td></tr>';
     }
     result+='</table>';

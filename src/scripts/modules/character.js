@@ -16,22 +16,28 @@ export class Character {
     }
     constructor(externlist) {
         this._data = externlist ? externlist : Character.defaultData();
-        this.Outfit = new Outfit(this,this._data.outfit);
-        this.Inv = new Inventory(this,this._data.inv);
-        this.Wardrobe = new Inventory(this,this._data.wardrobe);
-        this.Stats = new StatsDictionary(this,this._data.stats);
-        this.Effects = new Effects(this,this._data.effects);
-        this.Rel = new StatsDictionary(this,this._data.rel); //Todo Relation similiar to stats?
+        this.Outfit = new Outfit(this._data.outfit);
+        this.Outfit._parent = (function(me){ return function(){return me;}}(this));
+        this.Inv = new Inventory(this._data.inv);
+        this.Inv._parent = (function(me){ return function(){return me;}}(this));
+        this.Wardrobe = new Inventory(this._data.wardrobe);
+        this.Wardrobe._parent = (function(me){ return function(){return me;}}(this));
+        this.Stats = new StatsDictionary(this._data.stats);
+        this.Stats._parent = (function(me){ return function(){return me;}}(this));
+        this.Effects = new Effects(this._data.effects);
+        this.Effects._parent = (function(me){ return function(){return me;}}(this));
+        this.Rel = new StatsDictionary(this._data.rel); //Todo Relation similiar to stats?
+        this.Rel._parent = (function(me){ return function(){return me;}}(this));
         //create basic stats
         stPerversion.setup(this.Stats,1,15),stArousal.setup(this.Stats,1,100);
         stHealth.setup(this.Stats,50,60),stEnergy.setup(this.Stats,30,100),stPAttack.setup(this.Stats,4,100),stPDefense.setup(this.Stats,4,100),
         stAgility.setup(this.Stats,3,100),stStrength.setup(this.Stats,3,100),stEndurance.setup(this.Stats,3,100);
 
         this.Effects.addItem('Tired',window.gm.EffectLib.NotTired); //depending on sleep Tired will be set to NotTired or Tired
-        //window.storage.registerConstructor(Character);
+        window.storage.registerConstructor(Character);
     }
-    //toJSON() {return window.storage.Generic_toJSON("Character", this); };
-    //static fromJSON(value) { return window.storage.Generic_fromJSON(Character, value.data);};
+    toJSON() {return window.storage.Generic_toJSON("Character", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(Character, value.data);};
     get name() {
         return(this._data.name);    
     }

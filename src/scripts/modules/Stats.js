@@ -7,9 +7,12 @@
  */
 ///////////////////////////////////////////////////////////////
 export class StatsDictionary extends Inventory {  //Todo a collection of Stats is similiar to Inventory?
-    constructor(owner,externlist) {
-        super(owner,externlist);
+    constructor(externlist) {
+        super(externlist);
+        window.storage.registerConstructor(StatsDictionary);
     }
+    toJSON() {return window.storage.Generic_toJSON("StatsDictionary", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(StatsDictionary, value.data);};
     get(id) {
         var _i = this.findItemSlot(id);
         if(_i<0) throw new Error('unknown stat: '+id);
@@ -17,14 +20,13 @@ export class StatsDictionary extends Inventory {  //Todo a collection of Stats i
         _item.Calc(this);*/
         return(this.list[_i]);
     }
-    getRaw(id) {
-        var _i = this.findItemSlot(id);
-        if(_i<0) throw new Error('unknown stat: '+id);
-        return(this.list[_i]);
+    modifyHidden(id,hidden) {
+        var _data = this.get(id);
+        _data.hidden=hidden;
     }
     // adds a modifier to a Stat or replaces it
     addModifier(toId, modData) {
-        var _oldMods = this.getRaw(toId).modifier;
+        var _oldMods = this.get(toId).modifier;
         var _x=-1;
         for(var i=0;i<_oldMods.length;i++){
             if(_oldMods[i].id===modData.id) _x=i;
@@ -34,7 +36,7 @@ export class StatsDictionary extends Inventory {  //Todo a collection of Stats i
         window.gm.pushLog(Stat.Calc(this,toId).msg);
     }
     removeModifier(toId,modData) {
-        var _oldMods = this.getRaw(toId).modifier;
+        var _oldMods = this.get(toId).modifier;
         var _x=-1;
         for(var i=0;i<_oldMods.length;i++){
             if(_oldMods[i].id===modData.id) _x=i;
@@ -66,7 +68,7 @@ export class StatsDictionary extends Inventory {  //Todo a collection of Stats i
         this.list.splice(_i,1);
     }
     increment( id, value) {
-        var attr = this.getRaw(id);
+        var attr = this.get(id);
         attr.base += value;
         window.gm.pushLog(Stat.Calc(this,id).msg);
     }
@@ -82,14 +84,14 @@ class Stat {
     }
     //this is called to update value of the stat and will trigger calculation of dependend stats 
     static Calc(context, id) {
-        var attr = context.getRaw(id);
+        var attr = context.get(id);
         var min = -99999;
         var max = 99999;
         var msg = '';
         //get limits
         for(var k=0;k<attr.limits.length;k++) {
-            if (attr.limits[k].min!=='') min= Math.max(context.getRaw(attr.limits[k].min).value,min); //this might behave odly if any min>max
-            if (attr.limits[k].max!=='') max= Math.min(context.getRaw(attr.limits[k].max).value,max); 
+            if (attr.limits[k].min!=='') min= Math.max(context.get(attr.limits[k].min).value,min); //this might behave odly if any min>max
+            if (attr.limits[k].max!=='') max= Math.min(context.get(attr.limits[k].max).value,max); 
         }
         //recalculate modifiers
         var _old =  attr.value;
@@ -139,29 +141,28 @@ class stEnergy {
     static Calc(context) { Stat.Calc(context,'energy');  }
     static updateModifier(context) {};
 }
-class stArousal {
+class stArousal extends Stat{
     static setup(context, base,max) {
         var _n = Stat.dataPrototype();
-        _n.id='arousalMax',_n.base=max, _n.value=max;
+        _n.id='arousalMax',_n.base=max, _n.value=max, _n.hidden=3;
         if(context.findItemSlot(_n.id)<0) context.list.push(_n);
         _n = Stat.dataPrototype();
-        _n.id='arousalMin',_n.base=0, _n.value=0;
+        _n.id='arousalMin',_n.base=0, _n.value=0, _n.hidden=1;
         if(context.findItemSlot(_n.id)<0) context.list.push(_n);
         _n = Stat.dataPrototype();
-        _n.id='arousal',_n.base=base, _n.value=base,_n.limits=[{max:'arousalMax',min:'arousalMin'}];
+        _n.id='arousal', _n.hidden=3,_n.base=base, _n.value=base,_n.limits=[{max:'arousalMax',min:'arousalMin'}];
         if(context.findItemSlot(_n.id)<0) context.list.push(_n);
         stArousal.Calc(context);
     }
     static Calc(context) { Stat.Calc(context,'arousal');  }
-    static updateModifier(context) {};
 }
 class stPerversion {
     static setup(context, base,max) {
         var _n = Stat.dataPrototype();
-        _n.id='perversionMax',_n.base=max, _n.value=max;
+        _n.id='perversionMax',_n.base=max, _n.value=max,_n.hidden=4;
         if(context.findItemSlot(_n.id)<0) context.list.push(_n);
         _n = Stat.dataPrototype();
-        _n.id='perversion',_n.base=base, _n.value=base,_n.limits=[{max:'perversionMax',min:''}];
+        _n.id='perversion',_n.hidden=4,_n.base=base, _n.value=base,_n.limits=[{max:'perversionMax',min:''}];
         if(context.findItemSlot(_n.id)<0) context.list.push(_n);
         stPerversion.Calc(context);
     }
@@ -240,17 +241,22 @@ class stPDefense {   //physical defense
 
 /////////////////////////////////////////////////////////////////////////
 export class Effects extends Inventory {  //Todo a collection of Stats is similiar to Inventory?
-    constructor(owner,externlist) {
-        super(owner,externlist);
+    constructor(externlist) {
+        super(externlist);
+        window.storage.registerConstructor(Effects);
     }
+    toJSON() {return window.storage.Generic_toJSON("Effects", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(Effects, value.data);};
     //override
     getItem(id) {
         var _item = window.gm.EffectLib[id];
         if(!_item) throw new Error('unknown effect: '+id);
         return (window.gm.EffectLib[id]);
     }
-    getData(slot){
-        return(this.list[slot]);
+    get(id){
+        var _i = this.findItemSlot(id);
+        if(_i<0) throw new Error('unknown effect: '+id);
+        return(this.list[_i]);
     }
     //findItemslot uses id, this one finds all effects of one type
     findEffect(name) {

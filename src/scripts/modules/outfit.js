@@ -106,8 +106,7 @@ export class Crowbar extends Equipment {
 }
 //a kind of special inventory for worn equipment
 export class Outfit {
-    constructor(owner,externlist) {
-        this.parent = owner;
+    constructor(externlist) {
         this.list = externlist ? externlist : [];
         //create each slot
         for(var i=0; i<window.gm.OutfitSlotpLib.SLOTMAX;i++) {
@@ -115,10 +114,11 @@ export class Outfit {
                 this.list.push({id:''});        // {id:'Leggings'}
             }
         }
-        //window.storage.registerConstructor(Outfit);
+        window.storage.registerConstructor(Outfit);
     }
-    //toJSON() {return window.storage.Generic_toJSON("Outfit", this); };
-    //static fromJSON(value) { return window.storage.Generic_fromJSON(Outfit, value.data);};
+    get parent() {return this._parent();}
+    toJSON() {return window.storage.Generic_toJSON("Outfit", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(Outfit, value.data);};
     postItemChange(inv,id,operation,msg) {
         window.gm.pushLog('Outfit: '+operation+' '+id+' '+msg+'</br>');
     }

@@ -126,22 +126,3 @@ var _Entrys = [];
 _Entrys.push({id:"Crowbar",count:1,cost:25});
 _Entrys.push({id:"Battery",count:3,cost:2});
 renderToSelector("#panel", "listsell");</script>
-
-:: listsell
-<!--this fragment can be used to setup a list of items to sell:
-add into passage: <div id="choice"></div></br></br> <div id="panel"></div></br></br>   
-in <script> define variable _Entrys and specify wares to sell
-and run renderToSelector("#panel", "listsell"); 
--->
-<script>
-//define _Entrys in your passage lile this:
-//var _Entrys = [{id:"Crowbar",count:1,cost:25})];
-for(var i=0;_Entrys.length>i;i++) {
-    var entry=_Entrys[i];
-    let _id = entry.id;
-    let _cost=entry.cost;
-    window.gm.printShopSellEntry(_id,entry.count,
-    cbCanBuy=(function(itemid){return window.gm.defaultCanSell(itemid,_cost)}),
-    cbPostBuy=(function(itemid){window.gm.defaultPostSell(itemid,_cost)}));
-}
-</script>

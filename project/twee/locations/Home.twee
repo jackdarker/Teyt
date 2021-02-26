@@ -4,7 +4,7 @@
 <%s.player.location=window.passage.name;%>
 At the doorsteps of your home. </br>
 <div>Where would you like to go?</br>
-[[Living_Room]]   [[Your Bedroom]]  [[Moms Bedroom]] [[Kitchen]]  [[Garden]] </br>
+[[Living_Room]]   [[Your Bedroom]]  [[Moms Bedroom]] [[Kitchen]]  [[Garden]] [[Cellar]] </br>
 [[Into the city]]</br></div>
 </article><article id="LogPanel"></article></section>
 
@@ -163,7 +163,7 @@ There is nothing here
 <%s.player.location=window.passage.name;%>
 The garden behind the house is not very large. </br>
 There are a lot of molehills on the green. You should teach their creator a lesson.</br>
-[[Whack a mole|Encounter]]
+<a href="javascript:void(0)" onclick='testEncounter()'>Whack a mole</a> </br>
 <% if(s.mom.location==window.passage.name) { %>
 [[Mom|Info_Mom]] is wandering around. Maybe she is planning to setup some flower beds. </br>
 <%}%>
@@ -174,4 +174,41 @@ You remeber that you took the shovel from here.</br>
 <%}%>
 Where would you like to go?</br>
 [[Hallway|Home]]</br>
+</article><article id="LogPanel"></article></section>
+<script>
+function testEncounter() {
+  window.gm.initCombat(window.gm.Mobs.Mole);
+  window.story.show("Encounter");
+}
+</script>
+
+:: Cellar
+<section> 
+<aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%s.player.location=window.passage.name;%>
+The portal is still active. Do you dare to [[enter|Cellar_Portal]] it? </br></br>
+Where would you like to go?</br>
+[[Hallway|Home]]</br>
+</article><article id="LogPanel"></article></section>
+
+
+:: Cellar_PortalReverse
+<section> 
+<aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<!--<%s.player.location=window.passage.name;%>-->
+The portal spits you out in the dim light of your cellar.</br></br>
+[[Next|Cellar]]</br>
+</article><article id="LogPanel"></article></section>
+
+
+:: Cellar_Portal
+<section> 
+<aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<!--<%s.player.location=window.passage.name;%>-->
+A blinding light engulfs you just for a second and then a deafening darkness.  </br></br>
+Its impossible to tell what else happens or how long the process takes.</br></br>
+As you come back to your senses you find yourself cowering on the floor, still croggy from the experience.</br>
+Time to move on.</br></br></br>
+Where would you like to go?</br>
+[[Home|Cellar_PortalReverse]] [[Mall|Mall Floor 0 (postapocalypse)]]</br>
 </article><article id="LogPanel"></article></section>

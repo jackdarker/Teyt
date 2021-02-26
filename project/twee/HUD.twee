@@ -14,7 +14,7 @@ Money: <%=window.gm.player.Inv.countItem('Money') %></br>
 <button type="button" id="status">Status</button>
 <button type="button" id="inv">Inventory</button>
 <button type="button" id="dashboard">More</button>
-<button type="button" id="wait" style="width: 100%">Rest 45min</button>
+<!--<button type="button" id="wait" style="width: 100%">Rest 45min</button>-->
 </hr>
 <button type="button" id="save" style="width: 100%">Save/load</button>
 <button type="button" id="help" style="width: 100%">Help</button>
@@ -26,7 +26,7 @@ Money: <%=window.gm.player.Inv.countItem('Money') %></br>
 <%}%>
 </form>
 <script>
-document.querySelector('#wait').addEventListener('click', function(){window.gm.addTime(45);window.gm.refreshScreen();}); 
+//document.querySelector('#wait').addEventListener('click', function(){window.gm.addTime(45);window.gm.refreshScreen();}); 
 document.querySelector('#inv').addEventListener('click', function(){window.story.show('Inventory');});
 document.querySelector('#dashboard').addEventListener('click', function(){window.story.show('Player_Dashboard');});
 document.querySelector('#status').addEventListener('click', function(){window.story.show('Status');});
@@ -188,6 +188,7 @@ for(var i=0;i<maxSlots;i++){
 </article><article id="LogPanel"></article></section>
 
 :: Settings [back]
+<!--TODO what settings ?-->
 <section> 
 <!--<aside id="sidebar"></aside>--><article><%=window.story.render("CenterDialogs") %>
 <div id='combatCanvas' style='height:300px; background: url(<%=s.enemy.pic%>) no-repeat center,url(<%=s.combat.scenePic%>) no-repeat center;color:black;'></div>
@@ -197,9 +198,9 @@ for(var i=0;i<maxSlots;i++){
 </article><article id="LogPanel"></article></section>
 
 :: Settings2 [back]
+<!--just test-->
 <section> 
 <!--<aside id="sidebar"></aside>--><article><%=window.story.render("CenterDialogs") %>
-
 <div><canvas id="exampleCanvas" width="240" height="225">Your browser doesn't support the canvas tag.    </canvas></div>
 <button onclick='window.gm.printCombatScreen()'>test a</button>
 <button onclick='onimage("assets/favicon.png")'>test b</button>
