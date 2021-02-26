@@ -9,46 +9,9 @@ window.gm.getSaveVersion= function(){
   var version = [0,1,0];
     return(version);    
 };
-window.gm.testsaveReviver = function () {
-  window.storage.registerConstructor(Bar);
-  window.storage.registerConstructor(Foo);
-  var before = {
-    foo: new Foo(21, 44),foo2: new Foo(100, 111),
-  };
-  before.foo.print(); // Stringify it with a replacer:
-  var str = JSON.stringify(before); // Show that
-  console.log(str); // Re-create it with use of a "reviver" function
-  var after = JSON.parse(str, window.storage.Reviver);
-  after.foo.print();after.foo2.print();
-};
-class Bar {
-  constructor(x) {
-    this.__type="Bar";
-    this._x = x;
-  }
-  get parent() {return this._parent();}
-  print() {      console.log("parent="+this.parent.a.toString()+ this._x);    };
- toJSON() {return window.storage.Generic_toJSON("Bar", this); };
- static fromJSON(value) { return window.storage.Generic_fromJSON(Bar, value.data);};
-}
 
-class Foo {
-  constructor(a=0, b=0) {
-    this.__type = 'Foo';
-    this.a = a, this.b = b;
-    this._bar = new Bar('fooboo'+this.a.toString());
-    this._bar2 = new Bar('ba2'+this.b.toString());
-    this._bar._parent = (function(me){ return function(){return me;}}(this));
-    this._bar2._parent = (function(me){ return function(){return me;}}(this));
-  }
-  toJSON() {return window.storage.Generic_toJSON("Foo", this); };
-  static fromJSON(value) { return window.storage.Generic_fromJSON(Foo, value.data);};
-  setA(a) {   this.a = -1 * a;  };
-  print() {console.log(this.a.toString()); this._bar.print(); this._bar2.print();  };
-}
 window.gm.initGame= function(forceReset) {
   createItemLookups();
-  window.gm.testsaveReviver();
     //this does not work because hidden is called to late
     /*$(window).on('sm.passage.hidden', function(event, eventObject) {
       
