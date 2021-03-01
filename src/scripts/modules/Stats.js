@@ -352,6 +352,15 @@ class Effect {
     static onApply(context,data){}
     static onRemove(context,data){}
 }
+//a class that is used in combat
+class CombatEffect extends Effect {
+    //duration in turns !
+    static onCombatEnd(context,data) {}
+    //called before targets turn
+    static onTurnStart(context,data) {}
+    //at end of targets turn
+    static onTurnEnd(context,data) {}
+}
 class effEnergized extends Effect {
    /*constructor(parent) {
         super(parent,'Energized');
@@ -481,6 +490,31 @@ class skAnalReceiving extends Effect {
     static onRemove(context,data){    }
     static merge(context,data,neweffect,newdata) { }
 }
+
+class effStunned extends CombatEffect {
+    static get name() { return('Stunned');}
+    static get desc() {return(effStunned.name);}
+    static dataPrototype() {
+        return({id:effStunned.name, name: effStunned.name, time: 0, duration:2,hidden:0});
+    }
+    static onApply(context,data){
+        data.duration = 2;
+        data.time = window.gm.getTime();
+    }
+    static merge(context,data,neweffect,newdata) {
+        if(neweffect.name===data.name) {    //extends stun
+            neweffect.onApply(context,data);
+            return(true);
+        }
+    }
+    static onCombatEnd(context,data) {
+        context.removeItem(data.id);
+    }
+    static onTurnStart(context,data) {
+        data.duration-=1;
+        if(data.duration<=0) context.removeItem(data.id);
+    }
+} 
 //////////////////////////////////////////////////////////////
 /*export class BaseAttribute {   
     constructor(id,value, multiplier = 0) {

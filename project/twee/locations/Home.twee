@@ -177,7 +177,7 @@ Where would you like to go?</br>
 </article><article id="LogPanel"></article></section>
 <script>
 function testEncounter() {
-  window.gm.initCombat(window.gm.Mobs.Mole);
+  window.gm.combat.initCombat(window.gm.Mobs.Mole);
   window.story.show("Encounter");
 }
 </script>

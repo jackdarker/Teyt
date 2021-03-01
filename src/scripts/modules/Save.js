@@ -135,13 +135,13 @@ window.storage = {
     return(info);
       
   },
-  compressLocalSave: false,
+  compressLocalSave: false, //this is for debugging (save file uncompressed)
   loadFile: function(input){
       let file = input.files[0]; 
       let fileReader = new FileReader(); 
       fileReader.onload = function() {
         window.storage.rebuildFromSave(fileReader.result,window.storage.compressLocalSave);
-        div = document.querySelector('#backdrop'); //todo promise
+        div = document.querySelector('#backdrop'); //see save/load dialog
         div.parentNode.removeChild(div);
       }; 
       fileReader.onerror = function() {
@@ -152,7 +152,7 @@ window.storage = {
   },
   saveFile: function(){
     var hash = JSON.stringify({state:window.story.state,
-      history:window.story.history,checkpointName:window.story.checkpointName});//,window.storage._replacerFunc());
+      history:window.story.history,checkpointName:window.story.checkpointName});
     if(window.storage.compressLocalSave) hash = LZString.compressToBase64(hash);
     var filename= window.story.name+"_Save.dat";
     var blob = new Blob([hash], {type: "text/plain;charset=utf-8"});
@@ -161,7 +161,7 @@ window.storage = {
     saveBrowser: function(slot) {
       //var hash= window.story.save();    this call somehow messes up html and I had to copy the following from snowman script
       var hash = LZString.compressToBase64(JSON.stringify({state:window.story.state,
-          history:window.story.history,checkpointName:window.story.checkpointName}));//,window.storage._replacerFunc()));          //Todo
+          history:window.story.history,checkpointName:window.story.checkpointName}));
       
       var info=window.story.state.player.location +' - '+ new Date().toString();
       window.localStorage.setItem(slot.concat('info'),info);
@@ -181,15 +181,13 @@ window.storage = {
   },
   rebuildFromSave: function(hash,compressed){
     if(!compressed) hash=LZString.compressToBase64(hash);
-      //copied from window.story.restorebecause reviver  //window.story.restore(hash) ;
+      //copied from window.story.restore because reviver  //window.story.restore(hash) ;
       var save = JSON.parse(LZString.decompressFromBase64(hash), window.storage.Reviver);
       window.story.state = save.state;
       window.story.history = save.history;
       window.story.checkpointName = save.checkpointName;
-      window.story.show(window.story.history[window.story.history.length - 1], true);
-
-      window.gm.rebuildObjects();
-      window.gm.refreshScreen();
+      window.gm.rebuildObjects();  // this is for handling version-upgrades
+      window.story.show(window.story.history[window.story.history.length - 1], true);      
   }
 };
 /*  //save demo

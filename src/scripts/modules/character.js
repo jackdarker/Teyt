@@ -54,7 +54,7 @@ export class Character {
     }
 
     addEffect(id,effect) {
-        this.Effects.addItem(id,effect);   // CanOfCoffee:Energyzed,Energyzed
+        this.Effects.addItem(id,effect);
     }
     /*gainStat(id,val) {
         var _x = this.Stats.get(id);

@@ -47,10 +47,10 @@ window.gm.initGame= function(forceReset) {
         qUnlockDowntown : 0,
         qUnlockRedlight : 0,
         qUnlockBeach : 0,
-        debugInv: new Inventory()
+        debugInv: new Inventory2()
         }; 
         s.vars.debugInv._parent = (function(){ return function(){return null;}}());
-        s.vars.debugInv.addItem('Money',200);
+        s.vars.debugInv.addItem(window.gm.ItemsLib.Money,200);
 
     }
     if (!s.enemy||forceReset) { //actual/last enemy
@@ -60,8 +60,9 @@ window.gm.initGame= function(forceReset) {
     }
     if (!s.combat||forceReset) { //see encounter & combat.js
       s.combat = {
-        activeTurn : false, //true if enemys turn
+        enemyTurn : false, //true if enemys turn
         combatState : ""  ,
+        turnCount: 0,
         scenePic : 'assets/bg_park.png'
       }
     }

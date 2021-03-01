@@ -56,6 +56,7 @@ function createItemLookups(){
     'NotTired':  effNotTired,
     'Tired':  effTired,
     'Energized':  effEnergized,
+    'Stunned':  effStunned,
     //Todo separate skills from Effects?
     'Cooking':  skCooking,
     'AnalReceiving':  skAnalReceiving

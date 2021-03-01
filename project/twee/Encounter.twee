@@ -30,17 +30,17 @@ A <%=window.story.state.enemy.name%> appears ! </br>
     <%='You were defeated by '+s.enemy.name%></br>
     [[GameOver]]</br>
 <% }else{ %>
-   <% if(s.combat.activeTurn) {%>
-    <%=window.gm.calcEnemyCombat()%>
+   <% if(s.combat.enemyTurn) {%>
+    <%=window.gm.combat.calcEnemyCombat()%>
     [[Next|EncounterStartTurn]]</br>
     <% }else{ %>
-    <%=window.gm.printCombatOption()%>
+    <%=window.gm.combat.printCombatOption()%>
 <%}}%>
 
 <div><output></output></div></br>   <!--message is rendered here-->
 </article><article id="LogPanel"></article>
 <script>
-window.gm.printCombatHud();
+window.gm.combat.printCombatHud();
 </script>
 </section>
 

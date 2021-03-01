@@ -127,9 +127,7 @@ var maxSlots = 8; //number saveslots available; has to fit form below
     if(!OK){ 
       return;
     } //aborted by user
-    //div = document.querySelector('#backdrop');
-    //div.parentNode.removeChild(div);
-    }
+  }
 </script>
 
 
