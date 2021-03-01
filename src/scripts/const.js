@@ -51,16 +51,34 @@ function createItemLookups(){
     'perversion': stPerversion,
     'perversionMax': stPerversion
 }
-    //lookup table 
-    window.gm.EffectLib = { 
-    'NotTired':  effNotTired,
-    'Tired':  effTired,
-    'Energized':  effEnergized,
-    'Stunned':  effStunned,
-    //Todo separate skills from Effects?
-    'Cooking':  skCooking,
-    'AnalReceiving':  skAnalReceiving
-    };
+    //register constructors for reviver or your loaded save will not work !
+    //...items
+    window.storage.registerConstructor(LighterDad);
+    window.storage.registerConstructor(Money);
+    window.storage.registerConstructor(LaptopPS);
+    window.storage.registerConstructor(Battery);
+    window.storage.registerConstructor(Dildo_small);
+    window.storage.registerConstructor(Lube);
+    window.storage.registerConstructor(CanOfCoffee);
+    window.storage.registerConstructor(SimpleFood);
+    // ...wardrobe
+    window.storage.registerConstructor(Leggings);
+    window.storage.registerConstructor(TankShirt);
+    window.storage.registerConstructor(Jeans);
+    window.storage.registerConstructor(Pullover);
+    window.storage.registerConstructor(Crowbar);
+    //window.storage.registerConstructor(Shovel);
+    //window.storage.registerConstructor(Handcuffs);
+    //...stats
+    window.storage.registerConstructor(stHealthMax);
+    window.storage.registerConstructor(stHealth);
+    window.storage.registerConstructor(stRelation);
+    //...effects
+    window.storage.registerConstructor(effNotTired);
+    window.storage.registerConstructor(effTired);
+    window.storage.registerConstructor(effEnergized);
+    window.storage.registerConstructor(effStunned);
+    window.storage.registerConstructor(skCooking);
   
     window.gm.EnemyLib = {
         'Mole': {name: 'Mole',pic:'assets/mole.jpg'}, //new Mole(),

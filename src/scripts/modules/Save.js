@@ -64,7 +64,7 @@ window.storage = {
     data = {};
     for (index = 0; index < keys.length; ++index) {
       key = keys[index];
-      data[key] = obj[key];                 //TODO causes infinite loop   Character->Inventory->Character
+      data[key] = obj[key];                 //TODO causes infinite loop on circular ref   Character->Inventory->Character
     }
     return {ctor: ctorName, data: data};
   },

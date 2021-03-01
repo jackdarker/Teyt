@@ -1,6 +1,7 @@
 "use strict";
 /* bundles some utility operations*/
 window.gm = window.gm || {};
+window.gm.util = window.gm.util || {};
 //updates all panels
 window.gm.refreshScreen= function() {
     window.story.show(window.passage.name);
@@ -110,7 +111,7 @@ window.gm.defaultCanSell =function(itemid,cost){
 };
 //requires a <div id='choice'> </div> for displaying bought-message
 window.gm.defaultPostSell =function(itemid,cost){
-    window.gm.player.Inv.addItem('Money',cost);
+    window.gm.player.Inv.addItem(new Money(),cost);
     $("div#choice")[0].innerHTML='You sold '+ itemid; 
     $("div#choice")[0].classList.remove("div_alarm");
     $("div#choice")[0].offsetWidth; //this forces the browser to notice the class removal
@@ -134,7 +135,7 @@ window.gm.cbCanBuyPerverse = function(itemid,cost,pervcost) {
 };
 //this will add item to player; money-deduct or other cost has to be done in cbPostBuy ! 
 window.gm.buyFromShop=function(itemid, count,cbPostBuy) {
-    window.gm.player.Inv.addItem(itemid,count);   //Todo item or wardrobe
+    window.gm.player.Inv.addItem(new window.storage.constructors[itemid](),count);   //Todo item or wardrobe
     if(cbPostBuy) cbPostBuy(itemid);
     //window.gm.refreshScreen(); dont refresh fullscreen or might reset modified textoutput
     window.gm.updateOtherPanels(); //just update other panels
@@ -197,7 +198,7 @@ window.gm.printPickupAndClear= function(itemid, desc,itemleft,cbAfterPickup=null
     return(elmt);
 };
 window.gm.pickupAndClear=function(itemid, desc,itemleft,cbAfterPickup=null) {
-    window.gm.player.Inv.addItem(itemid);
+    window.gm.player.Inv.addItem(new window.storage.constructors[itemid]());
     //window.gm.pushLog("added "+itemid+" to inventory.</br>");
     if(cbAfterPickup) cbAfterPickup.call();
     window.gm.refreshScreen();
@@ -223,7 +224,7 @@ window.gm.printEquipment= function( id,descr) {
     var s= window.story.state;
     elmt +=`<a0 id='${id}' onclick='(function($event){document.querySelector(\"div#${id}\").toggleAttribute(\"hidden\");})(this);'>${id}</a>`;
     if(window.gm.player.Outfit.countItem(id)<=0) {
-        elmt +=`<a0 id='${id}' onclick='(function($event){window.gm.player.Outfit.addItem(\"${id}\"); window.gm.refreshScreen();}(this))'>Equip</a>`;
+        elmt +=`<a0 id='${id}' onclick='(function($event){window.gm.player.Outfit.addItem(new window.storage.constructors[\"${id}\"]()); window.gm.refreshScreen();}(this))'>Equip</a>`;
     } else {
         elmt +=`<a0 id='${id}' onclick='(function($event){window.gm.player.Outfit.removeItem(\"${id}\"); window.gm.refreshScreen();}(this))'>Unequip</a>`;
     }
@@ -259,7 +260,7 @@ window.gm.printRelationSummary= function() {
     for(var k=0;k<window.gm.player.Rel.count();k++){
         var data = window.gm.player.Rel.get(window.gm.player.Rel.getItemId(k));
         result+='<tr><td>'+data.id+':</td><td>'+data.value+'</td></tr>';
-    }
+    }   //todo print mom : 10 of 20
     result+='</table>';
     return(result);
 };
@@ -350,3 +351,5 @@ window.gm.toggleDialog= function(id){
         //??lastFocus.focus();
     }
 };
+// use child._parent = window.gm.util.refToParent(parent);
+window.gm.util.refToParent = function(me){ return function(){return(me);}};

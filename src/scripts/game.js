@@ -1,4 +1,5 @@
 "use strict";
+
 //var window = window || {};  //to supress lint-errors
 //import * as con from "const.js";
 //import {Inventory} from './inventory.js'; //already included??
@@ -49,8 +50,8 @@ window.gm.initGame= function(forceReset) {
         qUnlockBeach : 0,
         debugInv: new Inventory2()
         }; 
-        s.vars.debugInv._parent = (function(){ return function(){return null;}}());
-        s.vars.debugInv.addItem(window.gm.ItemsLib.Money,200);
+        s.vars.debugInv._parent = window.gm.util.refToParent(null);
+        s.vars.debugInv.addItem(new Money(),200);
 
     }
     if (!s.enemy||forceReset) { //actual/last enemy
@@ -80,10 +81,10 @@ window.gm.initGame= function(forceReset) {
       //window.gm.Cyril = new Character(s.Cyril);
       window.gm.Cyril = new Character()
       //add some basic inventory
-      window.gm.Cyril.Wardrobe.addItem('Jeans');
-      window.gm.Cyril.Wardrobe.addItem('Tank-shirt');
-      window.gm.Cyril.Outfit.addItem('Jeans');
-      window.gm.Cyril.Outfit.addItem('Tank-shirt');
+      window.gm.Cyril.Wardrobe.addItem(new Jeans());
+      window.gm.Cyril.Wardrobe.addItem(new TankShirt());
+      window.gm.Cyril.Outfit.addItem(new Jeans());
+      window.gm.Cyril.Outfit.addItem(new TankShirt());
       window.gm.Cyril.Stats.increment('strength',3);
       s.Cyril = window.gm.Cyril;
       //delete window.gm.Cyril; 
@@ -100,18 +101,17 @@ window.gm.initGame= function(forceReset) {
         //window.gm.Ratchel = new Character(s.Ratchel);
         window.gm.Ratchel = new Character();
         window.gm.Ratchel.name="Ratchel";
-        window.gm.Ratchel.Effects.addItem('Cooking',window.gm.EffectLib.Cooking);
+        window.gm.Ratchel.Effects.addItem(skCooking.name,new skCooking());
         //add some basic inventory
-        window.gm.Ratchel.Inv.addItem('Money',20);
-        window.gm.Ratchel.Inv.addItem('LighterDad');
-        window.gm.Ratchel.Wardrobe.addItem('Jeans');
-        window.gm.Ratchel.Wardrobe.addItem('Leggings');
-        window.gm.Ratchel.Wardrobe.addItem('Tank-shirt');
-        window.gm.Ratchel.Wardrobe.addItem('Pullover');
-        window.gm.Ratchel.Outfit.addItem('Jeans');
-        window.gm.Ratchel.Outfit.addItem('Pullover');
+        window.gm.Ratchel.Inv.addItem(new Money(),20);
+        window.gm.Ratchel.Inv.addItem(new LighterDad());
+        window.gm.Ratchel.Wardrobe.addItem(new Jeans());
+        window.gm.Ratchel.Wardrobe.addItem(new Leggings());
+        window.gm.Ratchel.Wardrobe.addItem(new TankShirt());
+        window.gm.Ratchel.Wardrobe.addItem(new Pullover());
+        window.gm.Ratchel.Outfit.addItem(new Jeans());
+        window.gm.Ratchel.Outfit.addItem(new Pullover());
         s.Ratchel=window.gm.Ratchel;
-        //delete window.gm.Ratchel;
     }      
     window.gm.switchPlayer(s.Ratchel.name); //start-player
 }

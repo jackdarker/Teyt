@@ -17,27 +17,36 @@ export class Character {
     constructor(externlist) {
         this._data = externlist ? externlist : Character.defaultData();
         this.Outfit = new Outfit(this._data.outfit);
-        this.Outfit._parent = (function(me){ return function(){return me;}}(this));
-        this.Inv = new Inventory(this._data.inv);
-        this.Inv._parent = (function(me){ return function(){return me;}}(this));
-        this.Wardrobe = new Inventory(this._data.wardrobe);
-        this.Wardrobe._parent = (function(me){ return function(){return me;}}(this));
+        this.Outfit._parent = window.gm.util.refToParent(this);
+        this.Inv = new Inventory2(this._data.inv);
+        this.Inv._parent = window.gm.util.refToParent(this);
+        this.Wardrobe = new Inventory2(this._data.wardrobe);
+        this.Wardrobe._parent = window.gm.util.refToParent(this);
         this.Stats = new StatsDictionary(this._data.stats);
-        this.Stats._parent = (function(me){ return function(){return me;}}(this));
+        this.Stats._parent = window.gm.util.refToParent(this);
         this.Effects = new Effects(this._data.effects);
-        this.Effects._parent = (function(me){ return function(){return me;}}(this));
+        this.Effects._parent = window.gm.util.refToParent(this);
         this.Rel = new StatsDictionary(this._data.rel); //Todo Relation similiar to stats?
-        this.Rel._parent = (function(me){ return function(){return me;}}(this));
+        this.Rel._parent = window.gm.util.refToParent(this);
         //create basic stats
-        stPerversion.setup(this.Stats,1,15),stArousal.setup(this.Stats,1,100);
         stHealth.setup(this.Stats,50,60),stEnergy.setup(this.Stats,30,100),stPAttack.setup(this.Stats,4,100),stPDefense.setup(this.Stats,4,100),
         stAgility.setup(this.Stats,3,100),stStrength.setup(this.Stats,3,100),stEndurance.setup(this.Stats,3,100);
+        stPerversion.setup(this.Stats,1,15),stArousal.setup(this.Stats,1,100);
 
-        this.Effects.addItem('Tired',window.gm.EffectLib.NotTired); //depending on sleep Tired will be set to NotTired or Tired
+        this.Effects.addItem(effNotTired.name, new effNotTired()); //depending on sleep Tired will be set to NotTired or Tired
         window.storage.registerConstructor(Character);
     }
     toJSON() {return window.storage.Generic_toJSON("Character", this); };
-    static fromJSON(value) { return window.storage.Generic_fromJSON(Character, value.data);};
+    static fromJSON(value) { 
+        var _x = window.storage.Generic_fromJSON(Character, value.data);
+        _x.Effects._relinkItems();
+        _x.Stats._relinkItems();
+        _x.Inv._relinkItems();
+        _x.Outfit._relinkItems();
+        _x.Wardrobe._relinkItems();
+        _x.Rel._relinkItems();
+        return(_x);
+    };
     get name() {
         return(this._data.name);    
     }
@@ -69,18 +78,11 @@ export class Character {
     }*/
 
     gainRelation(char,val) {
-        this.Rel.addItem(char);
-        var _x = this.Rel.get(char);
-        var old = _x.value; 
-        var _new =old+val; //Math.max(_x.min,Math.min(_x.max,old+val));
-        _x.value = _new;
-        var diff = _new-old;
-        if(diff>0) {
-            window.gm.pushLog('<statup>Your relation to '+char+" improved by "+diff.toString()+"</statup></br>");
-        } else if (diff<0) {
-            window.gm.pushLog('<statdown>Your relation to '+char+" worsend by "+diff.toString()+"</statdown></br>");
+        var _idx = this.Rel.findItemSlot(char);
+        if(_idx<0) {
+            var _rel = stRelation.setup(this.Rel,val,100,char);
         } else {
-            window.gm.pushLog('Your relation to '+char+" wasnt affected at all by your behaviour.</br>");
+            this.Rel.increment(char,val);
         }
     }
 }

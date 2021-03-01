@@ -133,7 +133,7 @@ window.gm.combat.moveStun = function() {
   var rnd = _.random(1,100);
   if(rnd >40) {
     result.msg += defender.name+" got stunned by "+attacker.name;
-    defender.addEffect("Stunned",effStunned)
+    defender.addEffect(new effStunned())
   } else {
     result.msg += "Attempt to stun "+defender.name +" failed.";
     result.OK=false;

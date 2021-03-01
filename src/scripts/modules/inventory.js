@@ -75,7 +75,15 @@ class Inventory2 {
     }
     get parent() {return this._parent();}
     toJSON() {return window.storage.Generic_toJSON("Inventory2", this); };
-    static fromJSON(value) { return window.storage.Generic_fromJSON(Inventory2, value.data);};
+    static fromJSON(value) { 
+        var _x = window.storage.Generic_fromJSON(Inventory2, value.data);
+        return(_x);
+    };
+    _relinkItems() {
+        for(var i=0; i<this.list.length; i++) {
+            this.list[i].item._parent=window.gm.util.refToParent(this);
+        }
+    }
     postItemChange(id,operation,msg) {
         window.gm.pushLog('Inventory: '+operation+' '+id+' '+msg+'</br>');
     }

@@ -6,71 +6,70 @@
     - 
  */
 ///////////////////////////////////////////////////////////////
-export class StatsDictionary extends Inventory {  //Todo a collection of Stats is similiar to Inventory?
+export class StatsDictionary extends Inventory2 {  //Todo a collection of Stats is similiar to Inventory?
     constructor(externlist) {
         super(externlist);
         window.storage.registerConstructor(StatsDictionary);
     }
     toJSON() {return window.storage.Generic_toJSON("StatsDictionary", this); };
-    static fromJSON(value) { return window.storage.Generic_fromJSON(StatsDictionary, value.data);};
+    static fromJSON(value) {
+        var _x = window.storage.Generic_fromJSON(StatsDictionary, value.data);
+        return(_x);
+    }
+    //
     get(id) {
-        var _i = this.findItemSlot(id);
-        if(_i<0) throw new Error('unknown stat: '+id);
-        /*var _item=this.getItem(id);
-        _item.Calc(this);*/
-        return(this.list[_i]);
+        return(this.getItem(id));
     }
     modifyHidden(id,hidden) {
-        var _data = this.get(id);
+        var _data = this.get(id).data;
         _data.hidden=hidden;
     }
     // adds a modifier to a Stat or replaces it
     addModifier(toId, modData) {
-        var _oldMods = this.get(toId).modifier;
+        var _stat = this.get(toId);
+        var _oldMods = _stat.data.modifier;
         var _x=-1;
         for(var i=0;i<_oldMods.length;i++){
             if(_oldMods[i].id===modData.id) _x=i;
         }
         if(_x>=0) _oldMods.splice(_x,1);
         _oldMods.push(modData);
-        window.gm.pushLog(Stat.Calc(this,toId).msg);
+        window.gm.pushLog(_stat.Calc().msg);
     }
     removeModifier(toId,modData) {
-        var _oldMods = this.get(toId).modifier;
+        var _stat = this.get(toId);
+        var _oldMods = _stat.data.modifier;
         var _x=-1;
         for(var i=0;i<_oldMods.length;i++){
             if(_oldMods[i].id===modData.id) _x=i;
         }
         if(_x>=0) _oldMods.splice(_x,1);
-        window.gm.pushLog(Stat.Calc(this,toId).msg);
+        window.gm.pushLog(_stat.Calc().msg);
     }
     //override
-    getItem(id) { 
-        var _item = window.gm.StatsLib[id];
-        if(!_item) throw new Error('unknown stat: '+id);
-        return (window.gm.StatsLib[id]);
-    }
-    //override
-    postItemChange(inv,id,operation,msg) {
+    postItemChange(id,operation,msg) {
         window.gm.pushLog('Stats: '+operation+' '+id+' '+msg+'</br>');
     }
     //override; only use to create new stats !
-    addItem(id) {
-        var _i = this.findItemSlot(id);
-        var _n=Stat.dataPrototype();
-        _n.id=id;
-        if(_i<0) this.list.push(_n);
+    addItem(stat) {
+        var _i = this.findItemSlot(stat.name);
+        if(_i<0) {
+            stat._parent=window.gm.util.refToParent(this);
+            this.list.push({'id': stat.name,'count': 1, item:stat});
+        }
     }
     //override
     removeItem(id) {
         var _i = this.findItemSlot(id);
         if(_i<0) return; //just skip if not found
+        var _stat = this.get(id);
         this.list.splice(_i,1);
+        _stat.calc();   //trigger update of dependent stat
     }
     increment( id, value) {
         var attr = this.get(id);
-        attr.base += value;
-        window.gm.pushLog(Stat.Calc(this,id).msg);
+        attr.data.base += value;
+        window.gm.pushLog(attr.Calc(this,id).msg);
     }
 }
 //class for an Attribute
@@ -82,183 +81,333 @@ class Stat {
         //modifys {id:}         point to the Stats that have modifiers from this stat
         //hidden 0 = visible, 1= name unreadable, 2= value unreadable, 4= hidden
     }
+    // Attention !!
+    //_parent will be added dynamical
+    get parent() {return this._parent();}
+    //add Reviver support:
+    //window.storage.registerConstructor(???);
+    //toJSON() {return window.storage.Generic_toJSON("???", this); };
+    //static fromJSON(value) { return window.storage.Generic_fromJSON(???, value.data);};
+
+    constructor() {
+        this.data = Stat.dataPrototype();
+    }
+    get name() {return(this.data.id);}
+    get id() {return(this.data.id);}
+    get base() {return(this.data.base);}
+    get value() {return(this.data.value);}
+    get hidden() {return(this.data.hidden);}
     //this is called to update value of the stat and will trigger calculation of dependend stats 
-    static Calc(context, id) {
-        var attr = context.get(id);
+    Calc( ) {
+        var attr = this.data;
         var min = -99999;
         var max = 99999;
         var msg = '';
         //get limits
         for(var k=0;k<attr.limits.length;k++) {
-            if (attr.limits[k].min!=='') min= Math.max(context.get(attr.limits[k].min).value,min); //this might behave odly if any min>max
-            if (attr.limits[k].max!=='') max= Math.min(context.get(attr.limits[k].max).value,max); 
+            if (attr.limits[k].min!=='') min= Math.max(this.parent.get(attr.limits[k].min).value,min); //this might behave odly if any min>max
+            if (attr.limits[k].max!=='') max= Math.min(this.parent.get(attr.limits[k].max).value,max); 
         }
         //recalculate modifiers
         var _old =  attr.value;
         attr.base = attr.value = Math.max(min,Math.min(max,attr.base));  
         for(var i=0;i<attr.modifier.length;i++) {
-            attr.value += attr.modifier[i].bonus;//window.gm.StatsLib[attr.modifier[i].id].modify(context,attr); 
+            attr.value += attr.modifier[i].bonus;
         }
         var _new = Math.max(min,Math.min(max,attr.value));
         attr.value = _new;
-        if(_new-_old>0) {
-            msg+='<statup>'+id+" regenerated by "+(_new-_old).toString()+"</statup></br>";
-        } else if(_new-_old<0) {
-            msg+='<statdown>'+id+" decreased by "+(_new-_old).toString()+"</statdown></br>";
-        }
-        context.getItem(id).updateModifier(context);
+        msg+=this.formatMsgStatChange(attr,_new,_old);//todo no log hidden
+        this.updateModifier();
         //trigger recalculation of dependend Stats
         for(var m=0;m<attr.modifys.length;m++) {
-            msg+=Stat.Calc(context,attr.modifys[m].id).msg;
+            msg+=this.parent.get(attr.modifys[m].id).Calc().msg;
         }
         return({OK:true,msg:msg});
     }
-    static updateModifier(context) {};
+    formatMsgStatChange(attr,_new,_old) {
+        if((_new-_old)>0) { 
+            return('<statup>'+attr.id+" regenerated by "+(_new-_old).toString()+"</statup></br>");
+        } else if((_new-_old)<0) {
+            return('<statdown>'+attr.id+" decreased by "+(_new-_old).toString()+"</statdown></br>");
+        }
+        return("");
+    };
+    updateModifier() {};
 }
-class stHealth {
-    static setup(context, base,max) {
-        var _n = Stat.dataPrototype();
+//this is special stat used together with Relation-collection
+//person is used as id instead of stat-name
+class stRelation extends Stat {
+    static setup(context, base,max,person) {    //todo Max-Limit
+        var _stat = new stRelation();
+        var _n = _stat.data;
+        _n.id=person+"Max",_n.base=max, _n.value=max;
+        context.addItem(_stat);
+        _stat.Calc();
+        _stat = new stRelation();
+        _n = _stat.data;
+        _n.id=person,_n.base=base, _n.value=base,_n.limits=[{max:person+"Max",min:''}];
+        context.addItem(_stat);
+        _stat.Calc();
+    }
+    constructor() {
+        super();
+        window.storage.registerConstructor(stRelation);
+    }
+    toJSON() {return window.storage.Generic_toJSON("stRelation", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(stRelation, value.data);};
+    formatMsgStatChange(attr,_new,_old) {
+        if((_new-_old)>0) {
+            return('<statup>Your relation to '+attr.id+" improved by "+(_new-_old).toString()+"</statup></br>");
+        } else if ((_new-_old)<0) {
+            return('<statdown>Your relation to '+attr.id+" worsend by "+(_new-_old).toString()+"</statdown></br>");
+        } else {
+            return('Your relation to '+attr.id+" wasnt affected at all by your behaviour.</br>");
+        }
+    };
+}
+class stHealthMax extends Stat {
+    static setup(context, max) {
+        var _stat = new stHealthMax();
+        var _n = _stat.data;
         _n.id='healthMax',_n.base=max, _n.value=max;
-        if(context.findItemSlot(_n.id)<0) context.list.push(_n);
-        _n = Stat.dataPrototype();
-        _n.id='health',_n.base=base, _n.value=base,_n.limits=[{max:'healthMax',min:''}];
-        if(context.findItemSlot(_n.id)<0) context.list.push(_n);
-        stHealth.Calc(context);
+        context.addItem(_stat);
+        _stat.Calc();
     }
-    static Calc(context) {  Stat.Calc(context,'health');    }
-    static updateModifier(context) {};
+    constructor() {
+        super();
+        window.storage.registerConstructor(stHealthMax);
+    }
+    toJSON() {return window.storage.Generic_toJSON("stHealthMax", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(stHealthMax, value.data);};
 }
-class stEnergy {
+class stHealth extends Stat {
     static setup(context, base,max) {
-        var _n = Stat.dataPrototype();
-        _n.id='energyMax',_n.base=max, _n.value=max;
-        if(context.findItemSlot(_n.id)<0) context.list.push(_n);
-        _n = Stat.dataPrototype();
-        _n.id='energy',_n.base=base, _n.value=base,_n.limits=[{max:'energyMax',min:''}];
-        if(context.findItemSlot(_n.id)<0) context.list.push(_n);
-        stEnergy.Calc(context);
+        stHealthMax.setup(context,max);
+        var _stat = new stHealth();
+        var _n = _stat.data;
+        _n.id='health',_n.base=base, _n.value=base,_n.limits=[{max:'healthMax',min:''}];
+        context.addItem(_stat);
+        _stat.Calc();
     }
-    static Calc(context) { Stat.Calc(context,'energy');  }
-    static updateModifier(context) {};
+    constructor() {
+        super();
+        window.storage.registerConstructor(stHealth);
+    }
+    toJSON() {return window.storage.Generic_toJSON("stHealth", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(stHealth, value.data);};
+}
+class stEnergyMax extends Stat {
+    static setup(context, max) {
+        var _stat = new stEnergyMax();
+        var _n = _stat.data;
+        _n.id='energyMax',_n.base=max, _n.value=max;
+        context.addItem(_stat);
+        _stat.Calc();
+    }
+    constructor() {
+        super();
+        window.storage.registerConstructor(stEnergyMax);
+    }
+    toJSON() {return window.storage.Generic_toJSON("stEnergyMax", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(stEnergyMax, value.data);};
+}
+class stEnergy extends Stat {
+    static setup(context, base,max) {
+        stEnergyMax.setup(context,max);
+
+        var _stat = new stEnergy();
+        var _n = _stat.data;
+        _n.id='energy',_n.base=base, _n.value=base,_n.limits=[{max:'energyMax',min:''}];
+        context.addItem(_stat);
+        _stat.Calc();
+    }
+    constructor() {
+        super();
+        window.storage.registerConstructor(stEnergy);
+    }
+    toJSON() {return window.storage.Generic_toJSON("stEnergy", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(stEnergy, value.data);};
+}
+class stArousalMax extends Stat {
+    static setup(context, max) {
+        var _stat = new stArousalMax();
+        var _n = _stat.data;
+        _n.id='arousalMax',_n.base=max, _n.value=max, _n.hidden=3;
+        context.addItem(_stat);
+        _stat.Calc();
+    }
+    constructor() {
+        super();
+        window.storage.registerConstructor(stArousalMax);
+    }
+    toJSON() {return window.storage.Generic_toJSON("stArousalMax", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(stArousalMax, value.data);};
+}
+class stArousalMin extends Stat {
+    static setup(context, max) {
+        var _stat = new stArousalMin();
+        var _n = _stat.data;
+        _n.id='arousalMin',_n.base=0, _n.value=0, _n.hidden=1;
+        context.addItem(_stat);
+        _stat.Calc();
+    }
+    constructor() {
+        super();
+        window.storage.registerConstructor(stArousalMin);
+    }
+    toJSON() {return window.storage.Generic_toJSON("stArousalMin", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(stArousalMin, value.data);};
 }
 class stArousal extends Stat{
     static setup(context, base,max) {
-        var _n = Stat.dataPrototype();
-        _n.id='arousalMax',_n.base=max, _n.value=max, _n.hidden=3;
-        if(context.findItemSlot(_n.id)<0) context.list.push(_n);
-        _n = Stat.dataPrototype();
-        _n.id='arousalMin',_n.base=0, _n.value=0, _n.hidden=1;
-        if(context.findItemSlot(_n.id)<0) context.list.push(_n);
-        _n = Stat.dataPrototype();
+        stArousalMax.setup(context,max);
+        stArousalMin.setup(context,0);
+        var _stat = new stArousal();
+        var _n = _stat.data;
         _n.id='arousal', _n.hidden=3,_n.base=base, _n.value=base,_n.limits=[{max:'arousalMax',min:'arousalMin'}];
-        if(context.findItemSlot(_n.id)<0) context.list.push(_n);
-        stArousal.Calc(context);
+        context.addItem(_stat);
+        _stat.Calc();
     }
-    static Calc(context) { Stat.Calc(context,'arousal');  }
+    constructor() {
+        super();
+        window.storage.registerConstructor(stArousal);
+    }
+    toJSON() {return window.storage.Generic_toJSON("stArousal", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(stArousal, value.data);};
 }
-class stPerversion {
+class stPerversionMax extends Stat {
     static setup(context, base,max) {
-        var _n = Stat.dataPrototype();
-        _n.id='perversionMax',_n.base=max, _n.value=max,_n.hidden=4;
-        if(context.findItemSlot(_n.id)<0) context.list.push(_n);
-        _n = Stat.dataPrototype();
-        _n.id='perversion',_n.hidden=4,_n.base=base, _n.value=base,_n.limits=[{max:'perversionMax',min:''}];
-        if(context.findItemSlot(_n.id)<0) context.list.push(_n);
-        stPerversion.Calc(context);
+        var _stat = new stPerversionMax();
+        var _n = _stat.data;
+        _n.id='perversionMax', _n.hidden=3,_n.base=base, _n.value=base,_n.limits=[{max:'',min:''}];
+        context.addItem(_stat);
+        _stat.Calc();
     }
-    static Calc(context) { Stat.Calc(context,'perversion');  }
-    static updateModifier(context) {};
+    constructor() {
+        super();
+        window.storage.registerConstructor(stPerversionMax);
+    }
+    toJSON() {return window.storage.Generic_toJSON("stPerversionMax", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(stPerversionMax, value.data);};
 }
-class stAgility { // core attribute
+class stPerversion extends Stat {
+    static setup(context, base,max) {
+        stPerversionMax.setup(context,max);
+        var _stat = new stPerversion();
+        var _n = _stat.data;
+        _n.id='perversion', _n.hidden=3,_n.base=base, _n.value=base,_n.limits=[{max:'perversionMax',min:''}];
+        context.addItem(_stat);
+        _stat.Calc();
+    }
+    constructor() {
+        super();
+        window.storage.registerConstructor(stPerversion);
+    }
+    toJSON() {return window.storage.Generic_toJSON("stPerversion", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(stPerversion, value.data);};
+}
+class stAgility extends Stat { // core attribute
     static setup(context, base,max) { 
-        var _n = Stat.dataPrototype();
+        var _stat = new stAgility();
+        var _n = _stat.data;
         _n.id='agility',_n.base=base, _n.value=base, _n.modifys=[{id:'energyMax'}];
-        if(context.findItemSlot(_n.id)<0)  context.list.push(_n);
-        stAgility.Calc(context);
+        context.addItem(_stat);
+        _stat.Calc();
     }
-    /*static modify(context, data) {
-        var bonus =0;
-        if(data.id==='healthMax') {
-            bonus = context.get('agility').value;
-        }
-        return (data.value+bonus);
-    }*/
-    static Calc(context) { Stat.Calc(context,'agility');  }
-    static updateModifier(context) {
-        context.addModifier('energyMax',{id:'agility', bonus:context.get('agility').value});
+    constructor() {
+        super();
+        window.storage.registerConstructor(stAgility);
+    }
+    toJSON() {return window.storage.Generic_toJSON("stAgility", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(stAgility, value.data);};
+    updateModifier() {
+        this.parent.addModifier('energyMax',{id:'agility', bonus:this.parent.get('agility').value});
     };
 }
-class stStrength { // core attribute
+class stStrength extends Stat { // core attribute
     static setup(context, base,max) { 
-        var _n = Stat.dataPrototype();
+        var _stat = new stAgility();
+        var _n = _stat.data;
         _n.id='strength',_n.base=base, _n.value=base, _n.modifys=[{id:'healthMax'},{id:'pAttack'}];
-        if(context.findItemSlot(_n.id)<0)  context.list.push(_n);
-        stStrength.Calc(context);
+        context.addItem(_stat);
+        _stat.Calc();
     }
-    static Calc(context) { Stat.Calc(context,'strength');  }
-    static updateModifier(context) {
-        context.addModifier('healthMax',{id:'strength', bonus:context.get('strength').value*4});
-        context.addModifier('pAttack',{id:'strength', bonus:context.get('strength').value%4});
+    constructor() {
+        super();
+        window.storage.registerConstructor(stStrength);
+    }
+    toJSON() {return window.storage.Generic_toJSON("stStrength", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(stStrength, value.data);};
+    updateModifier() {
+        this.parent.addModifier('healthMax',{id:'strength', bonus:this.parent.get('strength').value*4});
+        this.parent.addModifier('pAttack',{id:'strength', bonus:this.parent.get('strength').value%4});
     };
 }
-class stEndurance { // core attribute
+class stEndurance extends Stat { // core attribute
     static setup(context, base,max) { 
-        var _n = Stat.dataPrototype();
+        var _stat = new stAgility();
+        var _n = _stat.data;
         _n.id='endurance',_n.base=base, _n.value=base, _n.modifys=[{id:'healthMax'},{id:'pDefense'}];
-        if(context.findItemSlot(_n.id)<0)  context.list.push(_n);
-        stEndurance.Calc(context);
+        context.addItem(_stat);
+        _stat.Calc();
     }
-    static Calc(context) { Stat.Calc(context,'endurance');  }
-    static updateModifier(context) {
-        context.addModifier('healthMax',{id:'endurance', bonus:context.get('endurance').value*4});
-        context.addModifier('pDefense',{id:'strength', bonus:context.get('endurance').value%4});
+    constructor() {
+        super();
+        window.storage.registerConstructor(stEndurance);
+    }
+    toJSON() {return window.storage.Generic_toJSON("stEndurance", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(stEndurance, value.data);};
+    updateModifier() {
+        this.parent.addModifier('healthMax',{id:'endurance', bonus:this.arent.get('endurance').value*4});
+        this.parent.addModifier('pDefense',{id:'strength', bonus:this.parent.get('endurance').value%4});
     };
 }
-class stPAttack {   //physical attack
+class stPAttack extends Stat {   //physical attack
     static setup(context, base,max) {
-        var _n = Stat.dataPrototype();
+        var _stat = new stPAttack();
+        var _n = _stat.data;
         _n.id='pAttack',_n.base=base, _n.value=base;
-        if(context.findItemSlot(_n.id)<0) context.list.push(_n);
-        stPAttack.Calc(context);
+        context.addItem(_stat);
+        _stat.Calc();
     }
-    static Calc(context) {
-        Stat.Calc(context,'pAttack');
+    constructor() {
+        super();
+        window.storage.registerConstructor(stPAttack);
     }
-    static updateModifier(context) {};
+    toJSON() {return window.storage.Generic_toJSON("stPAttack", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(stPAttack, value.data);};
 }
-class stPDefense {   //physical defense
+class stPDefense extends Stat {   //physical defense
     static setup(context, base,max) {
-        var _n = Stat.dataPrototype();
+        var _stat = new stPAttack();
+        var _n = _stat.data;
         _n.id='pDefense',_n.base=base, _n.value=base;
-        if(context.findItemSlot(_n.id)<0) context.list.push(_n);
-        stPAttack.Calc(context);
+        context.addItem(_stat);
+        _stat.Calc();
     }
-    static Calc(context) {
-        Stat.Calc(context,'pDefense');
+    constructor() {
+        super();
+        window.storage.registerConstructor(stPDefense);
     }
-    static updateModifier(context) {};
+    toJSON() {return window.storage.Generic_toJSON("stPDefense", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(stPDefense, value.data);};
 }
 
 /////////////////////////////////////////////////////////////////////////
-export class Effects extends Inventory {  //Todo a collection of Stats is similiar to Inventory?
+export class Effects extends Inventory2 {  //Todo a collection of Stats is similiar to Inventory?
     constructor(externlist) {
         super(externlist);
         window.storage.registerConstructor(Effects);
     }
     toJSON() {return window.storage.Generic_toJSON("Effects", this); };
-    static fromJSON(value) { return window.storage.Generic_fromJSON(Effects, value.data);};
-    //override
-    getItem(id) {
-        var _item = window.gm.EffectLib[id];
-        if(!_item) throw new Error('unknown effect: '+id);
-        return (window.gm.EffectLib[id]);
+    static fromJSON(value) {
+        var _x = window.storage.Generic_fromJSON(Effects, value.data);
+        return(_x);
     }
     get(id){
-        var _i = this.findItemSlot(id);
-        if(_i<0) throw new Error('unknown effect: '+id);
-        return(this.list[_i]);
+        return(this.getItem(id));
     }
-    //findItemslot uses id, this one finds all effects of one type
+    //findItemslot uses id, this one finds all effects(-slot) of one type
     findEffect(name) {
         var _items = [] ;
         for (var i = 0; i < this.count(); i++) {
@@ -266,60 +415,69 @@ export class Effects extends Inventory {  //Todo a collection of Stats is simili
         }
         return(_items);
     }
+    //override
     removeItem(id) {
         var _i = this.findItemSlot(id);
         if(_i<0) return; //just skip if not found
-        window.gm.EffectLib[this.list[_i].name].onRemove(this,this.list[_i]);
+        var _eff = this.get(id);
         this.list.splice(_i,1);
-        this.postItemChange(this,id,"removed","");
+        _eff.onRemove(this,this.list[_i]);
+        this.postItemChange(id,"removed","");
     }
     addItem(id,effect) {
         var _i = this.findItemSlot(id);
         var res;
         //if effect with same id is already present, merge them
         if(_i>-1) {
-            res =window.gm.EffectLib[this.list[_i].name].merge(this,this.list[_i],effect,effect.dataPrototype());
+            var _old = this.get(effect.id);
+            res = _old.merge(effect);
+            //res =window.gm.EffectLib[this.list[_i].name].merge(this,this.list[_i],effect,effect.dataPrototype());
             if(res!=null) {
                 if(res===true) {}
                 else res(this); //should be a function
-                this.postItemChange(this,id,"merged","");
+                this.postItemChange(id,"merged","");
                 return;
             }  
         }
         //or if there are similiar effects try to merge with them
         var _k = this.findEffect(effect.name);
         for(var i=0;i<_k.length;i++) {
-            res =window.gm.EffectLib[this.list[__k].name].merge(this,this.list[_i],effect,effect.dataPrototype());
+            var _old = this.list[_k];
+            res = _old.merge(effect);
+            //res =window.gm.EffectLib[this.list[_k].name].merge(this,this.list[_i],effect,effect.dataPrototype());
             if(res!=null) {
                 if(res===true) {}
                 else res(this); //should be a function
-                this.postItemChange(this,id,"merged","");
+                this.postItemChange(id,"merged","");
                 break;
             }  
         }
         //else add it to list
-        var data = effect.dataPrototype();
-        data.id=id;
-        this.list.push(data);
-        effect.onApply(this,data);
-        this.postItemChange(this,id,"added","");
+        this.list.push({'id': id,'count': 1, item:effect});
+        effect._parent = window.gm.util.refToParent(this);
+        effect.onApply();
+        this.postItemChange(id,"added","");
     }
-    replace(id, neweffect,newdata) {
+    replace(id, neweffect) {
         var _i = this.findItemSlot(id);
-        window.gm.EffectLib[this.list[_i].name].onRemove(this,this.list[_i]);
-        newdata.id = id;
-        this.list[_i] = newdata;
-        neweffect.onApply(this,newdata);
+        if(_i<0) return; //Todo do nothing
+        var _old = this.get(id);
+        _old.onRemove();
+        //window.gm.EffectLib[this.list[_i].name].onRemove(this,this.list[_i]);
+        neweffect._parent = window.gm.util.refToParent(this);
+        this.list[_i].item = neweffect;
+        neweffect.onApply(this,neweffect);
     }
     updateTime() {
         var now =window.gm.getTime();
         for(var i=0;i<this.list.length;i++){
-            var foo = window.gm.EffectLib[this.list[i].name].onTimeChange(this,this.list[i],now);
+            var _eff = this.list[i].item;
+            var foo = _eff.onTimeChange(now);   
             if(foo) foo(this);
         }
     }
     //override
-    postItemChange(inv,id,operation,msg) {
+    postItemChange(id,operation,msg) {
         window.gm.pushLog('Effects: '+operation+' '+id+' '+msg+'</br>');
     }
 }
@@ -327,33 +485,45 @@ export class Effects extends Inventory {  //Todo a collection of Stats is simili
 
 //! because of the save-problem we dont use objects, just static methods
 class Effect {  
-    /*constructor(parent,name) {
-        this.parent = parent;
-        this.name = name;
-        this.desc = name;
-        this.time = window.gm.getTime();
-    }*/
-    //static get name() { return('Effect');}
-    //static get desc() {return(Effect.name);}
+    constructor() {
+        this.data = Effect.dataPrototype();
+        this.data.time = window.gm.getTime();
+    }
     static dataPrototype() {
-        return({id:'xxx', name: Effect.name, ts: 0, duration:0,hidden:0});
+        return({id:'xxx', name: Effect.name, time: 0, duration:0,hidden:0});
         //hidden 0 = visible, 1= name unreadable, 2= value unreadable, 4= hidden
     }
+    // Attention !!
+    //_parent will be added dynamical
+    get parent() {return this._parent();}
+    get id() {return(this.data.id);}
+    get name() {return(this.data.name);}
+    get time() {return(this.data.time);}
+    get duration() {return(this.data.duration);}
+    get hidden() {return(this.data.hidden);}
+        //add Reviver support:
+    //window.storage.registerConstructor(???);
+    //toJSON() {return window.storage.Generic_toJSON("???", this); };
+    //static fromJSON(value) { return window.storage.Generic_fromJSON(???, value.data);};
+    
     //is called when a effect is applied to check if the new effect can be combined with an exisitng one
     //return null if no merge occured
     //return true if the neweffect was merged into existing one; no other effects are then checked for mergeability
-    //or return function that has to be executed: (function(Effects){ Effects.replace(data.id,window.gm.EffectLib.NotTired,newdata);}));
-    static merge(context,data,neweffect,newdata) {
+    //or return function that has to be executed: (function(Effects){ Effects.replace(data.id,NotTired);}));
+    merge(neweffect) {
         return(null);
     }
-    static onTimeChange(context,data,time) {
+    onTimeChange(time) {
         return(null);
     }
-    static onApply(context,data){}
-    static onRemove(context,data){}
+    onApply(){}
+    onRemove(){}
 }
-//a class that is used in combat
+//combat effect use turn-count instead of realtime as duration
 class CombatEffect extends Effect {
+    constructor() {
+        super(); 
+    }
     //duration in turns !
     static onCombatEnd(context,data) {}
     //called before targets turn
@@ -362,157 +532,148 @@ class CombatEffect extends Effect {
     static onTurnEnd(context,data) {}
 }
 class effEnergized extends Effect {
-   /*constructor(parent) {
-        super(parent,'Energized');
-    }*/
-    static get name() { return('Energized');}
-    static get desc() {return(effEnergized.name);}
-    static dataPrototype() {
-        return({id:'Energized', name: effEnergized.name, time: 0, duration:120});
+    constructor() {
+        super();
+        this.data.id = this.data.name= effEnergized.name, this.data.duration = 120;
+        window.storage.registerConstructor(effEnergized);
     }
-    static onTimeChange(context,data,time) {
+    toJSON() {return window.storage.Generic_toJSON("effEnergized", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(effEnergized, value.data);};
+     get desc() {return(effEnergized.name);}
+
+    onTimeChange(time) {
         //+ 10Energy per hour
-        var delta = window.gm.getDeltaTime(time,data.time);
-        data.time = time;
-        data.duration-= delta;
-        if(data.duration<0) delta = delta+data.duration; // if delta is 20 but remaining duration is only 5, delta should be capped to 5
-        context.parent.Stats.increment('energy',10*delta/60);
-        if(data.duration<=0) {
-        return((function(Effects){ 
-            Effects.removeItem(data.id);}));
+        var delta = window.gm.getDeltaTime(time,this.data.time);
+        this.data.time = time;
+        this.data.duration-= delta;
+        if(this.data.duration<0) delta = delta+this.data.duration; // if delta is 20 but remaining duration is only 5, delta should be capped to 5
+        //Effects impact Stats:  Effect->Effects->Character->Stats    is there a prettier wy?
+        this.parent.parent.Stats.increment('energy',10*delta/60);
+        if(this.data.duration<=0) {
+            return((function(Effects){  //remove yourself
+                Effects.removeItem(this.data.id);}));
         }
         return(null);
     }
-    static onApply(context,data){
+    onApply(){
         //+10 energy
-        data.duration = 120;
-        data.time = window.gm.getTime();
-        context.parent.Stats.increment('energy',10);
+        this.data.duration = 120;
+        this.data.time = window.gm.getTime();
+        this.parent.parent.Stats.increment('energy',10);
     }
-    static merge(context,data,neweffect,newdata) {
-        if(neweffect.name===data.name) {
-            effEnergized.onApply(context,data);
+    merge(neweffect) {
+        if(neweffect.name===this.data.name) {
+            this.onApply(); //refresh 
             return(true);
         }
     }
 }
 class effNotTired extends Effect {
-    /*constructor(parent) {
-        super(parent,'NotTired');
-    }*/
-    static get name() { return('NotTired');}
-    static get desc() {return(effNotTired.name);}
-    static dataPrototype() {
-        return({id:effNotTired.name, name: effNotTired.name, time: 0, duration:120,hidden:4});
+    constructor() {
+        super();
+        this.data.id = this.data.name= effNotTired.name, this.data.duration = 120, this.data.hidden=4;
+        window.storage.registerConstructor(effNotTired);
     }
-    static onTimeChange(context,data,time) {
+    toJSON() {return window.storage.Generic_toJSON("effNotTired", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(effNotTired, value.data);};
+    get desc() {return(effNotTired.name);}
+
+    onTimeChange(time) {
         //Tired after xxh
-        data.duration-= window.gm.getDeltaTime(time,data.time);
-        data.time = time;
-        if(data.duration<=0) {
-        return((function(Effects){ 
-            var newdata =window.gm.EffectLib.Tired.dataPrototype();
-            newdata.id=data.id;
-            newdata.time = time;
-            Effects.replace(data.id,window.gm.EffectLib.Tired,newdata);}));
+        this.data.duration-= window.gm.getDeltaTime(time,this.data.time);
+        this.data.time = time;
+        if(this.data.duration<=0) {
+        return(function(me){
+            return (function(Effects){ 
+            var newdata =new effTired(); Effects.replace(me.data.id,newdata);});
+            }(this));
         }
         return(null);
     }
-    static onApply(context,data){
-        data.duration = 120;// todo 600;
-        data.time = window.gm.getTime();
+    onApply(){
+        this.data.duration = 120;// todo 600;
+        this.data.time = window.gm.getTime();
     }
-    static merge(context,data,neweffect,newdata) {
-        if(neweffect.name===data.name) {
-            neweffect.onApply(context,data);
+    merge(neweffect) {
+        if(neweffect.name===this.data.name) {
+            this.onApply(); //refresh
             return(true);
         }
     }
 }
 class effTired extends Effect {
-    /*constructor(parent) {
-        super(parent,'Tired');
-    }*/
-    static get name() { return('Tired');}
-    static get desc() {return(effTired.name);}
-    static dataPrototype() {
-        return({id:effTired.name, name: effTired.name, time: 0, duration:120,hidden:0});
+    constructor() {
+        super();
+        this.data.id = this.data.name= effTired.name, this.data.duration = 120, this.data.hidden=0;
+        window.storage.registerConstructor(effTired);
     }
-    static onTimeChange(context,data,time) {  
+    toJSON() {return window.storage.Generic_toJSON("effTired", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(effTired, value.data);};
+    get desc() {return(effTired.name);}
+
+    onTimeChange(time) {  
         //duration not used -> will never expire unless replaced
-        var delta = window.gm.getTime()- data.time;
+        var delta = window.gm.getTime()-this.data.time;
         //-10 max energy after 12h, but only up to 3 times
-        if(delta>60) context.parent.Stats.addModifier('energyMax',{id:'energyMax:Tired', bonus:-10});
+        if(delta>60) this.parent.parent.Stats.addModifier('energyMax',{id:'energyMax:Tired', bonus:-10});
     }
-    static onApply(context,data){
-        data.time = window.gm.getTime();
+    onApply(){
+        this.data.time = window.gm.getTime();
     }
-    static onRemove(context,data){
-        context.parent.Stats.removeModifier('energyMax',{id:'energyMax:Tired'});
+    onRemove(){
+        this.parent.parent.Stats.removeModifier('energyMax',{id:'energyMax:Tired'});
     }
-    static merge(context,data,neweffect,newdata) {
+    merge(neweffect) {
         if(neweffect.name==='NotTired') {
-            return((function(Effects){ 
-                Effects.replace(data.id,window.gm.EffectLib.NotTired,newdata);}));
+            return(function(me){
+                return (function(Effects){ 
+                var newdata =new effNotTired(); Effects.replace(me.data.id,newdata);});
+                }(this));
         }
-        if(neweffect.name===data.name) {
+        if(neweffect.name===this.data.name) {
             //just ignore
             return(true);
         }
     }
 }
+//skill 
 class skCooking extends Effect {
-    /*constructor(parent) {
-        super(parent,'Tired');
-    }*/
-    static get name() { return('Cooking');}
-    static get desc() {return(skCooking.name);}
-    static dataPrototype() {
-        return({id:skCooking.name, name: skCooking.name, time: 0, duration:0,hidden:0});
+    constructor() {
+        super();
+        this.data.id = this.data.name= skCooking.name;
+        window.storage.registerConstructor(skCooking);
     }
-    static onTimeChange(context,data,time) {    }
-    static onApply(context,data){    }
-    static onRemove(context,data){    }
-    static merge(context,data,neweffect,newdata) { }
-}
+    toJSON() {return window.storage.Generic_toJSON("skCooking", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(skCooking, value.data);};
 
-class skAnalReceiving extends Effect {
-    /*constructor(parent) {
-        super(parent,'Tired');
-    }*/
-    static get name() { return('AnalReceiving');}
-    static get desc() {return(skAnalReceiving.name);}
-    static dataPrototype() {
-        return({id:skAnalReceiving.name, name: skAnalReceiving.name, time: 0, duration:0,hidden:0});
-    }
-    static onTimeChange(context,data,time) {    }
-    static onApply(context,data){    }
-    static onRemove(context,data){    }
-    static merge(context,data,neweffect,newdata) { }
+    get desc() {return(skCooking.name);}
 }
 
 class effStunned extends CombatEffect {
-    static get name() { return('Stunned');}
-    static get desc() {return(effStunned.name);}
-    static dataPrototype() {
-        return({id:effStunned.name, name: effStunned.name, time: 0, duration:2,hidden:0});
+    constructor() {
+        super();
+        this.data.id = this.data.name= effStunned.name, this.data.duration = 2;
+        window.storage.registerConstructor(effStunned);
     }
-    static onApply(context,data){
-        data.duration = 2;
-        data.time = window.gm.getTime();
+    toJSON() {return window.storage.Generic_toJSON("effStunned", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(effStunned, value.data);};
+    get desc() {return(effStunned.name);}
+
+    onApply(){
+        this.data.duration = 2;
     }
-    static merge(context,data,neweffect,newdata) {
-        if(neweffect.name===data.name) {    //extends stun
-            neweffect.onApply(context,data);
+    merge(neweffect) {
+        if(neweffect.name===this.data.name) {    //extends stun
+            this.onApply();
             return(true);
         }
     }
-    static onCombatEnd(context,data) {
-        context.removeItem(data.id);
+    onCombatEnd() {
+        this.parent.removeItem(data.id);
     }
-    static onTurnStart(context,data) {
-        data.duration-=1;
-        if(data.duration<=0) context.removeItem(data.id);
+    onTurnStart() {
+        this.data.duration-=1;
+        if(this.data.duration<=0) this.parent.removeItem(this.data.id);
     }
 } 
 //////////////////////////////////////////////////////////////
