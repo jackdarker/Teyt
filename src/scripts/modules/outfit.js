@@ -32,10 +32,10 @@ export class Equipment extends Item {
     usable(context) {return({OK:false, msg:'Useable in wardrobe'});}
     use(context) {return({OK:false, msg:'Cannot use.'});}
 
-    canEquip(context) {return({OK:false, msg:'unusable'});}
-    canUnequip(context) {return({OK:false, msg:'unusable'});}
-    onEquip(context) {return({OK:true, msg:'equipped'});}
-    onUnequip(context) {return({OK:true, msg:'unequipped'});}
+    canEquip() {return({OK:false, msg:'unusable'});}
+    canUnequip() {return({OK:false, msg:'unusable'});}
+    onEquip() {return({OK:true, msg:'equipped'});}
+    onUnequip() {return({OK:true, msg:'unequipped'});}
 }
 export class Leggings extends Equipment {
     constructor() {
@@ -95,6 +95,7 @@ export class Pullover extends Equipment {
     canEquip() {return({OK:true, msg:'equipable'});}
     canUnequip() {return({OK:true, msg:'unequipable'});}
 }
+//this is an Inventory-item, not wardrobe
 export class Crowbar extends Equipment {
     constructor() {
         super('Crowbar');
@@ -105,17 +106,20 @@ export class Crowbar extends Equipment {
     }
     toJSON() {return window.storage.Generic_toJSON("Crowbar", this); };
     static fromJSON(value) {return(window.storage.Generic_fromJSON(Crowbar, value.data));}
-    usable() {return(this.canEquip());}
-    use() { //context here is inventory not outfit
+    usable(context) {return(this.canEquip());}
+    use(context) { //context here is inventory not outfit
         if(this.parent.parent.Outfit.findItemSlot(this.name).length>0) {  
             this.parent.parent.Outfit.removeItem(this.name); 
-            return( {OK:true, msg:''}); //todo
+            return( {OK:true, msg:'unequipped '+ this.name}); //todo
         } else {
             this.parent.parent.Outfit.addItem(this); 
-            return( {OK:true, msg:''}); //todo
+            return( {OK:true, msg:'equipped '+ this.name}); //todo
         }
     }
-    canEquip() {return({OK:true, msg:'equipable'});}
+    canEquip() { 
+        if(this.parent.parent.Outfit.findItemSlot(this.name).length>0) return({OK:true, msg:'unequip'});
+        else return({OK:true, msg:'equip'});
+    }
     canUnequip() {return({OK:true, msg:'unequipable'});}
     onEquip() {
         this.parent.parent.Stats.addModifier('pAttack',{id:'pAttack:Crowbar', bonus:2});
@@ -124,8 +128,41 @@ export class Crowbar extends Equipment {
         this.parent.parent.Stats.removeModifier('pAttack',{id:'pAttack:Crowbar'});
         return({OK:true, msg:'unequipped'});}
 }
+//this is an Inventory-item, not wardrobe
+export class Shovel extends Equipment {
+    constructor() {
+        super('Shovel');
+        this.desc = 'A rusty,old shovel.';
+        this.tags = ['tool', 'weapon'];
+        this.slotUse = ['RHand','LHand'];
+        window.storage.registerConstructor(Shovel);
+    }
+    toJSON() {return window.storage.Generic_toJSON("Shovel", this); };
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(Shovel, value.data));}
+    usable(context) {return(this.canEquip());}
+    use(context) { //context here is inventory not outfit
+        if(this.parent.parent.Outfit.findItemSlot(this.name).length>0) {  
+            this.parent.parent.Outfit.removeItem(this.name); 
+            return( {OK:true, msg:'unequipped '+ this.name}); //todo
+        } else {
+            this.parent.parent.Outfit.addItem(this); 
+            return( {OK:true, msg:'equipped '+ this.name}); //todo
+        }
+    }
+    canEquip() {
+        if(this.parent.parent.Outfit.findItemSlot(this.name).length>0) return({OK:true, msg:'unequip'});
+        else return({OK:true, msg:'equip'});
+    }
+    canUnequip() {return({OK:true, msg:'unequipable'});}
+    onEquip() {
+        this.parent.parent.Stats.addModifier('pAttack',{id:'pAttack:Shovel', bonus:2});
+        return({OK:true, msg:'equipped'});}
+    onUnequip() {
+        this.parent.parent.Stats.removeModifier('pAttack',{id:'pAttack:Shovel'});
+        return({OK:true, msg:'unequipped'});}
+}
 //a kind of special inventory for worn equipment
-export class Outfit extends Inventory2{
+export class Outfit extends Inventory{
     constructor(externlist) {
         super(externlist);
         //create each slot
@@ -170,7 +207,7 @@ export class Outfit extends Inventory2{
     canUnequipItem(id, force) {
         var _idx = this.findItemSlot(id);
         var _item = this.getItem(id);
-        var result = _item.canUnequip(id);
+        var result = _item.canUnequip();
         for(var i=0; i<_idx.length;i++) {
             var _tmp = this.canUnequipSlot(_idx[i]);
             if(!_tmp.OK) result.msg +=_tmp.msg+" ";
@@ -219,7 +256,7 @@ export class Outfit extends Inventory2{
     }
     //assumme that it was checked before that unequip is allowed
     __clearSlot(slot, force) {
-        this.list[slot].id = '';
+        this.list[slot].id = '', this.list[slot].item=null;
     }
     removeItem(id, force) {
         var _idx = this.findItemSlot(id);
@@ -237,7 +274,7 @@ export class Outfit extends Inventory2{
         this.postItemChange(id,"removed",result.msg);
         //Todo delete _item;    //un-parent
     }
-    isNaked() {
+    isNaked() { //TODO
         if(this.getItemId(window.gm.OutfitSlotpLib.Legs)==='' || this.getItemId(window.gm.OutfitSlotpLib.Torso)==='') 
         {
             return(true);

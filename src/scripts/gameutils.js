@@ -210,8 +210,10 @@ window.gm.printItem= function( id,descr) {
     var _inv = window.gm.player.Inv;
     var _count =_inv.countItem(id);
     elmt +=`<a0 id='${id}' onclick='(function($event){document.querySelector(\"div#${id}\").toggleAttribute(\"hidden\");})(this);'>${id} (x${_count})</a>`;
-    if(_count>0 && _inv.usable(id).OK) {
-        elmt +=`<a0 id='${id}' onclick='(function($event){window.gm.player.Inv.use(\"${id}\"); window.gm.refreshScreen();}(this))'>Use</a>`;
+    var useable = _inv.usable(id);
+    if(_count>0 && useable.OK) {
+
+        elmt +=`<a0 id='${id}' onclick='(function($event){var _res=window.gm.player.Inv.use(\"${id}\"); window.gm.refreshScreen();window.gm.printOutput(_res.msg);}(this))'>${useable.msg}</a>`;
     }
     elmt +=`</br><div hidden id='${id}'>${descr}</div>`;
     if(window.story.passage(id))  elmt +=''.concat("    [[Info|"+id+"]]");  //Todo add comands: drink,eat, use
@@ -257,9 +259,13 @@ window.gm.printRelationSummary= function() {
     var result ='';
     var ids = [];
     result+='<table>';
-    for(var k=0;k<window.gm.player.Rel.count();k++){
-        var data = window.gm.player.Rel.get(window.gm.player.Rel.getItemId(k));
-        result+='<tr><td>'+data.id+':</td><td>'+data.value+'</td></tr>';
+    var ids = window.gm.player.Rel.getAllIds();
+    ids.sort();
+    for(var k=0;k<ids.length;k++){
+        if(ids[k].split("_").length===1) {   //ignore _min/_max
+            var data = window.gm.player.Rel.get(ids[k]);
+            result+='<tr><td>'+data.id+':</td><td>'+data.value+' of '+window.gm.player.Rel.get(ids[k]+"_Max").value+'</td></tr>';
+        }
     }   //todo print mom : 10 of 20
     result+='</table>';
     return(result);
@@ -318,10 +324,10 @@ window.gm.printTodoList= function() {
 window.gm.printUnlockPerk= function(id, descr) {
     var elmt='';
     var s= window.story.state;
-        if(s.player[id]==0 && s.player.skillPoints>0) {
+        if(window.gm.player[id]==0 && window.gm.player.skillPoints>0) {
             elmt +=''.concat("<a0 id='"+id+"' onclick='(function ( $event ) { unlockPerk($event.id); })(this);'>"+descr+"</a>");
         elmt +=''.concat("    [[Info|"+id+"]]");
-        } else if(s.player[id]>0) {
+        } else if(window.gm.player[id]>0) {
             elmt +=id+": "+descr;
         }
         elmt +=''.concat("</br>");

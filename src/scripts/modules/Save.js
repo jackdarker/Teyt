@@ -162,8 +162,8 @@ window.storage = {
       //var hash= window.story.save();    this call somehow messes up html and I had to copy the following from snowman script
       var hash = LZString.compressToBase64(JSON.stringify({state:window.story.state,
           history:window.story.history,checkpointName:window.story.checkpointName}));
-      
-      var info=window.story.state.player.location +' - '+ new Date().toString();
+      var options = {year:"numeric", month:"short", day:"numeric", hour:"numeric", minute:"numeric", second:"numeric"};
+      var info=window.gm.player.location +' - '+ (new Intl.DateTimeFormat("default", options).format(new Date()));
       window.localStorage.setItem(slot.concat('info'),info);
       window.localStorage.setItem(slot,hash);
       //document.querySelector("output").textContent = info;  //causes problems because page reset to start-Index.html??

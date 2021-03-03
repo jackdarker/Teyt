@@ -67,7 +67,7 @@ function createItemLookups(){
     window.storage.registerConstructor(Jeans);
     window.storage.registerConstructor(Pullover);
     window.storage.registerConstructor(Crowbar);
-    //window.storage.registerConstructor(Shovel);
+    window.storage.registerConstructor(Shovel);
     //window.storage.registerConstructor(Handcuffs);
     //...stats
     window.storage.registerConstructor(stHealthMax);

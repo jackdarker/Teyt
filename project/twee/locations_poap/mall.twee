@@ -1,8 +1,8 @@
 :: Mall Floor 0 (postapocalypse)
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
-<%s.player.location=window.passage.name;%>
-You are actually at [[<%=s.player.location%>]].</br>
+<%window.gm.player.location=window.passage.name;%>
+You are actually at [[<%=window.gm.player.location%>]].</br>
 You could try to dig through the rubble in the demolished shops. But you doubt that there is much useful left worth to [[scavenge|Mall_scavenge]]. </br>
 The door to the [[Restrooms]] was torn by brute force.</br>
 
@@ -15,7 +15,7 @@ The stairway to the lower floor is blocked by parts of the building that fell do
 :: Mall Floor 1 (postapocalypse)
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
-<%s.player.location=window.passage.name;%>
+<%window.gm.player.location=window.passage.name;%>
 
 Where would you like to go from here?</br>
 [[Mall 0F|Mall Floor 0]]
@@ -24,7 +24,7 @@ Where would you like to go from here?</br>
 [[Mall_scavenge]]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
-<%s.player.location=window.passage.name;%>
+<%window.gm.player.location=window.passage.name;%>
 You are on the hunt for useful resources as...
 <a href="javascript:void(0)" onclick='(window.gm.combat.initCombat(window.gm.Mobs.Mole);window.story.show("Encounter");});'>Next</a> </br>
 

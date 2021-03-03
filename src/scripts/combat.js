@@ -4,9 +4,9 @@ window.gm = window.gm || {};
 window.gm.combat = window.gm.combat || {};
 window.gm.combat.initCombat = function(combatSetup) { //setup enemy for encounter
     var s=window.story.state;
-    window.gm.enemy = combatSetup();
-    s.enemy.name = window.gm.enemy.name;  
-    s.enemy.pic = window.gm.enemy.pic;
+    s.enemy = combatSetup();
+    //s.enemy.name = window.gm.enemy.name;  
+    //s.enemy.pic = window.gm.enemy.pic;
     s.combat.enemyTurn =false;
     s.combat.turnCount=0;
     s.combat.combatState='battling';
@@ -18,14 +18,33 @@ window.gm.combat.hideCombatOption= function() {
 window.gm.combat.printCombatOption= function() { //creates a list of possible moves
   var elmt="<form id='combatmenu'>";
   //Todo create list based on abilitys
+  var canAct = window.gm.player._canAct();
+  if(canAct.OK===true) {
   elmt +="<a0 id='moveFlee'           onclick='(function($event){window.gm.combat.triggerCombat($event.id);})(this);'>Try to flee</a></br>";
   elmt +="<a0 id='movePhysicalAttack' onclick='(function($event){window.gm.combat.triggerCombat($event.id);})(this);'>Attack</a></br>";
   elmt +="<a0 id='moveGuard'          onclick='(function($event){window.gm.combat.triggerCombat($event.id);})(this);'>Guard</a></br>";
   elmt +="<a0 id='moveStun'           onclick='(function($event){window.gm.combat.triggerCombat($event.id);})(this);'>Stun</a></br>";
+  //Todo Item-use on self or enemy
   //elmt +="<a0 id='showItems' onclick='(function($event){window.gm.execCombatCmd($event.id);"+next+"})(this);'>Item</a></br>";
-  elmt +="</form>";
+  } else {
+    elmt +=canAct.msg+"</br>";
+  }
+  elmt +="<a0 id='moveNOP'          onclick='(function($event){window.gm.combat.triggerCombat($event.id);})(this);'>Do nothing</a></br>";
+  elmt +="</form></br>";
   return(elmt);
 
+};
+//creates a list of active effects for combat display
+window.gm.combat.printCombatEffects= function(char) {
+  var list=[];
+  var effects = char.Effects.getAllIds();
+  for(var i=0; i<effects.length; i++) {
+    var effect = char.Effects.get(effects[i]);
+    if(effect.onCombatEnd!==null && effect.onCombatEnd!==undefined) {
+      list.push(effect.shortDesc);
+    }
+  }
+  return(list.reduce((sum, current) => sum + current +', ', ''));
 };
 //UNUSED
 window.gm.combat.printCombatScreen = function() { //prints scene-bg and enemy to canvas      
@@ -47,7 +66,7 @@ window.gm.combat.triggerCombat= function(id) {  //called by combatmenu-buttons e
 };
 //calculates and executes combat-cmd of enemy
 window.gm.combat.calcEnemyCombat= function() { 
-  var enemy = window.gm.enemy;
+  var enemy = window.story.state.enemy;
   var move = enemy.calcCombatMove();
   return(move.msg+"</br>");
 };
@@ -55,39 +74,40 @@ window.gm.combat.calcEnemyCombat= function() {
 window.gm.combat.execCombatCmd = function(move) { 
   var s = window.story.state;
   var result = move();
-
   s.combat.enemyTurn =!s.combat.enemyTurn;  //toggle whos turn
   return(result);
 }
 window.gm.combat.startRound = function() {
+  var s = window.story.state;
   s.combat.turnCount+=1;
   //update combateffects
-  var list = [window.gm.enemy, window.gm.player];
+  var list = [window.story.state.enemy, window.gm.player];
   for(var k=0; k<list.length;k++){
     var effects = list[k].Effects.getAllIds();
     for(var i=0; i<effects.length; i++) {
       var effect = list[k].Effects.get(effects[i]);
-      if(typeof effect === CombatEffect) {
-        //list[k].Effects.(effects[i]);
+      if(effect.onCombatEnd!==null && effect.onCombatEnd!==undefined) {  //typeof effect === CombatEffect doesnt work? so we check presencse of attribut
+        effect.onTurnStart();
       }
     }
   }
-}
+};
 window.gm.combat.endRound = function() {
-}
+};
 window.gm.combat.endCombat = function(){
   //remove combateffects
-  var list = [window.gm.enemy, window.gm.player];
+  var list = [window.story.state.enemy, window.gm.player];
   for(var k=0; k<list.length;k++){
     var effects = list[k].Effects.getAllIds();
     for(var i=0; i<effects.length; i++) {
       var effect = list[k].Effects.get(effects[i]);
-      if(typeof effect === CombatEffect) {
-        list[k].Effects.removeItem(effects[i]);
+      if(effect.onCombatEnd!==null && effect.onCombatEnd!==undefined) {
+        effect.onCombatEnd();
       }
     }
   }
-}
+};
+
 //OBSOLETE executes a combat-cmd for player/enemy
 window.gm.combat.execCombatCmd2 = function(id) { 
   var s = window.story.state;
@@ -114,6 +134,11 @@ window.gm.combat.execCombatCmd2 = function(id) {
   }
   
 };
+//does nothing
+window.gm.combat.moveNOP = function() { 
+  var result= {OK:false,msg:''};
+  return(result);
+}
 //increase defense
 window.gm.combat.moveGuard = function() { 
   //Todo
@@ -125,15 +150,14 @@ window.gm.combat.moveGuard = function() {
   return(result);
 }
 window.gm.combat.moveStun = function() { 
-  //Todo
   var s = window.story.state;
-  var attacker = s.combat.enemyTurn ? window.gm.enemy  :window.gm.player;
-  var defender = s.combat.enemyTurn ? window.gm.player :window.gm.enemy;
+  var attacker = s.combat.enemyTurn ? window.story.state.enemy  :window.gm.player;
+  var defender = s.combat.enemyTurn ? window.gm.player :window.story.state.enemy;
   var result= {OK:true,msg:''};
   var rnd = _.random(1,100);
-  if(rnd >40) {
+  if(rnd >4) {
     result.msg += defender.name+" got stunned by "+attacker.name;
-    defender.addEffect(new effStunned())
+    defender.addEffect(effStunned.name,new effStunned())
   } else {
     result.msg += "Attempt to stun "+defender.name +" failed.";
     result.OK=false;
@@ -160,8 +184,8 @@ window.gm.combat.moveFlee = function() {
 //calculates damage of attack
 window.gm.combat.movePhysicalAttack = function() { 
   var s = window.story.state;
-  var attacker = s.combat.enemyTurn ? window.gm.enemy  :window.gm.player;
-  var defender = s.combat.enemyTurn ? window.gm.player :window.gm.enemy;
+  var attacker = s.combat.enemyTurn ? window.story.state.enemy  :window.gm.player;
+  var defender = s.combat.enemyTurn ? window.gm.player :window.story.state.enemy;
   var msg = '';
   var crit= false,hit=false,block=false;
   var def = defender.Stats.get('pDefense').value;

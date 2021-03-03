@@ -1,8 +1,8 @@
 :: Mall Floor 0
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
-<%s.player.location=window.passage.name;%>
-You are actually at [[<%=s.player.location%>]].</br>
+<%window.gm.player.location=window.passage.name;%>
+You are actually at [[<%=window.gm.player.location%>]].</br>
 As you wander around you find a [[Bookstore]], a fine grocerie , [[Boots and Shoes]].</br>
 If you need some tools for your hobby you should check the [[craft store]].</br>
 There are also [[Restrooms]].</br>
@@ -24,10 +24,10 @@ renderToSelector("#panel", "listbuy");
 :: Mall Floor 1
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
-<%s.player.location=window.passage.name;%>
+<%window.gm.player.location=window.passage.name;%>
 <%window.gm.printShopBuyEntry("Lube",4,cbCanBuy=(function(itemid){return window.gm.cbCanBuyPerverse(itemid,15,10)}),cbPostBuy=(function(itemid){window.gm.defaultPostBuy(itemid,15)}))%>
 <%window.gm.printShopBuyEntry("Batteries",40,cbCanBuy=(function(itemid){return window.gm.defaultCanBuy(itemid,6)}),cbPostBuy=(function(itemid){window.gm.defaultPostBuy(itemid,6)}))%>
-You are actually at [[<%=s.player.location%>]].</br>
+You are actually at [[<%=window.gm.player.location%>]].</br>
 Several snack bars and smaller shops are cirling around the wall side of the mall.</br> 
 One of them is [[Alice treasures]], a place where women can buy more private cloths.</br>
 In a more shady corner you find a shop whose windows are just coverd with dark red and black foils. 
@@ -42,8 +42,8 @@ Where would you like to go from here?</br>
 :: Mall Floor -1
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
-<%s.player.location=window.passage.name;%>
-You are actually at [[<%=s.player.location%>]].</br>
+<%window.gm.player.location=window.passage.name;%>
+You are actually at [[<%=window.gm.player.location%>]].</br>
 This level of the mall seems to be reserved for the less fancy business. </br> 
 Most of the space is occupied by the usual [[electronics store]] and a [[food store]].
 Where would you like to go from here?</br>
@@ -53,8 +53,8 @@ Where would you like to go from here?</br>
 :: Adult books and tools
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
-<%s.player.location=window.passage.name;%>
-You are actually at [[<%=s.player.location%>]].</br>
+<%window.gm.player.location=window.passage.name;%>
+You are actually at [[<%=window.gm.player.location%>]].</br>
 Various Items are on sale: </br>
 <div id="choice"></div>
 <a href="javascript:void(0)" id="lube" onclick='choice(this,"div#choice")'>Lube</a></br>

@@ -72,9 +72,9 @@ class CanOfCoffee extends Item {
     }
     toJSON() {return window.storage.Generic_toJSON("CanOfCoffee", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(CanOfCoffee, value.data);};
-    usable(context) {return({OK:true, msg:'drinkable'});}
+    usable(context) {return({OK:true, msg:'drink'});}
     use(context) { 
-        if(context instanceof Inventory2) {
+        if(context instanceof Inventory) {
             context.removeItem('CanOfCoffee');
             if(context.parent instanceof Character){
                 context.parent.addEffect('CanOfCoffee:Energized',new effEnergized());    //apply over-time-effect instead directly changing stat
@@ -90,9 +90,9 @@ class SimpleFood extends Item {
     }
     toJSON() {return window.storage.Generic_toJSON("SimpleFood", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(SimpleFood, value.data);};
-    usable(context) {return({OK:true, msg:'eatable'});}
+    usable(context) {return({OK:true, msg:'eat'});}
     use(context) { 
-        if(context instanceof Inventory2) {
+        if(context instanceof Inventory) {
             context.removeItem('Simple food');
             if(context.parent instanceof Character){
                 context.parent.addEffect('Simple food:Energized',new effEnergized());

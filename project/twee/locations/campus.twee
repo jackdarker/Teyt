@@ -1,7 +1,7 @@
 :: Campus
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%s.player.location=window.passage.name;%>
+<%window.gm.player.location=window.passage.name;%>
 This is the campus of the Institute of Technology and Development.</br>
 A lot of people are hurrying along or stand by in idle chatter.</br>
 

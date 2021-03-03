@@ -48,7 +48,8 @@ window.gm.initGame= function(forceReset) {
         qUnlockDowntown : 0,
         qUnlockRedlight : 0,
         qUnlockBeach : 0,
-        debugInv: new Inventory2()
+        hairGrow: 0,
+        debugInv: new Inventory()
         }; 
         s.vars.debugInv._parent = window.gm.util.refToParent(null);
         s.vars.debugInv.addItem(new Money(),200);
@@ -56,8 +57,7 @@ window.gm.initGame= function(forceReset) {
     }
     if (!s.enemy||forceReset) { //actual/last enemy
       s.enemy = Character.defaultData();
-      //window.gm.enemy = new Character(s.enemy);
-      s.enemy = window.gm.enemy = new Character();
+      s.enemy = new Character();
     }
     if (!s.combat||forceReset) { //see encounter & combat.js
       s.combat = {
@@ -76,9 +76,6 @@ window.gm.initGame= function(forceReset) {
       };
     }
     if (!s.Cyril||forceReset) {  //alternative player character
-      //s.Cyril = Character.defaultData(); //get default struct and add some special data
-      //s.Cyril.name = 'Cyril';
-      //window.gm.Cyril = new Character(s.Cyril);
       window.gm.Cyril = new Character()
       //add some basic inventory
       window.gm.Cyril.Wardrobe.addItem(new Jeans());
@@ -101,6 +98,7 @@ window.gm.initGame= function(forceReset) {
         //window.gm.Ratchel = new Character(s.Ratchel);
         window.gm.Ratchel = new Character();
         window.gm.Ratchel.name="Ratchel";
+        window.gm.Ratchel.gainRelation('Mom',10);
         window.gm.Ratchel.Effects.addItem(skCooking.name,new skCooking());
         //add some basic inventory
         window.gm.Ratchel.Inv.addItem(new Money(),20);
@@ -117,8 +115,7 @@ window.gm.initGame= function(forceReset) {
 }
 window.gm.switchPlayer = function(playername) {
   var s = window.story.state;
-  window.gm.player= s.player = s[playername]; 
-  //window.gm.player = new Character(s.player);
+  window.gm.player= s[playername]; 
   s.vars.activePlayer = playername;
 }
 window.gm.rebuildObjects= function(){ //Reconnect the objects after load!  
@@ -210,13 +207,13 @@ window.gm.rollExplore= function() {
   var places=[];   
   var r = _.random(0,100);
   //todo:depending of your actual location you have a chance to find connected locations or end up in a known one
-  if(s.player.location=='Park')   places = ['Mall','Beach'];
-  if(s.player.location=='Mall')   places = ['Park','Beach','Downtown']; 
-  if(s.player.location=='Beach')   places = ['Park','Mall']; 
-  if(s.player.location=='Downtown')   {
+  if(window.gm.player.location=='Park')   places = ['Mall','Beach'];
+  if(window.gm.player.location=='Mall')   places = ['Park','Beach','Downtown']; 
+  if(window.gm.player.location=='Beach')   places = ['Park','Mall']; 
+  if(window.gm.player.location=='Downtown')   {
     places.push('Pawn shop'); 
   }
-  if(places.length==0) places = [s.player.location]; //fallback if unspeced location
+  if(places.length==0) places = [window.gm.player.location]; //fallback if unspeced location
   r = _.random(1, places.length)-1; //chances are equal
   window.gm.addTime(20);
   window.story.show(places[r]);
@@ -231,7 +228,7 @@ window.gm.rollExplore= function() {
 //the passage will trigger under the given condition: minimum time, location-tag, at a certain time-window
 //the passage will show when a new passage is requested and will be removed from stack
 //if this passage is already pushed, only its condition will be updated
-window.gm.pushDefferedEvent=function(id) {
+window.gm.pushDeferredEvent=function(id) {
   var cond = {waitTime: 6,
               locationTags: ['Home','City'],      //Never trigger in Combat
               dayTime: [1100,600]
@@ -240,8 +237,26 @@ window.gm.pushDefferedEvent=function(id) {
                 locationTags: ['Letterbox'],
       };
 
-  var xcond = [cond,cond1]; //passage is executed if any of the conds is met
+  var xcond = [cond,cond2]; //passage is executed if any of the conds is met
+  window.story.state.vars.hairGrow = 10;
 };
+window.gm.hasDeferredEvent = function() {
+  if(window.story.state.vars.hairGrow===10) return(true);
+  return(false);
+}
+window.gm.showDeferredEvent= function() {
+  var msg = '';
+
+  var namenext = window.passage.name;
+  var tagsnext = window.story.passage(namenext).tags;
+  
+  if(window.story.state.vars.hairGrow===10) {
+    window.story.state.vars.hairGrow =0;
+    msg += "You notice that your hair has grown quite a bit.</br>"
+    msg += window.gm.printPassageLink("Next",window.gm.player.location);
+  }
+  return msg;
+}
 //when show is called the previous passage is stored if the new has [back]-tag
 //if the new has no back-tag, the stack gets cleared
 window.gm.pushPassage=function(id) {

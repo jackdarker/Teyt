@@ -67,10 +67,10 @@ statup {
 statdown {
   color:red;
 }
-talkplayer {
-  color: DarkKhaki;
+.talkplayer {
+  color: steelblue;
 }
-talkfoo1 {
+.talkfoo1 {
   color: Brown;
 }
 @keyframes alarm {
