@@ -1,4 +1,4 @@
-:: Info_Jake [back]
+:: Info_Jake [_back]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 Jake is here.</br>
@@ -8,7 +8,7 @@ You barely know anything about him.</br>
 </article></section>
 
 
-:: Info_Mom [back]
+:: Info_Mom [_back]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 Your mom is here.</br>

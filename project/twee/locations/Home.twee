@@ -52,7 +52,7 @@ function switchChar(elmnt) {
 </script>
 
 
-:: moms_treasure [back]
+:: moms_treasure [_back]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 In one of the nightstand you find some handcuffs.They look thorough but you think they just might be used for some bedplay.</br>

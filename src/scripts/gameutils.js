@@ -200,7 +200,7 @@ window.gm.printPickupAndClear= function(itemid, desc,itemleft,cbAfterPickup=null
 window.gm.pickupAndClear=function(itemid, desc,itemleft,cbAfterPickup=null) {
     window.gm.player.Inv.addItem(new window.storage.constructors[itemid]());
     //window.gm.pushLog("added "+itemid+" to inventory.</br>");
-    if(cbAfterPickup) cbAfterPickup.call();
+    if(cbAfterPickup) cbAfterPickup();
     window.gm.refreshScreen();
 };
 //prints an item with description; used in inventory

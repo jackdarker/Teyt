@@ -49,6 +49,7 @@ window.gm.initGame= function(forceReset) {
         qUnlockRedlight : 0,
         qUnlockBeach : 0,
         hairGrow: 0,
+        crowBarLeft: 1,
         debugInv: new Inventory()
         }; 
         s.vars.debugInv._parent = window.gm.util.refToParent(null);
@@ -257,7 +258,7 @@ window.gm.showDeferredEvent= function() {
   }
   return msg;
 }
-//when show is called the previous passage is stored if the new has [back]-tag
+//when show is called the previous passage is stored if the new has [_back]-tag
 //if the new has no back-tag, the stack gets cleared
 window.gm.pushPassage=function(id) {
   if(!window.story.state.hasOwnProperty("vars")) return;  //vars exist only after initGame
@@ -267,7 +268,7 @@ window.gm.pushPassage=function(id) {
     window.story.state.vars.passageStack.push(id);
   }
 };
-//call on [back]-passages to get the previous passage
+//call on [_back]-passages to get the previous passage
 window.gm.popPassage=function() {
     var pass = window.story.state.vars.passageStack.pop();
     if(!pass) return('nothing to pop from stack');
@@ -284,7 +285,7 @@ window.story.__proto__.show = function(idOrName, noHistory = false) {
   } else {  //going forward
     var tagsnext = window.story.passage(next).tags;
     var namenext = window.story.passage(next).name;
-    if(tagsnext.indexOf('back')>=0 ) { //push on stack but only if not re-showing itself
+    if(tagsnext.indexOf('_back')>=0 ) { //push on stack but only if not re-showing itself
       if(namenext!=window.passage.name) window.gm.pushPassage(window.passage.name); 
     } else if(window.story.state.hasOwnProperty("vars")) {
       window.story.state.vars.passageStack.splice(0,window.story.state.vars.passageStack.length);

@@ -141,7 +141,7 @@ var maxSlots = 8; //number saveslots available; has to fit form below
 </script>
 
 
-:: Inventory [back]
+:: Inventory [_back]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 [[Back|_back]]</br>
@@ -159,7 +159,7 @@ for(var i=0;i<maxSlots;i++){
 </article><article id="LogPanel"></article></section>
 
 
-:: Relations [back]
+:: Relations [_back]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 [[Back|_back]]</br>
@@ -168,7 +168,7 @@ for(var i=0;i<maxSlots;i++){
 </article><article id="LogPanel"></article></section>
 
 
-:: Player_Dashboard [back]
+:: Player_Dashboard [_back]
 <!--a dashboard where the player can check his other stuff-->
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
@@ -178,7 +178,7 @@ Your outfit can only be changed by using a wardrobe.</br>
 </article><article id="LogPanel"></article></section>
 
 
-:: Wardrobe [back]
+:: Wardrobe [_back]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 [[Back|_back]]</br>
@@ -197,7 +197,7 @@ for(var i=0;i<maxSlots;i++){
 %>
 </article><article id="LogPanel"></article></section>
 
-:: Settings [back]
+:: Settings [_back]
 <!--TODO what settings ?-->
 <section> 
 <!--<aside id="sidebar"></aside>--><article><%=window.story.render("CenterDialogs") %>
@@ -207,7 +207,7 @@ for(var i=0;i<maxSlots;i++){
 [[Back|_back]]</br>
 </article><article id="LogPanel"></article></section>
 
-:: Settings2 [back]
+:: Settings2 [_back]
 <!--just test-->
 <section> 
 <!--<aside id="sidebar"></aside>--><article><%=window.story.render("CenterDialogs") %>
@@ -229,7 +229,7 @@ img.src = imgsrc;//'https://twinery.org/homepage/img/logo.svg';   //todo the loa
 </article><article id="LogPanel"></article></section>
 
 
-:: Status [back]
+:: Status [_back]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 Status of <%=window.gm.player.name%>:</br> 
@@ -285,7 +285,7 @@ The page should be setup like this:
 content here !
 </article><article id="LogPanel"></article></section>
 
-:: SubpanelTemplate [back]
+:: SubpanelTemplate [_back]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 If this is a subpanel you can use back-tag and _back-Link

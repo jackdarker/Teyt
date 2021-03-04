@@ -71,7 +71,7 @@ Where would you like to go from here?</br>
 </article><article id="LogPanel"></article></section>
 
 
-:: Buy [back]
+:: Buy [_back]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 

@@ -2,15 +2,15 @@
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 <!-- dont overwrite location -->
-<%=window.gm.printPickupAndClear('Crowbar','A crowbar is lying other there.',1)%>
+<%=window.gm.printPickupAndClear('Crowbar','A crowbar is lying other there.',window.story.state.vars.crowBarLeft)%>
 You are actually at [[<%=window.gm.player.location%>]].
 Where would you like to go from here?</br>
 <a0 onclick=window.gm.rollExplore()>Explore your surroundings</a> </br></br>
-[[Pawn shop]]
-<%  if(s.vars.qUnlockPark>0) {      %>[[Park]]</br>
-<%}; if(s.vars.qUnlockMall>0) {     %>[[Mall]]</br>
-<%}; if(s.vars.qUnlockDowntown>0) {     %>[[Downtown]]</br>
-<%}; if(s.vars.qUnlockBeach>0) {     %>[[Beach]]</br>
+[[Home]] [[Pawn shop]]
+<%  if(s.vars.qUnlockPark>0) {      %>[[Park]]
+<%}; if(s.vars.qUnlockMall>0) {     %>[[Mall]]
+<%}; if(s.vars.qUnlockDowntown>0) { %>[[Downtown]]
+<%}; if(s.vars.qUnlockBeach>0) {    %>[[Beach]]
 <%};%>
 </article><article id="LogPanel"></article></section>
 
@@ -52,7 +52,7 @@ Where would you like to go from here?</br>
 <%};%>
 </article><article id="LogPanel"></article></section>
 
-:: Park_Jogging [back]
+:: Park_Jogging [_back]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 <%if(window.gm.player.Stats.get('energy').value<=50) {%>
@@ -109,7 +109,7 @@ Where would you like to go from here?</br>
 </article><article id="LogPanel"></article></section>
 
 
-:: Pawn shop [back]
+:: Pawn shop [_back]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 <%window.gm.player.location=window.passage.name;%>
