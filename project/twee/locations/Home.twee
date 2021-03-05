@@ -150,7 +150,7 @@ There is nothing here
 <%window.gm.player.location=window.passage.name;%>
 The garden behind the house is not very large. </br>
 <p class="talkplayer">There are a lot of molehills on the green. I should teach their creator a lesson.</p></br>
-<a href="javascript:void(0)" onclick='testEncounter()'>Whack a mole</a> </br>
+<a href="javascript:void(0)" onclick='window.gm.encounters.mole(window.gm.player.location);'>Whack a mole</a> </br>
 <% if(s.mom.location==window.passage.name) { %>
 [[Mom|Info_Mom]] is wandering around. Maybe she is planning to setup some flower beds. </br>
 <%}%>
@@ -162,12 +162,6 @@ You remeber that you took the shovel from here.</br>
 Where would you like to go?</br>
 [[Hallway|Home]]</br>
 </article><article id="LogPanel"></article></section>
-<script>
-function testEncounter() {
-  window.gm.combat.initCombat(window.gm.Mobs.Mechanic);
-  window.story.show("Encounter");
-}
-</script>
 
 :: Cellar
 <section> 

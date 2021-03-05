@@ -62,8 +62,12 @@ window.gm.initGame= function(forceReset) {
     }
     if (!s.combat||forceReset) { //see encounter & combat.js
       s.combat = {
+        newTurn : false,
+        enemyFirst : false, //if true, enemy moves first
         enemyTurn : false, //true if enemys turn
-        combatState : ""  ,
+        state : ""  , //internal state
+        playerFleeing : false,
+        playerSubmitting : false,
         turnCount: 0,
         scenePic : 'assets/bg_park.png'
       }
@@ -125,7 +129,7 @@ window.gm.rebuildObjects= function(){ //Reconnect the objects after load!
   //window.gm.Cyril = new Character(s.Cyril);
   window.gm.switchPlayer(s.vars.activePlayer);
 }
-//returns timestamp sine start of game
+//returns timestamp since start of game
 window.gm.getTime= function() {
   return(window.story.state.vars.time+2400*window.story.state.vars.day);
 }
@@ -156,6 +160,7 @@ window.gm.getTimeString= function() {
   var c=window.gm.getTimeStruct();
   return (c.hour<10?"0":"")+c.hour.toString()+":"+(c.min<10?"0":"")+c.min.toString()+"("+c.daytime+")";
 };
+// DoW = DayOfWeek  7 = Sunday, 1 = Monday,...6 = Saturday 
 window.gm.getTimeStruct=function() {
   var v=window.story.state.vars;
   var m=v.time%100;
@@ -172,11 +177,14 @@ window.gm.getTimeStruct=function() {
   } else {
     daytime = 'night';
   }
-  return({'hour':h,'min':m, 'daytime': daytime});
+  var DoW = window.story.state.vars.day%7;
+  return({'hour':h,'min':m, 'daytime': daytime, 'DoW':DoW});
 };
+
 window.gm.getDateString= function() {
   var v=window.story.state.vars;
-  return v.day.toString().concat(". day");
+  const DoW=['Monday', 'Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  return v.day.toString()+". day "+ DoW[(v.day%7)-1];
 };
 //forward time to until (1025 = 10:25), regenerate player
 //warning dont write 0700 because this would be take as octal number

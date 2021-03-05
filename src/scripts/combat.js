@@ -2,139 +2,175 @@
 /* bundles some operations related to combat */
 window.gm = window.gm || {};
 window.gm.combat = window.gm.combat || {};
-window.gm.combat.initCombat = function(combatSetup) { //setup enemy for encounter
-    var s=window.story.state;
-    s.enemy = combatSetup();
-    //s.enemy.name = window.gm.enemy.name;  
-    //s.enemy.pic = window.gm.enemy.pic;
-    s.combat.enemyTurn =false;
-    s.combat.turnCount=0;
-    s.combat.combatState='battling';
-};
 
-window.gm.combat.hideCombatOption= function() {
-    document.querySelector("#combatmenu").remove();
-};
-window.gm.combat.printCombatOption= function() { //creates a list of possible moves
-  var elmt="<form id='combatmenu'>";
-  //Todo create list based on abilitys
-  var canAct = window.gm.player._canAct();
-  if(canAct.OK===true) {
-  elmt +="<a0 id='moveFlee'           onclick='(function($event){window.gm.combat.triggerCombat($event.id);})(this);'>Try to flee</a></br>";
-  elmt +="<a0 id='movePhysicalAttack' onclick='(function($event){window.gm.combat.triggerCombat($event.id);})(this);'>Attack</a></br>";
-  elmt +="<a0 id='moveGuard'          onclick='(function($event){window.gm.combat.triggerCombat($event.id);})(this);'>Guard</a></br>";
-  elmt +="<a0 id='moveStun'           onclick='(function($event){window.gm.combat.triggerCombat($event.id);})(this);'>Stun</a></br>";
-  //Todo Item-use on self or enemy
-  //elmt +="<a0 id='showItems' onclick='(function($event){window.gm.execCombatCmd($event.id);"+next+"})(this);'>Item</a></br>";
-  } else {
-    elmt +=canAct.msg+"</br>";
+class CombatSetup {
+  constructor() {
+    this.EnemyFirst=false;
+    this.EnemyFunc = null;  //a ctor of Mob
+    this.Location = ''  //your actual location-name
+    this.scenePic = ''  //bg-image to use
+    this.onDefeat = null;
+    this.onVictory = null;
+    this.onFlee = null;
+    this.onSubmit = null;
   }
-  elmt +="<a0 id='moveNOP'          onclick='(function($event){window.gm.combat.triggerCombat($event.id);})(this);'>Do nothing</a></br>";
-  elmt +="</form></br>";
-  return(elmt);
+  onSubmit() {
+    return('You submitted to '+s.enemy.name+" completely.</br>"+ window.gm.printPassageLink('GameOver','GameOver'));
+  }
+  //setup encounter; this calls the Encounter-passage !
+initCombat() {
+  var s=window.story.state;
+  s.enemy = window.gm.Encounter.EnemyFunc();
+  s.combat.location = window.gm.Encounter.location;
+  s.combat.scenePic = window.gm.Encounter.scenePic;
+  s.combat.playerFleeing = false;
+  s.combat.playerSubmitting = false;
+  s.enemyFirst= window.gm.Encounter.EnemyFirst;
+  s.combat.enemyTurn =false;
+  s.combat.newTurn = true;
+  s.combat.turnCount=0;
+  s.combat.state='battling';
+  window.story.show("Encounter");
+}
 
+hideCombatOption() {
+  document.querySelector("#combatmenu").remove();
+}
+//creates a list of possible moves for player
+printCombatOption() { 
+var elmt="<form id='combatmenu'>";
+//Todo create list based on abilitys
+var canAct = window.gm.player._canAct();
+if(canAct.OK===true) {
+elmt +="<a0 id='moveFlee'           onclick='(function($event){window.gm.Encounter.triggerCombat($event.id);})(this);'>Try to flee</a></br>";
+elmt +="<a0 id='movePhysicalAttack' onclick='(function($event){window.gm.Encounter.triggerCombat($event.id);})(this);'>Attack</a></br>";
+elmt +="<a0 id='moveUltraKill' onclick='(function($event){window.gm.Encounter.triggerCombat($event.id);})(this);'>KillYaAll</a></br>";
+elmt +="<a0 id='moveGuard'          onclick='(function($event){window.gm.Encounter.triggerCombat($event.id);})(this);'>Guard</a></br>";
+elmt +="<a0 id='moveStun'           onclick='(function($event){window.gm.Encounter.triggerCombat($event.id);})(this);'>Stun</a></br>";
+elmt +="<a0 id='moveSubmit'         onclick='(function($event){window.gm.Encounter.triggerCombat($event.id);})(this);'>Submit</a></br>";
+//Todo Item-use on self or enemy
+//elmt +="<a0 id='showItems' onclick='(function($event){window.gm.execCombatCmd($event.id);"+next+"})(this);'>Item</a></br>";
+} else {
+  elmt +=canAct.msg+"</br>";
+}
+elmt +="<a0 id='moveNOP'          onclick='(function($event){window.gm.Encounter.triggerCombat($event.id);})(this);'>Do nothing</a></br>";
+elmt +="</form></br>";
+return(elmt);
+}
+//prints the Stats and Effects of the Player&Enemy
+printCombatHud() { 
+renderToSelector("#playerstats", "playerstats");
+renderToSelector("#enemystats", "enemystats");
 };
 //creates a list of active effects for combat display
-window.gm.combat.printCombatEffects= function(char) {
-  var list=[];
-  var effects = char.Effects.getAllIds();
-  for(var i=0; i<effects.length; i++) {
-    var effect = char.Effects.get(effects[i]);
-    if(effect.onCombatEnd!==null && effect.onCombatEnd!==undefined) {
-      list.push(effect.shortDesc);
-    }
+printCombatEffects(char) {
+var list=[];
+var effects = char.Effects.getAllIds();
+for(var i=0; i<effects.length; i++) {
+  var effect = char.Effects.get(effects[i]);
+  if(effect.onCombatEnd!==null && effect.onCombatEnd!==undefined) {
+    list.push(effect.shortDesc);
   }
-  return(list.reduce((sum, current) => sum + current +', ', ''));
-};
-//UNUSED
-window.gm.combat.printCombatScreen = function() { //prints scene-bg and enemy to canvas      
-  var canvas = document.getElementById("exampleCanvas");
-  var ctx = canvas.getContext("2d");
-  var img = new Image();
-  img.src = "assets/bg_park.png";   //todo the loading o image takes a while and it will not refreh automatically
-  ctx.drawImage(img, 0, 0);
-  img = new Image();
-  img.src = "assets/bird.gif";   //todo the loading o image takes a while and it will not refreh automatically
-  ctx.drawImage(img, 0, 0);
-
 }
-window.gm.combat.triggerCombat= function(id) {  //called by combatmenu-buttons expects a functioname
-  window.gm.combat.hideCombatOption();
-  var result=window.gm.combat.execCombatCmd(window.gm.combat[id]);
-  window.gm.printOutput(result.msg+window.gm.printPassageLink("Next","EncounterStartTurn"));
-  window.gm.combat.printCombatHud();
-};
+return(list.reduce((sum, current) => sum + current +', ', ''));
+}
+triggerCombat(id) {  //called by combatmenu-buttons expects a functioname
+this.hideCombatOption();
+var result=window.gm.Encounter.execCombatCmd(window.gm.combat[id]);
+window.gm.printOutput(result.msg+window.gm.printPassageLink("Next","EncounterStartTurn"));
+this.printCombatHud();
+}
 //calculates and executes combat-cmd of enemy
-window.gm.combat.calcEnemyCombat= function() { 
-  var enemy = window.story.state.enemy;
-  var move = enemy.calcCombatMove();
-  return(move.msg+"</br>");
-};
-//executes a combat-cmd for player/enemy
-window.gm.combat.execCombatCmd = function(move) { 
-  var s = window.story.state;
-  var result = move();
-  s.combat.enemyTurn =!s.combat.enemyTurn;  //toggle whos turn
-  return(result);
+calcEnemyCombat() { 
+var enemy = window.story.state.enemy;
+var move = enemy.calcCombatMove();
+return(move.msg+"</br>");
 }
-window.gm.combat.startRound = function() {
-  var s = window.story.state;
-  s.combat.turnCount+=1;
-  //update combateffects
-  var list = [window.story.state.enemy, window.gm.player];
-  for(var k=0; k<list.length;k++){
-    var effects = list[k].Effects.getAllIds();
-    for(var i=0; i<effects.length; i++) {
-      var effect = list[k].Effects.get(effects[i]);
-      if(effect.onCombatEnd!==null && effect.onCombatEnd!==undefined) {  //typeof effect === CombatEffect doesnt work? so we check presencse of attribut
-        effect.onTurnStart();
-      }
+//executes a combat-cmd for player/enemy
+execCombatCmd(move) { 
+var s = window.story.state;
+var result = move();
+s.combat.enemyTurn =!s.combat.enemyTurn;  //toggle whos turn
+if(!(s.combat.enemyTurn ^ s.combat.enemyFirst)) s.combat.newTurn = false;
+return(result);
+}
+startRound() {
+var s = window.story.state;
+s.combat.turnCount+=1;
+//update combateffects
+var list = [window.story.state.enemy, window.gm.player];
+for(var k=0; k<list.length;k++){
+  var effects = list[k].Effects.getAllIds();
+  for(var i=0; i<effects.length; i++) {
+    var effect = list[k].Effects.get(effects[i]);
+    if(effect.onCombatEnd!==null && effect.onCombatEnd!==undefined) {  //typeof effect === CombatEffect doesnt work? so we check presencse of attribut
+      effect.onTurnStart();
     }
   }
+}
 };
-window.gm.combat.endRound = function() {
-};
-window.gm.combat.endCombat = function(){
-  //remove combateffects
-  var list = [window.story.state.enemy, window.gm.player];
-  for(var k=0; k<list.length;k++){
-    var effects = list[k].Effects.getAllIds();
-    for(var i=0; i<effects.length; i++) {
-      var effect = list[k].Effects.get(effects[i]);
-      if(effect.onCombatEnd!==null && effect.onCombatEnd!==undefined) {
-        effect.onCombatEnd();
-      }
+endCombat(){
+//remove combateffects
+var list = [window.story.state.enemy, window.gm.player];
+for(var k=0; k<list.length;k++){
+  var effects = list[k].Effects.getAllIds();
+  for(var i=0; i<effects.length; i++) {
+    var effect = list[k].Effects.get(effects[i]);
+    if(effect.onCombatEnd!==null && effect.onCombatEnd!==undefined) {
+      effect.onCombatEnd();
     }
   }
+}
 };
+//returns false if battle should continue
+battle() {
+var s=window.story.state;
+var result = {OK:false, msg:''};
+//check if battle done...
+if(s.combat.playerFleeing===true) { 
+  result.OK=true;
+  result.msg = 'You sucessfully escaped '+s.enemy.name+"</br>";
+  result.msg += window.gm.printPassageLink('Next',window.gm.player.location);
+} 
+if(s.combat.playerSubmitting===true) {  
+  result.OK=true;
+  result.msg = this.onSubmit();
+} 
+if(s.enemy.health().value<=0) { 
+  result.OK=true;
+  s.combat.state = 'victory';
+  result.msg = 'You defeated '+s.enemy.name+"</br>";
+  result.msg += window.gm.printPassageLink('Next',window.gm.player.location);
+}
+if(window.gm.player.health().value<=0){ 
+  result.OK=true;
+  s.combat.state = 'defeat';    
+  result.msg = 'You where defeated by'+s.enemy.name+"</br>";
+  result.msg += window.gm.printPassageLink('GameOver','GameOver');
+}
+if(result.OK) {this.endCombat(); }
+else{   //or continue combat                
+  if(s.combat.newTurn===false && !(s.combat.enemyTurn ^ s.combat.enemyFirst)) {
+    s.combat.newTurn = true;
+    result.msg += 'new turn</br>';
+    window.gm.Encounter.startRound();
+  }
+  if(s.combat.enemyTurn) { 
+    result.msg += this.calcEnemyCombat();
+    result.msg += window.gm.printPassageLink('Next','EncounterStartTurn');
+  }else{ 
+    result.msg += this.printCombatOption();
+  }
+  //todo how to know endRound
+}
+return(result);
+}
+}
 
-//OBSOLETE executes a combat-cmd for player/enemy
-window.gm.combat.execCombatCmd2 = function(id) { 
-  var s = window.story.state;
-  var rnd = _.random(1,100);
-  var msg = '';
-  var result = {};
-  if(s.combat.enemyTurn) {
-    if(id ==='Attack') {
-      result=window.gm.calcAttack(s.combat.enemyTurn);
-      msg+=result.msg;
-    }
-  } else {
-    if(id ==='Attack') {
-      result=window.gm.calcAttack(s.combat.enemyTurn);
-      msg+=result.msg;
-    } else if(id === 'RunAway') {
-      if(rnd >40) {
-        msg += "You escaped the fight.";
-        s.vars.combatState = 'fleeing';  //just setting the flag, you have to take care of handling!
-      } else {
-        msg += "Your attempts to escape failed.";
-      }
-    }
-  }
-  
-};
-//does nothing
+
+
+/*  generic combat moves */
+//used to skip turn
 window.gm.combat.moveNOP = function() { 
   var result= {OK:false,msg:''};
   return(result);
@@ -171,11 +207,27 @@ window.gm.combat.moveFlee = function() {
   var rnd = _.random(1,100);
   if(s.combat.enemyTurn) { //todo fleeing enemy?
   } else {
-    if(rnd >40) {
+    if(rnd >40) { //Todo fleeing chance calculation
       result.msg += "You escaped the fight.";
-      s.vars.combatState = 'fleeing';  //just setting the flag, you have to take care of handling!
+      s.combat.playerFleeing = true;  //just setting the flag, you have to take care of handling!
     } else {
       result.msg += "Your attempts to escape failed.";
+      result.OK=false;
+    }
+  }
+  return(result);
+}
+window.gm.combat.moveSubmit = function() { 
+  var s = window.story.state;
+  var result= {OK:true,msg:''};
+  var rnd = _.random(1,100);
+  if(s.combat.enemyTurn) { //todo enemy?
+  } else {
+    if(rnd >0) { //Todo fleeing chance calculation
+      result.msg += "You submit to your foe.";
+      s.combat.playerSubmitting = true;  //just setting the flag, you have to take care of handling!
+    } else {
+      result.msg += "Your attempts to submit failed.";
       result.OK=false;
     }
   }
@@ -231,9 +283,15 @@ window.gm.combat.movePhysicalAttack = function() {
     msg+= attacker.name+' dealt '+rnd+' damage to '+defender.name+'.</br>';
   }
 
-  return({OK:hit&& !block , msg:msg})
-}
-window.gm.combat.printCombatHud= function() { //prints the Stats and Effects of the Player&Enemy
-    renderToSelector("#playerstats", "playerstats");
-    renderToSelector("#enemystats", "enemystats");
+  return({OK:hit&& !block , msg:msg});
+};
+window.gm.combat.moveUltraKill = function() { 
+  var s = window.story.state;
+  var attacker = s.combat.enemyTurn ? window.story.state.enemy  :window.gm.player;
+  var defender = s.combat.enemyTurn ? window.gm.player :window.story.state.enemy;
+  var msg = '';
+  var rnd = 30;
+  defender.Stats.increment('health',-1*rnd);
+  msg+= attacker.name+' dealt '+rnd+' damage to '+defender.name+'.</br>';
+  return({OK:true , msg:msg})
 };

@@ -85,8 +85,8 @@ function createItemLookups(){
         'Mechanic' : {name: 'Mechanic-Guy',pic:'assets/mechanic.jpg'}
     }
     //mapping from passage-locations to background images
-    window.gm.ScenePic = {
-        'Garden': {pic:'assets/bg_park.png'},
-        'Park' : {pic:'assets/bg_park.png'}
+    window.gm.getScenePic = function(id){
+        if(id==='Garden' || id ==='Park')   return('assets/bg_park.png');
+        return('assets/bg_park.png');//todo placehodler
     }
 }

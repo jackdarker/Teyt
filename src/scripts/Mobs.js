@@ -11,14 +11,14 @@ class Mob extends Character {
         var rnd = _.random(1,100);
         var result = this._canAct();
         if(result.OK===false) {
-            window.gm.combat.execCombatCmd(window.gm.combat.moveNOP);
+            window.gm.Encounter.execCombatCmd(window.gm.combat.moveNOP);
             return(result);
         }
         if(rnd>30) {  
-            result=window.gm.combat.execCombatCmd(window.gm.combat.movePhysicalAttack);
+            result=window.gm.Encounter.execCombatCmd(window.gm.combat.movePhysicalAttack);
             result.msg =this.name+" trys to attack you.</br>"+result.msg;
         } else {
-            result=window.gm.combat.execCombatCmd(window.gm.combat.moveGuard);
+            result=window.gm.Encounter.execCombatCmd(window.gm.combat.moveGuard);
             result.msg =this.name+" takes a defensive stance.</br>"+result.msg;
         }
         return(result);
@@ -44,7 +44,7 @@ class Mechanic extends Mob {
     calcCombatMove(){
         var result = this._canAct();
         if(window.story.state.combat.turnCount<3) {
-            result=window.gm.combat.execCombatCmd(window.gm.combat.moveStun);
+            result=window.gm.Encounter.execCombatCmd(window.gm.combat.moveStun);
             result.msg =this.name+" trys to hit your head whith his wrench.</br>"+result.msg;
             return(result);
         }
