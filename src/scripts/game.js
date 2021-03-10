@@ -31,7 +31,8 @@ window.gm.initGame= function(forceReset) {
     var s = window.story.state; //s in template is window.story.state from snowman!
     if (!s.vars||forceReset) { // storage of variables that doesnt fit player
         s.vars = {
-        debug : true,   //TODO set to false for distribution !   
+        debug : true,   //TODO set to 0 for distribution !   see debug passage for meaning
+        dbgShowCombatRoll: false,
         version : window.gm.getSaveVersion(),
         log : [],
         passageStack : [],

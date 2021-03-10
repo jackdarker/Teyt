@@ -327,6 +327,74 @@ class stAgility extends Stat { // core attribute
         this.parent.addModifier('energyMax',{id:'agility', bonus:this.parent.get('agility').value});
     };
 }
+class stPerception extends Stat { // core attribute
+    static setup(context, base,max) { 
+        var _stat = new stPerception();
+        var _n = _stat.data;
+        _n.id='perception',_n.base=base, _n.value=base;
+        context.addItem(_stat);
+        _stat.Calc();
+    }
+    constructor() {
+        super();
+        window.storage.registerConstructor(stPerception);
+    }
+    toJSON() {return window.storage.Generic_toJSON("stPerception", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(stPerception, value.data);};
+    updateModifier() {
+    };
+}
+class stLuck extends Stat { // core attribute
+    static setup(context, base,max) { 
+        var _stat = new stLuck();
+        var _n = _stat.data;
+        _n.id='luck',_n.base=base, _n.value=base;
+        context.addItem(_stat);
+        _stat.Calc();
+    }
+    constructor() {
+        super();
+        window.storage.registerConstructor(stLuck);
+    }
+    toJSON() {return window.storage.Generic_toJSON("stLuck", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(stLuck, value.data);};
+    updateModifier() {
+    };
+}
+class stCharisma extends Stat { // core attribute
+    static setup(context, base,max) { 
+        var _stat = new stCharisma();
+        var _n = _stat.data;
+        _n.id='charisma',_n.base=base, _n.value=base;
+        context.addItem(_stat);
+        _stat.Calc();
+    }
+    constructor() {
+        super();
+        window.storage.registerConstructor(stCharisma);
+    }
+    toJSON() {return window.storage.Generic_toJSON("stCharisma", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(stCharisma, value.data);};
+    updateModifier() {
+    };
+}
+class stIntelligence extends Stat { // core attribute
+    static setup(context, base,max) { 
+        var _stat = new stIntelligence();
+        var _n = _stat.data;
+        _n.id='intelligence',_n.base=base, _n.value=base;
+        context.addItem(_stat);
+        _stat.Calc();
+    }
+    constructor() {
+        super();
+        window.storage.registerConstructor(stLuck);
+    }
+    toJSON() {return window.storage.Generic_toJSON("stIntelligence", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(stIntelligence, value.data);};
+    updateModifier() {
+    };
+}
 class stStrength extends Stat { // core attribute
     static setup(context, base,max) { 
         var _stat = new stAgility();
@@ -486,7 +554,7 @@ export class Effects extends Inventory {  //Todo a collection of Stats is simili
 }
 
 
-//! because of the save-problem we dont use objects, just static methods
+//
 class Effect {  
     constructor() {
         this.data = Effect.dataPrototype();
@@ -598,6 +666,7 @@ class effNotTired extends Effect {
     onApply(){
         this.data.duration = 120;// todo 600;
         this.data.time = window.gm.getTime();
+        this._data.time=0;
     }
     merge(neweffect) {
         if(neweffect.name===this.data.name) {
@@ -662,7 +731,7 @@ class effStunned extends CombatEffect {
         }
     }
     onCombatEnd() {
-        this.parent.removeItem(data.id);
+        this.parent.removeItem(this.data.id);
     }
     onTurnStart() {
         this.data.duration-=1;

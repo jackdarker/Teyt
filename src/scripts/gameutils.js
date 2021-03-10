@@ -10,7 +10,8 @@ window.gm.refreshScreen= function() {
 window.gm.updateOtherPanels = function(){
     renderToSelector("#sidebar", "sidebar");renderToSelector("#LogPanel", "LogPanel"); 
 };
-window.gm.pushLog=function(msg) {
+window.gm.pushLog=function(msg,Cond=true) {
+    if(!Cond) return;
     var log = window.story.state.vars.log;
     log.unshift(msg);
     if(log.length>10) {

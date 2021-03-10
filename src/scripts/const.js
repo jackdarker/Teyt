@@ -32,12 +32,12 @@ function createItemLookups(){
     //lookup table 
     window.gm.StatsLib = { 
     'strength':stStrength,
-    //'perception':stPerception,
+    'perception':stPerception,
     'endurance':stEndurance,
-    //'charisma':stCharisma,
-    //'intelligence':stIntelligence,
+    'charisma':stCharisma,
+    'intelligence':stIntelligence,
     'agility': stAgility,
-    //'luck':stLuck,
+    'luck':stLuck,
     //'willpower':stWillpower,
     'pAttack' :stPAttack,
     'pDefense':stPDefense,
@@ -80,13 +80,30 @@ function createItemLookups(){
     window.storage.registerConstructor(effStunned);
     window.storage.registerConstructor(skCooking);
   
-    window.gm.EnemyLib = {
-        'Mole': {name: 'Mole',pic:'assets/mole.jpg'}, //new Mole(),
-        'Mechanic' : {name: 'Mechanic-Guy',pic:'assets/mechanic.jpg'}
-    }
     //mapping from passage-locations to background images
     window.gm.getScenePic = function(id){
         if(id==='Garden' || id ==='Park')   return('assets/bg_park.png');
         return('assets/bg_park.png');//todo placehodler
     }
+
+    /*window.gm.test=function(dies) {
+        var list={};
+        var _com = [];
+        var die =33;
+        var total = Math.pow(die,dies);
+        for(var a=1;a<=die;a++) {
+            for(var b=1;b<=die;b++) {
+                for(var c=1;c<=die;c++) {
+                    if(list[a+b+c]) list[a+b+c]+=1;
+                    else list[a+b+c] =1;
+                }
+            }
+        }
+        
+        var list2 = Object.keys(list);
+        for(var i=0;i<list2.length;i++) {
+            list[list2[i]] *=1/total;
+        }
+        console.log(list);
+    }*/
 }

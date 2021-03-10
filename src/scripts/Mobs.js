@@ -23,6 +23,8 @@ class Mob extends Character {
         }
         return(result);
     }
+    //override to adjust the mobs attributes to player level
+    scaleLevel(lvl) {    };
 
 }
 

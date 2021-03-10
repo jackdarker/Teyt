@@ -166,9 +166,112 @@ else{   //or continue combat
 return(result);
 }
 }
+//calculates if target can evade the attack 
+/*requires minimum Poise
+Evasion depends on Agility & Endurance:
+- mallus for heavy armor & weapon
+- mallus for Effects like Prone, Frozen
+- bonus for Skills: Flying, Dancer
+Stunned/Bound Chars can not evade */
+// on evasion returns false and a message
+window.gm.combat.calcEvasion=function(attacker,target, attack) {
+  var result = {OK:true,msg:''}
+  var rnd = window.gm.roll(1,100);
 
+  if(target.Effects.findItemSlot(effStunned.name)>=0) {
+    result.OK = true; 
+    result.msg = target.name+' is stunned and cannot evade. '
+    attack.crit = true; //when stunned always critical hit
+    return(result);
+  }
 
+  var lvlDiff = target.level-attacker.level;
+  var chance = target.Stats.get("agility").value + target.Stats.get("endurance").value;
+  chance += lvlDiff*4;
+  window.gm.pushLog(`evasion roll:${chance} vs ${rnd} `,window.story.state.vars.dbgShowCombatRoll);
+  if(chance>rnd) {
+    result.OK = false;
+    result.msg += 'Using agility, '+ target.name +' was able to dodge the attack. '
+  }
+  return(result);
+}
+/*If evasion-roll fails, their is a chance that parry is rolled:
+- consumes some poise
+- parry only works for weapon of similiar size: a Zweihänder is to slow to parry a saber, a dagger is to light to deflect a club
+- requires minimum weapon-skill (f.e. projectile deflection )
+otherwise continue chain
+parry-result depends on agility+perception
+- bonus for skills
+- bonus for some weapons
+on critical fail- full damage, poise damage
+on fail - full damage
+on success no damage is taken (might consume weapon-stability)
+if a critical is rolled, 50% of the attackers damage is reflected to him*/
+window.gm.combat.calcParry=function(attacker,target, attack) {
+  var result = {OK:true,msg:'',foo:null}
+  var rnd = _.random(1,100);
 
+  if(target.Effects.findItemSlot(effStunned.name)>=0) {
+    result.OK = true; 
+    result.msg = target.name+' is stunned and cannot parry or block. '
+    attack.crit = true; //when stunned always critical hit
+    return(result);
+  }
+
+  var lvlDiff = target.level-attacker.level;
+  var chance = target.Stats.get("agility").value + target.Stats.get("perception").value;
+  chance += lvlDiff*4;
+  window.gm.pushLog(`parry roll:${chance} vs ${rnd} `,window.story.state.vars.dbgShowCombatRoll);
+  if(chance>rnd && rnd<10) {
+    result.OK = false;
+    if(rnd<10) {
+      result.msg = target.name +' parried the attack and was even able to land a hit.'  //todo how to add textual variation based on used weapon and skill?
+      result.foo = function(attacker,attack){ return(function(attacker,attack){ attacker.Stats.increment('health',-0.5*attack.value);});}(attacker,attack);
+    } else {
+      result.msg = target.name +' parried the attack.'
+    }
+  } else {
+    result.OK = true;
+    if(rnd>90) {
+      attack.crit = true;
+    }
+  }
+  return(result);
+}
+/*if all else failed you have to absorb the hit:
+DR = sum of armor (with individual skill-bonus) + magic armor
+attack = weapon damage formula + weakness-bonus
+attack increases on critical
+hp-dmg = attack -DR but min.1 */
+window.gm.combat.calcAbsorb=function(attacker,defender, attack) {
+  var result = {OK:true,msg:'',foo:null}
+  var rnd = _.random(1,100);
+  var def = defender.Stats.get('pDefense').value;
+  //todo weakness bonus
+  var dmg = Math.max(1,attack.value* (attack.crit?4:1)-def);
+  window.gm.pushLog(`absorb roll:${dmg} vs ${def} `,window.story.state.vars.dbgShowCombatRoll);
+  result.msg = defender.name +' got hit by '+attacker.name+' and suffered '+dmg+ (attack.crit?' critical ':'')+'damage. '
+  attack.total = dmg;
+  result.foo = function(defender,attack){ return(function(){ defender.Stats.increment('health',-1*attack.total);});}(defender,attack);
+  return(result);
+}
+// calculates the damage of an attack and applies it
+window.gm.combat.calcAttack=function(attacker,defender, attack) {
+
+  var result = window.gm.combat.calcEvasion(attacker,defender,attack);
+  if(result.OK===false) { return(result);  }
+  var _tmp = result.msg;
+  result = window.gm.combat.calcParry(attacker,defender,attack);  //todo or block
+  if(result.foo!==null) result.foo();
+  if(result.OK===false) {    return(result);  }
+  _tmp += result.msg;
+  result = window.gm.combat.calcAbsorb(attacker,defender,attack);
+  if(result.foo!==null) result.foo();
+  _tmp += result.msg;
+  result.msg = _tmp;
+  return(result);
+}
+/////////////////////////////////////////////////////////////
 /*  generic combat moves */
 //used to skip turn
 window.gm.combat.moveNOP = function() { 
@@ -185,6 +288,7 @@ window.gm.combat.moveGuard = function() {
   }
   return(result);
 }
+//stun caused by blunt weapon, shock
 window.gm.combat.moveStun = function() { 
   var s = window.story.state;
   var attacker = s.combat.enemyTurn ? window.story.state.enemy  :window.gm.player;
@@ -238,22 +342,23 @@ window.gm.combat.movePhysicalAttack = function() {
   var s = window.story.state;
   var attacker = s.combat.enemyTurn ? window.story.state.enemy  :window.gm.player;
   var defender = s.combat.enemyTurn ? window.gm.player :window.story.state.enemy;
+  var def = defender.Stats.get('pDefense').value;
+  var att = attacker.Stats.get('pAttack').value;
+  var result = window.gm.combat.calcAttack(attacker,defender,{value:att,total:att});
+  return({OK:result.OK,msg:result.msg});
+}
+//OBSOLETE
+window.gm.combat.movePhysicalAttack_old = function() { 
+  var s = window.story.state;
+  var attacker = s.combat.enemyTurn ? window.story.state.enemy  :window.gm.player;
+  var defender = s.combat.enemyTurn ? window.gm.player :window.story.state.enemy;
   var msg = '';
   var crit= false,hit=false,block=false;
   var def = defender.Stats.get('pDefense').value;
   var att = attacker.Stats.get('pAttack').value;
 //??  Erfolgswahrscheinlichkeit skalieren mit Differenz der Attribute Player-Enemy
 // gleiche Attribute = Wahrscheinlichkeit*100%; Attribut-Diff +2 = *100%*2; Attribut-Diff +4 = *200%
-/*
-=100^((100+2*C4)/100) =100^((25+C4)/25)
-0	100	100
-1	109,6478196143	120,2264434617
-2	120,2264434617	144,5439770746
-4	144,5439770746	208,9296130854
--1	91,2010839356	83,1763771103
--2	83,1763771103	69,1830970919
--4	69,1830970919	47,8630092323
-*/
+
   //GURPS-Lite ? this would means all skills are limited to 20!
   //atacker rolls 3d6; if < Attackskill you hit; if 3or4 you have critical hit; else you missed completely
   var rnd = window.gm.roll(3, 6);
