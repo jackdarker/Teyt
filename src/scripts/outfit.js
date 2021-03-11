@@ -16,9 +16,14 @@ window.gm.OutfitSlotpLib = {
     Hat     : 11,
     Neck    : 12,
     Eys     : 13,
+    bTorso  : 35,   //b.. = bodyparts
+    bEar    : 36,
+    bTailBase   : 37,   
     //insert more slots here
     SLOTMAX : 50
 };
+//Todo equip on other char:
+//move from own inventory to chars, equip, if impossible undo 
 export class Equipment extends Item {
     constructor(name) {
         super(name);
@@ -95,6 +100,32 @@ export class Pullover extends Equipment {
     canEquip() {return({OK:true, msg:'equipable'});}
     canUnequip() {return({OK:true, msg:'unequipable'});}
 }
+export class HandCuffs extends Equipment {
+    constructor() {
+        super('HandCuffs');
+        this.tags = ['restrain'];
+        this.slotUse = ['RHand','LHand'];
+        this.desc = 'handcuffs'
+        window.storage.registerConstructor(Pullover);
+    }
+    toJSON() {return window.storage.Generic_toJSON("HandCuffs", this); };
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(HandCuffs, value.data));}
+    usable(context) {return(this.canEquip());}
+    use(context) { //context here is inventory not outfit
+        if(this.parent.parent.Outfit.findItemSlot(this.name).length>0) {  
+            this.parent.parent.Outfit.removeItem(this.name); 
+            return( {OK:true, msg:'unequipped '+ this.name}); //todo
+        } else {
+            this.parent.parent.Outfit.addItem(this); 
+            return( {OK:true, msg:'equipped '+ this.name}); //todo
+        }
+    }
+    canEquip() { 
+        if(this.parent.parent.Outfit.findItemSlot(this.name).length>0) return({OK:true, msg:'unequip'});    //todo check for key
+        else return({OK:true, msg:'equip'});
+    }
+    canUnequip() {return({OK:false, msg:'You need to find a key first to be able to remove it!'});}
+}
 //this is an Inventory-item, not wardrobe
 export class Crowbar extends Equipment {
     constructor() {
@@ -161,6 +192,35 @@ export class Shovel extends Equipment {
         this.parent.parent.Stats.removeModifier('pAttack',{id:'pAttack:Shovel'});
         return({OK:true, msg:'unequipped'});}
 }
+
+//a bodypart
+export class TailNone extends Equipment {
+    constructor() {
+        super('TailNone');
+        this.tags = ['body'];
+        this.slotUse = ['bTailBase'];
+        this.desc = ''
+        window.storage.registerConstructor(TailNone);
+    }
+    toJSON() {return window.storage.Generic_toJSON("TailNone", this); };
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(TailNone, value.data));}
+    canEquip() {return({OK:true, msg:'equipable'});}
+    canUnequip() {return({OK:true, msg:'unequipable'});}
+}
+export class TailCat extends Equipment {
+    constructor() {
+        super('TailCat');
+        this.tags = ['body'];
+        this.slotUse = ['bTailBase'];
+        this.desc = 'a flexible,furred pipe-tail'
+        window.storage.registerConstructor(TailCat);
+    }
+    toJSON() {return window.storage.Generic_toJSON("TailCat", this); };
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(TailCat, value.data));}
+    canEquip() {return({OK:true, msg:'equipable'});}
+    canUnequip() {return({OK:true, msg:'unequipable'});}
+}
+
 //a kind of special inventory for worn equipment
 export class Outfit extends Inventory{
     constructor(externlist) {
@@ -215,6 +275,7 @@ export class Outfit extends Inventory{
         }
         return(result);
     }
+    //this will equip item if possible
     addItem(item, force) {
         var _idx = this.findItemSlot(item.name);
         if(_idx.length>0) return; //already equipped
@@ -282,6 +343,4 @@ export class Outfit extends Inventory{
         return(false);
     }
 }
-
-
 

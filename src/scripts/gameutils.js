@@ -2,6 +2,16 @@
 /* bundles some utility operations*/
 window.gm = window.gm || {};
 window.gm.util = window.gm.util || {};
+
+window.gm.giveCyrilFood=function(){
+    if(window.gm.player.Inv.countItem('SimpleFood')>0) {
+        var res=window.gm.player.Inv.use('SimpleFood', window.story.state.Cyril);
+        window.gm.printOutput(res.msg);
+    } else {
+        window.gm.printOutput("you have no food to spare");
+    }
+}
+
 //updates all panels
 window.gm.refreshScreen= function() {
     window.story.show(window.passage.name);
@@ -245,6 +255,7 @@ window.gm.printEquipmentSummary= function() {
     var result ='';
     var ids = [];
     for(var i=0;i<window.gm.player.Outfit.count();i++){
+        if(i>=window.gm.OutfitSlotpLib.bTorso) continue; //skip bodyparts
         var id = window.gm.player.Outfit.getItemId(i);
         if(id!='' && ids.indexOf(id)<0) {
             ids.push(id);

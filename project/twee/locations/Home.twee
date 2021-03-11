@@ -36,6 +36,9 @@ Where would you like to go?</br>
 <%window.gm.player.location=window.passage.name;%>
 This is the bedroom of your mom.
 A double bed is there with [[nightstands|moms_treasure]] on each side. <br>
+<%if(window.gm.player.name!=='Cyril') {%>
+<a0 onclick='window.story.show("Talk_Cyril")'>Cyril is here</a></br>
+<%}%>
 <a0 onclick='switchChar(this)'>Switch Char</a></br>
 <a0 onclick='window.gm.pushDeferredEvent("HairGrow")'>Hair Tonic</a></br>
 [[Hallway|Home]]</br>

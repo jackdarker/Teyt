@@ -6,28 +6,30 @@
 
 function getVersion(){return("0,0,0,");} 
 
+//this will make sure the item-ctor are registered and it can be used as a lookup 
 function createItemLookups(){
     window.gm.ItemsLib = {};
     //window.gm.ItemsLib = { 
     window.gm.ItemsLib['Money'] = new Money();
-    window.gm.ItemsLib['LighterDad'] = new LighterDad();// { name: 'Lighter from Dad', desc: 'I got this lighter from my real dad.', usable:defaultCanUse, use:defaultOnUse },
-    window.gm.ItemsLib['LaptopPS'] = new LaptopPS();//{name: 'Laptop-PS', desc:'Power converter for laptop.', usable: function(){return ({OK: false, msg:'not usable on its own'})},use: defaultNoUse};
+    window.gm.ItemsLib['LighterDad'] = new LighterDad();
+    window.gm.ItemsLib['LaptopPS'] = new LaptopPS();
     window.gm.ItemsLib['Battery'] = new Battery();
     window.gm.ItemsLib['Dildo_small'] = new Dildo_small();
     // consumables
     window.gm.ItemsLib['Lube'] = new Lube();
-    window.gm.ItemsLib['CanOfCoffee'] = new CanOfCoffee(); // {name: 'Can of coffee', desc: 'Cold coffee in a can. Tasty? Not really!', usable:canConsumeCoffee, use:onUseCoffee };
-    window.gm.ItemsLib['SimpleFood'] = new SimpleFood(); //{name: 'food ration', desc: 'You can eat this.', usable:defaultCanUse, use:defaultOnUse };
+    window.gm.ItemsLib['CanOfCoffee'] = new CanOfCoffee(); 
+    window.gm.ItemsLib['SimpleFood'] = new SimpleFood(); 
     //.. and Wardrobe
-    window.gm.ItemsLib['Leggings'] = new Leggings();//{ name: 'Sport-Leggings', desc: 'Spandex-leggings for sport.', tags: ['cloth'], slotUse: ['Legs'],canEquip:defaultCanUse, canUnequip:defaultCanUnequip };
-    window.gm.ItemsLib['Tank-shirt'] = new TankShirt(); //{name: 'White Tank-shirt', desc:'White Tank-shirt.',tags: ['cloth'],slotUse: ['Torso','Arms'],canEquip:defaultCanUse, canUnequip:defaultCanUnequip };
-    window.gm.ItemsLib['Jeans'] = new Jeans();// {name: 'Bluejeans', desc: 'Thight fitting blue jeans.',tags: ['cloth'], slotUse: ['Legs'],canEquip:defaultCanUse, canUnequip:defaultCanUnequip  };
-    window.gm.ItemsLib['Pullover'] = new Pullover();//{name: 'Pullover', desc: 'A warm pulloer.', tags: ['cloth'],slotUse: ['Torso','Arms'],canEquip:defaultCanUse, canUnequip:defaultCanUnequip };
+    window.gm.ItemsLib['Leggings'] = new Leggings();
+    window.gm.ItemsLib['Tank-shirt'] = new TankShirt(); 
+    window.gm.ItemsLib['Jeans'] = new Jeans();
+    window.gm.ItemsLib['Pullover'] = new Pullover();
     //special wardrobe-item combination
-    window.gm.ItemsLib['Crowbar']  = new Crowbar();//{name: 'Crowbar', desc: 'A durable crowbar.', tags: ['tool', 'weapon'], slotUse: ['RHand'],usable:defaultCanUse, use:defaultOnUse,canEquip:defaultCanUse, canUnequip:defaultCanUnequip };
-    window.gm.ItemsLib['Shovel']  = {name: 'Shovel', desc: 'A shovel for the dirty work.', tags: ['tool', 'weapon'], slotUse: ['RHand','LHand'],usable:defaultCanUse, use:defaultOnUse, canEquip:defaultCanUse, canUnequip:defaultCanUnequip };
-    window.gm.ItemsLib['Handcuffs'] = {name: 'Handcuffs', desc: 'You cannot use your hand.', tags: ['restrain'], slotUse: ['RHand','LHand'],usable:defaultCanUse, use:defaultOnUse, canEquip:defaultCanUse, canUnequip:defaultNoUnequip };
-    //};
+    window.gm.ItemsLib['Crowbar']  = new Crowbar();
+    window.gm.ItemsLib['Shovel']  = new Shovel();//{name: 'Shovel', desc: 'A shovel for the dirty work.', tags: ['tool', 'weapon'], slotUse: ['RHand','LHand'],usable:defaultCanUse, use:defaultOnUse, canEquip:defaultCanUse, canUnequip:defaultCanUnequip };
+    window.gm.ItemsLib['Handcuffs'] = new HandCuffs();//{name: 'Handcuffs', desc: 'You cannot use your hand.', tags: ['restrain'], slotUse: ['RHand','LHand'],usable:defaultCanUse, use:defaultOnUse, canEquip:defaultCanUse, canUnequip:defaultNoUnequip };
+    window.gm.ItemsLib['TailNone'] = new TailNone();
+    window.gm.ItemsLib['TailCat'] = new TailCat();
 
     //lookup table 
     window.gm.StatsLib = { 

@@ -58,7 +58,6 @@ window.gm.initGame= function(forceReset) {
 
     }
     if (!s.enemy||forceReset) { //actual/last enemy
-      s.enemy = Character.defaultData();
       s.enemy = new Character();
     }
     if (!s.combat||forceReset) { //see encounter & combat.js
@@ -83,6 +82,7 @@ window.gm.initGame= function(forceReset) {
     }
     if (!s.Cyril||forceReset) {  //alternative player character
       window.gm.Cyril = new Character()
+      window.gm.Cyril.name="Cyril";
       //add some basic inventory
       window.gm.Cyril.Wardrobe.addItem(new Jeans());
       window.gm.Cyril.Wardrobe.addItem(new TankShirt());
@@ -113,6 +113,7 @@ window.gm.initGame= function(forceReset) {
         window.gm.Ratchel.Wardrobe.addItem(new Leggings());
         window.gm.Ratchel.Wardrobe.addItem(new TankShirt());
         window.gm.Ratchel.Wardrobe.addItem(new Pullover());
+        window.gm.Ratchel.Outfit.addItem(new TailCat());
         window.gm.Ratchel.Outfit.addItem(new Jeans());
         window.gm.Ratchel.Outfit.addItem(new Pullover());
         s.Ratchel=window.gm.Ratchel;

@@ -666,7 +666,6 @@ class effNotTired extends Effect {
     onApply(){
         this.data.duration = 120;// todo 600;
         this.data.time = window.gm.getTime();
-        this._data.time=0;
     }
     merge(neweffect) {
         if(neweffect.name===this.data.name) {
