@@ -11,7 +11,7 @@ window.gm.getSaveVersion= function(){
     return(version);    
 };
 
-window.gm.initGame= function(forceReset) {
+window.gm.initGame= function(forceReset,NGP=null) {
   createItemLookups();
     //this does not work because hidden is called to late
     /*$(window).on('sm.passage.hidden', function(event, eventObject) {
@@ -56,6 +56,12 @@ window.gm.initGame= function(forceReset) {
         s.vars.debugInv._parent = window.gm.util.refToParent(null);
         s.vars.debugInv.addItem(new Money(),200);
 
+    }
+    if (!window.gm.achievements||forceReset) {  //outside of window.story !
+      window.gm.achievements= {
+        moleKillerGoldMedal: false //add your flags here
+      }
+      window.storage.loadAchivementsFromBrowser();
     }
     if (!s.enemy||forceReset) { //actual/last enemy
       s.enemy = new Character();
@@ -119,6 +125,8 @@ window.gm.initGame= function(forceReset) {
         s.Ratchel=window.gm.Ratchel;
     }      
     window.gm.switchPlayer(s.Ratchel.name); //start-player
+    if(NGP) { window.story.state.vars.crowBarLeft = NGP.crowBarLeft; }
+    NGP=null; //release memory
 }
 window.gm.switchPlayer = function(playername) {
   var s = window.story.state;
@@ -229,7 +237,13 @@ window.gm.rollExplore= function() {
   window.gm.addTime(20);
   window.story.show(places[r]);
 };
-
+window.gm.newGamePlus = function() {
+  var NGP = { //be mindful if adding complex objects to NGP, they might not work as expected ! simple types are ok 
+    crowBarLeft: window.story.state.vars.crowBarLeft
+    }
+  window.gm.initGame(true,NGP);
+  window.story.show('Home');
+};
 //---------------------------------------------------------------------------------
 //TODO Deferred Event is incomplete
 //maybe you sometimes dont want to trigger an event immediatly, 

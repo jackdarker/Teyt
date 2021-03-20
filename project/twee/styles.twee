@@ -15,7 +15,7 @@ a:hover {
   background-color: #ffede0;
   margin: 0.25em 0.25em;
   padding: 0.25em;
-  min-width: 8em;
+  min-width: 12em;
   min-height: 30em;
   text-align: center;
   grid-row-start: 1;
@@ -31,8 +31,10 @@ a:hover {
   color: black;
 }
 tw-story {
-  max-width: 70em;
-    margin: 0 auto;
+  height:100vh; 
+  /*width:95vW;*/
+  max-width: 60em;
+    margin: 0 0/*auto*/; 
     line-height: 100%;
     display: block;
 }
@@ -164,19 +166,31 @@ statdown {
     border-width: 3px;
     border-style: solid;
 }
- 
+.selected {
+    border-style: double;
+    border-width: thick;
+    /* border-spacing: 20px; */
+    border-color: coral;
+} 
 div.scroll {
   height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
 }
 @media (min-width: 30em) { 
+body {
+    background-image:url('assets/bg_hex.jpg');
+    color:black;
+    padding:0;
+    margin:0;
+  }
   section {
     background: #ffffff;
     display: grid;
     grid-template-columns: 0.5fr 1fr 1fr 1fr;
     grid-template-rows: 80% 20%;
-  }
+    height:100vh;
+    /*width:95vw;*/ /*scrollbars*/  }
   .section_swap {
     grid-template-rows: 2% ;
   }
@@ -187,10 +201,13 @@ div.scroll {
   article {
     background-color: #ffede0;
     margin: 0.25em 0.25em;
-    padding: 0.25em;
+    padding: 1em;
 	  grid-column: 2;
 	  grid-column-end: -1;
-  }
+    line-height: 130%;
+    /*height: 100%;*/
+    overflow-x: hidden;
+    overflow-y: auto;  }
   #LogPanel {
     background: #e4e4e4;
   }

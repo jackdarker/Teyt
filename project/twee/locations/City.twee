@@ -2,17 +2,9 @@
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 <!-- dont overwrite location -->
-<%=window.gm.printPickupAndClear('Crowbar','A crowbar is lying other there.',window.story.state.vars.crowBarLeft)%>
-<div class="popup" onclick='(function(){var popup = document.getElementById("myPopup"); popup.classList.toggle("show");}())'>Click me to toggle the popup!
-  <span class="popuptext" id="myPopup">A Simple Popup!</span>
-</div>
+<%=window.gm.printPickupAndClear('Crowbar','A crowbar is lying other there.',window.story.state.vars.crowBarLeft,(function(){window.story.state.vars.crowBarLeft-=1;}))%>
 You are actually at [[<%=window.gm.player.location%>]].
 Where would you like to go from here?</br>
-<div class="popup">Hover over me. <span class="popuptext">A intern Simple Popup!</span></div>
-<a href="javascript:void(0)" class="popup" id="Crowbar" onclick="(function($event){window.gm.pickupAndClear(&quot;Crowbar&quot;, &quot;A crowbar is lying other there.&quot;,1,null)})(this);">Hover over me. <span class="popuptext">Acrow bar of metal</span></a>
-<div class="popup">Hover over me. </div><span class="popuptext" id="myPopup">A extern Simple Popup!</span>
-<div class="myDIV">Hover over me.</div>
-<span class="popuptext" id="myPopup">A Simple Popup!</span>
 <a0 onclick=window.gm.rollExplore()>Explore your surroundings</a> </br></br>
 [[Home]] [[Pawn shop]]
 <%  if(s.vars.qUnlockPark>0) {      %>[[Park]]

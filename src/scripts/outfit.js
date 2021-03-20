@@ -17,7 +17,7 @@ window.gm.OutfitSlotpLib = {
     Neck    : 12,
     Eys     : 13,
     bTorso  : 35,   //b.. = bodyparts
-    bEar    : 36,
+    bSkin    : 36,
     bTailBase   : 37,   
     //insert more slots here
     SLOTMAX : 50

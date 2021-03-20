@@ -3,6 +3,7 @@
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
 At the doorsteps of your home. </br>
+[[NewGamePlus]]
 <div>Where would you like to go?</br>
 [[Living_Room]]   [[Your Bedroom]]  [[Moms Bedroom]] [[Kitchen]]  [[Garden]] [[Cellar]] </br>
 [[Into the city]]</br></div>
@@ -154,6 +155,7 @@ There is nothing here
 The garden behind the house is not very large. </br>
 <p class="talkplayer">There are a lot of molehills on the green. I should teach their creator a lesson.</p></br>
 <a href="javascript:void(0)" onclick='window.gm.encounters.mole(window.gm.player.location);'>Whack a mole</a> </br>
+You accidently stepped on a mole and killed it. Achievement unlocked ! <%window.gm.achievements.moleKillerGoldMedal=true;%>
 <% if(s.mom.location==window.passage.name) { %>
 [[Mom|Info_Mom]] is wandering around. Maybe she is planning to setup some flower beds. </br>
 <%}%>
