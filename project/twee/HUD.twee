@@ -1,6 +1,6 @@
 :: sidebar {"position":"551,513.3000030517578","size":"100,100"}
 <h3><%=window.story.name%></h3>V<%=window.gm.getSaveVersion().toString().replaceAll(",",".")%></br>
-<img src="https://twinery.org/homepage/img/logo.svg" width="256" height="256" onclick='this.classList.toggle("selected");alert("clicked");'>
+<img src="https://twinery.org/homepage/img/logo.svg" width="256" height="256">
 </hr>
 <div style="font-size: smaller;"><%=window.gm.player.location%></br>
 <%=window.gm.getTimeString()%> <%=window.gm.getDateString()%></br>
