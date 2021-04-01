@@ -13,6 +13,10 @@ window.gm.getSaveVersion= function(){
 
 window.gm.initGame= function(forceReset,NGP=null) {
   createItemLookups();
+  var toast = new Toasty();
+
+// this show an informational message:
+toast.info("Here is some information!");
     //this does not work because hidden is called to late
     /*$(window).on('sm.passage.hidden', function(event, eventObject) {
       
@@ -210,6 +214,9 @@ window.gm.sleep=function(until) {
   //if now is 10:00 and until is 9:00 we assume sleep for 23h
   if(until<v.time) {
     min = 24*60-(h-h2)*60+(m-m2);
+  }
+  if(min===0) { //if sleep from 700 to 700, its a day
+    min=24*60;
   }
   msg+="</br>Slept for "+min/60+" hours.</br>";
   window.gm.addTime(min);
