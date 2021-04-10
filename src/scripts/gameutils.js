@@ -260,7 +260,8 @@ window.gm.printEquipment= function( id,descr) {
     var s= window.story.state;
     elmt +=`<a0 id='${id}' onclick='(function($event){document.querySelector(\"div#${id}\").toggleAttribute(\"hidden\");})(this);'>${id}</a>`;
     if(window.gm.player.Outfit.countItem(id)<=0) {
-        elmt +=`<a0 id='${id}' onclick='(function($event){window.gm.player.Outfit.addItem(new window.storage.constructors[\"${id}\"]()); window.gm.refreshScreen();}(this))'>Equip</a>`;
+        //elmt +=`<a0 id='${id}' onclick='(function($event){window.gm.player.Outfit.addItem(new window.storage.constructors[\"${id}\"]()); window.gm.refreshScreen();}(this))'>Equip</a>`;
+        elmt +=`<a0 id='${id}' onclick='(function($event){window.gm.player.Outfit.addItem(window.gm.player.Wardrobe.getItem(\"${id}\")); window.gm.refreshScreen();}(this))'>Equip</a>`;
     } else {
         elmt +=`<a0 id='${id}' onclick='(function($event){window.gm.player.Outfit.removeItem(\"${id}\"); window.gm.refreshScreen();}(this))'>Unequip</a>`;
     }

@@ -39,7 +39,8 @@ toast.info("Here is some information!");
         dbgShowCombatRoll: false,
         version : window.gm.getSaveVersion(),
         log : [],
-        passageStack : [],
+        passageStack : [], //used for passage [back] functionality
+        defferedStack : [], //used for deffered events
         time : 700, //represented as hours*100 +minutes
         day : 1,
         activePlayer : 'Ratchel', //id of the character that the player controls currently
@@ -61,6 +62,13 @@ toast.info("Here is some information!");
         s.vars.debugInv.addItem(new Money(),200);
 
     }
+    if (!s.tmp||forceReset) { 
+      // storage of temporary variables; dont use them in stacking passages or deffered events      
+      s.tmp = {
+        rnd : 0,  // can be used as a random variable for use in CURRENT passage
+        args: []  // can be used to set arguments before another passage is called (passage-arguments) 
+      }
+  }
     if (!window.gm.achievements||forceReset) {  //outside of window.story !
       window.gm.achievements= {
         moleKillerGoldMedal: false //add your flags here
@@ -123,7 +131,8 @@ toast.info("Here is some information!");
         window.gm.Ratchel.Wardrobe.addItem(new Leggings());
         window.gm.Ratchel.Wardrobe.addItem(new TankShirt());
         window.gm.Ratchel.Wardrobe.addItem(new Pullover());
-        window.gm.Ratchel.Outfit.addItem(new TailCat());
+        window.gm.Ratchel.Wardrobe.addItem(new TailRibbon());
+        //window.gm.Ratchel.Outfit.addItem(new TailCat());
         window.gm.Ratchel.Outfit.addItem(new Jeans());
         window.gm.Ratchel.Outfit.addItem(new Pullover());
         s.Ratchel=window.gm.Ratchel;
@@ -261,7 +270,7 @@ window.gm.newGamePlus = function() {
 //the passage will show when a new passage is requested and will be removed from stack
 //if this passage is already pushed, only its condition will be updated
 window.gm.pushDeferredEvent=function(id) {
-  var cond = {waitTime: 6,
+  var cond1 = {waitTime: 6,
               locationTags: ['Home','City'],      //Never trigger in Combat
               dayTime: [1100,600]
             },
@@ -269,23 +278,37 @@ window.gm.pushDeferredEvent=function(id) {
                 locationTags: ['Letterbox'],
       };
 
-  var xcond = [cond,cond2]; //passage is executed if any of the conds is met
-  window.story.state.vars.hairGrow = 10;
+  var cond = [cond1,cond2]; //passage is executed if any of the conds is met
+  window.story.state.vars.defferedStack.push({id:id,cond:cond});
 };
-window.gm.hasDeferredEvent = function() {
-  if(window.story.state.vars.hairGrow===10) return(true);
-  return(false);
+window.gm.removeDefferedEvent=function(id=""){
+  if(id!=="") {
+    for(var i=window.story.state.vars.defferedStack.length-1;i>0;i--) {
+      if(window.story.state.vars.defferedStack[i].id===id) 
+      window.story.state.vars.defferedStack.splice(i,1);
+    }
+  }else {
+    window.story.state.vars.defferedStack = [];
+  }
+}
+window.gm.hasDeferredEvent = function(id="") {
+  if(id!=="") {
+    for(var i=0;i<window.story.state.vars.defferedStack.length;i++) {
+      if(window.story.state.vars.defferedStack[i].id===id) return(true);
+    }
+    return(false);
+  } else {
+    return(window.story.state.vars.defferedStack.length>0);
+  }
 }
 window.gm.showDeferredEvent= function() {
   var msg = '';
 
   var namenext = window.passage.name;
   var tagsnext = window.story.passage(namenext).tags;
-  
-  if(window.story.state.vars.hairGrow===10) {
-    window.story.state.vars.hairGrow =0;
-    msg += "You notice that your hair has grown quite a bit.</br>"
-    msg += window.gm.printPassageLink("Next",window.gm.player.location);
+  var evt = window.story.state.vars.defferedStack.shift();
+  if(evt!==null) {
+    msg += window.gm.printPassageLink("Next",evt.id);
   }
   return msg;
 }

@@ -82,6 +82,7 @@ Your [[Laptop|_Laptop_]] is placed on it and also a handwritten [[TodoList]]. </
 Above the desk is a window facing toward the backside of the house.</br>
 On the other side of the room is a large [[Wardrobe]].
 There is a large bed for sleeping with a nightstand aside. </br>
+<a0 onclick="touchCatIdol(this)">touch cat idol</a></br>
 <a href="javascript:void(0)" onclick='($("tw-passage").fadeOut(1000, function() {window.gm.sleep((window.gm.getTimeStruct().hour+1)*100);window.story.show("Sleep");}));'>Nap 1hour</a> </br>
 <%if(window.gm.getTimeStruct().hour<11) { %>
 >
@@ -96,7 +97,12 @@ There is a large bed for sleeping with a nightstand aside. </br>
 Where do you want to go ? </br>
 [[Hallway|Home]]</br> <%}%>
 </article><article id="LogPanel"></article></section>
-
+<script>
+function touchCatIdol(elmnt) {
+	elmnt.replaceWith("There is a tickling feeling in your hand.");
+	window.gm.player.addEffect("effMutateCat",window.gm.StatsLib.effMutateCat());
+}
+</script>
 :: Sleep
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>

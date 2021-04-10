@@ -8,8 +8,7 @@ function getVersion(){return("0,0,0,");}
 
 //this will make sure the item-ctor are registered and it can be used as a lookup 
 function createItemLookups(){
-    window.gm.ItemsLib = {};
-    //window.gm.ItemsLib = { 
+    /*window.gm.ItemsLib = {};
     window.gm.ItemsLib['Money'] = new Money();
     window.gm.ItemsLib['LighterDad'] = new LighterDad();
     window.gm.ItemsLib['LaptopPS'] = new LaptopPS();
@@ -30,9 +29,9 @@ function createItemLookups(){
     window.gm.ItemsLib['Handcuffs'] = new HandCuffs();//{name: 'Handcuffs', desc: 'You cannot use your hand.', tags: ['restrain'], slotUse: ['RHand','LHand'],usable:defaultCanUse, use:defaultOnUse, canEquip:defaultCanUse, canUnequip:defaultNoUnequip };
     window.gm.ItemsLib['TailNone'] = new TailNone();
     window.gm.ItemsLib['TailCat'] = new TailCat();
-
+*/
     //lookup table 
-    window.gm.StatsLib = { 
+   /* window.gm.StatsLib = { 
     'strength':stStrength,
     'perception':stPerception,
     'endurance':stEndurance,
@@ -52,10 +51,10 @@ function createItemLookups(){
     'arousalMax': stArousal,
     'perversion': stPerversion,
     'perversionMax': stPerversion
-}
+}*/
     //register constructors for reviver or your loaded save will not work !
     //...items
-    window.storage.registerConstructor(LighterDad);
+   /* window.storage.registerConstructor(LighterDad);
     window.storage.registerConstructor(Money);
     window.storage.registerConstructor(LaptopPS);
     window.storage.registerConstructor(Battery);
@@ -70,7 +69,7 @@ function createItemLookups(){
     window.storage.registerConstructor(Pullover);
     window.storage.registerConstructor(Crowbar);
     window.storage.registerConstructor(Shovel);
-    //window.storage.registerConstructor(Handcuffs);
+    //window.storage.registerConstructor(Handcuffs);*/
     //...stats
     window.storage.registerConstructor(stHealthMax);
     window.storage.registerConstructor(stHealth);

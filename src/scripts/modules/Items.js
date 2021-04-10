@@ -1,17 +1,4 @@
 "use strict";
-//import {Item} from './Inventory.js';
-/* class definiton of items & Equipment */
-class Item {
-    constructor(name) {
-        this.name = name;
-        this.desc = '';
-    }
-    get parent() {return this._parent();}
-    //context is the owner of item (parent of inventory), on is target (character)
-    usable(context,on=null) {return({OK:false, msg:'Cannot use.'});}
-    use(context,on=null) {return({OK:false, msg:'Cannot use.'});}
-}
-
 class LighterDad extends Item {
     constructor() {
         super('LighterDad');
@@ -102,5 +89,31 @@ class SimpleFood extends Item {
     }
 }
 
+window.gm.ItemsLib = (function (ItemsLib) {
+    // Private Objekte
+    /*var privateVariable = "privat";
+    function privateFunktion () {
+        alert("privateFunktion wurde aufgerufen\n" +
+            "Private Variable: " + privateVariable);
+    }*/
+    window.storage.registerConstructor(LighterDad);
+    window.storage.registerConstructor(Money);
+    window.storage.registerConstructor(LaptopPS);
+    window.storage.registerConstructor(Battery);
+    window.storage.registerConstructor(Dildo_small);
+    window.storage.registerConstructor(Lube);
+    window.storage.registerConstructor(CanOfCoffee);
+    window.storage.registerConstructor(SimpleFood);
+    
+    ItemsLib['Money'] = function () { return new Money();};
+    ItemsLib['LighterDad'] = function () { return new LighterDad();};
+    ItemsLib['LaptopPS'] = function () { return new LaptopPS();};
+    ItemsLib['Battery'] = function () { return new Battery();};
+    ItemsLib['Dildo_small'] = function () { return new Dildo_small();};
+    // consumables
+    ItemsLib['Lube'] = function () { return new Lube();};
+    ItemsLib['CanOfCoffee'] = function () { return new CanOfCoffee(); };
+    ItemsLib['SimpleFood'] = function () { return new SimpleFood(); };
 
-
+    return ItemsLib; 
+}(window.gm.ItemsLib || {}));
