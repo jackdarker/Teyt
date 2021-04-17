@@ -1,4 +1,14 @@
 "use strict";
+class Item {
+    constructor(name) {
+        this.name = name;
+        this.desc = '';
+    }
+    get parent() {return this._parent();}
+    //context is the owner of item (parent of inventory), on is target (character)
+    usable(context,on=null) {return({OK:false, msg:'Cannot use.'});}
+    use(context,on=null) {return({OK:false, msg:'Cannot use.'});}
+}
 //an Inventory-Component to store items
 class Inventory {
     constructor(externlist) {  

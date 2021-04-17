@@ -226,6 +226,7 @@ window.gm.combat.calcParry=function(attacker,target, attack) {
     result.OK = false;
     if(rnd<10) {
       result.msg = target.name +' parried the attack and was even able to land a hit.'  //todo how to add textual variation based on used weapon and skill?
+      // foo should reflect fraction of attack back to attacker
       result.foo = function(attacker,attack){ return(function(attacker,attack){ attacker.Stats.increment('health',-0.5*attack.value);});}(attacker,attack);
     } else {
       result.msg = target.name +' parried the attack.'
@@ -252,6 +253,7 @@ window.gm.combat.calcAbsorb=function(attacker,defender, attack) {
   window.gm.pushLog(`absorb roll:${dmg} vs ${def} `,window.story.state.vars.dbgShowCombatRoll);
   result.msg = defender.name +' got hit by '+attacker.name+' and suffered '+dmg+ (attack.crit?' critical ':'')+'damage. '
   attack.total = dmg;
+  //foo should add fraction of attack to defender-health
   result.foo = function(defender,attack){ return(function(){ defender.Stats.increment('health',-1*attack.total);});}(defender,attack);
   return(result);
 }
@@ -262,11 +264,11 @@ window.gm.combat.calcAttack=function(attacker,defender, attack) {
   if(result.OK===false) { return(result);  }
   var _tmp = result.msg;
   result = window.gm.combat.calcParry(attacker,defender,attack);  //todo or block
-  if(result.foo!==null) result.foo();
+  if(result.foo!==null) result.foo(attacker,attack);
   if(result.OK===false) {    return(result);  }
   _tmp += result.msg;
   result = window.gm.combat.calcAbsorb(attacker,defender,attack);
-  if(result.foo!==null) result.foo();
+  if(result.foo!==null) result.foo(defender,attack);
   _tmp += result.msg;
   result.msg = _tmp;
   return(result);

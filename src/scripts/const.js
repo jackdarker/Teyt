@@ -4,8 +4,6 @@
 //constant declarations
 //this is a lookuptable for items
 
-function getVersion(){return("0,0,0,");} 
-
 //this will make sure the item-ctor are registered and it can be used as a lookup 
 function createItemLookups(){
     /*window.gm.ItemsLib = {};
@@ -70,7 +68,7 @@ function createItemLookups(){
     window.storage.registerConstructor(Crowbar);
     window.storage.registerConstructor(Shovel);
     //window.storage.registerConstructor(Handcuffs);*/
-    //...stats
+    /*//...stats
     window.storage.registerConstructor(stHealthMax);
     window.storage.registerConstructor(stHealth);
     window.storage.registerConstructor(stRelation);
@@ -80,12 +78,9 @@ function createItemLookups(){
     window.storage.registerConstructor(effEnergized);
     window.storage.registerConstructor(effStunned);
     window.storage.registerConstructor(skCooking);
-  
+  */
     //mapping from passage-locations to background images
-    window.gm.getScenePic = function(id){
-        if(id==='Garden' || id ==='Park')   return('assets/bg_park.png');
-        return('assets/bg_park.png');//todo placehodler
-    }
+    
 
     /*window.gm.test=function(dies) {
         var list={};
