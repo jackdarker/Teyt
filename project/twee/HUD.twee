@@ -1,4 +1,4 @@
-:: sidebar {"position":"551,513.3000030517578","size":"100,100"}
+:: sidebar {"position":"375,500"}
 <h3><%=window.story.name%></h3>V<%=window.gm.getSaveVersion().toString().replaceAll(",",".")%></br>
 <img src="https://twinery.org/homepage/img/logo.svg" width="256" height="256">
 </hr>
@@ -286,14 +286,14 @@ for(var i=0;_Entrys.length>i;i++) {
 }
 </script>
 
-:: PassageTemplate [template] {"position":"253,496.5","size":"100,100"}
+:: PassageTemplate [template] {"position":"250,500"}
 The page should be setup like this:
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 content here !
 </article><article id="LogPanel"></article></section>
 
-:: SubpanelTemplate [_back]
+:: SubpanelTemplate [_back] {"position":"75,600"}
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 If this is a subpanel you can use back-tag and _back-Link

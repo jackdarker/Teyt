@@ -1,0 +1,232 @@
+
+:: YouDiedOnce
+"What happend? Why I'm sitting in a pool of ...goo?"
+"Choosen one, this is a shrine of restoration! ..." a priestess in a white robe with purle borders approachs you.
+<!--todo-->
+"So I died? And after death I return here?"
+"Those choosen by the goods might be revived in a shrine of restoration after their death or collaps of mind."
+"Collaps of mind? I just need to get stunned and will be sent back here?"
+<devnote>As a safeguard against mental trauma (*1) the players neural activity is supervised. If a certain amount of stress is detected (*2), the safeguard is triggered.
+*1): This applys not just to painful trauma but also marvelous sensations to avoid addictive states (*3).
+*2): Chances that the trigger is delayed or supressed might decrease if the user is inclined to the situation and has the proper mindset the safeguard 
+*3): According to user agreement §34-f2, the service-provider is not responsible for addiction caused by the use of the game.
+</devnote>
+"Addictive states? I'm pretty sure I will not get addicted on getting cut in half."
+You decide that you have been sitting in this sizzling pool of mysterious liquid long enough and rise to your feet to step out of it.
+You notice that you are naked and try to hide your privates with your hands. "Uhm...where is my gear?"
+"The gods restored your body and mind but your gear is nowwhere to be found."
+"Oh come on should I ran around in my birthday suite?"
+"Please take this cloth and staff as they are blessed by the gods to help you to live up to your goal."
+<devnote> For testing purpose the game is set to rougelike mode: on death you will loose your equipment and get the starter-gear. 
+But you keep your stats and skills (*1).  
+*1): It might occur that the questline has to be started from the beginning. We are doing our best to solve the problem in the next updates. 
+</devnote> 
+"Start the questline from the beginning? I really hope they get that fixed soon."
+
+
+:: YouDiedWithCursedGear
+"Choosen one, this is a shrine of restoration!" ... the acolyte starts heir rant.
+"Yeah, I know. I just got ass kicked again. At least I got rid of that freaking bracelet... "
+But that damned thing is still on your ankle!
+"Hey, why is everthing gone except that damn thing?"
+"At times the heros burden is increased by evil deeds and his epic story is extended further by finding closure for his curse." the priestess chants, holding out heir hands upward to heir gods.
+"So I'm stuck with cursed gear but have to let go the good one?"
+[[This sucks]][[Its an incentive to not die]]
+
+
+:: Skills
+Disrobe: cast on Self or other; does not remove jewellery, enhanted or summoned armor
+a naked body is less protected but might increase tease damage; exhibitionist streak increases targets arousal 
+"Why the fuck should I want to disrobe mids in combat?"
+
+Reduce Suffering: cast on Self or other; reduces willpower damage by physical pain but also makes you less sensitiv to other physical stimulation
+lets you endure stressful situations better and reduces blackout chance;increases masochism tendency;
+"other physical stimulation means sex?"
+
+Animal Comprehension: cast on self or other; silently understand what animals say
+having a chorus of thrilled animals in your mind might cause headache 
+"No I can discuss the hen-egg-problem with chicken"
+
+Regeneration: cast on self or other; healing over time ; might increase fertility/virility for a limited time
+overhealing friendly target might get them randy
+"Those side effects dont appear that terrible."
+
+Hedgehog Eyes: you can see in the dark - a little bit better then most humans but far as good as a common cat
+"I would prefer cat-eyes. Spider-senses would be even better. But you have to take what you get."
+
+:: SpecialItems
+Orb of Tremor: a floating orb of variyng size and mass that slings itself against an enemy to deal blunt damage;
+training allows to give better control about the motion and to navigate tight spaces
+upgraded version can be used as spydrone
+"What could it be good for to squeeze a solid ball into a tight?."
+
+SnakeRope: a leathery rope that is at least a dozen meters; it can move on its own and this movement can be controlled by whom held  
+useful as climbing aid or to bind something up
+"Somehow this remmebers me at Indys whip."
+
+Vial of slipery: a small vial with an unending supply of some slimy, greasy liquid of most likely organic origin.
+can be used as grease for machinery or other parts that need lubrication. 
+upgraded version can change color and taste
+"Unending huh? Will the world drown in goo if i put it upside down?"
+
+:: PostDefeatCombat
+<devnote>"We are happy to announce that we have extended combat with exceptional new possibilities to allow more variety in tactics and better chances for certain character builds.
+We would like to thank our player for the constructive criticism and are intent on your feedback.
+Here is a short description what we changed:
+Until now you had 2 options to defeat someone: kill them or fill up their arousal-meter.
+If you get your health drowned but the foe is horny enough, there is a chance that combat switches over to sexual innuendo mode.
+If you are able to wear out the foe before you do (*1), you score a win. 
+So get out their and do some loving!
+*1) balancing is still in progress"</devnote>
+"OOhKKeyyy. So this is now a rape-game?"
+
+:: PostDefeatCombat2
+"That brute is just to though. My staff doesnt deal enough damage."
+You dodge another attack barely.
+"And he has that salacious grin on his face."
+... You tease him until is meter is nearly full. But this just gets him enraged further.
+You try to block him with your staff, but the smash just pushed the breath out of you.
+He uses just that short moment and is on you, ripping your clothes away.
+"Ieekh" you black out
+"Ieekh" you are pretty sure that you already had this situation before and expect the safeguard to get you out of this. But it doesnt trigger.
+...
+
+
+:: GetPrincessBackSafe
+Your task is to escort Princess Eve safely back to her step-mother, the queen regent.
+She made clear that save means healthy with all body parts attached and - that she mentioned three times - as a virgin.
+So you not only have to defend her against foes, but also the advances of suitors. The princess trys hard to be not a burden and to stay chaste.
+But the primal urges of a youg girl in her age grow stronger...
+
+:: RockFlowers
+You have to collect a bunch of flowers growing on Mt.Scree for the local alchemist.
+While this seems to be easy at first, it gets quickly difficult:
+- climbing is not your thing; you need to borrow that snakerope for a favor
+- harpies are trying to mate with you as does an oversized eagle
+- Rams ram you 
+- a snow-leopard-lady is prowling around for some nice, hard meat to stuff herself full with
+Maybe you can play those 4 partys against each other
+
+
+:: PantyPantsy
+
+:: PantyPantsy2
+"Are you still in pantie-business? I got some more request here. Someone asks for panties from a dragoness."
+"I doubt dragons wear panties. They are animals right? Animals dont wear cloths."
+"Ahh. prejudice.... "
+"And who in the world would want that anyway?"
+"Even more prejudice. Anyway. Find a dragon and get those panties. And if it doesnt have some, obtain some and get her to wear them. And then get them back. Easy peasy right?
+I mean, I dont ask to get me 3 pieces again, just one."
+"I dont even know where I could find a dragon. And if knew, I would stay away from there."
+'I could just get some oversized pantys and make him believe its from a dragon.'
+"I will do it."
+"Very good" you seal the contract by hand. "I'm really sure you get this done." 
+...
+"You got pantys? That cocksure grin tells me: for sure you do. "
+"Well I can tell..." before you can even start to narrate your devised story the trader bubbles on.
+"That was much faster then the other guys. Just show me what you got and I will get my detector to proof it."
+"detector?" you are dumbfounded and deeple worried at the same time.
+"Yeah thats some awesome gadget I spent a lot of money in. You wont believe how many people tried to rip me off telling this for that. A mage sold it to me, showed how it can be used to detect different sort of things.
+As I said some guys brought me that crude slip just a short while ago. Swush - I used the detector - didnt show dragon. They were really surprised as the guards led them to the gallows."
+"Gallows?!"
+"They take it really serious now with faking things. Order from top management: no business with fake-items, be it gold-coin or dragon-pantys. Just visit them, maybe you saw them when entering the market, dancing happily in the air."
+"Uhm...I..I just wanted to tell you that I will need some more time OK. Its...its...I'm on it yes?"
+"Oh sure sure"
+You quickly hurry off 'a detector that can detect dragons?! Who in the world would be in need for that. I mean, you see a dragon or not.'
+No cheating here, get that mission done.
+...
+'Thats a dragon, question is, is it male or female.'
+You try to peek undertail from your hiding spot.
+'Is that a slit?' you are not really an expert for dragon genitalia - and for sure doesnt want to become one.
+So you found a dragon, a female one you guess. 
+'That was the easy part. But how to get to wear that thing underwear, without beeing eaten. And where would I get something fitting anyway.'
+Get some of those gobbled up spiderweb from the cave. Those are stretchy and durable and might be useful as cloth-replacement. 'Its spidersilk fashion, I will tell them.'
+...
+The dragon is now resting lazily on its side and watches you.
+You circle around but keep your eyes peeled on that muzzle that is filled with dagger-sized teeth. As you pass by it slowly raises that hindleg not resting on the ground.
+Your gaze is attracted to that movement and you blush deeply as you find yourself staring at whats inbetween those legs. 
+'She did that on cause. Oh my, I really thought SHE. I should think - IT - not she! '
+...
+
+
+:: DemonVisitant
+...
+With on hand on the wall and a torch in another you walk forward down another corridor of that labyrinthian place.
+A uncareful step on a old, wodden plank that is to rotten to bear your wight and your foot crashs through the floor. Not far but enough to let you trip. With both hands you catch your fall.
+Unfortunatly you let go of the torch that falls down to the ground, sending out firey sparks as it rolls around.
+At first you fear that this will set the whole place at fire. But that fear is soon replaced with another one as you see it rolling to the edge of the ballustrade. 
+Quickly dashing forward you try to grab it before it vanishs, but its to late. 
+The torch falls over the edge and all the light is gone.
+'This is really bad.'
+...
+Just before you hear it you an feel wood splittering again. And how you fall through the air. 
+And you think: "If I'm lucky I die and I get out of here."
+And dying you do as your body hits the paved ground 2 dozen meters below.
+And you are back. As usual sitting in that restoration-pool.
+But something is wrong. Its still dark except the dim glow caused by the fluid in the pool. This is for sure not the usual shrine that you had now enough chances to wake up in.
+You climb out of it and look around as far as you can see with that little light.
+'Hello?...Priestess are you here?'
+There is just some echo. An echo that indicates that you are somewhere in a building - or underground.
+'Oh fuck where am I?' You rush another turn around the shrine, looking everywhere for some hints where you are. And for something to dress in.
+You are still naked. 
+
+<Demon>You arent going to make it from here. Just try and you will see.</Demon>
+While you cannot see any trace of whoever is speaking to you, your imagination shows you a face with a sardonic grin plasterd on it.
+
+You need to find a way out of here. But the further you strive a way from the shrine the darker it gets until you cant see your hand in front your eyes.
+"This sucks."
+
+<Demon>Come on, lets help each other. I wanna leave that hellhole just like you.</Demon>
+"Help you? You keep me prison here and dare to ask for help!"
+
+<Demon>It wasnt me that trapped you here. This place is either a well thougth snare or an accident.</Demon>
+"How could I trust you, I dont know how you are and cannot even see you."
+
+<Demon>Thats a point my. But is it to much to ask for a little bit o trust nowadays?</Demon>
+"Stay away. I will find a way, believe me."
+<Demon>Fine. Suit yourself.</Demon>
+
+"Hello?...Hello voice. Are you still there?"
+Silence
+"Can we talk again?...About helping each other"
+Silence
+"HEY...can you here me?"
+Silence
+[[Plead some more]]
+Still now answer. You crouch down on your knees, feeling helpless and left-behind. 
+<Demon>So you going to listen now?</Demon>
+"Huh..you are still here"
+<Demon>Nope</Demon>
+"You said we should help each other. So, how could I help you and you me."
+<Demon>I'm stuck here similiar to you. Except that I dont have the variety to die and be revived. 
+I could grant you a skill, that lets say, make you see in the dark.</Demon>
+"See in the dark!" you blurt out. 'That would really be o help.'
+<Demon>Just to be clear. Its not like walking in bright daylight.</Demon>
+"Sure. But what do you want for this."
+<Demon>As you can see - or better not see. I lack a suitable body at the moment. Which makes it difficult to get anywhere. </Demon>
+"How did that happen? I guess a bug made your avatar glitch."
+<Demon>I'm not sure what you mean with glitch, but it wasn't a bug that caused my loss. No, it was a bunch of zombies that ripped that body appart </Demon>
+"Zombies!?" 
+<Demon>Yes. Those stinky, shuffling, brain slurping meatpiles. They usually are not a big issue. But..well I got a little careless and they overrun us.</Demon>
+"Us? You mean there are others here to."
+<Demon>Only one. And I'm pretty sure he switched sides in the meantime. Just try to be silent for a moment. Maybe then you are able to hear them stirring up. </Demon>
+You hold your breath and try to listen as intense as possible. Are there some shuffling noises from the oposite of the room?
+Right now you feel even more in a hurry to get out of here.
+"So, what exactly do you want from me?"
+<Demon>If you check those dirtpile other there, you will notice several mushrooms. Somewhere there has to be an amulett with a small figurine. Just pick up and wear it.</Demon>
+"Do I really have to wear it? I had some bad experiences with cursed gear."
+<Demon>Oh. Well I think its good enough if you just hold it in your hands or put it in a pocket. Sorry, I forgot. Pockets are actual out of scope.</Demon>
+"And how do you grant me that skill?"
+<Demon>Please pickup the amulet first, then I will tell you</Demon>
+<Demon>Fine, please dont loose it. So, you see those fungus all around. Some of them are white as a bone. I recommend to not even touch those. But you should also see some more bluish color.</Demon>
+You check the fungus. 'White,white, shitbrown, white,white,coalblack...hm not sure if this would count as blue'
+"I only see a single stalk here that could be called bluish. Is it that kind?"
+<Demon>Yes, yes very good. You have to eat it, make sure to consume the entire stalk. </Demon>
+"And you sure that isnt poisenous to me?"
+<Demon>Guarantee. Everything will be fine. And you will be able to see in the dark, but just for an amount of limited time.</Demon>
+...
+''
+
+
+
+[[Eat the fungus]][[]]

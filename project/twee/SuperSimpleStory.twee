@@ -1,4 +1,4 @@
-:: _SuperSimpleStory_
+:: _SuperSimpleStory_ {"position":"1200,125"}
 <%if(visited(window.passage.name)<=1) {%>
 Welcome to this short story.</br></br>
 <%}%>
@@ -8,17 +8,17 @@ What would you like to do.</br>
 [[Sleep|SleepALittle]]</br>
 [[Wakeup]] </br>
 
-:: SleepALittle
+:: SleepALittle {"position":"400,825"}
 You are sleeping some more. </br>
 <mark>The folowing is an example how to print a javascript calculation to html:</br></mark>
 It is now <%= 5*visited(window.passage.name)%> minutes later.</br>
 [[Continue|_SuperSimpleStory_]]
 
-:: Wakeup
+:: Wakeup {"position":"575,825"}
 You groan as you wake up. 'Damn life'</br>
 [[Start]]
 
-:: _ImagesAndOtherMedia_
+:: _ImagesAndOtherMedia_ {"position":"1075,125"}
 <mark>embed images in the following way:</mark></br>
 stored on a server:</br>
 <img alt="twinerylogo" src="https://twinery.org/homepage/img/logo.svg" width="256" height="256"></br>
@@ -55,7 +55,7 @@ video with integrated and separate controls:</br>
 [[Start]]
 
 
-:: _ControlElements_
+:: _ControlElements_ {"position":"1200,25"}
 <div id="choice">
 <p>click on image to show related text and border</p>
 <table><tbody>
@@ -72,7 +72,7 @@ video with integrated and separate controls:</br>
 <p id="1" hidden>Text 1</p><p id="2" hidden>[[Start]]</p><p id="3" hidden>Text 3</p>
 </div>
 
-:: _VariablesAndScript_
+:: _VariablesAndScript_ {"position":"1075,25"}
 <script>
 function getBanana(elmnt,val) {
     window.story.state.vars.bananas +=val;

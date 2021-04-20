@@ -1,4 +1,4 @@
-:: Campus
+:: Campus {"position":"825,825"}
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
