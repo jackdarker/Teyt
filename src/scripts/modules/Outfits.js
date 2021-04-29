@@ -201,6 +201,21 @@ class TailCat extends Equipment {
     canEquip() {return({OK:true, msg:'equipable'});}
     canUnequip() {return({OK:true, msg:'unequipable'});}
 }
+class BreastHuman extends Equipment {
+    constructor() {
+        super('BreastHuman');
+        this.tags = ['body'];
+        this.slotUse = ['bBreast'];
+        this.desc = 'some human breasts'
+        this.growth = 0.0; //in %/100 maxGrowth
+        this.maxGrowth = 0.3; //in meter, todo depends on bodysize
+        window.storage.registerConstructor(BreastHuman);
+    }
+    toJSON() {return window.storage.Generic_toJSON("BreastHuman", this); };
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(BreastHuman, value.data));}
+    canEquip() {return({OK:true, msg:'equipable'});}
+    canUnequip() {return({OK:true, msg:'unequipable'});}
+}
 
 window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(Leggings);
@@ -222,5 +237,6 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['Handcuffs'] = function () { return new HandCuffs();};//{name: 'Handcuffs', desc: 'You cannot use your hand.', tags: ['restrain'], slotUse: ['RHand','LHand'],usable:defaultCanUse, use:defaultOnUse, canEquip:defaultCanUse, canUnequip:defaultNoUnequip };
     ItemsLib['TailNone'] = function () { return new TailNone();};
     ItemsLib['TailCat'] = function () { return new TailCat();};
+    ItemsLib['BreastHuman'] = function () { return new BreastHuman();};
     return ItemsLib; 
 }(window.gm.ItemsLib || {}));

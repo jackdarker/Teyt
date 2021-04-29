@@ -80,9 +80,10 @@ This is your Bedroom.
 A desk with a wooden chair is setup as workingplace. <br>
 Your [[Laptop|_Laptop_]] is placed on it and also a handwritten [[TodoList]]. </br>
 Above the desk is a window facing toward the backside of the house.</br>
-On the other side of the room is a large [[Wardrobe]].
+On the other side of the room is a large [[Wardrobe]] with a [[Mirror]] where you can take a look at yourself.
 There is a large bed for sleeping with a nightstand aside. </br>
 <a0 onclick="touchCatIdol(this)">touch cat idol</a></br>
+you are quite horny right now. Maybe you have some time to [[play with yourself|Masturbate]].</br>
 <a href="javascript:void(0)" onclick='($("tw-passage").fadeOut(1000, function() {window.gm.sleep((window.gm.getTimeStruct().hour+1)*100);window.story.show("Sleep");}));'>Nap 1hour</a> </br>
 <%if(window.gm.getTimeStruct().hour<11) { %>
 >
@@ -114,6 +115,15 @@ You fall into your bedsheets and sleep until your smartphone buzzes you out of y
 [[Next|<%=window.gm.player.location%>]]</br>
 <%} %>
 </article><article id="LogPanel"></article></section>
+
+:: Mirror [_back]
+<section> 
+<aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+[[Back|_back]]</br>
+<!--todo: set height depending on browsersize-->
+<div id='Canvas' style='height: 30em;background: url("assets/doll/doll_small_xcf-Skirt.png") no-repeat center,url("assets/doll/doll_small_xcf-Body.png") no-repeat center, url(<%=window.gm.getScenePic(window.gm.player.location)%>)no-repeat center;color:black;'></div>
+</article><article id="LogPanel"></article></section>
+
 
 :: TodoList
 <section> 

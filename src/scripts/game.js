@@ -138,7 +138,7 @@ window.gm.util.refToParent = function(me){ return function(){return(me);}};
 //the passage will trigger under the given condition: minimum time, location-tag, at a certain time-window
 //the passage will show when a new passage is requested and will be removed from stack
 //if this passage is already pushed, only its condition will be updated
-window.gm.pushDeferredEvent=function(id) {
+window.gm.pushDeferredEvent=function(id,args) {
     var cond1 = {waitTime: 6,
                 locationTags: ['Home','City'],      //Never trigger in Combat
                 dayTime: [1100,600]
@@ -148,7 +148,7 @@ window.gm.pushDeferredEvent=function(id) {
         };
   
     var cond = [cond1,cond2]; //passage is executed if any of the conds is met
-    window.story.state.vars.defferedStack.push({id:id,cond:cond});
+    window.story.state.vars.defferedStack.push({id:id,cond:cond,args:args});
   };
   window.gm.removeDefferedEvent=function(id=""){
     if(id!=="") {
@@ -214,6 +214,9 @@ window.gm.pushDeferredEvent=function(id) {
         window.story.state.vars.passageStack.splice(0,window.story.state.vars.passageStack.length);
       }
   }
+
+  //Todo disable save-menu on _nosave-tag 
+
     //Todo
     //before entering a new passage check if there is a defferedEvent that we should do first
     //if so, push the normal-passage onto stack, show deffered passage
@@ -288,12 +291,35 @@ window.gm.onSelect = function(elmnt,ex_choice,ex_info) {
       else all[i].hidden=true;
   }
 };
+//connect to onclick to toggle selected-style for element + un-hiding related text
+//the elmnt (f.e.<img>) needs to be inside a parentnode f.e. <div id="choice">
+//ex_choice is jquery path to fetch all selectable elmnt
+//for a table in a div this could be "div#choice table tbody tr td *"
+//text-nodes needs to be inside a parent node f.e. <div id="info"> and have matching id of elmnt
+//ex_info is jquery path to fetch all info elmnt
+//for a <p> in div this could be "div#info  
+window.gm.onSelect = function(elmnt,ex_choice,ex_info) {
+  var all = $(ex_choice);//[0].children;
+  for(var i=0;i<all.length;i++) {
+    if(all[i].id === elmnt.id) {
+      all[i].classList.add("selected");
+    }
+    else all[i].classList.remove("selected");
+  }
+  all = $(ex_info)[0].children;
+  for(var i=0;i<all.length;i++) {
+      if(all[i].id === elmnt.id) {
+        all[i].hidden=false;
+      }
+      else all[i].hidden=true;
+  }
+};
 //call this onclick to make the connected element vanish and to unhide another one (if the passage is revisited the initial state will be restored)
 //unhidethis needs to be jquery-path to a div,span,.. that is initially set to hidden
-//cb can be a function(id) that gets called
+//cb can be a function(elmt) that gets called
 window.gm.printTalkLink =function(elmt,unhideThis,cb=null) {
   elmt.toggleAttribute("hidden");
-  if(cb!==null) cb(elmt.id);
+  if(cb!==null) cb(elmt);
 $(unhideThis)[0].toggleAttribute("hidden");
 }
 //prints the same kind of link like [[Next]] but can be called from code

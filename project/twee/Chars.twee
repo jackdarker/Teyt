@@ -60,9 +60,42 @@ mutate();
 </script>
 
 :: CatHabit
-<section> 
-<aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+<section> <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 You feel the urge to sit down and give yourself a good licking...</br>
+<% if(window.gm.hasDeferredEvent()){ %><%= window.gm.showDeferredEvent() %><%} else {%>
+[[Next|<%=window.gm.player.location%>]]</br>
+<%}%>
+</article></section>
+
+:: MutateBreast
+<section> <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+<div><output></output></div></br>   <!--message is rendered here-->
+<% if(window.gm.hasDeferredEvent()){ %> <%= window.gm.showDeferredEvent() %> <%} else {%>
+[[Next|<%=window.gm.player.location%>]]</br>
+<%}%>
+</article></section>
+<script>
+function mutate() {
+    if(window.gm.player.Outfit.countItem("BreastHuman")>0) {
+        var growth = window.gm.player.Outfit.getItem("BreastHuman").growth+=0.1;
+        var maxGrowth = 0.3;//window.gm.player.Outfit.getItem("TailCat").maxGrowth;
+        if(growth >= 1) {
+            window.gm.printOutput("Your teats are as big as they can get.</br>");
+        } else {
+            window.gm.player.Outfit.getItem("BreastHuman").growth=growth;
+            window.gm.printOutput("Your breasts seems to have enlarged again to a size of "+growth*maxGrowth*100+" cm.</br>");
+        }
+    } else {
+        window.gm.player.Outfit.addItem(window.gm.ItemsLib.BreastHuman());
+        window.gm.printOutput("As you feel up your pecks you notice that they seem to be softer than before !</br>");
+    }
+}
+mutate();
+</script>
+
+:: MutateBreastEnd
+<section> <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+Somehow you know your breast stopped changing ...</br>
 <% if(window.gm.hasDeferredEvent()){ %><%= window.gm.showDeferredEvent() %><%} else {%>
 [[Next|<%=window.gm.player.location%>]]</br>
 <%}%>

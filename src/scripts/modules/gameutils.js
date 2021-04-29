@@ -47,7 +47,6 @@ window.gm.initGame= function(forceReset,NGP=null) {
         qUnlockDowntown : 0,
         qUnlockRedlight : 0,
         qUnlockBeach : 0,
-        hairGrow: 0,
         crowBarLeft: 1,
         debugInv: new Inventory()
         }; 
@@ -137,6 +136,7 @@ window.gm.initGame= function(forceReset,NGP=null) {
 // lookup function for scene background
 window.gm.getScenePic = function(id){
   if(id==='Garden' || id ==='Park')   return('assets/bg_park.png');
+  if(id==='Bedroom' || id==='Your Bedroom')   return('assets/bg_bedroom.png');
   return('assets/bg_park.png');//todo placehodler
 }
 window.gm.giveCyrilFood=function(){

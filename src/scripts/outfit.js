@@ -21,8 +21,9 @@ window.gm.OutfitSlotpLib = {
     bSkin    : 36,
     bTailBase   : 37,   
     bBreast : 38,
+    bNipples : 39,
     //insert more slots here
-    SLOTMAX : 50
+    SLOTMAX : 70
 };
 //Todo equip on other char:
 //move from own inventory to chars, equip, if impossible undo 

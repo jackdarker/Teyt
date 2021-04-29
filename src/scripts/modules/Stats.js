@@ -464,6 +464,45 @@ class effMutateCat extends Effect {
         }
     }
 }
+class effGrowBreast extends Effect {
+    constructor() {
+        super();
+        this.data.id = this.data.name= effGrowBreast.name, this.data.duration = 60, this.data.hidden=0;
+        this.data.cycles = 3, this.data.magnitude = 3;
+    }
+    toJSON() {return window.storage.Generic_toJSON("effGrowBreast", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(effGrowBreast, value.data);};
+    get desc() {return(effGrowBreast.name);}
+
+    onTimeChange(time) {
+        //after some time you mutate a bit
+        this.data.duration = Math.max(this.data.duration-window.gm.getDeltaTime(time,this.data.time),0);
+        this.data.time = time;
+        if(this.data.duration<=0 && this.data.cycles>0) {
+            this.data.cycles-=1;
+            return(function(me){
+                return (function(Effects){ 
+                    if(me.data.cycles<=0) { 
+                        Effects.removeItem(me.data.id);
+                        window.gm.pushDeferredEvent("MutateBreastEnd");
+                    }
+                    else window.gm.pushDeferredEvent("MutateBreast");
+                });
+            }(this));
+        }
+        return(null);
+    }
+    onApply(){
+        this.data.duration = 60;
+        this.data.time = window.gm.getTime();
+    }
+    merge(neweffect) {
+        if(neweffect.name===this.data.name) {
+            this.data.cycles+= neweffect.data.cycles; //prolong the effect
+            return(true);
+        }
+    }
+}
 //combateffect
 class effStunned extends CombatEffect {
     constructor() {
@@ -527,8 +566,12 @@ window.gm.StatsLib = (function (StatsLib) {
     window.storage.registerConstructor(effTired);
     window.storage.registerConstructor(effEnergized);
     window.storage.registerConstructor(effStunned);
+
     window.storage.registerConstructor(effMutateCat);
     StatsLib.effMutateCat = function () { return new effMutateCat();  };  
+    window.storage.registerConstructor(effGrowBreast);
+    StatsLib.effGrowBreast = function () { return new effGrowBreast();  };
+    //
     window.storage.registerConstructor(skCooking);
 
     return(StatsLib); 

@@ -9,7 +9,9 @@ teyt
 	"format-version": "2.0.2",
 	"Start": "Intro",
 	"tag-colors": {
-		"template": "orange"
+		"template": "orange",
+		"_back": "gray",
+		"_nosave": "yellow"
 	},
 	"zoom": 1
 }
