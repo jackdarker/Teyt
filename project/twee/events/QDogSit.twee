@@ -9,7 +9,7 @@ var qDogSitLib = [ [0,'unknown'],
     [0x400 , 'first visit at dogsit-center'],
     [0x500 , 'interview run done'],
     [0x550 , 'training run done'],
-    
+    [0x600 , 'job offers lv1']
 ];</script>
 
 :: qDogSit_Status

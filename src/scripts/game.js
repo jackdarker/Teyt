@@ -16,6 +16,7 @@ window.gm.switchPlayer = function(playername) {
 //you might need to reimplement this to handle version upgrades on load
 window.gm.rebuildObjects= function(){ 
   var s = window.story.state;
+  window.gm.quests.setQuestData(s.quests); //necessary for load support
   window.gm.switchPlayer(s.vars.activePlayer);
 }
 //returns timestamp since start of game
@@ -69,11 +70,10 @@ window.gm.getTimeStruct=function() {
   var DoW = window.story.state.vars.day%7;
   return({'hour':h,'min':m, 'daytime': daytime, 'DoW':DoW});
 };
-
+window.gm.DoWs = ['Monday', 'Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 window.gm.getDateString= function() {
   var v=window.story.state.vars;
-  const DoW=['Monday', 'Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-  return v.day.toString()+". day "+ DoW[(v.day%7)-1];
+  return v.day.toString()+". day "+ window.gm.DoWs[(v.day%7)-1];
 };
 //forward time to until (1025 = 10:25), regenerate player
 //warning dont write 0700 because this would be take as octal number
@@ -119,6 +119,41 @@ window.gm.rollExplore= function() {
   window.gm.addTime(20);
   window.story.show(places[r]);
 };
+
+// reimplement to setup the game !
+window.gm.initGame= function(forceReset,NGP=null) {
+  window.gm.toasty= new Toasty();
+
+    //this does not work because hidden is called to late
+    /*$(window).on('sm.passage.hidden', function(event, eventObject) {
+      
+      if(eventObject.passage) {// No passage to hide when story starts
+          console.log('hiding'+eventObject.passage.name);        
+      }
+    });*/
+    $(window).on('sm.passage.showing', function(event, eventObject) {
+        // Current Passage object
+        $("tw-passage").fadeIn(500);  //fade in if was previously faded out
+      console.log('showing '+eventObject.passage.name);
+    });
+    // Render the passage named HUD into the element todo replace with <%=%>??
+    $(document).on('sm.passage.shown', function (ev,eventObject) { window.gm.updateOtherPanels();});
+    var s = window.story.state; //s in template is window.story.state from snowman!
+    if(!s.quests || forceReset) {
+      s.quests =  new QuestData();
+      window.gm.quests = new QuestManager(window.gm.questDef);
+      window.gm.quests.setQuestData(s.quests);
+      window.gm.quests.pubSub.subscribe("change",function(data){window.gm.toasty.info("Quest updated")});
+    }
+    if (!s.tmp||forceReset) { 
+      // storage of temporary variables; dont use them in stacking passages or deffered events      
+      s.tmp = {
+        rnd : 0,  // can be used as a random variable for use in CURRENT passage
+        args: []  // can be used to set arguments before another passage is called (passage-arguments) 
+      }
+    }
+  }
+//reimplement for your game !
 window.gm.newGamePlus = function() {
   var NGP = { //be mindful if adding complex objects to NGP, they might not work as expected ! simple types are ok 
     crowBarLeft: window.story.state.vars.crowBarLeft
@@ -127,7 +162,7 @@ window.gm.newGamePlus = function() {
   window.story.show('Home');
 };
 
-// use child._parent = window.gm.util.refToParent(parent);
+// use: child._parent = window.gm.util.refToParent(parent);
 window.gm.util.refToParent = function(me){ return function(){return(me);}};
 //---------------------------------------------------------------------------------
 //TODO Deferred Event is incomplete
@@ -267,29 +302,6 @@ window.gm.roll=function(n,sides) { //rolls n x dies with sides
 }
 window.gm.printOutput= function(text) {
   document.querySelector("section article div output").innerHTML = text;
-};
-//connect to onclick to toggle selected-style for element + un-hiding related text
-//the elmnt (f.e.<img>) needs to be inside a parentnode f.e. <div id="choice">
-//ex_choice is jquery path to fetch all selectable elmnt
-//for a table in a div this could be "div#choice table tbody tr td *"
-//text-nodes needs to be inside a parent node f.e. <div id="info"> and have matching id of elmnt
-//ex_info is jquery path to fetch all info elmnt
-//for a <p> in div this could be "div#info  
-window.gm.onSelect = function(elmnt,ex_choice,ex_info) {
-  var all = $(ex_choice);//[0].children;
-  for(var i=0;i<all.length;i++) {
-    if(all[i].id === elmnt.id) {
-      all[i].classList.add("selected");
-    }
-    else all[i].classList.remove("selected");
-  }
-  all = $(ex_info)[0].children;
-  for(var i=0;i<all.length;i++) {
-      if(all[i].id === elmnt.id) {
-        all[i].hidden=false;
-      }
-      else all[i].hidden=true;
-  }
 };
 //connect to onclick to toggle selected-style for element + un-hiding related text
 //the elmnt (f.e.<img>) needs to be inside a parentnode f.e. <div id="choice">

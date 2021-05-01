@@ -6,24 +6,9 @@ window.gm.getSaveVersion= function(){
       return(version);    
 };
 // reimplement to setup the game
+var _origInitGame = window.gm.initGame;
 window.gm.initGame= function(forceReset,NGP=null) {
-  //var toast = new Toasty();
-//toast.info("Here is some information!");
-
-    //this does not work because hidden is called to late
-    /*$(window).on('sm.passage.hidden', function(event, eventObject) {
-      
-      if(eventObject.passage) {// No passage to hide when story starts
-          console.log('hiding'+eventObject.passage.name);        
-      }
-    });*/
-    $(window).on('sm.passage.showing', function(event, eventObject) {
-        // Current Passage object
-        $("tw-passage").fadeIn(500);  //fade in if was previously faded out
-      console.log('showing '+eventObject.passage.name);
-    });
-    // Render the passage named HUD into the element todo replace with <%=%>??
-    $(document).on('sm.passage.shown', function (ev,eventObject) { window.gm.updateOtherPanels();});
+  _origInitGame(forceReset,NGP);
     
     var s = window.story.state; //s in template is window.story.state from snowman!
     if (!s.vars||forceReset) { // storage of variables that doesnt fit player
@@ -52,15 +37,8 @@ window.gm.initGame= function(forceReset,NGP=null) {
         }; 
         s.vars.debugInv._parent = window.gm.util.refToParent(null);
         s.vars.debugInv.addItem(new Money(),200);
-
     }
-    if (!s.tmp||forceReset) { 
-      // storage of temporary variables; dont use them in stacking passages or deffered events      
-      s.tmp = {
-        rnd : 0,  // can be used as a random variable for use in CURRENT passage
-        args: []  // can be used to set arguments before another passage is called (passage-arguments) 
-      }
-  }
+    
     if (!window.gm.achievements||forceReset) {  //outside of window.story !
       window.gm.achievements= {
         moleKillerGoldMedal: false //add your flags here
@@ -147,7 +125,34 @@ window.gm.giveCyrilFood=function(){
         window.gm.printOutput("you have no food to spare");
     }
 }
+//print list of actions for actual day and hour
+window.gm.printSchedule = function(){
+  var elmt='';
+  var s= window.story.state;
+  var now = window.gm.getTimeStruct();
 
+  var jobs = Object.values(window.gm.jobs);
+  for(var i=0;i<jobs.length;i++) {
+    var id = jobs[i].id;
+    if(jobs[i].hidden===true) {
+      //NOP;
+    } else if(jobs[i].disabled===true) {
+      elmt +=`<div>${jobs[i].disableReason}</div></br>`;
+    } else if(jobs[i].DoW.includes(now.DoW)&& s.vars.time>=jobs[i].startTimeMin && s.vars.time<jobs[i].startTimeMax) {
+      if(window.gm.player.energy().value>=jobs[i].reqEnergy) {
+        elmt +=`<a0 id='${id}' onclick='(function($event){window.story.show("${id}");})(this);'>${jobs[i].name} </a>`;
+        elmt +=`</br><div>${jobs[i].descr} It might require ${(jobs[i].reqTime)} minutes of your time and around ${jobs[i].reqEnergy} energy.</div></br>`;
+      } else {
+        elmt +=`<div>You are to tired to do ${jobs[i].name}.</div></br>`;
+      }
+    } else {
+      var days = "";
+      for(var k=0;k<jobs[i].DoW.length;k++) {days +=window.gm.DoWs[jobs[i].DoW[k]-1]+","; }
+      elmt +=`<div>${jobs[i].name} is only available between ${(jobs[i].startTimeMin/100).toFixed(0)} and ${(jobs[i].startTimeMax/100).toFixed(0)} at ${days}. </div></br>`;
+    }
+  }
+  return(elmt);
+};
 
 //prints a list of todo quest
 window.gm.printTodoList= function() {
@@ -172,6 +177,31 @@ window.gm.printTodoList= function() {
     }
         elmt +="</ul></form></br>";
         return(elmt);
+};
+//prints a list of quest
+window.gm.printQuestList= function() {
+  var elmt='<hr><form><ul style=\"list-style-type: none\" ><legend>In progress</legend>';
+  var s= window.story.state;
+  
+  //elmt +="<li><label><input type=\"checkbox\" name=\"y\" value=\"x\" readonly disabled>always: keep the fridge filled</label></li>";
+  for(var i=0; i<s.quests.activeQuests.length; i++) {
+      var qId = s.quests.activeQuests[i];
+      var msId = s.quests.activeQuestsMS[i];
+      var quest = window.gm.questDef[qId];
+      var mile = quest.getMileById(msId);
+      elmt +="<li><label><input type=\"checkbox\" name=\"y\" value=\"x\" readonly disabled>"+quest.name+" : "+ mile.descr+"</label></li>"; //checked="checked"
+  }
+  elmt +="</ul></form></br>";
+  elmt +='<hr><form><ul style=\"list-style-type: none\" ><legend>Completed</legend>';
+  for(var i=0; i<s.quests.finishedQuests.length; i++) {
+    var qId = s.quests.finishedQuests[i];
+    var msId = s.quests.finishedQuestsMS[i];
+    var quest = window.gm.questDef[qId];
+    var mile = quest.getMileById(msId);
+    elmt +="<li><label><input type=\"checkbox\" name=\"y\" value=\"x\" readonly disabled checked=\"checked\">"+quest.name+" : "+ mile.descr+"</label></li>"; //
+}
+  elmt +="</ul></form></br>";
+  return(elmt);
 };
 //prints a list of perks for unlock
 window.gm.printUnlockPerk= function(id, descr) {

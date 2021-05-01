@@ -182,9 +182,25 @@ for(var i=0;i<maxSlots;i++){
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 Here you can check and modify several options: </br>
 Your outfit can only be changed by using a wardrobe.</br>
-[[Back|_back]] [[Status]] [[Relations]] [[Inventory]] [[TodoList]]</br>
+[[Back|_back]] [[Status]] [[Relations]] [[Inventory]] [[QuestList]]</br>
 </article><article id="LogPanel"></article></section>
 
+:: TodoList
+<section> 
+<aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+Picking up your Todo-List you read:</br>
+<%=window.gm.printTodoList()%>
+<%=window.story.render('qLaptop_Status')%>
+[[Next|<%=window.gm.player.location%>]]</br>
+</article><article id="LogPanel"></article></section>
+
+:: QuestList [_back]
+<section> 
+<aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+</br>
+<%=window.gm.printQuestList()%>
+</br>[[Back|_back]]</br>
+</article><article id="LogPanel"></article></section>
 
 :: Wardrobe [_back]
 <section> 

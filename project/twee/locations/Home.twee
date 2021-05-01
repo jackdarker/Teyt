@@ -1,10 +1,14 @@
 :: Home
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%window.gm.player.location=window.passage.name;%>
+<%window.gm.player.location=window.passage.name;
+window.gm.quests.addQuest("qFindGarden",1);
+window.gm.quests.addQuest("qStudy",1);
+ %>
 At the doorsteps of your home. </br>
-[[NewGamePlus]]
-<div>Where would you like to go?</br>
+The following things are on your schedule-list:</br>
+<%=window.gm.printSchedule()%>
+</br><div>Where would you like to go?</br>
 [[Living_Room]]   [[Your Bedroom]]  [[Moms Bedroom]] [[Kitchen]]  [[Garden]] [[Cellar]] </br>
 [[Into the city]]</br></div>
 </article><article id="LogPanel"></article></section>
@@ -91,7 +95,7 @@ you are quite horny right now. Maybe you have some time to [[play with yourself|
 <%} else {%>
 <a href="javascript:void(0)" onclick='($("tw-passage").fadeOut(1000, function() {window.gm.sleep(700);window.story.show("Sleep");}));'>Sleep Until Morning</a> </br>
 <%}%>
-</br>
+</br>[[NewGamePlus]]</br> <!--todo-->
 <% if(window.gm.player.Outfit.isNaked()) { %>
 <div class="red">You should at least cover up your unmentionables before leaving your room.</div></br>
 <% } else { %>
@@ -104,6 +108,7 @@ function touchCatIdol(elmnt) {
 	window.gm.player.addEffect("effMutateCat",window.gm.StatsLib.effMutateCat());
 }
 </script>
+
 :: Sleep
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
@@ -122,16 +127,6 @@ You fall into your bedsheets and sleep until your smartphone buzzes you out of y
 [[Back|_back]]</br>
 <!--todo: set height depending on browsersize-->
 <div id='Canvas' style='height: 30em;background: url("assets/doll/doll_small_xcf-Skirt.png") no-repeat center,url("assets/doll/doll_small_xcf-Body.png") no-repeat center, url(<%=window.gm.getScenePic(window.gm.player.location)%>)no-repeat center;color:black;'></div>
-</article><article id="LogPanel"></article></section>
-
-
-:: TodoList
-<section> 
-<aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
-Picking up your Todo-List you read:</br>
-<%=window.gm.printTodoList()%>
-<%=window.story.render('qLaptop_Status')%>
-[[Next|<%=window.gm.player.location%>]]</br>
 </article><article id="LogPanel"></article></section>
 
 
@@ -167,7 +162,7 @@ There is nothing here
 :: Garden
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%window.gm.player.location=window.passage.name;%>
+<%window.gm.player.location=window.passage.name;window.gm.quests.tick();%>
 The garden behind the house is not very large. </br>
 <p class="talkplayer">There are a lot of molehills on the green. I should teach their creator a lesson.</p></br>
 <a href="javascript:void(0)" onclick='window.gm.encounters.mole(window.gm.player.location);'>Whack a mole</a> </br>
@@ -225,4 +220,12 @@ As you come back to your senses you find yourself cowering on the floor, still c
 Time to move on.</br></br></br>
 Where would you like to go?</br>
 [[Next|<%=window.gm.player.location%>]]</br>
+</article><article id="LogPanel"></article></section>
+
+:: Home_Study
+<section> 
+<aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<% window.gm.player.Stats.increment('energy',-20);window.gm.addTime(120);window.gm.quests.forceQuestMilestone("qStudy",100,1);%>
+You sit down with your books and scriblings and try to get some sense out of it.</br>
+[[Give up|<%=window.gm.player.location%>]]</br>
 </article><article id="LogPanel"></article></section>

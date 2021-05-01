@@ -1,4 +1,4 @@
-
+"use strict";
 class Leggings extends Equipment {
     constructor() {
         super('Leggings');
