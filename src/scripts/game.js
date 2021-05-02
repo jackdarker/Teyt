@@ -143,7 +143,7 @@ window.gm.initGame= function(forceReset,NGP=null) {
       s.quests =  new QuestData();
       window.gm.quests = new QuestManager(window.gm.questDef);
       window.gm.quests.setQuestData(s.quests);
-      window.gm.quests.pubSub.subscribe("change",function(data){window.gm.toasty.info("Quest updated")});
+      window.gm.quests.pubSub.subscribe("change",function(data){window.gm.toasty.info("Quest "+data.questId+" updated")});
     }
     if (!s.tmp||forceReset) { 
       // storage of temporary variables; dont use them in stacking passages or deffered events      

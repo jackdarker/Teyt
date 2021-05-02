@@ -22,6 +22,7 @@ Releasing the pressure on your nubs, they just feel numb right now.
 <script>
 function fondlebreast(elmnt) {
     elmnt.replaceWith("You nipple stiffens under this attention.</br>");
-	window.gm.player.addEffect("effGrowBreast",window.gm.StatsLib.effGrowBreast());
+    window.gm.player.addEffect("effGrowBreast",window.gm.StatsLib.effGrowBreast());
+    window.gm.quests.forceQuestMilestone("qMyPleasure",100,1);
 }
 </script>

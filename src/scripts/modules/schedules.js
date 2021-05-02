@@ -46,7 +46,7 @@ window.gm.questDef = window.gm.questDef || {};
         function(){ 
           if(window.passage.name==="Garden") return(100);
           else return (0);
-        })
+        });
     var mile2 = new QuestMilestone(100,"Found the garden","Congratulation. You found the garden.",
         function(){ return(-1)});
     quest.addMileStone(mile1),quest.addMileStone(mile2);
@@ -55,8 +55,18 @@ window.gm.questDef = window.gm.questDef || {};
 {
     var quest = new Quest("qStudy","Do some studying","Do something for your success at university.");
     var mile1 = new QuestMilestone(1,"","Sitting down and reading a book might get you some knowledge.",
-        function(){  return (0); })
+        function(){  return (0); });
     var mile2 = new QuestMilestone(100,"","At least you feel a little smarter now.",
+        function(){ return(-1)});
+    quest.addMileStone(mile1),quest.addMileStone(mile2);
+    window.gm.questDef[quest.id]= quest;
+}
+{
+    var hidden = (function(){return(window.gm.quests.getQuestState("qMyPleasure").id<100);});
+    var quest = new Quest("qMyPleasure","Pleasure yourself","Pleasure yourself.",hidden );
+    var mile1 = new QuestMilestone(1,"","Rub yourself.",
+        function(){  return (0);},hidden);
+    var mile2 = new QuestMilestone(100,"","You created a mmess in your bedsheets.",
         function(){ return(-1)});
     quest.addMileStone(mile1),quest.addMileStone(mile2);
     window.gm.questDef[quest.id]= quest;

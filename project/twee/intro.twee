@@ -23,8 +23,7 @@ Welcome to Meason, a town somewhere in these days. </br>
 You are a student in the local university and live in a shared house with some other fellows. </br>
 </br>Confirm your selection and [[Start|Home]] the game. </br>
 Or press <a0 id='reset' onclick='window.gm.initGame(true);window.gm.refreshScreen();'>Reset</a> to reset your selection.  </br></br>
- <a0 onclick='iqwerty.toast.toast("Hello!");'>Toast</a></br>
- <a0 onclick='(new Toasty()).info("Here is some information!");'>Toast2</a></br>
+
 <!--<%=window.gm.printUnlockPerk('skCooking','Your cooking skill is slightly improved.')%>
 <%=window.gm.printUnlockPerk('skSporty','You are sporty.')%>
 <%=window.gm.printUnlockPerk('skTechy','You are technic-affine.')%>

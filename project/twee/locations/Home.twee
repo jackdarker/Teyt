@@ -3,8 +3,7 @@
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;
 window.gm.quests.addQuest("qFindGarden",1);
-window.gm.quests.addQuest("qStudy",1);
- %>
+window.gm.quests.addQuest("qStudy",1); %>
 At the doorsteps of your home. </br>
 The following things are on your schedule-list:</br>
 <%=window.gm.printSchedule()%>
@@ -79,7 +78,8 @@ function useHandcuff(elmnt) {
 :: Your Bedroom {"position":"1033,470","size":"100,100"}
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
-<%window.gm.player.location=window.passage.name;%>
+<%window.gm.player.location=window.passage.name; 
+window.gm.quests.addQuest("qMyPleasure",1);%>
 This is your Bedroom.
 A desk with a wooden chair is setup as workingplace. <br>
 Your [[Laptop|_Laptop_]] is placed on it and also a handwritten [[TodoList]]. </br>

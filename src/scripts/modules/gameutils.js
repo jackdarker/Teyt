@@ -185,20 +185,25 @@ window.gm.printQuestList= function() {
   
   //elmt +="<li><label><input type=\"checkbox\" name=\"y\" value=\"x\" readonly disabled>always: keep the fridge filled</label></li>";
   for(var i=0; i<s.quests.activeQuests.length; i++) {
-      var qId = s.quests.activeQuests[i];
-      var msId = s.quests.activeQuestsMS[i];
+      var qId = s.quests.activeQuests[i].id;
+      var msId = s.quests.activeQuestsMS[i].id;
       var quest = window.gm.questDef[qId];
       var mile = quest.getMileById(msId);
-      elmt +="<li><label><input type=\"checkbox\" name=\"y\" value=\"x\" readonly disabled>"+quest.name+" : "+ mile.descr+"</label></li>"; //checked="checked"
+      if(!quest.HiddenCB()) {
+        elmt +="<li><label><input type=\"checkbox\" name=\"y\" value=\"x\" readonly disabled>"+
+          quest.name+" : "+ ((mile.HiddenCB()===true)?("???"):(mile.descr))+"</label></li>"; //checked="checked"
+      }
   }
   elmt +="</ul></form></br>";
   elmt +='<hr><form><ul style=\"list-style-type: none\" ><legend>Completed</legend>';
   for(var i=0; i<s.quests.finishedQuests.length; i++) {
-    var qId = s.quests.finishedQuests[i];
-    var msId = s.quests.finishedQuestsMS[i];
+    var qId = s.quests.finishedQuests[i].id;
+    var msId = s.quests.finishedQuestsMS[i].id;
     var quest = window.gm.questDef[qId];
     var mile = quest.getMileById(msId);
-    elmt +="<li><label><input type=\"checkbox\" name=\"y\" value=\"x\" readonly disabled checked=\"checked\">"+quest.name+" : "+ mile.descr+"</label></li>"; //
+    if(!quest.HiddenCB()) {
+      elmt +="<li><label><input type=\"checkbox\" name=\"y\" value=\"x\" readonly disabled checked=\"checked\">"+quest.name+" : "+ mile.descr+"</label></li>"; 
+    }
 }
   elmt +="</ul></form></br>";
   return(elmt);

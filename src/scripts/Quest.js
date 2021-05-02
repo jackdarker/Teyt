@@ -24,9 +24,9 @@ function PubSub() {
 
 ///////////////////////////////////////////////////////////////
 class QuestMilestone {
-    constructor(id,name,descr,CondCheckCB) {
+    constructor(id,name,descr,CondCheckCB,HiddenCB=null) {
         this.id =id,this.name=name;
-        this.hidden = (id=== ""); // Automatical hide entry
+        this.HiddenCB = (HiddenCB===null)? (function(){return(false);}): HiddenCB;
         this.descr =descr;
         this.CondCheckCB =CondCheckCB;
         /*this.EnterMilestoneCB = null; //todo use pubsub instead
@@ -45,11 +45,12 @@ class QuestMilestone {
 }
 // a Quest contains multiple milestones
 class Quest  { 
-    constructor(id,name) {
+    constructor(id,name,descr,HiddenCB=null) {
         //this.pubSub = PubSub();
-        this.id =id,this.name=name;
-        this.descr ="", this.hidden = (id==="");
-        this.finished = false; this.mile = null, this.miles=new Map();
+        this.id =id,this.name=name,this.descr =descr;
+        this.HiddenCB = (HiddenCB===null)? (function(){return(false);}): HiddenCB;
+        //this.finished = false; this.mile = null; 
+        this.miles=new Map();
         window.storage.registerConstructor(Quest);
     }
     toJSON() {return window.storage.Generic_toJSON("Quest", this); };
@@ -116,16 +117,18 @@ class Quest  {
         if (Mile !== null) {
             this.miles.set(Mile.id,Mile);
         }
-        if (this.mile === null) {
+        /*if (this.mile === null) {
             this.mile = Mile; //automatical activate entry milestone
             this.hidden = Mile.hidden;
-        }
+        }*/
     }
 }
-
+// QuestData only contains the state of the quests (finished, active milestone) but no function
+// dont change the data manually - this is done by QuestManager ! 
+// separation is necessary for save/reload issue
 class QuestData {
     constructor() {
-        this.activeQuests=[]; 
+        this.activeQuests=[];   //{id:"xyz",hidden:false}
         this.activeQuestsMS=[];
         this.finishedQuests=[];
         this.finishedQuestsMS=[];
@@ -143,16 +146,18 @@ class QuestData {
 // todo: this should be singleton
 // todo rebuild old quest-milestone structure !!
 class QuestManager {
+    //questDef is an object with properties that contain a quest-object and its milestones: questDef["myQuest"] = new Quest("myQuest") 
     constructor(questDef) {
         this.pubSub = PubSub();
         this.questDef = questDef;           
     }
+    // data is a QuestData-Object
     setQuestData(data) {
         this.questData = data;
     }
-    questUpdated(id) {
+    questUpdated(questId) {
         let nodeChangeEvent = new Event("change");
-        nodeChangeEvent.id = id;
+        nodeChangeEvent.questId = questId;
         this.pubSub.publish("change",nodeChangeEvent);
         //alert(id);
     }
@@ -161,10 +166,10 @@ class QuestManager {
     forceQuestMilestone(questId,mileId, reqMileId) {
         var needsUpdate=false;
         for (var i=0; i< this.questData.activeQuests.length; i++) {
-            var qID = this.questData.activeQuests[i];
-            var msID = this.questData.activeQuestsMS[i];
+            var qID = this.questData.activeQuests[i].id;
+            var msID = this.questData.activeQuestsMS[i].id;
             if(qID===questId && reqMileId===msID) {
-                this.questData.activeQuestsMS[i]=mileId;
+                this.questData.activeQuestsMS[i].id=mileId;
                 needsUpdate =true;
             }
         }
@@ -175,8 +180,8 @@ class QuestManager {
         var tickAgain = false;
         var tmpfinishedQuest =[];
         for (var i=0; i< this.questData.activeQuests.length; i++) {
-            var qID = this.questData.activeQuests[i];
-            var msID = this.questData.activeQuestsMS[i];
+            var qID = this.questData.activeQuests[i].id;
+            var msID = this.questData.activeQuestsMS[i].id;
             var quest = this.questDef[qID]
             var mile = quest.getMileById(msID);
             //if (quest.finished ) continue;
@@ -187,39 +192,48 @@ class QuestManager {
             if (Next === -1) {
                 tmpfinishedQuest.push(i);
             }else if (Next > 0) {
-                this.questData.activeQuestsMS[i] = (Next);
-                this.questUpdated(qID);
-                /*todo if (!mile.hidden) {
-                    //todo this.hidden=false;
-                    //todo this.questUpdated();
-                }*/
+                this.questData.activeQuestsMS[i].id = Next;
+                if(!quest.getMileById(Next).HiddenCB()) this.questUpdated(qID);
                 tickAgain=true;
             }
         }
         //remove finished quests
         for(var k=tmpfinishedQuest.length-1;k>=0;k--) {
-            var qID = this.questData.activeQuests[tmpfinishedQuest[k]];
-            var msId = this.questData.activeQuestsMS[tmpfinishedQuest[k]];
+            var qID = this.questData.activeQuests[tmpfinishedQuest[k]].id;
+            var msId = this.questData.activeQuestsMS[tmpfinishedQuest[k]].id;
             this.questData.activeQuests.splice(tmpfinishedQuest[k],1);
             this.questData.activeQuestsMS.splice(tmpfinishedQuest[k],1);
-            this.questData.finishedQuests.push(qID);
-            this.questData.finishedQuestsMS.push(msId);
-            this.questUpdated(qID);
+            this.questData.finishedQuests.push({id:qID});
+            this.questData.finishedQuestsMS.push({id:msId});
+            //if(!this.questDef[qID].getMileById(msId).HiddenCB()) this.questUpdated(qID);
         }
         // sometimes not only one milestone is fullfilled but several
         // so we need to recheck again until no more progressing milestone
         // also required to remove finished quests 
         if(tickAgain) this.tick();
     }
-    hasActiveQuest(questId) {
+    getQuestState(questId) {
         for (var i=0; i< this.questData.activeQuests.length; i++) {
-            if(questId===this.questData.activeQuests[i]) return(true);
+            if(questId===this.questData.activeQuests[i].id) 
+                return(this.questData.activeQuestsMS[i]);
+        }
+        for (var i=0; i< this.questData.finishedQuests.length; i++) {
+            if(questId===this.questData.finishedQuests[i].id) 
+                return(this.questData.finishedQuestsMS[i]);
+        }
+        return({});
+    }
+    hasActiveQuest(questId,msId=null) {
+        for (var i=0; i< this.questData.activeQuests.length; i++) {
+            if(questId===this.questData.activeQuests[i].id && (msId===null || msId===this.questData.activeQuestsMS[i].id)) 
+                return(true);
         }
         return(false);
     }
-    hasFinishedQuest(questId) {
+    hasFinishedQuest(questId,msId=null) {
         for (var i=0; i< this.questData.finishedQuests.length; i++) {
-            if(questId===this.questData.finishedQuests[i]) return(true);
+            if(questId===this.questData.finishedQuests[i].id && (msId===null || msId===this.questData.finishedQuestsMS[i].id))
+                return(true);
         }
         return(false);
     }
@@ -227,19 +241,20 @@ class QuestManager {
 	addQuest(questId,msID,noRedo=true){
         if(!noRedo) this.removeQuest(questId);//remove from finished if redoing a quest
         if(!(this.hasActiveQuest(questId) || this.hasFinishedQuest(questId))) {
-            this.questData.activeQuests.push(questId);
-            this.questData.activeQuestsMS.push(msID);   
+            this.questData.activeQuests.push({id:questId});
+            this.questData.activeQuestsMS.push({id:msID}); 
+            if(!this.questDef[questId].getMileById(msID).HiddenCB()) this.questUpdated(questId);  
         }
 	}
     removeQuest(Id) {
         for (var i=this.questData.activeQuests.length-1; i>=0; i--) {
-            if(this.questData.activeQuests[i]===Id) {
+            if(this.questData.activeQuests[i].id===Id) {
                 this.questData.activeQuests.splice(i,1);
                 this.questData.activeQuestsMS.splice(i,1);
             }
         }
         for (var i=this.questData.finishedQuests.length-1; i>=0; i--) {
-            if(this.questData.finishedQuests[i]===Id) {
+            if(this.questData.finishedQuests[i].id===Id) {
                 this.questData.finishedQuests.splice(i,1);
                 this.questData.finishedQuestsMS.splice(i,1);
             }
