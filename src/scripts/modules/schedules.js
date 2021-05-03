@@ -28,6 +28,11 @@ class Job {
 
 {
     var job;
+
+    job = new Job("Campus","get to the uni","You have to at least attend some of the lectures to keep up with the studys.");
+    job.reqEnergy = 5, job.reqTime=15,job.startTimeMin=700,job.startTimeMax=1100,job.DoW =[1,2,3,4,5];
+    window.gm.jobs[job.id] = job;
+
     job = new Job("Dogsit_NewCall","Dog-sitting","You could call the dogsit agency if they have a new job.");
     job.reqEnergy = 20, job.reqTime=120,job.startTimeMin=900,job.startTimeMax=1300,job.DoW =[2,3,4];
     window.gm.jobs[job.id] = job;

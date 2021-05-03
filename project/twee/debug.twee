@@ -40,3 +40,11 @@ function unhideStats() {
     }
 }
 </script>
+
+:: NOP [_back]
+<section> 
+<aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<author>Sorry, this loation is curently not implemented.</author>
+<div> </br>
+[[Back|_back]]</br></div>
+</article><article id="LogPanel"></article></section>

@@ -4,9 +4,33 @@
 <%window.gm.player.location=window.passage.name;%>
 This is the campus of the Institute of Technology and Development.</br>
 A lot of people are hurrying along or stand by in idle chatter.</br>
-
+<!--todo--> In den größeren Gebäuden sind die Vorlesungsräume und Labore der Fachabteilungen untergebracht. 
+Natürlich gibt es eine Mensa und auch ein Archiv bzw. Library. In einem Hochhaus ist die Verwaltung und sonstige Dienste für die Studenten untergebracht.  </br>
 
 <div>Where would you like to go?</br>
-[[Living_Room]]   [[Your Bedroom]]  [[Moms Bedroom]] [[Kitchen]]  [[Garden]] </br>
+[[Electrical & Mechanical Engineering|NOP]]  [[Chemistry & Process Engineering|NOP]] [[Micro-Power & Nano-Engineering|NOP]] [[Dining Hall|NOP]]  [[ITD Office]]  [[Library]] </br>
 [[Into the city]]</br></div>
 </article><article id="LogPanel"></article></section>
+
+
+:: ITD Office
+<section> 
+<aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+This is the office-building of the Institute.</br>
+The [[counsellor|NOP]] might be available to give you some guidance about institutional affairs.</br>
+Here in the lobby of the building is also a [[blackboard|NOP]]. Maybe you can find some job offers there or informations about upcoming events. </br>
+<div></br>
+[[Campus]]</br></div>
+</article><article id="LogPanel"></article></section>
+
+:: Dining Hall
+<section> 
+<aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+Die Mensa ist wahrscheinlich das beliebteste Gebäude des Campus bei den Studenten; es gibt was zu essen und an kann miteinander quatschen.</br>
+Das Essen ist vielleicht nicht gerade das beste auf der Welt aber dafür ist es recht günstig. Hast du Hunger?</br>
+<div></br>
+[[Campus]]</br></div>
+</article><article id="LogPanel"></article></section>
+
