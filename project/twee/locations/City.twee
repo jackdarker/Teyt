@@ -6,7 +6,7 @@
 You are actually at [[<%=window.gm.player.location%>]].
 Where would you like to go from here?</br>
 <a0 onclick=window.gm.rollExplore()>Explore your surroundings</a> </br></br>
-[[Home]] [[Pawn shop]]
+[[Home]] [[Pawn shop]]  [[Downtown]]
 <%  if(s.vars.qUnlockPark>0) {      %>[[Park]]
 <%}; if(s.vars.qUnlockMall>0) {     %>[[Mall]]
 <%}; if(s.vars.qUnlockDowntown>0) { %>[[Downtown]]
@@ -99,15 +99,16 @@ Where would you like to go from here?</br>
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 <%window.gm.player.location=window.passage.name;
-if(s.vars.qUnlockDowntown==0) {s.vars.qUnlockDowntown=1;%>
+if(s.vars.qUnlockDowntown===0) {s.vars.qUnlockDowntown=1;%>
 You found the <%=window.passage.name%> ! </br></br>
 <%}%>
 You are actually at [[<%=window.gm.player.location%>]].
 Where would you like to go from here?</br>
 <a0 onclick=window.gm.rollExplore()>Explore your surroundings</a> </br></br>
 [[Home]]</br>
-<%  if(s.vars.qUnlockMall>0) {      %>[[Mall]]</br>
-<%};%>
+<%  if(s.vars.qUnlockMall>0) {      %>[[Mall]]<%};%>
+[[Harcon_Health]]
+</br>
 </article><article id="LogPanel"></article></section>
 
 
@@ -115,6 +116,9 @@ Where would you like to go from here?</br>
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 <%window.gm.player.location=window.passage.name;%>
+if((s.vars.qUnlockDowntown & 0x2)===0) {s.vars.qUnlockDowntown|=0x2;%>
+You found the <%=window.passage.name%> ! </br></br>
+<%}%>
 You are actually at [[<%=window.gm.player.location%>]].</br>
 A sign denoting "quick money - no questions" sparks your interest. It leads you to a pawn shop where you can trade in your valuables to get some money.</br>
 <div id="choice"></div></br></br>   <!--display buy message-->

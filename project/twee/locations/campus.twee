@@ -2,14 +2,20 @@
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
-This is the campus of the Institute of Technology and Development.</br>
-A lot of people are hurrying along or stand by in idle chatter.</br>
-<!--todo--> In den größeren Gebäuden sind die Vorlesungsräume und Labore der Fachabteilungen untergebracht. 
-Natürlich gibt es eine Mensa und auch ein Archiv bzw. Library. In einem Hochhaus ist die Verwaltung und sonstige Dienste für die Studenten untergebracht.  </br>
-
-<div>Where would you like to go?</br>
-[[Electrical & Mechanical Engineering|NOP]]  [[Chemistry & Process Engineering|NOP]] [[Micro-Power & Nano-Engineering|NOP]] [[Dining Hall|NOP]]  [[ITD Office]]  [[Library]] </br>
-[[Into the city]]</br></div>
+<%if(!window.gm.quests.hasActiveQuest("qFindAJob")){  %>
+    As you arrive at the campus you check your purse.</br>
+    'I'm running out of money soon if I dont find some job or other possibilities to earn some. '</br>
+    <a0 onclick='window.gm.quests.addQuest("qFindAJob",1); window.story.show(window.passage.name);'>Mental note to yourself</a></br>
+<%} else { %>
+    This is the campus of the Institute of Technology and Development.</br>
+    A lot of people are hurrying along or stand by in idle chatter.</br>
+    <!--todo--> In den größeren Gebäuden sind die Vorlesungsräume und Labore der Fachabteilungen untergebracht. </br>
+    Natürlich gibt es eine Mensa und auch ein Archiv bzw. Library. In einem Hochhaus ist die Verwaltung und sonstige Dienste für die Studenten untergebracht.  </br>
+    </br>
+    <div>Where would you like to go?</br>
+    Electrical & Mechanical Engineering  Chemistry & Process Engineering Micro-Power & Nano-Engineering [[Dining Hall]]  [[ITD Office]]  Library </br>
+    [[Into the city]]</br></div> 
+<%}%>
 </article><article id="LogPanel"></article></section>
 
 
@@ -19,7 +25,7 @@ Natürlich gibt es eine Mensa und auch ein Archiv bzw. Library. In einem Hochhau
 <%window.gm.player.location=window.passage.name;%>
 This is the office-building of the Institute.</br>
 The [[counsellor|NOP]] might be available to give you some guidance about institutional affairs.</br>
-Here in the lobby of the building is also a [[blackboard|NOP]]. Maybe you can find some job offers there or informations about upcoming events. </br>
+Here in the lobby of the building is also a [[blackboard]]. Maybe you can find some job offers there or informations about upcoming events. </br>
 <div></br>
 [[Campus]]</br></div>
 </article><article id="LogPanel"></article></section>
@@ -32,5 +38,17 @@ Die Mensa ist wahrscheinlich das beliebteste Gebäude des Campus bei den Student
 Das Essen ist vielleicht nicht gerade das beste auf der Welt aber dafür ist es recht günstig. Hast du Hunger?</br>
 <div></br>
 [[Campus]]</br></div>
+</article><article id="LogPanel"></article></section>
+
+:: blackboard [_back]
+<section> 
+<aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+'Lets see if there is anything interesting.'</br>
+<%if(window.gm.quests.hasActiveQuest("qFindAJob",1)){%>
+There is an anounce from Harcon Health Inc. for a [[job|Harcon_Logistic_Ad]] in logistics-department.</br>
+<%}%>
+<div></br>
+[[Back|_back]]</br></div>
 </article><article id="LogPanel"></article></section>
 

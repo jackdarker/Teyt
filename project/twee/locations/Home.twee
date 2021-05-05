@@ -90,11 +90,11 @@ There is a large bed for sleeping with a nightstand aside. </br>
 you are quite horny right now. Maybe you have some time to [[play with yourself|Masturbate]].</br>
 <a href="javascript:void(0)" onclick='($("tw-passage").fadeOut(1000, function() {window.gm.sleep((window.gm.getTimeStruct().hour+1)*100);window.story.show("Sleep");}));'>Nap 1hour</a> </br>
 <%if(window.gm.getTimeStruct().hour<11) { %>
->
 <a href="javascript:void(0)" onclick='($("tw-passage").fadeOut(1000, function() {window.gm.sleep(1800);window.story.show("Sleep");}));'>Sleep Until Evening</a> </br>
 <%} else {%>
 <a href="javascript:void(0)" onclick='($("tw-passage").fadeOut(1000, function() {window.gm.sleep(700);window.story.show("Sleep");}));'>Sleep Until Morning</a> </br>
 <%}%>
+</br>[[MemoryGame]] [[HangmanGame]]</br> <!--todo-->
 </br>[[NewGamePlus]]</br> <!--todo-->
 <% if(window.gm.player.Outfit.isNaked()) { %>
 <div class="red">You should at least cover up your unmentionables before leaving your room.</div></br>
@@ -117,9 +117,26 @@ You fall into your bedsheets and sleep until your smartphone buzzes you out of y
 <% if(window.gm.hasDeferredEvent()){ %>
 <%= window.gm.showDeferredEvent() %>
 <%} else {%>
-[[Next|<%=window.gm.player.location%>]]</br>
+</br><div id='output'></div>
+</br>[[Next|<%=window.gm.player.location%>]]</br>
 <%} %>
 </article><article id="LogPanel"></article></section>
+<script>
+function checkJob() {
+	var text ='';
+	if(window.gm.getTimeStruct().DoW===1 && window.gm.quests.hasActiveQuest("qFindAJob",200)) { 
+		if(window.gm.quests.getQuestState("qFindAJob").flags>=2) { 
+			window.gm.player.Inv.addItem(new window.gm.ItemsLib.Money(),window.gm.quests.getQuestState("qFindAJob").flags*25);
+			text+='You earned '+window.gm.quests.getQuestState("qFindAJob").flags*25+' $ for doing shifts at Harcon Medical.';
+		} else {
+			text+='You didnt do enough shifts at Harcon Medical to earn your minimum pay.';
+		}
+		window.gm.quests.getQuestState("qFindAJob").flags=0;
+	}
+	return(text);
+}
+window.gm.printOutput(checkJob());
+</script>
 
 :: Mirror [_back]
 <section> 

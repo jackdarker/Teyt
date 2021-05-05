@@ -22,6 +22,9 @@ window.gm.OutfitSlotpLib = {
     bTailBase   : 37,   
     bBreast : 38,
     bNipples : 39,
+    bPenis : 40,
+    bBalls  : 41,
+    bVulva  : 42,
     //insert more slots here
     SLOTMAX : 70
 };

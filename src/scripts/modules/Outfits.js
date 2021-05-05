@@ -191,7 +191,7 @@ class TailCat extends Equipment {
         super('TailCat');
         this.tags = ['body'];
         this.slotUse = ['bTailBase'];
-        this.desc = 'a flexible,furred pipe-tail'
+        this.desc = 'a flexible,furred tail like that of a cat.'
         this.growth = 0.10; //in %/100 maxGrowth
         this.maxGrowth = 1.2; //in meter, todo depends on bodysize
         window.storage.registerConstructor(TailCat);
@@ -206,13 +206,28 @@ class BreastHuman extends Equipment {
         super('BreastHuman');
         this.tags = ['body'];
         this.slotUse = ['bBreast'];
-        this.desc = 'some human breasts'
+        this.desc = 'some human breasts.'
         this.growth = 0.0; //in %/100 maxGrowth
         this.maxGrowth = 0.3; //in meter, todo depends on bodysize
         window.storage.registerConstructor(BreastHuman);
     }
     toJSON() {return window.storage.Generic_toJSON("BreastHuman", this); };
     static fromJSON(value) {return(window.storage.Generic_fromJSON(BreastHuman, value.data));}
+    canEquip() {return({OK:true, msg:'equipable'});}
+    canUnequip() {return({OK:true, msg:'unequipable'});}
+}
+class VulvaHuman extends Equipment {
+    constructor() {
+        super('VulvaHuman');
+        this.tags = ['body'];
+        this.slotUse = ['bVulva'];
+        this.desc = 'a human cooter.'
+        this.growth = 0.0; //in %/100 maxGrowth
+        this.maxGrowth = 0.2; //in meter, todo depends on bodysize
+        window.storage.registerConstructor(VulvaHuman);
+    }
+    toJSON() {return window.storage.Generic_toJSON("VulvaHuman", this); };
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(VulvaHuman, value.data));}
     canEquip() {return({OK:true, msg:'equipable'});}
     canUnequip() {return({OK:true, msg:'unequipable'});}
 }
@@ -238,5 +253,6 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['TailNone'] = function () { return new TailNone();};
     ItemsLib['TailCat'] = function () { return new TailCat();};
     ItemsLib['BreastHuman'] = function () { return new BreastHuman();};
+    ItemsLib['BreastHuman'] = function () { return new VulvaHuman();};
     return ItemsLib; 
 }(window.gm.ItemsLib || {}));

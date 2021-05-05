@@ -73,7 +73,7 @@ window.gm.getTimeStruct=function() {
 window.gm.DoWs = ['Monday', 'Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 window.gm.getDateString= function() {
   var v=window.story.state.vars;
-  return v.day.toString()+". day "+ window.gm.DoWs[(v.day%7)-1];
+  return v.day.toString()+". day "+ window.gm.DoWs[(v.day%8)-1];
 };
 //forward time to until (1025 = 10:25), regenerate player
 //warning dont write 0700 because this would be take as octal number
@@ -100,24 +100,6 @@ window.gm.sleep=function(until) {
   window.gm.player.Stats.increment('energy',regen);
   window.gm.pushLog(msg);
   return(msg);
-};
-
-//Todo
-window.gm.rollExplore= function() {
-  var s=window.story.state;
-  var places=[];   
-  var r = _.random(0,100);
-  //todo:depending of your actual location you have a chance to find connected locations or end up in a known one
-  if(window.gm.player.location=='Park')   places = ['Mall','Beach'];
-  if(window.gm.player.location=='Mall')   places = ['Park','Beach','Downtown']; 
-  if(window.gm.player.location=='Beach')   places = ['Park','Mall']; 
-  if(window.gm.player.location=='Downtown')   {
-    places.push('Pawn shop'); 
-  }
-  if(places.length==0) places = [window.gm.player.location]; //fallback if unspeced location
-  r = _.random(1, places.length)-1; //chances are equal
-  window.gm.addTime(20);
-  window.story.show(places[r]);
 };
 
 // reimplement to setup the game !
@@ -300,8 +282,9 @@ window.gm.roll=function(n,sides) { //rolls n x dies with sides
   }
   return(rnd); 
 }
+//expects DOM like <section><article>..<div id='output'></div>..</article></section>
 window.gm.printOutput= function(text) {
-  document.querySelector("section article div output").innerHTML = text;
+  document.querySelector("section article div#output").innerHTML = text;
 };
 //connect to onclick to toggle selected-style for element + un-hiding related text
 //the elmnt (f.e.<img>) needs to be inside a parentnode f.e. <div id="choice">

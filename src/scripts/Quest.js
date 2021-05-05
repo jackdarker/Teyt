@@ -128,7 +128,7 @@ class Quest  {
 // separation is necessary for save/reload issue
 class QuestData {
     constructor() {
-        this.activeQuests=[];   //{id:"xyz",hidden:false}
+        this.activeQuests=[];   //{id:"xyz",flags:0x0}
         this.activeQuestsMS=[];
         this.finishedQuests=[];
         this.finishedQuestsMS=[];
@@ -199,12 +199,10 @@ class QuestManager {
         }
         //remove finished quests
         for(var k=tmpfinishedQuest.length-1;k>=0;k--) {
-            var qID = this.questData.activeQuests[tmpfinishedQuest[k]].id;
-            var msId = this.questData.activeQuestsMS[tmpfinishedQuest[k]].id;
+            this.questData.finishedQuests.push(this.questData.activeQuests[tmpfinishedQuest[k]]);
+            this.questData.finishedQuestsMS.push(this.questData.activeQuestsMS[tmpfinishedQuest[k]]);
             this.questData.activeQuests.splice(tmpfinishedQuest[k],1);
             this.questData.activeQuestsMS.splice(tmpfinishedQuest[k],1);
-            this.questData.finishedQuests.push({id:qID});
-            this.questData.finishedQuestsMS.push({id:msId});
             //if(!this.questDef[qID].getMileById(msId).HiddenCB()) this.questUpdated(qID);
         }
         // sometimes not only one milestone is fullfilled but several
@@ -212,7 +210,7 @@ class QuestManager {
         // also required to remove finished quests 
         if(tickAgain) this.tick();
     }
-    getQuestState(questId) {
+    getMilestoneState(questId) {
         for (var i=0; i< this.questData.activeQuests.length; i++) {
             if(questId===this.questData.activeQuests[i].id) 
                 return(this.questData.activeQuestsMS[i]);
@@ -220,6 +218,17 @@ class QuestManager {
         for (var i=0; i< this.questData.finishedQuests.length; i++) {
             if(questId===this.questData.finishedQuests[i].id) 
                 return(this.questData.finishedQuestsMS[i]);
+        }
+        return({});
+    }
+    getQuestState(questId) {
+        for (var i=0; i< this.questData.activeQuests.length; i++) {
+            if(questId===this.questData.activeQuests[i].id) 
+                return(this.questData.activeQuests[i]);
+        }
+        for (var i=0; i< this.questData.finishedQuests.length; i++) {
+            if(questId===this.questData.finishedQuests[i].id) 
+                return(this.questData.finishedQuests[i]);
         }
         return({});
     }
@@ -241,7 +250,7 @@ class QuestManager {
 	addQuest(questId,msID,noRedo=true){
         if(!noRedo) this.removeQuest(questId);//remove from finished if redoing a quest
         if(!(this.hasActiveQuest(questId) || this.hasFinishedQuest(questId))) {
-            this.questData.activeQuests.push({id:questId});
+            this.questData.activeQuests.push({id:questId,flags:0});
             this.questData.activeQuestsMS.push({id:msID}); 
             if(!this.questDef[questId].getMileById(msID).HiddenCB()) this.questUpdated(questId);  
         }

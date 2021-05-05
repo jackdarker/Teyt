@@ -13,8 +13,9 @@ window.gm.initGame= function(forceReset,NGP=null) {
     var s = window.story.state; //s in template is window.story.state from snowman!
     if (!s.vars||forceReset) { // storage of variables that doesnt fit player
         s.vars = {
-        debug : true,   //TODO set to 0 for distribution !   see debug passage for meaning
+        debug : 1,   //TODO set to 0 for distribution !   see debug passage for meaning
         dbgShowCombatRoll: false,
+        dbgShowQuestInfo: true,
         version : window.gm.getSaveVersion(),
         log : [],
         passageStack : [], //used for passage [back] functionality
@@ -30,6 +31,7 @@ window.gm.initGame= function(forceReset,NGP=null) {
         qUnlockMall : 0,
         qUnlockBeach : 0,
         qUnlockDowntown : 0,
+        qUnlockNorthlake : 0,
         qUnlockRedlight : 0,
         qUnlockBeach : 0,
         crowBarLeft: 1,
@@ -50,6 +52,10 @@ window.gm.initGame= function(forceReset,NGP=null) {
     }
     if (!s.combat||forceReset) { //see encounter & combat.js
       s.combat = {
+        enemyParty : [],  //collection of enemy-chars involved 
+        enemyIdx : 0,  //index of actual enemy 
+        playerParty : [],
+        playerIdx : 0,
         newTurn : false,
         enemyFirst : false, //if true, enemy moves first
         enemyTurn : false, //true if enemys turn
@@ -102,7 +108,7 @@ window.gm.initGame= function(forceReset,NGP=null) {
         window.gm.Ratchel.Wardrobe.addItem(new TankShirt());
         window.gm.Ratchel.Wardrobe.addItem(new Pullover());
         window.gm.Ratchel.Wardrobe.addItem(new TailRibbon());
-        //window.gm.Ratchel.Outfit.addItem(new TailCat());
+        window.gm.Ratchel.Outfit.addItem(new VulvaHuman());
         window.gm.Ratchel.Outfit.addItem(new Jeans());
         window.gm.Ratchel.Outfit.addItem(new Pullover());
         s.Ratchel=window.gm.Ratchel;
@@ -117,6 +123,23 @@ window.gm.getScenePic = function(id){
   if(id==='Bedroom' || id==='Your Bedroom')   return('assets/bg_bedroom.png');
   return('assets/bg_park.png');//todo placehodler
 }
+//Todo
+window.gm.rollExplore= function() {
+  var s=window.story.state;
+  var places=[];   
+  var r = _.random(0,100);
+  //todo:depending of your actual location you have a chance to find connected locations or end up in a known one
+  if(window.gm.player.location=='Park')   places = ['Mall','Beach','Downtown'];
+  if(window.gm.player.location=='Mall')   places = ['Park','Beach','Downtown']; 
+  if(window.gm.player.location=='Beach')   places = ['Park','Mall']; 
+  if(window.gm.player.location=='Downtown')   {
+    places.push('Pawn shop'); 
+  }
+  if(places.length==0) places = [window.gm.player.location]; //fallback if unspeced location
+  r = _.random(1, places.length)-1; //chances are equal
+  window.gm.addTime(20);
+  window.story.show(places[r]);
+};
 window.gm.giveCyrilFood=function(){
     if(window.gm.player.Inv.countItem('SimpleFood')>0) {
         var res=window.gm.player.Inv.use('SimpleFood', window.story.state.Cyril);
@@ -134,10 +157,10 @@ window.gm.printSchedule = function(){
   var jobs = Object.values(window.gm.jobs);
   for(var i=0;i<jobs.length;i++) {
     var id = jobs[i].id;
-    if(jobs[i].hidden===true) {
+    if(jobs[i].isHidden()===true) {
       //NOP;
-    } else if(jobs[i].disabled===true) {
-      elmt +=`<div>${jobs[i].disableReason}</div></br>`;
+    } else if(jobs[i].isDisabled()===true) {
+      elmt +=`<div>${jobs[i].disabledReason()}</div></br>`;
     } else if(jobs[i].DoW.includes(now.DoW)&& s.vars.time>=jobs[i].startTimeMin && s.vars.time<jobs[i].startTimeMax) {
       if(window.gm.player.energy().value>=jobs[i].reqEnergy) {
         elmt +=`<a0 id='${id}' onclick='(function($event){window.story.show("${id}");})(this);'>${jobs[i].name} </a>`;
@@ -180,29 +203,32 @@ window.gm.printTodoList= function() {
 };
 //prints a list of quest
 window.gm.printQuestList= function() {
-  var elmt='<hr><form><ul style=\"list-style-type: none\" ><legend>In progress</legend>';
+  var elmt='<hr><form><ul style=\"list-style-type: none; padding-inline-start: 0px;\" ><legend>In progress</legend>';
   var s= window.story.state;
   
   //elmt +="<li><label><input type=\"checkbox\" name=\"y\" value=\"x\" readonly disabled>always: keep the fridge filled</label></li>";
   for(var i=0; i<s.quests.activeQuests.length; i++) {
       var qId = s.quests.activeQuests[i].id;
+      var flags = s.quests.activeQuests[i].flags;
       var msId = s.quests.activeQuestsMS[i].id;
       var quest = window.gm.questDef[qId];
       var mile = quest.getMileById(msId);
       if(!quest.HiddenCB()) {
-        elmt +="<li><label><input type=\"checkbox\" name=\"y\" value=\"x\" readonly disabled>"+
-          quest.name+" : "+ ((mile.HiddenCB()===true)?("???"):(mile.descr))+"</label></li>"; //checked="checked"
+        elmt +="<li style=\"padding-bottom: 0.5em;\"><input type=\"checkbox\" name=\"y\" value=\"x\" readonly disabled><label>"+
+          quest.name+(window.story.state.vars.dbgShowQuestInfo?(" "+msId+" 0x"+flags.toString(16)):(""))+" : "+ ((mile.HiddenCB()===true)?("???"):(mile.descr))+"</label></li>"; //checked="checked"
       }
   }
   elmt +="</ul></form></br>";
   elmt +='<hr><form><ul style=\"list-style-type: none\" ><legend>Completed</legend>';
   for(var i=0; i<s.quests.finishedQuests.length; i++) {
     var qId = s.quests.finishedQuests[i].id;
+    var flags = s.quests.activeQuests[i].flags;
     var msId = s.quests.finishedQuestsMS[i].id;
     var quest = window.gm.questDef[qId];
     var mile = quest.getMileById(msId);
     if(!quest.HiddenCB()) {
-      elmt +="<li><label><input type=\"checkbox\" name=\"y\" value=\"x\" readonly disabled checked=\"checked\">"+quest.name+" : "+ mile.descr+"</label></li>"; 
+      elmt +="<li><input type=\"checkbox\" name=\"y\" value=\"x\" readonly disabled checked=\"checked\"><label>"+
+        quest.name+(window.story.state.vars.dbgShowQuestInfo?(" "+msId+" 0x"+flags.toString(16)):(""))+" : "+ mile.descr+"</label></li>"; 
     }
 }
   elmt +="</ul></form></br>";

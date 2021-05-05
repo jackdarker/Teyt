@@ -21,7 +21,12 @@ Cheat buttons:</br>
 <a href="javascript:void(0)" onclick='window.story.state.vars.dbgShowCombatRoll=false;window.gm.refreshScreen();'>disable combat debug</a></br>
 <%} else {%>
 <a href="javascript:void(0)" onclick='window.story.state.vars.dbgShowCombatRoll=true;window.gm.refreshScreen();'>enable combat debug (log combat calculations)</a></br>
-<%}%></br>
+<%}%>
+<%if(window.story.state.vars.dbgShowQuestInfo) {%>
+<a href="javascript:void(0)" onclick='window.story.state.vars.dbgShowQuestInfo=false;window.gm.refreshScreen();'>disable extended questinfo</a></br>
+<%} else {%>
+<a href="javascript:void(0)" onclick='window.story.state.vars.dbgShowQuestInfo=true;window.gm.refreshScreen();'>enable ext. questinfo</a></br>
+<%}%>
 <a href="javascript:void(0)" onclick='window.gm.player.Stats.increment("health",25);window.gm.refreshScreen();'>Health +25</a></br>
 <a href="javascript:void(0)" onclick='window.gm.player.Stats.increment("energy",25);window.gm.refreshScreen();'>Energy +25</a></br>
 <a href="javascript:void(0)" onclick='window.gm.player.Stats.increment("perversion",25);window.gm.refreshScreen();'>Perversion +25</a>
@@ -44,7 +49,7 @@ function unhideStats() {
 :: NOP [_back]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<author>Sorry, this loation is curently not implemented.</author>
+<p class='author'>Sorry, this loation is curently not implemented.</p>
 <div> </br>
 [[Back|_back]]</br></div>
 </article><article id="LogPanel"></article></section>
