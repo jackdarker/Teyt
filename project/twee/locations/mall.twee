@@ -62,10 +62,6 @@ if(window.gm.player.Stats.get('perversion').value<=15) {%>
 No way I'm going in to that smut-shop. Only perverts do that. </br>
 <%} else {%>
 <%} %>
-Several snack bars and smaller shops are cirling around the wall side of the mall.</br> 
-One of them is [[Alice treasures]], a place where women can buy more private cloths.</br>
-In a more shady corner you find a shop whose windows are just coverd with dark red and black foils. 
-Its name is [[Adult books and tools]] and there is an "adults only" sign at the entrance.</br>
 Where would you like to go from here?</br>
 [[Mall 0F|Mall Floor 0]]
 </article><article id="LogPanel"></article></section>

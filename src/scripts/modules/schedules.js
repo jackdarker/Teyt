@@ -34,8 +34,8 @@ class Job {
     job.reqEnergy = 5, job.reqTime=15,job.startTimeMin=700,job.startTimeMax=1100,job.DoW =[1,2,3,4,5];
     window.gm.jobs[job.id] = job;
 
-    job = new Job("Harcon_work","do a shift at Harcon logistic dept.","");
-    job.reqEnergy = 5, job.reqTime=15,job.startTimeMin=800,job.startTimeMax=930,job.DoW =[1,3,5];
+    job = new Job("Harcon_work","work at Hacorn facility","do a shift at Harcon logistic dept.");
+    job.reqEnergy = 10, job.reqTime=20,job.startTimeMin=800,job.startTimeMax=930,job.DoW =[1,3,5];
     job.isHidden = function (){ return(!window.gm.quests.hasActiveQuest("qFindAJob",200));};
     window.gm.jobs[job.id] = job;
 

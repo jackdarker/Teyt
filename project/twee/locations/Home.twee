@@ -86,14 +86,14 @@ Your [[Laptop|_Laptop_]] is placed on it and also a handwritten [[TodoList]]. </
 Above the desk is a window facing toward the backside of the house.</br>
 On the other side of the room is a large [[Wardrobe]] with a [[Mirror]] where you can take a look at yourself.
 There is a large bed for sleeping with a nightstand aside. </br>
-<a0 onclick="touchCatIdol(this)">touch cat idol</a></br>
-you are quite horny right now. Maybe you have some time to [[play with yourself|Masturbate]].</br>
-<a href="javascript:void(0)" onclick='($("tw-passage").fadeOut(1000, function() {window.gm.sleep((window.gm.getTimeStruct().hour+1)*100);window.story.show("Sleep");}));'>Nap 1hour</a> </br>
+<!--todo-->You are quite horny right now. Maybe you have some time to [[play with yourself|Masturbate]].</br>
+<a href="javascript:void(0)" onclick='($("tw-passage").fadeOut(1000, function() {window.gm.sleep((window.gm.getTimeStruct().hour+1)*100);window.story.show("Sleep");}));'>Nap 1hour</a>
 <%if(window.gm.getTimeStruct().hour<11) { %>
-<a href="javascript:void(0)" onclick='($("tw-passage").fadeOut(1000, function() {window.gm.sleep(1800);window.story.show("Sleep");}));'>Sleep Until Evening</a> </br>
+<a href="javascript:void(0)" onclick='($("tw-passage").fadeOut(1000, function() {window.gm.sleep(1800);window.story.show("Sleep");}));'>Sleep Until Evening</a> 
 <%} else {%>
-<a href="javascript:void(0)" onclick='($("tw-passage").fadeOut(1000, function() {window.gm.sleep(700);window.story.show("Sleep");}));'>Sleep Until Morning</a> </br>
+<a href="javascript:void(0)" onclick='($("tw-passage").fadeOut(1000, function() {window.gm.sleep(700);window.story.show("Sleep");}));'>Sleep Until Morning</a>
 <%}%>
+</br> That bulky VR-hanging scaffold is taking up a lot of space. You could [[try to start it up|VRSuiteUp]]. 
 </br>[[MemoryGame]] [[HangmanGame]]</br> <!--todo-->
 </br>[[NewGamePlus]]</br> <!--todo-->
 <% if(window.gm.player.Outfit.isNaked()) { %>
@@ -102,12 +102,7 @@ you are quite horny right now. Maybe you have some time to [[play with yourself|
 Where do you want to go ? </br>
 [[Hallway|Home]]</br> <%}%>
 </article><article id="LogPanel"></article></section>
-<script>
-function touchCatIdol(elmnt) {
-	elmnt.replaceWith("There is a tickling feeling in your hand.");
-	window.gm.player.addEffect("effMutateCat",window.gm.StatsLib.effMutateCat());
-}
-</script>
+
 
 :: Sleep
 <section> 
@@ -138,6 +133,7 @@ function checkJob() {
 window.gm.printOutput(checkJob());
 </script>
 
+
 :: Mirror [_back]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
@@ -159,12 +155,16 @@ There is a brown couch with a television in front of it. A smaller table with a 
 <%if(s.vars.qDogSit==0x200) {%>
 Your phone rings with an unknown number. [[Answer call|Dogsit_FirstCallBack]] 
 <%}%>
-
+On one of the shelves is a small statue of a striding cat. <a0 onclick="touchCatIdol(this)">inspect cat idol</a></br>
 Where would you like to go?</br>
 [[Kitchen]] [[Hallway|Home]] </br>
 </article><article id="LogPanel"></article><script>
 function getMoney(elmnt,val) {
 	elmnt.replaceWith("You shouldnt steal that money, should you?");
+}
+function touchCatIdol(elmnt) {
+	elmnt.replaceWith("There is a tickling feeling in your hand.");
+	window.gm.player.addEffect("effMutateCat",window.gm.StatsLib.effMutateCat());
 }
 </script></section>
 

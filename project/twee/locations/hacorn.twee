@@ -1,6 +1,5 @@
 :: Harcon_Logistic_Ad [_back]
-<section> 
-<aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <!--todo--> Auf dem maschinen-geschriebenen Zettel ist eine Teilzeit-Stelle in der Logistik-Abteilung ausgeschrieben.</br>
 'Logistic doesnt sound that interesting and I doubt that position is targeted to an engineer. Maybe I should show up there in person and check if that would be an option.'</br>
 The adress points to be somehwere around downtonw.</br>
@@ -18,8 +17,11 @@ The adress points to be somehwere around downtonw.</br>
     Gleich daneben befindet sich ein Gebäude in Form eines kleinen Glaswürfels das wohl den Torwächter beherbergt.</br>
     "Hallo?.. uhm Ich bin wegen der Stellenazeige hier."</br>
     "Stellenanzeige?...gehts etwas genauer...haben Sie einen Termin?"</br>
-    Fuck [Ja][Nein]
-    "Nein,naja ich hab die Anzeige in der Uni gesehen für eine Stelle in der Logistic-Abteilung und da dachte ich ich komm gleich mal vorbei bevor sie weg ist..."</br>
+    <div id='select1' >
+    <a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1a")'>"Unfortunatly not"</a>
+    </div>
+    <div id='choice1a' hidden></br>
+         "Nein,naja ich hab die Anzeige in der Uni gesehen für eine Stelle in der Logistic-Abteilung und da dachte ich ich komm gleich mal vorbei bevor sie weg ist..."</br>
     The guard frowns as he hears your rumblings. Clearly he doesnt understand how anyone would bother him WITHOUT having setup an appointment.</br>
     Then he grunt's because another huge load seems to be put onto his shoulders. He thoughtfully picks up the phone and calls someone.</br>
     "Yes, hello Elfred this is Frank from the gate. Here is a young man that asks about a position in your department do you know that.."</br>
@@ -34,8 +36,9 @@ The adress points to be somehwere around downtonw.</br>
     'Of course I an read you asshole, I'm from university' - well thats what came into your mind but you just say "Sure"</br>
     He buzzes you through the revolving door adjoining the car gate and you walk to Mr. Erichsons office.</br>
     <div></br>[[Go to logistics|Harcon_Logistic_Intro]]</br></div>
+    </div> 
 <% } else {%>
-    This sees to be a factory. You have no business here.</br>
+    This seems to be some kind of factory. You have no business here.</br>
     <div></br>[[Downtown]]</br></div>
 <%}%>
 </article><article id="LogPanel"></article></section>
@@ -46,7 +49,7 @@ The adress points to be somehwere around downtonw.</br>
 <%window.gm.player.location=window.passage.name;%>
 ...<!--todo-->
 
-Actually we need only some help here and there for Carl, so this is only a parttime-job.
+"Actually Carl needs only some help here and there, so this is only a parttime-job."</br>
 "If you work at least 2 shifts a week here, you will get 25$ the shift every week."</br>
 "So, do you want the job?" he looks at you.</br>
 <div id='select1' >

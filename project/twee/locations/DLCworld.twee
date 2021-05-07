@@ -1,0 +1,121 @@
+:: VRSuiteUp
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<!--todo--> You are eager to try that virtual reallity game. </br>
+<div></br>
+[[Start the game|CharacterEditor]]</br></div>
+</article><article id="LogPanel"></article></section>
+
+:: CharacterEditor
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<!--todo--> "Please select class and race of your character:"</br>
+<div></br>
+[[Ready|StartLocation]]</br></div>
+</article><article id="LogPanel"></article></section>
+
+
+:: StartLocation
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<!--todo--> "You magically appear near the top of a hill. </br>
+You can see some houses from here, you just need to follow the trail down the hill."</br>
+<div></br>
+[[Village|Training1]]</br></div>
+</article><article id="LogPanel"></article></section>
+
+
+:: Training1
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<!--todo--> The path snakes down the grassy flanks of the hill. As you make your way around a large boulder, something strange happens:</br>
+<devnote>"Welcome to our little world. Just in case you are not used to that kind of game we should get you some training."</devnote></br>
+<div></br>
+[[Continue|Training1Done]]</br></div>
+</article><article id="LogPanel"></article></section>
+
+
+:: Training1Done
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<!--todo--> </br>
+<devnote>"I wish you good luck in exploring this world. May the gods be with you."</devnote></br>
+<div></br>
+[[Continue|VillageEntranceIntro]]</br></div>
+</article><article id="LogPanel"></article></section>
+
+:: VillageEntranceIntro
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<!--todo--> A neat little village comes into view as you walk towards its entrance.  </br>
+'Thats really looks awesome. I wonder if I can really visit those houses or if they are just scenery.'</br>
+<div></br>
+[[Continue|VillageMarketPlace]]</br></div>
+</article><article id="LogPanel"></article></section>
+
+
+:: VillageEntrance
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<!--todo--> You are at the crossroads in front of the entrance to the settlement.
+Someone has painted 'Thetain' on the planks above the wooden gate. Most likely thats the name of this commune.</br></br>
+<div></br>
+[[Enter village|VillageMarketPlace]]  [[go to forest|ForestBorder]]</br></div>
+</article><article id="LogPanel"></article></section>
+
+
+:: VillageMarketPlace
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<!--todo--> There arent many people here right now.</br> There seems to be a shop of an alchemist, a Inn and another shop where you cant say what kind of wares - if any - they are trading.</br>
+</br> Near the entrance of the Inn is also a [[bulletin-board]]. 
+<div></br>
+[[VillageInn]]  [[VillagePotions]] [[VillagePawnshop]]</br></div>
+</article><article id="LogPanel"></article></section>
+
+
+:: VillageInn
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<!--todo--> 'This really looks like they scavenged that place from a typical fantasy story book.'</br> 
+</br> 
+<div></br>
+[[VillageMarketPlace]]  [[go to forest|ForestBorder]]</br></div>
+</article><article id="LogPanel"></article></section>
+
+
+:: VillagePotions
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<!--todo--> 'Puh, what a stink. I shouldnt stay here for long for I might suffocate'</br> 
+</br> "Hello? Anyone there?"
+<div></br>
+[[VillageMarketPlace]]  [[Alchemist]]</br></div>
+</article><article id="LogPanel"></article></section>
+
+
+:: VillagePawnshop
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<!--todo--> If this is a shop, then they sell everything: Shoes, cooking pans, assault ballista and chicken.</br> 
+</br> 
+<div></br>
+[[VillageMarketPlace]]  [[Shopkeeper]]</br></div>
+</article><article id="LogPanel"></article></section>
+
+
+:: VillageRespawnPod
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<!--todo--> You are in the sanctum of spawn. Its located on top of the hill above the settlement.</br> 
+</br> There is a path leading downwards to the settlement.</br>
+<div></br>
+[[VillageEntrance]] </br></div>
+</article><article id="LogPanel"></article></section>
+
+
+:: ForestBorder
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<!--todo--> There is a dirt road here crossing the lush grassland that is bordered by the trees of an forest.</br> 
+One direction leads to the settlement close by. The other direction follows the border of the forest but gets out of view quickly.</br> 
+</br> 
+<div></br>
+[[VillageEntrance]] [[ForestEntrance]] [[follow Road]] </br></div>
+</article><article id="LogPanel"></article></section>
+
+
+:: ForestEntrance
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<!--todo--> Der Wald macht einen freundlichen Eindruck. Die Bäume stehen noch licht und sind noch nicht so ausladend und groß als das kein Licht mehr durch das Blätterdach gelangt. </br> 
+</br> 
+<div></br>
+[[ForestBorder]] [[Forest]] </br></div>
+</article><article id="LogPanel"></article></section>
