@@ -74,28 +74,28 @@ function clearview(){
 
 :: SaveDialog
 <dialog role="dialog" id='dialog_save' aria-labelledby="dialog-heading">
-    <button id="close-dialog">Back</button>
+    <button id="close-dialog">Back</button> <div><%=(window.story.state._gm.nosave?"save disabled in this scene":"")%></div>
     <form>
     <label><output></output></label></br>
     <button type="button" id="saveAuto" hidden> </button><button type="button" id="loadAuto">load Auto</button>
     <button type="button" id="deleteAuto">delete Auto</button><label><outputAuto></outputAuto></label></br>
-    <button type="button" id="save1">save 1</button><button type="button" id="load1">load 1</button>
+    <button type="button" id="save1" <%=(window.story.state._gm.nosave?"disabled":"")%>>save 1</button><button type="button" id="load1">load 1</button>
     <button type="button" id="delete1">delete 1</button><label><output1></output1></label></br>
-    <button type="button" id="save2">save 2</button><button type="button" id="load2">load 2</button>
+    <button type="button" id="save2" <%=(window.story.state._gm.nosave?"disabled":"")%>>save 2</button><button type="button" id="load2">load 2</button>
     <button type="button" id="delete2">delete 2</button><label><output2></output2></label></br>
-    <button type="button" id="save3">save 3</button><button type="button" id="load3">load 3</button>
+    <button type="button" id="save3" <%=(window.story.state._gm.nosave?"disabled":"")%>>save 3</button><button type="button" id="load3">load 3</button>
     <button type="button" id="delete3">delete 3</button><label><output3></output3></label></br>
-    <button type="button" id="save4">save 4</button><button type="button" id="load4">load 4</button>
+    <button type="button" id="save4" <%=(window.story.state._gm.nosave?"disabled":"")%>>save 4</button><button type="button" id="load4">load 4</button>
     <button type="button" id="delete4">delete 4</button><label><output4></output4></label></br>
-    <button type="button" id="save5">save 5</button><button type="button" id="load5">load 5</button>
+    <button type="button" id="save5" <%=(window.story.state._gm.nosave?"disabled":"")%>>save 5</button><button type="button" id="load5">load 5</button>
     <button type="button" id="delete5">delete 5</button><label><output5></output5></label></br>
-    <button type="button" id="save6">save 6</button><button type="button" id="load6">load 6</button>
+    <button type="button" id="save6" <%=(window.story.state._gm.nosave?"disabled":"")%>>save 6</button><button type="button" id="load6">load 6</button>
     <button type="button" id="delete6">delete 6</button><label><output6></output6></label></br>
-    <button type="button" id="save7">save 7</button><button type="button" id="load7">load 7</button>
+    <button type="button" id="save7" <%=(window.story.state._gm.nosave?"disabled":"")%>>save 7</button><button type="button" id="load7">load 7</button>
     <button type="button" id="delete7">delete 7</button><label><output7></output7></label></br>
-    <button type="button" id="save8">save 8</button><button type="button" id="load8">load 8</button>
+    <button type="button" id="save8" <%=(window.story.state._gm.nosave?"disabled":"")%>>save 8</button><button type="button" id="load8">load 8</button>
     <button type="button" id="delete8">delete 8</button><label><output8></output8></label></br>
-    <button type="button" id="saveFile">save file...</button>
+    <button type="button" id="saveFile" <%=(window.story.state._gm.nosave?"disabled":"")%>>save file...</button>
     <input type="file" id="loadFile" name="image_uploads" onchange=readFile(this)></br>
     </form>
 </dialog>
@@ -124,22 +124,22 @@ for(var i=0; i< _slots.length;i++) {
   document.querySelector(infodisp).textContent='';
    refresh(_x);
 }
- document.querySelector('#saveFile').addEventListener('click', function(){
+document.querySelector('#saveFile').addEventListener('click', function(){
     document.querySelector(infodisp).textContent='';
     window.storage.saveFile();
- });
- function refresh(slot){
+});
+function refresh(slot){
     var ok = window.storage.getSaveInfo('save'.concat(slot));
     document.querySelector('#load'.concat(slot)).disabled=(ok==='');
     var out = document.querySelector('dialog form output'.concat(slot));
     if(out) out.textContent = ok;
 }
-  function readFile(input) {
+function readFile(input) {
     var OK = window.storage.loadFile(input);  //TODO this runs asynchron
     if(!OK){ 
       return;
     } //aborted by user
-  }
+}
 </script>
 
 

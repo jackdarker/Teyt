@@ -1,10 +1,8 @@
 "use strict";
-class BeeHive{
-		
-    constructor() 
-    {
-        this.name = "BeeHive";
-        this.description = "There seem to live alot of giant bees here.";
+
+class BeeHive extends DngDungeon{
+    constructor()    {
+        super("BeeHive", "There seem to live alot of giant bees here.")
         this.buildFloors();
     }
 
@@ -20,8 +18,8 @@ class BeeHive{
         //var rooms:LookupTable = new LookupTable(); 
         var rooms= new Map();
         /* first floor
-        * 	A1 - A2 - A3 - A4
-        *  	 |	  |    |	
+        *  A1 - A2 - A3 - A4
+        *  	    |	  |    |	
         *  B1 - B2   B3   B4
         *  |    |    |    |
         *  E    C2   C3   S
@@ -41,24 +39,26 @@ class BeeHive{
         DngDirection.createDirection(DngDirection.DirN, rooms.get("Entrance") , rooms.get("B1"));
         DngDirection.createDirection(DngDirection.DirE, rooms.get("B1" ), rooms.get("B2"));
         DngDirection.createDirection(DngDirection.DirN, rooms.get("B2" ), rooms.get("A2"));
+        DngDirection.createDirection(DngDirection.DirN, rooms.get("C2" ), rooms.get("B2"), true);
         DngDirection.createDirection(DngDirection.DirW, rooms.get("A2" ), rooms.get("A1"));
         DngDirection.createDirection(DngDirection.DirE, rooms.get("A2" ), rooms.get("A3"));
         DngDirection.createDirection(DngDirection.DirE, rooms.get("A3" ), rooms.get("A4"));
         DngDirection.createDirection(DngDirection.DirN, rooms.get("B3" ), rooms.get("A3"), true);
+        DngDirection.createDirection(DngDirection.DirN, rooms.get("C3" ), rooms.get("B3"), true);
         DngDirection.createDirection(DngDirection.DirS, rooms.get("A4" ), rooms.get("B4"));
         DngDirection.createDirection(DngDirection.DirS, rooms.get("B4" ), rooms.get("Stairs"));
         room = (rooms.get("Entrance") );
         room.isDungeonEntry = room.isDungeonExit = true;
         room = (rooms.get("B1"));
-        room.onEnterFct = encounterTentacle;
+        //room.onEnterFct = encounterTentacle;
         room = (rooms.get("B2") );
-        room.onEnterFct = encounterBee2;
+        //room.onEnterFct = this.encounterBee2;
         room = (rooms.get("A4") );
-        room.onEnterFct = encounterBee2;
+        room.onEnterFct = this.encounterBee2;
         room = (rooms.get("A3") );
-        room.onEnterFct = encounterBee2;
+        room.onEnterFct = this.encounterBee2;
         room = (rooms.get("B4") );
-        room.getDirection(DngDirection.DirS).canExitFct = hasItem;
+        room.getDirection(DngDirection.DirS).canExitFct = this.hasItem;
         stairUp = (rooms.get("Stairs") );
         
         firstFloor.setRooms(Array.from(rooms.values( )));
@@ -69,7 +69,7 @@ class BeeHive{
         secondFloor = new DngFloor();
         secondFloor.description = "This is the second floor of the beehive.";
         secondFloor.name = "2.Floor";
-        rooms= new LookupTable(); 
+        rooms= new Map(); 
         /* second floor
         * 	A1# - A2 - A3# - A4
         *  |	  |	   |     |	
@@ -83,7 +83,7 @@ class BeeHive{
         rooms.set("C2", new DngRoom("C2", "",false));
         rooms.set("B2",new DngRoom("B2", "",false));
         rooms.set("A2", new DngRoom("A2", "",false));
-        rooms.set("C3", new DngRoom("C1", "",false));
+        rooms.set("C3", new DngRoom("C3", "",false));
         rooms.set("B3",new DngRoom("B3", "",false));
         rooms.set("A3", new DngRoom("A3", "",false));
         rooms.set("StairsDown",new DngRoom("StairsDown", "",false));
@@ -111,34 +111,33 @@ class BeeHive{
         DngDirection.createDirection(DngDirection.DirN, rooms.get("StairsDown"), rooms.get("B4"));
         room = (rooms.get("B4") );
         stairDown = room = (rooms.get("StairsDown") );
-        room.getDirection(DngDirection.DirW).onExitFct = trapDoor;	//its a trap
+        room.getDirection(DngDirection.DirW).onExitFct = this.trapDoor;	//its a trap
         room = (rooms.get("B3") );
-        room.getDirection(DngDirection.DirW).canExitFct = hasItem;
-        room.getDirection(DngDirection.DirN).onExitFct = trapDoor;	//its a trap
-        room.getDirection(DngDirection.DirS).onExitFct = trapDoor;	//its a trap
+        room.getDirection(DngDirection.DirW).canExitFct = this.hasItem;
+        room.getDirection(DngDirection.DirN).onExitFct = this.trapDoor;	//its a trap
+        room.getDirection(DngDirection.DirS).onExitFct = this.trapDoor;	//its a trap
         room = (rooms.get("B2") );
-        room.getDirection(DngDirection.DirE).onExitFct = trapDoor;	//its a trap
+        room.getDirection(DngDirection.DirE).onExitFct = this.trapDoor;	//its a trap
         room = (rooms.get("A2"));
-        room.getDirection(DngDirection.DirW).onExitFct = trapDoor;	//its a trap
+        room.getDirection(DngDirection.DirW).onExitFct = this.trapDoor;	//its a trap
         room = (rooms.get("B1"));
-        room.getDirection(DngDirection.DirN).onExitFct = trapDoor;	//its a trap
+        room.getDirection(DngDirection.DirN).onExitFct = this.trapDoor;	//its a trap
         secondFloor.setRooms(Array.from(rooms.values( )));
         _floors.push(secondFloor);
         //now create floor links
         DngDirection.createDirection(DngDirection.StairUp, stairUp , stairDown);
-        setFloors(_floors);
+        this.setFloors(_floors);
     }
-
+    exitDungeon() {
+        window.gm.dng=null;
+        window.story.show("ForestEntrance");
+    }
     encounterTentacle(Me) {
-        /*outputText("\nThere is a Tentaclebeast.");
-        startCombat(new TentacleBeast());
-        doNext(playerMenu);*/
+        window.story.show('DungeonFoundNothing');
         return true;
     }
     encounterBee2(Me) {
-        /*outputText("\nThere is another beegirl.");
-        startCombat(new BeeGirl());
-        doNext(playerMenu);*/
+        window.story.show('DungeonFoundNothing');
         return true;
     }
     hasItem(Me) {
@@ -151,14 +150,20 @@ class BeeHive{
     }
     //player falls down to 1.floor when entering the room
     trapDoor(Me) {
-        outputText("\nYou crash down through the floor and find yourself back on the lowest level of the beehive.\n")
-        var floor1 = this.allFloors()[0];
-        var Room = floor1.getRoom(Me.roomB.name);
+        window.story.show('DungeonCrashedThroughFloor');
+        return(true);
+        var floor1 = this.floor.dungeon.allFloors()[0];
+        var Room = floor1.getRoom(Me.roomB.name);  //room names are the same at same position of floor
         if (Room != null) {
-            doNext(curry(this.teleport, floor1, Room)); //this.teleport( floor1, Room);	//Todo and if not found??
+            this.floor.dungeon.teleport(floor1, Room);
+            
             return true;
         }
         return false; 	
-        
     }
-    }
+}
+
+window.gm.dngs = (function (dngs) {
+    dngs.BeeHive = function () { return(new BeeHive());  };  
+    return dngs; 
+}(window.gm.dngs || {}));

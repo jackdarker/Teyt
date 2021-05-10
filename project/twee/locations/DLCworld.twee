@@ -116,6 +116,61 @@ One direction leads to the settlement close by. The other direction follows the 
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <!--todo--> Der Wald macht einen freundlichen Eindruck. Die Bäume stehen noch licht und sind noch nicht so ausladend und groß als das kein Licht mehr durch das Blätterdach gelangt. </br> 
 </br> 
-<div></br>
+<div></br><a0 onclick='enterBeehive(); '>Enter Beehive</a></br>
 [[ForestBorder]] [[Forest]] </br></div>
 </article><article id="LogPanel"></article></section>
+<script> function enterBeehive() {
+    window.gm.dng = window.gm.dngs.BeeHive();
+    window.gm.dng.enterDungeon();
+}
+</script>
+
+
+:: Dungeon [_nosave]
+<!--dont "show" this! setup the dungeon and call enterDungeon-->
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%= window.gm.dng.name%> <%= window.gm.dng.actualRoom.descr%></br>
+</br> 
+<div id="panel"></div></br></br>    <!--display button list-->
+</article><article id="LogPanel"></article></section>
+<script>
+window.gm.dng.printButtons()
+</script>
+
+
+:: DungeonMap [_nosave]
+<!--dont "show" this! setup the dungeon and call displayMap-->
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<!--pre-formatted or messup allignment of ascii-rows-->
+<pre><%= window.gm.dng.Mapper.printMap( window.gm.dng.actualRoom)%></pre></br>
+<pre>Legend: P=Player, S=Stair, E=Entry/Exit<pre></br>
+</br> 
+[[Back|Dungeon]]
+</article><article id="LogPanel"></article></section>
+
+
+:: DungeonFoundNothing [_nosave]
+<!--example-scene for onenter/onexit event-->
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%= window.gm.dng.actualRoom.descr%></br>
+There are some buckets here, but there is nothing useful inside.</br>
+</br>
+<a0 onclick='window.gm.dng.resumeRoom();'>Go on</a></br>
+</article><article id="LogPanel"></article></section>
+
+
+:: DungeonCrashedThroughFloor [_nosave]
+<!--example-scene for onenter/onexit event-->
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%= window.gm.dng.actualRoom.descr%></br>
+You crash down through the floor and find yourself back on the lowest level of the area.</br>
+</br>
+<a0 onclick='crashThrough();'>Go on</a></br>
+</article><article id="LogPanel"></article></section>
+<script>
+function crashThrough() {
+    var floor1 = window.gm.dng.allFloors()[0];
+    var Room = floor1.getRoom(window.gm.dng.actualRoom.name);  //room names are the same at same position of floor
+    window.gm.dng.teleport(floor1, Room);
+}
+</script>

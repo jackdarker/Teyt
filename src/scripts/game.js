@@ -127,6 +127,18 @@ window.gm.initGame= function(forceReset,NGP=null) {
       window.gm.quests.setQuestData(s.quests);
       window.gm.quests.pubSub.subscribe("change",function(data){window.gm.toasty.info("Quest "+data.questId+" updated")});
     }
+    if (!s._gm||forceReset) {
+      s._gm = {
+        nosave : false
+      }
+    }
+    if (!s.dng||forceReset) { //stores the state of the current dungeon
+      s.dng = {
+        id : "",
+        floorId : "",
+        roomId : ""
+      }
+    }
     if (!s.tmp||forceReset) { 
       // storage of temporary variables; dont use them in stacking passages or deffered events      
       s.tmp = {
@@ -220,20 +232,25 @@ window.gm.pushDeferredEvent=function(id,args) {
   var _origStoryShow = window.story.__proto__.show;
   window.story.__proto__.show = function(idOrName, noHistory = false) {
     var next = idOrName;
+    var inGame = window.story.state.hasOwnProperty("vars");
+    var tagsnext;
     if(idOrName === '_back') { //going back
       next = window.gm.popPassage();
+      tagsnext = window.story.passage(next).tags;
     } else {  //going forward
-      var tagsnext = window.story.passage(next).tags;
+      tagsnext = window.story.passage(next).tags;
       var namenext = window.story.passage(next).name;
       if(tagsnext.indexOf('_back')>=0 ) { //push on stack but only if not re-showing itself
         if(namenext!=window.passage.name) window.gm.pushPassage(window.passage.name); 
-      } else if(window.story.state.hasOwnProperty("vars")) {
+      } else if(inGame) { //...otherwise error on game start
         window.story.state.vars.passageStack.splice(0,window.story.state.vars.passageStack.length);
       }
   }
 
   //Todo disable save-menu on _nosave-tag 
-
+  if(inGame) {
+      window.story.state._gm.nosave = (tagsnext.indexOf('_nosave')>=0 );
+  }
     //Todo
     //before entering a new passage check if there is a defferedEvent that we should do first
     //if so, push the normal-passage onto stack, show deffered passage

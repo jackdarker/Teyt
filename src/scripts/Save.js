@@ -121,8 +121,8 @@ window.storage = {
       }
   },
   delete: function(slot) {
-    window.localStorage.removeItem(slot);
-    window.localStorage.removeItem(slot.concat('info'));
+    window.localStorage.removeItem(window.story.name +slot);
+    window.localStorage.removeItem(window.story.name +slot.concat('info'));
   },
     getSaveInfo: function(slot) {
         var info=null;

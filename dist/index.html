@@ -1590,6 +1590,857 @@ window.gm.combat.moveUltraKill = function () {
 };
 
 "use strict";
+/* bundles some operations related to dungeon navigation */
+
+
+window.gm = window.gm || {};
+window.gm.dng = window.gm.dng || {}; //represents a button the player can press for directions N,E,S,W; this will also be used to generate the map
+//if you have to connect 2 rooms, you have to define direction in both of them
+
+var DngDirection = /*#__PURE__*/function () {
+  _createClass(DngDirection, null, [{
+    key: "createDirection",
+    //creates direction between 2 rooms and assigns them to them; you can then modify them
+    value: function createDirection(DirEnum, RoomA, RoomB) {
+      var onlyAtoB = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+      var Label = DngDirection.DirEnumToString(DirEnum);
+      var DirAtoB = new DngDirection(DirEnum, Label, "");
+      var inverseDir = DngDirection.inverseDirection(DirEnum);
+      var backLabel = DngDirection.DirEnumToString(inverseDir);
+      var DirBtoA = new DngDirection(inverseDir, backLabel, "");
+      DirBtoA.oneWay = onlyAtoB;
+      DirAtoB.roomA = DirBtoA.roomB = RoomA;
+      DirAtoB.roomB = DirBtoA.roomA = RoomB;
+      if (RoomA != null) RoomA.setDirection(DirEnum, DirAtoB);
+      if (RoomB != null) RoomB.setDirection(inverseDir, DirBtoA);
+    } //returns the opposite direction f.e up-down
+
+  }, {
+    key: "inverseDirection",
+    value: function inverseDirection(DirEnum) {
+      switch (DirEnum) {
+        case DngDirection.DirN:
+          return DngDirection.DirS;
+          break;
+
+        case DngDirection.DirS:
+          return DngDirection.DirN;
+          break;
+
+        case DngDirection.DirE:
+          return DngDirection.DirW;
+
+        case DngDirection.DirW:
+          return DngDirection.DirE;
+          break;
+
+        case DngDirection.StairDown:
+          return DngDirection.StairUp;
+          break;
+
+        case DngDirection.StairUp:
+          return DngDirection.StairDown;
+          break;
+
+        default:
+          break;
+      }
+
+      return 0;
+    } //converts direction enum to label
+
+  }, {
+    key: "DirEnumToString",
+    value: function DirEnumToString(DirEnum) {
+      var backLabel = "";
+
+      switch (DirEnum) {
+        case DngDirection.DirN:
+          backLabel = "N";
+          break;
+
+        case DngDirection.DirS:
+          backLabel = "S";
+          break;
+
+        case DngDirection.DirE:
+          backLabel = "E";
+          break;
+
+        case DngDirection.DirW:
+          backLabel = "W";
+          break;
+
+        case DngDirection.StairUp:
+          backLabel = "Stair up";
+          break;
+
+        case DngDirection.StairDown:
+          backLabel = "Stair down";
+          break;
+
+        default:
+          break;
+      }
+
+      return backLabel;
+    } //Enum for possible directions  ??static DirS = 2; doesnt work ??
+
+  }, {
+    key: "FALSE",
+    // default functions for callbacks
+    value: function FALSE(Me) {
+      return false;
+    }
+  }, {
+    key: "TRUE",
+    value: function TRUE(Me) {
+      return true;
+    }
+  }, {
+    key: "DirW",
+    get: function get() {
+      return 4;
+    }
+  }, {
+    key: "DirE",
+    get: function get() {
+      return 3;
+    }
+  }, {
+    key: "DirN",
+    get: function get() {
+      return 1;
+    }
+  }, {
+    key: "DirS",
+    get: function get() {
+      return 2;
+    }
+  }, {
+    key: "StairUp",
+    get: function get() {
+      return 6;
+    }
+  }, {
+    key: "StairDown",
+    get: function get() {
+      return 5;
+    }
+  }]);
+
+  function DngDirection(dirEnum, name, descr) {
+    _classCallCheck(this, DngDirection);
+
+    this.name = name, this.descr = descr === "" ? name : descr;
+    this.direction = dirEnum;
+    this.oneWay = false;
+    this.onExitFct = this.onEnterFct = this.canExitFct = null;
+    this.roomA; //DngRoom;	//source room
+
+    this.roomB; //:DngRoom;	//target room
+
+    this.tooltip = ""; //:String = "";	//tooltip of the button
+  } //gets called when player enters from this direction
+
+  /*public function onEnterAtoB():void { 
+      onEnterAtoBFct();
+  }*/
+
+
+  _createClass(DngDirection, [{
+    key: "onEnter",
+    value: function onEnter() {
+      if (this.onEnterFct == null) return false;
+      return onEnterFct(this);
+    } //gets called when player  exits into this direction
+
+    /*public function onExitBtoA():void { 
+        onExitBtoAFct();
+    };*/
+
+  }, {
+    key: "onExit",
+    value: function onExit() {
+      if (this.onExitFct == null) return false;
+      return this.onExitFct(this);
+    }
+  }, {
+    key: "canExit",
+    //function to check if player can use this direction; you should also set tooltip for display
+    value: function canExit() {
+      if (this.canExitFct == null) return !this.oneWay;
+      return this.canExitFct(this);
+    } //the direction is hidden if one of the connected rooms is hidden
+
+  }, {
+    key: "hidden",
+    value: function hidden() {
+      return this.roomA.isHidden || this.roomB.isHidden;
+    }
+  }]);
+
+  return DngDirection;
+}(); // a room connected by directions
+
+
+var DngRoom = /*#__PURE__*/function () {
+  function DngRoom(name, descr, hidden) {
+    _classCallCheck(this, DngRoom);
+
+    this.name = name, this.descr = descr === null || descr === "" ? name : descr;
+    this.isDungeonExit = false; // player can leave to camp with Leave-button
+
+    this.isDungeonEntry = false; //when entering the dungeon player will be coming from here; there should only be one of this 
+
+    this.directions
+    /*DngDirection*/
+    = [null, null, null, null, null, null]; //list of directions
+
+    this.operations
+    /*DngOperations*/
+    = []; //list of additional operations (= buttons you can press)
+
+    this.isHidden = false; //this.floor/*DngFloor*/ = null;	//the floor where the room is assigned to
+
+    this.onEnterFct = null;
+    this.origResumeFct = null;
+    this.it;
+    this.fromRoom;
+  } //the floor where the room is assigned to
+
+
+  _createClass(DngRoom, [{
+    key: "setDirection",
+    value: function setDirection(DirEnum, direction) {
+      var invalid = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+      this.directions.splice(DirEnum - 1, 1, direction);
+    }
+  }, {
+    key: "getDirections",
+    value: function getDirections() {
+      return this.directions;
+    }
+  }, {
+    key: "getDirection",
+    value: function getDirection(DirEnum) {
+      return this.directions[DirEnum - 1];
+    } //this is called after the direction onEnter-Event was called
+
+  }, {
+    key: "onEnter",
+    value: function onEnter() {
+      this.isHidden = false;
+      if (this.onEnterFct == null) return false;
+      return this.onEnterFct(this);
+    }
+  }, {
+    key: "moveHere",
+    value: function moveHere(from) {
+      this.origResumeFct = this.floor.dungeon.inRoomedDungeonResume;
+      this.fromRoom = from;
+      this.it = 0;
+      this.moveIterator();
+    } // Whats that good for: onExit or onEnter might trigger an interaction/combat that we have to finish first befor displaying navigation buttons again.
+    // iterator->onExit->startCombat->won->doNext(resume)->iterator
+
+  }, {
+    key: "moveIterator",
+    value: function moveIterator() {
+      var dir; //DngDirection;
+
+      var _it = 0; //int = 0;
+      //call Exit function from previous room
+
+      var _dirs = this.fromRoom.getDirections();
+
+      for (var i = 0; i < _dirs.length; i++) {
+        var element = _dirs[i];
+        _it = _it + 1;
+        if (element == null) continue;
+        if (_it <= this.it) continue;
+        this.it = _it;
+        dir = element; // as DngDirection;
+
+        if (dir.roomA == this.fromRoom && dir.roomB == this) {
+          if (dir.onExit()) {
+            this.floor.dungeon.inRoomedDungeonResume = this.moveIterator;
+            return;
+          }
+        }
+      } //call Entry function of this room
+
+
+      _dirs = this.getDirections();
+
+      for (var i = 0; i < _dirs.length; i++) {
+        var element1 = _dirs[i];
+        _it = _it + 1;
+        if (element1 == null) continue;
+        if (_it <= this.it) continue;
+        this.it = _it;
+        dir = element1; // as DngDirection;
+
+        if (dir.roomA == this && dir.roomB == this.fromRoom) {
+          if (dir.onEnter()) {
+            this.floor.dungeon.inRoomedDungeonResume = this.moveIterator;
+            return;
+          }
+        }
+      }
+
+      _it = _it + 1;
+
+      if (_it > this.it && this.onEnter()) {
+        this.it = _it;
+        this.floor.dungeon.inRoomedDungeonResume = this.moveIterator;
+        return;
+      }
+
+      this.floor.dungeon.inRoomedDungeonResume = this.origResumeFct;
+      this.floor.dungeon.inRoomedDungeonResume();
+    } //gets called when entering the floor or room; override it to update the other properties
+
+  }, {
+    key: "updateRoom",
+    value: function updateRoom() {}
+  }, {
+    key: "floor",
+    get: function get() {
+      return this._parent();
+    }
+  }]);
+
+  return DngRoom;
+}(); //a floor of the dungeon
+//a floor consist of several rooms that are arranged in a xy-coordinate system
+//every room is connected up to 4 surrounding rooms, + stairs to lower/higher floor; 
+
+
+var DngFloor = /*#__PURE__*/function () {
+  function DngFloor(name, descr) {
+    _classCallCheck(this, DngFloor);
+
+    this.rooms = []; //list of rooms
+
+    this.descr = descr;
+    this.name = name; //label of the floor 
+  }
+  /*addRoom(room) { 
+      this.rooms.push(room);
+  };*/
+
+
+  _createClass(DngFloor, [{
+    key: "setRooms",
+    value: function setRooms(Rooms) {
+      this.rooms = Rooms;
+      var found = null;
+
+      for (var i = 0; i < this.rooms.length; i++) {
+        var element = this.rooms[i];
+        if (element == null) continue;
+        found = element;
+
+        if (found != null) {
+          //found.floor = this;
+          found._parent = window.gm.util.refToParent(this);
+        }
+      }
+    }
+  }, {
+    key: "allRooms",
+    value: function allRooms() {
+      return this.rooms;
+    }
+  }, {
+    key: "getRoom",
+    value: function getRoom(Name) {
+      var found = null;
+
+      for (var i = 0; i < this.rooms.length; i++) {
+        var element = this.rooms[i];
+        if (element == null) continue;
+        found = element;
+
+        if (found.name == Name) {
+          break;
+        }
+
+        found = null;
+      }
+
+      return found;
+    }
+  }, {
+    key: "dungeon",
+    get: function get() {
+      return this._parent();
+    }
+  }]);
+
+  return DngFloor;
+}(); // an additional operation that the player can trigger by pressing a button
+
+
+var DngOperation = /*#__PURE__*/function () {
+  function DngOperation(name, destination) {
+    _classCallCheck(this, DngOperation);
+
+    this.destination = destination; //description to be displayed when entering room
+
+    this.name = name; //label of the button
+  }
+
+  _createClass(DngOperation, [{
+    key: "canTrigger",
+    //function to check if player can use this button
+    value: function canTrigger() {
+      return false;
+    }
+  }, {
+    key: "onTrigger",
+    value: function onTrigger() {}
+  }]);
+
+  return DngOperation;
+}();
+
+var DngDungeon = /*#__PURE__*/function () {
+  function DngDungeon(name, descr) {
+    _classCallCheck(this, DngDungeon);
+
+    this.name = name; //name of the dungeon
+
+    this.descr = descr; //text diplayed when entering the dungeon
+
+    this.floors = []; //list of Dngfloors
+
+    this.actualRoom = null;
+    this.Mapper = {}; //DngMapper; 
+
+    this.buttons = [];
+    this.inRoomedDungeonResume = this.inRoomedDungeonDefeat = null;
+  }
+
+  _createClass(DngDungeon, [{
+    key: "setFloors",
+    value: function setFloors(Floors) {
+      this.floors = Floors;
+
+      for (var i = 0; i < this.floors.length; i++) {
+        this.floors[i]._parent = window.gm.util.refToParent(this);
+      }
+    }
+  }, {
+    key: "allFloors",
+    value: function allFloors() {
+      return this.floors;
+    } //enters the dungeon; also does some checks to verify that dungeon was properly setup
+
+  }, {
+    key: "enterDungeon",
+    value: function enterDungeon() {
+      this.Mapper = new DngMapper();
+      this.actualRoom = null;
+      var Entry = null;
+      var Exit = null;
+      var Room; //search the dungeon-Entry, has to be in first floor
+
+      var rooms = this.floors[0].allRooms();
+
+      for (var i = 0; i < rooms.length; i++) {
+        Room = rooms[i];
+
+        if (Room.isDungeonEntry) {
+          Entry = Room;
+        }
+
+        if (Room.isDungeonExit) {
+          Exit = Room;
+        }
+      }
+
+      if (Entry == null || Exit == null) {
+        throw new Error('Error: Dungeon-Exit or Entry missing');
+      }
+
+      this.inRoomedDungeonDefeat = this.exitDungeon;
+      this.moveToRoom(Entry); // playerMenu();
+    } //used to exit the dungeon via Leave-button or by battledefeat
+    //You need to override this to return to a proper passage with window.story.show
+    //You should also set window.gm.dng=null to release memory
+
+  }, {
+    key: "exitDungeon",
+    value: function exitDungeon() {
+      throw new Error('Error: exitDungeon not overridden');
+    } //similiar to moveTo except no onenter/onexit processing
+
+  }, {
+    key: "teleport",
+    value: function teleport(Floor, Room) {
+      this.actualRoom = null;
+      this.moveToRoom(Room);
+    } //move to an ADJOINING room next to the actual one
+    //this might trigger onenter/onexit scenes, those scenes should then call resumeRoom to finish room-swap
+
+  }, {
+    key: "moveToRoom",
+    value: function moveToRoom(newRoom) {
+      /*clearOutput();
+      cheatTime(1 / 12);
+      EngineCore.statScreenRefresh(true);
+      //DungeonCore.setTopButtons();
+      spriteSelect(-1);
+      menu();*/
+      var _actualRoom = this.actualRoom;
+      this.actualRoom = newRoom;
+      this.inRoomedDungeonResume = this.resumeRoom;
+
+      if (_actualRoom != null) {
+        newRoom.moveHere(_actualRoom); //this will trigger onExit/onEnter
+      } else {
+        this.inRoomedDungeonResume();
+      }
+    }
+  }, {
+    key: "clearButtons",
+    value: function clearButtons() {
+      this.buttons = [];
+
+      for (var i = 0; i < 15; i++) {
+        //up to 15 buttons
+        this.buttons.push({
+          name: "",
+          disabled: true,
+          func: null,
+          data: null
+        });
+      }
+    }
+  }, {
+    key: "addButton",
+    value: function addButton(bt, name, func, arg) {
+      this.buttons[bt] = {
+        name: name,
+        disabled: false,
+        func: func,
+        data: arg
+      };
+    }
+  }, {
+    key: "addButtonDisabled",
+    value: function addButtonDisabled(bt, name, arg) {
+      this.buttons[bt] = {
+        name: "-",
+        disabled: true,
+        func: null,
+        data: arg
+      };
+    } //render 5x3 grid of buttons
+
+  }, {
+    key: "printButtons",
+    value: function printButtons() {
+      //because click-event mapping this has to manipulate DOM-tree instead of just rendering html-code
+      var table = document.createElement('table');
+      var tbody = document.createElement('tbody');
+      table.appendChild(tbody);
+
+      for (var y = 0; y < 3; y++) {
+        var tr = document.createElement('tr');
+        tbody.appendChild(tr);
+
+        for (var x = 0; x < 5; x++) {
+          //<a0 onclick=getBanana(this,5)>Get more banana</a>
+          var td = document.createElement('td');
+          tr.appendChild(td);
+          var entry = document.createElement('a');
+          entry.href = 'javascript:void(0)';
+          entry.addEventListener("click", this.buttons[y * 5 + x].func ? function (me, bt) {
+            return bt.func.bind(me, bt.data);
+          }(this, this.buttons[y * 5 + x]) : null);
+          entry.textContent = this.buttons[y * 5 + x].name;
+          entry.disabled = this.buttons[y * 5 + x].disabled;
+          td.appendChild(entry); //$("div#panel")[0].appendChild(entry);
+        }
+      }
+
+      $("div#panel")[0].appendChild(table);
+    }
+  }, {
+    key: "resumeRoom",
+    value: function resumeRoom() {
+      /*clearOutput();
+      EngineCore.statScreenRefresh(true);
+      //setTopButtons();
+      spriteSelect(-1);
+      menu();
+      actualRoom.updateRoom();
+      outputText(actualRoom.getDescription());
+      */
+
+      /*		Menu Layout
+          * 		[ Op1 ]	[ Op2 ]	[ Op3 ]	[ Op4 ]	[More ]
+          * 		[ Up  ]	[  N  ]	[Down ]	[Mast ]	[     ]
+          * 		[  W  ]	[  S  ]	[  E  ]	[ Inv ]	[ Map ]
+          *  
+          */
+      this.clearButtons();
+      this.actualRoom.updateRoom();
+      var bt;
+      var btMask = 0xE;
+      this.actualRoom.getDirections().forEach(function (element, index, arr) {
+        var Dir = element;
+        if (Dir == null) return;
+        bt = Dir.direction;
+        if (bt == DngDirection.DirN) bt = 6;else if (bt == DngDirection.DirS) bt = 11;else if (bt == DngDirection.DirE) bt = 12;else if (bt == DngDirection.DirW) bt = 10;else if (bt == DngDirection.StairDown) bt = 7;else if (bt == DngDirection.StairUp) bt = 5;
+
+        if (Dir.canExit()) {
+          this.addButton(bt, Dir.name, this.moveToRoom, Dir.roomB);
+        } else {
+          this.addButtonDisabled(bt, Dir.name, Dir.tooltip);
+        }
+
+        btMask = btMask ^ 1 >>> bt;
+      }, this); //if (player.lust >= 30) addButton(8, "Masturbate", SceneLib.masturbation.masturbateGo);
+      //addButton(13, "Inventory", inventory.inventoryMenu).hint("The inventory allows you to use an item.  Be careful as this leaves you open to a counterattack when in combat.");
+
+      this.addButton(14, "Map", this.displayMap); //.hint("View the map of this dungeon.");
+
+      if (this.actualRoom.isDungeonExit) {
+        for (var i = 5; i < 15; i++) {
+          //find an empty navigation button for leave
+          bt = i;
+          if ((btMask << i & 1) == 0) break;
+        }
+
+        this.addButton(bt, "Leave", this.exitDungeon, false);
+      }
+
+      window.story.show("Dungeon"); //call the scene
+    } //shows a map-screen
+
+  }, {
+    key: "displayMap",
+    value: function displayMap() {
+      this.Mapper.createMap(this.actualRoom.floor);
+      window.story.show("DungeonMap");
+    }
+  }]);
+
+  return DngDungeon;
+}(); // a helper class to store info for a room
+
+
+var DngMapperInfo = function DngMapperInfo() {
+  _classCallCheck(this, DngMapperInfo);
+
+  this.X = this.Y = 0;
+  this.Name = "";
+  this.Hidden = false;
+  this.Connect = 0; //bitwise encoding of directions
+}; // builds the map from the dungeons info and actualRoom
+// it is expected that all rooms in a floor are somehow connected with each other - no isolated rooms !
+//todo Not completed !
+
+
+var DngMapper = /*#__PURE__*/function () {
+  function DngMapper() {
+    _classCallCheck(this, DngMapper);
+
+    this.dungeon = this.floor = null;
+    this.allInfo = [];
+    this.maxX = this.maxY = this.minX = this.minY = 0;
+  }
+
+  _createClass(DngMapper, [{
+    key: "createMap",
+    value: function createMap(Floor) {
+      this.floor = Floor;
+      var allrooms = Floor.allRooms();
+      var roomIndexs = [];
+      this.allinfo = new Array(allrooms.length);
+      var dirs;
+      var dir; //:DngDirection;
+
+      var room, room2;
+      var x, y, m;
+      var roomInfo = new DngMapperInfo();
+      var roomInfo2;
+      roomInfo.X = x = this.maxX = this.minX = 0;
+      roomInfo.Y = y = this.maxY = this.minY = 0;
+      /*  put 1.room of actual floor to dictionary, set coord XY ={0,0]
+          *  get next room from dictionary until no more
+          *  	for every direction of room
+          * 			get targt room and place into dictionary
+          * 			depending of direction, add flags to source & target room
+          * 			calculate coord of target room  (f.e. direction =E then X/Y = {+1 , +0})
+          * 		...
+          *  ...
+          */
+
+      this.allinfo[0] = roomInfo;
+      roomIndexs[0] = 0;
+
+      for (var i = 0; i < roomIndexs.length; i++) {
+        //allrooms.length??
+        m = roomIndexs[i];
+        room = allrooms[m];
+        roomInfo = this.allinfo[m];
+        roomInfo.Name = room.name;
+        roomInfo.Hidden = roomInfo.Hidden || room.isHidden;
+        dirs = room.getDirections();
+
+        for (var k = 0; k < dirs.length; k++) {
+          if (dirs[k] == null) continue;
+          dir = dirs[k];
+          room2 = dir.roomB;
+          roomInfo.Connect = roomInfo.Connect + (1 << dir.direction);
+          m = allrooms.indexOf(room2);
+
+          if (m >= 0) {
+            //create new roominfo and set coordinate
+            roomInfo2 = new DngMapperInfo();
+            roomInfo2.Hidden = dir.hidden();
+
+            switch (dir.direction) {
+              case DngDirection.DirN:
+                roomInfo2.X = roomInfo.X;
+                roomInfo2.Y = roomInfo.Y - 1;
+                break;
+
+              case DngDirection.DirS:
+                roomInfo2.X = roomInfo.X;
+                roomInfo2.Y = roomInfo.Y + 1;
+                break;
+
+              case DngDirection.DirE:
+                roomInfo2.X = roomInfo.X + 1;
+                roomInfo2.Y = roomInfo.Y;
+                break;
+
+              case DngDirection.DirW:
+                roomInfo2.X = roomInfo.X - 1;
+                roomInfo2.Y = roomInfo.Y;
+                break;
+
+              default:
+                break;
+            }
+
+            if (roomInfo2.X < this.minX) this.minX = roomInfo2.X;
+            if (roomInfo2.X > this.maxX) this.maxX = roomInfo2.X;
+            if (roomInfo2.Y < this.minY) this.minY = roomInfo2.Y;
+            if (roomInfo2.Y > this.maxY) this.maxY = roomInfo2.Y;
+
+            if (roomIndexs.indexOf(m) < 0) {
+              roomIndexs.push(m);
+              this.allinfo[m] = roomInfo2;
+            }
+          }
+        }
+      }
+
+      return;
+    }
+    /* now we have a dictonary of all rooms, their coordinate and flags
+        * create 2DArray of size ( 2*(maxX-minX) , 2*(maxY-minY)) ; even indices store rooms "[ ]", uneven indices store directions " - "
+        * for every room in dictionary
+        * 		update Array[2*(X-minX)][2*(Y-minY)] with room-information
+        * 		update Array[2*(X-1-minX)][2*(Y-0-minY)] with W-direction
+        * 		update Array[2*(X-0-minX)][2*(Y-1-minY)] with N-direction
+        * 		aso.
+        * ...
+        * now we can print something like this:
+        * 	[ ]-[ ]-[ ]-[S]
+        *   |	 |	 |   |	
+        *  [ ]-[P]-[ ]-[ ]
+    */
+
+  }, {
+    key: "printMap",
+    value: function printMap(playerRoom) {
+      //Todo update player location
+      var _line = "";
+      var map = [];
+      var roomInfo;
+      var i, j; //create 2d-array to store textual representation of room and connection between them
+
+      map = new Array(2 * (this.maxX - this.minX) + 1);
+
+      for (i = 0; i < map.length; i++) {
+        var submap = new Array(2 * (this.maxY - this.minY) + 1);
+
+        for (j = 0; j < submap.length; j++) {
+          submap[j] = "   ";
+        }
+
+        map[i] = submap;
+      } //convert the MapperInfo to textual representation
+
+
+      for (i = 0; i < this.allinfo.length; i++) {
+        if (this.allinfo[i] == null) continue;
+        roomInfo = this.allinfo[i];
+        _line = " ";
+
+        if (roomInfo.Connect & 1 << DngDirection.StairDown || roomInfo.Connect & 1 << DngDirection.StairUp) {
+          _line = "S";
+        }
+
+        if (playerRoom != null && playerRoom.name == roomInfo.Name) {
+          _line = "P";
+        } //each room/connection has to be 3 chars long or it will messup formatting !
+        //todo format as table?
+
+
+        if (!roomInfo.Hidden) {
+          _line = "[" + _line + "]";
+          map[2 * (roomInfo.X - this.minX)][2 * (roomInfo.Y - this.minY)] = _line;
+
+          if (roomInfo.Connect & 1 << DngDirection.DirN) {
+            _line = " | ";
+            map[2 * (roomInfo.X - this.minX) + 0][2 * (roomInfo.Y - this.minY) - 1] = _line;
+          }
+
+          if (roomInfo.Connect & 1 << DngDirection.DirE) {
+            _line = " - ";
+            map[2 * (roomInfo.X - this.minX) + 1][2 * (roomInfo.Y - this.minY) + 0] = _line;
+          }
+
+          if (roomInfo.Connect & 1 << DngDirection.DirS) {
+            _line = " | ";
+            map[2 * (roomInfo.X - this.minX) + 0][2 * (roomInfo.Y - this.minY) + 1] = _line;
+          }
+
+          if (roomInfo.Connect & 1 << DngDirection.DirW) {
+            _line = " - ";
+            map[2 * (roomInfo.X - this.minX) - 1][2 * (roomInfo.Y - this.minY) - 0] = _line;
+          }
+        }
+      } //print
+
+
+      _line = this.floor.dungeon.name + " " + this.floor.name + "\n";
+
+      for (j = 0; j < 2 * (this.maxY - this.minY) + 1; j++) {
+        for (i = 0; i < 2 * (this.maxX - this.minX) + 1; i++) {
+          _line += map[i][j];
+        }
+
+        _line += "\n";
+      }
+
+      return _line;
+    }
+  }]);
+
+  return DngMapper;
+}();
+
+"use strict";
 /* combat encounters are defined here */
 
 
@@ -1784,6 +2635,21 @@ window.gm.initGame = function (forceReset) {
     });
   }
 
+  if (!s._gm || forceReset) {
+    s._gm = {
+      nosave: false
+    };
+  }
+
+  if (!s.dng || forceReset) {
+    //stores the state of the current dungeon
+    s.dng = {
+      id: "",
+      floorId: "",
+      roomId: ""
+    };
+  }
+
   if (!s.tmp || forceReset) {
     // storage of temporary variables; dont use them in stacking passages or deffered events      
     s.tmp = {
@@ -1906,23 +2772,31 @@ var _origStoryShow = window.story.__proto__.show;
 window.story.__proto__.show = function (idOrName) {
   var noHistory = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
   var next = idOrName;
+  var inGame = window.story.state.hasOwnProperty("vars");
+  var tagsnext;
 
   if (idOrName === '_back') {
     //going back
     next = window.gm.popPassage();
+    tagsnext = window.story.passage(next).tags;
   } else {
     //going forward
-    var tagsnext = window.story.passage(next).tags;
+    tagsnext = window.story.passage(next).tags;
     var namenext = window.story.passage(next).name;
 
     if (tagsnext.indexOf('_back') >= 0) {
       //push on stack but only if not re-showing itself
       if (namenext != window.passage.name) window.gm.pushPassage(window.passage.name);
-    } else if (window.story.state.hasOwnProperty("vars")) {
+    } else if (inGame) {
+      //...otherwise error on game start
       window.story.state.vars.passageStack.splice(0, window.story.state.vars.passageStack.length);
     }
   } //Todo disable save-menu on _nosave-tag 
-  //Todo
+
+
+  if (inGame) {
+    window.story.state._gm.nosave = tagsnext.indexOf('_nosave') >= 0;
+  } //Todo
   //before entering a new passage check if there is a defferedEvent that we should do first
   //if so, push the normal-passage onto stack, show deffered passage
   //after the deffered passage(s) finish, make sure to show the original passage
@@ -3505,8 +4379,8 @@ window.storage = {
     }
   },
   delete: function _delete(slot) {
-    window.localStorage.removeItem(slot);
-    window.localStorage.removeItem(slot.concat('info'));
+    window.localStorage.removeItem(window.story.name + slot);
+    window.localStorage.removeItem(window.story.name + slot.concat('info'));
   },
   getSaveInfo: function getSaveInfo(slot) {
     var info = null;
@@ -4996,6 +5870,220 @@ var CombatEffect = /*#__PURE__*/function (_Effect) {
 
 
 "use strict";
+
+var BeeHive = /*#__PURE__*/function (_DngDungeon) {
+  _inherits(BeeHive, _DngDungeon);
+
+  var _super7 = _createSuper(BeeHive);
+
+  function BeeHive() {
+    var _this5;
+
+    _classCallCheck(this, BeeHive);
+
+    _this5 = _super7.call(this, "BeeHive", "There seem to live alot of giant bees here.");
+
+    _this5.buildFloors();
+
+    return _this5;
+  }
+
+  _createClass(BeeHive, [{
+    key: "buildFloors",
+    value: function buildFloors() {
+      var _floors = [];
+      var firstFloor; //:DngFloor;
+
+      var stairUp; //:DngRoom;
+
+      var stairDown; //:DngRoom;
+
+      firstFloor = new DngFloor();
+      firstFloor.description = "This is the lowest floor of the beehive.";
+      firstFloor.name = "1.Floor";
+      var room; //:DngRoom;
+      //var rooms:LookupTable = new LookupTable(); 
+
+      var rooms = new Map();
+      /* first floor
+      *  A1 - A2 - A3 - A4
+      *  	    |	  |    |	
+      *  B1 - B2   B3   B4
+      *  |    |    |    |
+      *  E    C2   C3   S
+      * */
+
+      rooms.set("Entrance", new DngRoom("Entrance", "", false));
+      rooms.set("B1", new DngRoom("B1", "", false));
+      rooms.set("A1", new DngRoom("A1", "", true)); //hidden
+
+      rooms.set("B2", new DngRoom("B2", "", false));
+      rooms.set("C2", new DngRoom("C2", "", false));
+      rooms.set("A2", new DngRoom("A2", "", false));
+      rooms.set("B3", new DngRoom("B3", "", false));
+      rooms.set("C3", new DngRoom("C3", "", false));
+      rooms.set("A3", new DngRoom("A3", "", false));
+      rooms.set("B4", new DngRoom("B4", "", false));
+      rooms.set("A4", new DngRoom("A4", "", false));
+      rooms.set("Stairs", new DngRoom("Stairs", "", false));
+      DngDirection.createDirection(DngDirection.DirN, rooms.get("Entrance"), rooms.get("B1"));
+      DngDirection.createDirection(DngDirection.DirE, rooms.get("B1"), rooms.get("B2"));
+      DngDirection.createDirection(DngDirection.DirN, rooms.get("B2"), rooms.get("A2"));
+      DngDirection.createDirection(DngDirection.DirN, rooms.get("C2"), rooms.get("B2"), true);
+      DngDirection.createDirection(DngDirection.DirW, rooms.get("A2"), rooms.get("A1"));
+      DngDirection.createDirection(DngDirection.DirE, rooms.get("A2"), rooms.get("A3"));
+      DngDirection.createDirection(DngDirection.DirE, rooms.get("A3"), rooms.get("A4"));
+      DngDirection.createDirection(DngDirection.DirN, rooms.get("B3"), rooms.get("A3"), true);
+      DngDirection.createDirection(DngDirection.DirN, rooms.get("C3"), rooms.get("B3"), true);
+      DngDirection.createDirection(DngDirection.DirS, rooms.get("A4"), rooms.get("B4"));
+      DngDirection.createDirection(DngDirection.DirS, rooms.get("B4"), rooms.get("Stairs"));
+      room = rooms.get("Entrance");
+      room.isDungeonEntry = room.isDungeonExit = true;
+      room = rooms.get("B1"); //room.onEnterFct = encounterTentacle;
+
+      room = rooms.get("B2"); //room.onEnterFct = this.encounterBee2;
+
+      room = rooms.get("A4");
+      room.onEnterFct = this.encounterBee2;
+      room = rooms.get("A3");
+      room.onEnterFct = this.encounterBee2;
+      room = rooms.get("B4");
+      room.getDirection(DngDirection.DirS).canExitFct = this.hasItem;
+      stairUp = rooms.get("Stairs");
+      firstFloor.setRooms(Array.from(rooms.values()));
+
+      _floors.push(firstFloor);
+
+      var secondFloor;
+      secondFloor = new DngFloor();
+      secondFloor.description = "This is the second floor of the beehive.";
+      secondFloor.name = "2.Floor";
+      rooms = new Map();
+      /* second floor
+      * 	A1# - A2 - A3# - A4
+      *  |	  |	   |     |	
+      *  B1 -  B2 - B3 -  B4
+      *  |     |    |     |
+      *  C1 - C2# - C3# - S
+      * */
+
+      rooms.set("C1", new DngRoom("C1", "", false));
+      rooms.set("B1", new DngRoom("B1", "", false));
+      rooms.set("A1", new DngRoom("A1", "", false));
+      rooms.set("C2", new DngRoom("C2", "", false));
+      rooms.set("B2", new DngRoom("B2", "", false));
+      rooms.set("A2", new DngRoom("A2", "", false));
+      rooms.set("C3", new DngRoom("C3", "", false));
+      rooms.set("B3", new DngRoom("B3", "", false));
+      rooms.set("A3", new DngRoom("A3", "", false));
+      rooms.set("StairsDown", new DngRoom("StairsDown", "", false));
+      rooms.set("B4", new DngRoom("B4", "", false));
+      rooms.set("A4", new DngRoom("A4", "", false));
+      DngDirection.createDirection(DngDirection.DirE, rooms.get("C3"), rooms.get("StairsDown"));
+      DngDirection.createDirection(DngDirection.DirE, rooms.get("C2"), rooms.get("C3"));
+      DngDirection.createDirection(DngDirection.DirE, rooms.get("C1"), rooms.get("C2"));
+      DngDirection.createDirection(DngDirection.DirE, rooms.get("A3"), rooms.get("A4"));
+      DngDirection.createDirection(DngDirection.DirE, rooms.get("A2"), rooms.get("A3"));
+      DngDirection.createDirection(DngDirection.DirE, rooms.get("A1"), rooms.get("A2"));
+      DngDirection.createDirection(DngDirection.DirE, rooms.get("B3"), rooms.get("B4"));
+      DngDirection.createDirection(DngDirection.DirE, rooms.get("B2"), rooms.get("B3"));
+      DngDirection.createDirection(DngDirection.DirE, rooms.get("B1"), rooms.get("B2"));
+      DngDirection.createDirection(DngDirection.DirE, rooms.get("C3"), rooms.get("C4"));
+      DngDirection.createDirection(DngDirection.DirE, rooms.get("C2"), rooms.get("C3"));
+      DngDirection.createDirection(DngDirection.DirE, rooms.get("C1"), rooms.get("C2"));
+      DngDirection.createDirection(DngDirection.DirN, rooms.get("B1"), rooms.get("A1"));
+      DngDirection.createDirection(DngDirection.DirN, rooms.get("C1"), rooms.get("B1"));
+      DngDirection.createDirection(DngDirection.DirN, rooms.get("B2"), rooms.get("A2"));
+      DngDirection.createDirection(DngDirection.DirN, rooms.get("C2"), rooms.get("B2"));
+      DngDirection.createDirection(DngDirection.DirN, rooms.get("B3"), rooms.get("A3"));
+      DngDirection.createDirection(DngDirection.DirN, rooms.get("C3"), rooms.get("B3"));
+      DngDirection.createDirection(DngDirection.DirN, rooms.get("B4"), rooms.get("A4"));
+      DngDirection.createDirection(DngDirection.DirN, rooms.get("StairsDown"), rooms.get("B4"));
+      room = rooms.get("B4");
+      stairDown = room = rooms.get("StairsDown");
+      room.getDirection(DngDirection.DirW).onExitFct = this.trapDoor; //its a trap
+
+      room = rooms.get("B3");
+      room.getDirection(DngDirection.DirW).canExitFct = this.hasItem;
+      room.getDirection(DngDirection.DirN).onExitFct = this.trapDoor; //its a trap
+
+      room.getDirection(DngDirection.DirS).onExitFct = this.trapDoor; //its a trap
+
+      room = rooms.get("B2");
+      room.getDirection(DngDirection.DirE).onExitFct = this.trapDoor; //its a trap
+
+      room = rooms.get("A2");
+      room.getDirection(DngDirection.DirW).onExitFct = this.trapDoor; //its a trap
+
+      room = rooms.get("B1");
+      room.getDirection(DngDirection.DirN).onExitFct = this.trapDoor; //its a trap
+
+      secondFloor.setRooms(Array.from(rooms.values()));
+
+      _floors.push(secondFloor); //now create floor links
+
+
+      DngDirection.createDirection(DngDirection.StairUp, stairUp, stairDown);
+      this.setFloors(_floors);
+    }
+  }, {
+    key: "exitDungeon",
+    value: function exitDungeon() {
+      window.gm.dng = null;
+      window.story.show("ForestEntrance");
+    }
+  }, {
+    key: "encounterTentacle",
+    value: function encounterTentacle(Me) {
+      window.story.show('DungeonFoundNothing');
+      return true;
+    }
+  }, {
+    key: "encounterBee2",
+    value: function encounterBee2(Me) {
+      window.story.show('DungeonFoundNothing');
+      return true;
+    }
+  }, {
+    key: "hasItem",
+    value: function hasItem(Me) {
+      /* if (!player.hasItem(ItemType.lookupItem("BeeHony"), 1))
+       {
+           Me.tooltip = "You dont have a vial of beehoney";
+           return false;
+       }*/
+      return true;
+    } //player falls down to 1.floor when entering the room
+
+  }, {
+    key: "trapDoor",
+    value: function trapDoor(Me) {
+      window.story.show('DungeonCrashedThroughFloor');
+      return true;
+      var floor1 = this.floor.dungeon.allFloors()[0];
+      var Room = floor1.getRoom(Me.roomB.name); //room names are the same at same position of floor
+
+      if (Room != null) {
+        this.floor.dungeon.teleport(floor1, Room);
+        return true;
+      }
+
+      return false;
+    }
+  }]);
+
+  return BeeHive;
+}(DngDungeon);
+
+window.gm.dngs = function (dngs) {
+  dngs.BeeHive = function () {
+    return new BeeHive();
+  };
+
+  return dngs;
+}(window.gm.dngs || {});
+
+"use strict";
 /* bundles some utility operations*/
 
 
@@ -5308,16 +6396,16 @@ window.gm.printUnlockPerk = function (id, descr) {
 var LighterDad = /*#__PURE__*/function (_Item2) {
   _inherits(LighterDad, _Item2);
 
-  var _super7 = _createSuper(LighterDad);
+  var _super8 = _createSuper(LighterDad);
 
   function LighterDad() {
-    var _this5;
+    var _this6;
 
     _classCallCheck(this, LighterDad);
 
-    _this5 = _super7.call(this, 'LighterDad');
-    _this5.desc = 'I got this lighter from my real dad.';
-    return _this5;
+    _this6 = _super8.call(this, 'LighterDad');
+    _this6.desc = 'I got this lighter from my real dad.';
+    return _this6;
   }
 
   _createClass(LighterDad, [{
@@ -5340,16 +6428,16 @@ var LighterDad = /*#__PURE__*/function (_Item2) {
 var Money = /*#__PURE__*/function (_Item3) {
   _inherits(Money, _Item3);
 
-  var _super8 = _createSuper(Money);
+  var _super9 = _createSuper(Money);
 
   function Money() {
-    var _this6;
+    var _this7;
 
     _classCallCheck(this, Money);
 
-    _this6 = _super8.call(this, 'Money');
-    _this6.desc = 'shiny,clinky coin.';
-    return _this6;
+    _this7 = _super9.call(this, 'Money');
+    _this7.desc = 'shiny,clinky coin.';
+    return _this7;
   }
 
   _createClass(Money, [{
@@ -5372,16 +6460,16 @@ var Money = /*#__PURE__*/function (_Item3) {
 var LaptopPS = /*#__PURE__*/function (_Item4) {
   _inherits(LaptopPS, _Item4);
 
-  var _super9 = _createSuper(LaptopPS);
+  var _super10 = _createSuper(LaptopPS);
 
   function LaptopPS() {
-    var _this7;
+    var _this8;
 
     _classCallCheck(this, LaptopPS);
 
-    _this7 = _super9.call(this, 'Laptop-PS');
-    _this7.desc = 'Power converter for laptop.';
-    return _this7;
+    _this8 = _super10.call(this, 'Laptop-PS');
+    _this8.desc = 'Power converter for laptop.';
+    return _this8;
   }
 
   _createClass(LaptopPS, [{
@@ -5404,16 +6492,16 @@ var LaptopPS = /*#__PURE__*/function (_Item4) {
 var Dildo_small = /*#__PURE__*/function (_Item5) {
   _inherits(Dildo_small, _Item5);
 
-  var _super10 = _createSuper(Dildo_small);
+  var _super11 = _createSuper(Dildo_small);
 
   function Dildo_small() {
-    var _this8;
+    var _this9;
 
     _classCallCheck(this, Dildo_small);
 
-    _this8 = _super10.call(this, 'Dildo_small');
-    _this8.desc = 'A dildo, smaller than an average dong, made from rubbery plastic.';
-    return _this8;
+    _this9 = _super11.call(this, 'Dildo_small');
+    _this9.desc = 'A dildo, smaller than an average dong, made from rubbery plastic.';
+    return _this9;
   }
 
   _createClass(Dildo_small, [{
@@ -5436,16 +6524,16 @@ var Dildo_small = /*#__PURE__*/function (_Item5) {
 var Lube = /*#__PURE__*/function (_Item6) {
   _inherits(Lube, _Item6);
 
-  var _super11 = _createSuper(Lube);
+  var _super12 = _createSuper(Lube);
 
   function Lube() {
-    var _this9;
+    var _this10;
 
     _classCallCheck(this, Lube);
 
-    _this9 = _super11.call(this, 'Lube');
-    _this9.desc = 'Slippery lubricant for personal use.';
-    return _this9;
+    _this10 = _super12.call(this, 'Lube');
+    _this10.desc = 'Slippery lubricant for personal use.';
+    return _this10;
   }
 
   _createClass(Lube, [{
@@ -5468,16 +6556,16 @@ var Lube = /*#__PURE__*/function (_Item6) {
 var Battery = /*#__PURE__*/function (_Item7) {
   _inherits(Battery, _Item7);
 
-  var _super12 = _createSuper(Battery);
+  var _super13 = _createSuper(Battery);
 
   function Battery() {
-    var _this10;
+    var _this11;
 
     _classCallCheck(this, Battery);
 
-    _this10 = _super12.call(this, 'Battery');
-    _this10.desc = 'Provides electricity for devices.';
-    return _this10;
+    _this11 = _super13.call(this, 'Battery');
+    _this11.desc = 'Provides electricity for devices.';
+    return _this11;
   }
 
   _createClass(Battery, [{
@@ -5500,16 +6588,16 @@ var Battery = /*#__PURE__*/function (_Item7) {
 var CanOfCoffee = /*#__PURE__*/function (_Item8) {
   _inherits(CanOfCoffee, _Item8);
 
-  var _super13 = _createSuper(CanOfCoffee);
+  var _super14 = _createSuper(CanOfCoffee);
 
   function CanOfCoffee() {
-    var _this11;
+    var _this12;
 
     _classCallCheck(this, CanOfCoffee);
 
-    _this11 = _super13.call(this, 'Can of coffee');
-    _this11.desc = 'Cold coffee in a can. Tasty? Not really!';
-    return _this11;
+    _this12 = _super14.call(this, 'Can of coffee');
+    _this12.desc = 'Cold coffee in a can. Tasty? Not really!';
+    return _this12;
   }
 
   _createClass(CanOfCoffee, [{
@@ -5556,16 +6644,16 @@ var CanOfCoffee = /*#__PURE__*/function (_Item8) {
 var SimpleFood = /*#__PURE__*/function (_Item9) {
   _inherits(SimpleFood, _Item9);
 
-  var _super14 = _createSuper(SimpleFood);
+  var _super15 = _createSuper(SimpleFood);
 
   function SimpleFood() {
-    var _this12;
+    var _this13;
 
     _classCallCheck(this, SimpleFood);
 
-    _this12 = _super14.call(this, 'SimpleFood');
-    _this12.desc = 'Something to eat.';
-    return _this12;
+    _this13 = _super15.call(this, 'SimpleFood');
+    _this13.desc = 'Something to eat.';
+    return _this13;
   }
 
   _createClass(SimpleFood, [{
@@ -5669,20 +6757,20 @@ window.gm.ItemsLib = function (ItemsLib) {
 var Mole = /*#__PURE__*/function (_Mob) {
   _inherits(Mole, _Mob);
 
-  var _super15 = _createSuper(Mole);
+  var _super16 = _createSuper(Mole);
 
   function Mole() {
-    var _this13;
+    var _this14;
 
     _classCallCheck(this, Mole);
 
-    _this13 = _super15.call(this);
-    _this13.name = 'Mole';
-    _this13.pic = 'assets/mole.jpg';
+    _this14 = _super16.call(this);
+    _this14.name = 'Mole';
+    _this14.pic = 'assets/mole.jpg';
 
-    _this13.Stats.increment('healthMax', -1 * (_this13.health().max - 20));
+    _this14.Stats.increment('healthMax', -1 * (_this14.health().max - 20));
 
-    return _this13;
+    return _this14;
   }
 
   return Mole;
@@ -5693,17 +6781,17 @@ var Mole = /*#__PURE__*/function (_Mob) {
 var Mechanic = /*#__PURE__*/function (_Mob2) {
   _inherits(Mechanic, _Mob2);
 
-  var _super16 = _createSuper(Mechanic);
+  var _super17 = _createSuper(Mechanic);
 
   function Mechanic() {
-    var _this14;
+    var _this15;
 
     _classCallCheck(this, Mechanic);
 
-    _this14 = _super16.call(this);
-    _this14.name = 'Mechanic-Guy';
-    _this14.pic = 'assets/mechanic.jpg';
-    return _this14;
+    _this15 = _super17.call(this);
+    _this15.name = 'Mechanic-Guy';
+    _this15.pic = 'assets/mechanic.jpg';
+    return _this15;
   }
 
   _createClass(Mechanic, [{
@@ -5751,19 +6839,19 @@ window.gm.Mobs = function (Mobs) {
 var Leggings = /*#__PURE__*/function (_Equipment) {
   _inherits(Leggings, _Equipment);
 
-  var _super17 = _createSuper(Leggings);
+  var _super18 = _createSuper(Leggings);
 
   function Leggings() {
-    var _this15;
+    var _this16;
 
     _classCallCheck(this, Leggings);
 
-    _this15 = _super17.call(this, 'Leggings');
-    _this15.tags = ['cloth'];
-    _this15.slotUse = ['Legs'];
-    _this15.desc = 'Spandex-leggings for sport. (agility+)';
+    _this16 = _super18.call(this, 'Leggings');
+    _this16.tags = ['cloth'];
+    _this16.slotUse = ['Legs'];
+    _this16.desc = 'Spandex-leggings for sport. (agility+)';
     window.storage.registerConstructor(Leggings);
-    return _this15;
+    return _this16;
   }
 
   _createClass(Leggings, [{
@@ -5823,19 +6911,19 @@ var Leggings = /*#__PURE__*/function (_Equipment) {
 var Jeans = /*#__PURE__*/function (_Equipment2) {
   _inherits(Jeans, _Equipment2);
 
-  var _super18 = _createSuper(Jeans);
+  var _super19 = _createSuper(Jeans);
 
   function Jeans() {
-    var _this16;
+    var _this17;
 
     _classCallCheck(this, Jeans);
 
-    _this16 = _super18.call(this, 'Jeans');
-    _this16.tags = ['cloth'];
-    _this16.slotUse = ['Legs'];
-    _this16.desc = 'plain old blue jeans';
+    _this17 = _super19.call(this, 'Jeans');
+    _this17.tags = ['cloth'];
+    _this17.slotUse = ['Legs'];
+    _this17.desc = 'plain old blue jeans';
     window.storage.registerConstructor(Jeans);
-    return _this16;
+    return _this17;
   }
 
   _createClass(Jeans, [{
@@ -5872,19 +6960,19 @@ var Jeans = /*#__PURE__*/function (_Equipment2) {
 var TankShirt = /*#__PURE__*/function (_Equipment3) {
   _inherits(TankShirt, _Equipment3);
 
-  var _super19 = _createSuper(TankShirt);
+  var _super20 = _createSuper(TankShirt);
 
   function TankShirt() {
-    var _this17;
+    var _this18;
 
     _classCallCheck(this, TankShirt);
 
-    _this17 = _super19.call(this, 'TankShirt');
-    _this17.tags = ['cloth'];
-    _this17.slotUse = ['Torso'];
-    _this17.desc = 'light blue tank-top';
+    _this18 = _super20.call(this, 'TankShirt');
+    _this18.tags = ['cloth'];
+    _this18.slotUse = ['Torso'];
+    _this18.desc = 'light blue tank-top';
     window.storage.registerConstructor(TankShirt);
-    return _this17;
+    return _this18;
   }
 
   _createClass(TankShirt, [{
@@ -5921,19 +7009,19 @@ var TankShirt = /*#__PURE__*/function (_Equipment3) {
 var Pullover = /*#__PURE__*/function (_Equipment4) {
   _inherits(Pullover, _Equipment4);
 
-  var _super20 = _createSuper(Pullover);
+  var _super21 = _createSuper(Pullover);
 
   function Pullover() {
-    var _this18;
+    var _this19;
 
     _classCallCheck(this, Pullover);
 
-    _this18 = _super20.call(this, 'Pullover');
-    _this18.tags = ['cloth'];
-    _this18.slotUse = ['Torso', 'Arms'];
-    _this18.desc = 'warm pullover';
+    _this19 = _super21.call(this, 'Pullover');
+    _this19.tags = ['cloth'];
+    _this19.slotUse = ['Torso', 'Arms'];
+    _this19.desc = 'warm pullover';
     window.storage.registerConstructor(Pullover);
-    return _this18;
+    return _this19;
   }
 
   _createClass(Pullover, [{
@@ -5970,19 +7058,19 @@ var Pullover = /*#__PURE__*/function (_Equipment4) {
 var HandCuffs = /*#__PURE__*/function (_Equipment5) {
   _inherits(HandCuffs, _Equipment5);
 
-  var _super21 = _createSuper(HandCuffs);
+  var _super22 = _createSuper(HandCuffs);
 
   function HandCuffs() {
-    var _this19;
+    var _this20;
 
     _classCallCheck(this, HandCuffs);
 
-    _this19 = _super21.call(this, 'HandCuffs');
-    _this19.tags = ['restrain'];
-    _this19.slotUse = ['RHand', 'LHand'];
-    _this19.desc = 'handcuffs';
+    _this20 = _super22.call(this, 'HandCuffs');
+    _this20.tags = ['restrain'];
+    _this20.slotUse = ['RHand', 'LHand'];
+    _this20.desc = 'handcuffs';
     window.storage.registerConstructor(Pullover);
-    return _this19;
+    return _this20;
   }
 
   _createClass(HandCuffs, [{
@@ -6047,19 +7135,19 @@ var HandCuffs = /*#__PURE__*/function (_Equipment5) {
 var Crowbar = /*#__PURE__*/function (_Equipment6) {
   _inherits(Crowbar, _Equipment6);
 
-  var _super22 = _createSuper(Crowbar);
+  var _super23 = _createSuper(Crowbar);
 
   function Crowbar() {
-    var _this20;
+    var _this21;
 
     _classCallCheck(this, Crowbar);
 
-    _this20 = _super22.call(this, 'Crowbar');
-    _this20.desc = 'A durable crowbar.';
-    _this20.tags = ['tool', 'weapon'];
-    _this20.slotUse = ['RHand'];
+    _this21 = _super23.call(this, 'Crowbar');
+    _this21.desc = 'A durable crowbar.';
+    _this21.tags = ['tool', 'weapon'];
+    _this21.slotUse = ['RHand'];
     window.storage.registerConstructor(Crowbar);
-    return _this20;
+    return _this21;
   }
 
   _createClass(Crowbar, [{
@@ -6146,19 +7234,19 @@ var Crowbar = /*#__PURE__*/function (_Equipment6) {
 var Shovel = /*#__PURE__*/function (_Equipment7) {
   _inherits(Shovel, _Equipment7);
 
-  var _super23 = _createSuper(Shovel);
+  var _super24 = _createSuper(Shovel);
 
   function Shovel() {
-    var _this21;
+    var _this22;
 
     _classCallCheck(this, Shovel);
 
-    _this21 = _super23.call(this, 'Shovel');
-    _this21.desc = 'A rusty,old shovel.';
-    _this21.tags = ['tool', 'weapon'];
-    _this21.slotUse = ['RHand', 'LHand'];
+    _this22 = _super24.call(this, 'Shovel');
+    _this22.desc = 'A rusty,old shovel.';
+    _this22.tags = ['tool', 'weapon'];
+    _this22.slotUse = ['RHand', 'LHand'];
     window.storage.registerConstructor(Shovel);
-    return _this21;
+    return _this22;
   }
 
   _createClass(Shovel, [{
@@ -6244,19 +7332,19 @@ var Shovel = /*#__PURE__*/function (_Equipment7) {
 var TailRibbon = /*#__PURE__*/function (_Equipment8) {
   _inherits(TailRibbon, _Equipment8);
 
-  var _super24 = _createSuper(TailRibbon);
+  var _super25 = _createSuper(TailRibbon);
 
   function TailRibbon() {
-    var _this22;
+    var _this23;
 
     _classCallCheck(this, TailRibbon);
 
-    _this22 = _super24.call(this, 'TailRibbon');
-    _this22.tags = ['cloth'];
-    _this22.slotUse = ['TailTip'];
-    _this22.desc = 'a fancy color band that can be wrapped around someones tailtip';
+    _this23 = _super25.call(this, 'TailRibbon');
+    _this23.tags = ['cloth'];
+    _this23.slotUse = ['TailTip'];
+    _this23.desc = 'a fancy color band that can be wrapped around someones tailtip';
     window.storage.registerConstructor(TailRibbon);
-    return _this22;
+    return _this23;
   }
 
   _createClass(TailRibbon, [{
@@ -6307,19 +7395,19 @@ var TailRibbon = /*#__PURE__*/function (_Equipment8) {
 var TailNone = /*#__PURE__*/function (_Equipment9) {
   _inherits(TailNone, _Equipment9);
 
-  var _super25 = _createSuper(TailNone);
+  var _super26 = _createSuper(TailNone);
 
   function TailNone() {
-    var _this23;
+    var _this24;
 
     _classCallCheck(this, TailNone);
 
-    _this23 = _super25.call(this, 'TailNone');
-    _this23.tags = ['body'];
-    _this23.slotUse = ['bTailBase'];
-    _this23.desc = '';
+    _this24 = _super26.call(this, 'TailNone');
+    _this24.tags = ['body'];
+    _this24.slotUse = ['bTailBase'];
+    _this24.desc = '';
     window.storage.registerConstructor(TailNone);
-    return _this23;
+    return _this24;
   }
 
   _createClass(TailNone, [{
@@ -6356,23 +7444,23 @@ var TailNone = /*#__PURE__*/function (_Equipment9) {
 var TailCat = /*#__PURE__*/function (_Equipment10) {
   _inherits(TailCat, _Equipment10);
 
-  var _super26 = _createSuper(TailCat);
+  var _super27 = _createSuper(TailCat);
 
   function TailCat() {
-    var _this24;
+    var _this25;
 
     _classCallCheck(this, TailCat);
 
-    _this24 = _super26.call(this, 'TailCat');
-    _this24.tags = ['body'];
-    _this24.slotUse = ['bTailBase'];
-    _this24.desc = 'a flexible,furred tail like that of a cat.';
-    _this24.growth = 0.10; //in %/100 maxGrowth
+    _this25 = _super27.call(this, 'TailCat');
+    _this25.tags = ['body'];
+    _this25.slotUse = ['bTailBase'];
+    _this25.desc = 'a flexible,furred tail like that of a cat.';
+    _this25.growth = 0.10; //in %/100 maxGrowth
 
-    _this24.maxGrowth = 1.2; //in meter, todo depends on bodysize
+    _this25.maxGrowth = 1.2; //in meter, todo depends on bodysize
 
     window.storage.registerConstructor(TailCat);
-    return _this24;
+    return _this25;
   }
 
   _createClass(TailCat, [{
@@ -6409,23 +7497,23 @@ var TailCat = /*#__PURE__*/function (_Equipment10) {
 var BreastHuman = /*#__PURE__*/function (_Equipment11) {
   _inherits(BreastHuman, _Equipment11);
 
-  var _super27 = _createSuper(BreastHuman);
+  var _super28 = _createSuper(BreastHuman);
 
   function BreastHuman() {
-    var _this25;
+    var _this26;
 
     _classCallCheck(this, BreastHuman);
 
-    _this25 = _super27.call(this, 'BreastHuman');
-    _this25.tags = ['body'];
-    _this25.slotUse = ['bBreast'];
-    _this25.desc = 'some human breasts.';
-    _this25.growth = 0.0; //in %/100 maxGrowth
+    _this26 = _super28.call(this, 'BreastHuman');
+    _this26.tags = ['body'];
+    _this26.slotUse = ['bBreast'];
+    _this26.desc = 'some human breasts.';
+    _this26.growth = 0.0; //in %/100 maxGrowth
 
-    _this25.maxGrowth = 0.3; //in meter, todo depends on bodysize
+    _this26.maxGrowth = 0.3; //in meter, todo depends on bodysize
 
     window.storage.registerConstructor(BreastHuman);
-    return _this25;
+    return _this26;
   }
 
   _createClass(BreastHuman, [{
@@ -6462,23 +7550,23 @@ var BreastHuman = /*#__PURE__*/function (_Equipment11) {
 var VulvaHuman = /*#__PURE__*/function (_Equipment12) {
   _inherits(VulvaHuman, _Equipment12);
 
-  var _super28 = _createSuper(VulvaHuman);
+  var _super29 = _createSuper(VulvaHuman);
 
   function VulvaHuman() {
-    var _this26;
+    var _this27;
 
     _classCallCheck(this, VulvaHuman);
 
-    _this26 = _super28.call(this, 'VulvaHuman');
-    _this26.tags = ['body'];
-    _this26.slotUse = ['bVulva'];
-    _this26.desc = 'a human cooter.';
-    _this26.growth = 0.0; //in %/100 maxGrowth
+    _this27 = _super29.call(this, 'VulvaHuman');
+    _this27.tags = ['body'];
+    _this27.slotUse = ['bVulva'];
+    _this27.desc = 'a human cooter.';
+    _this27.growth = 0.0; //in %/100 maxGrowth
 
-    _this26.maxGrowth = 0.2; //in meter, todo depends on bodysize
+    _this27.maxGrowth = 0.2; //in meter, todo depends on bodysize
 
     window.storage.registerConstructor(VulvaHuman);
-    return _this26;
+    return _this27;
   }
 
   _createClass(VulvaHuman, [{
@@ -6625,8 +7713,8 @@ var Job = /*#__PURE__*/function () {
   job = new Job("Campus", "get to the uni", "You have to at least attend some of the lectures to keep up with the studys.");
   job.reqEnergy = 5, job.reqTime = 15, job.startTimeMin = 700, job.startTimeMax = 1100, job.DoW = [1, 2, 3, 4, 5];
   window.gm.jobs[job.id] = job;
-  job = new Job("Harcon_work", "do a shift at Harcon logistic dept.", "");
-  job.reqEnergy = 5, job.reqTime = 15, job.startTimeMin = 800, job.startTimeMax = 930, job.DoW = [1, 3, 5];
+  job = new Job("Harcon_work", "work at Hacorn facility", "do a shift at Harcon logistic dept.");
+  job.reqEnergy = 10, job.reqTime = 20, job.startTimeMin = 800, job.startTimeMax = 930, job.DoW = [1, 3, 5];
 
   job.isHidden = function () {
     return !window.gm.quests.hasActiveQuest("qFindAJob", 200);
@@ -6715,7 +7803,7 @@ window.gm.questDef = window.gm.questDef || {};
 var stRelation = /*#__PURE__*/function (_Stat) {
   _inherits(stRelation, _Stat);
 
-  var _super29 = _createSuper(stRelation);
+  var _super30 = _createSuper(stRelation);
 
   _createClass(stRelation, null, [{
     key: "setup",
@@ -6745,7 +7833,7 @@ var stRelation = /*#__PURE__*/function (_Stat) {
   function stRelation() {
     _classCallCheck(this, stRelation);
 
-    return _super29.call(this);
+    return _super30.call(this);
   }
 
   _createClass(stRelation, [{
@@ -6777,7 +7865,7 @@ var stRelation = /*#__PURE__*/function (_Stat) {
 var stHealthMax = /*#__PURE__*/function (_Stat2) {
   _inherits(stHealthMax, _Stat2);
 
-  var _super30 = _createSuper(stHealthMax);
+  var _super31 = _createSuper(stHealthMax);
 
   _createClass(stHealthMax, null, [{
     key: "setup",
@@ -6795,7 +7883,7 @@ var stHealthMax = /*#__PURE__*/function (_Stat2) {
   function stHealthMax() {
     _classCallCheck(this, stHealthMax);
 
-    return _super30.call(this);
+    return _super31.call(this);
   }
 
   _createClass(stHealthMax, [{
@@ -6816,7 +7904,7 @@ var stHealthMax = /*#__PURE__*/function (_Stat2) {
 var stHealth = /*#__PURE__*/function (_Stat3) {
   _inherits(stHealth, _Stat3);
 
-  var _super31 = _createSuper(stHealth);
+  var _super32 = _createSuper(stHealth);
 
   _createClass(stHealth, null, [{
     key: "setup",
@@ -6839,7 +7927,7 @@ var stHealth = /*#__PURE__*/function (_Stat3) {
   function stHealth() {
     _classCallCheck(this, stHealth);
 
-    return _super31.call(this);
+    return _super32.call(this);
   }
 
   _createClass(stHealth, [{
@@ -6860,7 +7948,7 @@ var stHealth = /*#__PURE__*/function (_Stat3) {
 var stEnergyMax = /*#__PURE__*/function (_Stat4) {
   _inherits(stEnergyMax, _Stat4);
 
-  var _super32 = _createSuper(stEnergyMax);
+  var _super33 = _createSuper(stEnergyMax);
 
   _createClass(stEnergyMax, null, [{
     key: "setup",
@@ -6879,7 +7967,7 @@ var stEnergyMax = /*#__PURE__*/function (_Stat4) {
   function stEnergyMax() {
     _classCallCheck(this, stEnergyMax);
 
-    return _super32.call(this);
+    return _super33.call(this);
   }
 
   _createClass(stEnergyMax, [{
@@ -6900,7 +7988,7 @@ var stEnergyMax = /*#__PURE__*/function (_Stat4) {
 var stEnergy = /*#__PURE__*/function (_Stat5) {
   _inherits(stEnergy, _Stat5);
 
-  var _super33 = _createSuper(stEnergy);
+  var _super34 = _createSuper(stEnergy);
 
   _createClass(stEnergy, null, [{
     key: "setup",
@@ -6923,7 +8011,7 @@ var stEnergy = /*#__PURE__*/function (_Stat5) {
   function stEnergy() {
     _classCallCheck(this, stEnergy);
 
-    return _super33.call(this);
+    return _super34.call(this);
   }
 
   _createClass(stEnergy, [{
@@ -6944,7 +8032,7 @@ var stEnergy = /*#__PURE__*/function (_Stat5) {
 var stArousalMax = /*#__PURE__*/function (_Stat6) {
   _inherits(stArousalMax, _Stat6);
 
-  var _super34 = _createSuper(stArousalMax);
+  var _super35 = _createSuper(stArousalMax);
 
   _createClass(stArousalMax, null, [{
     key: "setup",
@@ -6962,7 +8050,7 @@ var stArousalMax = /*#__PURE__*/function (_Stat6) {
   function stArousalMax() {
     _classCallCheck(this, stArousalMax);
 
-    return _super34.call(this);
+    return _super35.call(this);
   }
 
   _createClass(stArousalMax, [{
@@ -6983,7 +8071,7 @@ var stArousalMax = /*#__PURE__*/function (_Stat6) {
 var stArousalMin = /*#__PURE__*/function (_Stat7) {
   _inherits(stArousalMin, _Stat7);
 
-  var _super35 = _createSuper(stArousalMin);
+  var _super36 = _createSuper(stArousalMin);
 
   _createClass(stArousalMin, null, [{
     key: "setup",
@@ -7001,7 +8089,7 @@ var stArousalMin = /*#__PURE__*/function (_Stat7) {
   function stArousalMin() {
     _classCallCheck(this, stArousalMin);
 
-    return _super35.call(this);
+    return _super36.call(this);
   }
 
   _createClass(stArousalMin, [{
@@ -7022,7 +8110,7 @@ var stArousalMin = /*#__PURE__*/function (_Stat7) {
 var stArousal = /*#__PURE__*/function (_Stat8) {
   _inherits(stArousal, _Stat8);
 
-  var _super36 = _createSuper(stArousal);
+  var _super37 = _createSuper(stArousal);
 
   _createClass(stArousal, null, [{
     key: "setup",
@@ -7046,7 +8134,7 @@ var stArousal = /*#__PURE__*/function (_Stat8) {
   function stArousal() {
     _classCallCheck(this, stArousal);
 
-    return _super36.call(this);
+    return _super37.call(this);
   }
 
   _createClass(stArousal, [{
@@ -7067,7 +8155,7 @@ var stArousal = /*#__PURE__*/function (_Stat8) {
 var stPerversionMax = /*#__PURE__*/function (_Stat9) {
   _inherits(stPerversionMax, _Stat9);
 
-  var _super37 = _createSuper(stPerversionMax);
+  var _super38 = _createSuper(stPerversionMax);
 
   _createClass(stPerversionMax, null, [{
     key: "setup",
@@ -7088,7 +8176,7 @@ var stPerversionMax = /*#__PURE__*/function (_Stat9) {
   function stPerversionMax() {
     _classCallCheck(this, stPerversionMax);
 
-    return _super37.call(this);
+    return _super38.call(this);
   }
 
   _createClass(stPerversionMax, [{
@@ -7109,7 +8197,7 @@ var stPerversionMax = /*#__PURE__*/function (_Stat9) {
 var stPerversion = /*#__PURE__*/function (_Stat10) {
   _inherits(stPerversion, _Stat10);
 
-  var _super38 = _createSuper(stPerversion);
+  var _super39 = _createSuper(stPerversion);
 
   _createClass(stPerversion, null, [{
     key: "setup",
@@ -7132,7 +8220,7 @@ var stPerversion = /*#__PURE__*/function (_Stat10) {
   function stPerversion() {
     _classCallCheck(this, stPerversion);
 
-    return _super38.call(this);
+    return _super39.call(this);
   }
 
   _createClass(stPerversion, [{
@@ -7153,7 +8241,7 @@ var stPerversion = /*#__PURE__*/function (_Stat10) {
 var stAgility = /*#__PURE__*/function (_Stat11) {
   _inherits(stAgility, _Stat11);
 
-  var _super39 = _createSuper(stAgility);
+  var _super40 = _createSuper(stAgility);
 
   _createClass(stAgility, null, [{
     key: "setup",
@@ -7174,7 +8262,7 @@ var stAgility = /*#__PURE__*/function (_Stat11) {
   function stAgility() {
     _classCallCheck(this, stAgility);
 
-    return _super39.call(this);
+    return _super40.call(this);
   }
 
   _createClass(stAgility, [{
@@ -7203,7 +8291,7 @@ var stAgility = /*#__PURE__*/function (_Stat11) {
 var stPerception = /*#__PURE__*/function (_Stat12) {
   _inherits(stPerception, _Stat12);
 
-  var _super40 = _createSuper(stPerception);
+  var _super41 = _createSuper(stPerception);
 
   _createClass(stPerception, null, [{
     key: "setup",
@@ -7222,7 +8310,7 @@ var stPerception = /*#__PURE__*/function (_Stat12) {
   function stPerception() {
     _classCallCheck(this, stPerception);
 
-    return _super40.call(this);
+    return _super41.call(this);
   }
 
   _createClass(stPerception, [{
@@ -7246,7 +8334,7 @@ var stPerception = /*#__PURE__*/function (_Stat12) {
 var stLuck = /*#__PURE__*/function (_Stat13) {
   _inherits(stLuck, _Stat13);
 
-  var _super41 = _createSuper(stLuck);
+  var _super42 = _createSuper(stLuck);
 
   _createClass(stLuck, null, [{
     key: "setup",
@@ -7265,7 +8353,7 @@ var stLuck = /*#__PURE__*/function (_Stat13) {
   function stLuck() {
     _classCallCheck(this, stLuck);
 
-    return _super41.call(this);
+    return _super42.call(this);
   }
 
   _createClass(stLuck, [{
@@ -7289,7 +8377,7 @@ var stLuck = /*#__PURE__*/function (_Stat13) {
 var stCharisma = /*#__PURE__*/function (_Stat14) {
   _inherits(stCharisma, _Stat14);
 
-  var _super42 = _createSuper(stCharisma);
+  var _super43 = _createSuper(stCharisma);
 
   _createClass(stCharisma, null, [{
     key: "setup",
@@ -7308,7 +8396,7 @@ var stCharisma = /*#__PURE__*/function (_Stat14) {
   function stCharisma() {
     _classCallCheck(this, stCharisma);
 
-    return _super42.call(this);
+    return _super43.call(this);
   }
 
   _createClass(stCharisma, [{
@@ -7332,7 +8420,7 @@ var stCharisma = /*#__PURE__*/function (_Stat14) {
 var stIntelligence = /*#__PURE__*/function (_Stat15) {
   _inherits(stIntelligence, _Stat15);
 
-  var _super43 = _createSuper(stIntelligence);
+  var _super44 = _createSuper(stIntelligence);
 
   _createClass(stIntelligence, null, [{
     key: "setup",
@@ -7351,7 +8439,7 @@ var stIntelligence = /*#__PURE__*/function (_Stat15) {
   function stIntelligence() {
     _classCallCheck(this, stIntelligence);
 
-    return _super43.call(this);
+    return _super44.call(this);
   }
 
   _createClass(stIntelligence, [{
@@ -7375,7 +8463,7 @@ var stIntelligence = /*#__PURE__*/function (_Stat15) {
 var stStrength = /*#__PURE__*/function (_Stat16) {
   _inherits(stStrength, _Stat16);
 
-  var _super44 = _createSuper(stStrength);
+  var _super45 = _createSuper(stStrength);
 
   _createClass(stStrength, null, [{
     key: "setup",
@@ -7398,7 +8486,7 @@ var stStrength = /*#__PURE__*/function (_Stat16) {
   function stStrength() {
     _classCallCheck(this, stStrength);
 
-    return _super44.call(this);
+    return _super45.call(this);
   }
 
   _createClass(stStrength, [{
@@ -7431,7 +8519,7 @@ var stStrength = /*#__PURE__*/function (_Stat16) {
 var stEndurance = /*#__PURE__*/function (_Stat17) {
   _inherits(stEndurance, _Stat17);
 
-  var _super45 = _createSuper(stEndurance);
+  var _super46 = _createSuper(stEndurance);
 
   _createClass(stEndurance, null, [{
     key: "setup",
@@ -7454,7 +8542,7 @@ var stEndurance = /*#__PURE__*/function (_Stat17) {
   function stEndurance() {
     _classCallCheck(this, stEndurance);
 
-    return _super45.call(this);
+    return _super46.call(this);
   }
 
   _createClass(stEndurance, [{
@@ -7487,7 +8575,7 @@ var stEndurance = /*#__PURE__*/function (_Stat17) {
 var stPAttack = /*#__PURE__*/function (_Stat18) {
   _inherits(stPAttack, _Stat18);
 
-  var _super46 = _createSuper(stPAttack);
+  var _super47 = _createSuper(stPAttack);
 
   _createClass(stPAttack, null, [{
     key: "setup",
@@ -7506,7 +8594,7 @@ var stPAttack = /*#__PURE__*/function (_Stat18) {
   function stPAttack() {
     _classCallCheck(this, stPAttack);
 
-    return _super46.call(this);
+    return _super47.call(this);
   }
 
   _createClass(stPAttack, [{
@@ -7527,7 +8615,7 @@ var stPAttack = /*#__PURE__*/function (_Stat18) {
 var stPDefense = /*#__PURE__*/function (_Stat19) {
   _inherits(stPDefense, _Stat19);
 
-  var _super47 = _createSuper(stPDefense);
+  var _super48 = _createSuper(stPDefense);
 
   _createClass(stPDefense, null, [{
     key: "setup",
@@ -7546,7 +8634,7 @@ var stPDefense = /*#__PURE__*/function (_Stat19) {
   function stPDefense() {
     _classCallCheck(this, stPDefense);
 
-    return _super47.call(this);
+    return _super48.call(this);
   }
 
   _createClass(stPDefense, [{
@@ -7568,16 +8656,16 @@ var stPDefense = /*#__PURE__*/function (_Stat19) {
 var effEnergized = /*#__PURE__*/function (_Effect2) {
   _inherits(effEnergized, _Effect2);
 
-  var _super48 = _createSuper(effEnergized);
+  var _super49 = _createSuper(effEnergized);
 
   function effEnergized() {
-    var _this27;
+    var _this28;
 
     _classCallCheck(this, effEnergized);
 
-    _this27 = _super48.call(this);
-    _this27.data.id = _this27.data.name = effEnergized.name, _this27.data.duration = 120;
-    return _this27;
+    _this28 = _super49.call(this);
+    _this28.data.id = _this28.data.name = effEnergized.name, _this28.data.duration = 120;
+    return _this28;
   }
 
   _createClass(effEnergized, [{
@@ -7643,16 +8731,16 @@ var effEnergized = /*#__PURE__*/function (_Effect2) {
 var effNotTired = /*#__PURE__*/function (_Effect3) {
   _inherits(effNotTired, _Effect3);
 
-  var _super49 = _createSuper(effNotTired);
+  var _super50 = _createSuper(effNotTired);
 
   function effNotTired() {
-    var _this28;
+    var _this29;
 
     _classCallCheck(this, effNotTired);
 
-    _this28 = _super49.call(this);
-    _this28.data.id = _this28.data.name = effNotTired.name, _this28.data.duration = 120, _this28.data.hidden = 4;
-    return _this28;
+    _this29 = _super50.call(this);
+    _this29.data.id = _this29.data.name = effNotTired.name, _this29.data.duration = 120, _this29.data.hidden = 4;
+    return _this29;
   }
 
   _createClass(effNotTired, [{
@@ -7712,16 +8800,16 @@ var effNotTired = /*#__PURE__*/function (_Effect3) {
 var effTired = /*#__PURE__*/function (_Effect4) {
   _inherits(effTired, _Effect4);
 
-  var _super50 = _createSuper(effTired);
+  var _super51 = _createSuper(effTired);
 
   function effTired() {
-    var _this29;
+    var _this30;
 
     _classCallCheck(this, effTired);
 
-    _this29 = _super50.call(this);
-    _this29.data.id = _this29.data.name = effTired.name, _this29.data.duration = 120, _this29.data.hidden = 0;
-    return _this29;
+    _this30 = _super51.call(this);
+    _this30.data.id = _this30.data.name = effTired.name, _this30.data.duration = 120, _this30.data.hidden = 0;
+    return _this30;
   }
 
   _createClass(effTired, [{
@@ -7787,16 +8875,16 @@ var effTired = /*#__PURE__*/function (_Effect4) {
 var effMutateCat = /*#__PURE__*/function (_Effect5) {
   _inherits(effMutateCat, _Effect5);
 
-  var _super51 = _createSuper(effMutateCat);
+  var _super52 = _createSuper(effMutateCat);
 
   function effMutateCat() {
-    var _this30;
+    var _this31;
 
     _classCallCheck(this, effMutateCat);
 
-    _this30 = _super51.call(this);
-    _this30.data.id = _this30.data.name = effMutateCat.name, _this30.data.duration = 60, _this30.data.hidden = 0;
-    return _this30;
+    _this31 = _super52.call(this);
+    _this31.data.id = _this31.data.name = effMutateCat.name, _this31.data.duration = 60, _this31.data.hidden = 0;
+    return _this31;
   }
 
   _createClass(effMutateCat, [{
@@ -7855,17 +8943,17 @@ var effMutateCat = /*#__PURE__*/function (_Effect5) {
 var effGrowBreast = /*#__PURE__*/function (_Effect6) {
   _inherits(effGrowBreast, _Effect6);
 
-  var _super52 = _createSuper(effGrowBreast);
+  var _super53 = _createSuper(effGrowBreast);
 
   function effGrowBreast() {
-    var _this31;
+    var _this32;
 
     _classCallCheck(this, effGrowBreast);
 
-    _this31 = _super52.call(this);
-    _this31.data.id = _this31.data.name = effGrowBreast.name, _this31.data.duration = 60, _this31.data.hidden = 0;
-    _this31.data.cycles = 3, _this31.data.magnitude = 3;
-    return _this31;
+    _this32 = _super53.call(this);
+    _this32.data.id = _this32.data.name = effGrowBreast.name, _this32.data.duration = 60, _this32.data.hidden = 0;
+    _this32.data.cycles = 3, _this32.data.magnitude = 3;
+    return _this32;
   }
 
   _createClass(effGrowBreast, [{
@@ -7928,16 +9016,16 @@ var effGrowBreast = /*#__PURE__*/function (_Effect6) {
 var effStunned = /*#__PURE__*/function (_CombatEffect) {
   _inherits(effStunned, _CombatEffect);
 
-  var _super53 = _createSuper(effStunned);
+  var _super54 = _createSuper(effStunned);
 
   function effStunned() {
-    var _this32;
+    var _this33;
 
     _classCallCheck(this, effStunned);
 
-    _this32 = _super53.call(this);
-    _this32.data.id = _this32.data.name = effStunned.name, _this32.data.duration = 2;
-    return _this32;
+    _this33 = _super54.call(this);
+    _this33.data.id = _this33.data.name = effStunned.name, _this33.data.duration = 2;
+    return _this33;
   }
 
   _createClass(effStunned, [{
@@ -7994,16 +9082,16 @@ var effStunned = /*#__PURE__*/function (_CombatEffect) {
 var skCooking = /*#__PURE__*/function (_Effect7) {
   _inherits(skCooking, _Effect7);
 
-  var _super54 = _createSuper(skCooking);
+  var _super55 = _createSuper(skCooking);
 
   function skCooking() {
-    var _this33;
+    var _this34;
 
     _classCallCheck(this, skCooking);
 
-    _this33 = _super54.call(this);
-    _this33.data.id = _this33.data.name = skCooking.name;
-    return _this33;
+    _this34 = _super55.call(this);
+    _this34.data.id = _this34.data.name = skCooking.name;
+    return _this34;
   }
 
   _createClass(skCooking, [{
@@ -8068,7 +9156,7 @@ window.gm.StatsLib = function (StatsLib) {
   return StatsLib;
 }(window.gm.StatsLib || {});
 /* twine-user-script #2: "Story JavaScript" */
-</script><tw-tag name="template" color="orange"></tw-tag><tw-tag name="_back" color="gray"></tw-tag><tw-tag name="_nosave" color="yellow"></tw-tag><tw-passagedata pid="1" name="Info_Jake" tags="_back" position="100,100" size="100,100">&lt;section&gt; 
+</script><tw-tag name="_back" color="gray"></tw-tag><tw-tag name="_nosave" color="yellow"></tw-tag><tw-tag name="template" color="orange"></tw-tag><tw-passagedata pid="1" name="Info_Jake" tags="_back" position="100,100" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 Jake is here.&lt;/br&gt;
 You barely know anything about him.&lt;/br&gt;
@@ -8675,28 +9763,28 @@ function clearview(){
   window.gm.clearLog();window.gm.refreshScreen();
 }
 &lt;/script&gt;</tw-passagedata><tw-passagedata pid="42" name="SaveDialog" tags="" position="225,600" size="100,100">&lt;dialog role=&quot;dialog&quot; id=&#39;dialog_save&#39; aria-labelledby=&quot;dialog-heading&quot;&gt;
-    &lt;button id=&quot;close-dialog&quot;&gt;Back&lt;/button&gt;
+    &lt;button id=&quot;close-dialog&quot;&gt;Back&lt;/button&gt; &lt;div&gt;&lt;%=(window.story.state._gm.nosave?&quot;save disabled in this scene&quot;:&quot;&quot;)%&gt;&lt;/div&gt;
     &lt;form&gt;
     &lt;label&gt;&lt;output&gt;&lt;/output&gt;&lt;/label&gt;&lt;/br&gt;
     &lt;button type=&quot;button&quot; id=&quot;saveAuto&quot; hidden&gt; &lt;/button&gt;&lt;button type=&quot;button&quot; id=&quot;loadAuto&quot;&gt;load Auto&lt;/button&gt;
     &lt;button type=&quot;button&quot; id=&quot;deleteAuto&quot;&gt;delete Auto&lt;/button&gt;&lt;label&gt;&lt;outputAuto&gt;&lt;/outputAuto&gt;&lt;/label&gt;&lt;/br&gt;
-    &lt;button type=&quot;button&quot; id=&quot;save1&quot;&gt;save 1&lt;/button&gt;&lt;button type=&quot;button&quot; id=&quot;load1&quot;&gt;load 1&lt;/button&gt;
+    &lt;button type=&quot;button&quot; id=&quot;save1&quot; &lt;%=(window.story.state._gm.nosave?&quot;disabled&quot;:&quot;&quot;)%&gt;&gt;save 1&lt;/button&gt;&lt;button type=&quot;button&quot; id=&quot;load1&quot;&gt;load 1&lt;/button&gt;
     &lt;button type=&quot;button&quot; id=&quot;delete1&quot;&gt;delete 1&lt;/button&gt;&lt;label&gt;&lt;output1&gt;&lt;/output1&gt;&lt;/label&gt;&lt;/br&gt;
-    &lt;button type=&quot;button&quot; id=&quot;save2&quot;&gt;save 2&lt;/button&gt;&lt;button type=&quot;button&quot; id=&quot;load2&quot;&gt;load 2&lt;/button&gt;
+    &lt;button type=&quot;button&quot; id=&quot;save2&quot; &lt;%=(window.story.state._gm.nosave?&quot;disabled&quot;:&quot;&quot;)%&gt;&gt;save 2&lt;/button&gt;&lt;button type=&quot;button&quot; id=&quot;load2&quot;&gt;load 2&lt;/button&gt;
     &lt;button type=&quot;button&quot; id=&quot;delete2&quot;&gt;delete 2&lt;/button&gt;&lt;label&gt;&lt;output2&gt;&lt;/output2&gt;&lt;/label&gt;&lt;/br&gt;
-    &lt;button type=&quot;button&quot; id=&quot;save3&quot;&gt;save 3&lt;/button&gt;&lt;button type=&quot;button&quot; id=&quot;load3&quot;&gt;load 3&lt;/button&gt;
+    &lt;button type=&quot;button&quot; id=&quot;save3&quot; &lt;%=(window.story.state._gm.nosave?&quot;disabled&quot;:&quot;&quot;)%&gt;&gt;save 3&lt;/button&gt;&lt;button type=&quot;button&quot; id=&quot;load3&quot;&gt;load 3&lt;/button&gt;
     &lt;button type=&quot;button&quot; id=&quot;delete3&quot;&gt;delete 3&lt;/button&gt;&lt;label&gt;&lt;output3&gt;&lt;/output3&gt;&lt;/label&gt;&lt;/br&gt;
-    &lt;button type=&quot;button&quot; id=&quot;save4&quot;&gt;save 4&lt;/button&gt;&lt;button type=&quot;button&quot; id=&quot;load4&quot;&gt;load 4&lt;/button&gt;
+    &lt;button type=&quot;button&quot; id=&quot;save4&quot; &lt;%=(window.story.state._gm.nosave?&quot;disabled&quot;:&quot;&quot;)%&gt;&gt;save 4&lt;/button&gt;&lt;button type=&quot;button&quot; id=&quot;load4&quot;&gt;load 4&lt;/button&gt;
     &lt;button type=&quot;button&quot; id=&quot;delete4&quot;&gt;delete 4&lt;/button&gt;&lt;label&gt;&lt;output4&gt;&lt;/output4&gt;&lt;/label&gt;&lt;/br&gt;
-    &lt;button type=&quot;button&quot; id=&quot;save5&quot;&gt;save 5&lt;/button&gt;&lt;button type=&quot;button&quot; id=&quot;load5&quot;&gt;load 5&lt;/button&gt;
+    &lt;button type=&quot;button&quot; id=&quot;save5&quot; &lt;%=(window.story.state._gm.nosave?&quot;disabled&quot;:&quot;&quot;)%&gt;&gt;save 5&lt;/button&gt;&lt;button type=&quot;button&quot; id=&quot;load5&quot;&gt;load 5&lt;/button&gt;
     &lt;button type=&quot;button&quot; id=&quot;delete5&quot;&gt;delete 5&lt;/button&gt;&lt;label&gt;&lt;output5&gt;&lt;/output5&gt;&lt;/label&gt;&lt;/br&gt;
-    &lt;button type=&quot;button&quot; id=&quot;save6&quot;&gt;save 6&lt;/button&gt;&lt;button type=&quot;button&quot; id=&quot;load6&quot;&gt;load 6&lt;/button&gt;
+    &lt;button type=&quot;button&quot; id=&quot;save6&quot; &lt;%=(window.story.state._gm.nosave?&quot;disabled&quot;:&quot;&quot;)%&gt;&gt;save 6&lt;/button&gt;&lt;button type=&quot;button&quot; id=&quot;load6&quot;&gt;load 6&lt;/button&gt;
     &lt;button type=&quot;button&quot; id=&quot;delete6&quot;&gt;delete 6&lt;/button&gt;&lt;label&gt;&lt;output6&gt;&lt;/output6&gt;&lt;/label&gt;&lt;/br&gt;
-    &lt;button type=&quot;button&quot; id=&quot;save7&quot;&gt;save 7&lt;/button&gt;&lt;button type=&quot;button&quot; id=&quot;load7&quot;&gt;load 7&lt;/button&gt;
+    &lt;button type=&quot;button&quot; id=&quot;save7&quot; &lt;%=(window.story.state._gm.nosave?&quot;disabled&quot;:&quot;&quot;)%&gt;&gt;save 7&lt;/button&gt;&lt;button type=&quot;button&quot; id=&quot;load7&quot;&gt;load 7&lt;/button&gt;
     &lt;button type=&quot;button&quot; id=&quot;delete7&quot;&gt;delete 7&lt;/button&gt;&lt;label&gt;&lt;output7&gt;&lt;/output7&gt;&lt;/label&gt;&lt;/br&gt;
-    &lt;button type=&quot;button&quot; id=&quot;save8&quot;&gt;save 8&lt;/button&gt;&lt;button type=&quot;button&quot; id=&quot;load8&quot;&gt;load 8&lt;/button&gt;
+    &lt;button type=&quot;button&quot; id=&quot;save8&quot; &lt;%=(window.story.state._gm.nosave?&quot;disabled&quot;:&quot;&quot;)%&gt;&gt;save 8&lt;/button&gt;&lt;button type=&quot;button&quot; id=&quot;load8&quot;&gt;load 8&lt;/button&gt;
     &lt;button type=&quot;button&quot; id=&quot;delete8&quot;&gt;delete 8&lt;/button&gt;&lt;label&gt;&lt;output8&gt;&lt;/output8&gt;&lt;/label&gt;&lt;/br&gt;
-    &lt;button type=&quot;button&quot; id=&quot;saveFile&quot;&gt;save file...&lt;/button&gt;
+    &lt;button type=&quot;button&quot; id=&quot;saveFile&quot; &lt;%=(window.story.state._gm.nosave?&quot;disabled&quot;:&quot;&quot;)%&gt;&gt;save file...&lt;/button&gt;
     &lt;input type=&quot;file&quot; id=&quot;loadFile&quot; name=&quot;image_uploads&quot; onchange=readFile(this)&gt;&lt;/br&gt;
     &lt;/form&gt;
 &lt;/dialog&gt;
@@ -8725,22 +9813,22 @@ for(var i=0; i&lt; _slots.length;i++) {
   document.querySelector(infodisp).textContent=&#39;&#39;;
    refresh(_x);
 }
- document.querySelector(&#39;#saveFile&#39;).addEventListener(&#39;click&#39;, function(){
+document.querySelector(&#39;#saveFile&#39;).addEventListener(&#39;click&#39;, function(){
     document.querySelector(infodisp).textContent=&#39;&#39;;
     window.storage.saveFile();
- });
- function refresh(slot){
+});
+function refresh(slot){
     var ok = window.storage.getSaveInfo(&#39;save&#39;.concat(slot));
     document.querySelector(&#39;#load&#39;.concat(slot)).disabled=(ok===&#39;&#39;);
     var out = document.querySelector(&#39;dialog form output&#39;.concat(slot));
     if(out) out.textContent = ok;
 }
-  function readFile(input) {
+function readFile(input) {
     var OK = window.storage.loadFile(input);  //TODO this runs asynchron
     if(!OK){ 
       return;
     } //aborted by user
-  }
+}
 &lt;/script&gt;</tw-passagedata><tw-passagedata pid="43" name="Inventory" tags="_back" position="350,600" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 [[Back|_back]]&lt;/br&gt;
@@ -9767,7 +10855,8 @@ function gameReset() {
   $(&quot;.alphabet, .word&quot;).fadeIn();
   getRandomWord();
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="70" name="MemoryGame" tags="" position="1225,850" size="100,100">&lt;section&gt; 
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="70" name="MemoryGame" tags="" position="1225,850" size="100,100">&lt;!--adapted from https://remybeumier.be/#creations-anchor--&gt;
+&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article class=&quot;main&quot;&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
   &lt;div class=&quot;box play&quot;&gt;&lt;/div&gt;
   &lt;div class=&quot;box play&quot;&gt;&lt;/div&gt;
@@ -10113,6 +11202,7 @@ Here you can find some information about the gameplay.&lt;/br&gt;&lt;/br&gt;
 [[Basics|Help_Basics]]&lt;/br&gt;
 [[What should I do, where should I go|Help_Quest]]&lt;/br&gt;
 [[Im stuck!|Help_Fixes]]&lt;/br&gt;
+[[Back|_back]]&lt;/br&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="85" name="Help_Background" tags="_back" position="600,1100" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 Your goal is - to save the earth.&lt;/br&gt;
@@ -10125,27 +11215,27 @@ Here is a task-list for you: &lt;/br&gt;
 4. find ways to earn money. Money can unlock things,you know? &lt;/br&gt;
 5. dont eat yellow snow&lt;/br&gt;
 &lt;/br&gt;
-[[Next|_back]]&lt;/br&gt;
+[[Back|_back]]&lt;/br&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="86" name="Help_Basics" tags="_back" position="725,1100" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 For many activities you have to spend energy and time. F.e. walking into the city takes some time and effort.&lt;/br&gt;
 Energy can be recovered by sleeping. Also some activities, food or drugs can restore energy.&lt;/br&gt;
 Use the sleep-option in your own bedroom to rest.&lt;/br&gt;
 &lt;/br&gt;
-[[Next|_back]]&lt;/br&gt;
+[[Back|_back]]&lt;/br&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="87" name="Help_Quest" tags="_back" position="850,1100" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 In your bedroom on your desk you can find a todo-list that gives some hint on what you should work on.&lt;/br&gt;
 For the beginning try to explore the city.&lt;/br&gt;
 TODO: There isnt much more content right now!&lt;/br&gt;
-[[Next|_back]]&lt;/br&gt;
+[[Back|_back]]&lt;/br&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="88" name="Help_Fixes" tags="_back" position="975,1100" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 If you are stuck on a page and you cannot escape. Press this [[Button|Home]] to get back to your Home.&lt;/br&gt;&lt;/br&gt;
 If you are even unable to get to this page because you see a weird plain textmessage in your browser:&lt;/br&gt;
 Im sorry but no one can help you. I will try to add some debug-log that shows some more information that you can send me.&lt;/br&gt;
 Then I might be abel to backtrack the error.&lt;/br&gt;
-[[Next|_back]]&lt;/br&gt;
+[[Back|_back]]&lt;/br&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="89" name="StartPage" tags="" position="1100,1100" size="100,100">&lt;article&gt;
 
 &lt;h1 align=&quot;center&quot;&gt;Teyt &lt;%-window.gm.getSaveVersion()%&gt;&lt;/h1&gt;
@@ -10289,7 +11379,115 @@ Where would you like to go from here?&lt;/br&gt;
 var _Entrys = [];
 _Entrys.push({id:&quot;Crowbar&quot;,count:1,cost:25});
 _Entrys.push({id:&quot;Battery&quot;,count:3,cost:2});
-renderToSelector(&quot;#panel&quot;, &quot;listsell&quot;);&lt;/script&gt;</tw-passagedata><tw-passagedata pid="99" name="Home" tags="" position="1100,1225" size="100,100">&lt;section&gt; 
+renderToSelector(&quot;#panel&quot;, &quot;listsell&quot;);&lt;/script&gt;</tw-passagedata><tw-passagedata pid="99" name="VRSuiteUp" tags="" position="1100,1225" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;!--todo--&gt; You are eager to try that virtual reallity game. &lt;/br&gt;
+&lt;div&gt;&lt;/br&gt;
+[[Start the game|CharacterEditor]]&lt;/br&gt;&lt;/div&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="100" name="CharacterEditor" tags="" position="1225,1225" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;!--todo--&gt; &quot;Please select class and race of your character:&quot;&lt;/br&gt;
+&lt;div&gt;&lt;/br&gt;
+[[Ready|StartLocation]]&lt;/br&gt;&lt;/div&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="101" name="StartLocation" tags="" position="100,1350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;!--todo--&gt; &quot;You magically appear near the top of a hill. &lt;/br&gt;
+You can see some houses from here, you just need to follow the trail down the hill.&quot;&lt;/br&gt;
+&lt;div&gt;&lt;/br&gt;
+[[Village|Training1]]&lt;/br&gt;&lt;/div&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="102" name="Training1" tags="" position="225,1350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;!--todo--&gt; The path snakes down the grassy flanks of the hill. As you make your way around a large boulder, something strange happens:&lt;/br&gt;
+&lt;devnote&gt;&quot;Welcome to our little world. Just in case you are not used to that kind of game we should get you some training.&quot;&lt;/devnote&gt;&lt;/br&gt;
+&lt;div&gt;&lt;/br&gt;
+[[Continue|Training1Done]]&lt;/br&gt;&lt;/div&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="103" name="Training1Done" tags="" position="350,1350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;!--todo--&gt; &lt;/br&gt;
+&lt;devnote&gt;&quot;I wish you good luck in exploring this world. May the gods be with you.&quot;&lt;/devnote&gt;&lt;/br&gt;
+&lt;div&gt;&lt;/br&gt;
+[[Continue|VillageEntranceIntro]]&lt;/br&gt;&lt;/div&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="104" name="VillageEntranceIntro" tags="" position="475,1350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;!--todo--&gt; A neat little village comes into view as you walk towards its entrance.  &lt;/br&gt;
+&#39;Thats really looks awesome. I wonder if I can really visit those houses or if they are just scenery.&#39;&lt;/br&gt;
+&lt;div&gt;&lt;/br&gt;
+[[Continue|VillageMarketPlace]]&lt;/br&gt;&lt;/div&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="105" name="VillageEntrance" tags="" position="600,1350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;!--todo--&gt; You are at the crossroads in front of the entrance to the settlement.
+Someone has painted &#39;Thetain&#39; on the planks above the wooden gate. Most likely thats the name of this commune.&lt;/br&gt;&lt;/br&gt;
+&lt;div&gt;&lt;/br&gt;
+[[Enter village|VillageMarketPlace]]  [[go to forest|ForestBorder]]&lt;/br&gt;&lt;/div&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="106" name="VillageMarketPlace" tags="" position="725,1350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;!--todo--&gt; There arent many people here right now.&lt;/br&gt; There seems to be a shop of an alchemist, a Inn and another shop where you cant say what kind of wares - if any - they are trading.&lt;/br&gt;
+&lt;/br&gt; Near the entrance of the Inn is also a [[bulletin-board]]. 
+&lt;div&gt;&lt;/br&gt;
+[[VillageInn]]  [[VillagePotions]] [[VillagePawnshop]]&lt;/br&gt;&lt;/div&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="107" name="VillageInn" tags="" position="850,1350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;!--todo--&gt; &#39;This really looks like they scavenged that place from a typical fantasy story book.&#39;&lt;/br&gt; 
+&lt;/br&gt; 
+&lt;div&gt;&lt;/br&gt;
+[[VillageMarketPlace]]  [[go to forest|ForestBorder]]&lt;/br&gt;&lt;/div&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="108" name="VillagePotions" tags="" position="975,1350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;!--todo--&gt; &#39;Puh, what a stink. I shouldnt stay here for long for I might suffocate&#39;&lt;/br&gt; 
+&lt;/br&gt; &quot;Hello? Anyone there?&quot;
+&lt;div&gt;&lt;/br&gt;
+[[VillageMarketPlace]]  [[Alchemist]]&lt;/br&gt;&lt;/div&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="109" name="VillagePawnshop" tags="" position="1100,1350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;!--todo--&gt; If this is a shop, then they sell everything: Shoes, cooking pans, assault ballista and chicken.&lt;/br&gt; 
+&lt;/br&gt; 
+&lt;div&gt;&lt;/br&gt;
+[[VillageMarketPlace]]  [[Shopkeeper]]&lt;/br&gt;&lt;/div&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="110" name="VillageRespawnPod" tags="" position="1225,1350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;!--todo--&gt; You are in the sanctum of spawn. Its located on top of the hill above the settlement.&lt;/br&gt; 
+&lt;/br&gt; There is a path leading downwards to the settlement.&lt;/br&gt;
+&lt;div&gt;&lt;/br&gt;
+[[VillageEntrance]] &lt;/br&gt;&lt;/div&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="111" name="ForestBorder" tags="" position="100,1475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;!--todo--&gt; There is a dirt road here crossing the lush grassland that is bordered by the trees of an forest.&lt;/br&gt; 
+One direction leads to the settlement close by. The other direction follows the border of the forest but gets out of view quickly.&lt;/br&gt; 
+&lt;/br&gt; 
+&lt;div&gt;&lt;/br&gt;
+[[VillageEntrance]] [[ForestEntrance]] [[follow Road]] &lt;/br&gt;&lt;/div&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="112" name="ForestEntrance" tags="" position="225,1475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;!--todo--&gt; Der Wald macht einen freundlichen Eindruck. Die Bäume stehen noch licht und sind noch nicht so ausladend und groß als das kein Licht mehr durch das Blätterdach gelangt. &lt;/br&gt; 
+&lt;/br&gt; 
+&lt;div&gt;&lt;/br&gt;&lt;a0 onclick=&#39;enterBeehive(); &#39;&gt;Enter Beehive&lt;/a&gt;&lt;/br&gt;
+[[ForestBorder]] [[Forest]] &lt;/br&gt;&lt;/div&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
+&lt;script&gt; function enterBeehive() {
+    window.gm.dng = window.gm.dngs.BeeHive();
+    window.gm.dng.enterDungeon();
+}
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="113" name="Dungeon" tags="" position="350,1475" size="100,100">&lt;!--dont &quot;show&quot; this! setup the dungeon and call enterDungeon--&gt;
+&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;%= window.gm.dng.name%&gt; &lt;%= window.gm.dng.actualRoom.descr%&gt;&lt;/br&gt;
+&lt;/br&gt; 
+&lt;div id=&quot;panel&quot;&gt;&lt;/div&gt;&lt;/br&gt;&lt;/br&gt;    &lt;!--display button list--&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
+&lt;script&gt;
+window.gm.dng.printButtons()
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="114" name="DungeonMap" tags="" position="475,1475" size="100,100">&lt;!--dont &quot;show&quot; this! setup the dungeon and call displayMap--&gt;
+&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;!--pre-formatted or messup allignment of ascii-rows--&gt;
+&lt;pre&gt;&lt;%= window.gm.dng.Mapper.printMap( window.gm.dng.actualRoom)%&gt;&lt;/pre&gt;&lt;/br&gt;
+&lt;pre&gt;Legend: P=Player, S=Stair, E=Entry/Exit&lt;pre&gt;&lt;/br&gt;
+&lt;/br&gt; 
+[[Back|Dungeon]]
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="115" name="DungeonFoundNothing" tags="" position="600,1475" size="100,100">&lt;!--example-scene for onenter/onexit event--&gt;
+&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;%= window.gm.dng.actualRoom.descr%&gt;&lt;/br&gt;
+There are some buckets here, but there is nothing useful inside.&lt;/br&gt;
+&lt;/br&gt;
+&lt;a0 onclick=&#39;window.gm.dng.resumeRoom();&#39;&gt;Go on&lt;/a&gt;&lt;/br&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="116" name="DungeonCrashedThroughFloor" tags="" position="725,1475" size="100,100">&lt;!--example-scene for onenter/onexit event--&gt;
+&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;%= window.gm.dng.actualRoom.descr%&gt;&lt;/br&gt;
+You crash down through the floor and find yourself back on the lowest level of the area.&lt;/br&gt;
+&lt;/br&gt;
+&lt;a0 onclick=&#39;crashThrough();&#39;&gt;Go on&lt;/a&gt;&lt;/br&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
+&lt;script&gt;
+function crashThrough() {
+    var floor1 = window.gm.dng.allFloors()[0];
+    var Room = floor1.getRoom(window.gm.dng.actualRoom.name);  //room names are the same at same position of floor
+    window.gm.dng.teleport(floor1, Room);
+}
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="117" name="Home" tags="" position="850,1475" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;
 window.gm.quests.addQuest(&quot;qFindGarden&quot;,1);
@@ -10299,9 +11497,9 @@ The following things are on your schedule-list:&lt;/br&gt;
 &lt;%=window.gm.printSchedule()%&gt;
 &lt;/br&gt;&lt;div&gt;Where would you like to go?&lt;/br&gt;
 [[Living_Room]]   [[Your Bedroom]]  [[Moms Bedroom]] [[Kitchen]]  [[Garden]] [[Cellar]] &lt;/br&gt;
-[[Into the city]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="100" name="Kitchen" tags="" position="1231,613" size="100,100">&lt;section&gt; 
-&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+[[Into the city]] [[ForestEntrance]]&lt;/br&gt;&lt;/div&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="118" name="Kitchen" tags="" position="1231,613" size="100,100">&lt;section&gt; 
+&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%window.story.state._gm.nosave =true;%&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 You are in the kitchen. &lt;/br&gt;
 &lt;%=window.gm.printPickupAndClear(&#39;CanOfCoffee&#39;,&#39;get a can of ice-coffee from the fridge&#39;,s.mom.coffeeStore)%&gt;
@@ -10317,7 +11515,7 @@ Mom will take care to resupply the fridge. But she might be disappointed if you 
 &lt;%}%&gt;
 Where would you like to go?&lt;/br&gt;
 [[Living_Room]]   [[Hallway|Home]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="101" name="Moms Bedroom" tags="" position="100,1350" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="119" name="Moms Bedroom" tags="" position="1100,1475" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 This is the bedroom of your mom.
@@ -10338,7 +11536,7 @@ function switchChar(elmnt) {
 	}
 	elmnt.outerHTML=(&quot;&lt;div class=&#39;red&#39;&gt;You are now playing as &quot;+window.story.state.vars.activePlayer+&quot;. &lt;/div&gt;&quot;);
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="102" name="moms_treasure" tags="_back" position="225,1350" size="100,100">&lt;section&gt; 
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="120" name="moms_treasure" tags="_back" position="1225,1475" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 In one of the nightstand you find some handcuffs.They look thorough but you think they just might be used for some bedplay.&lt;/br&gt;
 &lt;a0 onclick=&#39;useHandcuff(this)&#39;&gt;Play with them&lt;/a&gt;&lt;/br&gt;
@@ -10350,7 +11548,7 @@ function useHandcuff(elmnt) {
 	window.gm.player.Outfit.addItem(new Handcuffs());
 	elmnt.replaceWith(&quot;&lt;div class=&#39;red&#39;&gt;Playing around with the cuffs you suddenly find yourself locked up with them. You panick as you find the locking-mechanic quite tight. You need a key and maybe some help to unlock them!&lt;/div&gt;&quot;);
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="103" name="Your Bedroom" tags="" position="1033,470" size="100,100">&lt;section&gt; 
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="121" name="Your Bedroom" tags="" position="1033,470" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%window.gm.player.location=window.passage.name; 
 window.gm.quests.addQuest(&quot;qMyPleasure&quot;,1);%&gt;
@@ -10360,14 +11558,14 @@ Your [[Laptop|_Laptop_]] is placed on it and also a handwritten [[TodoList]]. &l
 Above the desk is a window facing toward the backside of the house.&lt;/br&gt;
 On the other side of the room is a large [[Wardrobe]] with a [[Mirror]] where you can take a look at yourself.
 There is a large bed for sleeping with a nightstand aside. &lt;/br&gt;
-&lt;a0 onclick=&quot;touchCatIdol(this)&quot;&gt;touch cat idol&lt;/a&gt;&lt;/br&gt;
-you are quite horny right now. Maybe you have some time to [[play with yourself|Masturbate]].&lt;/br&gt;
-&lt;a href=&quot;javascript:void(0)&quot; onclick=&#39;($(&quot;tw-passage&quot;).fadeOut(1000, function() {window.gm.sleep((window.gm.getTimeStruct().hour+1)*100);window.story.show(&quot;Sleep&quot;);}));&#39;&gt;Nap 1hour&lt;/a&gt; &lt;/br&gt;
+&lt;!--todo--&gt;You are quite horny right now. Maybe you have some time to [[play with yourself|Masturbate]].&lt;/br&gt;
+&lt;a href=&quot;javascript:void(0)&quot; onclick=&#39;($(&quot;tw-passage&quot;).fadeOut(1000, function() {window.gm.sleep((window.gm.getTimeStruct().hour+1)*100);window.story.show(&quot;Sleep&quot;);}));&#39;&gt;Nap 1hour&lt;/a&gt;
 &lt;%if(window.gm.getTimeStruct().hour&lt;11) { %&gt;
-&lt;a href=&quot;javascript:void(0)&quot; onclick=&#39;($(&quot;tw-passage&quot;).fadeOut(1000, function() {window.gm.sleep(1800);window.story.show(&quot;Sleep&quot;);}));&#39;&gt;Sleep Until Evening&lt;/a&gt; &lt;/br&gt;
+&lt;a href=&quot;javascript:void(0)&quot; onclick=&#39;($(&quot;tw-passage&quot;).fadeOut(1000, function() {window.gm.sleep(1800);window.story.show(&quot;Sleep&quot;);}));&#39;&gt;Sleep Until Evening&lt;/a&gt; 
 &lt;%} else {%&gt;
-&lt;a href=&quot;javascript:void(0)&quot; onclick=&#39;($(&quot;tw-passage&quot;).fadeOut(1000, function() {window.gm.sleep(700);window.story.show(&quot;Sleep&quot;);}));&#39;&gt;Sleep Until Morning&lt;/a&gt; &lt;/br&gt;
+&lt;a href=&quot;javascript:void(0)&quot; onclick=&#39;($(&quot;tw-passage&quot;).fadeOut(1000, function() {window.gm.sleep(700);window.story.show(&quot;Sleep&quot;);}));&#39;&gt;Sleep Until Morning&lt;/a&gt;
 &lt;%}%&gt;
+&lt;/br&gt; That bulky VR-hanging scaffold is taking up a lot of space. You could [[try to start it up|VRSuiteUp]]. 
 &lt;/br&gt;[[MemoryGame]] [[HangmanGame]]&lt;/br&gt; &lt;!--todo--&gt;
 &lt;/br&gt;[[NewGamePlus]]&lt;/br&gt; &lt;!--todo--&gt;
 &lt;% if(window.gm.player.Outfit.isNaked()) { %&gt;
@@ -10375,13 +11573,7 @@ you are quite horny right now. Maybe you have some time to [[play with yourself|
 &lt;% } else { %&gt;
 Where do you want to go ? &lt;/br&gt;
 [[Hallway|Home]]&lt;/br&gt; &lt;%}%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
-&lt;script&gt;
-function touchCatIdol(elmnt) {
-	elmnt.replaceWith(&quot;There is a tickling feeling in your hand.&quot;);
-	window.gm.player.addEffect(&quot;effMutateCat&quot;,window.gm.StatsLib.effMutateCat());
-}
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="104" name="Sleep" tags="" position="475,1350" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="122" name="Sleep" tags="" position="225,1600" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 You fall into your bedsheets and sleep until your smartphone buzzes you out of your dreams.&lt;/br&gt;
 &lt;!--deferred post sleep events--&gt;
@@ -10407,12 +11599,12 @@ function checkJob() {
 	return(text);
 }
 window.gm.printOutput(checkJob());
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="105" name="Mirror" tags="_back" position="600,1350" size="100,100">&lt;section&gt; 
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="123" name="Mirror" tags="_back" position="350,1600" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 [[Back|_back]]&lt;/br&gt;
 &lt;!--todo: set height depending on browsersize--&gt;
 &lt;div id=&#39;Canvas&#39; style=&#39;height: 30em;background: url(&quot;assets/doll/doll_small_xcf-Skirt.png&quot;) no-repeat center,url(&quot;assets/doll/doll_small_xcf-Body.png&quot;) no-repeat center, url(&lt;%=window.gm.getScenePic(window.gm.player.location)%&gt;)no-repeat center;color:black;&#39;&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="106" name="Living_Room" tags="" position="725,1350" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="124" name="Living_Room" tags="" position="475,1600" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 The living room that you share with your mom is sparsely decorated (until now).&lt;/br&gt;
 An old wooden table with 4 chairs rests on a wornout green carpet.&lt;/br&gt;
@@ -10423,18 +11615,22 @@ There is a brown couch with a television in front of it. A smaller table with a 
 &lt;%if(s.vars.qDogSit==0x200) {%&gt;
 Your phone rings with an unknown number. [[Answer call|Dogsit_FirstCallBack]] 
 &lt;%}%&gt;
-
+On one of the shelves is a small statue of a striding cat. &lt;a0 onclick=&quot;touchCatIdol(this)&quot;&gt;inspect cat idol&lt;/a&gt;&lt;/br&gt;
 Where would you like to go?&lt;/br&gt;
 [[Kitchen]] [[Hallway|Home]] &lt;/br&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;script&gt;
 function getMoney(elmnt,val) {
 	elmnt.replaceWith(&quot;You shouldnt steal that money, should you?&quot;);
 }
-&lt;/script&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="107" name="Cabinet" tags="" position="850,1350" size="100,100">&lt;section&gt; 
+function touchCatIdol(elmnt) {
+	elmnt.replaceWith(&quot;There is a tickling feeling in your hand.&quot;);
+	window.gm.player.addEffect(&quot;effMutateCat&quot;,window.gm.StatsLib.effMutateCat());
+}
+&lt;/script&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="125" name="Cabinet" tags="" position="600,1600" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 There is nothing here
 [[Living_Room]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="108" name="Garden" tags="" position="975,1350" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="126" name="Garden" tags="" position="725,1600" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;window.gm.quests.tick();%&gt;
 The garden behind the house is not very large. &lt;/br&gt;
@@ -10451,18 +11647,18 @@ You remeber that you took the shovel from here.&lt;/br&gt;
 &lt;%}%&gt;
 Where would you like to go?&lt;/br&gt;
 [[Hallway|Home]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="109" name="Cellar" tags="" position="1100,1350" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="127" name="Cellar" tags="" position="850,1600" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 The portal is still active. Do you dare to [[enter|Cellar_Portal]] it? &lt;/br&gt;&lt;/br&gt;
 Where would you like to go?&lt;/br&gt;
 [[Hallway|Home]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="110" name="Cellar_PortalReverse" tags="" position="1225,1350" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="128" name="Cellar_PortalReverse" tags="" position="975,1600" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;!--&lt;%window.gm.player.location=window.passage.name;%&gt;--&gt;
 The portal spits you out in the dim light of your cellar.&lt;/br&gt;&lt;/br&gt;
 [[Next|Cellar]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="111" name="Cellar_Portal" tags="" position="100,1475" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="129" name="Cellar_Portal" tags="" position="1100,1600" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;!--&lt;%window.gm.player.location=window.passage.name;%&gt;--&gt;
 A blinding light engulfs you just for a second and then a deafening darkness.  &lt;/br&gt;&lt;/br&gt;
@@ -10471,7 +11667,7 @@ As you come back to your senses you find yourself cowering on the floor, still c
 Time to move on.&lt;/br&gt;&lt;/br&gt;&lt;/br&gt;
 Where would you like to go?&lt;/br&gt;
 [[Home|Cellar_PortalReverse]] [[Mall|Mall Floor 0 (postapocalypse)]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="112" name="HairGrow" tags="deferred" position="225,1475" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="130" name="HairGrow" tags="deferred" position="1225,1600" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 A blinding light engulfs you just for a second and then a deafening darkness.  &lt;/br&gt;&lt;/br&gt;
 Its impossible to tell what else happens or how long the process takes.&lt;/br&gt;&lt;/br&gt;
@@ -10479,12 +11675,12 @@ As you come back to your senses you find yourself cowering on the floor, still c
 Time to move on.&lt;/br&gt;&lt;/br&gt;&lt;/br&gt;
 Where would you like to go?&lt;/br&gt;
 [[Next|&lt;%=window.gm.player.location%&gt;]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="113" name="Home_Study" tags="" position="350,1475" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="131" name="Home_Study" tags="" position="100,1725" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;% window.gm.player.Stats.increment(&#39;energy&#39;,-20);window.gm.addTime(120);window.gm.quests.forceQuestMilestone(&quot;qStudy&quot;,100,1);%&gt;
 You sit down with your books and scriblings and try to get some sense out of it.&lt;/br&gt;
 [[Give up|&lt;%=window.gm.player.location%&gt;]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="114" name="Campus" tags="" position="825,825" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="132" name="Campus" tags="" position="825,825" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;%if(!window.gm.quests.hasActiveQuest(&quot;qFindAJob&quot;)){  %&gt;
@@ -10501,7 +11697,7 @@ You sit down with your books and scriblings and try to get some sense out of it.
     Electrical &amp; Mechanical Engineering  Chemistry &amp; Process Engineering Micro-Power &amp; Nano-Engineering [[Dining Hall]]  [[ITD Office]]  Library &lt;/br&gt;
     [[Into the city]]&lt;/br&gt;&lt;/div&gt; 
 &lt;%}%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="115" name="ITD Office" tags="" position="600,1475" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="133" name="ITD Office" tags="" position="350,1725" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 This is the office-building of the Institute.&lt;/br&gt;
@@ -10509,14 +11705,14 @@ The [[counsellor|NOP]] might be available to give you some guidance about instit
 Here in the lobby of the building is also a [[blackboard]]. Maybe you can find some job offers there or informations about upcoming events. &lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Campus]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="116" name="Dining Hall" tags="" position="725,1475" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="134" name="Dining Hall" tags="" position="475,1725" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 Die Mensa ist wahrscheinlich das beliebteste Gebäude des Campus bei den Studenten; es gibt was zu essen und an kann miteinander quatschen.&lt;/br&gt;
 Das Essen ist vielleicht nicht gerade das beste auf der Welt aber dafür ist es recht günstig. Hast du Hunger?&lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Campus]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="117" name="blackboard" tags="_back" position="850,1475" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="135" name="blackboard" tags="_back" position="600,1725" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &#39;Lets see if there is anything interesting.&#39;&lt;/br&gt;
@@ -10525,15 +11721,14 @@ There is an anounce from Harcon Health Inc. for a [[job|Harcon_Logistic_Ad]] in 
 &lt;%}%&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Back|_back]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="118" name="Harcon_Logistic_Ad" tags="_back" position="975,1475" size="100,100">&lt;section&gt; 
-&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="136" name="Harcon_Logistic_Ad" tags="_back" position="725,1725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;!--todo--&gt; Auf dem maschinen-geschriebenen Zettel ist eine Teilzeit-Stelle in der Logistik-Abteilung ausgeschrieben.&lt;/br&gt;
 &#39;Logistic doesnt sound that interesting and I doubt that position is targeted to an engineer. Maybe I should show up there in person and check if that would be an option.&#39;&lt;/br&gt;
 The adress points to be somehwere around downtonw.&lt;/br&gt;
 &lt;a0 onclick=&#39;window.gm.quests.forceQuestMilestone(&quot;qFindAJob&quot;,100,1); window.story.show(&quot;ITD Office&quot;);&#39;&gt;Note down the adress&lt;/a&gt;&lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Back|_back]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="119" name="Harcon_Health" tags="" position="1100,1475" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="137" name="Harcon_Health" tags="" position="850,1725" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;%if(window.gm.quests.hasActiveQuest(&quot;qFindAJob&quot;,100)){  %&gt;
@@ -10541,8 +11736,11 @@ The adress points to be somehwere around downtonw.&lt;/br&gt;
     Gleich daneben befindet sich ein Gebäude in Form eines kleinen Glaswürfels das wohl den Torwächter beherbergt.&lt;/br&gt;
     &quot;Hallo?.. uhm Ich bin wegen der Stellenazeige hier.&quot;&lt;/br&gt;
     &quot;Stellenanzeige?...gehts etwas genauer...haben Sie einen Termin?&quot;&lt;/br&gt;
-    Fuck [Ja][Nein]
-    &quot;Nein,naja ich hab die Anzeige in der Uni gesehen für eine Stelle in der Logistic-Abteilung und da dachte ich ich komm gleich mal vorbei bevor sie weg ist...&quot;&lt;/br&gt;
+    &lt;div id=&#39;select1&#39; &gt;
+    &lt;a0 onclick=&#39;window.gm.printTalkLink($(&quot;div#select1&quot;)[0],&quot;div#choice1a&quot;)&#39;&gt;&quot;Unfortunatly not&quot;&lt;/a&gt;
+    &lt;/div&gt;
+    &lt;div id=&#39;choice1a&#39; hidden&gt;&lt;/br&gt;
+         &quot;Nein,naja ich hab die Anzeige in der Uni gesehen für eine Stelle in der Logistic-Abteilung und da dachte ich ich komm gleich mal vorbei bevor sie weg ist...&quot;&lt;/br&gt;
     The guard frowns as he hears your rumblings. Clearly he doesnt understand how anyone would bother him WITHOUT having setup an appointment.&lt;/br&gt;
     Then he grunt&#39;s because another huge load seems to be put onto his shoulders. He thoughtfully picks up the phone and calls someone.&lt;/br&gt;
     &quot;Yes, hello Elfred this is Frank from the gate. Here is a young man that asks about a position in your department do you know that..&quot;&lt;/br&gt;
@@ -10557,16 +11755,17 @@ The adress points to be somehwere around downtonw.&lt;/br&gt;
     &#39;Of course I an read you asshole, I&#39;m from university&#39; - well thats what came into your mind but you just say &quot;Sure&quot;&lt;/br&gt;
     He buzzes you through the revolving door adjoining the car gate and you walk to Mr. Erichsons office.&lt;/br&gt;
     &lt;div&gt;&lt;/br&gt;[[Go to logistics|Harcon_Logistic_Intro]]&lt;/br&gt;&lt;/div&gt;
+    &lt;/div&gt; 
 &lt;% } else {%&gt;
-    This sees to be a factory. You have no business here.&lt;/br&gt;
+    This seems to be some kind of factory. You have no business here.&lt;/br&gt;
     &lt;div&gt;&lt;/br&gt;[[Downtown]]&lt;/br&gt;&lt;/div&gt;
 &lt;%}%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="120" name="Harcon_Logistic_Intro" tags="" position="1225,1475" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="138" name="Harcon_Logistic_Intro" tags="" position="975,1725" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 ...&lt;!--todo--&gt;
 
-Actually we need only some help here and there for Carl, so this is only a parttime-job.
+&quot;Actually Carl needs only some help here and there, so this is only a parttime-job.&quot;&lt;/br&gt;
 &quot;If you work at least 2 shifts a week here, you will get 25$ the shift every week.&quot;&lt;/br&gt;
 &quot;So, do you want the job?&quot; he looks at you.&lt;/br&gt;
 &lt;div id=&#39;select1&#39; &gt;
@@ -10582,7 +11781,7 @@ Actually we need only some help here and there for Carl, so this is only a partt
     Mr. Erichson looks quite disappointed.  &lt;/br&gt;
     [[Next|Downtown]]&lt;/br&gt; 
 &lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="121" name="Harcon_work" tags="" position="100,1600" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="139" name="Harcon_work" tags="" position="1100,1725" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;%if(window.gm.quests.hasActiveQuest(&quot;qFindAJob&quot;,200)){  %&gt;
@@ -10599,7 +11798,7 @@ function work() {
     window.gm.quests.getQuestState(&quot;qFindAJob&quot;).flags+=1;
     window.story.show(&quot;Downtown&quot;);
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="122" name="Mall Floor 0" tags="" position="1250,850" size="100,100">&lt;section&gt; 
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="140" name="Mall Floor 0" tags="" position="1250,850" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 You are actually at [[&lt;%=window.gm.player.location%&gt;]].&lt;/br&gt;
@@ -10619,7 +11818,7 @@ _Entrys.push({id:&quot;Lube&quot;,count:10,cost:4,costPerv:10});
 _Entrys.push({id:&quot;Battery&quot;,count:4,cost:4,costPerv:0});
 _Entrys.push({id:&quot;Dildo_small&quot;,count:1,cost:25,costPerv:14});
 renderToSelector(&quot;#panel&quot;, &quot;listbuy&quot;); 
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="123" name="Mall Floor 1" tags="" position="1125,850" size="100,100">&lt;section&gt; 
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="141" name="Mall Floor 1" tags="" position="1125,850" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;%window.gm.printShopBuyEntry(&quot;Lube&quot;,4,cbCanBuy=(function(itemid){return window.gm.cbCanBuyPerverse(itemid,15,10)}),cbPostBuy=(function(itemid){window.gm.defaultPostBuy(itemid,15)}))%&gt;
@@ -10634,7 +11833,7 @@ if(window.gm.player.Stats.get(&#39;perversion&#39;).value&lt;=10) {%&gt;
 &lt;%} else {%&gt; [[Adult books and tools]] &lt;/br&gt; &lt;%} %&gt;
 Where would you like to go from here?&lt;/br&gt;
 [[Mall 0F|Mall Floor 0]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="124" name="Mall Floor -1" tags="" position="1000,825" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="142" name="Mall Floor -1" tags="" position="1000,825" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 You are actually at [[&lt;%=window.gm.player.location%&gt;]].&lt;/br&gt;
@@ -10642,7 +11841,7 @@ This level of the mall seems to be reserved for the less fancy business. &lt;/br
 Most of the space is occupied by the usual [[electronics store]] and a [[food store]].
 Where would you like to go from here?&lt;/br&gt;
 [[Mall 0F|Mall Floor 0]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="125" name="Adult books and tools" tags="" position="1025,650" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="143" name="Adult books and tools" tags="" position="1025,650" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 You are actually at [[&lt;%=window.gm.player.location%&gt;]].&lt;/br&gt;
@@ -10653,17 +11852,13 @@ if(window.gm.player.Stats.get(&#39;perversion&#39;).value&lt;=15) {%&gt;
 No way I&#39;m going in to that smut-shop. Only perverts do that. &lt;/br&gt;
 &lt;%} else {%&gt;
 &lt;%} %&gt;
-Several snack bars and smaller shops are cirling around the wall side of the mall.&lt;/br&gt; 
-One of them is [[Alice treasures]], a place where women can buy more private cloths.&lt;/br&gt;
-In a more shady corner you find a shop whose windows are just coverd with dark red and black foils. 
-Its name is [[Adult books and tools]] and there is an &quot;adults only&quot; sign at the entrance.&lt;/br&gt;
 Where would you like to go from here?&lt;/br&gt;
 [[Mall 0F|Mall Floor 0]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="126" name="Buy" tags="_back" position="850,350" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="144" name="Buy" tags="_back" position="850,350" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 
 [[Back|_back]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="127" name="Mall Floor 0 (postapocalypse)" tags="" position="850,1600" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="145" name="Mall Floor 0 (postapocalypse)" tags="" position="600,1850" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 You are actually at [[&lt;%=window.gm.player.location%&gt;]].&lt;/br&gt;
@@ -10674,7 +11869,7 @@ Where would you like to go from here?&lt;/br&gt;
 [[Mall 1F|Mall Floor 1 (postapocalypse)]]
 The stairway to the lower floor is blocked by parts of the building that fell down from top. But there might be other options to get there. &lt;/br&gt; 
 [[Exit|Into the city]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="128" name="Mall Floor 1 (postapocalypse)" tags="" position="975,1600" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="146" name="Mall Floor 1 (postapocalypse)" tags="" position="725,1850" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 
@@ -10689,50 +11884,11 @@ Where would you like to go from here?&lt;/br&gt;
 You are on the hunt for useful resources as...
 &lt;a href=&quot;javascript:void(0)&quot; onclick=&#39;window.gm.encounters.mole(window.gm.player.location);&#39;&gt;Next&lt;/a&gt; &lt;/br&gt;
 
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="129" name="_SaveLoad_" tags="" position="1100,1600" size="100,100">&lt;%
-  if(window.storage.ok()) { %&gt;
-  Window storage works!
-&lt;% } %&gt;  
-&lt;%
-  if(window.storage.restore()) { %&gt;
-  There is a session saved!
-&lt;% } %&gt;
-
-[[Bedroom]]
-
-[[Get hash]]
-
-[[Save the session hash?]]
-
-[[Restore from previous session?]]
-
-[[Delete previous session?]]</tw-passagedata><tw-passagedata pid="130" name="Save the session hash?" tags="" position="538,364.1000061035156" size="100,100">&lt;% s.hash = window.story.save()%&gt;
-The hash is &lt;%=s.hash  %&gt;. It has been saved!
-
-&lt;% if(window.storage.ok()) {
-  window.storage.save(s.hash);
-  //return &quot;Saved&quot;;
-} else {
- //return &quot;save failed&quot;;
-}
-
-%&gt;
-
-[[Go back?|Start]]</tw-passagedata><tw-passagedata pid="131" name="Restore from previous session?" tags="" position="746,211.3000030517578" size="100,100">&lt;% if(window.storage.ok()) {
-  if(window.story.restore(window.storage.restore()) ) { %&gt;
-  The restore was successful!
-&lt;% }
-}
-%&gt;
-[[Go back?|Start]]</tw-passagedata><tw-passagedata pid="132" name="Delete previous session?" tags="" position="723,356.3000030517578" size="100,100">&lt;% window.storage.delete() %&gt;
-
-[[Go back?|Start]]</tw-passagedata><tw-passagedata pid="133" name="Get hash" tags="" position="418,353.3000030517578" size="100,100">The hash is &lt;%= window.story.save() %&gt;. It has been saved!
-
-[[Go back?|Start]]</tw-passagedata><tw-passagedata pid="134" name="skCooking" tags="" position="825,625" size="100,100">You can create tasty meals from basic ingredients. No need to rely on fastfood.
-[[Back|&lt;%=window.gm.player.location%&gt;]]</tw-passagedata><tw-passagedata pid="135" name="skSporty" tags="" position="725,625" size="100,100">You like to do sports.
-[[Back|&lt;%=window.gm.player.location%&gt;]]</tw-passagedata><tw-passagedata pid="136" name="skTechy" tags="" position="825,525" size="100,100">Tinkering and repairing gadgets is your thing.
-[[Back|&lt;%=window.gm.player.location%&gt;]]</tw-passagedata><tw-passagedata pid="137" name="skMoneymaker" tags="" position="725,525" size="100,100">You often find ways to increase your profit a little bit.
-[[Back|&lt;%=window.gm.player.location%&gt;]]</tw-passagedata><tw-passagedata pid="138" name="Start" tags="" position="975,1725" size="100,100">Select a Link:
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="147" name="skCooking" tags="" position="825,625" size="100,100">You can create tasty meals from basic ingredients. No need to rely on fastfood.
+[[Back|&lt;%=window.gm.player.location%&gt;]]</tw-passagedata><tw-passagedata pid="148" name="skSporty" tags="" position="725,625" size="100,100">You like to do sports.
+[[Back|&lt;%=window.gm.player.location%&gt;]]</tw-passagedata><tw-passagedata pid="149" name="skTechy" tags="" position="825,525" size="100,100">Tinkering and repairing gadgets is your thing.
+[[Back|&lt;%=window.gm.player.location%&gt;]]</tw-passagedata><tw-passagedata pid="150" name="skMoneymaker" tags="" position="725,525" size="100,100">You often find ways to increase your profit a little bit.
+[[Back|&lt;%=window.gm.player.location%&gt;]]</tw-passagedata><tw-passagedata pid="151" name="Start" tags="" position="100,1975" size="100,100">Select a Link:
 &lt;ul&gt;
     &lt;li&gt;[[_SuperSimpleStory_]]&lt;/li&gt;
 	&lt;li&gt;[[_ImagesAndOtherMedia_]]&lt;/li&gt;
@@ -10741,7 +11897,7 @@ The hash is &lt;%=s.hash  %&gt;. It has been saved!
     &lt;li&gt;[[_Inventory_]]&lt;/li&gt;
     &lt;li&gt;[[_SaveAndRestore_]]&lt;/li&gt;
     &lt;li&gt;[[StartPage]]&lt;/li&gt;
-&lt;/ul&gt;</tw-passagedata><tw-passagedata pid="139" name="NewGamePlus" tags="" position="1100,1725" size="100,100">You finished the game in some way but maybe you have missed something. &lt;/br&gt;
+&lt;/ul&gt;</tw-passagedata><tw-passagedata pid="152" name="NewGamePlus" tags="" position="225,1975" size="100,100">You finished the game in some way but maybe you have missed something. &lt;/br&gt;
 Would you like to start a new game while taking some of your equipment/skills with you?&lt;/br&gt;
 &lt;a0 onclick=&#39;window.gm.newGamePlus()&#39;&gt;Start new game plus&lt;/a&gt;&lt;/br&gt;</tw-passagedata></tw-storydata>
 		<script>
