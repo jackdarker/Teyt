@@ -146,6 +146,25 @@ window.gm.initGame= function(forceReset,NGP=null) {
         args: []  // can be used to set arguments before another passage is called (passage-arguments) 
       }
     }
+    if (!s.enemy||forceReset) { //actual/last enemy
+      s.enemy = new Character();
+    }
+    if (!s.combat||forceReset) { //see encounter & combat.js
+      s.combat = {
+        enemyParty : [],  //collection of enemy-chars involved 
+        enemyIdx : 0,  //index of actual enemy 
+        playerParty : [],
+        playerIdx : 0,
+        newTurn : false,
+        enemyFirst : false, //if true, enemy moves first
+        enemyTurn : false, //true if enemys turn
+        state : ""  , //internal state
+        playerFleeing : false,
+        playerSubmitting : false,
+        turnCount: 0,
+        scenePic : 'assets/bg_park.png'
+      }
+    }
   }
 //reimplement for your game !
 window.gm.newGamePlus = function() {

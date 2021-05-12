@@ -7,6 +7,7 @@
 
 :: CharacterEditor
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
 <!--todo--> "Please select class and race of your character:"</br>
 <div></br>
 [[Ready|StartLocation]]</br></div>
@@ -15,6 +16,7 @@
 
 :: StartLocation
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
 <!--todo--> "You magically appear near the top of a hill. </br>
 You can see some houses from here, you just need to follow the trail down the hill."</br>
 <div></br>
@@ -24,6 +26,7 @@ You can see some houses from here, you just need to follow the trail down the hi
 
 :: Training1
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
 <!--todo--> The path snakes down the grassy flanks of the hill. As you make your way around a large boulder, something strange happens:</br>
 <devnote>"Welcome to our little world. Just in case you are not used to that kind of game we should get you some training."</devnote></br>
 <div></br>
@@ -33,6 +36,7 @@ You can see some houses from here, you just need to follow the trail down the hi
 
 :: Training1Done
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
 <!--todo--> </br>
 <devnote>"I wish you good luck in exploring this world. May the gods be with you."</devnote></br>
 <div></br>
@@ -50,6 +54,7 @@ You can see some houses from here, you just need to follow the trail down the hi
 
 :: VillageEntrance
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
 <!--todo--> You are at the crossroads in front of the entrance to the settlement.
 Someone has painted 'Thetain' on the planks above the wooden gate. Most likely thats the name of this commune.</br></br>
 <div></br>
@@ -59,7 +64,8 @@ Someone has painted 'Thetain' on the planks above the wooden gate. Most likely t
 
 :: VillageMarketPlace
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<!--todo--> There arent many people here right now.</br> There seems to be a shop of an alchemist, a Inn and another shop where you cant say what kind of wares - if any - they are trading.</br>
+<%window.gm.player.location=window.passage.name;%>
+<!--todo--> There arent many people around the place right now.</br> There seems to be a shop of an alchemist, a Inn and another shop where you cant say what kind of wares - if any - they are trading.</br>
 </br> Near the entrance of the Inn is also a [[bulletin-board]]. 
 <div></br>
 [[VillageInn]]  [[VillagePotions]] [[VillagePawnshop]]</br></div>
@@ -68,6 +74,7 @@ Someone has painted 'Thetain' on the planks above the wooden gate. Most likely t
 
 :: VillageInn
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
 <!--todo--> 'This really looks like they scavenged that place from a typical fantasy story book.'</br> 
 </br> 
 <div></br>
@@ -77,6 +84,7 @@ Someone has painted 'Thetain' on the planks above the wooden gate. Most likely t
 
 :: VillagePotions
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
 <!--todo--> 'Puh, what a stink. I shouldnt stay here for long for I might suffocate'</br> 
 </br> "Hello? Anyone there?"
 <div></br>
@@ -86,6 +94,7 @@ Someone has painted 'Thetain' on the planks above the wooden gate. Most likely t
 
 :: VillagePawnshop
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
 <!--todo--> If this is a shop, then they sell everything: Shoes, cooking pans, assault ballista and chicken.</br> 
 </br> 
 <div></br>
@@ -95,6 +104,7 @@ Someone has painted 'Thetain' on the planks above the wooden gate. Most likely t
 
 :: VillageRespawnPod
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
 <!--todo--> You are in the sanctum of spawn. Its located on top of the hill above the settlement.</br> 
 </br> There is a path leading downwards to the settlement.</br>
 <div></br>
@@ -104,6 +114,7 @@ Someone has painted 'Thetain' on the planks above the wooden gate. Most likely t
 
 :: ForestBorder
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
 <!--todo--> There is a dirt road here crossing the lush grassland that is bordered by the trees of an forest.</br> 
 One direction leads to the settlement close by. The other direction follows the border of the forest but gets out of view quickly.</br> 
 </br> 
@@ -114,6 +125,7 @@ One direction leads to the settlement close by. The other direction follows the 
 
 :: ForestEntrance
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
 <!--todo--> Der Wald macht einen freundlichen Eindruck. Die Bäume stehen noch licht und sind noch nicht so ausladend und groß als das kein Licht mehr durch das Blätterdach gelangt. </br> 
 </br> 
 <div></br><a0 onclick='enterBeehive(); '>Enter Beehive</a></br>

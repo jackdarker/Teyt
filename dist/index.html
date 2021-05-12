@@ -9156,7 +9156,7 @@ window.gm.StatsLib = function (StatsLib) {
   return StatsLib;
 }(window.gm.StatsLib || {});
 /* twine-user-script #2: "Story JavaScript" */
-</script><tw-tag name="_back" color="gray"></tw-tag><tw-tag name="_nosave" color="yellow"></tw-tag><tw-tag name="template" color="orange"></tw-tag><tw-passagedata pid="1" name="Info_Jake" tags="_back" position="100,100" size="100,100">&lt;section&gt; 
+</script><tw-tag name="template" color="orange"></tw-tag><tw-tag name="_back" color="gray"></tw-tag><tw-tag name="_nosave" color="yellow"></tw-tag><tw-passagedata pid="1" name="Info_Jake" tags="_back" position="100,100" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 Jake is here.&lt;/br&gt;
 You barely know anything about him.&lt;/br&gt;
@@ -11453,7 +11453,7 @@ One direction leads to the settlement close by. The other direction follows the 
     window.gm.dng = window.gm.dngs.BeeHive();
     window.gm.dng.enterDungeon();
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="113" name="Dungeon" tags="" position="350,1475" size="100,100">&lt;!--dont &quot;show&quot; this! setup the dungeon and call enterDungeon--&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="113" name="Dungeon" tags="_nosave" position="350,1475" size="100,100">&lt;!--dont &quot;show&quot; this! setup the dungeon and call enterDungeon--&gt;
 &lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%= window.gm.dng.name%&gt; &lt;%= window.gm.dng.actualRoom.descr%&gt;&lt;/br&gt;
 &lt;/br&gt; 
@@ -11461,20 +11461,20 @@ One direction leads to the settlement close by. The other direction follows the 
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
 &lt;script&gt;
 window.gm.dng.printButtons()
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="114" name="DungeonMap" tags="" position="475,1475" size="100,100">&lt;!--dont &quot;show&quot; this! setup the dungeon and call displayMap--&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="114" name="DungeonMap" tags="_nosave" position="475,1475" size="100,100">&lt;!--dont &quot;show&quot; this! setup the dungeon and call displayMap--&gt;
 &lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;!--pre-formatted or messup allignment of ascii-rows--&gt;
 &lt;pre&gt;&lt;%= window.gm.dng.Mapper.printMap( window.gm.dng.actualRoom)%&gt;&lt;/pre&gt;&lt;/br&gt;
 &lt;pre&gt;Legend: P=Player, S=Stair, E=Entry/Exit&lt;pre&gt;&lt;/br&gt;
 &lt;/br&gt; 
 [[Back|Dungeon]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="115" name="DungeonFoundNothing" tags="" position="600,1475" size="100,100">&lt;!--example-scene for onenter/onexit event--&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="115" name="DungeonFoundNothing" tags="_nosave" position="600,1475" size="100,100">&lt;!--example-scene for onenter/onexit event--&gt;
 &lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%= window.gm.dng.actualRoom.descr%&gt;&lt;/br&gt;
 There are some buckets here, but there is nothing useful inside.&lt;/br&gt;
 &lt;/br&gt;
 &lt;a0 onclick=&#39;window.gm.dng.resumeRoom();&#39;&gt;Go on&lt;/a&gt;&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="116" name="DungeonCrashedThroughFloor" tags="" position="725,1475" size="100,100">&lt;!--example-scene for onenter/onexit event--&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="116" name="DungeonCrashedThroughFloor" tags="_nosave" position="725,1475" size="100,100">&lt;!--example-scene for onenter/onexit event--&gt;
 &lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%= window.gm.dng.actualRoom.descr%&gt;&lt;/br&gt;
 You crash down through the floor and find yourself back on the lowest level of the area.&lt;/br&gt;
@@ -11499,7 +11499,7 @@ The following things are on your schedule-list:&lt;/br&gt;
 [[Living_Room]]   [[Your Bedroom]]  [[Moms Bedroom]] [[Kitchen]]  [[Garden]] [[Cellar]] &lt;/br&gt;
 [[Into the city]] [[ForestEntrance]]&lt;/br&gt;&lt;/div&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="118" name="Kitchen" tags="" position="1231,613" size="100,100">&lt;section&gt; 
-&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%window.story.state._gm.nosave =true;%&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 You are in the kitchen. &lt;/br&gt;
 &lt;%=window.gm.printPickupAndClear(&#39;CanOfCoffee&#39;,&#39;get a can of ice-coffee from the fridge&#39;,s.mom.coffeeStore)%&gt;
