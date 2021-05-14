@@ -5,6 +5,7 @@ export class Character {
     static defaultData() {
         return({
         name: '',
+        faction: 'Enemy',
         location : "Home",
         XP: 0,  
         level: 1,  
@@ -56,10 +57,10 @@ export class Character {
     static calcLevelToXP(lvl) {
         return(100*lvl*(lvl+1)/2); //Gauss-Sum
     }
-    get name() {
-        return(this._data.name);    
-    }
+    get name() { return(this._data.name);  }
     set name(name) {this._data.name=name;}
+    get faction() { return this._data.faction; } 
+    set faction(name) {this._data.faction=name;}
     get location() {
         return(this._data.location);    
     }
@@ -84,6 +85,7 @@ export class Character {
         this._data.XP=reqXP;
         this._data.level+=1;
     }
+    isDead() {return(this.Stats.get('health').value<=0);}
     health() {
         return({value:this.Stats.get('health').value, max:this.Stats.get('healthMax').value, min:0});
     }

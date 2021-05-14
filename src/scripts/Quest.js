@@ -1,7 +1,7 @@
 "use strict";
 /* classes to manage a quest
  */
-//todo move to class
+
 // helper for publisher/subscriber-pattern
 function PubSub() {
     return {
@@ -29,8 +29,6 @@ class QuestMilestone {
         this.HiddenCB = (HiddenCB===null)? (function(){return(false);}): HiddenCB;
         this.descr =descr;
         this.CondCheckCB =CondCheckCB;
-        /*this.EnterMilestoneCB = null; //todo use pubsub instead
-        this.ExitMilestoneCB = null;*/
         window.storage.registerConstructor(QuestMilestone);
     }
     toJSON() {return window.storage.Generic_toJSON("QuestMilestone", this); };

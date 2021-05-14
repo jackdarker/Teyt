@@ -6,7 +6,20 @@ window.gm.encounters = window.gm.encounters || {};
 
 window.gm.encounters.mole = function(location) {
     window.gm.Encounter = new CombatSetup();
-    window.gm.Encounter.EnemyFunc = (function() { var x = new window.gm.Mobs.Mole(); x.scaleLevel(window.gm.player.level); return(x);});
+    window.gm.Encounter.EnemyFunc = (function() { var x = new window.gm.Mobs.Mole(); x.scaleLevel(window.gm.player.level); return([x]);});
+    window.gm.Encounter.Location = location;
+    window.gm.Encounter.scenePic = window.gm.getScenePic(location);
+    window.gm.Encounter.onSubmit = function() {
+        return('What will now happen to you?</br>'+ window.gm.printPassageLink('Next','Mole Submit'));
+    }
+    window.gm.Encounter.initCombat();
+}
+
+window.gm.encounters.moleX2 = function(location) {
+    window.gm.Encounter = new CombatSetup();
+    window.gm.Encounter.EnemyFunc = (function() { 
+        return([new window.gm.Mobs.Mole().scaleLevel(window.gm.player.level),
+            new window.gm.Mobs.Mole().scaleLevel(window.gm.player.level) ]);});
     window.gm.Encounter.Location = location;
     window.gm.Encounter.scenePic = window.gm.getScenePic(location);
     window.gm.Encounter.onSubmit = function() {

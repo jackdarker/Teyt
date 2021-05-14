@@ -816,6 +816,12 @@ function _superPropBase(object, property) { while (!Object.prototype.hasOwnPrope
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+function _createForOfIteratorHelper(o, allowArrayLike) { var it; if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
@@ -844,6 +850,7 @@ var Character = /*#__PURE__*/function () {
     value: function defaultData() {
       return {
         name: '',
+        faction: 'Enemy',
         location: "Home",
         XP: 0,
         level: 1,
@@ -905,6 +912,11 @@ var Character = /*#__PURE__*/function () {
       this._data.level += 1;
     }
   }, {
+    key: "isDead",
+    value: function isDead() {
+      return this.Stats.get('health').value <= 0;
+    }
+  }, {
     key: "health",
     value: function health() {
       return {
@@ -963,6 +975,14 @@ var Character = /*#__PURE__*/function () {
     },
     set: function set(name) {
       this._data.name = name;
+    }
+  }, {
+    key: "faction",
+    get: function get() {
+      return this._data.faction;
+    },
+    set: function set(name) {
+      this._data.faction = name;
     }
   }, {
     key: "location",
@@ -1051,37 +1071,89 @@ var CombatSetup = /*#__PURE__*/function () {
   _createClass(CombatSetup, [{
     key: "onSubmit",
     value: function onSubmit() {
-      return 'You submitted to ' + s.enemy.name + " completely.</br>" + window.gm.printPassageLink('GameOver', 'GameOver');
+      return 'You submitted completely.</br>' + window.gm.printPassageLink('GameOver', 'GameOver');
     } //setup encounter; this calls the Encounter-passage !
 
   }, {
     key: "initCombat",
     value: function initCombat() {
       var s = window.story.state;
-      s.enemy = window.gm.Encounter.EnemyFunc();
-      s.combat.location = window.gm.Encounter.location;
-      s.combat.scenePic = window.gm.Encounter.scenePic;
+      s.combat.enemyParty = this.EnemyFunc();
+      s.combat.playerParty = [window.gm.player];
+      s.combat.turnStack = [];
+      s.combat.actor = s.combat.target = s.combat.action = null;
+      s.combat.location = this.location;
+      s.combat.scenePic = this.scenePic;
       s.combat.playerFleeing = false;
       s.combat.playerSubmitting = false;
-      s.enemyFirst = window.gm.Encounter.EnemyFirst;
+      s.enemyFirst = this.EnemyFirst;
       s.combat.enemyTurn = false;
       s.combat.newTurn = true;
       s.combat.turnCount = 0;
-      s.combat.state = 'battling';
+      this.next = this.battleInit;
       window.story.show("Encounter");
     }
   }, {
     key: "hideCombatOption",
     value: function hideCombatOption() {
       document.querySelector("#combatmenu").remove();
+    }
+  }, {
+    key: "printStats",
+    value: function printStats() {
+      var s = window.story.state;
+
+      function createList(array) {
+        var list = [];
+
+        for (var i = 0; i < 3; i++) {
+          //max 3 party members !
+          var col = {
+            name: "",
+            health: "",
+            arousal: "",
+            effects: ""
+          };
+
+          if (i < array.length) {
+            col.name = array[i].name;
+            col.health = array[i].health().value.toString() + '/' + array[i].health().max.toString();
+            col.arousal = array[i].Stats.get("arousal").value.toString() + '/' + array[i].Stats.get("arousalMax").value.toString();
+            col.effects = window.gm.Encounter.printCombatEffects(array[i]);
+          }
+
+          list.push(col);
+        }
+
+        return list;
+      }
+
+      var players = createList(s.combat.playerParty);
+      var enemys = createList(s.combat.enemyParty);
+      /*
+                  Health  Arousal Effects         Health  Arousal Effects
+          player1 10/20   10/20 Stunned     Ork1  10/10   10/10
+          player2 50/100  10/20             Ork2  20/20   10/100
+      */
+
+      var elmt = '<table><tbody>';
+      elmt += "<tr><td>Player</td><td>Health</td><td>Arousal</td><td>Effects</td><td></td><td>Enemys</td><td>Health</td><td>Arousal</td><td>Effects</td>";
+
+      for (var i = 0; i < 3; i++) {
+        elmt += "<tr><td>" + players[i].name + "</td><td>" + players[i].health + "</td><td>" + players[i].arousal + "</td><td>" + players[i].effects + "</td><td></td><td>" + enemys[i].name + "</td><td>" + enemys[i].health + "</td><td>" + enemys[i].arousal + "</td><td>" + enemys[i].effects + "</td>";
+      }
+
+      elmt += '</tbody></table>';
+      return elmt;
     } //creates a list of possible moves for player
 
   }, {
     key: "printCombatOption",
     value: function printCombatOption() {
+      var s = window.story.state;
       var elmt = "<form id='combatmenu'>"; //Todo create list based on abilitys
 
-      var canAct = window.gm.player._canAct();
+      var canAct = s.combat.actor._canAct();
 
       if (canAct.OK === true) {
         elmt += "<a0 id='moveFlee'           onclick='(function($event){window.gm.Encounter.triggerCombat($event.id);})(this);'>Try to flee</a></br>";
@@ -1102,9 +1174,8 @@ var CombatSetup = /*#__PURE__*/function () {
 
   }, {
     key: "printCombatHud",
-    value: function printCombatHud() {
-      renderToSelector("#playerstats", "playerstats");
-      renderToSelector("#enemystats", "enemystats");
+    value: function printCombatHud() {//renderToSelector("#playerstats", "playerstats");
+      //renderToSelector("#enemystats", "enemystats");
     }
   }, {
     key: "printCombatEffects",
@@ -1133,12 +1204,12 @@ var CombatSetup = /*#__PURE__*/function () {
       var result = window.gm.Encounter.execCombatCmd(window.gm.combat[id]);
       window.gm.printOutput(result.msg + window.gm.printPassageLink("Next", "EncounterStartTurn"));
       this.printCombatHud();
-    } //calculates and executes combat-cmd of enemy
+    } //calculates combat-cmd of enemy
 
   }, {
     key: "calcEnemyCombat",
     value: function calcEnemyCombat() {
-      var enemy = window.story.state.enemy;
+      var enemy = window.story.state.combat.actor;
       var move = enemy.calcCombatMove();
       return move.msg + "</br>";
     } //executes a combat-cmd for player/enemy
@@ -1147,19 +1218,19 @@ var CombatSetup = /*#__PURE__*/function () {
     key: "execCombatCmd",
     value: function execCombatCmd(move) {
       var s = window.story.state;
-      var result = move();
-      s.combat.enemyTurn = !s.combat.enemyTurn; //toggle whos turn
+      var result = move(s.combat.actor, s.combat.target);
+      /*s.combat.enemyTurn =!s.combat.enemyTurn;  //toggle whos turn
+      if(!(s.combat.enemyTurn ^ s.combat.enemyFirst)) s.combat.newTurn = false;
+      */
 
-      if (!(s.combat.enemyTurn ^ s.combat.enemyFirst)) s.combat.newTurn = false;
       return result;
     }
   }, {
     key: "startRound",
     value: function startRound() {
       var s = window.story.state;
-      s.combat.turnCount += 1; //update combateffects
-
-      var list = [window.story.state.enemy, window.gm.player];
+      s.combat.turnCount += 1;
+      var list = s.combat.allChars = s.combat.enemyParty.concat(s.combat.playerParty); //update combateffects
 
       for (var k = 0; k < list.length; k++) {
         var effects = list[k].Effects.getAllIds();
@@ -1177,8 +1248,9 @@ var CombatSetup = /*#__PURE__*/function () {
   }, {
     key: "endCombat",
     value: function endCombat() {
-      //remove combateffects
-      var list = [window.story.state.enemy, window.gm.player];
+      var s = window.story.state; //remove combateffects
+
+      var list = s.combat.enemyParty.concat(s.combat.playerParty);
 
       for (var k = 0; k < list.length; k++) {
         var effects = list[k].Effects.getAllIds();
@@ -1193,9 +1265,169 @@ var CombatSetup = /*#__PURE__*/function () {
       }
     }
   }, {
-    key: "battle",
-    //returns false if battle should continue
-    value: function battle() {
+    key: "isAllDefeated",
+    value: function isAllDefeated(party) {
+      for (var i = 0; i < party.length; i++) {
+        if (!party[i].isDead()) return false;
+      }
+
+      return true;
+    }
+  }, {
+    key: "calcTurnOrder",
+    value: function calcTurnOrder() {
+      var s = window.story.state; //todo sort by agility
+      //todo turnorder can be intermixed?
+
+      if (s.combat.enemyFirst) {
+        s.combat.turnStack = s.combat.enemyParty.concat(s.combat.playerParty);
+      } else {
+        s.combat.turnStack = s.combat.playerParty.concat(s.combat.enemyParty);
+      }
+    } /////////////////////  State Machine /////////////////////
+    //
+
+  }, {
+    key: "battleInit",
+    value: function battleInit() {
+      var result = {
+        OK: false,
+        msg: ''
+      };
+      this.next = this.preTurn;
+      return result;
+    }
+  }, {
+    key: "preTurn",
+    value: function preTurn() {
+      var result = {
+        OK: false,
+        msg: ''
+      };
+      var s = window.story.state;
+      s.combat.turnCount += 1;
+      var list = s.combat.enemyParty.concat(s.combat.playerParty); //update combateffects
+
+      for (var k = list.length - 1; k >= 0; k--) {
+        if (list[k].isDead()) {
+          continue;
+        }
+
+        var effects = list[k].Effects.getAllIds();
+
+        for (var i = 0; i < effects.length; i++) {
+          var effect = list[k].Effects.get(effects[i]);
+
+          if (effect.onCombatEnd !== null && effect.onCombatEnd !== undefined) {
+            //typeof effect === CombatEffect doesnt work? so we check presencse of attribut
+            effect.onTurnStart();
+          }
+        }
+      } //calculate turnorder
+
+
+      this.calcTurnOrder();
+      this.next = this.checkDefeat;
+      return result;
+    }
+  }, {
+    key: "checkDefeat",
+    value: function checkDefeat() {
+      //check if party is defeated
+      var result = {
+        OK: false,
+        msg: ''
+      };
+      var s = window.story.state;
+
+      if (s.combat.playerFleeing === true) {
+        this.next = this.postBattle;
+        return result;
+      } else if (s.combat.playerSubmitting === true) {
+        this.next = this.postBattle;
+        return result;
+      } else if (this.isAllDefeated(s.combat.enemyParty)) {
+        this.next = this.postBattle;
+        return result;
+      } else if (this.isAllDefeated(s.combat.playerParty)) {
+        this.next = this.postBattle;
+        return result;
+      }
+
+      this.next = this.selectChar;
+      return result;
+    }
+  }, {
+    key: "selectChar",
+    value: function selectChar() {
+      var s = window.story.state;
+      var result = {
+        OK: false,
+        msg: ''
+      };
+
+      if (s.combat.turnStack.length > 0) {
+        //switch to next char
+        s.combat.actor = s.combat.turnStack.shift(); //actual move = 0
+
+        s.combat.action = null;
+        this.next = this.selectMove;
+      } else {
+        //next turn after all done
+        this.next = this.preTurn;
+      }
+
+      return result;
+    }
+  }, {
+    key: "selectMove",
+    value: function selectMove() {
+      var s = window.story.state;
+      var result = {
+        OK: false,
+        msg: ''
+      }; //navigate through moves-menu
+
+      var canAct = s.combat.actor._canAct();
+
+      if (canAct.OK === false) {
+        result.msg = canAct.msg;
+        return result;
+      } else {
+        if (s.combat.actor.calcCombatMove) {
+          //selected by AI
+          s.combat.target = s.combat.playerParty[0]; //Todo
+
+          result.OK = true;
+          result.msg += this.calcEnemyCombat();
+          result.msg += window.gm.printPassageLink('Next', 'EncounterStartTurn');
+        } else {
+          s.combat.target = s.combat.enemyParty[0]; //Todo
+
+          result.OK = true, result.msg = this.printCombatOption();
+        }
+      } //move confirmed
+
+
+      this.next = this.execMove;
+      return result;
+    }
+  }, {
+    key: "execMove",
+    value: function execMove() {
+      var result = {
+        OK: false,
+        msg: ''
+      }; //apply move
+
+      this.next = this.checkDefeat;
+      return result;
+    }
+  }, {
+    key: "postBattle",
+    value: function postBattle() {
+      this.next = null; //terminate SM
+
       var s = window.story.state;
       var result = {
         OK: false,
@@ -1204,7 +1436,54 @@ var CombatSetup = /*#__PURE__*/function () {
 
       if (s.combat.playerFleeing === true) {
         result.OK = true;
-        result.msg = 'You sucessfully escaped ' + s.enemy.name + "</br>";
+        result.msg = 'You sucessfully escaped ' + "</br>";
+        result.msg += window.gm.printPassageLink('Next', window.gm.player.location);
+      } else if (s.combat.playerSubmitting === true) {
+        result.OK = true;
+        result.msg = this.onSubmit();
+      } else if (this.isAllDefeated(s.combat.enemyParty)) {
+        result.OK = true;
+        result.msg = 'You defeated the enemy' + "</br>";
+        result.msg += window.gm.printPassageLink('Next', window.gm.player.location);
+      } else if (this.isAllDefeated(s.combat.playerParty)) {
+        result.OK = true;
+        result.msg = 'You got defeated by the enemy' + "</br>";
+        result.msg += window.gm.printPassageLink('Next', window.gm.player.location);
+      }
+
+      this.endCombat();
+      return result;
+    } //this runs the statemachine and is triggered by user input
+
+  }, {
+    key: "battle",
+    value: function battle() {
+      var result = {
+        OK: false,
+        msg: ''
+      };
+
+      while (this.next !== null && !result.OK) {
+        //if result =true; user input required
+        result = this.next();
+        if (result.OK) return result;
+      }
+
+      return result;
+    }
+  }, {
+    key: "battle_old",
+    //returns false if battle should continue
+    value: function battle_old() {
+      var s = window.story.state;
+      var result = {
+        OK: false,
+        msg: ''
+      }; //check if battle done...
+
+      if (s.combat.playerFleeing === true) {
+        result.OK = true;
+        result.msg = 'You sucessfully escaped ' + "</br>";
         result.msg += window.gm.printPassageLink('Next', window.gm.player.location);
       }
 
@@ -1411,7 +1690,7 @@ window.gm.combat.calcAttack = function (attacker, defender, attack) {
 //used to skip turn
 
 
-window.gm.combat.moveNOP = function () {
+window.gm.combat.moveNOP = function (actor, target) {
   var result = {
     OK: false,
     msg: ''
@@ -1420,24 +1699,23 @@ window.gm.combat.moveNOP = function () {
 }; //increase defense
 
 
-window.gm.combat.moveGuard = function () {
+window.gm.combat.moveGuard = function (actor, target) {
   //Todo
   var s = window.story.state;
   var result = {
     OK: true,
     msg: ''
   };
-
-  if (s.combat.enemyTurn) {} else {}
-
   return result;
 }; //stun caused by blunt weapon, shock
 
 
-window.gm.combat.moveStun = function () {
+window.gm.combat.moveStun = function (actor, target) {
   var s = window.story.state;
-  var attacker = s.combat.enemyTurn ? window.story.state.enemy : window.gm.player;
-  var defender = s.combat.enemyTurn ? window.gm.player : window.story.state.enemy;
+  var attacker = actor; //s.combat.enemyTurn ? window.story.state.enemy  :window.gm.player;
+
+  var defender = target; //s.combat.enemyTurn ? window.gm.player :window.story.state.enemy;
+
   var result = {
     OK: true,
     msg: ''
@@ -1456,7 +1734,7 @@ window.gm.combat.moveStun = function () {
   return result;
 };
 
-window.gm.combat.moveFlee = function () {
+window.gm.combat.moveFlee = function (actor, target) {
   //Todo
   var s = window.story.state;
   var result = {
@@ -1466,22 +1744,19 @@ window.gm.combat.moveFlee = function () {
 
   var rnd = _.random(1, 100);
 
-  if (s.combat.enemyTurn) {//todo fleeing enemy?
+  if (rnd > 40) {
+    //Todo fleeing chance calculation
+    result.msg += "You escaped the fight.";
+    s.combat.playerFleeing = true; //just setting the flag, you have to take care of handling!
   } else {
-    if (rnd > 40) {
-      //Todo fleeing chance calculation
-      result.msg += "You escaped the fight.";
-      s.combat.playerFleeing = true; //just setting the flag, you have to take care of handling!
-    } else {
-      result.msg += "Your attempts to escape failed.";
-      result.OK = false;
-    }
+    result.msg += "Your attempts to escape failed.";
+    result.OK = false;
   }
 
   return result;
 };
 
-window.gm.combat.moveSubmit = function () {
+window.gm.combat.moveSubmit = function (actor, target) {
   var s = window.story.state;
   var result = {
     OK: true,
@@ -1490,26 +1765,31 @@ window.gm.combat.moveSubmit = function () {
 
   var rnd = _.random(1, 100);
 
-  if (s.combat.enemyTurn) {//todo enemy?
+  if (rnd > 0) {
+    //Todo fleeing chance calculation
+    result.msg += "You submit to your foe.";
+    s.combat.playerSubmitting = true; //just setting the flag, you have to take care of handling!
   } else {
-    if (rnd > 0) {
-      //Todo fleeing chance calculation
-      result.msg += "You submit to your foe.";
-      s.combat.playerSubmitting = true; //just setting the flag, you have to take care of handling!
-    } else {
-      result.msg += "Your attempts to submit failed.";
-      result.OK = false;
-    }
+    result.msg += "Your attempts to submit failed.";
+    result.OK = false;
   }
 
   return result;
 }; //calculates damage of attack
 
 
-window.gm.combat.movePhysicalAttack = function () {
+window.gm.combat.movePhysicalAttack = function (actor, target) {
   var s = window.story.state;
-  var attacker = s.combat.enemyTurn ? window.story.state.enemy : window.gm.player;
-  var defender = s.combat.enemyTurn ? window.gm.player : window.story.state.enemy;
+  var skill = new SkillAttack(actor);
+  skill.cast([target]);
+  return {
+    OK: true,
+    msg: 'dealt some damage'
+  };
+  var attacker = actor; //s.combat.enemyTurn ? window.story.state.enemy  :window.gm.player;
+
+  var defender = target; //s.combat.enemyTurn ? window.gm.player :window.story.state.enemy;
+
   var def = defender.Stats.get('pDefense').value;
   var att = attacker.Stats.get('pAttack').value;
   var result = window.gm.combat.calcAttack(attacker, defender, {
@@ -1520,65 +1800,14 @@ window.gm.combat.movePhysicalAttack = function () {
     OK: result.OK,
     msg: result.msg
   };
-}; //OBSOLETE
-
-
-window.gm.combat.movePhysicalAttack_old = function () {
-  var s = window.story.state;
-  var attacker = s.combat.enemyTurn ? window.story.state.enemy : window.gm.player;
-  var defender = s.combat.enemyTurn ? window.gm.player : window.story.state.enemy;
-  var msg = '';
-  var crit = false,
-      hit = false,
-      block = false;
-  var def = defender.Stats.get('pDefense').value;
-  var att = attacker.Stats.get('pAttack').value; //??  Erfolgswahrscheinlichkeit skalieren mit Differenz der Attribute Player-Enemy
-  // gleiche Attribute = Wahrscheinlichkeit*100%; Attribut-Diff +2 = *100%*2; Attribut-Diff +4 = *200%
-  //GURPS-Lite ? this would means all skills are limited to 20!
-  //atacker rolls 3d6; if < Attackskill you hit; if 3or4 you have critical hit; else you missed completely
-
-  var rnd = window.gm.roll(3, 6);
-
-  if (rnd == 3 || rnd == 4) {
-    crit = hit = true;
-    msg += attacker.name + ' landed a critical hit.</br>';
-  } else if (rnd <= att) {
-    hit = true;
-  } else {
-    msg += attacker.name + ' missed his target.</br>';
-  } //defender rolls 3d6 (no roll on critical hit); if < Defense, the hit was avoided
-
-
-  rnd = window.gm.roll(3, 6);
-
-  if (crit == false) {
-    if (rnd == 3 || rnd == 4) {
-      hit = false;
-      msg += defender.name + ' avoided beeing hit.</br>';
-    } else if (rnd <= def) {
-      block = true;
-      msg += defender.name + ' was hit but shrugged of the damage.</br>';
-    }
-  } //attacker rolls dies according to weapon; damage is the result reduced by DR
-
-
-  if (hit == true && block == false) {
-    rnd = Math.max(0, rnd = window.gm.roll(1, 6) + 1 - 0); //todo
-
-    defender.Stats.increment('health', -1 * rnd);
-    msg += attacker.name + ' dealt ' + rnd + ' damage to ' + defender.name + '.</br>';
-  }
-
-  return {
-    OK: hit && !block,
-    msg: msg
-  };
 };
 
-window.gm.combat.moveUltraKill = function () {
+window.gm.combat.moveUltraKill = function (actor, target) {
   var s = window.story.state;
-  var attacker = s.combat.enemyTurn ? window.story.state.enemy : window.gm.player;
-  var defender = s.combat.enemyTurn ? window.gm.player : window.story.state.enemy;
+  var attacker = actor; //s.combat.enemyTurn ? window.story.state.enemy  :window.gm.player;
+
+  var defender = target; //s.combat.enemyTurn ? window.gm.player :window.story.state.enemy;
+
   var msg = '';
   var rnd = 30;
   defender.Stats.increment('health', -1 * rnd);
@@ -2441,40 +2670,6 @@ var DngMapper = /*#__PURE__*/function () {
 }();
 
 "use strict";
-/* combat encounters are defined here */
-
-
-window.gm = window.gm || {};
-window.gm.encounters = window.gm.encounters || {};
-
-window.gm.encounters.mole = function (location) {
-  window.gm.Encounter = new CombatSetup();
-
-  window.gm.Encounter.EnemyFunc = function () {
-    var x = new window.gm.Mobs.Mole();
-    x.scaleLevel(window.gm.player.level);
-    return x;
-  };
-
-  window.gm.Encounter.Location = location;
-  window.gm.Encounter.scenePic = window.gm.getScenePic(location);
-
-  window.gm.Encounter.onSubmit = function () {
-    return 'What will now happen to you?</br>' + window.gm.printPassageLink('Next', 'Mole Submit');
-  };
-
-  window.gm.Encounter.initCombat();
-};
-
-window.gm.encounters.mechanicguy = function (location) {
-  window.gm.Encounter = new CombatSetup();
-  window.gm.Encounter.EnemyFunc = window.gm.Mobs.Mechanic;
-  window.gm.Encounter.Location = location;
-  window.gm.Encounter.scenePic = window.gm.getScenePic(location);
-  window.gm.Encounter.initCombat();
-};
-
-"use strict";
 /*
 core functionality
 */
@@ -2657,6 +2852,29 @@ window.gm.initGame = function (forceReset) {
       // can be used as a random variable for use in CURRENT passage
       args: [] // can be used to set arguments before another passage is called (passage-arguments) 
 
+    };
+  }
+
+  if (!s.combat || forceReset) {
+    //see encounter & combat.js
+    s.combat = {
+      enemyParty: [],
+      //collection of enemy-chars involved 
+      enemyIdx: 0,
+      //index of actual enemy 
+      playerParty: [],
+      playerIdx: 0,
+      newTurn: false,
+      enemyFirst: false,
+      //if true, enemy moves first
+      enemyTurn: false,
+      //true if enemys turn
+      state: "",
+      //internal state
+      playerFleeing: false,
+      playerSubmitting: false,
+      turnCount: 0,
+      scenePic: 'assets/bg_park.png'
     };
   }
 }; //reimplement for your game !
@@ -3856,7 +4074,6 @@ var Outfit = /*#__PURE__*/function (_Inventory) {
 "use strict";
 /* classes to manage a quest
  */
-//todo move to class
 // helper for publisher/subscriber-pattern
 
 
@@ -3895,9 +4112,6 @@ var QuestMilestone = /*#__PURE__*/function () {
     } : HiddenCB;
     this.descr = descr;
     this.CondCheckCB = CondCheckCB;
-    /*this.EnterMilestoneCB = null; //todo use pubsub instead
-    this.ExitMilestoneCB = null;*/
-
     window.storage.registerConstructor(QuestMilestone);
   }
 
@@ -4591,6 +4805,315 @@ window.gm.testsaveAssign = function () {
   },*/
 
 "use strict";
+
+var SkillResult = function SkillResult() {
+  _classCallCheck(this, SkillResult);
+
+  this.OK = false, this.source = null, this.targets = [], this.skill = null, this.effects = [];
+};
+
+var Skill = /*#__PURE__*/function () {
+  function Skill(name, descr, caster) {
+    _classCallCheck(this, Skill);
+
+    this.name = name;
+    this.descr = descr;
+    this.caster = caster;
+    this.targetFilter = this.targetFilterEnemy;
+  }
+
+  _createClass(Skill, [{
+    key: "getMaxTargetCount",
+    value: function getMaxTargetCount() {
+      return 1;
+    }
+    /*targetFilter(){
+          //returns a function to filter a list of possible targets for targets that this skill can cast on
+          //myFilter(targets)->targets   teams is a array of party; targets is a list of character
+          return this.targetFilterEnemy;
+    }*/
+
+  }, {
+    key: "isValidPhase",
+    value: function isValidPhase() {
+      //returns True if the skill can be used in tha actual game-phase (combatPhase,explorePhase)
+      return true;
+    }
+  }, {
+    key: "isDisabled",
+    value: function isDisabled() {
+      //returns True and text if the skill cannot be used because its temporary disabled (silenced mage, blinded)
+      //the text should indicate why and how long it is disabled
+      return {
+        OK: false,
+        msg: ''
+      };
+    }
+  }, {
+    key: "isValidTarget",
+    value: function isValidTarget(targets) {
+      //returns True if the skill can be used on the target(s)
+      var filtered = this.targetFilter(targets);
+
+      var _iterator = _createForOfIteratorHelper(targets),
+          _step;
+
+      try {
+        for (_iterator.s(); !(_step = _iterator.n()).done;) {
+          var target = _step.value;
+
+          var _i = filtered.indexOf(target);
+
+          if (_i < 0) return false;
+        }
+      } catch (err) {
+        _iterator.e(err);
+      } finally {
+        _iterator.f();
+      }
+
+      return true; //return ((this.targetFilter(targets))===(targets));//sorted(this.targetFilter()(targets))== sorted(targets))
+    }
+  }, {
+    key: "getCost",
+    value: function getCost() {
+      //returns information about the cost to execute the skill
+      return {};
+    }
+  }, {
+    key: "getName",
+    value: function getName() {
+      //returns name of the skill for listboxes/labels"""
+      return this.name;
+    }
+  }, {
+    key: "getDescription",
+    value: function getDescription() {
+      //returns a description of the skill for tooltip
+      return this.descr;
+    }
+  }, {
+    key: "previewCast",
+    value: function previewCast(targets) {
+      var result = new SkillResult();
+      return result;
+    }
+  }, {
+    key: "cast",
+    value: function cast(targets) {
+      //execute the skill on the targets
+      var result = this.previewCast(targets);
+
+      if (result.OK) {
+        var _iterator2 = _createForOfIteratorHelper(result.effects),
+            _step2;
+
+        try {
+          for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+            var X = _step2.value;
+
+            // for each target
+            var _iterator3 = _createForOfIteratorHelper(X.eff),
+                _step3;
+
+            try {
+              for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
+                var Y = _step3.value;
+                //...multiple effects
+                X.target.addEffect(Y.name, Y);
+              }
+            } catch (err) {
+              _iterator3.e(err);
+            } finally {
+              _iterator3.f();
+            }
+          }
+        } catch (err) {
+          _iterator2.e(err);
+        } finally {
+          _iterator2.f();
+        }
+      }
+    } //some predefined filter; chain them to narrow down the targets
+
+  }, {
+    key: "targetFilterSelf",
+    value: function targetFilterSelf(targets) {
+      var possibleTarget = [];
+
+      var _iterator4 = _createForOfIteratorHelper(targets),
+          _step4;
+
+      try {
+        for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
+          var target = _step4.value;
+          if (this.caster == target) possibleTarget.push(target);
+        }
+      } catch (err) {
+        _iterator4.e(err);
+      } finally {
+        _iterator4.f();
+      }
+
+      return possibleTarget;
+    }
+  }, {
+    key: "targetFilterAlly",
+    value: function targetFilterAlly(targets) {
+      var possibleTarget = [];
+
+      var _iterator5 = _createForOfIteratorHelper(targets),
+          _step5;
+
+      try {
+        for (_iterator5.s(); !(_step5 = _iterator5.n()).done;) {
+          var target = _step5.value;
+          if (this.caster.faction == target.faction) possibleTarget.push(target);
+        }
+      } catch (err) {
+        _iterator5.e(err);
+      } finally {
+        _iterator5.f();
+      }
+
+      return possibleTarget;
+    }
+  }, {
+    key: "targetFilterEnemy",
+    value: function targetFilterEnemy(targets) {
+      var possibleTarget = [];
+
+      var _iterator6 = _createForOfIteratorHelper(targets),
+          _step6;
+
+      try {
+        for (_iterator6.s(); !(_step6 = _iterator6.n()).done;) {
+          var target = _step6.value;
+          if (this.caster.faction != target.faction) possibleTarget.push(target);
+        }
+      } catch (err) {
+        _iterator6.e(err);
+      } finally {
+        _iterator6.f();
+      }
+
+      return possibleTarget;
+    }
+  }, {
+    key: "targetFilterFighting",
+    value: function targetFilterFighting(targets) {
+      //chars that are not inhibited"""
+      var possibleTarget = [];
+
+      var _iterator7 = _createForOfIteratorHelper(targets),
+          _step7;
+
+      try {
+        for (_iterator7.s(); !(_step7 = _iterator7.n()).done;) {
+          var target = _step7.value;
+          if (target._canAct().OK) possibleTarget.push(target);
+        }
+      } catch (err) {
+        _iterator7.e(err);
+      } finally {
+        _iterator7.f();
+      }
+
+      return possibleTarget;
+    }
+  }, {
+    key: "targetFilterDead",
+    value: function targetFilterDead(targets) {
+      //chars that are dead"""
+      var possibleTarget = [];
+
+      var _iterator8 = _createForOfIteratorHelper(targets),
+          _step8;
+
+      try {
+        for (_iterator8.s(); !(_step8 = _iterator8.n()).done;) {
+          var target = _step8.value;
+          if (!target.isDead()) possibleTarget.push(target);
+        }
+      } catch (err) {
+        _iterator8.e(err);
+      } finally {
+        _iterator8.f();
+      }
+
+      return possibleTarget;
+    }
+  }]);
+
+  return Skill;
+}();
+
+var SkillAttack = /*#__PURE__*/function (_Skill) {
+  _inherits(SkillAttack, _Skill);
+
+  var _super4 = _createSuper(SkillAttack);
+
+  //execute simple attack with active weapon
+  function SkillAttack(caster) {
+    var _this3;
+
+    _classCallCheck(this, SkillAttack);
+
+    _this3 = _super4.call(this, "Attack", "Attack", caster);
+
+    _this3.targetFilter = function (targets) {
+      return this.targetFilterFighting(this.targetFilterEnemy(targets));
+    };
+
+    return _this3;
+  }
+
+  _createClass(SkillAttack, [{
+    key: "previewCast",
+    value: function previewCast(targets) {
+      var result = new SkillResult();
+      result.skill = this;
+      result.source = this.caster;
+      result.targets = targets;
+
+      if (this.isValidTarget(targets)) {
+        result.OK = true;
+
+        var _iterator9 = _createForOfIteratorHelper(targets),
+            _step9;
+
+        try {
+          for (_iterator9.s(); !(_step9 = _iterator9.n()).done;) {
+            var target = _step9.value;
+            result.effects.push({
+              target: target,
+              eff: this.calculateDamage(this.caster, target)
+            });
+          }
+        } catch (err) {
+          _iterator9.e(err);
+        } finally {
+          _iterator9.f();
+        }
+      }
+
+      return result;
+    }
+  }, {
+    key: "calculateDamage",
+    value: function calculateDamage(caster, target) {
+      var att = caster.Stats.get('pAttack').value;
+      var def = target.Stats.get('pDefense').value; //var result = window.gm.combat.calcAttack(caster,target,{value:att,total:att});
+
+      var x = att - def + 5;
+      return [new effDamage(x)]; //return [EffMiss(caster,targets[0],'missed attack')]
+    }
+  }]);
+
+  return SkillAttack;
+}(Skill);
+
+"use strict";
 /* classes to affect...: 
     - the state of a character like     'tired'
     - stats of a character like healthMax
@@ -4602,17 +5125,17 @@ window.gm.testsaveAssign = function () {
 var StatsDictionary = /*#__PURE__*/function (_Inventory2) {
   _inherits(StatsDictionary, _Inventory2);
 
-  var _super4 = _createSuper(StatsDictionary);
+  var _super5 = _createSuper(StatsDictionary);
 
   //Todo a collection of Stats is similiar to Inventory?
   function StatsDictionary(externlist) {
-    var _this3;
+    var _this4;
 
     _classCallCheck(this, StatsDictionary);
 
-    _this3 = _super4.call(this, externlist);
+    _this4 = _super5.call(this, externlist);
     window.storage.registerConstructor(StatsDictionary);
-    return _this3;
+    return _this4;
   }
 
   _createClass(StatsDictionary, [{
@@ -4847,17 +5370,17 @@ var Stat = /*#__PURE__*/function () {
 var Effects = /*#__PURE__*/function (_Inventory3) {
   _inherits(Effects, _Inventory3);
 
-  var _super5 = _createSuper(Effects);
+  var _super6 = _createSuper(Effects);
 
   //Todo a collection of Stats is similiar to Inventory?
   function Effects(externlist) {
-    var _this4;
+    var _this5;
 
     _classCallCheck(this, Effects);
 
-    _this4 = _super5.call(this, externlist);
+    _this5 = _super6.call(this, externlist);
     window.storage.registerConstructor(Effects);
-    return _this4;
+    return _this5;
   }
 
   _createClass(Effects, [{
@@ -5082,12 +5605,12 @@ var Effect = /*#__PURE__*/function () {
 var CombatEffect = /*#__PURE__*/function (_Effect) {
   _inherits(CombatEffect, _Effect);
 
-  var _super6 = _createSuper(CombatEffect);
+  var _super7 = _createSuper(CombatEffect);
 
   function CombatEffect() {
     _classCallCheck(this, CombatEffect);
 
-    return _super6.call(this);
+    return _super7.call(this);
   }
 
   _createClass(CombatEffect, [{
@@ -5874,18 +6397,18 @@ var CombatEffect = /*#__PURE__*/function (_Effect) {
 var BeeHive = /*#__PURE__*/function (_DngDungeon) {
   _inherits(BeeHive, _DngDungeon);
 
-  var _super7 = _createSuper(BeeHive);
+  var _super8 = _createSuper(BeeHive);
 
   function BeeHive() {
-    var _this5;
+    var _this6;
 
     _classCallCheck(this, BeeHive);
 
-    _this5 = _super7.call(this, "BeeHive", "There seem to live alot of giant bees here.");
+    _this6 = _super8.call(this, "BeeHive", "There seem to live alot of giant bees here.");
 
-    _this5.buildFloors();
+    _this6.buildFloors();
 
-    return _this5;
+    return _this6;
   }
 
   _createClass(BeeHive, [{
@@ -6084,6 +6607,57 @@ window.gm.dngs = function (dngs) {
 }(window.gm.dngs || {});
 
 "use strict";
+/* combat encounters are defined here */
+
+
+window.gm = window.gm || {};
+window.gm.encounters = window.gm.encounters || {};
+
+window.gm.encounters.mole = function (location) {
+  window.gm.Encounter = new CombatSetup();
+
+  window.gm.Encounter.EnemyFunc = function () {
+    var x = new window.gm.Mobs.Mole();
+    x.scaleLevel(window.gm.player.level);
+    return [x];
+  };
+
+  window.gm.Encounter.Location = location;
+  window.gm.Encounter.scenePic = window.gm.getScenePic(location);
+
+  window.gm.Encounter.onSubmit = function () {
+    return 'What will now happen to you?</br>' + window.gm.printPassageLink('Next', 'Mole Submit');
+  };
+
+  window.gm.Encounter.initCombat();
+};
+
+window.gm.encounters.moleX2 = function (location) {
+  window.gm.Encounter = new CombatSetup();
+
+  window.gm.Encounter.EnemyFunc = function () {
+    return [new window.gm.Mobs.Mole().scaleLevel(window.gm.player.level), new window.gm.Mobs.Mole().scaleLevel(window.gm.player.level)];
+  };
+
+  window.gm.Encounter.Location = location;
+  window.gm.Encounter.scenePic = window.gm.getScenePic(location);
+
+  window.gm.Encounter.onSubmit = function () {
+    return 'What will now happen to you?</br>' + window.gm.printPassageLink('Next', 'Mole Submit');
+  };
+
+  window.gm.Encounter.initCombat();
+};
+
+window.gm.encounters.mechanicguy = function (location) {
+  window.gm.Encounter = new CombatSetup();
+  window.gm.Encounter.EnemyFunc = window.gm.Mobs.Mechanic;
+  window.gm.Encounter.Location = location;
+  window.gm.Encounter.scenePic = window.gm.getScenePic(location);
+  window.gm.Encounter.initCombat();
+};
+
+"use strict";
 /* bundles some utility operations*/
 
 
@@ -6149,34 +6723,6 @@ window.gm.initGame = function (forceReset) {
     window.storage.loadAchivementsFromBrowser();
   }
 
-  if (!s.enemy || forceReset) {
-    //actual/last enemy
-    s.enemy = new Character();
-  }
-
-  if (!s.combat || forceReset) {
-    //see encounter & combat.js
-    s.combat = {
-      enemyParty: [],
-      //collection of enemy-chars involved 
-      enemyIdx: 0,
-      //index of actual enemy 
-      playerParty: [],
-      playerIdx: 0,
-      newTurn: false,
-      enemyFirst: false,
-      //if true, enemy moves first
-      enemyTurn: false,
-      //true if enemys turn
-      state: "",
-      //internal state
-      playerFleeing: false,
-      playerSubmitting: false,
-      turnCount: 0,
-      scenePic: 'assets/bg_park.png'
-    };
-  }
-
   if (!s.mom || forceReset) {
     s.mom = {
       location: "Kitchen",
@@ -6211,6 +6757,7 @@ window.gm.initGame = function (forceReset) {
     //window.gm.Ratchel = new Character(s.Ratchel);
     window.gm.Ratchel = new Character();
     window.gm.Ratchel.name = "Ratchel";
+    window.gm.Ratchel.faction = "Player";
     window.gm.Ratchel.gainRelation('Mom', 10);
     window.gm.Ratchel.Effects.addItem(skCooking.name, new skCooking()); //add some basic inventory
 
@@ -6396,16 +6943,16 @@ window.gm.printUnlockPerk = function (id, descr) {
 var LighterDad = /*#__PURE__*/function (_Item2) {
   _inherits(LighterDad, _Item2);
 
-  var _super8 = _createSuper(LighterDad);
+  var _super9 = _createSuper(LighterDad);
 
   function LighterDad() {
-    var _this6;
+    var _this7;
 
     _classCallCheck(this, LighterDad);
 
-    _this6 = _super8.call(this, 'LighterDad');
-    _this6.desc = 'I got this lighter from my real dad.';
-    return _this6;
+    _this7 = _super9.call(this, 'LighterDad');
+    _this7.desc = 'I got this lighter from my real dad.';
+    return _this7;
   }
 
   _createClass(LighterDad, [{
@@ -6428,16 +6975,16 @@ var LighterDad = /*#__PURE__*/function (_Item2) {
 var Money = /*#__PURE__*/function (_Item3) {
   _inherits(Money, _Item3);
 
-  var _super9 = _createSuper(Money);
+  var _super10 = _createSuper(Money);
 
   function Money() {
-    var _this7;
+    var _this8;
 
     _classCallCheck(this, Money);
 
-    _this7 = _super9.call(this, 'Money');
-    _this7.desc = 'shiny,clinky coin.';
-    return _this7;
+    _this8 = _super10.call(this, 'Money');
+    _this8.desc = 'shiny,clinky coin.';
+    return _this8;
   }
 
   _createClass(Money, [{
@@ -6460,16 +7007,16 @@ var Money = /*#__PURE__*/function (_Item3) {
 var LaptopPS = /*#__PURE__*/function (_Item4) {
   _inherits(LaptopPS, _Item4);
 
-  var _super10 = _createSuper(LaptopPS);
+  var _super11 = _createSuper(LaptopPS);
 
   function LaptopPS() {
-    var _this8;
+    var _this9;
 
     _classCallCheck(this, LaptopPS);
 
-    _this8 = _super10.call(this, 'Laptop-PS');
-    _this8.desc = 'Power converter for laptop.';
-    return _this8;
+    _this9 = _super11.call(this, 'Laptop-PS');
+    _this9.desc = 'Power converter for laptop.';
+    return _this9;
   }
 
   _createClass(LaptopPS, [{
@@ -6492,16 +7039,16 @@ var LaptopPS = /*#__PURE__*/function (_Item4) {
 var Dildo_small = /*#__PURE__*/function (_Item5) {
   _inherits(Dildo_small, _Item5);
 
-  var _super11 = _createSuper(Dildo_small);
+  var _super12 = _createSuper(Dildo_small);
 
   function Dildo_small() {
-    var _this9;
+    var _this10;
 
     _classCallCheck(this, Dildo_small);
 
-    _this9 = _super11.call(this, 'Dildo_small');
-    _this9.desc = 'A dildo, smaller than an average dong, made from rubbery plastic.';
-    return _this9;
+    _this10 = _super12.call(this, 'Dildo_small');
+    _this10.desc = 'A dildo, smaller than an average dong, made from rubbery plastic.';
+    return _this10;
   }
 
   _createClass(Dildo_small, [{
@@ -6524,16 +7071,16 @@ var Dildo_small = /*#__PURE__*/function (_Item5) {
 var Lube = /*#__PURE__*/function (_Item6) {
   _inherits(Lube, _Item6);
 
-  var _super12 = _createSuper(Lube);
+  var _super13 = _createSuper(Lube);
 
   function Lube() {
-    var _this10;
+    var _this11;
 
     _classCallCheck(this, Lube);
 
-    _this10 = _super12.call(this, 'Lube');
-    _this10.desc = 'Slippery lubricant for personal use.';
-    return _this10;
+    _this11 = _super13.call(this, 'Lube');
+    _this11.desc = 'Slippery lubricant for personal use.';
+    return _this11;
   }
 
   _createClass(Lube, [{
@@ -6556,16 +7103,16 @@ var Lube = /*#__PURE__*/function (_Item6) {
 var Battery = /*#__PURE__*/function (_Item7) {
   _inherits(Battery, _Item7);
 
-  var _super13 = _createSuper(Battery);
+  var _super14 = _createSuper(Battery);
 
   function Battery() {
-    var _this11;
+    var _this12;
 
     _classCallCheck(this, Battery);
 
-    _this11 = _super13.call(this, 'Battery');
-    _this11.desc = 'Provides electricity for devices.';
-    return _this11;
+    _this12 = _super14.call(this, 'Battery');
+    _this12.desc = 'Provides electricity for devices.';
+    return _this12;
   }
 
   _createClass(Battery, [{
@@ -6588,16 +7135,16 @@ var Battery = /*#__PURE__*/function (_Item7) {
 var CanOfCoffee = /*#__PURE__*/function (_Item8) {
   _inherits(CanOfCoffee, _Item8);
 
-  var _super14 = _createSuper(CanOfCoffee);
+  var _super15 = _createSuper(CanOfCoffee);
 
   function CanOfCoffee() {
-    var _this12;
+    var _this13;
 
     _classCallCheck(this, CanOfCoffee);
 
-    _this12 = _super14.call(this, 'Can of coffee');
-    _this12.desc = 'Cold coffee in a can. Tasty? Not really!';
-    return _this12;
+    _this13 = _super15.call(this, 'Can of coffee');
+    _this13.desc = 'Cold coffee in a can. Tasty? Not really!';
+    return _this13;
   }
 
   _createClass(CanOfCoffee, [{
@@ -6644,16 +7191,16 @@ var CanOfCoffee = /*#__PURE__*/function (_Item8) {
 var SimpleFood = /*#__PURE__*/function (_Item9) {
   _inherits(SimpleFood, _Item9);
 
-  var _super15 = _createSuper(SimpleFood);
+  var _super16 = _createSuper(SimpleFood);
 
   function SimpleFood() {
-    var _this13;
+    var _this14;
 
     _classCallCheck(this, SimpleFood);
 
-    _this13 = _super15.call(this, 'SimpleFood');
-    _this13.desc = 'Something to eat.';
-    return _this13;
+    _this14 = _super16.call(this, 'SimpleFood');
+    _this14.desc = 'Something to eat.';
+    return _this14;
   }
 
   _createClass(SimpleFood, [{
@@ -6757,20 +7304,20 @@ window.gm.ItemsLib = function (ItemsLib) {
 var Mole = /*#__PURE__*/function (_Mob) {
   _inherits(Mole, _Mob);
 
-  var _super16 = _createSuper(Mole);
+  var _super17 = _createSuper(Mole);
 
   function Mole() {
-    var _this14;
+    var _this15;
 
     _classCallCheck(this, Mole);
 
-    _this14 = _super16.call(this);
-    _this14.name = 'Mole';
-    _this14.pic = 'assets/mole.jpg';
+    _this15 = _super17.call(this);
+    _this15.name = 'Mole';
+    _this15.pic = 'assets/mole.jpg';
 
-    _this14.Stats.increment('healthMax', -1 * (_this14.health().max - 20));
+    _this15.Stats.increment('healthMax', -1 * (_this15.health().max - 20));
 
-    return _this14;
+    return _this15;
   }
 
   return Mole;
@@ -6781,17 +7328,17 @@ var Mole = /*#__PURE__*/function (_Mob) {
 var Mechanic = /*#__PURE__*/function (_Mob2) {
   _inherits(Mechanic, _Mob2);
 
-  var _super17 = _createSuper(Mechanic);
+  var _super18 = _createSuper(Mechanic);
 
   function Mechanic() {
-    var _this15;
+    var _this16;
 
     _classCallCheck(this, Mechanic);
 
-    _this15 = _super17.call(this);
-    _this15.name = 'Mechanic-Guy';
-    _this15.pic = 'assets/mechanic.jpg';
-    return _this15;
+    _this16 = _super18.call(this);
+    _this16.name = 'Mechanic-Guy';
+    _this16.pic = 'assets/mechanic.jpg';
+    return _this16;
   }
 
   _createClass(Mechanic, [{
@@ -6839,19 +7386,19 @@ window.gm.Mobs = function (Mobs) {
 var Leggings = /*#__PURE__*/function (_Equipment) {
   _inherits(Leggings, _Equipment);
 
-  var _super18 = _createSuper(Leggings);
+  var _super19 = _createSuper(Leggings);
 
   function Leggings() {
-    var _this16;
+    var _this17;
 
     _classCallCheck(this, Leggings);
 
-    _this16 = _super18.call(this, 'Leggings');
-    _this16.tags = ['cloth'];
-    _this16.slotUse = ['Legs'];
-    _this16.desc = 'Spandex-leggings for sport. (agility+)';
+    _this17 = _super19.call(this, 'Leggings');
+    _this17.tags = ['cloth'];
+    _this17.slotUse = ['Legs'];
+    _this17.desc = 'Spandex-leggings for sport. (agility+)';
     window.storage.registerConstructor(Leggings);
-    return _this16;
+    return _this17;
   }
 
   _createClass(Leggings, [{
@@ -6911,19 +7458,19 @@ var Leggings = /*#__PURE__*/function (_Equipment) {
 var Jeans = /*#__PURE__*/function (_Equipment2) {
   _inherits(Jeans, _Equipment2);
 
-  var _super19 = _createSuper(Jeans);
+  var _super20 = _createSuper(Jeans);
 
   function Jeans() {
-    var _this17;
+    var _this18;
 
     _classCallCheck(this, Jeans);
 
-    _this17 = _super19.call(this, 'Jeans');
-    _this17.tags = ['cloth'];
-    _this17.slotUse = ['Legs'];
-    _this17.desc = 'plain old blue jeans';
+    _this18 = _super20.call(this, 'Jeans');
+    _this18.tags = ['cloth'];
+    _this18.slotUse = ['Legs'];
+    _this18.desc = 'plain old blue jeans';
     window.storage.registerConstructor(Jeans);
-    return _this17;
+    return _this18;
   }
 
   _createClass(Jeans, [{
@@ -6960,19 +7507,19 @@ var Jeans = /*#__PURE__*/function (_Equipment2) {
 var TankShirt = /*#__PURE__*/function (_Equipment3) {
   _inherits(TankShirt, _Equipment3);
 
-  var _super20 = _createSuper(TankShirt);
+  var _super21 = _createSuper(TankShirt);
 
   function TankShirt() {
-    var _this18;
+    var _this19;
 
     _classCallCheck(this, TankShirt);
 
-    _this18 = _super20.call(this, 'TankShirt');
-    _this18.tags = ['cloth'];
-    _this18.slotUse = ['Torso'];
-    _this18.desc = 'light blue tank-top';
+    _this19 = _super21.call(this, 'TankShirt');
+    _this19.tags = ['cloth'];
+    _this19.slotUse = ['Torso'];
+    _this19.desc = 'light blue tank-top';
     window.storage.registerConstructor(TankShirt);
-    return _this18;
+    return _this19;
   }
 
   _createClass(TankShirt, [{
@@ -7009,19 +7556,19 @@ var TankShirt = /*#__PURE__*/function (_Equipment3) {
 var Pullover = /*#__PURE__*/function (_Equipment4) {
   _inherits(Pullover, _Equipment4);
 
-  var _super21 = _createSuper(Pullover);
+  var _super22 = _createSuper(Pullover);
 
   function Pullover() {
-    var _this19;
+    var _this20;
 
     _classCallCheck(this, Pullover);
 
-    _this19 = _super21.call(this, 'Pullover');
-    _this19.tags = ['cloth'];
-    _this19.slotUse = ['Torso', 'Arms'];
-    _this19.desc = 'warm pullover';
+    _this20 = _super22.call(this, 'Pullover');
+    _this20.tags = ['cloth'];
+    _this20.slotUse = ['Torso', 'Arms'];
+    _this20.desc = 'warm pullover';
     window.storage.registerConstructor(Pullover);
-    return _this19;
+    return _this20;
   }
 
   _createClass(Pullover, [{
@@ -7058,19 +7605,19 @@ var Pullover = /*#__PURE__*/function (_Equipment4) {
 var HandCuffs = /*#__PURE__*/function (_Equipment5) {
   _inherits(HandCuffs, _Equipment5);
 
-  var _super22 = _createSuper(HandCuffs);
+  var _super23 = _createSuper(HandCuffs);
 
   function HandCuffs() {
-    var _this20;
+    var _this21;
 
     _classCallCheck(this, HandCuffs);
 
-    _this20 = _super22.call(this, 'HandCuffs');
-    _this20.tags = ['restrain'];
-    _this20.slotUse = ['RHand', 'LHand'];
-    _this20.desc = 'handcuffs';
+    _this21 = _super23.call(this, 'HandCuffs');
+    _this21.tags = ['restrain'];
+    _this21.slotUse = ['RHand', 'LHand'];
+    _this21.desc = 'handcuffs';
     window.storage.registerConstructor(Pullover);
-    return _this20;
+    return _this21;
   }
 
   _createClass(HandCuffs, [{
@@ -7135,19 +7682,19 @@ var HandCuffs = /*#__PURE__*/function (_Equipment5) {
 var Crowbar = /*#__PURE__*/function (_Equipment6) {
   _inherits(Crowbar, _Equipment6);
 
-  var _super23 = _createSuper(Crowbar);
+  var _super24 = _createSuper(Crowbar);
 
   function Crowbar() {
-    var _this21;
+    var _this22;
 
     _classCallCheck(this, Crowbar);
 
-    _this21 = _super23.call(this, 'Crowbar');
-    _this21.desc = 'A durable crowbar.';
-    _this21.tags = ['tool', 'weapon'];
-    _this21.slotUse = ['RHand'];
+    _this22 = _super24.call(this, 'Crowbar');
+    _this22.desc = 'A durable crowbar.';
+    _this22.tags = ['tool', 'weapon'];
+    _this22.slotUse = ['RHand'];
     window.storage.registerConstructor(Crowbar);
-    return _this21;
+    return _this22;
   }
 
   _createClass(Crowbar, [{
@@ -7234,19 +7781,19 @@ var Crowbar = /*#__PURE__*/function (_Equipment6) {
 var Shovel = /*#__PURE__*/function (_Equipment7) {
   _inherits(Shovel, _Equipment7);
 
-  var _super24 = _createSuper(Shovel);
+  var _super25 = _createSuper(Shovel);
 
   function Shovel() {
-    var _this22;
+    var _this23;
 
     _classCallCheck(this, Shovel);
 
-    _this22 = _super24.call(this, 'Shovel');
-    _this22.desc = 'A rusty,old shovel.';
-    _this22.tags = ['tool', 'weapon'];
-    _this22.slotUse = ['RHand', 'LHand'];
+    _this23 = _super25.call(this, 'Shovel');
+    _this23.desc = 'A rusty,old shovel.';
+    _this23.tags = ['tool', 'weapon'];
+    _this23.slotUse = ['RHand', 'LHand'];
     window.storage.registerConstructor(Shovel);
-    return _this22;
+    return _this23;
   }
 
   _createClass(Shovel, [{
@@ -7332,19 +7879,19 @@ var Shovel = /*#__PURE__*/function (_Equipment7) {
 var TailRibbon = /*#__PURE__*/function (_Equipment8) {
   _inherits(TailRibbon, _Equipment8);
 
-  var _super25 = _createSuper(TailRibbon);
+  var _super26 = _createSuper(TailRibbon);
 
   function TailRibbon() {
-    var _this23;
+    var _this24;
 
     _classCallCheck(this, TailRibbon);
 
-    _this23 = _super25.call(this, 'TailRibbon');
-    _this23.tags = ['cloth'];
-    _this23.slotUse = ['TailTip'];
-    _this23.desc = 'a fancy color band that can be wrapped around someones tailtip';
+    _this24 = _super26.call(this, 'TailRibbon');
+    _this24.tags = ['cloth'];
+    _this24.slotUse = ['TailTip'];
+    _this24.desc = 'a fancy color band that can be wrapped around someones tailtip';
     window.storage.registerConstructor(TailRibbon);
-    return _this23;
+    return _this24;
   }
 
   _createClass(TailRibbon, [{
@@ -7395,19 +7942,19 @@ var TailRibbon = /*#__PURE__*/function (_Equipment8) {
 var TailNone = /*#__PURE__*/function (_Equipment9) {
   _inherits(TailNone, _Equipment9);
 
-  var _super26 = _createSuper(TailNone);
+  var _super27 = _createSuper(TailNone);
 
   function TailNone() {
-    var _this24;
+    var _this25;
 
     _classCallCheck(this, TailNone);
 
-    _this24 = _super26.call(this, 'TailNone');
-    _this24.tags = ['body'];
-    _this24.slotUse = ['bTailBase'];
-    _this24.desc = '';
+    _this25 = _super27.call(this, 'TailNone');
+    _this25.tags = ['body'];
+    _this25.slotUse = ['bTailBase'];
+    _this25.desc = '';
     window.storage.registerConstructor(TailNone);
-    return _this24;
+    return _this25;
   }
 
   _createClass(TailNone, [{
@@ -7444,23 +7991,23 @@ var TailNone = /*#__PURE__*/function (_Equipment9) {
 var TailCat = /*#__PURE__*/function (_Equipment10) {
   _inherits(TailCat, _Equipment10);
 
-  var _super27 = _createSuper(TailCat);
+  var _super28 = _createSuper(TailCat);
 
   function TailCat() {
-    var _this25;
+    var _this26;
 
     _classCallCheck(this, TailCat);
 
-    _this25 = _super27.call(this, 'TailCat');
-    _this25.tags = ['body'];
-    _this25.slotUse = ['bTailBase'];
-    _this25.desc = 'a flexible,furred tail like that of a cat.';
-    _this25.growth = 0.10; //in %/100 maxGrowth
+    _this26 = _super28.call(this, 'TailCat');
+    _this26.tags = ['body'];
+    _this26.slotUse = ['bTailBase'];
+    _this26.desc = 'a flexible,furred tail like that of a cat.';
+    _this26.growth = 0.10; //in %/100 maxGrowth
 
-    _this25.maxGrowth = 1.2; //in meter, todo depends on bodysize
+    _this26.maxGrowth = 1.2; //in meter, todo depends on bodysize
 
     window.storage.registerConstructor(TailCat);
-    return _this25;
+    return _this26;
   }
 
   _createClass(TailCat, [{
@@ -7497,23 +8044,23 @@ var TailCat = /*#__PURE__*/function (_Equipment10) {
 var BreastHuman = /*#__PURE__*/function (_Equipment11) {
   _inherits(BreastHuman, _Equipment11);
 
-  var _super28 = _createSuper(BreastHuman);
+  var _super29 = _createSuper(BreastHuman);
 
   function BreastHuman() {
-    var _this26;
+    var _this27;
 
     _classCallCheck(this, BreastHuman);
 
-    _this26 = _super28.call(this, 'BreastHuman');
-    _this26.tags = ['body'];
-    _this26.slotUse = ['bBreast'];
-    _this26.desc = 'some human breasts.';
-    _this26.growth = 0.0; //in %/100 maxGrowth
+    _this27 = _super29.call(this, 'BreastHuman');
+    _this27.tags = ['body'];
+    _this27.slotUse = ['bBreast'];
+    _this27.desc = 'some human breasts.';
+    _this27.growth = 0.0; //in %/100 maxGrowth
 
-    _this26.maxGrowth = 0.3; //in meter, todo depends on bodysize
+    _this27.maxGrowth = 0.3; //in meter, todo depends on bodysize
 
     window.storage.registerConstructor(BreastHuman);
-    return _this26;
+    return _this27;
   }
 
   _createClass(BreastHuman, [{
@@ -7550,23 +8097,23 @@ var BreastHuman = /*#__PURE__*/function (_Equipment11) {
 var VulvaHuman = /*#__PURE__*/function (_Equipment12) {
   _inherits(VulvaHuman, _Equipment12);
 
-  var _super29 = _createSuper(VulvaHuman);
+  var _super30 = _createSuper(VulvaHuman);
 
   function VulvaHuman() {
-    var _this27;
+    var _this28;
 
     _classCallCheck(this, VulvaHuman);
 
-    _this27 = _super29.call(this, 'VulvaHuman');
-    _this27.tags = ['body'];
-    _this27.slotUse = ['bVulva'];
-    _this27.desc = 'a human cooter.';
-    _this27.growth = 0.0; //in %/100 maxGrowth
+    _this28 = _super30.call(this, 'VulvaHuman');
+    _this28.tags = ['body'];
+    _this28.slotUse = ['bVulva'];
+    _this28.desc = 'a human cooter.';
+    _this28.growth = 0.0; //in %/100 maxGrowth
 
-    _this27.maxGrowth = 0.2; //in meter, todo depends on bodysize
+    _this28.maxGrowth = 0.2; //in meter, todo depends on bodysize
 
     window.storage.registerConstructor(VulvaHuman);
-    return _this27;
+    return _this28;
   }
 
   _createClass(VulvaHuman, [{
@@ -7803,7 +8350,7 @@ window.gm.questDef = window.gm.questDef || {};
 var stRelation = /*#__PURE__*/function (_Stat) {
   _inherits(stRelation, _Stat);
 
-  var _super30 = _createSuper(stRelation);
+  var _super31 = _createSuper(stRelation);
 
   _createClass(stRelation, null, [{
     key: "setup",
@@ -7833,7 +8380,7 @@ var stRelation = /*#__PURE__*/function (_Stat) {
   function stRelation() {
     _classCallCheck(this, stRelation);
 
-    return _super30.call(this);
+    return _super31.call(this);
   }
 
   _createClass(stRelation, [{
@@ -7865,7 +8412,7 @@ var stRelation = /*#__PURE__*/function (_Stat) {
 var stHealthMax = /*#__PURE__*/function (_Stat2) {
   _inherits(stHealthMax, _Stat2);
 
-  var _super31 = _createSuper(stHealthMax);
+  var _super32 = _createSuper(stHealthMax);
 
   _createClass(stHealthMax, null, [{
     key: "setup",
@@ -7883,7 +8430,7 @@ var stHealthMax = /*#__PURE__*/function (_Stat2) {
   function stHealthMax() {
     _classCallCheck(this, stHealthMax);
 
-    return _super31.call(this);
+    return _super32.call(this);
   }
 
   _createClass(stHealthMax, [{
@@ -7904,7 +8451,7 @@ var stHealthMax = /*#__PURE__*/function (_Stat2) {
 var stHealth = /*#__PURE__*/function (_Stat3) {
   _inherits(stHealth, _Stat3);
 
-  var _super32 = _createSuper(stHealth);
+  var _super33 = _createSuper(stHealth);
 
   _createClass(stHealth, null, [{
     key: "setup",
@@ -7927,7 +8474,7 @@ var stHealth = /*#__PURE__*/function (_Stat3) {
   function stHealth() {
     _classCallCheck(this, stHealth);
 
-    return _super32.call(this);
+    return _super33.call(this);
   }
 
   _createClass(stHealth, [{
@@ -7948,7 +8495,7 @@ var stHealth = /*#__PURE__*/function (_Stat3) {
 var stEnergyMax = /*#__PURE__*/function (_Stat4) {
   _inherits(stEnergyMax, _Stat4);
 
-  var _super33 = _createSuper(stEnergyMax);
+  var _super34 = _createSuper(stEnergyMax);
 
   _createClass(stEnergyMax, null, [{
     key: "setup",
@@ -7967,7 +8514,7 @@ var stEnergyMax = /*#__PURE__*/function (_Stat4) {
   function stEnergyMax() {
     _classCallCheck(this, stEnergyMax);
 
-    return _super33.call(this);
+    return _super34.call(this);
   }
 
   _createClass(stEnergyMax, [{
@@ -7988,7 +8535,7 @@ var stEnergyMax = /*#__PURE__*/function (_Stat4) {
 var stEnergy = /*#__PURE__*/function (_Stat5) {
   _inherits(stEnergy, _Stat5);
 
-  var _super34 = _createSuper(stEnergy);
+  var _super35 = _createSuper(stEnergy);
 
   _createClass(stEnergy, null, [{
     key: "setup",
@@ -8011,7 +8558,7 @@ var stEnergy = /*#__PURE__*/function (_Stat5) {
   function stEnergy() {
     _classCallCheck(this, stEnergy);
 
-    return _super34.call(this);
+    return _super35.call(this);
   }
 
   _createClass(stEnergy, [{
@@ -8032,7 +8579,7 @@ var stEnergy = /*#__PURE__*/function (_Stat5) {
 var stArousalMax = /*#__PURE__*/function (_Stat6) {
   _inherits(stArousalMax, _Stat6);
 
-  var _super35 = _createSuper(stArousalMax);
+  var _super36 = _createSuper(stArousalMax);
 
   _createClass(stArousalMax, null, [{
     key: "setup",
@@ -8050,7 +8597,7 @@ var stArousalMax = /*#__PURE__*/function (_Stat6) {
   function stArousalMax() {
     _classCallCheck(this, stArousalMax);
 
-    return _super35.call(this);
+    return _super36.call(this);
   }
 
   _createClass(stArousalMax, [{
@@ -8071,7 +8618,7 @@ var stArousalMax = /*#__PURE__*/function (_Stat6) {
 var stArousalMin = /*#__PURE__*/function (_Stat7) {
   _inherits(stArousalMin, _Stat7);
 
-  var _super36 = _createSuper(stArousalMin);
+  var _super37 = _createSuper(stArousalMin);
 
   _createClass(stArousalMin, null, [{
     key: "setup",
@@ -8089,7 +8636,7 @@ var stArousalMin = /*#__PURE__*/function (_Stat7) {
   function stArousalMin() {
     _classCallCheck(this, stArousalMin);
 
-    return _super36.call(this);
+    return _super37.call(this);
   }
 
   _createClass(stArousalMin, [{
@@ -8110,7 +8657,7 @@ var stArousalMin = /*#__PURE__*/function (_Stat7) {
 var stArousal = /*#__PURE__*/function (_Stat8) {
   _inherits(stArousal, _Stat8);
 
-  var _super37 = _createSuper(stArousal);
+  var _super38 = _createSuper(stArousal);
 
   _createClass(stArousal, null, [{
     key: "setup",
@@ -8134,7 +8681,7 @@ var stArousal = /*#__PURE__*/function (_Stat8) {
   function stArousal() {
     _classCallCheck(this, stArousal);
 
-    return _super37.call(this);
+    return _super38.call(this);
   }
 
   _createClass(stArousal, [{
@@ -8155,7 +8702,7 @@ var stArousal = /*#__PURE__*/function (_Stat8) {
 var stPerversionMax = /*#__PURE__*/function (_Stat9) {
   _inherits(stPerversionMax, _Stat9);
 
-  var _super38 = _createSuper(stPerversionMax);
+  var _super39 = _createSuper(stPerversionMax);
 
   _createClass(stPerversionMax, null, [{
     key: "setup",
@@ -8176,7 +8723,7 @@ var stPerversionMax = /*#__PURE__*/function (_Stat9) {
   function stPerversionMax() {
     _classCallCheck(this, stPerversionMax);
 
-    return _super38.call(this);
+    return _super39.call(this);
   }
 
   _createClass(stPerversionMax, [{
@@ -8197,7 +8744,7 @@ var stPerversionMax = /*#__PURE__*/function (_Stat9) {
 var stPerversion = /*#__PURE__*/function (_Stat10) {
   _inherits(stPerversion, _Stat10);
 
-  var _super39 = _createSuper(stPerversion);
+  var _super40 = _createSuper(stPerversion);
 
   _createClass(stPerversion, null, [{
     key: "setup",
@@ -8220,7 +8767,7 @@ var stPerversion = /*#__PURE__*/function (_Stat10) {
   function stPerversion() {
     _classCallCheck(this, stPerversion);
 
-    return _super39.call(this);
+    return _super40.call(this);
   }
 
   _createClass(stPerversion, [{
@@ -8241,7 +8788,7 @@ var stPerversion = /*#__PURE__*/function (_Stat10) {
 var stAgility = /*#__PURE__*/function (_Stat11) {
   _inherits(stAgility, _Stat11);
 
-  var _super40 = _createSuper(stAgility);
+  var _super41 = _createSuper(stAgility);
 
   _createClass(stAgility, null, [{
     key: "setup",
@@ -8262,7 +8809,7 @@ var stAgility = /*#__PURE__*/function (_Stat11) {
   function stAgility() {
     _classCallCheck(this, stAgility);
 
-    return _super40.call(this);
+    return _super41.call(this);
   }
 
   _createClass(stAgility, [{
@@ -8291,7 +8838,7 @@ var stAgility = /*#__PURE__*/function (_Stat11) {
 var stPerception = /*#__PURE__*/function (_Stat12) {
   _inherits(stPerception, _Stat12);
 
-  var _super41 = _createSuper(stPerception);
+  var _super42 = _createSuper(stPerception);
 
   _createClass(stPerception, null, [{
     key: "setup",
@@ -8310,7 +8857,7 @@ var stPerception = /*#__PURE__*/function (_Stat12) {
   function stPerception() {
     _classCallCheck(this, stPerception);
 
-    return _super41.call(this);
+    return _super42.call(this);
   }
 
   _createClass(stPerception, [{
@@ -8334,7 +8881,7 @@ var stPerception = /*#__PURE__*/function (_Stat12) {
 var stLuck = /*#__PURE__*/function (_Stat13) {
   _inherits(stLuck, _Stat13);
 
-  var _super42 = _createSuper(stLuck);
+  var _super43 = _createSuper(stLuck);
 
   _createClass(stLuck, null, [{
     key: "setup",
@@ -8353,7 +8900,7 @@ var stLuck = /*#__PURE__*/function (_Stat13) {
   function stLuck() {
     _classCallCheck(this, stLuck);
 
-    return _super42.call(this);
+    return _super43.call(this);
   }
 
   _createClass(stLuck, [{
@@ -8377,7 +8924,7 @@ var stLuck = /*#__PURE__*/function (_Stat13) {
 var stCharisma = /*#__PURE__*/function (_Stat14) {
   _inherits(stCharisma, _Stat14);
 
-  var _super43 = _createSuper(stCharisma);
+  var _super44 = _createSuper(stCharisma);
 
   _createClass(stCharisma, null, [{
     key: "setup",
@@ -8396,7 +8943,7 @@ var stCharisma = /*#__PURE__*/function (_Stat14) {
   function stCharisma() {
     _classCallCheck(this, stCharisma);
 
-    return _super43.call(this);
+    return _super44.call(this);
   }
 
   _createClass(stCharisma, [{
@@ -8420,7 +8967,7 @@ var stCharisma = /*#__PURE__*/function (_Stat14) {
 var stIntelligence = /*#__PURE__*/function (_Stat15) {
   _inherits(stIntelligence, _Stat15);
 
-  var _super44 = _createSuper(stIntelligence);
+  var _super45 = _createSuper(stIntelligence);
 
   _createClass(stIntelligence, null, [{
     key: "setup",
@@ -8439,7 +8986,7 @@ var stIntelligence = /*#__PURE__*/function (_Stat15) {
   function stIntelligence() {
     _classCallCheck(this, stIntelligence);
 
-    return _super44.call(this);
+    return _super45.call(this);
   }
 
   _createClass(stIntelligence, [{
@@ -8463,7 +9010,7 @@ var stIntelligence = /*#__PURE__*/function (_Stat15) {
 var stStrength = /*#__PURE__*/function (_Stat16) {
   _inherits(stStrength, _Stat16);
 
-  var _super45 = _createSuper(stStrength);
+  var _super46 = _createSuper(stStrength);
 
   _createClass(stStrength, null, [{
     key: "setup",
@@ -8486,7 +9033,7 @@ var stStrength = /*#__PURE__*/function (_Stat16) {
   function stStrength() {
     _classCallCheck(this, stStrength);
 
-    return _super45.call(this);
+    return _super46.call(this);
   }
 
   _createClass(stStrength, [{
@@ -8519,7 +9066,7 @@ var stStrength = /*#__PURE__*/function (_Stat16) {
 var stEndurance = /*#__PURE__*/function (_Stat17) {
   _inherits(stEndurance, _Stat17);
 
-  var _super46 = _createSuper(stEndurance);
+  var _super47 = _createSuper(stEndurance);
 
   _createClass(stEndurance, null, [{
     key: "setup",
@@ -8542,7 +9089,7 @@ var stEndurance = /*#__PURE__*/function (_Stat17) {
   function stEndurance() {
     _classCallCheck(this, stEndurance);
 
-    return _super46.call(this);
+    return _super47.call(this);
   }
 
   _createClass(stEndurance, [{
@@ -8575,7 +9122,7 @@ var stEndurance = /*#__PURE__*/function (_Stat17) {
 var stPAttack = /*#__PURE__*/function (_Stat18) {
   _inherits(stPAttack, _Stat18);
 
-  var _super47 = _createSuper(stPAttack);
+  var _super48 = _createSuper(stPAttack);
 
   _createClass(stPAttack, null, [{
     key: "setup",
@@ -8594,7 +9141,7 @@ var stPAttack = /*#__PURE__*/function (_Stat18) {
   function stPAttack() {
     _classCallCheck(this, stPAttack);
 
-    return _super47.call(this);
+    return _super48.call(this);
   }
 
   _createClass(stPAttack, [{
@@ -8615,7 +9162,7 @@ var stPAttack = /*#__PURE__*/function (_Stat18) {
 var stPDefense = /*#__PURE__*/function (_Stat19) {
   _inherits(stPDefense, _Stat19);
 
-  var _super48 = _createSuper(stPDefense);
+  var _super49 = _createSuper(stPDefense);
 
   _createClass(stPDefense, null, [{
     key: "setup",
@@ -8634,7 +9181,7 @@ var stPDefense = /*#__PURE__*/function (_Stat19) {
   function stPDefense() {
     _classCallCheck(this, stPDefense);
 
-    return _super48.call(this);
+    return _super49.call(this);
   }
 
   _createClass(stPDefense, [{
@@ -8656,16 +9203,16 @@ var stPDefense = /*#__PURE__*/function (_Stat19) {
 var effEnergized = /*#__PURE__*/function (_Effect2) {
   _inherits(effEnergized, _Effect2);
 
-  var _super49 = _createSuper(effEnergized);
+  var _super50 = _createSuper(effEnergized);
 
   function effEnergized() {
-    var _this28;
+    var _this29;
 
     _classCallCheck(this, effEnergized);
 
-    _this28 = _super49.call(this);
-    _this28.data.id = _this28.data.name = effEnergized.name, _this28.data.duration = 120;
-    return _this28;
+    _this29 = _super50.call(this);
+    _this29.data.id = _this29.data.name = effEnergized.name, _this29.data.duration = 120;
+    return _this29;
   }
 
   _createClass(effEnergized, [{
@@ -8731,16 +9278,16 @@ var effEnergized = /*#__PURE__*/function (_Effect2) {
 var effNotTired = /*#__PURE__*/function (_Effect3) {
   _inherits(effNotTired, _Effect3);
 
-  var _super50 = _createSuper(effNotTired);
+  var _super51 = _createSuper(effNotTired);
 
   function effNotTired() {
-    var _this29;
+    var _this30;
 
     _classCallCheck(this, effNotTired);
 
-    _this29 = _super50.call(this);
-    _this29.data.id = _this29.data.name = effNotTired.name, _this29.data.duration = 120, _this29.data.hidden = 4;
-    return _this29;
+    _this30 = _super51.call(this);
+    _this30.data.id = _this30.data.name = effNotTired.name, _this30.data.duration = 120, _this30.data.hidden = 4;
+    return _this30;
   }
 
   _createClass(effNotTired, [{
@@ -8800,16 +9347,16 @@ var effNotTired = /*#__PURE__*/function (_Effect3) {
 var effTired = /*#__PURE__*/function (_Effect4) {
   _inherits(effTired, _Effect4);
 
-  var _super51 = _createSuper(effTired);
+  var _super52 = _createSuper(effTired);
 
   function effTired() {
-    var _this30;
+    var _this31;
 
     _classCallCheck(this, effTired);
 
-    _this30 = _super51.call(this);
-    _this30.data.id = _this30.data.name = effTired.name, _this30.data.duration = 120, _this30.data.hidden = 0;
-    return _this30;
+    _this31 = _super52.call(this);
+    _this31.data.id = _this31.data.name = effTired.name, _this31.data.duration = 120, _this31.data.hidden = 0;
+    return _this31;
   }
 
   _createClass(effTired, [{
@@ -8872,19 +9419,86 @@ var effTired = /*#__PURE__*/function (_Effect4) {
   return effTired;
 }(Effect);
 
+var effDamage = /*#__PURE__*/function (_CombatEffect) {
+  _inherits(effDamage, _CombatEffect);
+
+  var _super53 = _createSuper(effDamage);
+
+  function effDamage(amount) {
+    var _this32;
+
+    _classCallCheck(this, effDamage);
+
+    _this32 = _super53.call(this);
+    _this32.amount = amount;
+    _this32.data.id = _this32.data.name = effDamage.name, _this32.data.duration = 0, _this32.data.hidden = 0;
+    return _this32;
+  }
+
+  _createClass(effDamage, [{
+    key: "toJSON",
+    value: function toJSON() {
+      return window.storage.Generic_toJSON("effDamage", this);
+    }
+  }, {
+    key: "onApply",
+    value: function onApply() {
+      this.data.duration = 0;
+      this.parent.parent.Stats.increment('health', -1 * this.amount);
+    }
+  }, {
+    key: "merge",
+    value: function merge(neweffect) {
+      if (neweffect.name === this.data.name) {
+        //extends stun
+        this.onApply();
+        return true;
+      }
+    }
+  }, {
+    key: "onCombatEnd",
+    value: function onCombatEnd() {
+      this.parent.removeItem(this.data.id);
+    }
+  }, {
+    key: "onTurnStart",
+    value: function onTurnStart() {
+      this.data.duration -= 1;
+      if (this.data.duration <= 0) this.parent.removeItem(this.data.id);
+    }
+  }, {
+    key: "desc",
+    get: function get() {
+      return effDamage.name;
+    }
+  }, {
+    key: "shortDesc",
+    get: function get() {
+      return this.desc + " for " + this.data.duration + " turns";
+    }
+  }], [{
+    key: "fromJSON",
+    value: function fromJSON(value) {
+      return window.storage.Generic_fromJSON(effDamage, value.data);
+    }
+  }]);
+
+  return effDamage;
+}(CombatEffect);
+
 var effMutateCat = /*#__PURE__*/function (_Effect5) {
   _inherits(effMutateCat, _Effect5);
 
-  var _super52 = _createSuper(effMutateCat);
+  var _super54 = _createSuper(effMutateCat);
 
   function effMutateCat() {
-    var _this31;
+    var _this33;
 
     _classCallCheck(this, effMutateCat);
 
-    _this31 = _super52.call(this);
-    _this31.data.id = _this31.data.name = effMutateCat.name, _this31.data.duration = 60, _this31.data.hidden = 0;
-    return _this31;
+    _this33 = _super54.call(this);
+    _this33.data.id = _this33.data.name = effMutateCat.name, _this33.data.duration = 60, _this33.data.hidden = 0;
+    return _this33;
   }
 
   _createClass(effMutateCat, [{
@@ -8943,17 +9557,17 @@ var effMutateCat = /*#__PURE__*/function (_Effect5) {
 var effGrowBreast = /*#__PURE__*/function (_Effect6) {
   _inherits(effGrowBreast, _Effect6);
 
-  var _super53 = _createSuper(effGrowBreast);
+  var _super55 = _createSuper(effGrowBreast);
 
   function effGrowBreast() {
-    var _this32;
+    var _this34;
 
     _classCallCheck(this, effGrowBreast);
 
-    _this32 = _super53.call(this);
-    _this32.data.id = _this32.data.name = effGrowBreast.name, _this32.data.duration = 60, _this32.data.hidden = 0;
-    _this32.data.cycles = 3, _this32.data.magnitude = 3;
-    return _this32;
+    _this34 = _super55.call(this);
+    _this34.data.id = _this34.data.name = effGrowBreast.name, _this34.data.duration = 60, _this34.data.hidden = 0;
+    _this34.data.cycles = 3, _this34.data.magnitude = 3;
+    return _this34;
   }
 
   _createClass(effGrowBreast, [{
@@ -9013,19 +9627,19 @@ var effGrowBreast = /*#__PURE__*/function (_Effect6) {
 }(Effect); //combateffect
 
 
-var effStunned = /*#__PURE__*/function (_CombatEffect) {
-  _inherits(effStunned, _CombatEffect);
+var effStunned = /*#__PURE__*/function (_CombatEffect2) {
+  _inherits(effStunned, _CombatEffect2);
 
-  var _super54 = _createSuper(effStunned);
+  var _super56 = _createSuper(effStunned);
 
   function effStunned() {
-    var _this33;
+    var _this35;
 
     _classCallCheck(this, effStunned);
 
-    _this33 = _super54.call(this);
-    _this33.data.id = _this33.data.name = effStunned.name, _this33.data.duration = 2;
-    return _this33;
+    _this35 = _super56.call(this);
+    _this35.data.id = _this35.data.name = effStunned.name, _this35.data.duration = 2;
+    return _this35;
   }
 
   _createClass(effStunned, [{
@@ -9082,16 +9696,16 @@ var effStunned = /*#__PURE__*/function (_CombatEffect) {
 var skCooking = /*#__PURE__*/function (_Effect7) {
   _inherits(skCooking, _Effect7);
 
-  var _super55 = _createSuper(skCooking);
+  var _super57 = _createSuper(skCooking);
 
   function skCooking() {
-    var _this34;
+    var _this36;
 
     _classCallCheck(this, skCooking);
 
-    _this34 = _super55.call(this);
-    _this34.data.id = _this34.data.name = skCooking.name;
-    return _this34;
+    _this36 = _super57.call(this);
+    _this36.data.id = _this36.data.name = skCooking.name;
+    return _this36;
   }
 
   _createClass(skCooking, [{
@@ -9682,21 +10296,17 @@ Als du aus dem Suite kletterst bist du hundemüde und deine Muskeln schmerzen al
 &lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 Get ready...
-A &lt;%=window.story.state.enemy.name%&gt; appears ! &lt;/br&gt;
+A &lt;%=window.story.state.combat.enemyParty[0].name%&gt; appears ! &lt;/br&gt;
 [[Next|EncounterStartTurn]]
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="34" name="EncounterStartTurn" tags="" position="650,25" size="100,100">&lt;section&gt; 
 &lt;!--hide this because could interfere with combat &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;--&gt;
 &lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
-&lt;div id=&#39;combatCanvas&#39; style=&#39;background: url(&lt;%=s.enemy.pic%&gt;) no-repeat center,url(&lt;%=s.combat.scenePic%&gt;) no-repeat center;color:black;&#39;&gt;&lt;/div&gt;
+&lt;div id=&#39;combatCanvas&#39; style=&#39;background: url(&lt;%=s.combat.enemyParty[0].pic%&gt;) no-repeat center,url(&lt;%=s.combat.scenePic%&gt;) no-repeat center;color:black;&#39;&gt;&lt;/div&gt;
 &lt;!--filled by printCombatHud--&gt;
-&lt;div id=&quot;playerstats&quot;&gt;&lt;/div&gt; &lt;/br&gt;  &lt;!--TODO print side by side--&gt;
-&lt;div id=&quot;enemystats&quot;&gt;&lt;/div&gt;&lt;/br&gt;
+&lt;%=window.gm.Encounter.printStats()%&gt; &lt;/br&gt;
 &lt;%=window.gm.Encounter.battle().msg%&gt;
-&lt;/br&gt;&lt;div&gt;&lt;output&gt;&lt;/output&gt;&lt;/div&gt;&lt;/br&gt;   &lt;!--message is rendered here--&gt;
+&lt;/br&gt;&lt;div id=&#39;output&#39;&gt;&lt;/div&gt;&lt;/br&gt;   &lt;!--message is rendered here--&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;
-&lt;script&gt;
-window.gm.Encounter.printCombatHud();
-&lt;/script&gt;
 &lt;/section&gt;</tw-passagedata><tw-passagedata pid="35" name="GameOver" tags="" position="200,275" size="100,100">Game Over. I hope you learned something.&lt;/br&gt;
 &lt;/br&gt;[[New Game|Start]]</tw-passagedata><tw-passagedata pid="36" name="Mole Submit" tags="" position="500,175" size="100,100">&lt;section&gt; 
 &lt;!--hide this, we are not in a state ready to save &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;--&gt;
@@ -11384,20 +11994,24 @@ renderToSelector(&quot;#panel&quot;, &quot;listsell&quot;);&lt;/script&gt;</tw-p
 &lt;div&gt;&lt;/br&gt;
 [[Start the game|CharacterEditor]]&lt;/br&gt;&lt;/div&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="100" name="CharacterEditor" tags="" position="1225,1225" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;!--todo--&gt; &quot;Please select class and race of your character:&quot;&lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Ready|StartLocation]]&lt;/br&gt;&lt;/div&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="101" name="StartLocation" tags="" position="100,1350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;!--todo--&gt; &quot;You magically appear near the top of a hill. &lt;/br&gt;
 You can see some houses from here, you just need to follow the trail down the hill.&quot;&lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Village|Training1]]&lt;/br&gt;&lt;/div&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="102" name="Training1" tags="" position="225,1350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;!--todo--&gt; The path snakes down the grassy flanks of the hill. As you make your way around a large boulder, something strange happens:&lt;/br&gt;
 &lt;devnote&gt;&quot;Welcome to our little world. Just in case you are not used to that kind of game we should get you some training.&quot;&lt;/devnote&gt;&lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Continue|Training1Done]]&lt;/br&gt;&lt;/div&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="103" name="Training1Done" tags="" position="350,1350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;!--todo--&gt; &lt;/br&gt;
 &lt;devnote&gt;&quot;I wish you good luck in exploring this world. May the gods be with you.&quot;&lt;/devnote&gt;&lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
@@ -11408,42 +12022,50 @@ You can see some houses from here, you just need to follow the trail down the hi
 &lt;div&gt;&lt;/br&gt;
 [[Continue|VillageMarketPlace]]&lt;/br&gt;&lt;/div&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="105" name="VillageEntrance" tags="" position="600,1350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;!--todo--&gt; You are at the crossroads in front of the entrance to the settlement.
 Someone has painted &#39;Thetain&#39; on the planks above the wooden gate. Most likely thats the name of this commune.&lt;/br&gt;&lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Enter village|VillageMarketPlace]]  [[go to forest|ForestBorder]]&lt;/br&gt;&lt;/div&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="106" name="VillageMarketPlace" tags="" position="725,1350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
-&lt;!--todo--&gt; There arent many people here right now.&lt;/br&gt; There seems to be a shop of an alchemist, a Inn and another shop where you cant say what kind of wares - if any - they are trading.&lt;/br&gt;
+&lt;%window.gm.player.location=window.passage.name;%&gt;
+&lt;!--todo--&gt; There arent many people around the place right now.&lt;/br&gt; There seems to be a shop of an alchemist, a Inn and another shop where you cant say what kind of wares - if any - they are trading.&lt;/br&gt;
 &lt;/br&gt; Near the entrance of the Inn is also a [[bulletin-board]]. 
 &lt;div&gt;&lt;/br&gt;
 [[VillageInn]]  [[VillagePotions]] [[VillagePawnshop]]&lt;/br&gt;&lt;/div&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="107" name="VillageInn" tags="" position="850,1350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;!--todo--&gt; &#39;This really looks like they scavenged that place from a typical fantasy story book.&#39;&lt;/br&gt; 
 &lt;/br&gt; 
 &lt;div&gt;&lt;/br&gt;
 [[VillageMarketPlace]]  [[go to forest|ForestBorder]]&lt;/br&gt;&lt;/div&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="108" name="VillagePotions" tags="" position="975,1350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;!--todo--&gt; &#39;Puh, what a stink. I shouldnt stay here for long for I might suffocate&#39;&lt;/br&gt; 
 &lt;/br&gt; &quot;Hello? Anyone there?&quot;
 &lt;div&gt;&lt;/br&gt;
 [[VillageMarketPlace]]  [[Alchemist]]&lt;/br&gt;&lt;/div&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="109" name="VillagePawnshop" tags="" position="1100,1350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;!--todo--&gt; If this is a shop, then they sell everything: Shoes, cooking pans, assault ballista and chicken.&lt;/br&gt; 
 &lt;/br&gt; 
 &lt;div&gt;&lt;/br&gt;
 [[VillageMarketPlace]]  [[Shopkeeper]]&lt;/br&gt;&lt;/div&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="110" name="VillageRespawnPod" tags="" position="1225,1350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;!--todo--&gt; You are in the sanctum of spawn. Its located on top of the hill above the settlement.&lt;/br&gt; 
 &lt;/br&gt; There is a path leading downwards to the settlement.&lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
 [[VillageEntrance]] &lt;/br&gt;&lt;/div&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="111" name="ForestBorder" tags="" position="100,1475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;!--todo--&gt; There is a dirt road here crossing the lush grassland that is bordered by the trees of an forest.&lt;/br&gt; 
 One direction leads to the settlement close by. The other direction follows the border of the forest but gets out of view quickly.&lt;/br&gt; 
 &lt;/br&gt; 
 &lt;div&gt;&lt;/br&gt;
 [[VillageEntrance]] [[ForestEntrance]] [[follow Road]] &lt;/br&gt;&lt;/div&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="112" name="ForestEntrance" tags="" position="225,1475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;!--todo--&gt; Der Wald macht einen freundlichen Eindruck. Die Bäume stehen noch licht und sind noch nicht so ausladend und groß als das kein Licht mehr durch das Blätterdach gelangt. &lt;/br&gt; 
 &lt;/br&gt; 
 &lt;div&gt;&lt;/br&gt;&lt;a0 onclick=&#39;enterBeehive(); &#39;&gt;Enter Beehive&lt;/a&gt;&lt;/br&gt;

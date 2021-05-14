@@ -3,7 +3,7 @@
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 Get ready...
-A <%=window.story.state.enemy.name%> appears ! </br>
+A <%=window.story.state.combat.enemyParty[0].name%> appears ! </br>
 [[Next|EncounterStartTurn]]
 </article><article id="LogPanel"></article></section>
 
@@ -11,16 +11,12 @@ A <%=window.story.state.enemy.name%> appears ! </br>
 <section> 
 <!--hide this because could interfere with combat <aside id="sidebar"></aside>-->
 <article><%=window.story.render("CenterDialogs") %>
-<div id='combatCanvas' style='background: url(<%=s.enemy.pic%>) no-repeat center,url(<%=s.combat.scenePic%>) no-repeat center;color:black;'></div>
+<div id='combatCanvas' style='background: url(<%=s.combat.enemyParty[0].pic%>) no-repeat center,url(<%=s.combat.scenePic%>) no-repeat center;color:black;'></div>
 <!--filled by printCombatHud-->
-<div id="playerstats"></div> </br>  <!--TODO print side by side-->
-<div id="enemystats"></div></br>
+<%=window.gm.Encounter.printStats()%> </br>
 <%=window.gm.Encounter.battle().msg%>
-</br><div><output></output></div></br>   <!--message is rendered here-->
+</br><div id='output'></div></br>   <!--message is rendered here-->
 </article><article id="LogPanel"></article>
-<script>
-window.gm.Encounter.printCombatHud();
-</script>
 </section>
 
 :: GameOver {"position":"200,275"}

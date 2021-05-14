@@ -146,9 +146,7 @@ window.gm.initGame= function(forceReset,NGP=null) {
         args: []  // can be used to set arguments before another passage is called (passage-arguments) 
       }
     }
-    if (!s.enemy||forceReset) { //actual/last enemy
-      s.enemy = new Character();
-    }
+
     if (!s.combat||forceReset) { //see encounter & combat.js
       s.combat = {
         enemyParty : [],  //collection of enemy-chars involved 

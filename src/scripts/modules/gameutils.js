@@ -47,25 +47,6 @@ window.gm.initGame= function(forceReset,NGP=null) {
       }
       window.storage.loadAchivementsFromBrowser();
     }
-    if (!s.enemy||forceReset) { //actual/last enemy
-      s.enemy = new Character();
-    }
-    if (!s.combat||forceReset) { //see encounter & combat.js
-      s.combat = {
-        enemyParty : [],  //collection of enemy-chars involved 
-        enemyIdx : 0,  //index of actual enemy 
-        playerParty : [],
-        playerIdx : 0,
-        newTurn : false,
-        enemyFirst : false, //if true, enemy moves first
-        enemyTurn : false, //true if enemys turn
-        state : ""  , //internal state
-        playerFleeing : false,
-        playerSubmitting : false,
-        turnCount: 0,
-        scenePic : 'assets/bg_park.png'
-      }
-    }
     if (!s.mom||forceReset) {
       s.mom = {
         location : "Kitchen",
@@ -98,6 +79,7 @@ window.gm.initGame= function(forceReset,NGP=null) {
         //window.gm.Ratchel = new Character(s.Ratchel);
         window.gm.Ratchel = new Character();
         window.gm.Ratchel.name="Ratchel";
+        window.gm.Ratchel.faction="Player";
         window.gm.Ratchel.gainRelation('Mom',10);
         window.gm.Ratchel.Effects.addItem(skCooking.name,new skCooking());
         //add some basic inventory
