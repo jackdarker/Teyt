@@ -18,8 +18,11 @@ window.gm.encounters.mole = function(location) {
 window.gm.encounters.moleX2 = function(location) {
     window.gm.Encounter = new CombatSetup();
     window.gm.Encounter.EnemyFunc = (function() { 
-        return([new window.gm.Mobs.Mole().scaleLevel(window.gm.player.level),
-            new window.gm.Mobs.Mole().scaleLevel(window.gm.player.level) ]);});
+        var a = new window.gm.Mobs.Mole();
+        var b = new window.gm.Mobs.Mole();
+        a.name = a.name+"#1";
+        b.name = b.name+"#2";
+        return([a,b]);});
     window.gm.Encounter.Location = location;
     window.gm.Encounter.scenePic = window.gm.getScenePic(location);
     window.gm.Encounter.onSubmit = function() {

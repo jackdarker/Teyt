@@ -12,12 +12,19 @@ A <%=window.story.state.combat.enemyParty[0].name%> appears ! </br>
 <!--hide this because could interfere with combat <aside id="sidebar"></aside>-->
 <article><%=window.story.render("CenterDialogs") %>
 <div id='combatCanvas' style='background: url(<%=s.combat.enemyParty[0].pic%>) no-repeat center,url(<%=s.combat.scenePic%>) no-repeat center;color:black;'></div>
-<!--filled by printCombatHud-->
-<%=window.gm.Encounter.printStats()%> </br>
-<%=window.gm.Encounter.battle().msg%>
+<div id="panel"></div></br></br> <!--filled by statspanel-->
+<div id="choice"></div></br></br>
+<%=window.gm.Encounter.battle().msg%></br>
 </br><div id='output'></div></br>   <!--message is rendered here-->
 </article><article id="LogPanel"></article>
 </section>
+<script>
+renderToSelector("#panel", "statspanel");
+</script>
+
+:: statspanel
+<!--subpanel-->
+<%=window.gm.Encounter.printStats()%>
 
 :: GameOver {"position":"200,275"}
 Game Over. I hope you learned something.</br>

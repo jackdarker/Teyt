@@ -5,16 +5,19 @@ class SkillResult{
           this.source = null,
           this.targets = [],
           this.skill = null,
+          this.msg = "",
           this.effects = [];
     }
   }
   class Skill {
-    constructor(name,descr,caster) {
+    constructor(name,descr) {
       this.name = name;
       this.descr = descr;
-      this.caster = caster;
       this.targetFilter = this.targetFilterEnemy;
     }
+    //_parent will be added dynamical
+    get parent() {return this._parent();}
+    get caster() {return this.parent.parent;}
     getMaxTargetCount() {return 1;}
     /*targetFilter(){
           //returns a function to filter a list of possible targets for targets that this skill can cast on
@@ -54,20 +57,28 @@ class SkillResult{
           //returns a description of the skill for tooltip
           return this.descr;
     }
+    getCastDescription(result) {
+        //update msg after sucessful cast
+        return(this.caster.name +" uses "+ this.name +" on " + result.targets[0].name+".");
+    }
     previewCast(targets){
           var result = new SkillResult();
-          return result;
+          result.msg = this.caster.name +" will use "+ this.name +" on " + targets[0].name;
+          return(result);
     }
     cast(targets){
-          //execute the skill on the targets
-          var result = this.previewCast(targets);
-          if(result.OK) {
-                for(var X of result.effects) {// for each target
-                  for(var Y of X.eff) {//...multiple effects
+        //execute the skill on the targets
+        var result = this.previewCast(targets);
+        if(result.OK) {
+            result.msg = "";
+            for(var X of result.effects) {// for each target
+                for(var Y of X.eff) {//...multiple effects
                         X.target.addEffect(Y.name,Y);
-                  }
                 }
-          }
+            }
+            result.msg += this.getCastDescription(result); 
+        }
+        return(result)
     }
   
     //some predefined filter; chain them to narrow down the targets
@@ -115,11 +126,70 @@ class SkillResult{
     }
   }
   
-  class SkillAttack extends Skill {
-      //execute simple attack with active weapon
-      constructor(caster) {
-          super("Attack","Attack",caster);
-          this.targetFilter = (function(targets) { return(this.targetFilterFighting(this.targetFilterEnemy(targets)));});
+class SkillAttack extends Skill {
+    //execute simple attack with active weapon
+    constructor() {
+        super("Attack","Attack");
+        this.targetFilter = (function(targets) { return(this.targetFilterEnemy(targets));});
+    }
+    previewCast(targets){
+        var result = new SkillResult()
+        result.skill =this;
+        result.source = this.caster;
+        result.targets = targets;
+        if(this.isValidTarget(targets)) {
+            result.OK = true;
+            for(var target of targets) {
+                var eff = this.calculateDamage(this.caster,target);
+                result.effects.push( {target:target,
+                    eff:eff});
+            }
+        }
+        return result
+    }
+    calculateDamage( caster,target) {
+    var att = caster.Stats.get('pAttack').value;
+    var def = target.Stats.get('pDefense').value;
+    var blunt = caster.Outfit.countItem("Shovel");
+    //var result = window.gm.combat.calcAttack(caster,target,{value:att,total:att});
+    var x = att-def+5;
+    var eff = [new effDamage(x)];
+    if(blunt>0) eff.push(new effStunned());
+    return(eff);
+            //return [EffMiss(caster,targets[0],'missed attack')]
+    }
+}
+class SkillStun extends Skill {
+    //execute stun attack
+    constructor() {
+        super("Stun","Stun");
+        this.targetFilter = (function(targets) { return(this.targetFilterFighting(this.targetFilterEnemy(targets)));});
+    }
+    previewCast(targets){
+        var result = new SkillResult()
+        result.skill =this;
+        result.source = this.caster;
+        result.targets = targets;
+        if(this.isValidTarget(targets)) {
+            result.OK = true;
+            for(var target of targets) {
+                result.effects.push( {target:target,
+                    eff:[new effStunned()]})
+                }
+        }
+        return result
+    }
+    getCastDescription(result) {
+        //update msg after sucessful cast
+        return(this.caster.name +" stunned " + result.targets[0]+".");
+    }
+}
+
+class SkillHeal extends Skill {
+      //execute stun attack
+      constructor() {
+          super("Heal","Heal");
+          this.targetFilter = (function(targets) { return(targets);});
       }
       previewCast(targets){
           var result = new SkillResult()
@@ -130,17 +200,30 @@ class SkillResult{
               result.OK = true;
               for(var target of targets) {
                   result.effects.push( {target:target,
-                      eff:this.calculateDamage(this.caster,target)})
+                      eff:[new effHeal(10)]})
                   }
           }
           return result
       }
-      calculateDamage( caster,target) {
-        var att = caster.Stats.get('pAttack').value;
-        var def = target.Stats.get('pDefense').value;
-        //var result = window.gm.combat.calcAttack(caster,target,{value:att,total:att});
-        var x = att-def+5;
-              return [new effDamage(x)];
-              //return [EffMiss(caster,targets[0],'missed attack')]
+}
+class SkillGuard extends Skill {
+      //todo improves defense
+      constructor() {
+          super("Guard","Guard");
+          this.targetFilter = (function(targets) { return(this.targetFilterSelf(targets));});
       }
-    }
+      previewCast(targets){
+          var result = new SkillResult()
+          result.skill =this;
+          result.source = this.caster;
+          result.targets = targets;
+          if(this.isValidTarget(targets)) {
+              result.OK = true;
+              for(var target of targets) {
+                  /*result.effects.push( {target:target,
+                      eff:[new effHeal(10)]})*/
+                  }
+          }
+          return result
+      }
+}

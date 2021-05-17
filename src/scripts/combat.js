@@ -42,35 +42,58 @@ hideCombatOption() {
 }
 printStats() {
   var s=window.story.state;
-  
-  function createList(array) {
-    var list = [];
-    for(var i=0; i<3; i++) {  //max 3 party members !
-      var col = {name:"",health:"",arousal:"",effects:""};
-      if(i<array.length) {
-        col.name = array[i].name;
-        col.health = array[i].health().value.toString()+'/'+array[i].health().max.toString();
-        col.arousal = array[i].Stats.get("arousal").value.toString()+'/'+array[i].Stats.get("arousalMax").value.toString();
-        col.effects = window.gm.Encounter.printCombatEffects(array[i]);
-      }
-      list.push(col);
-    }
-    return(list);
-  }
-  var players = createList(s.combat.playerParty);
-  var enemys = createList(s.combat.enemyParty);
+  var players = (s.combat.playerParty);
+  var enemys = (s.combat.enemyParty);
   /*
               Health  Arousal Effects         Health  Arousal Effects
       player1 10/20   10/20 Stunned     Ork1  10/10   10/10
       player2 50/100  10/20             Ork2  20/20   10/100
   */
-  var elmt = '<table><tbody>';
-  elmt += "<tr><td>Player</td><td>Health</td><td>Arousal</td><td>Effects</td><td></td><td>Enemys</td><td>Health</td><td>Arousal</td><td>Effects</td>";
-  for(var i=0;i<3;i++) {
-    elmt += "<tr><td>"+players[i].name+"</td><td>"+players[i].health+"</td><td>"+players[i].arousal+"</td><td>"+players[i].effects+"</td><td></td><td>"+enemys[i].name+"</td><td>"+enemys[i].health+"</td><td>"+enemys[i].arousal+"</td><td>"+enemys[i].effects+"</td>";
+  var elmt = '<table id=\"combatstats\"><tbody>';
+  elmt += "<tr><th>   </th><th>Player</th><th>Health</th><th>Arousal</th><th>Effects</th><th>   </th><th>Enemys</th><th>Health</th><th>Arousal</th><th>Effects</th>";
+  for(var i=0;(i<players.length || i<enemys.length);i++) {
+    elmt += "<tr>";
+    if(i<players.length) {
+      elmt += "<td>" + (s.combat.actor && s.combat.actor.name==players[i].name?">>": "")+ "</td><td>"+players[i].name+"</td><td>"+players[i].health().value.toString()+'/'+players[i].health().max.toString()+"</td><td>"+players[i].Stats.get("arousal").value.toString()+'/'+players[i].Stats.get("arousalMax").value.toString()+"</td><td style=\"font-size:smaller\">"+window.gm.Encounter.printCombatEffects(players[i])+"</td>";
+    } else {
+      elmt += "<tr><td></td><td></td><td></td><td></td><td></td>";
+    }
+    if(i<enemys.length) {
+      elmt += "<td>" + (s.combat.actor==enemys[i]?">>>": "")+ "</td><td>"+enemys[i].name+"</td><td>"+enemys[i].health().value.toString()+'/'+enemys[i].health().max.toString()+"</td><td>"+enemys[i].Stats.get("arousal").value.toString()+'/'+enemys[i].Stats.get("arousalMax").value.toString()+"</td><td style=\"font-size:smaller\">"+window.gm.Encounter.printCombatEffects(enemys[i])+"</td>";
+    } else {
+      elmt += "<tr><td></td><td></td><td></td><td></td><td></td>";
+    }
   }
   elmt +='</tbody></table>'
   return(elmt);
+}
+//creates buttons for skills of current actor
+printSkillList() {
+  var s = window.story.state;
+  var elmt="<form id='combatmenu'>";
+  //Todo create list based on abilitys
+  var canAct = s.combat.actor._canAct();
+  if(canAct.OK===true) {
+    var skillIds = s.combat.actor.Skills.getAllIds();
+    for(var i=0; i<skillIds.length;i++) {
+      elmt +="<a0 id=\'"+skillIds[i]+"\' onclick=\'(function($event){window.gm.Encounter._postSkillSelect($event.id) })(this);\'>"+s.combat.actor.Skills.getItem(skillIds[i]).name+"</a></br>";
+    }
+  } else {
+    elmt +=canAct.msg+"</br>";
+  }
+  elmt +="<a0 id='moveNOP'          onclick='(function($event){window.gm.Encounter._postSkillAbort();})(this);'>Do nothing</a></br>";
+  elmt +="</form></br>";
+  return(elmt);
+}
+_postSkillAbort(){
+  window.story.state.combat.action=null;
+  window.gm.Encounter.next=window.gm.Encounter.checkDefeat;
+  window.story.show('EncounterStartTurn');
+}
+_postSkillSelect(id){
+  window.story.state.combat.action=id;
+  window.gm.Encounter.next=window.gm.Encounter.selectTarget;
+  window.story.show('EncounterStartTurn');
 }
 //creates a list of possible moves for player
 printCombatOption() { 
@@ -94,11 +117,7 @@ printCombatOption() {
   elmt +="</form></br>";
   return(elmt);
 }
-//prints the Stats and Effects of the Player&Enemy
-printCombatHud() { 
-  //renderToSelector("#playerstats", "playerstats");
-  //renderToSelector("#enemystats", "enemystats");
-};
+
 //creates a list of active effects for combat display
 printCombatEffects(char) {
   var list=[];
@@ -111,16 +130,45 @@ printCombatEffects(char) {
   }
   return(list.reduce((sum, current) => sum + current +', ', ''));
 }
+printTargetList() {
+  var s = window.story.state;
+  var elmt="<form id='combatmenu'>";
+  var skill = s.combat.actor.Skills.getItem(s.combat.action);
+  var targets = skill.targetFilter(s.combat.playerParty.concat(s.combat.enemyParty));
+  elmt += "<label>use "+s.combat.action+" on..</label>";
+  for(var i=0; i<targets.length;i++) {
+    elmt +="<a0 id=\'"+targets[i].name+"\' onclick=\'(function($event){window.gm.Encounter._postTargetSelect(id);})(this);\'>"+targets[i].name+"</a>";
+  }
+
+  elmt +="</br><a0 id='back' onclick='(function($event){window.gm.Encounter._postTargetAbort();})(this);'>Back</a></br>";
+  elmt +="</form></br>";
+  return(elmt);
+}
+_postTargetAbort(){
+  window.story.state.combat.action=null;
+  window.gm.Encounter.next=window.gm.Encounter.selectMove;
+  window.story.show('EncounterStartTurn');
+}
+_postTargetSelect(id){
+  this.hideCombatOption();
+  var targets = window.story.state.combat.playerParty.concat(window.story.state.combat.enemyParty);
+  for(var i=0; i<targets.length;i++) {
+    if(id===targets[i].name) window.story.state.combat.target = targets[i];  //todo problems if names are non-unique
+  }
+  window.gm.Encounter.next=window.gm.Encounter.execMove;
+  window.story.show('EncounterStartTurn');
+}
 triggerCombat(id) {  //called by combatmenu-buttons expects a functioname
   this.hideCombatOption();
   var result=window.gm.Encounter.execCombatCmd(window.gm.combat[id] );
   window.gm.printOutput(result.msg+window.gm.printPassageLink("Next","EncounterStartTurn"));
-  this.printCombatHud();
+  //this.printCombatHud();
 }
 //calculates combat-cmd of enemy
 calcEnemyCombat() { 
   var enemy = window.story.state.combat.actor;
-  var move = enemy.calcCombatMove();
+  var move = enemy.calcCombatMove(window.story.state.combat.playerParty,window.story.state.combat.enemyParty);
+  
   return(move.msg+"</br>");
 }
 //executes a combat-cmd for player/enemy
@@ -252,26 +300,36 @@ selectMove() {
   var canAct = s.combat.actor._canAct();
   if(canAct.OK===false) {
     result.msg = canAct.msg;
+    this.next=this.checkDefeat;
     return(result);
   } else {
     if(s.combat.actor.calcCombatMove) { //selected by AI
-      s.combat.target = s.combat.playerParty[0]; //Todo
+      //s.combat.target = s.combat.playerParty[0]; //Todo
       result.OK=true;
       result.msg += this.calcEnemyCombat();
       result.msg += window.gm.printPassageLink('Next','EncounterStartTurn');
+      this.next=this.checkDefeat;
     } else {
-      s.combat.target = s.combat.enemyParty[0]; //Todo
-      result.OK=true, result.msg=this.printCombatOption();
+      result.OK=true, result.msg=this.printSkillList();
+      this.next=this.selectTarget;
     }
   }
-  //move confirmed
-  this.next=this.execMove;
+  return(result);
+}
+selectTarget() {  //select target for choosen action
+  var s = window.story.state;
+  var result = {OK:false, msg:''};
+  result.OK=true,result.msg = this.printTargetList();
   return(result);
 }
 execMove(){
   var result = {OK:false, msg:''};
+  var s = window.story.state;
   //apply move
+  result.msg=s.combat.actor.Skills.getItem(s.combat.action).cast([s.combat.target]).msg;
+  result.OK = true;
   this.next=this.checkDefeat;
+  result.msg+=window.gm.printPassageLink("Next","EncounterStartTurn");
   return(result);
 }
 postBattle() {
@@ -304,7 +362,9 @@ battle() {
   while(this.next!==null && !result.OK) {
     //if result =true; user input required
     result =this.next();
-    if(result.OK) return(result);
+    if(result.OK) {
+      return(result);
+    }
   }
   return(result);
 };

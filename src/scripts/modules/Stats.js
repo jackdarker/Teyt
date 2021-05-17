@@ -429,34 +429,6 @@ class effTired extends Effect {
         }
     }
 }
-class effDamage extends CombatEffect {
-    constructor(amount) {
-        super();
-        this.amount = amount;
-        this.data.id = this.data.name= effDamage.name, this.data.duration = 0, this.data.hidden=0;
-    }
-    toJSON() {return window.storage.Generic_toJSON("effDamage", this); };
-    static fromJSON(value) { return window.storage.Generic_fromJSON(effDamage, value.data);};
-    get desc() {return(effDamage.name);}
-    get shortDesc() {return(this.desc+" for " + this.data.duration+" turns");}
-    onApply(){
-        this.data.duration = 0;
-        this.parent.parent.Stats.increment('health',-1*this.amount);
-    }
-    merge(neweffect) {
-        if(neweffect.name===this.data.name) {    //extends stun
-            this.onApply();
-            return(true);
-        }
-    }
-    onCombatEnd() {
-        this.parent.removeItem(this.data.id);
-    }
-    onTurnStart() {
-        this.data.duration-=1;
-        if(this.data.duration<=0) this.parent.removeItem(this.data.id);
-    }
-}
 class effMutateCat extends Effect {
     constructor() {
         super();
@@ -531,7 +503,66 @@ class effGrowBreast extends Effect {
         }
     }
 }
-//combateffect
+/////////////// combateffects /////////////////////////
+class effHeal extends CombatEffect {
+    constructor(amount) {
+        super();
+        this.amount = amount;
+        this.data.id = this.data.name= effHeal.name, this.data.duration = 0, this.data.hidden=0;
+    }
+    toJSON() {return window.storage.Generic_toJSON("effHeal", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(effHeal, value.data);};
+    get desc() {return(effHeal.name);}
+    get shortDesc() {return(this.desc+" for " + this.data.duration+" turns");}
+    onApply(){
+        this.data.duration = 2;
+        this.parent.parent.Stats.increment('health',this.amount);
+    }
+    merge(neweffect) {
+        if(neweffect.name===this.data.name) {    //extends stun
+            this.onApply();
+            return(true);
+        }
+    }
+    onCombatEnd() {
+        this.parent.removeItem(this.data.id);
+    }
+    onTurnStart() {
+        this.data.duration-=1;
+        if(this.data.duration<=0) this.parent.removeItem(this.data.id);
+        else {
+            this.parent.parent.Stats.increment('health',this.amount);
+        }
+    }
+}
+class effDamage extends CombatEffect {
+    constructor(amount) {
+        super();
+        this.amount = amount;
+        this.data.id = this.data.name= effDamage.name, this.data.duration = 0, this.data.hidden=0;
+    }
+    toJSON() {return window.storage.Generic_toJSON("effDamage", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(effDamage, value.data);};
+    get desc() {return(effDamage.name);}
+    get shortDesc() {return(this.desc+" for " + this.data.duration+" turns");}
+    onApply(){
+        this.data.duration = 0;
+        this.parent.parent.Stats.increment('health',-1*this.amount);
+    }
+    merge(neweffect) {
+        if(neweffect.name===this.data.name) {    //extends stun
+            this.onApply();
+            return(true);
+        }
+    }
+    onCombatEnd() {
+        this.parent.removeItem(this.data.id);
+    }
+    onTurnStart() {
+        this.data.duration-=1;
+        if(this.data.duration<=0) this.parent.removeItem(this.data.id);
+    }
+}
 class effStunned extends CombatEffect {
     constructor() {
         super();

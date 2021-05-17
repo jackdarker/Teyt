@@ -157,7 +157,7 @@ for(var i=0;i<maxSlots;i++){
   %><%=window.gm.printItem(id,inv.countItem(id).toString()+'x '+inv.getItem(id).desc+' '+inv.getItem(id).usable(inv).msg)%><%
 } 
 %>
-<div><output></output></div></br>
+<div id='output'></div></br>
 </article><article id="LogPanel"></article></section>
 
 

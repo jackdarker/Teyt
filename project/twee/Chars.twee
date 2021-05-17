@@ -11,7 +11,7 @@ You barely know anything about him.</br>
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 Cyril is here.</br>
 <a0 onclick='window.gm.giveCyrilFood()'>Give him some food</a></br>
-</br><div><output></output></div></br>   <!--message is rendered here-->
+</br><div id='output'></div></br>   <!--message is rendered here-->
 [[Back|_back]]</br></br>
 </article></section>
 
@@ -33,7 +33,7 @@ You can see a disapproving look on her face.
 :: MutateTailCat
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
-<div><output></output></div></br>   <!--message is rendered here-->
+<div id='output'></div></br>   <!--message is rendered here-->
 <% if(window.gm.hasDeferredEvent()){ %>
 <%= window.gm.showDeferredEvent() %>
 <%} else {%>
@@ -69,7 +69,7 @@ You feel the urge to sit down and give yourself a good licking...</br>
 
 :: MutateBreast
 <section> <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
-<div><output></output></div></br>   <!--message is rendered here-->
+<div id='output'></div></br>   <!--message is rendered here-->
 <% if(window.gm.hasDeferredEvent()){ %> <%= window.gm.showDeferredEvent() %> <%} else {%>
 [[Next|<%=window.gm.player.location%>]]</br>
 <%}%>

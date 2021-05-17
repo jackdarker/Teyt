@@ -173,7 +173,6 @@ class Effects extends Inventory {  //Todo a collection of Stats is similiar to I
         if(_i>-1) {
             var _old = this.get(effect.id);
             res = _old.merge(effect);
-            //res =window.gm.EffectLib[this.list[_i].name].merge(this,this.list[_i],effect,effect.dataPrototype());
             if(res!=null) {
                 if(res===true) {}
                 else res(this); //should be a function
@@ -186,7 +185,6 @@ class Effects extends Inventory {  //Todo a collection of Stats is similiar to I
         for(var i=0;i<_k.length;i++) {
             var _old = this.list[_k];
             res = _old.merge(effect);
-            //res =window.gm.EffectLib[this.list[_k].name].merge(this,this.list[_i],effect,effect.dataPrototype());
             if(res!=null) {
                 if(res===true) {}
                 else res(this); //should be a function
@@ -208,7 +206,7 @@ class Effects extends Inventory {  //Todo a collection of Stats is similiar to I
         //window.gm.EffectLib[this.list[_i].name].onRemove(this,this.list[_i]);
         neweffect._parent = window.gm.util.refToParent(this);
         this.list[_i].item = neweffect;
-        neweffect.onApply(this,neweffect);
+        neweffect.onApply();
     }
     updateTime() {
         var now =window.gm.getTime();

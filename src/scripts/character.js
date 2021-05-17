@@ -14,7 +14,8 @@ export class Character {
         outfit: [],  // needs to be mapped to outfit-Instance
         stats: [],
         effects: [],
-        rel: []
+        rel: [],
+        skills: []
         });
     }
     constructor(externlist) {
@@ -31,13 +32,18 @@ export class Character {
         this.Effects._parent = window.gm.util.refToParent(this);
         this.Rel = new StatsDictionary(this._data.rel); //Todo Relation similiar to stats?
         this.Rel._parent = window.gm.util.refToParent(this);
+        this.Skills = new Inventory(this._data.skills);
+        this.Skills._parent = window.gm.util.refToParent(this);
         //create basic stats
-        stHealth.setup(this.Stats,50,60),stEnergy.setup(this.Stats,30,100),stPAttack.setup(this.Stats,4,100),stPDefense.setup(this.Stats,4,100),
+        stHealth.setup(this.Stats,50,60),stEnergy.setup(this.Stats,30,100),stPAttack.setup(this.Stats,6,100),stPDefense.setup(this.Stats,4,100),
         stAgility.setup(this.Stats,10,100),stIntelligence.setup(this.Stats,10,100),stLuck.setup(this.Stats,10,100);
         stCharisma.setup(this.Stats,10,100),stPerception.setup(this.Stats,10,100),stStrength.setup(this.Stats,10,100),stEndurance.setup(this.Stats,10,100);
         stPerversion.setup(this.Stats,1,15),stArousal.setup(this.Stats,1,100);
 
         this.Effects.addItem(effNotTired.name, new effNotTired()); //depending on sleep Tired will be set to NotTired or Tired
+        this.Skills.addItem(new SkillAttack());this.Skills.addItem(new SkillStun());
+        this.Skills.addItem(new SkillHeal());
+
         window.storage.registerConstructor(Character);
     }
     toJSON() {return window.storage.Generic_toJSON("Character", this); };
