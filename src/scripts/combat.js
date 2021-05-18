@@ -38,7 +38,7 @@ initCombat() {
 }
 
 hideCombatOption() {
-  document.querySelector("#combatmenu").remove();
+  document.querySelector("#choice").remove();
 }
 printStats() {
   var s=window.story.state;
@@ -70,8 +70,7 @@ printStats() {
 //creates buttons for skills of current actor
 printSkillList() {
   var s = window.story.state;
-  var elmt="<form id='combatmenu'>";
-  //Todo create list based on abilitys
+  /*var elmt="<form id='combatmenu'>";
   var canAct = s.combat.actor._canAct();
   if(canAct.OK===true) {
     var skillIds = s.combat.actor.Skills.getAllIds();
@@ -83,7 +82,30 @@ printSkillList() {
   }
   elmt +="<a0 id='moveNOP'          onclick='(function($event){window.gm.Encounter._postSkillAbort();})(this);'>Do nothing</a></br>";
   elmt +="</form></br>";
-  return(elmt);
+  return(elmt);*/
+
+  var canAct = s.combat.actor._canAct();
+  if(canAct.OK===true) {
+    var skillIds = s.combat.actor.Skills.getAllIds();
+    for(var i=0; i<skillIds.length;i++) {
+      var entry = document.createElement('a');
+      entry.href='javascript:void(0)';
+      entry.addEventListener("click",(function(me,target){ 
+        return(window.gm.Encounter._postSkillSelect.bind(me,target));}(this,skillIds[i])));
+      entry.textContent=s.combat.actor.Skills.getItem(skillIds[i]).name;
+      //entry.disabled=this.buttons[y*5+x].disabled;
+      $("div#choice")[0].appendChild(entry);      // <- requires this node in html
+    }
+  } else {
+    var entry = document.createElement('p');
+    entry.textContent=canAct.msg;
+    $("div#choice")[0].appendChild(entry);
+  }
+  var entry = document.createElement('a');
+  entry.href='javascript:void(0)';
+  entry.addEventListener('click',(function(me){return(window.gm.Encounter._postSkillAbort.bind(me));}(this)));
+  entry.textContent="Do nothing";
+  $("div#choice")[0].appendChild(entry);
 }
 _postSkillAbort(){
   window.story.state.combat.action=null;
@@ -132,9 +154,10 @@ printCombatEffects(char) {
 }
 printTargetList() {
   var s = window.story.state;
-  var elmt="<form id='combatmenu'>";
+  
   var skill = s.combat.actor.Skills.getItem(s.combat.action);
   var targets = skill.targetFilter(s.combat.playerParty.concat(s.combat.enemyParty));
+  /*var elmt="<form id='combatmenu'>";
   elmt += "<label>use "+s.combat.action+" on..</label>";
   for(var i=0; i<targets.length;i++) {
     elmt +="<a0 id=\'"+targets[i].name+"\' onclick=\'(function($event){window.gm.Encounter._postTargetSelect(id);})(this);\'>"+targets[i].name+"</a>";
@@ -142,19 +165,30 @@ printTargetList() {
 
   elmt +="</br><a0 id='back' onclick='(function($event){window.gm.Encounter._postTargetAbort();})(this);'>Back</a></br>";
   elmt +="</form></br>";
-  return(elmt);
+  return(elmt);*/
+
+  for(var i=0; i<targets.length;i++) {
+    var entry = document.createElement('a');
+    entry.href='javascript:void(0)';
+    entry.addEventListener("click",(function(me,target){ 
+      return(window.gm.Encounter._postTargetSelect.bind(me,target));}(this,targets[i])));
+    entry.textContent=targets[i].name;
+    //entry.disabled=this.buttons[y*5+x].disabled;
+    $("div#choice")[0].appendChild(entry);      // <- requires this node in html
+  }
 }
 _postTargetAbort(){
   window.story.state.combat.action=null;
   window.gm.Encounter.next=window.gm.Encounter.selectMove;
   window.story.show('EncounterStartTurn');
 }
-_postTargetSelect(id){
+_postTargetSelect(target){
   this.hideCombatOption();
-  var targets = window.story.state.combat.playerParty.concat(window.story.state.combat.enemyParty);
+  /*var targets = window.story.state.combat.playerParty.concat(window.story.state.combat.enemyParty);
   for(var i=0; i<targets.length;i++) {
     if(id===targets[i].name) window.story.state.combat.target = targets[i];  //todo problems if names are non-unique
-  }
+  }*/
+  window.story.state.combat.target = (target.length)? target : [target] ;
   window.gm.Encounter.next=window.gm.Encounter.execMove;
   window.story.show('EncounterStartTurn');
 }
@@ -304,13 +338,13 @@ selectMove() {
     return(result);
   } else {
     if(s.combat.actor.calcCombatMove) { //selected by AI
-      //s.combat.target = s.combat.playerParty[0]; //Todo
       result.OK=true;
       result.msg += this.calcEnemyCombat();
       result.msg += window.gm.printPassageLink('Next','EncounterStartTurn');
       this.next=this.checkDefeat;
     } else {
-      result.OK=true, result.msg=this.printSkillList();
+      this.printSkillList();
+      result.OK=true, result.msg="Choose your action !";//
       this.next=this.selectTarget;
     }
   }
@@ -319,14 +353,15 @@ selectMove() {
 selectTarget() {  //select target for choosen action
   var s = window.story.state;
   var result = {OK:false, msg:''};
-  result.OK=true,result.msg = this.printTargetList();
+  this.printTargetList();
+  result.OK=true,result.msg = "Choose target";
   return(result);
 }
 execMove(){
   var result = {OK:false, msg:''};
   var s = window.story.state;
   //apply move
-  result.msg=s.combat.actor.Skills.getItem(s.combat.action).cast([s.combat.target]).msg;
+  result.msg=s.combat.actor.Skills.getItem(s.combat.action).cast(s.combat.target).msg;
   result.OK = true;
   this.next=this.checkDefeat;
   result.msg+=window.gm.printPassageLink("Next","EncounterStartTurn");
@@ -369,49 +404,6 @@ battle() {
   return(result);
 };
 
-//returns false if battle should continue
-battle_old() {
-  var s=window.story.state;
-  var result = {OK:false, msg:''};
-  //check if battle done...
-  if(s.combat.playerFleeing===true) { 
-    result.OK=true;
-    result.msg = 'You sucessfully escaped '+"</br>";
-    result.msg += window.gm.printPassageLink('Next',window.gm.player.location);
-  } 
-  if(s.combat.playerSubmitting===true) {  
-    result.OK=true;
-    result.msg = this.onSubmit();
-  } 
-  if(s.enemy.health().value<=0) { 
-    result.OK=true;
-    s.combat.state = 'victory';
-    result.msg = 'You defeated '+s.enemy.name+"</br>";
-    result.msg += window.gm.printPassageLink('Next',window.gm.player.location);
-  }
-  if(window.gm.player.health().value<=0){ 
-    result.OK=true;
-    s.combat.state = 'defeat';    
-    result.msg = 'You where defeated by'+s.enemy.name+"</br>";
-    result.msg += window.gm.printPassageLink('GameOver','GameOver');
-  }
-  if(result.OK) {this.endCombat(); }
-  else{   //or continue combat                
-    if(s.combat.newTurn===false && !(s.combat.enemyTurn ^ s.combat.enemyFirst)) {
-      s.combat.newTurn = true;
-      result.msg += 'new turn</br>';
-      window.gm.Encounter.startRound();
-    }
-    if(s.combat.enemyTurn) { 
-      result.msg += this.calcEnemyCombat();
-      result.msg += window.gm.printPassageLink('Next','EncounterStartTurn');
-    }else{ 
-      result.msg += this.printCombatOption();
-    }
-    //todo how to know endRound
-  }
-  return(result);
-}
 }
 //calculates if target can evade the attack 
 /*requires minimum Poise

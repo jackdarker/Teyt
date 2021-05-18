@@ -40,24 +40,6 @@ document.querySelector('#settings').addEventListener('click', function(){window.
 <!--called to include important dialogs; mainly the save-Dialog because of special behaviour-->
 <%=window.story.render("SaveDialog") %></br>
 
-:: playerstats
-<!--called to render stats in combat-->
-<table><tbody>
-<tr><td></td><td><%=window.gm.player.name%></td>
-<tr><td>Health:</td><td><%=window.gm.player.health().value%>/<%=window.gm.player.health().max%></td></tr>
-<tr><td>Arousal:</td><td><%=window.gm.player.Stats.get("arousal").value%>/<%=window.gm.player.Stats.get("arousalMax").value%></td></tr>
-<tr><td>State:</td><td><%=window.gm.Encounter.printCombatEffects(window.gm.player)%></td></tr>
-</tbody></table>
-
-:: enemystats
-<!--called to render stats in combat-->
-<table><tbody>
-<tr><td></td><td><%=s.enemy.name%></td>
-<tr><td>Health:</td><td><%=s.enemy.health().value%>/<%=s.enemy.health().max%></td></tr>
-<tr><td>Arousal:</td><td><%=s.enemy.Stats.get("arousal").value%>/<%=s.enemy.Stats.get("arousalMax").value%></td></tr>
-<tr><td>State:</td><td><%=window.gm.Encounter.printCombatEffects(s.enemy)%></td></tr>
-</tbody></table>
-
 
 :: LogPanel
 <div class="scroll" style="font-size: smaller;"><%=window.gm.getLog()%></br></br></div>
