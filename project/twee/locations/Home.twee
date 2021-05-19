@@ -44,6 +44,7 @@ A double bed is there with [[nightstands|moms_treasure]] on each side. <br>
 <a0 onclick='window.story.show("Talk_Cyril")'>Cyril is here</a></br>
 <%}%>
 <a0 onclick='switchChar(this)'>Switch Char</a></br>
+<a0 onclick='inviteChar(this)'>Invite Char</a></br>
 <a0 onclick='window.gm.pushDeferredEvent("HairGrow")'>Hair Tonic</a></br>
 [[Hallway|Home]]</br>
 </article><article id="LogPanel"></article></section>
@@ -55,6 +56,15 @@ function switchChar(elmnt) {
 		window.gm.switchPlayer('Ratchel');
 	}
 	elmnt.outerHTML=("<div class='red'>You are now playing as "+window.story.state.vars.activePlayer+". </div>");
+}
+function inviteChar(elmnt) {
+	if(window.gm.isInParty('Cyril')) {
+		window.gm.removeFromParty('Cyril');
+		elmnt.outerHTML=("<div class='red'>You kicked Cyril from your team. </div>");
+	} else {
+		window.gm.addToParty('Cyril');
+		elmnt.outerHTML=("<div class='red'>Cyril added to your team. </div>");
+	}
 }
 </script>
 

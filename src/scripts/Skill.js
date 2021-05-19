@@ -9,21 +9,18 @@ class SkillResult{
           this.effects = [];
     }
   }
+
+
 class Skill {
 constructor(name,descr) {
     this.name = name;
     this.descr = descr;
-    this.targetFilter = this.targetFilterEnemy;
 }
 //_parent will be added dynamical
 get parent() {return this._parent();}
 get caster() {return this.parent.parent;}
 getMaxTargetCount() {return 1;}
-/*targetFilter(){
-        //returns a function to filter a list of possible targets for targets that this skill can cast on
-        //myFilter(targets)->targets   teams is a array of party; targets is a list of character
-        return this.targetFilterEnemy;
-}*/
+
 isValidPhase() {
         //returns True if the skill can be used in tha actual game-phase (combatPhase,explorePhase)
         return true;
@@ -34,15 +31,40 @@ isDisabled() {
     //the text should indicate why and how long it is disabled
     return ({OK:false,msg:''});
 }
-
+//this is used to filter possible targets for a skill
+//the function returns a array of arrays containing the targets  
+//f.e. [[dragon],[mole1,mole2]] to indicate that the skill can be used on dragon or both moles at same time
+targetFilter(targets){
+    return(this.targetFilterEnemy(targets));
+}
+//returns True if the skill can be used on the target(s)
+isValidTarget(target) {
+    // filtered can be [[mole1,mole2]] or [[dragon],[mole1,mole2]]
+    //target is [dragon] or [mole1,mole2]
+    var filtered = this.targetFilter([target]); //[[]] !
+    for(var targ of target) {
+        var _i = filtered.indexOf(target);
+        if(_i<0) return false;
+    }
+    return true;
+}
+/*
 isValidTarget(targets) {
         //returns True if the skill can be used on the target(s)
         var filtered = this.targetFilter(targets);
-todo filtered can be [mole1,mole2] or [dragon,[mole1,mole2]]
-targets is dragon or [mole1,mole2]
+
     if(targets.length>1) {
         for(var filt of filtered) {
-            if(targets===filt) return true;
+            //const firstCopy = targets.slice();
+            //const secondCopy = filt.slice();
+            for(let i = 0; i < targets.length; i++){
+                const ind = filt.indexOf(targets[i]);
+                if(ind === -1){
+                    return false;
+                };
+                filt.splice(ind, 1);
+            };
+            return true;
         }
         return false;
     }else {
@@ -52,7 +74,7 @@ targets is dragon or [mole1,mole2]
         }
         return true;
     }
-}
+}*/
 getCost(){
         //returns information about the cost to execute the skill
         return {}
@@ -69,14 +91,14 @@ getCastDescription(result) {
     //update msg after sucessful cast
     return(this.caster.name +" uses "+ this.name +" on " + result.targets[0].name+".");
 }
-previewCast(targets){
+previewCast(target){
         var result = new SkillResult();
-        result.msg = this.caster.name +" will use "+ this.name +" on " + targets[0].name;
+        result.msg = this.caster.name +" will use "+ this.name +" on " + targets.name;
         return(result);
 }
-cast(targets){
+cast(target){
     //execute the skill on the targets
-    var result = this.previewCast(targets);
+    var result = this.previewCast(target);
     if(result.OK) {
         result.msg = "";
         for(var X of result.effects) {// for each target
@@ -93,23 +115,35 @@ cast(targets){
 targetFilterSelf(targets){
         var possibleTarget = [];
         for(var target of targets) {
-            if(this.caster == target)
-                possibleTarget.push(target);
+            var valid = true;
+            for(var targ of target) {
+                if(this.caster != target) valid=false;
+            }
+            if(valid)
+                possibleTarget.push(target);           
         }
         return possibleTarget;
 }
 targetFilterAlly(targets){
         var possibleTarget = [];
         for(var target of targets){
-            if(this.caster.faction == target.faction)
-                possibleTarget.push(target);
+            var valid = true;
+            for(var targ of target) {
+                if(this.caster.faction != targ.faction) valid=false;
+            }
+            if(valid)
+                possibleTarget.push(target);     
         }
         return possibleTarget;
 }
 targetFilterEnemy(targets){
         var possibleTarget = [];
         for(var target of targets){
-            if(this.caster.faction != target.faction)
+            var valid = true;
+            for(var targ of target) {
+                if(this.caster.faction == targ.faction) valid=false;
+            }
+            if(valid)
                 possibleTarget.push(target);
         }
         return possibleTarget;
@@ -118,17 +152,38 @@ targetFilterFighting(targets){
         //chars that are not inhibited"""
         var possibleTarget = [];
         for(var target of targets){
-            if(target._canAct().OK)
-                possibleTarget.push(target);
+            var valid = true;
+            for(var targ of target) {
+                if(!targ._canAct().OK) valid=false;
+            }
+            if(valid)
+                possibleTarget.push(target); 
         }
         return possibleTarget
+}
+targetFilterAlive(targets){
+    //chars that are dead"""
+        var possibleTarget = [];
+        for(var target of targets){
+            var valid = true;
+            for(var targ of target) {
+                if(targ.isDead()) valid=false;
+            }
+            if(valid)
+                possibleTarget.push(target); 
+        }
+        return possibleTarget;
 }
 targetFilterDead(targets){
     //chars that are dead"""
         var possibleTarget = [];
         for(var target of targets){
-            if(!target.isDead()) 
-                possibleTarget.push(target);
+            var valid = true;
+            for(var targ of target) {
+                if(!targ.isDead()) valid=false;
+            }
+            if(valid)
+                possibleTarget.push(target); 
         }
         return possibleTarget;
 }
@@ -138,7 +193,9 @@ class SkillAttack extends Skill {
     //execute simple attack with active weapon
     constructor() {
         super("Attack","Attack");
-        this.targetFilter = (function(targets) { return(this.targetFilterEnemy(targets));});
+    }
+    targetFilter(targets){
+        return(this.targetFilterEnemy(targets));
     }
     previewCast(targets){
         var result = new SkillResult()
@@ -171,11 +228,19 @@ class SkillStun extends Skill {
     //execute stun attack
     constructor() {
         super("Stun","Stun");
-        this.targetFilter = (function(targets) { 
-            var prefiltered = this.targetFilterFighting(this.targetFilterEnemy(targets));
-            prefiltered.name = "all";
-            var possibletarget = [prefiltered];
-            return(possibletarget);});
+    }
+    targetFilter(targets){
+        var possibletarget = this.targetFilterFighting(this.targetFilterEnemy(targets));
+        //[[mole1],[mole2]]
+        var multi = [];
+        multi.name = "all";
+        for(var el of possibletarget) {
+            if(el.length===1)   //dont stack multi-targets
+                multi.push(el[0]);
+        }
+        if(multi.length>0) possibletarget.push(multi);
+        //[[mole1],[mole2],[mole1,mole2]]
+        return(possibletarget);
     }
     previewCast(targets){
         var result = new SkillResult()
@@ -193,13 +258,15 @@ class SkillStun extends Skill {
     }
     getCastDescription(result) {
         //update msg after sucessful cast
-        return(this.caster.name +" stunned " + result.targets[0]+".");
+        return(this.caster.name +" stunned " + result.targets.name+".");
     }
 }
 class SkillPoisonCloud extends Skill {
     constructor() {
         super("PoisonCloud","PoisonCloud");
-        this.targetFilter = (function(targets) { return(this.targetFilterFighting(this.targetFilterEnemy(targets)));});
+    }
+    targetFilter(targets){
+        return(this.targetFilterFighting(this.targetFilterEnemy(targets)));
     }
     previewCast(targets){
         var result = new SkillResult()
@@ -217,15 +284,17 @@ class SkillPoisonCloud extends Skill {
     }
     getCastDescription(result) {
         //update msg after sucessful cast
-        return(this.caster.name +" poisons " + result.targets[0]+".");
+        return(this.caster.name +" poisons " + result.targets.name+".");
     }
 }
 class SkillHeal extends Skill {
-      //execute stun attack
-      constructor() {
-          super("Heal","Heal");
-          this.targetFilter = (function(targets) { return(targets);});
-      }
+    //execute stun attack
+    constructor() {
+        super("Heal","Heal");
+    }
+    targetFilter(targets){
+        return(this.targetFilterAlive(targets));
+    }
       previewCast(targets){
           var result = new SkillResult()
           result.skill =this;
@@ -242,11 +311,13 @@ class SkillHeal extends Skill {
       }
 }
 class SkillGuard extends Skill {
-      //todo improves defense
-      constructor() {
-          super("Guard","Guard");
-          this.targetFilter = (function(targets) { return(this.targetFilterSelf(targets));});
-      }
+    //todo improves defense
+    constructor() {
+        super("Guard","Guard");
+    }
+    targetFilter(targets){
+        return(this.targetFilterSelf(targets));
+    }
       previewCast(targets){
           var result = new SkillResult()
           result.skill =this;

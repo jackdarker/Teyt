@@ -58,6 +58,7 @@ window.gm.initGame= function(forceReset,NGP=null) {
     if (!s.Cyril||forceReset) {  //alternative player character
       window.gm.Cyril = new Character()
       window.gm.Cyril.name="Cyril";
+      window.gm.Cyril.faction="Player";
       //add some basic inventory
       window.gm.Cyril.Wardrobe.addItem(new Jeans());
       window.gm.Cyril.Wardrobe.addItem(new TankShirt());

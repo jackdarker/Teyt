@@ -22,7 +22,10 @@ class CombatSetup {
 initCombat() {
   var s=window.story.state;
   s.combat.enemyParty = this.EnemyFunc();
-  s.combat.playerParty = [window.gm.player];
+  s.combat.playerParty = [];
+  for(var el of s._gm.playerParty) {
+    s.combat.playerParty.push(s[el]);
+  }
   s.combat.turnStack = [];
   s.combat.actor = s.combat.target = s.combat.action = null;
   s.combat.location = this.location;
@@ -156,7 +159,12 @@ printTargetList() {
   var s = window.story.state;
   
   var skill = s.combat.actor.Skills.getItem(s.combat.action);
-  var targets = skill.targetFilter(s.combat.playerParty.concat(s.combat.enemyParty));
+  var all = s.combat.playerParty.concat(s.combat.enemyParty);
+  var targets = [];
+  for( el of all) {
+    targets.push([el]);
+  }
+  targets = skill.targetFilter(targets);
   /*var elmt="<form id='combatmenu'>";
   elmt += "<label>use "+s.combat.action+" on..</label>";
   for(var i=0; i<targets.length;i++) {
@@ -172,10 +180,16 @@ printTargetList() {
     entry.href='javascript:void(0)';
     entry.addEventListener("click",(function(me,target){ 
       return(window.gm.Encounter._postTargetSelect.bind(me,target));}(this,targets[i])));
-    entry.textContent=targets[i].name;
+    //if single-target, use name from mob, for multitarget we expect a name attribute to the list
+    entry.textContent=(targets[i].length>1)?targets[i].name:targets[i][0].name;
     //entry.disabled=this.buttons[y*5+x].disabled;
     $("div#choice")[0].appendChild(entry);      // <- requires this node in html
   }
+  var entry = document.createElement('a');
+  entry.href='javascript:void(0)';
+  entry.addEventListener('click',(function(me){return(window.gm.Encounter._postTargetAbort.bind(me));}(this)));
+  entry.textContent="back";
+  $("div#choice")[0].appendChild(entry);
 }
 _postTargetAbort(){
   window.story.state.combat.action=null;
@@ -188,7 +202,7 @@ _postTargetSelect(target){
   for(var i=0; i<targets.length;i++) {
     if(id===targets[i].name) window.story.state.combat.target = targets[i];  //todo problems if names are non-unique
   }*/
-  window.story.state.combat.target = (target.length)? target : [target] ;
+  window.story.state.combat.target = target;//(target.length)? target : [target] ;
   window.gm.Encounter.next=window.gm.Encounter.execMove;
   window.story.show('EncounterStartTurn');
 }

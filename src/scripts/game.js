@@ -8,11 +8,6 @@ window.gm = window.gm || {}; //game related operations
 window.gm.util = window.gm.util || {};  //utility functions
 // define save-game-file-version 1
 
-window.gm.switchPlayer = function(playername) {
-  var s = window.story.state;
-  window.gm.player= s[playername]; 
-  s.vars.activePlayer = playername;
-}
 //you might need to reimplement this to handle version upgrades on load
 window.gm.rebuildObjects= function(){ 
   var s = window.story.state;
@@ -129,7 +124,8 @@ window.gm.initGame= function(forceReset,NGP=null) {
     }
     if (!s._gm||forceReset) {
       s._gm = {
-        nosave : false
+        nosave : false,
+        playerParty: []  //names of NPC in playerParty 
       }
     }
     if (!s.dng||forceReset) { //stores the state of the current dungeon
@@ -176,7 +172,7 @@ window.gm.newGamePlus = function() {
 // use: child._parent = window.gm.util.refToParent(parent);
 window.gm.util.refToParent = function(me){ return function(){return(me);}};
 //---------------------------------------------------------------------------------
-//TODO Deferred Event is incomplete
+//TODO 
 //maybe you sometimes dont want to trigger an event immediatly, 
 //f.e. if you send a email, it might take some time until you get a response-email 
 //(you can receive email at anytime on your phone, so we would have to add checks on ALL passages)
@@ -264,7 +260,7 @@ window.gm.pushDeferredEvent=function(id,args) {
       }
   }
 
-  //Todo disable save-menu on _nosave-tag 
+  //disable save-menu on _nosave-tag 
   if(inGame) {
       window.story.state._gm.nosave = (tagsnext.indexOf('_nosave')>=0 );
   }
@@ -275,6 +271,32 @@ window.gm.pushDeferredEvent=function(id,args) {
     //this is a problem?how do I know the deffered passage is done? 
     _origStoryShow.call(window.story,next, noHistory);
   };
+//-----------------------------------------------------------------------------
+//changes the active player and will add him to party!
+window.gm.switchPlayer = function(playername) {
+  var s = window.story.state;
+  window.gm.player= s[playername];
+  s.vars.activePlayer = playername;
+  window.gm.addToParty(playername);
+}
+window.gm.removeFromParty= function(name) {
+  var s=window.story.state;
+  var i = s._gm.playerParty.indexOf(name);
+  if(i>=0) s._gm.playerParty.splice(i,1);
+}
+//adds the character to the party
+//there has to be a CharacterObject for window.story.state[name]
+window.gm.addToParty= function(name) {
+  var s=window.story.state;
+  if(s._gm.playerParty.indexOf(name)<0)
+    s._gm.playerParty.push(name);
+}
+window.gm.isInParty = function(name) {
+  return(window.story.state._gm.playerParty.indexOf(name)>=0);
+}
+//-----------------------------------------------------------------------------
+
+
   //---------------------------------------------------------------------------------
   //updates all panels
 window.gm.refreshScreen= function() {

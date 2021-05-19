@@ -775,7 +775,7 @@ main .alphabet span {
   color: black;
 /*   border-color: #43a047 !important; */
 }
-.red{
+.red2{
 /*   background: #e53935; */
   background: black;
   color: black;
@@ -816,12 +816,6 @@ function _superPropBase(object, property) { while (!Object.prototype.hasOwnPrope
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-function _createForOfIteratorHelper(o, allowArrayLike) { var it; if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
-
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
-
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
@@ -837,6 +831,12 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _createForOfIteratorHelper(o, allowArrayLike) { var it; if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -1085,7 +1085,22 @@ var CombatSetup = /*#__PURE__*/function () {
     value: function initCombat() {
       var s = window.story.state;
       s.combat.enemyParty = this.EnemyFunc();
-      s.combat.playerParty = [window.gm.player];
+      s.combat.playerParty = [];
+
+      var _iterator = _createForOfIteratorHelper(s._gm.playerParty),
+          _step;
+
+      try {
+        for (_iterator.s(); !(_step = _iterator.n()).done;) {
+          var el = _step.value;
+          s.combat.playerParty.push(s[el]);
+        }
+      } catch (err) {
+        _iterator.e(err);
+      } finally {
+        _iterator.f();
+      }
+
       s.combat.turnStack = [];
       s.combat.actor = s.combat.target = s.combat.action = null;
       s.combat.location = this.location;
@@ -1249,7 +1264,24 @@ var CombatSetup = /*#__PURE__*/function () {
     value: function printTargetList() {
       var s = window.story.state;
       var skill = s.combat.actor.Skills.getItem(s.combat.action);
-      var targets = skill.targetFilter(s.combat.playerParty.concat(s.combat.enemyParty));
+      var all = s.combat.playerParty.concat(s.combat.enemyParty);
+      var targets = [];
+
+      var _iterator2 = _createForOfIteratorHelper(all),
+          _step2;
+
+      try {
+        for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+          el = _step2.value;
+          targets.push([el]);
+        }
+      } catch (err) {
+        _iterator2.e(err);
+      } finally {
+        _iterator2.f();
+      }
+
+      targets = skill.targetFilter(targets);
       /*var elmt="<form id='combatmenu'>";
       elmt += "<label>use "+s.combat.action+" on..</label>";
       for(var i=0; i<targets.length;i++) {
@@ -1264,11 +1296,20 @@ var CombatSetup = /*#__PURE__*/function () {
         entry.href = 'javascript:void(0)';
         entry.addEventListener("click", function (me, target) {
           return window.gm.Encounter._postTargetSelect.bind(me, target);
-        }(this, targets[i]));
-        entry.textContent = targets[i].name; //entry.disabled=this.buttons[y*5+x].disabled;
+        }(this, targets[i])); //if single-target, use name from mob, for multitarget we expect a name attribute to the list
+
+        entry.textContent = targets[i].length > 1 ? targets[i].name : targets[i][0].name; //entry.disabled=this.buttons[y*5+x].disabled;
 
         $("div#choice")[0].appendChild(entry); // <- requires this node in html
       }
+
+      var entry = document.createElement('a');
+      entry.href = 'javascript:void(0)';
+      entry.addEventListener('click', function (me) {
+        return window.gm.Encounter._postTargetAbort.bind(me);
+      }(this));
+      entry.textContent = "back";
+      $("div#choice")[0].appendChild(entry);
     }
   }, {
     key: "_postTargetAbort",
@@ -1286,7 +1327,8 @@ var CombatSetup = /*#__PURE__*/function () {
         if(id===targets[i].name) window.story.state.combat.target = targets[i];  //todo problems if names are non-unique
       }*/
 
-      window.story.state.combat.target = target.length ? target : [target];
+      window.story.state.combat.target = target; //(target.length)? target : [target] ;
+
       window.gm.Encounter.next = window.gm.Encounter.execMove;
       window.story.show('EncounterStartTurn');
     }
@@ -2735,13 +2777,7 @@ window.gm = window.gm || {}; //game related operations
 
 window.gm.util = window.gm.util || {}; //utility functions
 // define save-game-file-version 1
-
-window.gm.switchPlayer = function (playername) {
-  var s = window.story.state;
-  window.gm.player = s[playername];
-  s.vars.activePlayer = playername;
-}; //you might need to reimplement this to handle version upgrades on load
-
+//you might need to reimplement this to handle version upgrades on load
 
 window.gm.rebuildObjects = function () {
   var s = window.story.state;
@@ -2888,7 +2924,9 @@ window.gm.initGame = function (forceReset) {
 
   if (!s._gm || forceReset) {
     s._gm = {
-      nosave: false
+      nosave: false,
+      playerParty: [] //names of NPC in playerParty 
+
     };
   }
 
@@ -2951,7 +2989,7 @@ window.gm.util.refToParent = function (me) {
     return me;
   };
 }; //---------------------------------------------------------------------------------
-//TODO Deferred Event is incomplete
+//TODO 
 //maybe you sometimes dont want to trigger an event immediatly, 
 //f.e. if you send a email, it might take some time until you get a response-email 
 //(you can receive email at anytime on your phone, so we would have to add checks on ALL passages)
@@ -3065,7 +3103,7 @@ window.story.__proto__.show = function (idOrName) {
       //...otherwise error on game start
       window.story.state.vars.passageStack.splice(0, window.story.state.vars.passageStack.length);
     }
-  } //Todo disable save-menu on _nosave-tag 
+  } //disable save-menu on _nosave-tag 
 
 
   if (inGame) {
@@ -3078,7 +3116,36 @@ window.story.__proto__.show = function (idOrName) {
 
 
   _origStoryShow.call(window.story, next, noHistory);
-}; //---------------------------------------------------------------------------------
+}; //-----------------------------------------------------------------------------
+//changes the active player and will add him to party!
+
+
+window.gm.switchPlayer = function (playername) {
+  var s = window.story.state;
+  window.gm.player = s[playername];
+  s.vars.activePlayer = playername;
+  window.gm.addToParty(playername);
+};
+
+window.gm.removeFromParty = function (name) {
+  var s = window.story.state;
+
+  var i = s._gm.playerParty.indexOf(name);
+
+  if (i >= 0) s._gm.playerParty.splice(i, 1);
+}; //adds the character to the party
+//there has to be a CharacterObject for window.story.state[name]
+
+
+window.gm.addToParty = function (name) {
+  var s = window.story.state;
+  if (s._gm.playerParty.indexOf(name) < 0) s._gm.playerParty.push(name);
+};
+
+window.gm.isInParty = function (name) {
+  return window.story.state._gm.playerParty.indexOf(name) >= 0;
+}; //-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------------
 //updates all panels
 
 
@@ -4876,7 +4943,6 @@ var Skill = /*#__PURE__*/function () {
 
     this.name = name;
     this.descr = descr;
-    this.targetFilter = this.targetFilterEnemy;
   } //_parent will be added dynamical
 
 
@@ -4885,12 +4951,6 @@ var Skill = /*#__PURE__*/function () {
     value: function getMaxTargetCount() {
       return 1;
     }
-    /*targetFilter(){
-            //returns a function to filter a list of possible targets for targets that this skill can cast on
-            //myFilter(targets)->targets   teams is a array of party; targets is a list of character
-            return this.targetFilterEnemy;
-    }*/
-
   }, {
     key: "isValidPhase",
     value: function isValidPhase() {
@@ -4906,32 +4966,70 @@ var Skill = /*#__PURE__*/function () {
         OK: false,
         msg: ''
       };
-    }
+    } //this is used to filter possible targets for a skill
+    //the function returns a array of arrays containing the targets  
+    //f.e. [[dragon],[mole1,mole2]] to indicate that the skill can be used on dragon or both moles at same time
+
+  }, {
+    key: "targetFilter",
+    value: function targetFilter(targets) {
+      return this.targetFilterEnemy(targets);
+    } //returns True if the skill can be used on the target(s)
+
   }, {
     key: "isValidTarget",
-    value: function isValidTarget(targets) {
-      //returns True if the skill can be used on the target(s)
-      var filtered = this.targetFilter(targets);
+    value: function isValidTarget(target) {
+      // filtered can be [[mole1,mole2]] or [[dragon],[mole1,mole2]]
+      //target is [dragon] or [mole1,mole2]
+      var filtered = this.targetFilter([target]); //[[]] !
 
-      var _iterator = _createForOfIteratorHelper(targets),
-          _step;
+      var _iterator3 = _createForOfIteratorHelper(target),
+          _step3;
 
       try {
-        for (_iterator.s(); !(_step = _iterator.n()).done;) {
-          var target = _step.value;
+        for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
+          var targ = _step3.value;
 
           var _i = filtered.indexOf(target);
 
           if (_i < 0) return false;
         }
       } catch (err) {
-        _iterator.e(err);
+        _iterator3.e(err);
       } finally {
-        _iterator.f();
+        _iterator3.f();
       }
 
-      return true; //return ((this.targetFilter(targets))===(targets));//sorted(this.targetFilter()(targets))== sorted(targets))
+      return true;
     }
+    /*
+    isValidTarget(targets) {
+            //returns True if the skill can be used on the target(s)
+            var filtered = this.targetFilter(targets);
+    
+        if(targets.length>1) {
+            for(var filt of filtered) {
+                //const firstCopy = targets.slice();
+                //const secondCopy = filt.slice();
+                for(let i = 0; i < targets.length; i++){
+                    const ind = filt.indexOf(targets[i]);
+                    if(ind === -1){
+                        return false;
+                    };
+                    filt.splice(ind, 1);
+                };
+                return true;
+            }
+            return false;
+        }else {
+            for(var target of targets) {
+                var _i = filtered.indexOf(target);
+                if(_i<0) return false;
+            }
+            return true;
+        }
+    }*/
+
   }, {
     key: "getCost",
     value: function getCost() {
@@ -4958,47 +5056,47 @@ var Skill = /*#__PURE__*/function () {
     }
   }, {
     key: "previewCast",
-    value: function previewCast(targets) {
+    value: function previewCast(target) {
       var result = new SkillResult();
-      result.msg = this.caster.name + " will use " + this.name + " on " + targets[0].name;
+      result.msg = this.caster.name + " will use " + this.name + " on " + targets.name;
       return result;
     }
   }, {
     key: "cast",
-    value: function cast(targets) {
+    value: function cast(target) {
       //execute the skill on the targets
-      var result = this.previewCast(targets);
+      var result = this.previewCast(target);
 
       if (result.OK) {
         result.msg = "";
 
-        var _iterator2 = _createForOfIteratorHelper(result.effects),
-            _step2;
+        var _iterator4 = _createForOfIteratorHelper(result.effects),
+            _step4;
 
         try {
-          for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
-            var X = _step2.value;
+          for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
+            var X = _step4.value;
 
             // for each target
-            var _iterator3 = _createForOfIteratorHelper(X.eff),
-                _step3;
+            var _iterator5 = _createForOfIteratorHelper(X.eff),
+                _step5;
 
             try {
-              for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
-                var Y = _step3.value;
+              for (_iterator5.s(); !(_step5 = _iterator5.n()).done;) {
+                var Y = _step5.value;
                 //...multiple effects
                 X.target.addEffect(Y.name, Y);
               }
             } catch (err) {
-              _iterator3.e(err);
+              _iterator5.e(err);
             } finally {
-              _iterator3.f();
+              _iterator5.f();
             }
           }
         } catch (err) {
-          _iterator2.e(err);
+          _iterator4.e(err);
         } finally {
-          _iterator2.f();
+          _iterator4.f();
         }
 
         result.msg += this.getCastDescription(result);
@@ -5012,55 +5110,29 @@ var Skill = /*#__PURE__*/function () {
     value: function targetFilterSelf(targets) {
       var possibleTarget = [];
 
-      var _iterator4 = _createForOfIteratorHelper(targets),
-          _step4;
-
-      try {
-        for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
-          var target = _step4.value;
-          if (this.caster == target) possibleTarget.push(target);
-        }
-      } catch (err) {
-        _iterator4.e(err);
-      } finally {
-        _iterator4.f();
-      }
-
-      return possibleTarget;
-    }
-  }, {
-    key: "targetFilterAlly",
-    value: function targetFilterAlly(targets) {
-      var possibleTarget = [];
-
-      var _iterator5 = _createForOfIteratorHelper(targets),
-          _step5;
-
-      try {
-        for (_iterator5.s(); !(_step5 = _iterator5.n()).done;) {
-          var target = _step5.value;
-          if (this.caster.faction == target.faction) possibleTarget.push(target);
-        }
-      } catch (err) {
-        _iterator5.e(err);
-      } finally {
-        _iterator5.f();
-      }
-
-      return possibleTarget;
-    }
-  }, {
-    key: "targetFilterEnemy",
-    value: function targetFilterEnemy(targets) {
-      var possibleTarget = [];
-
       var _iterator6 = _createForOfIteratorHelper(targets),
           _step6;
 
       try {
         for (_iterator6.s(); !(_step6 = _iterator6.n()).done;) {
           var target = _step6.value;
-          if (this.caster.faction != target.faction) possibleTarget.push(target);
+          var valid = true;
+
+          var _iterator7 = _createForOfIteratorHelper(target),
+              _step7;
+
+          try {
+            for (_iterator7.s(); !(_step7 = _iterator7.n()).done;) {
+              var targ = _step7.value;
+              if (this.caster != target) valid = false;
+            }
+          } catch (err) {
+            _iterator7.e(err);
+          } finally {
+            _iterator7.f();
+          }
+
+          if (valid) possibleTarget.push(target);
         }
       } catch (err) {
         _iterator6.e(err);
@@ -5071,23 +5143,151 @@ var Skill = /*#__PURE__*/function () {
       return possibleTarget;
     }
   }, {
+    key: "targetFilterAlly",
+    value: function targetFilterAlly(targets) {
+      var possibleTarget = [];
+
+      var _iterator8 = _createForOfIteratorHelper(targets),
+          _step8;
+
+      try {
+        for (_iterator8.s(); !(_step8 = _iterator8.n()).done;) {
+          var target = _step8.value;
+          var valid = true;
+
+          var _iterator9 = _createForOfIteratorHelper(target),
+              _step9;
+
+          try {
+            for (_iterator9.s(); !(_step9 = _iterator9.n()).done;) {
+              var targ = _step9.value;
+              if (this.caster.faction != targ.faction) valid = false;
+            }
+          } catch (err) {
+            _iterator9.e(err);
+          } finally {
+            _iterator9.f();
+          }
+
+          if (valid) possibleTarget.push(target);
+        }
+      } catch (err) {
+        _iterator8.e(err);
+      } finally {
+        _iterator8.f();
+      }
+
+      return possibleTarget;
+    }
+  }, {
+    key: "targetFilterEnemy",
+    value: function targetFilterEnemy(targets) {
+      var possibleTarget = [];
+
+      var _iterator10 = _createForOfIteratorHelper(targets),
+          _step10;
+
+      try {
+        for (_iterator10.s(); !(_step10 = _iterator10.n()).done;) {
+          var target = _step10.value;
+          var valid = true;
+
+          var _iterator11 = _createForOfIteratorHelper(target),
+              _step11;
+
+          try {
+            for (_iterator11.s(); !(_step11 = _iterator11.n()).done;) {
+              var targ = _step11.value;
+              if (this.caster.faction == targ.faction) valid = false;
+            }
+          } catch (err) {
+            _iterator11.e(err);
+          } finally {
+            _iterator11.f();
+          }
+
+          if (valid) possibleTarget.push(target);
+        }
+      } catch (err) {
+        _iterator10.e(err);
+      } finally {
+        _iterator10.f();
+      }
+
+      return possibleTarget;
+    }
+  }, {
     key: "targetFilterFighting",
     value: function targetFilterFighting(targets) {
       //chars that are not inhibited"""
       var possibleTarget = [];
 
-      var _iterator7 = _createForOfIteratorHelper(targets),
-          _step7;
+      var _iterator12 = _createForOfIteratorHelper(targets),
+          _step12;
 
       try {
-        for (_iterator7.s(); !(_step7 = _iterator7.n()).done;) {
-          var target = _step7.value;
-          if (target._canAct().OK) possibleTarget.push(target);
+        for (_iterator12.s(); !(_step12 = _iterator12.n()).done;) {
+          var target = _step12.value;
+          var valid = true;
+
+          var _iterator13 = _createForOfIteratorHelper(target),
+              _step13;
+
+          try {
+            for (_iterator13.s(); !(_step13 = _iterator13.n()).done;) {
+              var targ = _step13.value;
+              if (!targ._canAct().OK) valid = false;
+            }
+          } catch (err) {
+            _iterator13.e(err);
+          } finally {
+            _iterator13.f();
+          }
+
+          if (valid) possibleTarget.push(target);
         }
       } catch (err) {
-        _iterator7.e(err);
+        _iterator12.e(err);
       } finally {
-        _iterator7.f();
+        _iterator12.f();
+      }
+
+      return possibleTarget;
+    }
+  }, {
+    key: "targetFilterAlive",
+    value: function targetFilterAlive(targets) {
+      //chars that are dead"""
+      var possibleTarget = [];
+
+      var _iterator14 = _createForOfIteratorHelper(targets),
+          _step14;
+
+      try {
+        for (_iterator14.s(); !(_step14 = _iterator14.n()).done;) {
+          var target = _step14.value;
+          var valid = true;
+
+          var _iterator15 = _createForOfIteratorHelper(target),
+              _step15;
+
+          try {
+            for (_iterator15.s(); !(_step15 = _iterator15.n()).done;) {
+              var targ = _step15.value;
+              if (targ.isDead()) valid = false;
+            }
+          } catch (err) {
+            _iterator15.e(err);
+          } finally {
+            _iterator15.f();
+          }
+
+          if (valid) possibleTarget.push(target);
+        }
+      } catch (err) {
+        _iterator14.e(err);
+      } finally {
+        _iterator14.f();
       }
 
       return possibleTarget;
@@ -5098,18 +5298,34 @@ var Skill = /*#__PURE__*/function () {
       //chars that are dead"""
       var possibleTarget = [];
 
-      var _iterator8 = _createForOfIteratorHelper(targets),
-          _step8;
+      var _iterator16 = _createForOfIteratorHelper(targets),
+          _step16;
 
       try {
-        for (_iterator8.s(); !(_step8 = _iterator8.n()).done;) {
-          var target = _step8.value;
-          if (!target.isDead()) possibleTarget.push(target);
+        for (_iterator16.s(); !(_step16 = _iterator16.n()).done;) {
+          var target = _step16.value;
+          var valid = true;
+
+          var _iterator17 = _createForOfIteratorHelper(target),
+              _step17;
+
+          try {
+            for (_iterator17.s(); !(_step17 = _iterator17.n()).done;) {
+              var targ = _step17.value;
+              if (!targ.isDead()) valid = false;
+            }
+          } catch (err) {
+            _iterator17.e(err);
+          } finally {
+            _iterator17.f();
+          }
+
+          if (valid) possibleTarget.push(target);
         }
       } catch (err) {
-        _iterator8.e(err);
+        _iterator16.e(err);
       } finally {
-        _iterator8.f();
+        _iterator16.f();
       }
 
       return possibleTarget;
@@ -5136,20 +5352,17 @@ var SkillAttack = /*#__PURE__*/function (_Skill) {
 
   //execute simple attack with active weapon
   function SkillAttack() {
-    var _this3;
-
     _classCallCheck(this, SkillAttack);
 
-    _this3 = _super4.call(this, "Attack", "Attack");
-
-    _this3.targetFilter = function (targets) {
-      return this.targetFilterEnemy(targets);
-    };
-
-    return _this3;
+    return _super4.call(this, "Attack", "Attack");
   }
 
   _createClass(SkillAttack, [{
+    key: "targetFilter",
+    value: function targetFilter(targets) {
+      return this.targetFilterEnemy(targets);
+    }
+  }, {
     key: "previewCast",
     value: function previewCast(targets) {
       var result = new SkillResult();
@@ -5160,12 +5373,12 @@ var SkillAttack = /*#__PURE__*/function (_Skill) {
       if (this.isValidTarget(targets)) {
         result.OK = true;
 
-        var _iterator9 = _createForOfIteratorHelper(targets),
-            _step9;
+        var _iterator18 = _createForOfIteratorHelper(targets),
+            _step18;
 
         try {
-          for (_iterator9.s(); !(_step9 = _iterator9.n()).done;) {
-            var target = _step9.value;
+          for (_iterator18.s(); !(_step18 = _iterator18.n()).done;) {
+            var target = _step18.value;
             var eff = this.calculateDamage(this.caster, target);
             result.effects.push({
               target: target,
@@ -5173,9 +5386,9 @@ var SkillAttack = /*#__PURE__*/function (_Skill) {
             });
           }
         } catch (err) {
-          _iterator9.e(err);
+          _iterator18.e(err);
         } finally {
-          _iterator9.f();
+          _iterator18.f();
         }
       }
 
@@ -5205,23 +5418,39 @@ var SkillStun = /*#__PURE__*/function (_Skill2) {
 
   //execute stun attack
   function SkillStun() {
-    var _this4;
-
     _classCallCheck(this, SkillStun);
 
-    _this4 = _super5.call(this, "Stun", "Stun");
-
-    _this4.targetFilter = function (targets) {
-      var prefiltered = this.targetFilterFighting(this.targetFilterEnemy(targets));
-      prefiltered.name = "all";
-      var possibletarget = [prefiltered];
-      return possibletarget;
-    };
-
-    return _this4;
+    return _super5.call(this, "Stun", "Stun");
   }
 
   _createClass(SkillStun, [{
+    key: "targetFilter",
+    value: function targetFilter(targets) {
+      var possibletarget = this.targetFilterFighting(this.targetFilterEnemy(targets)); //[[mole1],[mole2]]
+
+      var multi = [];
+      multi.name = "all";
+
+      var _iterator19 = _createForOfIteratorHelper(possibletarget),
+          _step19;
+
+      try {
+        for (_iterator19.s(); !(_step19 = _iterator19.n()).done;) {
+          var el = _step19.value;
+          if (el.length === 1) //dont stack multi-targets
+            multi.push(el[0]);
+        }
+      } catch (err) {
+        _iterator19.e(err);
+      } finally {
+        _iterator19.f();
+      }
+
+      if (multi.length > 0) possibletarget.push(multi); //[[mole1],[mole2],[mole1,mole2]]
+
+      return possibletarget;
+    }
+  }, {
     key: "previewCast",
     value: function previewCast(targets) {
       var result = new SkillResult();
@@ -5232,21 +5461,21 @@ var SkillStun = /*#__PURE__*/function (_Skill2) {
       if (this.isValidTarget(targets)) {
         result.OK = true;
 
-        var _iterator10 = _createForOfIteratorHelper(targets),
-            _step10;
+        var _iterator20 = _createForOfIteratorHelper(targets),
+            _step20;
 
         try {
-          for (_iterator10.s(); !(_step10 = _iterator10.n()).done;) {
-            var target = _step10.value;
+          for (_iterator20.s(); !(_step20 = _iterator20.n()).done;) {
+            var target = _step20.value;
             result.effects.push({
               target: target,
               eff: [new effStunned()]
             });
           }
         } catch (err) {
-          _iterator10.e(err);
+          _iterator20.e(err);
         } finally {
-          _iterator10.f();
+          _iterator20.f();
         }
       }
 
@@ -5256,7 +5485,7 @@ var SkillStun = /*#__PURE__*/function (_Skill2) {
     key: "getCastDescription",
     value: function getCastDescription(result) {
       //update msg after sucessful cast
-      return this.caster.name + " stunned " + result.targets[0] + ".";
+      return this.caster.name + " stunned " + result.targets.name + ".";
     }
   }]);
 
@@ -5269,20 +5498,17 @@ var SkillPoisonCloud = /*#__PURE__*/function (_Skill3) {
   var _super6 = _createSuper(SkillPoisonCloud);
 
   function SkillPoisonCloud() {
-    var _this5;
-
     _classCallCheck(this, SkillPoisonCloud);
 
-    _this5 = _super6.call(this, "PoisonCloud", "PoisonCloud");
-
-    _this5.targetFilter = function (targets) {
-      return this.targetFilterFighting(this.targetFilterEnemy(targets));
-    };
-
-    return _this5;
+    return _super6.call(this, "PoisonCloud", "PoisonCloud");
   }
 
   _createClass(SkillPoisonCloud, [{
+    key: "targetFilter",
+    value: function targetFilter(targets) {
+      return this.targetFilterFighting(this.targetFilterEnemy(targets));
+    }
+  }, {
     key: "previewCast",
     value: function previewCast(targets) {
       var result = new SkillResult();
@@ -5293,21 +5519,21 @@ var SkillPoisonCloud = /*#__PURE__*/function (_Skill3) {
       if (this.isValidTarget(targets)) {
         result.OK = true;
 
-        var _iterator11 = _createForOfIteratorHelper(targets),
-            _step11;
+        var _iterator21 = _createForOfIteratorHelper(targets),
+            _step21;
 
         try {
-          for (_iterator11.s(); !(_step11 = _iterator11.n()).done;) {
-            var target = _step11.value;
+          for (_iterator21.s(); !(_step21 = _iterator21.n()).done;) {
+            var target = _step21.value;
             result.effects.push({
               target: target,
               eff: [new effPoisoned()]
             });
           }
         } catch (err) {
-          _iterator11.e(err);
+          _iterator21.e(err);
         } finally {
-          _iterator11.f();
+          _iterator21.f();
         }
       }
 
@@ -5317,7 +5543,7 @@ var SkillPoisonCloud = /*#__PURE__*/function (_Skill3) {
     key: "getCastDescription",
     value: function getCastDescription(result) {
       //update msg after sucessful cast
-      return this.caster.name + " poisons " + result.targets[0] + ".";
+      return this.caster.name + " poisons " + result.targets.name + ".";
     }
   }]);
 
@@ -5331,20 +5557,17 @@ var SkillHeal = /*#__PURE__*/function (_Skill4) {
 
   //execute stun attack
   function SkillHeal() {
-    var _this6;
-
     _classCallCheck(this, SkillHeal);
 
-    _this6 = _super7.call(this, "Heal", "Heal");
-
-    _this6.targetFilter = function (targets) {
-      return targets;
-    };
-
-    return _this6;
+    return _super7.call(this, "Heal", "Heal");
   }
 
   _createClass(SkillHeal, [{
+    key: "targetFilter",
+    value: function targetFilter(targets) {
+      return this.targetFilterAlive(targets);
+    }
+  }, {
     key: "previewCast",
     value: function previewCast(targets) {
       var result = new SkillResult();
@@ -5355,21 +5578,21 @@ var SkillHeal = /*#__PURE__*/function (_Skill4) {
       if (this.isValidTarget(targets)) {
         result.OK = true;
 
-        var _iterator12 = _createForOfIteratorHelper(targets),
-            _step12;
+        var _iterator22 = _createForOfIteratorHelper(targets),
+            _step22;
 
         try {
-          for (_iterator12.s(); !(_step12 = _iterator12.n()).done;) {
-            var target = _step12.value;
+          for (_iterator22.s(); !(_step22 = _iterator22.n()).done;) {
+            var target = _step22.value;
             result.effects.push({
               target: target,
               eff: [new effHeal(10)]
             });
           }
         } catch (err) {
-          _iterator12.e(err);
+          _iterator22.e(err);
         } finally {
-          _iterator12.f();
+          _iterator22.f();
         }
       }
 
@@ -5387,20 +5610,17 @@ var SkillGuard = /*#__PURE__*/function (_Skill5) {
 
   //todo improves defense
   function SkillGuard() {
-    var _this7;
-
     _classCallCheck(this, SkillGuard);
 
-    _this7 = _super8.call(this, "Guard", "Guard");
-
-    _this7.targetFilter = function (targets) {
-      return this.targetFilterSelf(targets);
-    };
-
-    return _this7;
+    return _super8.call(this, "Guard", "Guard");
   }
 
   _createClass(SkillGuard, [{
+    key: "targetFilter",
+    value: function targetFilter(targets) {
+      return this.targetFilterSelf(targets);
+    }
+  }, {
     key: "previewCast",
     value: function previewCast(targets) {
       var result = new SkillResult();
@@ -5411,20 +5631,20 @@ var SkillGuard = /*#__PURE__*/function (_Skill5) {
       if (this.isValidTarget(targets)) {
         result.OK = true;
 
-        var _iterator13 = _createForOfIteratorHelper(targets),
-            _step13;
+        var _iterator23 = _createForOfIteratorHelper(targets),
+            _step23;
 
         try {
-          for (_iterator13.s(); !(_step13 = _iterator13.n()).done;) {
+          for (_iterator23.s(); !(_step23 = _iterator23.n()).done;) {
             /*result.effects.push( {target:target,
                 eff:[new effHeal(10)]})*/
 
-            var target = _step13.value;
+            var target = _step23.value;
           }
         } catch (err) {
-          _iterator13.e(err);
+          _iterator23.e(err);
         } finally {
-          _iterator13.f();
+          _iterator23.f();
         }
       }
 
@@ -5451,13 +5671,13 @@ var StatsDictionary = /*#__PURE__*/function (_Inventory2) {
 
   //Todo a collection of Stats is similiar to Inventory?
   function StatsDictionary(externlist) {
-    var _this8;
+    var _this3;
 
     _classCallCheck(this, StatsDictionary);
 
-    _this8 = _super9.call(this, externlist);
+    _this3 = _super9.call(this, externlist);
     window.storage.registerConstructor(StatsDictionary);
-    return _this8;
+    return _this3;
   }
 
   _createClass(StatsDictionary, [{
@@ -5696,13 +5916,13 @@ var Effects = /*#__PURE__*/function (_Inventory3) {
 
   //Todo a collection of Stats is similiar to Inventory?
   function Effects(externlist) {
-    var _this9;
+    var _this4;
 
     _classCallCheck(this, Effects);
 
-    _this9 = _super10.call(this, externlist);
+    _this4 = _super10.call(this, externlist);
     window.storage.registerConstructor(Effects);
-    return _this9;
+    return _this4;
   }
 
   _createClass(Effects, [{
@@ -6722,15 +6942,15 @@ var BeeHive = /*#__PURE__*/function (_DngDungeon) {
   var _super12 = _createSuper(BeeHive);
 
   function BeeHive() {
-    var _this10;
+    var _this5;
 
     _classCallCheck(this, BeeHive);
 
-    _this10 = _super12.call(this, "BeeHive", "There seem to live alot of giant bees here.");
+    _this5 = _super12.call(this, "BeeHive", "There seem to live alot of giant bees here.");
 
-    _this10.buildFloors();
+    _this5.buildFloors();
 
-    return _this10;
+    return _this5;
   }
 
   _createClass(BeeHive, [{
@@ -7272,13 +7492,13 @@ var LighterDad = /*#__PURE__*/function (_Item2) {
   var _super13 = _createSuper(LighterDad);
 
   function LighterDad() {
-    var _this11;
+    var _this6;
 
     _classCallCheck(this, LighterDad);
 
-    _this11 = _super13.call(this, 'LighterDad');
-    _this11.desc = 'I got this lighter from my real dad.';
-    return _this11;
+    _this6 = _super13.call(this, 'LighterDad');
+    _this6.desc = 'I got this lighter from my real dad.';
+    return _this6;
   }
 
   _createClass(LighterDad, [{
@@ -7304,13 +7524,13 @@ var Money = /*#__PURE__*/function (_Item3) {
   var _super14 = _createSuper(Money);
 
   function Money() {
-    var _this12;
+    var _this7;
 
     _classCallCheck(this, Money);
 
-    _this12 = _super14.call(this, 'Money');
-    _this12.desc = 'shiny,clinky coin.';
-    return _this12;
+    _this7 = _super14.call(this, 'Money');
+    _this7.desc = 'shiny,clinky coin.';
+    return _this7;
   }
 
   _createClass(Money, [{
@@ -7336,13 +7556,13 @@ var LaptopPS = /*#__PURE__*/function (_Item4) {
   var _super15 = _createSuper(LaptopPS);
 
   function LaptopPS() {
-    var _this13;
+    var _this8;
 
     _classCallCheck(this, LaptopPS);
 
-    _this13 = _super15.call(this, 'Laptop-PS');
-    _this13.desc = 'Power converter for laptop.';
-    return _this13;
+    _this8 = _super15.call(this, 'Laptop-PS');
+    _this8.desc = 'Power converter for laptop.';
+    return _this8;
   }
 
   _createClass(LaptopPS, [{
@@ -7368,13 +7588,13 @@ var Dildo_small = /*#__PURE__*/function (_Item5) {
   var _super16 = _createSuper(Dildo_small);
 
   function Dildo_small() {
-    var _this14;
+    var _this9;
 
     _classCallCheck(this, Dildo_small);
 
-    _this14 = _super16.call(this, 'Dildo_small');
-    _this14.desc = 'A dildo, smaller than an average dong, made from rubbery plastic.';
-    return _this14;
+    _this9 = _super16.call(this, 'Dildo_small');
+    _this9.desc = 'A dildo, smaller than an average dong, made from rubbery plastic.';
+    return _this9;
   }
 
   _createClass(Dildo_small, [{
@@ -7400,13 +7620,13 @@ var Lube = /*#__PURE__*/function (_Item6) {
   var _super17 = _createSuper(Lube);
 
   function Lube() {
-    var _this15;
+    var _this10;
 
     _classCallCheck(this, Lube);
 
-    _this15 = _super17.call(this, 'Lube');
-    _this15.desc = 'Slippery lubricant for personal use.';
-    return _this15;
+    _this10 = _super17.call(this, 'Lube');
+    _this10.desc = 'Slippery lubricant for personal use.';
+    return _this10;
   }
 
   _createClass(Lube, [{
@@ -7432,13 +7652,13 @@ var Battery = /*#__PURE__*/function (_Item7) {
   var _super18 = _createSuper(Battery);
 
   function Battery() {
-    var _this16;
+    var _this11;
 
     _classCallCheck(this, Battery);
 
-    _this16 = _super18.call(this, 'Battery');
-    _this16.desc = 'Provides electricity for devices.';
-    return _this16;
+    _this11 = _super18.call(this, 'Battery');
+    _this11.desc = 'Provides electricity for devices.';
+    return _this11;
   }
 
   _createClass(Battery, [{
@@ -7464,13 +7684,13 @@ var CanOfCoffee = /*#__PURE__*/function (_Item8) {
   var _super19 = _createSuper(CanOfCoffee);
 
   function CanOfCoffee() {
-    var _this17;
+    var _this12;
 
     _classCallCheck(this, CanOfCoffee);
 
-    _this17 = _super19.call(this, 'Can of coffee');
-    _this17.desc = 'Cold coffee in a can. Tasty? Not really!';
-    return _this17;
+    _this12 = _super19.call(this, 'Can of coffee');
+    _this12.desc = 'Cold coffee in a can. Tasty? Not really!';
+    return _this12;
   }
 
   _createClass(CanOfCoffee, [{
@@ -7520,13 +7740,13 @@ var SimpleFood = /*#__PURE__*/function (_Item9) {
   var _super20 = _createSuper(SimpleFood);
 
   function SimpleFood() {
-    var _this18;
+    var _this13;
 
     _classCallCheck(this, SimpleFood);
 
-    _this18 = _super20.call(this, 'SimpleFood');
-    _this18.desc = 'Something to eat.';
-    return _this18;
+    _this13 = _super20.call(this, 'SimpleFood');
+    _this13.desc = 'Something to eat.';
+    return _this13;
   }
 
   _createClass(SimpleFood, [{
@@ -7633,17 +7853,17 @@ var Mole = /*#__PURE__*/function (_Mob) {
   var _super21 = _createSuper(Mole);
 
   function Mole() {
-    var _this19;
+    var _this14;
 
     _classCallCheck(this, Mole);
 
-    _this19 = _super21.call(this);
-    _this19.name = 'Mole';
-    _this19.pic = 'assets/mole.jpg';
+    _this14 = _super21.call(this);
+    _this14.name = 'Mole';
+    _this14.pic = 'assets/mole.jpg';
 
-    _this19.Stats.increment('healthMax', -1 * (_this19.health().max - 20));
+    _this14.Stats.increment('healthMax', -1 * (_this14.health().max - 20));
 
-    return _this19;
+    return _this14;
   }
 
   return Mole;
@@ -7657,14 +7877,14 @@ var Mechanic = /*#__PURE__*/function (_Mob2) {
   var _super22 = _createSuper(Mechanic);
 
   function Mechanic() {
-    var _this20;
+    var _this15;
 
     _classCallCheck(this, Mechanic);
 
-    _this20 = _super22.call(this);
-    _this20.name = 'Mechanic-Guy';
-    _this20.pic = 'assets/mechanic.jpg';
-    return _this20;
+    _this15 = _super22.call(this);
+    _this15.name = 'Mechanic-Guy';
+    _this15.pic = 'assets/mechanic.jpg';
+    return _this15;
   }
 
   _createClass(Mechanic, [{
@@ -7715,16 +7935,16 @@ var Leggings = /*#__PURE__*/function (_Equipment) {
   var _super23 = _createSuper(Leggings);
 
   function Leggings() {
-    var _this21;
+    var _this16;
 
     _classCallCheck(this, Leggings);
 
-    _this21 = _super23.call(this, 'Leggings');
-    _this21.tags = ['cloth'];
-    _this21.slotUse = ['Legs'];
-    _this21.desc = 'Spandex-leggings for sport. (agility+)';
+    _this16 = _super23.call(this, 'Leggings');
+    _this16.tags = ['cloth'];
+    _this16.slotUse = ['Legs'];
+    _this16.desc = 'Spandex-leggings for sport. (agility+)';
     window.storage.registerConstructor(Leggings);
-    return _this21;
+    return _this16;
   }
 
   _createClass(Leggings, [{
@@ -7787,16 +8007,16 @@ var Jeans = /*#__PURE__*/function (_Equipment2) {
   var _super24 = _createSuper(Jeans);
 
   function Jeans() {
-    var _this22;
+    var _this17;
 
     _classCallCheck(this, Jeans);
 
-    _this22 = _super24.call(this, 'Jeans');
-    _this22.tags = ['cloth'];
-    _this22.slotUse = ['Legs'];
-    _this22.desc = 'plain old blue jeans';
+    _this17 = _super24.call(this, 'Jeans');
+    _this17.tags = ['cloth'];
+    _this17.slotUse = ['Legs'];
+    _this17.desc = 'plain old blue jeans';
     window.storage.registerConstructor(Jeans);
-    return _this22;
+    return _this17;
   }
 
   _createClass(Jeans, [{
@@ -7836,16 +8056,16 @@ var TankShirt = /*#__PURE__*/function (_Equipment3) {
   var _super25 = _createSuper(TankShirt);
 
   function TankShirt() {
-    var _this23;
+    var _this18;
 
     _classCallCheck(this, TankShirt);
 
-    _this23 = _super25.call(this, 'TankShirt');
-    _this23.tags = ['cloth'];
-    _this23.slotUse = ['Torso'];
-    _this23.desc = 'light blue tank-top';
+    _this18 = _super25.call(this, 'TankShirt');
+    _this18.tags = ['cloth'];
+    _this18.slotUse = ['Torso'];
+    _this18.desc = 'light blue tank-top';
     window.storage.registerConstructor(TankShirt);
-    return _this23;
+    return _this18;
   }
 
   _createClass(TankShirt, [{
@@ -7885,16 +8105,16 @@ var Pullover = /*#__PURE__*/function (_Equipment4) {
   var _super26 = _createSuper(Pullover);
 
   function Pullover() {
-    var _this24;
+    var _this19;
 
     _classCallCheck(this, Pullover);
 
-    _this24 = _super26.call(this, 'Pullover');
-    _this24.tags = ['cloth'];
-    _this24.slotUse = ['Torso', 'Arms'];
-    _this24.desc = 'warm pullover';
+    _this19 = _super26.call(this, 'Pullover');
+    _this19.tags = ['cloth'];
+    _this19.slotUse = ['Torso', 'Arms'];
+    _this19.desc = 'warm pullover';
     window.storage.registerConstructor(Pullover);
-    return _this24;
+    return _this19;
   }
 
   _createClass(Pullover, [{
@@ -7934,16 +8154,16 @@ var HandCuffs = /*#__PURE__*/function (_Equipment5) {
   var _super27 = _createSuper(HandCuffs);
 
   function HandCuffs() {
-    var _this25;
+    var _this20;
 
     _classCallCheck(this, HandCuffs);
 
-    _this25 = _super27.call(this, 'HandCuffs');
-    _this25.tags = ['restrain'];
-    _this25.slotUse = ['RHand', 'LHand'];
-    _this25.desc = 'handcuffs';
+    _this20 = _super27.call(this, 'HandCuffs');
+    _this20.tags = ['restrain'];
+    _this20.slotUse = ['RHand', 'LHand'];
+    _this20.desc = 'handcuffs';
     window.storage.registerConstructor(Pullover);
-    return _this25;
+    return _this20;
   }
 
   _createClass(HandCuffs, [{
@@ -8011,16 +8231,16 @@ var Crowbar = /*#__PURE__*/function (_Equipment6) {
   var _super28 = _createSuper(Crowbar);
 
   function Crowbar() {
-    var _this26;
+    var _this21;
 
     _classCallCheck(this, Crowbar);
 
-    _this26 = _super28.call(this, 'Crowbar');
-    _this26.desc = 'A durable crowbar.';
-    _this26.tags = ['tool', 'weapon'];
-    _this26.slotUse = ['RHand'];
+    _this21 = _super28.call(this, 'Crowbar');
+    _this21.desc = 'A durable crowbar.';
+    _this21.tags = ['tool', 'weapon'];
+    _this21.slotUse = ['RHand'];
     window.storage.registerConstructor(Crowbar);
-    return _this26;
+    return _this21;
   }
 
   _createClass(Crowbar, [{
@@ -8110,16 +8330,16 @@ var Shovel = /*#__PURE__*/function (_Equipment7) {
   var _super29 = _createSuper(Shovel);
 
   function Shovel() {
-    var _this27;
+    var _this22;
 
     _classCallCheck(this, Shovel);
 
-    _this27 = _super29.call(this, 'Shovel');
-    _this27.desc = 'A rusty,old shovel.';
-    _this27.tags = ['tool', 'weapon'];
-    _this27.slotUse = ['RHand', 'LHand'];
+    _this22 = _super29.call(this, 'Shovel');
+    _this22.desc = 'A rusty,old shovel.';
+    _this22.tags = ['tool', 'weapon'];
+    _this22.slotUse = ['RHand', 'LHand'];
     window.storage.registerConstructor(Shovel);
-    return _this27;
+    return _this22;
   }
 
   _createClass(Shovel, [{
@@ -8208,16 +8428,16 @@ var TailRibbon = /*#__PURE__*/function (_Equipment8) {
   var _super30 = _createSuper(TailRibbon);
 
   function TailRibbon() {
-    var _this28;
+    var _this23;
 
     _classCallCheck(this, TailRibbon);
 
-    _this28 = _super30.call(this, 'TailRibbon');
-    _this28.tags = ['cloth'];
-    _this28.slotUse = ['TailTip'];
-    _this28.desc = 'a fancy color band that can be wrapped around someones tailtip';
+    _this23 = _super30.call(this, 'TailRibbon');
+    _this23.tags = ['cloth'];
+    _this23.slotUse = ['TailTip'];
+    _this23.desc = 'a fancy color band that can be wrapped around someones tailtip';
     window.storage.registerConstructor(TailRibbon);
-    return _this28;
+    return _this23;
   }
 
   _createClass(TailRibbon, [{
@@ -8271,16 +8491,16 @@ var TailNone = /*#__PURE__*/function (_Equipment9) {
   var _super31 = _createSuper(TailNone);
 
   function TailNone() {
-    var _this29;
+    var _this24;
 
     _classCallCheck(this, TailNone);
 
-    _this29 = _super31.call(this, 'TailNone');
-    _this29.tags = ['body'];
-    _this29.slotUse = ['bTailBase'];
-    _this29.desc = '';
+    _this24 = _super31.call(this, 'TailNone');
+    _this24.tags = ['body'];
+    _this24.slotUse = ['bTailBase'];
+    _this24.desc = '';
     window.storage.registerConstructor(TailNone);
-    return _this29;
+    return _this24;
   }
 
   _createClass(TailNone, [{
@@ -8320,20 +8540,20 @@ var TailCat = /*#__PURE__*/function (_Equipment10) {
   var _super32 = _createSuper(TailCat);
 
   function TailCat() {
-    var _this30;
+    var _this25;
 
     _classCallCheck(this, TailCat);
 
-    _this30 = _super32.call(this, 'TailCat');
-    _this30.tags = ['body'];
-    _this30.slotUse = ['bTailBase'];
-    _this30.desc = 'a flexible,furred tail like that of a cat.';
-    _this30.growth = 0.10; //in %/100 maxGrowth
+    _this25 = _super32.call(this, 'TailCat');
+    _this25.tags = ['body'];
+    _this25.slotUse = ['bTailBase'];
+    _this25.desc = 'a flexible,furred tail like that of a cat.';
+    _this25.growth = 0.10; //in %/100 maxGrowth
 
-    _this30.maxGrowth = 1.2; //in meter, todo depends on bodysize
+    _this25.maxGrowth = 1.2; //in meter, todo depends on bodysize
 
     window.storage.registerConstructor(TailCat);
-    return _this30;
+    return _this25;
   }
 
   _createClass(TailCat, [{
@@ -8373,20 +8593,20 @@ var BreastHuman = /*#__PURE__*/function (_Equipment11) {
   var _super33 = _createSuper(BreastHuman);
 
   function BreastHuman() {
-    var _this31;
+    var _this26;
 
     _classCallCheck(this, BreastHuman);
 
-    _this31 = _super33.call(this, 'BreastHuman');
-    _this31.tags = ['body'];
-    _this31.slotUse = ['bBreast'];
-    _this31.desc = 'some human breasts.';
-    _this31.growth = 0.0; //in %/100 maxGrowth
+    _this26 = _super33.call(this, 'BreastHuman');
+    _this26.tags = ['body'];
+    _this26.slotUse = ['bBreast'];
+    _this26.desc = 'some human breasts.';
+    _this26.growth = 0.0; //in %/100 maxGrowth
 
-    _this31.maxGrowth = 0.3; //in meter, todo depends on bodysize
+    _this26.maxGrowth = 0.3; //in meter, todo depends on bodysize
 
     window.storage.registerConstructor(BreastHuman);
-    return _this31;
+    return _this26;
   }
 
   _createClass(BreastHuman, [{
@@ -8426,20 +8646,20 @@ var VulvaHuman = /*#__PURE__*/function (_Equipment12) {
   var _super34 = _createSuper(VulvaHuman);
 
   function VulvaHuman() {
-    var _this32;
+    var _this27;
 
     _classCallCheck(this, VulvaHuman);
 
-    _this32 = _super34.call(this, 'VulvaHuman');
-    _this32.tags = ['body'];
-    _this32.slotUse = ['bVulva'];
-    _this32.desc = 'a human cooter.';
-    _this32.growth = 0.0; //in %/100 maxGrowth
+    _this27 = _super34.call(this, 'VulvaHuman');
+    _this27.tags = ['body'];
+    _this27.slotUse = ['bVulva'];
+    _this27.desc = 'a human cooter.';
+    _this27.growth = 0.0; //in %/100 maxGrowth
 
-    _this32.maxGrowth = 0.2; //in meter, todo depends on bodysize
+    _this27.maxGrowth = 0.2; //in meter, todo depends on bodysize
 
     window.storage.registerConstructor(VulvaHuman);
-    return _this32;
+    return _this27;
   }
 
   _createClass(VulvaHuman, [{
@@ -9532,13 +9752,13 @@ var effEnergized = /*#__PURE__*/function (_Effect2) {
   var _super54 = _createSuper(effEnergized);
 
   function effEnergized() {
-    var _this33;
+    var _this28;
 
     _classCallCheck(this, effEnergized);
 
-    _this33 = _super54.call(this);
-    _this33.data.id = _this33.data.name = effEnergized.name, _this33.data.duration = 120;
-    return _this33;
+    _this28 = _super54.call(this);
+    _this28.data.id = _this28.data.name = effEnergized.name, _this28.data.duration = 120;
+    return _this28;
   }
 
   _createClass(effEnergized, [{
@@ -9607,13 +9827,13 @@ var effNotTired = /*#__PURE__*/function (_Effect3) {
   var _super55 = _createSuper(effNotTired);
 
   function effNotTired() {
-    var _this34;
+    var _this29;
 
     _classCallCheck(this, effNotTired);
 
-    _this34 = _super55.call(this);
-    _this34.data.id = _this34.data.name = effNotTired.name, _this34.data.duration = 120, _this34.data.hidden = 4;
-    return _this34;
+    _this29 = _super55.call(this);
+    _this29.data.id = _this29.data.name = effNotTired.name, _this29.data.duration = 120, _this29.data.hidden = 4;
+    return _this29;
   }
 
   _createClass(effNotTired, [{
@@ -9676,13 +9896,13 @@ var effTired = /*#__PURE__*/function (_Effect4) {
   var _super56 = _createSuper(effTired);
 
   function effTired() {
-    var _this35;
+    var _this30;
 
     _classCallCheck(this, effTired);
 
-    _this35 = _super56.call(this);
-    _this35.data.id = _this35.data.name = effTired.name, _this35.data.duration = 120, _this35.data.hidden = 0;
-    return _this35;
+    _this30 = _super56.call(this);
+    _this30.data.id = _this30.data.name = effTired.name, _this30.data.duration = 120, _this30.data.hidden = 0;
+    return _this30;
   }
 
   _createClass(effTired, [{
@@ -9751,13 +9971,13 @@ var effMutateCat = /*#__PURE__*/function (_Effect5) {
   var _super57 = _createSuper(effMutateCat);
 
   function effMutateCat() {
-    var _this36;
+    var _this31;
 
     _classCallCheck(this, effMutateCat);
 
-    _this36 = _super57.call(this);
-    _this36.data.id = _this36.data.name = effMutateCat.name, _this36.data.duration = 60, _this36.data.hidden = 0;
-    return _this36;
+    _this31 = _super57.call(this);
+    _this31.data.id = _this31.data.name = effMutateCat.name, _this31.data.duration = 60, _this31.data.hidden = 0;
+    return _this31;
   }
 
   _createClass(effMutateCat, [{
@@ -9819,14 +10039,14 @@ var effGrowBreast = /*#__PURE__*/function (_Effect6) {
   var _super58 = _createSuper(effGrowBreast);
 
   function effGrowBreast() {
-    var _this37;
+    var _this32;
 
     _classCallCheck(this, effGrowBreast);
 
-    _this37 = _super58.call(this);
-    _this37.data.id = _this37.data.name = effGrowBreast.name, _this37.data.duration = 60, _this37.data.hidden = 0;
-    _this37.data.cycles = 3, _this37.data.magnitude = 3;
-    return _this37;
+    _this32 = _super58.call(this);
+    _this32.data.id = _this32.data.name = effGrowBreast.name, _this32.data.duration = 60, _this32.data.hidden = 0;
+    _this32.data.cycles = 3, _this32.data.magnitude = 3;
+    return _this32;
   }
 
   _createClass(effGrowBreast, [{
@@ -9892,14 +10112,14 @@ var effHeal = /*#__PURE__*/function (_CombatEffect) {
   var _super59 = _createSuper(effHeal);
 
   function effHeal(amount) {
-    var _this38;
+    var _this33;
 
     _classCallCheck(this, effHeal);
 
-    _this38 = _super59.call(this);
-    _this38.amount = amount;
-    _this38.data.id = _this38.data.name = effHeal.name, _this38.data.duration = 0, _this38.data.hidden = 0;
-    return _this38;
+    _this33 = _super59.call(this);
+    _this33.amount = amount;
+    _this33.data.id = _this33.data.name = effHeal.name, _this33.data.duration = 0, _this33.data.hidden = 0;
+    return _this33;
   }
 
   _createClass(effHeal, [{
@@ -9961,14 +10181,14 @@ var effDamage = /*#__PURE__*/function (_CombatEffect2) {
   var _super60 = _createSuper(effDamage);
 
   function effDamage(amount) {
-    var _this39;
+    var _this34;
 
     _classCallCheck(this, effDamage);
 
-    _this39 = _super60.call(this);
-    _this39.amount = amount;
-    _this39.data.id = _this39.data.name = effDamage.name, _this39.data.duration = 0, _this39.data.hidden = 0;
-    return _this39;
+    _this34 = _super60.call(this);
+    _this34.amount = amount;
+    _this34.data.id = _this34.data.name = effDamage.name, _this34.data.duration = 0, _this34.data.hidden = 0;
+    return _this34;
   }
 
   _createClass(effDamage, [{
@@ -10028,13 +10248,13 @@ var effStunned = /*#__PURE__*/function (_CombatEffect3) {
   var _super61 = _createSuper(effStunned);
 
   function effStunned() {
-    var _this40;
+    var _this35;
 
     _classCallCheck(this, effStunned);
 
-    _this40 = _super61.call(this);
-    _this40.data.id = _this40.data.name = effStunned.name, _this40.data.duration = 2;
-    return _this40;
+    _this35 = _super61.call(this);
+    _this35.data.id = _this35.data.name = effStunned.name, _this35.data.duration = 2;
+    return _this35;
   }
 
   _createClass(effStunned, [{
@@ -10094,13 +10314,13 @@ var skCooking = /*#__PURE__*/function (_Effect7) {
   var _super62 = _createSuper(skCooking);
 
   function skCooking() {
-    var _this41;
+    var _this36;
 
     _classCallCheck(this, skCooking);
 
-    _this41 = _super62.call(this);
-    _this41.data.id = _this41.data.name = skCooking.name;
-    return _this41;
+    _this36 = _super62.call(this);
+    _this36.data.id = _this36.data.name = skCooking.name;
+    return _this36;
   }
 
   _createClass(skCooking, [{
@@ -11825,7 +12045,7 @@ function getRandomWord() {
       }
     }
     else {
-      $(this).addClass(&quot;red&quot;);
+      $(this).addClass(&quot;red2&quot;);
     }
   });
 }
@@ -12532,6 +12752,7 @@ A double bed is there with [[nightstands|moms_treasure]] on each side. &lt;br&gt
 &lt;a0 onclick=&#39;window.story.show(&quot;Talk_Cyril&quot;)&#39;&gt;Cyril is here&lt;/a&gt;&lt;/br&gt;
 &lt;%}%&gt;
 &lt;a0 onclick=&#39;switchChar(this)&#39;&gt;Switch Char&lt;/a&gt;&lt;/br&gt;
+&lt;a0 onclick=&#39;inviteChar(this)&#39;&gt;Invite Char&lt;/a&gt;&lt;/br&gt;
 &lt;a0 onclick=&#39;window.gm.pushDeferredEvent(&quot;HairGrow&quot;)&#39;&gt;Hair Tonic&lt;/a&gt;&lt;/br&gt;
 [[Hallway|Home]]&lt;/br&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
@@ -12543,6 +12764,15 @@ function switchChar(elmnt) {
 		window.gm.switchPlayer(&#39;Ratchel&#39;);
 	}
 	elmnt.outerHTML=(&quot;&lt;div class=&#39;red&#39;&gt;You are now playing as &quot;+window.story.state.vars.activePlayer+&quot;. &lt;/div&gt;&quot;);
+}
+function inviteChar(elmnt) {
+	if(window.gm.isInParty(&#39;Cyril&#39;)) {
+		window.gm.removeFromParty(&#39;Cyril&#39;);
+		elmnt.outerHTML=(&quot;&lt;div class=&#39;red&#39;&gt;You kicked Cyril from your team. &lt;/div&gt;&quot;);
+	} else {
+		window.gm.addToParty(&#39;Cyril&#39;);
+		elmnt.outerHTML=(&quot;&lt;div class=&#39;red&#39;&gt;Cyril added to your team. &lt;/div&gt;&quot;);
+	}
 }
 &lt;/script&gt;</tw-passagedata><tw-passagedata pid="119" name="moms_treasure" tags="_back" position="1100,1475" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
