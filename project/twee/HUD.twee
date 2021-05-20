@@ -136,7 +136,7 @@ var inv = window.gm.player.Inv;
 var maxSlots = inv.count(); 
 for(var i=0;i<maxSlots;i++){
   id=inv.getItemId(i);
-  %><%=window.gm.printItem(id,inv.countItem(id).toString()+'x '+inv.getItem(id).desc+' '+inv.getItem(id).usable(inv).msg)%><%
+  %><%=window.gm.printItem(id,inv.countItem(id).toString()+'x '+inv.getItem(id).desc+' '+inv.getItem(id).usable(inv).msg,window.gm.player)%><%
 } 
 %>
 <div id='output'></div></br>

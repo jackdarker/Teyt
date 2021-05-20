@@ -149,12 +149,8 @@ window.gm.initGame= function(forceReset,NGP=null) {
         enemyIdx : 0,  //index of actual enemy 
         playerParty : [],
         playerIdx : 0,
-        newTurn : false,
         enemyFirst : false, //if true, enemy moves first
-        enemyTurn : false, //true if enemys turn
-        state : ""  , //internal state
-        playerFleeing : false,
-        playerSubmitting : false,
+        inCombat: false,  //for query window.gm.combat.inCombat
         turnCount: 0,
         scenePic : 'assets/bg_park.png'
       }
@@ -533,21 +529,39 @@ window.gm.pickupAndClear=function(itemid, desc,itemleft,cbAfterPickup=null) {
   window.gm.refreshScreen();
 };
 //prints an item with description; used in inventory
-window.gm.printItem= function( id,descr) {
+window.gm.printItem= function( id,descr,carrier,useOn=null ) {
   var elmt='';
   var s= window.story.state;
   var _inv = window.gm.player.Inv;
   var _count =_inv.countItem(id);
+  if(useOn===null) useOn=carrier;
   elmt +=`<a0 id='${id}' onclick='(function($event){document.querySelector(\"div#${id}\").toggleAttribute(\"hidden\");})(this);'>${id} (x${_count})</a>`;
   var useable = _inv.usable(id);
   if(_count>0 && useable.OK) {
-
       elmt +=`<a0 id='${id}' onclick='(function($event){var _res=window.gm.player.Inv.use(\"${id}\"); window.gm.refreshScreen();window.gm.printOutput(_res.msg);}(this))'>${useable.msg}</a>`;
   }
   elmt +=`</br><div hidden id='${id}'>${descr}</div>`;
   if(window.story.passage(id))  elmt +=''.concat("    [[Info|"+id+"]]");  //Todo add comands: drink,eat, use
       elmt +=''.concat("</br>");
       return(elmt);
+};
+window.gm.printItem2= function( id,descr,carrier,useOn=null ) {
+  let elmt='';
+  let s= window.story.state;
+  let _inv = carrier.Inv;
+  let _count =_inv.countItem(id);
+  if(useOn===null) useOn=carrier;
+  let useable = _inv.usable(id);
+  if(_count>0 && useable.OK) {
+    let entry = document.createElement('a');
+    entry.href='javascript:void(0)';
+    let foo = (function(id,carrier,useOn){ 
+      let _res=carrier.Inv.use(id); window.gm.refreshScreen();window.gm.printOutput(_res.msg);
+    }).bind(null,id,carrier,useOn);
+    entry.addEventListener("click",foo);
+    entry.textContent=id;
+    $("div#choice")[0].appendChild(entry);      // <- requires this node in html
+  }
 };
 //prints an equipment with description; used in wardrobe
 window.gm.printEquipment= function( id,descr) {

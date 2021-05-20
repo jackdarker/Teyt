@@ -48,33 +48,7 @@ isValidTarget(target) {
     }
     return true;
 }
-/*
-isValidTarget(targets) {
-        //returns True if the skill can be used on the target(s)
-        var filtered = this.targetFilter(targets);
 
-    if(targets.length>1) {
-        for(var filt of filtered) {
-            //const firstCopy = targets.slice();
-            //const secondCopy = filt.slice();
-            for(let i = 0; i < targets.length; i++){
-                const ind = filt.indexOf(targets[i]);
-                if(ind === -1){
-                    return false;
-                };
-                filt.splice(ind, 1);
-            };
-            return true;
-        }
-        return false;
-    }else {
-        for(var target of targets) {
-            var _i = filtered.indexOf(target);
-            if(_i<0) return false;
-        }
-        return true;
-    }
-}*/
 getCost(){
         //returns information about the cost to execute the skill
         return {}
@@ -186,6 +160,19 @@ targetFilterDead(targets){
                 possibleTarget.push(target); 
         }
         return possibleTarget;
+}
+targetMultiple(targets){
+    var possibletarget = targets.slice(0);
+    //[[mole1],[mole2]]
+    var multi = [];
+    multi.name = "all";
+    for(var el of possibletarget) {
+        if(el.length===1)   //dont stack multi-targets
+            multi.push(el[0]);
+    }
+    if(multi.length>0) possibletarget.push(multi);
+    //[[mole1],[mole2],[mole1,mole2]]
+    return(possibletarget);
 }
 }
   
@@ -332,4 +319,35 @@ class SkillGuard extends Skill {
           }
           return result
       }
+}
+class SkillUseItem extends Skill {
+    constructor() {
+        super("UseItem","UseItem");
+        this.item=null;
+    }
+// first item has to be set
+// then when targetFilter is called, forward the filterrequest to the item
+// the item has to implement targetFilter and also check if the item is valid for use in combat    
+    targetFilter(targets){
+        return(this.caster.Inv.getItem(this.item).targetFilter(targets,this));
+    }
+    get item() {return this._item;}
+    set item(item) {
+        this._item=item;
+        this.msg = '';
+    }
+    previewCast(targets){
+        var result = new SkillResult()
+        result.skill =this;
+        result.source = this.caster;
+        result.targets = targets;
+        if(this.isValidTarget(targets)) {
+            result.OK = true;
+            this.msg = result.msg = this.caster.Inv.use(this.item,targets).msg;    //Todo preview shouldnt call use !
+        }
+        return result
+    }
+    getCastDescription(result) {
+        return(this.msg);
+    }
 }

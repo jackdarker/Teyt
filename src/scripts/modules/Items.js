@@ -48,10 +48,61 @@ class Battery extends Item {
     toJSON() {return window.storage.Generic_toJSON("Battery", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(Battery, value.data);};
 };
+class SilverPowderBomb extends Item {
+    constructor() {
+        super('SilverPowderBomb');
+        this.desc = 'Very effective against shapeshifters.';
+    }
+    toJSON() {return window.storage.Generic_toJSON("SilverPowderBomb", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(SilverPowderBomb, value.data);};
+
+    //context is the skillUseItem calling this
+    targetFilter(targets,context) {
+        if(!window.gm.combat.inCombat()) return([]);
+        //to use skill-targetfilter we need an instance of skill bound to the caster  - todo this is ugly
+        //let _sk = this.parent.parent.Skills.getItem('UseItem');//._parent=window.gm.util.refToParent(this.parent.parent.Skills); 
+        return(context.targetMultiple(context.targetFilterFighting(context.targetFilterEnemy(targets))));
+    }
+    usable(context,on=null) {
+        //can only be used while in combat and target is enemy
+        let result = {OK:false, msg:'cannot use'};
+        if(!window.gm.combat.inCombat()) {
+            result.msg= 'can only be used in combat';
+        } else {
+            result.msg= 'use',result.OK=true;
+        }
+        return(result);
+    }
+    use(context,on=null) { 
+        let result = {OK:false,msg:''};
+        if(context instanceof Inventory) {
+            context.removeItem('SilverPowderBomb');
+            if(context.parent instanceof Character){
+                if(on===null) on=context.parent;
+                if(on.length && on.length>0) { 
+                    //on can be several targets (array)
+                } else {
+                    on = [on];  //..if not an array change it
+                }
+                result.msg = context.parent.name+' uses '+this.name+'.';
+                for(let _targ of on) {
+                    _targ.addEffect(effStunned.name,new effStunned());  //todo should 'SilverPowderBomb:Stunned' merge with other stunned? 
+                    result.msg +=_targ.name+' got stunned. ';
+                }
+                result.OK=true;
+                return(result);
+            }
+        } else throw new Error('context is invalid');
+    }
+};
 class CanOfCoffee extends Item {
     constructor() {
-        super('Can of coffee');
+        super('CanOfCoffee');
         this.desc = 'Cold coffee in a can. Tasty? Not really!';
+    }
+    targetFilter(targets) {
+        //Todo
+        return(targets);
     }
     toJSON() {return window.storage.Generic_toJSON("CanOfCoffee", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(CanOfCoffee, value.data);};
@@ -104,6 +155,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(Lube);
     window.storage.registerConstructor(CanOfCoffee);
     window.storage.registerConstructor(SimpleFood);
+    window.storage.registerConstructor(SilverPowderBomb);
     
     ItemsLib['Money'] = function () { return new Money();};
     ItemsLib['LighterDad'] = function () { return new LighterDad();};
@@ -114,6 +166,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['Lube'] = function () { return new Lube();};
     ItemsLib['CanOfCoffee'] = function () { return new CanOfCoffee(); };
     ItemsLib['SimpleFood'] = function () { return new SimpleFood(); };
+    ItemsLib['SilverPowderBomb'] = function () { return new SilverPowderBomb(); };
 
     return ItemsLib; 
 }(window.gm.ItemsLib || {}));

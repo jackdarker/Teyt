@@ -41,7 +41,7 @@ export class Character {
         stPerversion.setup(this.Stats,1,15),stArousal.setup(this.Stats,1,100);
 
         this.Effects.addItem(effNotTired.name, new effNotTired()); //depending on sleep Tired will be set to NotTired or Tired
-        this.Skills.addItem(new SkillAttack());this.Skills.addItem(new SkillStun());
+        this.Skills.addItem(new SkillUseItem());this.Skills.addItem(new SkillAttack());this.Skills.addItem(new SkillStun());
         this.Skills.addItem(new SkillHeal());
 
         window.storage.registerConstructor(Character);
@@ -114,7 +114,7 @@ export class Character {
     //combat related
     _canAct() {
         var result = {OK:true,msg:''};
-        if(this.Effects.findItemSlot("effStunned")>=0) {
+        if(this.Effects.findEffect("effStunned").length>0) {    //findItemSlot annot use since there might be different effect ids
             result.OK=false;
             result.msg =this.name+ " is stunned and cannot react."
             return(result);

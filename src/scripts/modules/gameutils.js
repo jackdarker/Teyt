@@ -86,6 +86,8 @@ window.gm.initGame= function(forceReset,NGP=null) {
         //add some basic inventory
         window.gm.Ratchel.Inv.addItem(new Money(),20);
         window.gm.Ratchel.Inv.addItem(new LighterDad());
+        window.gm.Ratchel.Inv.addItem(new SilverPowderBomb(),2);
+        window.gm.Ratchel.Inv.addItem(new CanOfCoffee(),2);
         window.gm.Ratchel.Wardrobe.addItem(new Jeans());
         window.gm.Ratchel.Wardrobe.addItem(new Leggings());
         window.gm.Ratchel.Wardrobe.addItem(new TankShirt());

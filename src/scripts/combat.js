@@ -32,9 +32,8 @@ initCombat() {
   s.combat.scenePic = this.scenePic;
   s.combat.playerFleeing = false;
   s.combat.playerSubmitting = false;
-  s.enemyFirst= this.EnemyFirst;
-  s.combat.enemyTurn =false;
-  s.combat.newTurn = true;
+  s.combat.inCombat=true;
+  s.combat.enemyFirst= this.EnemyFirst;
   s.combat.turnCount=0;
   this.next=this.battleInit;
   window.story.show("Encounter");
@@ -73,20 +72,6 @@ printStats() {
 //creates buttons for skills of current actor
 printSkillList() {
   var s = window.story.state;
-  /*var elmt="<form id='combatmenu'>";
-  var canAct = s.combat.actor._canAct();
-  if(canAct.OK===true) {
-    var skillIds = s.combat.actor.Skills.getAllIds();
-    for(var i=0; i<skillIds.length;i++) {
-      elmt +="<a0 id=\'"+skillIds[i]+"\' onclick=\'(function($event){window.gm.Encounter._postSkillSelect($event.id) })(this);\'>"+s.combat.actor.Skills.getItem(skillIds[i]).name+"</a></br>";
-    }
-  } else {
-    elmt +=canAct.msg+"</br>";
-  }
-  elmt +="<a0 id='moveNOP'          onclick='(function($event){window.gm.Encounter._postSkillAbort();})(this);'>Do nothing</a></br>";
-  elmt +="</form></br>";
-  return(elmt);*/
-
   var canAct = s.combat.actor._canAct();
   if(canAct.OK===true) {
     var skillIds = s.combat.actor.Skills.getAllIds();
@@ -99,7 +84,7 @@ printSkillList() {
       //entry.disabled=this.buttons[y*5+x].disabled;
       $("div#choice")[0].appendChild(entry);      // <- requires this node in html
     }
-  } else {
+  } else {  //cannot do a thing
     var entry = document.createElement('p');
     entry.textContent=canAct.msg;
     $("div#choice")[0].appendChild(entry);
@@ -117,30 +102,12 @@ _postSkillAbort(){
 }
 _postSkillSelect(id){
   window.story.state.combat.action=id;
-  window.gm.Encounter.next=window.gm.Encounter.selectTarget;
-  window.story.show('EncounterStartTurn');
-}
-//creates a list of possible moves for player
-printCombatOption() { 
-  var s = window.story.state;
-  var elmt="<form id='combatmenu'>";
-  //Todo create list based on abilitys
-  var canAct = s.combat.actor._canAct();
-  if(canAct.OK===true) {
-  elmt +="<a0 id='moveFlee'           onclick='(function($event){window.gm.Encounter.triggerCombat($event.id);})(this);'>Try to flee</a></br>";
-  elmt +="<a0 id='movePhysicalAttack' onclick='(function($event){window.gm.Encounter.triggerCombat($event.id);})(this);'>Attack</a></br>";
-  elmt +="<a0 id='moveUltraKill' onclick='(function($event){window.gm.Encounter.triggerCombat($event.id);})(this);'>KillYaAll</a></br>";
-  elmt +="<a0 id='moveGuard'          onclick='(function($event){window.gm.Encounter.triggerCombat($event.id);})(this);'>Guard</a></br>";
-  elmt +="<a0 id='moveStun'           onclick='(function($event){window.gm.Encounter.triggerCombat($event.id);})(this);'>Stun</a></br>";
-  elmt +="<a0 id='moveSubmit'         onclick='(function($event){window.gm.Encounter.triggerCombat($event.id);})(this);'>Submit</a></br>";
-  //Todo Item-use on self or enemy
-  //elmt +="<a0 id='showItems' onclick='(function($event){window.gm.execCombatCmd($event.id);"+next+"})(this);'>Item</a></br>";
+  if(id==='UseItem') {
+    window.gm.Encounter.next=window.gm.Encounter.selectItem;
   } else {
-    elmt +=canAct.msg+"</br>";
+    window.gm.Encounter.next=window.gm.Encounter.selectTarget;
   }
-  elmt +="<a0 id='moveNOP'          onclick='(function($event){window.gm.Encounter.triggerCombat($event.id);})(this);'>Do nothing</a></br>";
-  elmt +="</form></br>";
-  return(elmt);
+  window.story.show('EncounterStartTurn');
 }
 
 //creates a list of active effects for combat display
@@ -157,24 +124,13 @@ printCombatEffects(char) {
 }
 printTargetList() {
   var s = window.story.state;
-  
   var skill = s.combat.actor.Skills.getItem(s.combat.action);
   var all = s.combat.playerParty.concat(s.combat.enemyParty);
   var targets = [];
   for( el of all) {
-    targets.push([el]);
+    targets.push([el]); //need [[],[]]
   }
   targets = skill.targetFilter(targets);
-  /*var elmt="<form id='combatmenu'>";
-  elmt += "<label>use "+s.combat.action+" on..</label>";
-  for(var i=0; i<targets.length;i++) {
-    elmt +="<a0 id=\'"+targets[i].name+"\' onclick=\'(function($event){window.gm.Encounter._postTargetSelect(id);})(this);\'>"+targets[i].name+"</a>";
-  }
-
-  elmt +="</br><a0 id='back' onclick='(function($event){window.gm.Encounter._postTargetAbort();})(this);'>Back</a></br>";
-  elmt +="</form></br>";
-  return(elmt);*/
-
   for(var i=0; i<targets.length;i++) {
     var entry = document.createElement('a');
     entry.href='javascript:void(0)';
@@ -198,19 +154,43 @@ _postTargetAbort(){
 }
 _postTargetSelect(target){
   this.hideCombatOption();
-  /*var targets = window.story.state.combat.playerParty.concat(window.story.state.combat.enemyParty);
-  for(var i=0; i<targets.length;i++) {
-    if(id===targets[i].name) window.story.state.combat.target = targets[i];  //todo problems if names are non-unique
-  }*/
   window.story.state.combat.target = target;//(target.length)? target : [target] ;
   window.gm.Encounter.next=window.gm.Encounter.execMove;
   window.story.show('EncounterStartTurn');
 }
-triggerCombat(id) {  //called by combatmenu-buttons expects a functioname
+printItemList() {
+  let s = window.story.state;
+  let inv = s.combat.actor.Inv;
+  let maxSlots = inv.count(); 
+  for(var i=0;i<maxSlots;i++){
+    let id=inv.getItemId(i);
+    let _count =inv.countItem(id);
+    //if(useOn===null) useOn=s.combat.actor;
+    let useable = inv.usable(id);
+    if(_count>0 && useable.OK) {
+      let entry = document.createElement('a');
+      entry.href='javascript:void(0)';
+      let foo = (function(id,carrier){ 
+        this._postItemSelect(id);
+        //let _res=carrier.Inv.use(id); window.gm.refreshScreen();window.gm.printOutput(_res.msg);
+      }).bind(this,id);
+      entry.addEventListener("click",foo);
+      entry.textContent=id;
+      $("div#choice")[0].appendChild(entry);      // <- requires this node in html
+    }
+  }
+  var entry = document.createElement('a');
+  entry.href='javascript:void(0)';
+  entry.addEventListener('click',(function(me){return(window.gm.Encounter._postTargetAbort.bind(me));}(this)));
+  entry.textContent="back";
+  $("div#choice")[0].appendChild(entry);
+}
+_postItemSelect(id){
+  let s = window.story.state;
   this.hideCombatOption();
-  var result=window.gm.Encounter.execCombatCmd(window.gm.combat[id] );
-  window.gm.printOutput(result.msg+window.gm.printPassageLink("Next","EncounterStartTurn"));
-  //this.printCombatHud();
+  s.combat.actor.Skills.getItem(s.combat.action).item=id;
+  window.gm.Encounter.next=window.gm.Encounter.selectTarget;
+  window.story.show('EncounterStartTurn');
 }
 //calculates combat-cmd of enemy
 calcEnemyCombat() { 
@@ -246,6 +226,7 @@ startRound() {
 }
 endCombat(){
   var s = window.story.state;
+  s.combat.inCombat=false;
 //remove combateffects
   var list = s.combat.enemyParty.concat(s.combat.playerParty);
   for(var k=0; k<list.length;k++){
@@ -354,14 +335,20 @@ selectMove() {
     if(s.combat.actor.calcCombatMove) { //selected by AI
       result.OK=true;
       result.msg += this.calcEnemyCombat();
-      result.msg += window.gm.printPassageLink('Next','EncounterStartTurn');
-      this.next=this.checkDefeat;
+      result.msg += window.gm.printPassageLink('Next','EncounterStartTurn');   
+      this.next=this.checkDefeat; //todo if switching to Status panel and back this will redraw screen and call this step ! change step only when pressing next
     } else {
       this.printSkillList();
       result.OK=true, result.msg="Choose your action !";//
-      this.next=this.selectTarget;
     }
   }
+  return(result);
+}
+selectItem() {  //select Item from Inventory
+  var s = window.story.state;
+  var result = {OK:false, msg:''};
+  this.printItemList();
+  result.OK=true,result.msg = "Choose item";
   return(result);
 }
 selectTarget() {  //select target for choosen action
@@ -418,6 +405,9 @@ battle() {
   return(result);
 };
 
+}
+window.gm.combat.inCombat = function() {
+  return(window.story.state.combat.inCombat);
 }
 //calculates if target can evade the attack 
 /*requires minimum Poise

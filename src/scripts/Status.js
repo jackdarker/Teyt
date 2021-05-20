@@ -153,7 +153,7 @@ class Effects extends Inventory {  //Todo a collection of Stats is similiar to I
     findEffect(name) {
         var _items = [] ;
         for (var i = 0; i < this.count(); i++) {
-            if(this.list[i].name===name) _items.push(i);
+            if(this.list[i].item.name===name) _items.push(i);
         }
         return(_items);
     }
@@ -171,7 +171,7 @@ class Effects extends Inventory {  //Todo a collection of Stats is similiar to I
         var res;
         //if effect with same id is already present, merge them
         if(_i>-1) {
-            var _old = this.get(effect.id);
+            var _old = this.get(id);//effect.id);
             res = _old.merge(effect);
             if(res!=null) {
                 if(res===true) {}
@@ -235,7 +235,9 @@ class Effect {
     // Attention !!
     //_parent will be added dynamical
     get parent() {return this._parent();}
+    // id = SlumberPotion:Stunned;  name = Stunned
     get id() {return(this.data.id);}
+    set id(id) { this.data.id=id;}
     get name() {return(this.data.name);}
     get time() {return(this.data.time);}
     get duration() {return(this.data.duration);}
