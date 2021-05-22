@@ -3,13 +3,13 @@
 //person is used as id instead of stat-name
 class stRelation extends Stat {
     static setup(context, base,max,person) {    //todo Max-Limit
-        var _stat = new stRelation();
-        var _n = _stat.data;
-        _n.id=person+"_Max",_n.base=max, _n.value=max;
+        let _stat = new stRelation();
+        let _n = _stat.data;
+        _n.id=person+"_Max",_n.base=max, _n.value=max,_n.limits=[{max:999,min:-999}];
         context.addItem(_stat);
         _stat = new stRelation();
         _n = _stat.data;
-        _n.id=person+"_Min",_n.base=0, _n.value=0;
+        _n.id=person+"_Min",_n.base=0, _n.value=0,_n.limits=[{max:999,min:-999}];
         context.addItem(_stat);
         _stat = new stRelation();
         _n = _stat.data;
@@ -17,9 +17,7 @@ class stRelation extends Stat {
         context.addItem(_stat);
         _stat.Calc();
     }
-    constructor() {
-        super();
-    }
+    constructor() {   super();  }
     toJSON() {return window.storage.Generic_toJSON("stRelation", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stRelation, value.data);};
     formatMsgStatChange(attr,_new,_old) {
@@ -36,13 +34,11 @@ class stHealthMax extends Stat {
     static setup(context, max) {
         var _stat = new stHealthMax();
         var _n = _stat.data;
-        _n.id='healthMax',_n.base=max, _n.value=max,_n.modifys=[{id:'health'}];
+        _n.id='healthMax',_n.base=max, _n.value=max,_n.modifys=[{id:'health'}],_n.limits=[{max:99999,min:0}];
         context.addItem(_stat);
         //_stat.Calc(); cause problem because health not yet present
     }
-    constructor() {
-        super();
-    }
+    constructor() { super();    }
     toJSON() {return window.storage.Generic_toJSON("stHealthMax", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stHealthMax, value.data);};
 }
@@ -51,13 +47,11 @@ class stHealth extends Stat {
         stHealthMax.setup(context,max);
         var _stat = new stHealth();
         var _n = _stat.data;
-        _n.id='health',_n.base=base, _n.value=base,_n.limits=[{max:'healthMax',min:''}];
+        _n.id='health',_n.base=base, _n.value=base,_n.limits=[{max:'healthMax',min:0}];
         context.addItem(_stat);
         _stat.Calc();
     }
-    constructor() {
-        super();
-    }
+    constructor() {  super();   }
     toJSON() {return window.storage.Generic_toJSON("stHealth", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stHealth, value.data);};
 }
@@ -65,14 +59,11 @@ class stEnergyMax extends Stat {
     static setup(context, max) {
         var _stat = new stEnergyMax();
         var _n = _stat.data;
-        _n.id='energyMax',_n.base=max, _n.value=max,_n.modifys=[{id:'energy'}];;
+        _n.id='energyMax',_n.base=max, _n.value=max,_n.modifys=[{id:'energy'}],_n.limits=[{max:99999,min:0}];
         context.addItem(_stat);
-        //_stat.Calc();
+
     }
-    constructor() {
-        super();
-        
-    }
+    constructor() {  super();    }
     toJSON() {return window.storage.Generic_toJSON("stEnergyMax", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stEnergyMax, value.data);};
 }
@@ -82,14 +73,11 @@ class stEnergy extends Stat {
 
         var _stat = new stEnergy();
         var _n = _stat.data;
-        _n.id='energy',_n.base=base, _n.value=base,_n.limits=[{max:'energyMax',min:''}];
+        _n.id='energy',_n.base=base, _n.value=base,_n.limits=[{max:'energyMax',min:0}];
         context.addItem(_stat);
         _stat.Calc();
     }
-    constructor() {
-        super();
-        
-    }
+    constructor() { super();   }
     toJSON() {return window.storage.Generic_toJSON("stEnergy", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stEnergy, value.data);};
 }
@@ -97,7 +85,7 @@ class stArousalMax extends Stat {
     static setup(context, max) {
         var _stat = new stArousalMax();
         var _n = _stat.data;
-        _n.id='arousalMax',_n.base=max, _n.value=max, _n.hidden=3;
+        _n.id='arousalMax',_n.base=max, _n.value=max, _n.hidden=3,_n.limits=[{max:999,min:0}];
         context.addItem(_stat);
         _stat.Calc();
     }
@@ -112,7 +100,7 @@ class stArousalMin extends Stat {
     static setup(context, max) {
         var _stat = new stArousalMin();
         var _n = _stat.data;
-        _n.id='arousalMin',_n.base=0, _n.value=0, _n.hidden=1;
+        _n.id='arousalMin',_n.base=0, _n.value=0, _n.hidden=1,_n.limits=[{max:999,min:0}];
         context.addItem(_stat);
         _stat.Calc();
     }
@@ -144,7 +132,7 @@ class stPerversionMax extends Stat {
     static setup(context, base,max) {
         var _stat = new stPerversionMax();
         var _n = _stat.data;
-        _n.id='perversionMax', _n.hidden=3,_n.base=base, _n.value=base,_n.limits=[{max:'',min:''}];
+        _n.id='perversionMax', _n.hidden=3,_n.base=base, _n.value=base,_n.limits=[{max:99999,min:0}];
         context.addItem(_stat);
         _stat.Calc();
     }
@@ -160,7 +148,7 @@ class stPerversion extends Stat {
         stPerversionMax.setup(context,max);
         var _stat = new stPerversion();
         var _n = _stat.data;
-        _n.id='perversion', _n.hidden=3,_n.base=base, _n.value=base,_n.limits=[{max:'perversionMax',min:''}];
+        _n.id='perversion', _n.hidden=3,_n.base=base, _n.value=base,_n.limits=[{max:'perversionMax',min:0}];
         context.addItem(_stat);
         _stat.Calc();
     }
@@ -175,7 +163,7 @@ class stAgility extends Stat { // core attribute
     static setup(context, base,max) { 
         var _stat = new stAgility();
         var _n = _stat.data;
-        _n.id='agility',_n.base=base, _n.value=base, _n.modifys=[{id:'energyMax'}];
+        _n.id='agility',_n.base=base, _n.value=base, _n.modifys=[{id:'energyMax'}],_n.limits=[{max:999,min:0}];
         context.addItem(_stat);
         _stat.Calc();
     }
@@ -193,7 +181,7 @@ class stPerception extends Stat { // core attribute
     static setup(context, base,max) { 
         var _stat = new stPerception();
         var _n = _stat.data;
-        _n.id='perception',_n.base=base, _n.value=base;
+        _n.id='perception',_n.base=base, _n.value=base,_n.limits=[{max:999,min:0}];
         context.addItem(_stat);
         _stat.Calc();
     }
@@ -210,7 +198,7 @@ class stLuck extends Stat { // core attribute
     static setup(context, base,max) { 
         var _stat = new stLuck();
         var _n = _stat.data;
-        _n.id='luck',_n.base=base, _n.value=base;
+        _n.id='luck',_n.base=base, _n.value=base,_n.limits=[{max:999,min:0}];
         context.addItem(_stat);
         _stat.Calc();
     }
@@ -227,7 +215,7 @@ class stCharisma extends Stat { // core attribute
     static setup(context, base,max) { 
         var _stat = new stCharisma();
         var _n = _stat.data;
-        _n.id='charisma',_n.base=base, _n.value=base;
+        _n.id='charisma',_n.base=base, _n.value=base,_n.limits=[{max:999,min:0}];
         context.addItem(_stat);
         _stat.Calc();
     }
@@ -244,7 +232,7 @@ class stIntelligence extends Stat { // core attribute
     static setup(context, base,max) { 
         var _stat = new stIntelligence();
         var _n = _stat.data;
-        _n.id='intelligence',_n.base=base, _n.value=base;
+        _n.id='intelligence',_n.base=base, _n.value=base,_n.limits=[{max:999,min:0}];
         context.addItem(_stat);
         _stat.Calc();
     }
@@ -299,7 +287,7 @@ class stPAttack extends Stat {   //physical attack
     static setup(context, base,max) {
         var _stat = new stPAttack();
         var _n = _stat.data;
-        _n.id='pAttack',_n.base=base, _n.value=base;
+        _n.id='pAttack',_n.base=base, _n.value=base,_n.limits=[{max:99999,min:0}];
         context.addItem(_stat);
         _stat.Calc();
     }
@@ -314,7 +302,7 @@ class stPDefense extends Stat {   //physical defense
     static setup(context, base,max) {
         var _stat = new stPAttack();
         var _n = _stat.data;
-        _n.id='pDefense',_n.base=base, _n.value=base;
+        _n.id='pDefense',_n.base=base, _n.value=base,_n.limits=[{max:99999,min:0}];
         context.addItem(_stat);
         _stat.Calc();
     }
@@ -533,6 +521,37 @@ class effHeal extends CombatEffect {
         else {
             this.parent.parent.Stats.increment('health',this.amount);
         }
+    }
+}
+class effGuard extends CombatEffect {
+    constructor(amount) {
+        super();
+        this.amount = amount;
+        this.data.id = this.data.name= effGuard.name, this.data.duration = 0, this.data.hidden=0;
+    }
+    toJSON() {return window.storage.Generic_toJSON("effGuard", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(effGuard, value.data);};
+    get desc() {return(effGuard.name);}
+    get shortDesc() {return(this.desc+" for " + this.data.duration+" turns");}
+    onApply(){
+        this.data.duration = 2;
+        this.parent.parent.Stats.addModifier('pDefense',{id:'pDefense:Guard', bonus:5}); //Todo percentage
+    }
+    merge(neweffect) {
+        if(neweffect.name===this.data.name) {    //extends
+            this.onApply();
+            return(true);
+        }
+    }
+    onCombatEnd() {
+        this.parent.removeItem(this.data.id);
+    }
+    onTurnStart() {
+        this.data.duration-=1;
+        if(this.data.duration<=0) this.parent.removeItem(this.data.id);
+    }
+    onRemove(){
+        this.parent.parent.Stats.removeModifier('pDefense',{id:'pDefense:Guard'});
     }
 }
 class effDamage extends CombatEffect {

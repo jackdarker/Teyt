@@ -36,24 +36,42 @@ initCombat() {
   s.combat.enemyFirst= this.EnemyFirst;
   s.combat.turnCount=0;
   this.next=this.battleInit;
+  this.msg='';
   window.story.show("Encounter");
 }
 
 hideCombatOption() {
   document.querySelector("#choice").remove();
 }
+//creates a list of active effects for combat display
+printCombatEffects(char) {
+  let list=[];
+  if(char.isDead()) { //if char is dead print this instead other effects; effects also get not updated when dead??
+    list.push('knocked out');
+  } else {
+    let effects = char.Effects.getAllIds();
+    for(let i=0; i<effects.length; i++) {
+      let effect = char.Effects.get(effects[i]);
+      if(effect.onCombatEnd!==null && effect.onCombatEnd!==undefined) {
+        list.push(effect.shortDesc);
+      }
+    }
+  }
+  return(list.reduce((sum, current) => sum + current +', ', ''));
+}
+//prints a table with all player/enemy data
 printStats() {
-  var s=window.story.state;
-  var players = (s.combat.playerParty);
-  var enemys = (s.combat.enemyParty);
+  let s=window.story.state;
+  let players = (s.combat.playerParty);
+  let enemys = (s.combat.enemyParty);
   /*
               Health  Arousal Effects         Health  Arousal Effects
       player1 10/20   10/20 Stunned     Ork1  10/10   10/10
       player2 50/100  10/20             Ork2  20/20   10/100
   */
-  var elmt = '<table id=\"combatstats\"><tbody>';
+ let elmt = '<table id=\"combatstats\"><tbody>';
   elmt += "<tr><th>   </th><th>Player</th><th>Health</th><th>Arousal</th><th>Effects</th><th>   </th><th>Enemys</th><th>Health</th><th>Arousal</th><th>Effects</th>";
-  for(var i=0;(i<players.length || i<enemys.length);i++) {
+  for(let i=0;(i<players.length || i<enemys.length);i++) {
     elmt += "<tr>";
     if(i<players.length) {
       elmt += "<td>" + (s.combat.actor && s.combat.actor.name==players[i].name?">>": "")+ "</td><td>"+players[i].name+"</td><td>"+players[i].health().value.toString()+'/'+players[i].health().max.toString()+"</td><td>"+players[i].Stats.get("arousal").value.toString()+'/'+players[i].Stats.get("arousalMax").value.toString()+"</td><td style=\"font-size:smaller\">"+window.gm.Encounter.printCombatEffects(players[i])+"</td>";
@@ -108,19 +126,6 @@ _postSkillSelect(id){
     window.gm.Encounter.next=window.gm.Encounter.selectTarget;
   }
   window.story.show('EncounterStartTurn');
-}
-
-//creates a list of active effects for combat display
-printCombatEffects(char) {
-  var list=[];
-  var effects = char.Effects.getAllIds();
-  for(var i=0; i<effects.length; i++) {
-    var effect = char.Effects.get(effects[i]);
-    if(effect.onCombatEnd!==null && effect.onCombatEnd!==undefined) {
-      list.push(effect.shortDesc);
-    }
-  }
-  return(list.reduce((sum, current) => sum + current +', ', ''));
 }
 printTargetList() {
   var s = window.story.state;
@@ -179,7 +184,7 @@ printItemList() {
       $("div#choice")[0].appendChild(entry);      // <- requires this node in html
     }
   }
-  var entry = document.createElement('a');
+  let entry = document.createElement('a');
   entry.href='javascript:void(0)';
   entry.addEventListener('click',(function(me){return(window.gm.Encounter._postTargetAbort.bind(me));}(this)));
   entry.textContent="back";
@@ -192,12 +197,18 @@ _postItemSelect(id){
   window.gm.Encounter.next=window.gm.Encounter.selectTarget;
   window.story.show('EncounterStartTurn');
 }
-//calculates combat-cmd of enemy
-calcEnemyCombat() { 
-  var enemy = window.story.state.combat.actor;
-  var move = enemy.calcCombatMove(window.story.state.combat.playerParty,window.story.state.combat.enemyParty);
-  
-  return(move.msg+"</br>");
+//if switching to Status panel and back this will redraw screen and call this this.next; to avoid this set next only in clickhandler 
+printNextLink(nextState,label="Next") {
+  let entry = document.createElement('a');
+  entry.href='javascript:void(0)';
+  entry.addEventListener('click',(function(me,nextState)
+  {return(function() {
+    window.gm.Encounter.next=nextState;
+    window.story.show('EncounterStartTurn');
+  });
+  }(this,nextState)));
+  entry.textContent=label;
+  $("div#choice2")[0].appendChild(entry);
 }
 //executes a combat-cmd for player/enemy
 execCombatCmd(move) { 
@@ -288,7 +299,8 @@ preTurn() {
   return(result);
 }
 checkDefeat() { //check if party is defeated
-  var result = {OK:false, msg:''}; 
+  let result = {OK:false, msg:''}; 
+  this.msg = '';
   var s = window.story.state;
   if(s.combat.playerFleeing===true) { 
     this.next=this.postBattle;
@@ -323,20 +335,27 @@ selectChar() {
 }
 
 selectMove() {
-  var s = window.story.state;
-  var result = {OK:false, msg:''};
-  //navigate through moves-menu
-  var canAct = s.combat.actor._canAct();
-  if(canAct.OK===false) {
+  let s = window.story.state;
+  let result = {OK:false, msg:''};
+  if(s.combat.actor.isDead())  { //skip char if already dead
+    this.next=this.selectChar;
+    return(result);
+  }
+  let canAct = s.combat.actor._canAct();
+  if(canAct.OK===false) { //skip char if not dead but incapaciated and show msg
     result.msg = canAct.msg;
     this.next=this.checkDefeat;
     return(result);
   } else {
     if(s.combat.actor.calcCombatMove) { //selected by AI
-      result.OK=true;
-      result.msg += this.calcEnemyCombat();
-      result.msg += window.gm.printPassageLink('Next','EncounterStartTurn');   
-      this.next=this.checkDefeat; //todo if switching to Status panel and back this will redraw screen and call this step ! change step only when pressing next
+      result = s.combat.actor.calcCombatMove(window.story.state.combat.playerParty,window.story.state.combat.enemyParty);
+      window.story.state.combat.action=result.action;
+      window.story.state.combat.target=result.target;
+      //continue with execMove but memorize the moveselection message for display
+            //this.printNextLink(this.execMove) 
+      this.next=this.execMove; 
+      this.msg=result.msg;
+      result.OK=false;
     } else {
       this.printSkillList();
       result.OK=true, result.msg="Choose your action !";//
@@ -361,11 +380,12 @@ selectTarget() {  //select target for choosen action
 execMove(){
   var result = {OK:false, msg:''};
   var s = window.story.state;
-  //apply move
-  result.msg=s.combat.actor.Skills.getItem(s.combat.action).cast(s.combat.target).msg;
+  //apply move; AI might not found a possible action
+  if(s.combat.action!==null && s.combat.action!=='') {
+    result.msg=s.combat.actor.Skills.getItem(s.combat.action).cast(s.combat.target).msg;
+  }
   result.OK = true;
-  this.next=this.checkDefeat;
-  result.msg+=window.gm.printPassageLink("Next","EncounterStartTurn");
+  this.printNextLink(this.checkDefeat);//this.next=this.checkDefeat; result.msg+=window.gm.printPassageLink("Next","EncounterStartTurn");
   return(result);
 }
 postBattle() {
@@ -399,6 +419,7 @@ battle() {
     //if result =true; user input required
     result =this.next();
     if(result.OK) {
+      result.msg = this.msg+result.msg;
       return(result);
     }
   }
@@ -406,6 +427,7 @@ battle() {
 };
 
 }
+//returns true if in combat
 window.gm.combat.inCombat = function() {
   return(window.story.state.combat.inCombat);
 }
@@ -470,7 +492,8 @@ window.gm.combat.calcParry=function(attacker,target, attack) {
     if(rnd<10) {
       result.msg = target.name +' parried the attack and was even able to land a hit.'  //todo how to add textual variation based on used weapon and skill?
       // foo should reflect fraction of attack back to attacker
-      result.foo = function(attacker,attack){ return(function(attacker,attack){ attacker.Stats.increment('health',-0.5*attack.value);});}(attacker,attack);
+      attack.effects.push( {target:attacker,eff:([new effDamage(0.5*attack.value)])});
+      //result.foo = function(attacker,attack){ return(function(attacker,attack){ attacker.Stats.increment('health',-0.5*attack.value);});}(attacker,attack);
     } else {
       result.msg = target.name +' parried the attack.'
     }
@@ -488,30 +511,41 @@ attack = weapon damage formula + weakness-bonus
 attack increases on critical
 hp-dmg = attack -DR but min.1 */
 window.gm.combat.calcAbsorb=function(attacker,defender, attack) {
-  var result = {OK:true,msg:'',foo:null}
-  var rnd = _.random(1,100);
-  var def = defender.Stats.get('pDefense').value;
+  let result = {OK:true,msg:'',foo:null}
+  let rnd = _.random(1,100);
+  let def = defender.Stats.get('pDefense').value;
   //todo weakness bonus
   var dmg = Math.max(1,attack.value* (attack.crit?4:1)-def);
   window.gm.pushLog(`absorb roll:${dmg} vs ${def} `,window.story.state.vars.dbgShowCombatRoll);
   result.msg = defender.name +' got hit by '+attacker.name+' and suffered '+dmg+ (attack.crit?' critical ':'')+'damage. '
   attack.total = dmg;
   //foo should add fraction of attack to defender-health
-  result.foo = function(defender,attack){ return(function(){ defender.Stats.increment('health',-1*attack.total);});}(defender,attack);
+  attack.effects.push( {target:defender,eff:[(new effDamage(attack.total))]});
+  //result.foo = function(defender,attack){ return(function(){ defender.Stats.increment('health',-1*attack.total);});}(defender,attack);
   return(result);
 }
+//object to store attack-data
+window.gm.combat.defaultAttackData = function() {
+  return({value:0,total:0,crit:false,effects:[]}); 
+}
 // calculates the damage of an attack and applies it
-window.gm.combat.calcAttack=function(attacker,defender, attack) {
-
-  var result = window.gm.combat.calcEvasion(attacker,defender,attack);
+window.gm.combat.calcAttack=function(attacker,defender,attack) {
+  let result = {OK:false,msg:''};
+  //var def = defender.Stats.get('pDefense').value;
+  let att = attacker.Stats.get('pAttack').value;
+  attack.value=att,attack.total=att; 
+  //check if target an evade
+  result = window.gm.combat.calcEvasion(attacker,defender,attack);
   if(result.OK===false) { return(result);  }
   var _tmp = result.msg;
+  //check if target can block or parry
   result = window.gm.combat.calcParry(attacker,defender,attack);  //todo or block
-  if(result.foo!==null) result.foo(attacker,attack);
+  //if(result.foo!==null) result.foo(attacker,attack);
   if(result.OK===false) {    return(result);  }
   _tmp += result.msg;
+  //deal damage
   result = window.gm.combat.calcAbsorb(attacker,defender,attack);
-  if(result.foo!==null) result.foo(defender,attack);
+  //if(result.foo!==null) result.foo(defender,attack);
   _tmp += result.msg;
   result.msg = _tmp;
   return(result);

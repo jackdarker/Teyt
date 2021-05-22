@@ -116,6 +116,7 @@ targetFilterEnemy(targets){
             var valid = true;
             for(var targ of target) {
                 if(this.caster.faction == targ.faction) valid=false;
+                if(targ.isDead()) valid=false;
             }
             if(valid)
                 possibleTarget.push(target);
@@ -123,7 +124,7 @@ targetFilterEnemy(targets){
         return possibleTarget;
 }
 targetFilterFighting(targets){
-        //chars that are not inhibited"""
+        //chars that are not inhibited
         var possibleTarget = [];
         for(var target of targets){
             var valid = true;
@@ -136,7 +137,7 @@ targetFilterFighting(targets){
         return possibleTarget
 }
 targetFilterAlive(targets){
-    //chars that are dead"""
+    //chars that are not dead
         var possibleTarget = [];
         for(var target of targets){
             var valid = true;
@@ -149,7 +150,7 @@ targetFilterAlive(targets){
         return possibleTarget;
 }
 targetFilterDead(targets){
-    //chars that are dead"""
+    //chars that are dead
         var possibleTarget = [];
         for(var target of targets){
             var valid = true;
@@ -180,35 +181,32 @@ class SkillAttack extends Skill {
     //execute simple attack with active weapon
     constructor() {
         super("Attack","Attack");
+        this.msg = '';
     }
     targetFilter(targets){
-        return(this.targetFilterEnemy(targets));
+        return(this.targetFilterEnemy(this.targetFilterAlive(targets)));
     }
     previewCast(targets){
         var result = new SkillResult()
         result.skill =this;
         result.source = this.caster;
         result.targets = targets;
+        this.msg = '';
         if(this.isValidTarget(targets)) {
             result.OK = true;
             for(var target of targets) {
-                var eff = this.calculateDamage(this.caster,target);
-                result.effects.push( {target:target,
-                    eff:eff});
+                let attack =window.gm.combat.defaultAttackData();
+                let result2 = window.gm.combat.calcAttack(this.caster,target,attack);
+                this.msg+=result2.msg;
+                result.effects = result.effects.concat(attack.effects); 
+                //var eff = this.calculateDamage(this.caster,target);
+                //result.effects.push( {target:target,eff:eff});
             }
         }
         return result
     }
-    calculateDamage( caster,target) {
-    var att = caster.Stats.get('pAttack').value;
-    var def = target.Stats.get('pDefense').value;
-    var blunt = caster.Outfit.countItem("Shovel");
-    //var result = window.gm.combat.calcAttack(caster,target,{value:att,total:att});
-    var x = att-def+5;
-    var eff = [new effDamage(x)];
-    if(blunt>0) eff.push(new effStunned());
-    return(eff);
-            //return [EffMiss(caster,targets[0],'missed attack')]
+    getCastDescription(result) {
+        return(this.msg);
     }
 }
 class SkillStun extends Skill {
@@ -225,9 +223,8 @@ class SkillStun extends Skill {
             if(el.length===1)   //dont stack multi-targets
                 multi.push(el[0]);
         }
-        if(multi.length>0) possibletarget.push(multi);
-        //[[mole1],[mole2],[mole1,mole2]]
-        return(possibletarget);
+        if(multi.length>1) possibletarget.push(multi);  //if there is only [[mole]] we dont want [[mole],[mole]]
+        return(possibletarget);//[[mole1],[mole2],[mole1,mole2]]
     }
     previewCast(targets){
         var result = new SkillResult()
@@ -245,7 +242,7 @@ class SkillStun extends Skill {
     }
     getCastDescription(result) {
         //update msg after sucessful cast
-        return(this.caster.name +" stunned " + result.targets.name+".");
+        return(this.caster.name +" stunned " + ((result.targets.length>1)?result.targets.name:result.targets[0].name)+".");
     }
 }
 class SkillPoisonCloud extends Skill {
@@ -324,6 +321,7 @@ class SkillUseItem extends Skill {
     constructor() {
         super("UseItem","UseItem");
         this.item=null;
+        this.msg = '';
     }
 // first item has to be set
 // then when targetFilter is called, forward the filterrequest to the item

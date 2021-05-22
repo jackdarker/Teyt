@@ -15,10 +15,12 @@ class Mechanic extends Mob {
         this.name = 'Mechanic-Guy';
         this.pic= 'assets/mechanic.jpg';
     }
-    calcCombatMove(){
-        var result = this._canAct();
+    calcCombatMove(enemys,friends){
+        let result = this._canAct();
+        result.action =result.target= null;
         if(window.story.state.combat.turnCount<3) {
-            result=window.gm.Encounter.execCombatCmd(window.gm.combat.moveStun);
+            result.action = "Stun";
+            result.target = [enemys[rnd]];
             result.msg =this.name+" trys to hit your head whith his wrench.</br>"+result.msg;
             return(result);
         }

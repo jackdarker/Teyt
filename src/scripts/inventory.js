@@ -4,6 +4,10 @@ class Item {
         this.name = name;
         this.desc = '';
     }
+    //called by SkillUseItem
+    targetFilter(targets) {
+        return([]); //default unuseable in combat
+    }
     get parent() {return this._parent();}
     //context is the owner of item (parent of inventory), on is target (character)
     usable(context,on=null) {return({OK:false, msg:'Cannot use.'});}

@@ -1113,13 +1113,40 @@ var CombatSetup = /*#__PURE__*/function () {
       s.combat.enemyFirst = this.EnemyFirst;
       s.combat.turnCount = 0;
       this.next = this.battleInit;
+      this.msg = '';
       window.story.show("Encounter");
     }
   }, {
     key: "hideCombatOption",
     value: function hideCombatOption() {
       document.querySelector("#choice").remove();
-    }
+    } //creates a list of active effects for combat display
+
+  }, {
+    key: "printCombatEffects",
+    value: function printCombatEffects(char) {
+      var list = [];
+
+      if (char.isDead()) {
+        //if char is dead print this instead other effects; effects also get not updated when dead??
+        list.push('knocked out');
+      } else {
+        var effects = char.Effects.getAllIds();
+
+        for (var i = 0; i < effects.length; i++) {
+          var effect = char.Effects.get(effects[i]);
+
+          if (effect.onCombatEnd !== null && effect.onCombatEnd !== undefined) {
+            list.push(effect.shortDesc);
+          }
+        }
+      }
+
+      return list.reduce(function (sum, current) {
+        return sum + current + ', ';
+      }, '');
+    } //prints a table with all player/enemy data
+
   }, {
     key: "printStats",
     value: function printStats() {
@@ -1209,25 +1236,6 @@ var CombatSetup = /*#__PURE__*/function () {
       }
 
       window.story.show('EncounterStartTurn');
-    } //creates a list of active effects for combat display
-
-  }, {
-    key: "printCombatEffects",
-    value: function printCombatEffects(char) {
-      var list = [];
-      var effects = char.Effects.getAllIds();
-
-      for (var i = 0; i < effects.length; i++) {
-        var effect = char.Effects.get(effects[i]);
-
-        if (effect.onCombatEnd !== null && effect.onCombatEnd !== undefined) {
-          list.push(effect.shortDesc);
-        }
-      }
-
-      return list.reduce(function (sum, current) {
-        return sum + current + ', ';
-      }, '');
     }
   }, {
     key: "printTargetList",
@@ -1337,14 +1345,22 @@ var CombatSetup = /*#__PURE__*/function () {
       s.combat.actor.Skills.getItem(s.combat.action).item = id;
       window.gm.Encounter.next = window.gm.Encounter.selectTarget;
       window.story.show('EncounterStartTurn');
-    } //calculates combat-cmd of enemy
+    } //if switching to Status panel and back this will redraw screen and call this this.next; to avoid this set next only in clickhandler 
 
   }, {
-    key: "calcEnemyCombat",
-    value: function calcEnemyCombat() {
-      var enemy = window.story.state.combat.actor;
-      var move = enemy.calcCombatMove(window.story.state.combat.playerParty, window.story.state.combat.enemyParty);
-      return move.msg + "</br>";
+    key: "printNextLink",
+    value: function printNextLink(nextState) {
+      var label = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "Next";
+      var entry = document.createElement('a');
+      entry.href = 'javascript:void(0)';
+      entry.addEventListener('click', function (me, nextState) {
+        return function () {
+          window.gm.Encounter.next = nextState;
+          window.story.show('EncounterStartTurn');
+        };
+      }(this, nextState));
+      entry.textContent = label;
+      $("div#choice2")[0].appendChild(entry);
     } //executes a combat-cmd for player/enemy
 
   }, {
@@ -1472,6 +1488,7 @@ var CombatSetup = /*#__PURE__*/function () {
         OK: false,
         msg: ''
       };
+      this.msg = '';
       var s = window.story.state;
 
       if (s.combat.playerFleeing === true) {
@@ -1520,21 +1537,32 @@ var CombatSetup = /*#__PURE__*/function () {
       var result = {
         OK: false,
         msg: ''
-      }; //navigate through moves-menu
+      };
+
+      if (s.combat.actor.isDead()) {
+        //skip char if already dead
+        this.next = this.selectChar;
+        return result;
+      }
 
       var canAct = s.combat.actor._canAct();
 
       if (canAct.OK === false) {
+        //skip char if not dead but incapaciated and show msg
         result.msg = canAct.msg;
         this.next = this.checkDefeat;
         return result;
       } else {
         if (s.combat.actor.calcCombatMove) {
           //selected by AI
-          result.OK = true;
-          result.msg += this.calcEnemyCombat();
-          result.msg += window.gm.printPassageLink('Next', 'EncounterStartTurn');
-          this.next = this.checkDefeat; //todo if switching to Status panel and back this will redraw screen and call this step ! change step only when pressing next
+          result = s.combat.actor.calcCombatMove(window.story.state.combat.playerParty, window.story.state.combat.enemyParty);
+          window.story.state.combat.action = result.action;
+          window.story.state.combat.target = result.target; //continue with execMove but memorize the moveselection message for display
+          //this.printNextLink(this.execMove) 
+
+          this.next = this.execMove;
+          this.msg = result.msg;
+          result.OK = false;
         } else {
           this.printSkillList();
           result.OK = true, result.msg = "Choose your action !"; //
@@ -1576,12 +1604,15 @@ var CombatSetup = /*#__PURE__*/function () {
         OK: false,
         msg: ''
       };
-      var s = window.story.state; //apply move
+      var s = window.story.state; //apply move; AI might not found a possible action
 
-      result.msg = s.combat.actor.Skills.getItem(s.combat.action).cast(s.combat.target).msg;
+      if (s.combat.action !== null && s.combat.action !== '') {
+        result.msg = s.combat.actor.Skills.getItem(s.combat.action).cast(s.combat.target).msg;
+      }
+
       result.OK = true;
-      this.next = this.checkDefeat;
-      result.msg += window.gm.printPassageLink("Next", "EncounterStartTurn");
+      this.printNextLink(this.checkDefeat); //this.next=this.checkDefeat; result.msg+=window.gm.printPassageLink("Next","EncounterStartTurn");
+
       return result;
     }
   }, {
@@ -1629,6 +1660,7 @@ var CombatSetup = /*#__PURE__*/function () {
         result = this.next();
 
         if (result.OK) {
+          result.msg = this.msg + result.msg;
           return result;
         }
       }
@@ -1638,7 +1670,8 @@ var CombatSetup = /*#__PURE__*/function () {
   }]);
 
   return CombatSetup;
-}();
+}(); //returns true if in combat
+
 
 window.gm.combat.inCombat = function () {
   return window.story.state.combat.inCombat;
@@ -1723,11 +1756,10 @@ window.gm.combat.calcParry = function (attacker, target, attack) {
       result.msg = target.name + ' parried the attack and was even able to land a hit.'; //todo how to add textual variation based on used weapon and skill?
       // foo should reflect fraction of attack back to attacker
 
-      result.foo = function (attacker, attack) {
-        return function (attacker, attack) {
-          attacker.Stats.increment('health', -0.5 * attack.value);
-        };
-      }(attacker, attack);
+      attack.effects.push({
+        target: attacker,
+        eff: [new effDamage(0.5 * attack.value)]
+      }); //result.foo = function(attacker,attack){ return(function(attacker,attack){ attacker.Stats.increment('health',-0.5*attack.value);});}(attacker,attack);
     } else {
       result.msg = target.name + ' parried the attack.';
     }
@@ -1764,35 +1796,53 @@ window.gm.combat.calcAbsorb = function (attacker, defender, attack) {
   result.msg = defender.name + ' got hit by ' + attacker.name + ' and suffered ' + dmg + (attack.crit ? ' critical ' : '') + 'damage. ';
   attack.total = dmg; //foo should add fraction of attack to defender-health
 
-  result.foo = function (defender, attack) {
-    return function () {
-      defender.Stats.increment('health', -1 * attack.total);
-    };
-  }(defender, attack);
+  attack.effects.push({
+    target: defender,
+    eff: [new effDamage(attack.total)]
+  }); //result.foo = function(defender,attack){ return(function(){ defender.Stats.increment('health',-1*attack.total);});}(defender,attack);
 
   return result;
+}; //object to store attack-data
+
+
+window.gm.combat.defaultAttackData = function () {
+  return {
+    value: 0,
+    total: 0,
+    crit: false,
+    effects: []
+  };
 }; // calculates the damage of an attack and applies it
 
 
 window.gm.combat.calcAttack = function (attacker, defender, attack) {
-  var result = window.gm.combat.calcEvasion(attacker, defender, attack);
+  var result = {
+    OK: false,
+    msg: ''
+  }; //var def = defender.Stats.get('pDefense').value;
+
+  var att = attacker.Stats.get('pAttack').value;
+  attack.value = att, attack.total = att; //check if target an evade
+
+  result = window.gm.combat.calcEvasion(attacker, defender, attack);
 
   if (result.OK === false) {
     return result;
   }
 
-  var _tmp = result.msg;
+  var _tmp = result.msg; //check if target can block or parry
+
   result = window.gm.combat.calcParry(attacker, defender, attack); //todo or block
-
-  if (result.foo !== null) result.foo(attacker, attack);
+  //if(result.foo!==null) result.foo(attacker,attack);
 
   if (result.OK === false) {
     return result;
   }
 
-  _tmp += result.msg;
-  result = window.gm.combat.calcAbsorb(attacker, defender, attack);
-  if (result.foo !== null) result.foo(defender, attack);
+  _tmp += result.msg; //deal damage
+
+  result = window.gm.combat.calcAbsorb(attacker, defender, attack); //if(result.foo!==null) result.foo(defender,attack);
+
   _tmp += result.msg;
   result.msg = _tmp;
   return result;
@@ -3166,7 +3216,8 @@ window.gm.refreshScreen = function () {
 window.gm.updateOtherPanels = function () {
   renderToSelector("#sidebar", "sidebar");
   renderToSelector("#LogPanel", "LogPanel");
-};
+}; ///////////////////////////////////////////////////////////////////////
+
 
 window.gm.pushLog = function (msg) {
   var Cond = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
@@ -3200,7 +3251,8 @@ window.gm.clearLog = function () {
 
   window.story.state.vars.log = [];
   return msg;
-};
+}; //////////////////////////////////////////////////////////////////////
+
 
 window.gm.roll = function (n, sides) {
   //rolls n x dies with sides
@@ -3675,9 +3727,15 @@ var Item = /*#__PURE__*/function () {
 
     this.name = name;
     this.desc = '';
-  }
+  } //called by SkillUseItem
+
 
   _createClass(Item, [{
+    key: "targetFilter",
+    value: function targetFilter(targets) {
+      return []; //default unuseable in combat
+    }
+  }, {
     key: "usable",
     //context is the owner of item (parent of inventory), on is target (character)
     value: function usable(context) {
@@ -3869,8 +3927,8 @@ var Mob = /*#__PURE__*/function (_Character) {
   _createClass(Mob, [{
     key: "calcCombatMove",
     //override to return the next move to execute
-    //OK = false if move===null, else true
-    //msg should contain a message formatted for view (move description and result) 
+    //OK = false if no action, else true
+    //msg should contain a message formatted for view (move description )g 
     //this function should decide what actions the mob takes; 
     //query _canAct to check if stunned or otherwise incapaciated, then run execCombatCmd(moveNOP) 
     value: function calcCombatMove(enemys, friends) {
@@ -3878,15 +3936,18 @@ var Mob = /*#__PURE__*/function (_Character) {
 
       var result = this._canAct();
 
+      result.action = result.target = null;
+
       if (result.OK === false) {
         //window.gm.Encounter.execCombatCmd(window.gm.combat.moveNOP);
         return result;
       }
 
       if (rnd > 30) {
+        rnd = _.random(0, enemys.length - 1);
         result.action = "Attack"; // window.gm.Encounter.execCombatCmd(window.gm.combat.movePhysicalAttack);
 
-        result.target = enemys[0];
+        result.target = [enemys[rnd]];
         result.msg = this.name + " trys to attack you.</br>" + result.msg;
       } else {
         //result=window.gm.Encounter.execCombatCmd(window.gm.combat.moveGuard);
@@ -5211,6 +5272,7 @@ var Skill = /*#__PURE__*/function () {
             for (_iterator11.s(); !(_step11 = _iterator11.n()).done;) {
               var targ = _step11.value;
               if (this.caster.faction == targ.faction) valid = false;
+              if (targ.isDead()) valid = false;
             }
           } catch (err) {
             _iterator11.e(err);
@@ -5231,7 +5293,7 @@ var Skill = /*#__PURE__*/function () {
   }, {
     key: "targetFilterFighting",
     value: function targetFilterFighting(targets) {
-      //chars that are not inhibited"""
+      //chars that are not inhibited
       var possibleTarget = [];
 
       var _iterator12 = _createForOfIteratorHelper(targets),
@@ -5269,7 +5331,7 @@ var Skill = /*#__PURE__*/function () {
   }, {
     key: "targetFilterAlive",
     value: function targetFilterAlive(targets) {
-      //chars that are dead"""
+      //chars that are not dead
       var possibleTarget = [];
 
       var _iterator14 = _createForOfIteratorHelper(targets),
@@ -5307,7 +5369,7 @@ var Skill = /*#__PURE__*/function () {
   }, {
     key: "targetFilterDead",
     value: function targetFilterDead(targets) {
-      //chars that are dead"""
+      //chars that are dead
       var possibleTarget = [];
 
       var _iterator16 = _createForOfIteratorHelper(targets),
@@ -5391,15 +5453,19 @@ var SkillAttack = /*#__PURE__*/function (_Skill) {
 
   //execute simple attack with active weapon
   function SkillAttack() {
+    var _this3;
+
     _classCallCheck(this, SkillAttack);
 
-    return _super4.call(this, "Attack", "Attack");
+    _this3 = _super4.call(this, "Attack", "Attack");
+    _this3.msg = '';
+    return _this3;
   }
 
   _createClass(SkillAttack, [{
     key: "targetFilter",
     value: function targetFilter(targets) {
-      return this.targetFilterEnemy(targets);
+      return this.targetFilterEnemy(this.targetFilterAlive(targets));
     }
   }, {
     key: "previewCast",
@@ -5408,6 +5474,7 @@ var SkillAttack = /*#__PURE__*/function (_Skill) {
       result.skill = this;
       result.source = this.caster;
       result.targets = targets;
+      this.msg = '';
 
       if (this.isValidTarget(targets)) {
         result.OK = true;
@@ -5418,11 +5485,11 @@ var SkillAttack = /*#__PURE__*/function (_Skill) {
         try {
           for (_iterator19.s(); !(_step19 = _iterator19.n()).done;) {
             var target = _step19.value;
-            var eff = this.calculateDamage(this.caster, target);
-            result.effects.push({
-              target: target,
-              eff: eff
-            });
+            var attack = window.gm.combat.defaultAttackData();
+            var result2 = window.gm.combat.calcAttack(this.caster, target, attack);
+            this.msg += result2.msg;
+            result.effects = result.effects.concat(attack.effects); //var eff = this.calculateDamage(this.caster,target);
+            //result.effects.push( {target:target,eff:eff});
           }
         } catch (err) {
           _iterator19.e(err);
@@ -5434,16 +5501,9 @@ var SkillAttack = /*#__PURE__*/function (_Skill) {
       return result;
     }
   }, {
-    key: "calculateDamage",
-    value: function calculateDamage(caster, target) {
-      var att = caster.Stats.get('pAttack').value;
-      var def = target.Stats.get('pDefense').value;
-      var blunt = caster.Outfit.countItem("Shovel"); //var result = window.gm.combat.calcAttack(caster,target,{value:att,total:att});
-
-      var x = att - def + 5;
-      var eff = [new effDamage(x)];
-      if (blunt > 0) eff.push(new effStunned());
-      return eff; //return [EffMiss(caster,targets[0],'missed attack')]
+    key: "getCastDescription",
+    value: function getCastDescription(result) {
+      return this.msg;
     }
   }]);
 
@@ -5524,7 +5584,7 @@ var SkillStun = /*#__PURE__*/function (_Skill2) {
     key: "getCastDescription",
     value: function getCastDescription(result) {
       //update msg after sucessful cast
-      return this.caster.name + " stunned " + result.targets.name + ".";
+      return this.caster.name + " stunned " + (result.targets.length > 0 ? result.targets.name : result.targets[0].name) + ".";
     }
   }]);
 
@@ -5700,13 +5760,14 @@ var SkillUseItem = /*#__PURE__*/function (_Skill6) {
   var _super9 = _createSuper(SkillUseItem);
 
   function SkillUseItem() {
-    var _this3;
+    var _this4;
 
     _classCallCheck(this, SkillUseItem);
 
-    _this3 = _super9.call(this, "UseItem", "UseItem");
-    _this3.item = null;
-    return _this3;
+    _this4 = _super9.call(this, "UseItem", "UseItem");
+    _this4.item = null;
+    _this4.msg = '';
+    return _this4;
   } // first item has to be set
   // then when targetFilter is called, forward the filterrequest to the item
   // the item has to implement targetFilter and also check if the item is valid for use in combat    
@@ -5767,13 +5828,13 @@ var StatsDictionary = /*#__PURE__*/function (_Inventory2) {
 
   //Todo a collection of Stats is similiar to Inventory?
   function StatsDictionary(externlist) {
-    var _this4;
+    var _this5;
 
     _classCallCheck(this, StatsDictionary);
 
-    _this4 = _super10.call(this, externlist);
+    _this5 = _super10.call(this, externlist);
     window.storage.registerConstructor(StatsDictionary);
-    return _this4;
+    return _this5;
   }
 
   _createClass(StatsDictionary, [{
@@ -5908,7 +5969,7 @@ var Stat = /*#__PURE__*/function () {
         modifier: [],
         modifys: [],
         hidden: 0
-      }; //limit = {id: min: max:}   limit to apply to value and base
+      }; //limit = {min: max:}   limit to apply to value and base; either statid or number
       //modifier {id: calc:}      Stat that modifys value, calc is function(context,data)=> newvalue
       //modifys {id:}         point to the Stats that have modifiers from this stat or is used as limit
       //hidden 0 = visible, 1= name unreadable, 2= value unreadable, 4= hidden
@@ -5931,9 +5992,17 @@ var Stat = /*#__PURE__*/function () {
       var msg = ''; //get limits
 
       for (var k = 0; k < attr.limits.length; k++) {
-        if (attr.limits[k].min !== '') min = Math.max(this.parent.get(attr.limits[k].min).value, min); //this might behave odly if any min>max
+        //this might behave odly if any min>max
+        var lmin = attr.limits[k].min,
+            lmax = attr.limits[k].max; //lm__ is id or number
 
-        if (attr.limits[k].max !== '') max = Math.min(this.parent.get(attr.limits[k].max).value, max);
+        if (lmin || lmin === 0) {
+          min = typeof lmin === 'string' ? Math.max(this.parent.get(lmin).value, min) : Math.max(lmin, min);
+        }
+
+        if (lmax || lmax === 0) {
+          max = typeof lmax === 'string' ? Math.min(this.parent.get(lmax).value, max) : Math.min(lmax, max);
+        }
       } //recalculate modifiers
 
 
@@ -6012,13 +6081,13 @@ var Effects = /*#__PURE__*/function (_Inventory3) {
 
   //Todo a collection of Stats is similiar to Inventory?
   function Effects(externlist) {
-    var _this5;
+    var _this6;
 
     _classCallCheck(this, Effects);
 
-    _this5 = _super11.call(this, externlist);
+    _this6 = _super11.call(this, externlist);
     window.storage.registerConstructor(Effects);
-    return _this5;
+    return _this6;
   }
 
   _createClass(Effects, [{
@@ -7043,15 +7112,15 @@ var BeeHive = /*#__PURE__*/function (_DngDungeon) {
   var _super13 = _createSuper(BeeHive);
 
   function BeeHive() {
-    var _this6;
+    var _this7;
 
     _classCallCheck(this, BeeHive);
 
-    _this6 = _super13.call(this, "BeeHive", "There seem to live alot of giant bees here.");
+    _this7 = _super13.call(this, "BeeHive", "There seem to live alot of giant bees here.");
 
-    _this6.buildFloors();
+    _this7.buildFloors();
 
-    return _this6;
+    return _this7;
   }
 
   _createClass(BeeHive, [{
@@ -7596,13 +7665,13 @@ var LighterDad = /*#__PURE__*/function (_Item2) {
   var _super14 = _createSuper(LighterDad);
 
   function LighterDad() {
-    var _this7;
+    var _this8;
 
     _classCallCheck(this, LighterDad);
 
-    _this7 = _super14.call(this, 'LighterDad');
-    _this7.desc = 'I got this lighter from my real dad.';
-    return _this7;
+    _this8 = _super14.call(this, 'LighterDad');
+    _this8.desc = 'I got this lighter from my real dad.';
+    return _this8;
   }
 
   _createClass(LighterDad, [{
@@ -7628,13 +7697,13 @@ var Money = /*#__PURE__*/function (_Item3) {
   var _super15 = _createSuper(Money);
 
   function Money() {
-    var _this8;
+    var _this9;
 
     _classCallCheck(this, Money);
 
-    _this8 = _super15.call(this, 'Money');
-    _this8.desc = 'shiny,clinky coin.';
-    return _this8;
+    _this9 = _super15.call(this, 'Money');
+    _this9.desc = 'shiny,clinky coin.';
+    return _this9;
   }
 
   _createClass(Money, [{
@@ -7660,13 +7729,13 @@ var LaptopPS = /*#__PURE__*/function (_Item4) {
   var _super16 = _createSuper(LaptopPS);
 
   function LaptopPS() {
-    var _this9;
+    var _this10;
 
     _classCallCheck(this, LaptopPS);
 
-    _this9 = _super16.call(this, 'Laptop-PS');
-    _this9.desc = 'Power converter for laptop.';
-    return _this9;
+    _this10 = _super16.call(this, 'Laptop-PS');
+    _this10.desc = 'Power converter for laptop.';
+    return _this10;
   }
 
   _createClass(LaptopPS, [{
@@ -7692,13 +7761,13 @@ var Dildo_small = /*#__PURE__*/function (_Item5) {
   var _super17 = _createSuper(Dildo_small);
 
   function Dildo_small() {
-    var _this10;
+    var _this11;
 
     _classCallCheck(this, Dildo_small);
 
-    _this10 = _super17.call(this, 'Dildo_small');
-    _this10.desc = 'A dildo, smaller than an average dong, made from rubbery plastic.';
-    return _this10;
+    _this11 = _super17.call(this, 'Dildo_small');
+    _this11.desc = 'A dildo, smaller than an average dong, made from rubbery plastic.';
+    return _this11;
   }
 
   _createClass(Dildo_small, [{
@@ -7724,13 +7793,13 @@ var Lube = /*#__PURE__*/function (_Item6) {
   var _super18 = _createSuper(Lube);
 
   function Lube() {
-    var _this11;
+    var _this12;
 
     _classCallCheck(this, Lube);
 
-    _this11 = _super18.call(this, 'Lube');
-    _this11.desc = 'Slippery lubricant for personal use.';
-    return _this11;
+    _this12 = _super18.call(this, 'Lube');
+    _this12.desc = 'Slippery lubricant for personal use.';
+    return _this12;
   }
 
   _createClass(Lube, [{
@@ -7756,13 +7825,13 @@ var Battery = /*#__PURE__*/function (_Item7) {
   var _super19 = _createSuper(Battery);
 
   function Battery() {
-    var _this12;
+    var _this13;
 
     _classCallCheck(this, Battery);
 
-    _this12 = _super19.call(this, 'Battery');
-    _this12.desc = 'Provides electricity for devices.';
-    return _this12;
+    _this13 = _super19.call(this, 'Battery');
+    _this13.desc = 'Provides electricity for devices.';
+    return _this13;
   }
 
   _createClass(Battery, [{
@@ -7788,13 +7857,13 @@ var SilverPowderBomb = /*#__PURE__*/function (_Item8) {
   var _super20 = _createSuper(SilverPowderBomb);
 
   function SilverPowderBomb() {
-    var _this13;
+    var _this14;
 
     _classCallCheck(this, SilverPowderBomb);
 
-    _this13 = _super20.call(this, 'SilverPowderBomb');
-    _this13.desc = 'Very effective against shapeshifters.';
-    return _this13;
+    _this14 = _super20.call(this, 'SilverPowderBomb');
+    _this14.desc = 'Very effective against shapeshifters.';
+    return _this14;
   }
 
   _createClass(SilverPowderBomb, [{
@@ -7858,7 +7927,7 @@ var SilverPowderBomb = /*#__PURE__*/function (_Item8) {
             for (_iterator25.s(); !(_step25 = _iterator25.n()).done;) {
               var _targ = _step25.value;
 
-              _targ.addEffect(effStunned.name, new effStunned()); //'SilverPowderBomb:Stunned'
+              _targ.addEffect(effStunned.name, new effStunned()); //todo should 'SilverPowderBomb:Stunned' merge with other stunned? 
 
 
               result.msg += _targ.name + ' got stunned. ';
@@ -7892,13 +7961,13 @@ var CanOfCoffee = /*#__PURE__*/function (_Item9) {
   var _super21 = _createSuper(CanOfCoffee);
 
   function CanOfCoffee() {
-    var _this14;
+    var _this15;
 
     _classCallCheck(this, CanOfCoffee);
 
-    _this14 = _super21.call(this, 'CanOfCoffee');
-    _this14.desc = 'Cold coffee in a can. Tasty? Not really!';
-    return _this14;
+    _this15 = _super21.call(this, 'CanOfCoffee');
+    _this15.desc = 'Cold coffee in a can. Tasty? Not really!';
+    return _this15;
   }
 
   _createClass(CanOfCoffee, [{
@@ -7954,13 +8023,13 @@ var SimpleFood = /*#__PURE__*/function (_Item10) {
   var _super22 = _createSuper(SimpleFood);
 
   function SimpleFood() {
-    var _this15;
+    var _this16;
 
     _classCallCheck(this, SimpleFood);
 
-    _this15 = _super22.call(this, 'SimpleFood');
-    _this15.desc = 'Something to eat.';
-    return _this15;
+    _this16 = _super22.call(this, 'SimpleFood');
+    _this16.desc = 'Something to eat.';
+    return _this16;
   }
 
   _createClass(SimpleFood, [{
@@ -8072,17 +8141,17 @@ var Mole = /*#__PURE__*/function (_Mob) {
   var _super23 = _createSuper(Mole);
 
   function Mole() {
-    var _this16;
+    var _this17;
 
     _classCallCheck(this, Mole);
 
-    _this16 = _super23.call(this);
-    _this16.name = 'Mole';
-    _this16.pic = 'assets/mole.jpg';
+    _this17 = _super23.call(this);
+    _this17.name = 'Mole';
+    _this17.pic = 'assets/mole.jpg';
 
-    _this16.Stats.increment('healthMax', -1 * (_this16.health().max - 20));
+    _this17.Stats.increment('healthMax', -1 * (_this17.health().max - 20));
 
-    return _this16;
+    return _this17;
   }
 
   return Mole;
@@ -8096,23 +8165,26 @@ var Mechanic = /*#__PURE__*/function (_Mob2) {
   var _super24 = _createSuper(Mechanic);
 
   function Mechanic() {
-    var _this17;
+    var _this18;
 
     _classCallCheck(this, Mechanic);
 
-    _this17 = _super24.call(this);
-    _this17.name = 'Mechanic-Guy';
-    _this17.pic = 'assets/mechanic.jpg';
-    return _this17;
+    _this18 = _super24.call(this);
+    _this18.name = 'Mechanic-Guy';
+    _this18.pic = 'assets/mechanic.jpg';
+    return _this18;
   }
 
   _createClass(Mechanic, [{
     key: "calcCombatMove",
-    value: function calcCombatMove() {
+    value: function calcCombatMove(enemys, friends) {
       var result = this._canAct();
 
+      result.action = result.target = null;
+
       if (window.story.state.combat.turnCount < 3) {
-        result = window.gm.Encounter.execCombatCmd(window.gm.combat.moveStun);
+        result.action = "Stun";
+        result.target = [enemys[rnd]];
         result.msg = this.name + " trys to hit your head whith his wrench.</br>" + result.msg;
         return result;
       }
@@ -8154,16 +8226,16 @@ var Leggings = /*#__PURE__*/function (_Equipment) {
   var _super25 = _createSuper(Leggings);
 
   function Leggings() {
-    var _this18;
+    var _this19;
 
     _classCallCheck(this, Leggings);
 
-    _this18 = _super25.call(this, 'Leggings');
-    _this18.tags = ['cloth'];
-    _this18.slotUse = ['Legs'];
-    _this18.desc = 'Spandex-leggings for sport. (agility+)';
+    _this19 = _super25.call(this, 'Leggings');
+    _this19.tags = ['cloth'];
+    _this19.slotUse = ['Legs'];
+    _this19.desc = 'Spandex-leggings for sport. (agility+)';
     window.storage.registerConstructor(Leggings);
-    return _this18;
+    return _this19;
   }
 
   _createClass(Leggings, [{
@@ -8226,16 +8298,16 @@ var Jeans = /*#__PURE__*/function (_Equipment2) {
   var _super26 = _createSuper(Jeans);
 
   function Jeans() {
-    var _this19;
+    var _this20;
 
     _classCallCheck(this, Jeans);
 
-    _this19 = _super26.call(this, 'Jeans');
-    _this19.tags = ['cloth'];
-    _this19.slotUse = ['Legs'];
-    _this19.desc = 'plain old blue jeans';
+    _this20 = _super26.call(this, 'Jeans');
+    _this20.tags = ['cloth'];
+    _this20.slotUse = ['Legs'];
+    _this20.desc = 'plain old blue jeans';
     window.storage.registerConstructor(Jeans);
-    return _this19;
+    return _this20;
   }
 
   _createClass(Jeans, [{
@@ -8275,16 +8347,16 @@ var TankShirt = /*#__PURE__*/function (_Equipment3) {
   var _super27 = _createSuper(TankShirt);
 
   function TankShirt() {
-    var _this20;
+    var _this21;
 
     _classCallCheck(this, TankShirt);
 
-    _this20 = _super27.call(this, 'TankShirt');
-    _this20.tags = ['cloth'];
-    _this20.slotUse = ['Torso'];
-    _this20.desc = 'light blue tank-top';
+    _this21 = _super27.call(this, 'TankShirt');
+    _this21.tags = ['cloth'];
+    _this21.slotUse = ['Torso'];
+    _this21.desc = 'light blue tank-top';
     window.storage.registerConstructor(TankShirt);
-    return _this20;
+    return _this21;
   }
 
   _createClass(TankShirt, [{
@@ -8324,16 +8396,16 @@ var Pullover = /*#__PURE__*/function (_Equipment4) {
   var _super28 = _createSuper(Pullover);
 
   function Pullover() {
-    var _this21;
+    var _this22;
 
     _classCallCheck(this, Pullover);
 
-    _this21 = _super28.call(this, 'Pullover');
-    _this21.tags = ['cloth'];
-    _this21.slotUse = ['Torso', 'Arms'];
-    _this21.desc = 'warm pullover';
+    _this22 = _super28.call(this, 'Pullover');
+    _this22.tags = ['cloth'];
+    _this22.slotUse = ['Torso', 'Arms'];
+    _this22.desc = 'warm pullover';
     window.storage.registerConstructor(Pullover);
-    return _this21;
+    return _this22;
   }
 
   _createClass(Pullover, [{
@@ -8373,16 +8445,16 @@ var HandCuffs = /*#__PURE__*/function (_Equipment5) {
   var _super29 = _createSuper(HandCuffs);
 
   function HandCuffs() {
-    var _this22;
+    var _this23;
 
     _classCallCheck(this, HandCuffs);
 
-    _this22 = _super29.call(this, 'HandCuffs');
-    _this22.tags = ['restrain'];
-    _this22.slotUse = ['RHand', 'LHand'];
-    _this22.desc = 'handcuffs';
+    _this23 = _super29.call(this, 'HandCuffs');
+    _this23.tags = ['restrain'];
+    _this23.slotUse = ['RHand', 'LHand'];
+    _this23.desc = 'handcuffs';
     window.storage.registerConstructor(Pullover);
-    return _this22;
+    return _this23;
   }
 
   _createClass(HandCuffs, [{
@@ -8450,16 +8522,16 @@ var Crowbar = /*#__PURE__*/function (_Equipment6) {
   var _super30 = _createSuper(Crowbar);
 
   function Crowbar() {
-    var _this23;
+    var _this24;
 
     _classCallCheck(this, Crowbar);
 
-    _this23 = _super30.call(this, 'Crowbar');
-    _this23.desc = 'A durable crowbar.';
-    _this23.tags = ['tool', 'weapon'];
-    _this23.slotUse = ['RHand'];
+    _this24 = _super30.call(this, 'Crowbar');
+    _this24.desc = 'A durable crowbar.';
+    _this24.tags = ['tool', 'weapon'];
+    _this24.slotUse = ['RHand'];
     window.storage.registerConstructor(Crowbar);
-    return _this23;
+    return _this24;
   }
 
   _createClass(Crowbar, [{
@@ -8549,16 +8621,16 @@ var Shovel = /*#__PURE__*/function (_Equipment7) {
   var _super31 = _createSuper(Shovel);
 
   function Shovel() {
-    var _this24;
+    var _this25;
 
     _classCallCheck(this, Shovel);
 
-    _this24 = _super31.call(this, 'Shovel');
-    _this24.desc = 'A rusty,old shovel.';
-    _this24.tags = ['tool', 'weapon'];
-    _this24.slotUse = ['RHand', 'LHand'];
+    _this25 = _super31.call(this, 'Shovel');
+    _this25.desc = 'A rusty,old shovel.';
+    _this25.tags = ['tool', 'weapon'];
+    _this25.slotUse = ['RHand', 'LHand'];
     window.storage.registerConstructor(Shovel);
-    return _this24;
+    return _this25;
   }
 
   _createClass(Shovel, [{
@@ -8647,16 +8719,16 @@ var TailRibbon = /*#__PURE__*/function (_Equipment8) {
   var _super32 = _createSuper(TailRibbon);
 
   function TailRibbon() {
-    var _this25;
+    var _this26;
 
     _classCallCheck(this, TailRibbon);
 
-    _this25 = _super32.call(this, 'TailRibbon');
-    _this25.tags = ['cloth'];
-    _this25.slotUse = ['TailTip'];
-    _this25.desc = 'a fancy color band that can be wrapped around someones tailtip';
+    _this26 = _super32.call(this, 'TailRibbon');
+    _this26.tags = ['cloth'];
+    _this26.slotUse = ['TailTip'];
+    _this26.desc = 'a fancy color band that can be wrapped around someones tailtip';
     window.storage.registerConstructor(TailRibbon);
-    return _this25;
+    return _this26;
   }
 
   _createClass(TailRibbon, [{
@@ -8710,16 +8782,16 @@ var TailNone = /*#__PURE__*/function (_Equipment9) {
   var _super33 = _createSuper(TailNone);
 
   function TailNone() {
-    var _this26;
+    var _this27;
 
     _classCallCheck(this, TailNone);
 
-    _this26 = _super33.call(this, 'TailNone');
-    _this26.tags = ['body'];
-    _this26.slotUse = ['bTailBase'];
-    _this26.desc = '';
+    _this27 = _super33.call(this, 'TailNone');
+    _this27.tags = ['body'];
+    _this27.slotUse = ['bTailBase'];
+    _this27.desc = '';
     window.storage.registerConstructor(TailNone);
-    return _this26;
+    return _this27;
   }
 
   _createClass(TailNone, [{
@@ -8759,20 +8831,20 @@ var TailCat = /*#__PURE__*/function (_Equipment10) {
   var _super34 = _createSuper(TailCat);
 
   function TailCat() {
-    var _this27;
+    var _this28;
 
     _classCallCheck(this, TailCat);
 
-    _this27 = _super34.call(this, 'TailCat');
-    _this27.tags = ['body'];
-    _this27.slotUse = ['bTailBase'];
-    _this27.desc = 'a flexible,furred tail like that of a cat.';
-    _this27.growth = 0.10; //in %/100 maxGrowth
+    _this28 = _super34.call(this, 'TailCat');
+    _this28.tags = ['body'];
+    _this28.slotUse = ['bTailBase'];
+    _this28.desc = 'a flexible,furred tail like that of a cat.';
+    _this28.growth = 0.10; //in %/100 maxGrowth
 
-    _this27.maxGrowth = 1.2; //in meter, todo depends on bodysize
+    _this28.maxGrowth = 1.2; //in meter, todo depends on bodysize
 
     window.storage.registerConstructor(TailCat);
-    return _this27;
+    return _this28;
   }
 
   _createClass(TailCat, [{
@@ -8812,20 +8884,20 @@ var BreastHuman = /*#__PURE__*/function (_Equipment11) {
   var _super35 = _createSuper(BreastHuman);
 
   function BreastHuman() {
-    var _this28;
+    var _this29;
 
     _classCallCheck(this, BreastHuman);
 
-    _this28 = _super35.call(this, 'BreastHuman');
-    _this28.tags = ['body'];
-    _this28.slotUse = ['bBreast'];
-    _this28.desc = 'some human breasts.';
-    _this28.growth = 0.0; //in %/100 maxGrowth
+    _this29 = _super35.call(this, 'BreastHuman');
+    _this29.tags = ['body'];
+    _this29.slotUse = ['bBreast'];
+    _this29.desc = 'some human breasts.';
+    _this29.growth = 0.0; //in %/100 maxGrowth
 
-    _this28.maxGrowth = 0.3; //in meter, todo depends on bodysize
+    _this29.maxGrowth = 0.3; //in meter, todo depends on bodysize
 
     window.storage.registerConstructor(BreastHuman);
-    return _this28;
+    return _this29;
   }
 
   _createClass(BreastHuman, [{
@@ -8865,20 +8937,20 @@ var VulvaHuman = /*#__PURE__*/function (_Equipment12) {
   var _super36 = _createSuper(VulvaHuman);
 
   function VulvaHuman() {
-    var _this29;
+    var _this30;
 
     _classCallCheck(this, VulvaHuman);
 
-    _this29 = _super36.call(this, 'VulvaHuman');
-    _this29.tags = ['body'];
-    _this29.slotUse = ['bVulva'];
-    _this29.desc = 'a human cooter.';
-    _this29.growth = 0.0; //in %/100 maxGrowth
+    _this30 = _super36.call(this, 'VulvaHuman');
+    _this30.tags = ['body'];
+    _this30.slotUse = ['bVulva'];
+    _this30.desc = 'a human cooter.';
+    _this30.growth = 0.0; //in %/100 maxGrowth
 
-    _this29.maxGrowth = 0.2; //in meter, todo depends on bodysize
+    _this30.maxGrowth = 0.2; //in meter, todo depends on bodysize
 
     window.storage.registerConstructor(VulvaHuman);
-    return _this29;
+    return _this30;
   }
 
   _createClass(VulvaHuman, [{
@@ -9124,11 +9196,17 @@ var stRelation = /*#__PURE__*/function (_Stat) {
       var _stat = new stRelation();
 
       var _n = _stat.data;
-      _n.id = person + "_Max", _n.base = max, _n.value = max;
+      _n.id = person + "_Max", _n.base = max, _n.value = max, _n.limits = [{
+        max: 999,
+        min: -999
+      }];
       context.addItem(_stat);
       _stat = new stRelation();
       _n = _stat.data;
-      _n.id = person + "_Min", _n.base = 0, _n.value = 0;
+      _n.id = person + "_Min", _n.base = 0, _n.value = 0, _n.limits = [{
+        max: 999,
+        min: -999
+      }];
       context.addItem(_stat);
       _stat = new stRelation();
       _n = _stat.data;
@@ -9187,6 +9265,9 @@ var stHealthMax = /*#__PURE__*/function (_Stat2) {
       var _n = _stat.data;
       _n.id = 'healthMax', _n.base = max, _n.value = max, _n.modifys = [{
         id: 'health'
+      }], _n.limits = [{
+        max: 99999,
+        min: 0
       }];
       context.addItem(_stat); //_stat.Calc(); cause problem because health not yet present
     }
@@ -9228,7 +9309,7 @@ var stHealth = /*#__PURE__*/function (_Stat3) {
       var _n = _stat.data;
       _n.id = 'health', _n.base = base, _n.value = base, _n.limits = [{
         max: 'healthMax',
-        min: ''
+        min: 0
       }];
       context.addItem(_stat);
 
@@ -9270,9 +9351,11 @@ var stEnergyMax = /*#__PURE__*/function (_Stat4) {
       var _n = _stat.data;
       _n.id = 'energyMax', _n.base = max, _n.value = max, _n.modifys = [{
         id: 'energy'
+      }], _n.limits = [{
+        max: 99999,
+        min: 0
       }];
-      ;
-      context.addItem(_stat); //_stat.Calc();
+      context.addItem(_stat);
     }
   }]);
 
@@ -9312,7 +9395,7 @@ var stEnergy = /*#__PURE__*/function (_Stat5) {
       var _n = _stat.data;
       _n.id = 'energy', _n.base = base, _n.value = base, _n.limits = [{
         max: 'energyMax',
-        min: ''
+        min: 0
       }];
       context.addItem(_stat);
 
@@ -9352,7 +9435,10 @@ var stArousalMax = /*#__PURE__*/function (_Stat6) {
       var _stat = new stArousalMax();
 
       var _n = _stat.data;
-      _n.id = 'arousalMax', _n.base = max, _n.value = max, _n.hidden = 3;
+      _n.id = 'arousalMax', _n.base = max, _n.value = max, _n.hidden = 3, _n.limits = [{
+        max: 999,
+        min: 0
+      }];
       context.addItem(_stat);
 
       _stat.Calc();
@@ -9391,7 +9477,10 @@ var stArousalMin = /*#__PURE__*/function (_Stat7) {
       var _stat = new stArousalMin();
 
       var _n = _stat.data;
-      _n.id = 'arousalMin', _n.base = 0, _n.value = 0, _n.hidden = 1;
+      _n.id = 'arousalMin', _n.base = 0, _n.value = 0, _n.hidden = 1, _n.limits = [{
+        max: 999,
+        min: 0
+      }];
       context.addItem(_stat);
 
       _stat.Calc();
@@ -9476,8 +9565,8 @@ var stPerversionMax = /*#__PURE__*/function (_Stat9) {
 
       var _n = _stat.data;
       _n.id = 'perversionMax', _n.hidden = 3, _n.base = base, _n.value = base, _n.limits = [{
-        max: '',
-        min: ''
+        max: 99999,
+        min: 0
       }];
       context.addItem(_stat);
 
@@ -9521,7 +9610,7 @@ var stPerversion = /*#__PURE__*/function (_Stat10) {
       var _n = _stat.data;
       _n.id = 'perversion', _n.hidden = 3, _n.base = base, _n.value = base, _n.limits = [{
         max: 'perversionMax',
-        min: ''
+        min: 0
       }];
       context.addItem(_stat);
 
@@ -9564,6 +9653,9 @@ var stAgility = /*#__PURE__*/function (_Stat11) {
       var _n = _stat.data;
       _n.id = 'agility', _n.base = base, _n.value = base, _n.modifys = [{
         id: 'energyMax'
+      }], _n.limits = [{
+        max: 999,
+        min: 0
       }];
       context.addItem(_stat);
 
@@ -9612,7 +9704,10 @@ var stPerception = /*#__PURE__*/function (_Stat12) {
       var _stat = new stPerception();
 
       var _n = _stat.data;
-      _n.id = 'perception', _n.base = base, _n.value = base;
+      _n.id = 'perception', _n.base = base, _n.value = base, _n.limits = [{
+        max: 999,
+        min: 0
+      }];
       context.addItem(_stat);
 
       _stat.Calc();
@@ -9655,7 +9750,10 @@ var stLuck = /*#__PURE__*/function (_Stat13) {
       var _stat = new stLuck();
 
       var _n = _stat.data;
-      _n.id = 'luck', _n.base = base, _n.value = base;
+      _n.id = 'luck', _n.base = base, _n.value = base, _n.limits = [{
+        max: 999,
+        min: 0
+      }];
       context.addItem(_stat);
 
       _stat.Calc();
@@ -9698,7 +9796,10 @@ var stCharisma = /*#__PURE__*/function (_Stat14) {
       var _stat = new stCharisma();
 
       var _n = _stat.data;
-      _n.id = 'charisma', _n.base = base, _n.value = base;
+      _n.id = 'charisma', _n.base = base, _n.value = base, _n.limits = [{
+        max: 999,
+        min: 0
+      }];
       context.addItem(_stat);
 
       _stat.Calc();
@@ -9741,7 +9842,10 @@ var stIntelligence = /*#__PURE__*/function (_Stat15) {
       var _stat = new stIntelligence();
 
       var _n = _stat.data;
-      _n.id = 'intelligence', _n.base = base, _n.value = base;
+      _n.id = 'intelligence', _n.base = base, _n.value = base, _n.limits = [{
+        max: 999,
+        min: 0
+      }];
       context.addItem(_stat);
 
       _stat.Calc();
@@ -9896,7 +10000,10 @@ var stPAttack = /*#__PURE__*/function (_Stat18) {
       var _stat = new stPAttack();
 
       var _n = _stat.data;
-      _n.id = 'pAttack', _n.base = base, _n.value = base;
+      _n.id = 'pAttack', _n.base = base, _n.value = base, _n.limits = [{
+        max: 99999,
+        min: 0
+      }];
       context.addItem(_stat);
 
       _stat.Calc();
@@ -9936,7 +10043,10 @@ var stPDefense = /*#__PURE__*/function (_Stat19) {
       var _stat = new stPAttack();
 
       var _n = _stat.data;
-      _n.id = 'pDefense', _n.base = base, _n.value = base;
+      _n.id = 'pDefense', _n.base = base, _n.value = base, _n.limits = [{
+        max: 99999,
+        min: 0
+      }];
       context.addItem(_stat);
 
       _stat.Calc();
@@ -9971,13 +10081,13 @@ var effEnergized = /*#__PURE__*/function (_Effect2) {
   var _super56 = _createSuper(effEnergized);
 
   function effEnergized() {
-    var _this30;
+    var _this31;
 
     _classCallCheck(this, effEnergized);
 
-    _this30 = _super56.call(this);
-    _this30.data.id = _this30.data.name = effEnergized.name, _this30.data.duration = 120;
-    return _this30;
+    _this31 = _super56.call(this);
+    _this31.data.id = _this31.data.name = effEnergized.name, _this31.data.duration = 120;
+    return _this31;
   }
 
   _createClass(effEnergized, [{
@@ -10046,13 +10156,13 @@ var effNotTired = /*#__PURE__*/function (_Effect3) {
   var _super57 = _createSuper(effNotTired);
 
   function effNotTired() {
-    var _this31;
+    var _this32;
 
     _classCallCheck(this, effNotTired);
 
-    _this31 = _super57.call(this);
-    _this31.data.id = _this31.data.name = effNotTired.name, _this31.data.duration = 120, _this31.data.hidden = 4;
-    return _this31;
+    _this32 = _super57.call(this);
+    _this32.data.id = _this32.data.name = effNotTired.name, _this32.data.duration = 120, _this32.data.hidden = 4;
+    return _this32;
   }
 
   _createClass(effNotTired, [{
@@ -10115,13 +10225,13 @@ var effTired = /*#__PURE__*/function (_Effect4) {
   var _super58 = _createSuper(effTired);
 
   function effTired() {
-    var _this32;
+    var _this33;
 
     _classCallCheck(this, effTired);
 
-    _this32 = _super58.call(this);
-    _this32.data.id = _this32.data.name = effTired.name, _this32.data.duration = 120, _this32.data.hidden = 0;
-    return _this32;
+    _this33 = _super58.call(this);
+    _this33.data.id = _this33.data.name = effTired.name, _this33.data.duration = 120, _this33.data.hidden = 0;
+    return _this33;
   }
 
   _createClass(effTired, [{
@@ -10190,13 +10300,13 @@ var effMutateCat = /*#__PURE__*/function (_Effect5) {
   var _super59 = _createSuper(effMutateCat);
 
   function effMutateCat() {
-    var _this33;
+    var _this34;
 
     _classCallCheck(this, effMutateCat);
 
-    _this33 = _super59.call(this);
-    _this33.data.id = _this33.data.name = effMutateCat.name, _this33.data.duration = 60, _this33.data.hidden = 0;
-    return _this33;
+    _this34 = _super59.call(this);
+    _this34.data.id = _this34.data.name = effMutateCat.name, _this34.data.duration = 60, _this34.data.hidden = 0;
+    return _this34;
   }
 
   _createClass(effMutateCat, [{
@@ -10258,14 +10368,14 @@ var effGrowBreast = /*#__PURE__*/function (_Effect6) {
   var _super60 = _createSuper(effGrowBreast);
 
   function effGrowBreast() {
-    var _this34;
+    var _this35;
 
     _classCallCheck(this, effGrowBreast);
 
-    _this34 = _super60.call(this);
-    _this34.data.id = _this34.data.name = effGrowBreast.name, _this34.data.duration = 60, _this34.data.hidden = 0;
-    _this34.data.cycles = 3, _this34.data.magnitude = 3;
-    return _this34;
+    _this35 = _super60.call(this);
+    _this35.data.id = _this35.data.name = effGrowBreast.name, _this35.data.duration = 60, _this35.data.hidden = 0;
+    _this35.data.cycles = 3, _this35.data.magnitude = 3;
+    return _this35;
   }
 
   _createClass(effGrowBreast, [{
@@ -10331,14 +10441,14 @@ var effHeal = /*#__PURE__*/function (_CombatEffect) {
   var _super61 = _createSuper(effHeal);
 
   function effHeal(amount) {
-    var _this35;
+    var _this36;
 
     _classCallCheck(this, effHeal);
 
-    _this35 = _super61.call(this);
-    _this35.amount = amount;
-    _this35.data.id = _this35.data.name = effHeal.name, _this35.data.duration = 0, _this35.data.hidden = 0;
-    return _this35;
+    _this36 = _super61.call(this);
+    _this36.amount = amount;
+    _this36.data.id = _this36.data.name = effHeal.name, _this36.data.duration = 0, _this36.data.hidden = 0;
+    return _this36;
   }
 
   _createClass(effHeal, [{
@@ -10394,20 +10504,97 @@ var effHeal = /*#__PURE__*/function (_CombatEffect) {
   return effHeal;
 }(CombatEffect);
 
-var effDamage = /*#__PURE__*/function (_CombatEffect2) {
-  _inherits(effDamage, _CombatEffect2);
+var effGuard = /*#__PURE__*/function (_CombatEffect2) {
+  _inherits(effGuard, _CombatEffect2);
 
-  var _super62 = _createSuper(effDamage);
+  var _super62 = _createSuper(effGuard);
+
+  function effGuard(amount) {
+    var _this37;
+
+    _classCallCheck(this, effGuard);
+
+    _this37 = _super62.call(this);
+    _this37.amount = amount;
+    _this37.data.id = _this37.data.name = effGuard.name, _this37.data.duration = 0, _this37.data.hidden = 0;
+    return _this37;
+  }
+
+  _createClass(effGuard, [{
+    key: "toJSON",
+    value: function toJSON() {
+      return window.storage.Generic_toJSON("effGuard", this);
+    }
+  }, {
+    key: "onApply",
+    value: function onApply() {
+      this.data.duration = 2;
+      this.parent.parent.Stats.addModifier('pDefense', {
+        id: 'pDefense:Guard',
+        bonus: 5
+      }); //Todo percentage
+    }
+  }, {
+    key: "merge",
+    value: function merge(neweffect) {
+      if (neweffect.name === this.data.name) {
+        //extends
+        this.onApply();
+        return true;
+      }
+    }
+  }, {
+    key: "onCombatEnd",
+    value: function onCombatEnd() {
+      this.parent.removeItem(this.data.id);
+    }
+  }, {
+    key: "onTurnStart",
+    value: function onTurnStart() {
+      this.data.duration -= 1;
+      if (this.data.duration <= 0) this.parent.removeItem(this.data.id);
+    }
+  }, {
+    key: "onRemove",
+    value: function onRemove() {
+      this.parent.parent.Stats.removeModifier('pDefense', {
+        id: 'pDefense:Guard'
+      });
+    }
+  }, {
+    key: "desc",
+    get: function get() {
+      return effGuard.name;
+    }
+  }, {
+    key: "shortDesc",
+    get: function get() {
+      return this.desc + " for " + this.data.duration + " turns";
+    }
+  }], [{
+    key: "fromJSON",
+    value: function fromJSON(value) {
+      return window.storage.Generic_fromJSON(effGuard, value.data);
+    }
+  }]);
+
+  return effGuard;
+}(CombatEffect);
+
+var effDamage = /*#__PURE__*/function (_CombatEffect3) {
+  _inherits(effDamage, _CombatEffect3);
+
+  var _super63 = _createSuper(effDamage);
 
   function effDamage(amount) {
-    var _this36;
+    var _this38;
 
     _classCallCheck(this, effDamage);
 
-    _this36 = _super62.call(this);
-    _this36.amount = amount;
-    _this36.data.id = _this36.data.name = effDamage.name, _this36.data.duration = 0, _this36.data.hidden = 0;
-    return _this36;
+    _this38 = _super63.call(this);
+    _this38.amount = amount;
+    _this38.data.id = _this38.data.name = effDamage.name, _this38.data.duration = 0, _this38.data.hidden = 0;
+    return _this38;
   }
 
   _createClass(effDamage, [{
@@ -10461,19 +10648,19 @@ var effDamage = /*#__PURE__*/function (_CombatEffect2) {
   return effDamage;
 }(CombatEffect);
 
-var effStunned = /*#__PURE__*/function (_CombatEffect3) {
-  _inherits(effStunned, _CombatEffect3);
+var effStunned = /*#__PURE__*/function (_CombatEffect4) {
+  _inherits(effStunned, _CombatEffect4);
 
-  var _super63 = _createSuper(effStunned);
+  var _super64 = _createSuper(effStunned);
 
   function effStunned() {
-    var _this37;
+    var _this39;
 
     _classCallCheck(this, effStunned);
 
-    _this37 = _super63.call(this);
-    _this37.data.id = _this37.data.name = effStunned.name, _this37.data.duration = 2;
-    return _this37;
+    _this39 = _super64.call(this);
+    _this39.data.id = _this39.data.name = effStunned.name, _this39.data.duration = 2;
+    return _this39;
   }
 
   _createClass(effStunned, [{
@@ -10530,16 +10717,16 @@ var effStunned = /*#__PURE__*/function (_CombatEffect3) {
 var skCooking = /*#__PURE__*/function (_Effect7) {
   _inherits(skCooking, _Effect7);
 
-  var _super64 = _createSuper(skCooking);
+  var _super65 = _createSuper(skCooking);
 
   function skCooking() {
-    var _this38;
+    var _this40;
 
     _classCallCheck(this, skCooking);
 
-    _this38 = _super64.call(this);
-    _this38.data.id = _this38.data.name = skCooking.name;
-    return _this38;
+    _this40 = _super65.call(this);
+    _this40.data.id = _this40.data.name = skCooking.name;
+    return _this40;
   }
 
   _createClass(skCooking, [{
@@ -10604,7 +10791,7 @@ window.gm.StatsLib = function (StatsLib) {
   return StatsLib;
 }(window.gm.StatsLib || {});
 /* twine-user-script #2: "Story JavaScript" */
-</script><tw-tag name="_nosave" color="yellow"></tw-tag><tw-tag name="template" color="orange"></tw-tag><tw-tag name="_back" color="gray"></tw-tag><tw-passagedata pid="1" name="Info_Jake" tags="_back" position="100,100" size="100,100">&lt;section&gt; 
+</script><tw-tag name="template" color="orange"></tw-tag><tw-tag name="_back" color="gray"></tw-tag><tw-tag name="_nosave" color="yellow"></tw-tag><tw-passagedata pid="1" name="Info_Jake" tags="_back" position="100,100" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 Jake is here.&lt;/br&gt;
 You barely know anything about him.&lt;/br&gt;
@@ -11138,6 +11325,7 @@ A &lt;%=window.story.state.combat.enemyParty[0].name%&gt; appears ! &lt;/br&gt;
 &lt;div id=&quot;panel&quot;&gt;&lt;/div&gt;&lt;/br&gt;&lt;/br&gt; &lt;!--filled by statspanel--&gt;
 &lt;div id=&quot;choice&quot;&gt;&lt;/div&gt;&lt;/br&gt;&lt;/br&gt; &lt;!--filled by combat-statemachine--&gt;
 &lt;/br&gt;&lt;div id=&#39;output&#39;&gt;&lt;/div&gt;&lt;/br&gt;   &lt;!--message is rendered here--&gt;
+&lt;div id=&quot;choice2&quot;&gt;&lt;/div&gt;&lt;/br&gt;&lt;/br&gt; &lt;!--filled by combat-statemachine--&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;
 &lt;/section&gt;
 &lt;script&gt;

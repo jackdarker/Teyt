@@ -14,6 +14,7 @@ A <%=window.story.state.combat.enemyParty[0].name%> appears ! </br>
 <div id="panel"></div></br></br> <!--filled by statspanel-->
 <div id="choice"></div></br></br> <!--filled by combat-statemachine-->
 </br><div id='output'></div></br>   <!--message is rendered here-->
+<div id="choice2"></div></br></br> <!--filled by combat-statemachine-->
 </article><article id="LogPanel"></article>
 </section>
 <script>

@@ -75,7 +75,7 @@
 class Stat {
     static dataPrototype() {    
         return({id: '', base: 0,value: 0, limits: [],modifier:[], modifys:[], hidden:0});
-        //limit = {id: min: max:}   limit to apply to value and base
+        //limit = {min: max:}   limit to apply to value and base; either statid or number
         //modifier {id: calc:}      Stat that modifys value, calc is function(context,data)=> newvalue
         //modifys {id:}         point to the Stats that have modifiers from this stat or is used as limit
         //hidden 0 = visible, 1= name unreadable, 2= value unreadable, 4= hidden
@@ -103,9 +103,14 @@ class Stat {
         var max = 99999;
         var msg = '';
         //get limits
-        for(var k=0;k<attr.limits.length;k++) {
-            if (attr.limits[k].min!=='') min= Math.max(this.parent.get(attr.limits[k].min).value,min); //this might behave odly if any min>max
-            if (attr.limits[k].max!=='') max= Math.min(this.parent.get(attr.limits[k].max).value,max); 
+        for(var k=0;k<attr.limits.length;k++) {//this might behave odly if any min>max
+            let lmin = attr.limits[k].min, lmax = attr.limits[k].max;  //lm__ is id or number
+            if (lmin || lmin===0) {
+                min= (typeof lmin ==='string')? Math.max(this.parent.get(lmin).value,min): Math.max(lmin,min);
+            }
+            if (lmax || lmax===0) {
+                max=(typeof lmax ==='string') ? Math.min(this.parent.get(lmax).value,max): Math.min(lmax,max);
+            }
         }
         //recalculate modifiers
         var _old =  attr.value;

@@ -187,86 +187,86 @@ window.gm.pushDeferredEvent=function(id,args) {
   
     var cond = [cond1,cond2]; //passage is executed if any of the conds is met
     window.story.state.vars.defferedStack.push({id:id,cond:cond,args:args});
-  };
-  window.gm.removeDefferedEvent=function(id=""){
-    if(id!=="") {
-      for(var i=window.story.state.vars.defferedStack.length-1;i>0;i--) {
-        if(window.story.state.vars.defferedStack[i].id===id) 
-        window.story.state.vars.defferedStack.splice(i,1);
-      }
-    }else {
-      window.story.state.vars.defferedStack = [];
+};
+window.gm.removeDefferedEvent=function(id=""){
+  if(id!=="") {
+    for(var i=window.story.state.vars.defferedStack.length-1;i>0;i--) {
+      if(window.story.state.vars.defferedStack[i].id===id) 
+      window.story.state.vars.defferedStack.splice(i,1);
     }
+  }else {
+    window.story.state.vars.defferedStack = [];
   }
-  window.gm.hasDeferredEvent = function(id="") {
-    if(id!=="") {
-      for(var i=0;i<window.story.state.vars.defferedStack.length;i++) {
-        if(window.story.state.vars.defferedStack[i].id===id) return(true);
-      }
-      return(false);
-    } else {
-      return(window.story.state.vars.defferedStack.length>0);
+}
+window.gm.hasDeferredEvent = function(id="") {
+  if(id!=="") {
+    for(var i=0;i<window.story.state.vars.defferedStack.length;i++) {
+      if(window.story.state.vars.defferedStack[i].id===id) return(true);
     }
+    return(false);
+  } else {
+    return(window.story.state.vars.defferedStack.length>0);
   }
-  window.gm.showDeferredEvent= function() {
-    var msg = '';
-  
-    var namenext = window.passage.name;
-    var tagsnext = window.story.passage(namenext).tags;
-    var evt = window.story.state.vars.defferedStack.shift();
-    if(evt!==null) {
-      msg += window.gm.printPassageLink("Next",evt.id);
-    }
-    return msg;
-  }
-  //when show is called the previous passage is stored if the new has [_back]-tag
-  //if the new has no back-tag, the stack gets cleared
-  window.gm.pushPassage=function(id) {
-    if(!window.story.state.hasOwnProperty("vars")) return;  //vars exist only after initGame
-    if(window.story.state.vars.passageStack.length>0 && window.story.state.vars.passageStack[window.story.state.vars.passageStack.length-1]===id){
-      //already pushed
-    } else {
-      window.story.state.vars.passageStack.push(id);
-    }
-  };
-  //call on [_back]-passages to get the previous passage
-  window.gm.popPassage=function() {
-      var pass = window.story.state.vars.passageStack.pop();
-      if(!pass) return('nothing to pop from stack');
-      return(pass);
-  };
-  //overriding show:
-  //- to enable back-link
-  //- to intercept with deffered events
-  var _origStoryShow = window.story.__proto__.show;
-  window.story.__proto__.show = function(idOrName, noHistory = false) {
-    var next = idOrName;
-    var inGame = window.story.state.hasOwnProperty("vars");
-    var tagsnext;
-    if(idOrName === '_back') { //going back
-      next = window.gm.popPassage();
-      tagsnext = window.story.passage(next).tags;
-    } else {  //going forward
-      tagsnext = window.story.passage(next).tags;
-      var namenext = window.story.passage(next).name;
-      if(tagsnext.indexOf('_back')>=0 ) { //push on stack but only if not re-showing itself
-        if(namenext!=window.passage.name) window.gm.pushPassage(window.passage.name); 
-      } else if(inGame) { //...otherwise error on game start
-        window.story.state.vars.passageStack.splice(0,window.story.state.vars.passageStack.length);
-      }
-  }
+}
+window.gm.showDeferredEvent= function() {
+  var msg = '';
 
-  //disable save-menu on _nosave-tag 
-  if(inGame) {
-      window.story.state._gm.nosave = (tagsnext.indexOf('_nosave')>=0 );
+  var namenext = window.passage.name;
+  var tagsnext = window.story.passage(namenext).tags;
+  var evt = window.story.state.vars.defferedStack.shift();
+  if(evt!==null) {
+    msg += window.gm.printPassageLink("Next",evt.id);
   }
-    //Todo
-    //before entering a new passage check if there is a defferedEvent that we should do first
-    //if so, push the normal-passage onto stack, show deffered passage
-    //after the deffered passage(s) finish, make sure to show the original passage
-    //this is a problem?how do I know the deffered passage is done? 
-    _origStoryShow.call(window.story,next, noHistory);
-  };
+  return msg;
+}
+//when show is called the previous passage is stored if the new has [_back]-tag
+//if the new has no back-tag, the stack gets cleared
+window.gm.pushPassage=function(id) {
+  if(!window.story.state.hasOwnProperty("vars")) return;  //vars exist only after initGame
+  if(window.story.state.vars.passageStack.length>0 && window.story.state.vars.passageStack[window.story.state.vars.passageStack.length-1]===id){
+    //already pushed
+  } else {
+    window.story.state.vars.passageStack.push(id);
+  }
+};
+//call on [_back]-passages to get the previous passage
+window.gm.popPassage=function() {
+    var pass = window.story.state.vars.passageStack.pop();
+    if(!pass) return('nothing to pop from stack');
+    return(pass);
+};
+//overriding show:
+//- to enable back-link
+//- to intercept with deffered events
+var _origStoryShow = window.story.__proto__.show;
+window.story.__proto__.show = function(idOrName, noHistory = false) {
+  var next = idOrName;
+  var inGame = window.story.state.hasOwnProperty("vars");
+  var tagsnext;
+  if(idOrName === '_back') { //going back
+    next = window.gm.popPassage();
+    tagsnext = window.story.passage(next).tags;
+  } else {  //going forward
+    tagsnext = window.story.passage(next).tags;
+    var namenext = window.story.passage(next).name;
+    if(tagsnext.indexOf('_back')>=0 ) { //push on stack but only if not re-showing itself
+      if(namenext!=window.passage.name) window.gm.pushPassage(window.passage.name); 
+    } else if(inGame) { //...otherwise error on game start
+      window.story.state.vars.passageStack.splice(0,window.story.state.vars.passageStack.length);
+    }
+}
+
+//disable save-menu on _nosave-tag 
+if(inGame) {
+    window.story.state._gm.nosave = (tagsnext.indexOf('_nosave')>=0 );
+}
+  //Todo
+  //before entering a new passage check if there is a defferedEvent that we should do first
+  //if so, push the normal-passage onto stack, show deffered passage
+  //after the deffered passage(s) finish, make sure to show the original passage
+  //this is a problem?how do I know the deffered passage is done? 
+  _origStoryShow.call(window.story,next, noHistory);
+};
 //-----------------------------------------------------------------------------
 //changes the active player and will add him to party!
 window.gm.switchPlayer = function(playername) {
@@ -302,6 +302,7 @@ window.gm.refreshScreen= function() {
 window.gm.updateOtherPanels = function(){
   renderToSelector("#sidebar", "sidebar");renderToSelector("#LogPanel", "LogPanel"); 
 };
+///////////////////////////////////////////////////////////////////////
 window.gm.pushLog=function(msg,Cond=true) {
   if(!Cond) return;
   var log = window.story.state.vars.log;
@@ -327,6 +328,7 @@ window.gm.clearLog=function() {
   window.story.state.vars.log = [];
   return(msg);
 };
+//////////////////////////////////////////////////////////////////////
 window.gm.roll=function(n,sides) { //rolls n x dies with sides
   var rnd = 0;
   for(var i=0;i<n;i++) {
