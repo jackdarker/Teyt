@@ -271,7 +271,7 @@ class CombatEffect extends Effect {
     constructor() {
         super(); 
     }
-    get shortDesc() {return('missing description');}
+    get shortDesc() {return(this.desc+" for " + this.data.duration+" turns");}
     //duration in turns !
     static onCombatEnd(context,data) {}
     //called before targets turn

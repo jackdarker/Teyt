@@ -69,15 +69,6 @@ window.gm.initGame= function(forceReset,NGP=null) {
       //delete window.gm.Cyril; 
     }
     if (!s.Ratchel||forceReset) {  
-        /*s.Ratchel = Character.defaultData(); //get default struct and add some special data
-        s.Ratchel.name = 'Ratchel',
-        s.Ratchel.skillPoints = 2,    //no. of free skillpoints on game-start  
-        s.Ratchel.skSporty = 0,//perklevels ,name should match perkId
-        s.Ratchel.skCook = 0,
-        s.Ratchel.skSlacker = 0,
-        s.Ratchel.skMoneymaker = 0,
-        s.Ratchel.skTechy = 0;*/
-        //window.gm.Ratchel = new Character(s.Ratchel);
         window.gm.Ratchel = new Character();
         window.gm.Ratchel.name="Ratchel";
         window.gm.Ratchel.faction="Player";
@@ -86,16 +77,20 @@ window.gm.initGame= function(forceReset,NGP=null) {
         //add some basic inventory
         window.gm.Ratchel.Inv.addItem(new Money(),20);
         window.gm.Ratchel.Inv.addItem(new LighterDad());
-        window.gm.Ratchel.Inv.addItem(new SilverPowderBomb(),2);
+        window.gm.Ratchel.Inv.addItem(new FlashBang(),2);
         window.gm.Ratchel.Inv.addItem(new CanOfCoffee(),2);
         window.gm.Ratchel.Wardrobe.addItem(new Jeans());
+        window.gm.Ratchel.Wardrobe.addItem(new Sneakers());
         window.gm.Ratchel.Wardrobe.addItem(new Leggings());
         window.gm.Ratchel.Wardrobe.addItem(new TankShirt());
         window.gm.Ratchel.Wardrobe.addItem(new Pullover());
         window.gm.Ratchel.Wardrobe.addItem(new TailRibbon());
         window.gm.Ratchel.Outfit.addItem(new VulvaHuman());
         window.gm.Ratchel.Outfit.addItem(new Jeans());
+        window.gm.Ratchel.Outfit.addItem(new Sneakers());
         window.gm.Ratchel.Outfit.addItem(new Pullover());
+        //special skills
+        window.gm.Ratchel.Skills.addItem(SkillCallHelp.setup('Mole'));
         s.Ratchel=window.gm.Ratchel;
     }      
     window.gm.switchPlayer(s.Ratchel.name); //start-player

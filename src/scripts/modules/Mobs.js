@@ -9,6 +9,14 @@ class Mole extends Mob {
     }
     
 };
+class Wolf extends Mob {
+    constructor() {
+        super();
+        this.name = 'Wolf';
+        this.pic= 'assets/bw_wolf1.png';
+        //this.Stats.increment('healthMax',-1*(this.health().max+20));
+    }
+};
 class Mechanic extends Mob {
     constructor() {
         super();
@@ -37,6 +45,7 @@ window.gm.Mobs = (function (Mobs) {
     }*/
 
     Mobs.Mole = function () { return new Mole();  };    //add Mole-constructor to Mob-ollection
+    Mobs.Wolf = function () { return new Wolf();  };    
     Mobs.Mechanic = function () {return new Mechanic();};
     return Mobs; 
 }(window.gm.Mobs || {}));

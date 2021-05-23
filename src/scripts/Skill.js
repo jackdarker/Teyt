@@ -12,13 +12,14 @@ class SkillResult{
 
 
 class Skill {
-constructor(name,descr) {
+constructor(name) {
     this.name = name;
-    this.descr = descr;
 }
 //_parent will be added dynamical
 get parent() {return this._parent();}
 get caster() {return this.parent.parent;}
+//implement this for description
+get desc() { return(this.name);}
 getMaxTargetCount() {return 1;}
 
 isValidPhase() {
@@ -49,17 +50,13 @@ isValidTarget(target) {
     return true;
 }
 
-getCost(){
-        //returns information about the cost to execute the skill
-        return {}
+getCost(){ //Todo
+    //returns information about the cost to execute the skill
+    return {}
 }
 getName(){
-        //returns name of the skill for listboxes/labels"""
-        return this.name;
-}
-getDescription(){
-        //returns a description of the skill for tooltip
-        return this.descr;
+    //returns name of the skill for listboxes/labels"""
+    return this.name;
 }
 getCastDescription(result) {
     //update msg after sucessful cast
@@ -91,7 +88,7 @@ targetFilterSelf(targets){
         for(var target of targets) {
             var valid = true;
             for(var targ of target) {
-                if(this.caster != target) valid=false;
+                if(this.caster != targ) valid=false;
             }
             if(valid)
                 possibleTarget.push(target);           
@@ -180,9 +177,11 @@ targetMultiple(targets){
 class SkillAttack extends Skill {
     //execute simple attack with active weapon
     constructor() {
-        super("Attack","Attack");
+        super("Attack");
         this.msg = '';
     }
+    toJSON() {return window.storage.Generic_toJSON("SkillAttack", this); };
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillAttack, value.data));}
     targetFilter(targets){
         return(this.targetFilterEnemy(this.targetFilterAlive(targets)));
     }
@@ -211,9 +210,7 @@ class SkillAttack extends Skill {
 }
 class SkillStun extends Skill {
     //execute stun attack
-    constructor() {
-        super("Stun","Stun");
-    }
+    constructor() {  super("Stun");  }
     targetFilter(targets){
         var possibletarget = this.targetFilterFighting(this.targetFilterEnemy(targets));
         //[[mole1],[mole2]]
@@ -246,9 +243,7 @@ class SkillStun extends Skill {
     }
 }
 class SkillPoisonCloud extends Skill {
-    constructor() {
-        super("PoisonCloud","PoisonCloud");
-    }
+    constructor() {  super("PoisonCloud");  }
     targetFilter(targets){
         return(this.targetFilterFighting(this.targetFilterEnemy(targets)));
     }
@@ -272,33 +267,72 @@ class SkillPoisonCloud extends Skill {
     }
 }
 class SkillHeal extends Skill {
-    //execute stun attack
-    constructor() {
-        super("Heal","Heal");
-    }
+    constructor() { super("Heal");    }
     targetFilter(targets){
-        return(this.targetFilterAlive(targets));
+        return(this.targetFilterAlly(this.targetFilterAlive(targets)));
     }
-      previewCast(targets){
-          var result = new SkillResult()
-          result.skill =this;
-          result.source = this.caster;
-          result.targets = targets;
-          if(this.isValidTarget(targets)) {
-              result.OK = true;
-              for(var target of targets) {
-                  result.effects.push( {target:target,
-                      eff:[new effHeal(10)]})
-                  }
-          }
-          return result
-      }
+    previewCast(targets){
+        var result = new SkillResult()
+        result.skill =this;
+        result.source = this.caster;
+        result.targets = targets;
+        if(this.isValidTarget(targets)) {
+            result.OK = true;
+            for(var target of targets) {
+                result.effects.push( {target:target,
+                    eff:[new effHeal(10)]})
+                }
+        }
+        return result
+    }
+}
+class SkillFlee extends Skill {
+    constructor() { super("Flee");    }
+    targetFilter(targets){
+        return(this.targetFilterSelf(targets));
+    }
+    previewCast(targets){
+        var result = new SkillResult()
+        result.skill =this,result.source = this.caster, result.targets = targets;
+        if(this.isValidTarget(targets)) {
+            result.OK = true;
+            let rnd = _.random(1,100);
+            if(rnd >40) { //Todo fleeing chance calculation
+              result.msg += "You escaped the fight.";
+              window.story.state.combat.playerFleeing = true;  //just setting the flag, you have to take care of handling!
+            } else {
+              result.msg += "Your attempts to escape failed.";
+              //result.OK=false;
+            }
+        }
+        return result
+    }
+}
+class SkillSubmit extends Skill {
+    constructor() { super("Submit");    }
+    targetFilter(targets){
+        return(this.targetFilterSelf(targets));
+    }
+    previewCast(targets){
+        var result = new SkillResult()
+        result.skill =this,result.source = this.caster, result.targets = targets;
+        if(this.isValidTarget(targets)) {
+            result.OK = true;
+            let rnd = _.random(1,100);
+            if(rnd >0) { //Todo fleeing chance calculation
+                result.msg += "You submit to your foe.";
+                window.story.state.combat.playerSubmitting = true;  //just setting the flag, you have to take care of handling!
+            } else {
+                result.msg += "Your attempts to submit failed.";
+                //result.OK=false;
+            }
+        }
+        return result
+    }
 }
 class SkillGuard extends Skill {
     //todo improves defense
-    constructor() {
-        super("Guard","Guard");
-    }
+    constructor() { super("Guard");}
     targetFilter(targets){
         return(this.targetFilterSelf(targets));
     }
@@ -318,8 +352,7 @@ class SkillGuard extends Skill {
       }
 }
 class SkillUseItem extends Skill {
-    constructor() {
-        super("UseItem","UseItem");
+    constructor() {super("UseItem");
         this.item=null;
         this.msg = '';
     }
@@ -349,3 +382,45 @@ class SkillUseItem extends Skill {
         return(this.msg);
     }
 }
+//calls reinforcement; set item before casting to the mob-name to spawn
+class SkillCallHelp extends Skill {
+    static setup(item) {
+        let sk = new SkillCallHelp();
+        sk.item = item;
+        return(sk);
+    }
+    constructor() {
+        super("CallHelp");
+        this.item=null;
+        this.delay = 2;
+    } 
+    targetFilter(targets){
+        return(this.targetFilterSelf(targets));
+    }
+    previewCast(targets){
+        var result = new SkillResult()
+        result.skill =this,result.source = this.caster,result.targets = targets;
+        if(this.isValidTarget(targets)) {
+            result.OK = true;
+            for(var target of targets) {
+                let eff = new effCallHelp();
+                eff.configureSpawn(this.item,this.caster.faction);
+                result.effects.push( {target:target,eff:[eff]});
+            }
+        }
+        return result
+    }
+    isDisabled() { //Todo cooldown
+        return({OK:false,msg:''});
+    }
+    getCastDescription(result) {
+        return("Calls some "+this.item+" as reinforcement.");
+    }
+}
+window.gm.SkillsLib = (function (Lib) {
+    window.storage.registerConstructor(SkillAttack);
+TODO    window.storage.registerConstructor(SkillCallHelp);
+    //.. and Wardrobe
+    Lib['SkillAttack'] = function () { return new SkillAttack();};
+    return Lib; 
+}(window.gm.SkillsLib || {}));

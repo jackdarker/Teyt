@@ -501,7 +501,6 @@ class effHeal extends CombatEffect {
     toJSON() {return window.storage.Generic_toJSON("effHeal", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(effHeal, value.data);};
     get desc() {return(effHeal.name);}
-    get shortDesc() {return(this.desc+" for " + this.data.duration+" turns");}
     onApply(){
         this.data.duration = 2;
         this.parent.parent.Stats.increment('health',this.amount);
@@ -532,7 +531,6 @@ class effGuard extends CombatEffect {
     toJSON() {return window.storage.Generic_toJSON("effGuard", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(effGuard, value.data);};
     get desc() {return(effGuard.name);}
-    get shortDesc() {return(this.desc+" for " + this.data.duration+" turns");}
     onApply(){
         this.data.duration = 2;
         this.parent.parent.Stats.addModifier('pDefense',{id:'pDefense:Guard', bonus:5}); //Todo percentage
@@ -563,7 +561,6 @@ class effDamage extends CombatEffect {
     toJSON() {return window.storage.Generic_toJSON("effDamage", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(effDamage, value.data);};
     get desc() {return(effDamage.name);}
-    get shortDesc() {return(this.desc+" for " + this.data.duration+" turns");}
     onApply(){
         this.data.duration = 0;
         this.parent.parent.Stats.increment('health',-1*this.amount);
@@ -590,7 +587,6 @@ class effStunned extends CombatEffect {
     toJSON() {return window.storage.Generic_toJSON("effStunned", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(effStunned, value.data);};
     get desc() {return(effStunned.name);}
-    get shortDesc() {return(this.desc+" for " + this.data.duration+" turns");}
     onApply(){
         this.data.duration = 2;
     }
@@ -608,6 +604,36 @@ class effStunned extends CombatEffect {
         if(this.data.duration<=0) this.parent.removeItem(this.data.id);
     }
 } 
+class effCallHelp extends CombatEffect {
+    constructor() {
+        super();
+        this.data.id = this.data.name= effCallHelp.name, this.data.duration = 2;
+    }
+    toJSON() {return window.storage.Generic_toJSON("effCallHelp", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(effCallHelp, value.data);};
+    get desc() {return(effCallHelp.name);}
+    onApply(){
+        this.data.duration = 2;
+    }
+    merge(neweffect) {
+        if(neweffect.name===this.data.name) {    //ignore
+            return(true);
+        }
+    }
+    onCombatEnd() {
+        this.parent.removeItem(this.data.id);
+    }
+    onTurnStart() {
+        this.data.duration-=1;
+        if(this.data.duration<=0) {
+            window.gm.Encounter.spawnChar(this.data.item,this.data.faction,this.data.amount);
+            this.parent.removeItem(this.data.id);
+        }
+    }
+    configureSpawn(item,faction,amount=1) {
+        this.data.item=item,this.data.faction=faction,this.data.amount=amount;
+    }
+}
 //skills
 class skCooking extends Effect {
     constructor() {
@@ -644,6 +670,9 @@ window.gm.StatsLib = (function (StatsLib) {
     window.storage.registerConstructor(effTired);
     window.storage.registerConstructor(effEnergized);
     window.storage.registerConstructor(effStunned);
+    window.storage.registerConstructor(effGuard);
+    window.storage.registerConstructor(effHeal);
+    window.storage.registerConstructor(effCallHelp);
 
     window.storage.registerConstructor(effMutateCat);
     StatsLib.effMutateCat = function () { return new effMutateCat();  };  

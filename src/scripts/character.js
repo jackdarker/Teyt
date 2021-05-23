@@ -41,6 +41,7 @@ export class Character {
         stPerversion.setup(this.Stats,1,15),stArousal.setup(this.Stats,1,100);
 
         this.Effects.addItem(effNotTired.name, new effNotTired()); //depending on sleep Tired will be set to NotTired or Tired
+        this.Skills.addItem(new SkillFlee()),this.Skills.addItem(new SkillSubmit());
         this.Skills.addItem(new SkillUseItem());this.Skills.addItem(new SkillAttack());this.Skills.addItem(new SkillStun());
         this.Skills.addItem(new SkillHeal());
 
@@ -49,12 +50,14 @@ export class Character {
     toJSON() {return window.storage.Generic_toJSON("Character", this); };
     static fromJSON(value) { 
         var _x = window.storage.Generic_fromJSON(Character, value.data);
+        //need to recreate parent links
         _x.Effects._relinkItems();
         _x.Stats._relinkItems();
         _x.Inv._relinkItems();
         _x.Outfit._relinkItems();
         _x.Wardrobe._relinkItems();
         _x.Rel._relinkItems();
+        _x.Skills._relinkItems();
         return(_x);
     };
     static calcXPToLevel(XP) {
@@ -92,6 +95,25 @@ export class Character {
         this._data.level+=1;
     }
     isDead() {return(this.Stats.get('health').value<=0);}
+    //naked returns: 
+    //"naked" - naked
+    //"primal" - cover genitals 
+    //"civil" - wears some trousers,footwear and torsocovers
+    //"formal" - ...wears underwear too
+    clothLevel() { //TODO
+        let uwOK = false,civOK =false;
+        if(this.Outfit.getItemId(window.gm.OutfitSlotpLib.uHips)!=='' && this.Outfit.getItemId(window.gm.OutfitSlotpLib.uBreast)!=='')  {
+            uwOK= true;
+        }
+        if(this.Outfit.getItemId(window.gm.OutfitSlotpLib.Hips)!=='' && this.Outfit.getItemId(window.gm.OutfitSlotpLib.Breast)!=='' &&
+            this.Outfit.getItemId(window.gm.OutfitSlotpLib.Feet)!=='') {
+                civOK= true;
+        }
+        if(uwOK && civOK) return "formal";
+        if(civOK) return "civil";
+        if(uwOK ) return "primal"  
+        return('naked');
+    }
     health() {
         return({value:this.Stats.get('health').value, max:this.Stats.get('healthMax').value, min:0});
     }

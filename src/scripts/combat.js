@@ -20,10 +20,10 @@ class CombatSetup {
   }
   //setup encounter; this calls the Encounter-passage !
 initCombat() {
-  var s=window.story.state;
+  let s=window.story.state;
   s.combat.enemyParty = this.EnemyFunc();
   s.combat.playerParty = [];
-  for(var el of s._gm.playerParty) {
+  for(let el of s._gm.playerParty) {
     s.combat.playerParty.push(s[el]);
   }
   s.combat.turnStack = [];
@@ -39,7 +39,28 @@ initCombat() {
   this.msg='';
   window.story.show("Encounter");
 }
-
+//spawns additional enemys or friends
+//called by effCallHelp at begin of turn
+spawnChar(item,party,amount){
+  let s=window.story.state;
+  let mob = window.gm.Mobs[item]();
+  mob.faction = party;
+  let list = s.combat.enemyParty.concat(s.combat.playerParty);
+  let uid=1;
+  for(el of list) {
+    if(mob.__proto__.isPrototypeOf(el)) {
+      //expecting Mole#2
+      uid = Math.max(uid,parseInt(el.name.split('#')[1],10)+1);
+    };
+  }
+  mob.name = mob.name+"#"+uid.toString(); //TODO need unique name !!
+  if(party === 'Player') {
+    mob.calcCombatMove=null; //hack to disable AI
+    s.combat.playerParty.push(mob);
+  } else {
+    s.combat.enemyParty.push(mob);
+  }
+}
 hideCombatOption() {
   document.querySelector("#choice").remove();
 }
@@ -275,19 +296,19 @@ battleInit() {
 };
 
 preTurn() {
-  var result = {OK:false, msg:''};
-  var s = window.story.state;
+  let result = {OK:false, msg:''};
+  let s = window.story.state;
   s.combat.turnCount+=1;
   
-  var list = s.combat.enemyParty.concat(s.combat.playerParty);
+  let list = s.combat.enemyParty.concat(s.combat.playerParty);
   //update combateffects
-  for(var k=list.length-1; k>=0;k--){
+  for(let k=list.length-1; k>=0;k--){
     if(list[k].isDead()) {
       continue;
     }
-    var effects = list[k].Effects.getAllIds();
-    for(var i=0; i<effects.length; i++) {
-      var effect = list[k].Effects.get(effects[i]);
+    let effects = list[k].Effects.getAllIds();
+    for(let i=0; i<effects.length; i++) {
+      let effect = list[k].Effects.get(effects[i]);
       if(effect.onCombatEnd!==null && effect.onCombatEnd!==undefined) {  //typeof effect === CombatEffect doesnt work? so we check presencse of attribut
         effect.onTurnStart();
       }

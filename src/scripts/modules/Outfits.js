@@ -3,10 +3,10 @@ class Leggings extends Equipment {
     constructor() {
         super('Leggings');
         this.tags = ['cloth'];
-        this.slotUse = ['Legs'];
-        this.desc = 'Spandex-leggings for sport. (agility+)'
+        this.slotUse = ['Legs','Hips'];
         window.storage.registerConstructor(Leggings);
     }
+    get desc() { return 'Spandex-leggings for sport. (agility+)';}
     toJSON() {return window.storage.Generic_toJSON("Leggings", this); };
     static fromJSON(value) {return(window.storage.Generic_fromJSON(Leggings, value.data));}
     canEquip() {return({OK:true, msg:'equipable'});}
@@ -22,12 +22,25 @@ class Jeans extends Equipment {
     constructor() {
         super('Jeans');
         this.tags = ['cloth'];
-        this.slotUse = ['Legs'];
-        this.desc = 'plain old blue jeans';
+        this.slotUse = ['Legs','Hips'];
         window.storage.registerConstructor(Jeans);
     }
+    get desc() { return 'plain old blue jeans';    }
     toJSON() {return window.storage.Generic_toJSON("Jeans", this); };
     static fromJSON(value) {return(window.storage.Generic_fromJSON(Jeans, value.data));}
+    canEquip() {return({OK:true, msg:'equipable'});}
+    canUnequip() {return({OK:true, msg:'unequipable'});}
+}
+class Sneakers extends Equipment {
+    constructor() {
+        super('Sneakers');
+        this.tags = ['cloth'];
+        this.slotUse = ['Feet'];
+        window.storage.registerConstructor(Sneakers);
+    }
+    get desc() { return 'Sneakers for sport and recreational activities.';    }
+    toJSON() {return window.storage.Generic_toJSON("Sneakers", this); };
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(Sneakers, value.data));}
     canEquip() {return({OK:true, msg:'equipable'});}
     canUnequip() {return({OK:true, msg:'unequipable'});}
 }
@@ -35,10 +48,10 @@ class TankShirt extends Equipment {
     constructor() {
         super('TankShirt');
         this.tags = ['cloth'];
-        this.slotUse = ['Torso'];
-        this.desc = 'light blue tank-top'
+        this.slotUse = ['Breast','Stomach'];       
         window.storage.registerConstructor(TankShirt);
     }
+    get desc() { return 'light blue tank-top';}
     toJSON() {return window.storage.Generic_toJSON("TankShirt", this); };
     static fromJSON(value) {return(window.storage.Generic_fromJSON(TankShirt, value.data));}
     canEquip() {return({OK:true, msg:'equipable'});}
@@ -48,10 +61,10 @@ class Pullover extends Equipment {
     constructor() {
         super('Pullover');
         this.tags = ['cloth'];
-        this.slotUse = ['Torso','Arms'];
-        this.desc = 'warm pullover'
+        this.slotUse = ['Breast','Stomach','Arms'];
         window.storage.registerConstructor(Pullover);
     }
+    get desc() { return 'warm pullover';}
     toJSON() {return window.storage.Generic_toJSON("Pullover", this); };
     static fromJSON(value) {return(window.storage.Generic_fromJSON(Pullover, value.data));}
     canEquip() {return({OK:true, msg:'equipable'});}
@@ -61,8 +74,9 @@ class HandCuffs extends Equipment {
     constructor() {
         super('HandCuffs');
         this.tags = ['restrain'];
-        this.slotUse = ['RHand','LHand'];
-        this.desc = 'handcuffs'
+        this.slotUse = ['RHand','LHand'];   //Todo wrists??
+    }
+    get desc() { return 'handcuffs'
         window.storage.registerConstructor(Pullover);
     }
     toJSON() {return window.storage.Generic_toJSON("HandCuffs", this); };
@@ -87,11 +101,11 @@ class HandCuffs extends Equipment {
 class Crowbar extends Equipment {
     constructor() {
         super('Crowbar');
-        this.desc = 'A durable crowbar.';
         this.tags = ['tool', 'weapon'];
         this.slotUse = ['RHand'];
         window.storage.registerConstructor(Crowbar);
     }
+    get desc() { return 'A durable crowbar.';}
     toJSON() {return window.storage.Generic_toJSON("Crowbar", this); };
     static fromJSON(value) {return(window.storage.Generic_fromJSON(Crowbar, value.data));}
     usable(context) {return(this.canEquip());}
@@ -120,11 +134,11 @@ class Crowbar extends Equipment {
 class Shovel extends Equipment {
     constructor() {
         super('Shovel');
-        this.desc = 'A rusty,old shovel.';
         this.tags = ['tool', 'weapon'];
         this.slotUse = ['RHand','LHand'];
         window.storage.registerConstructor(Shovel);
     }
+    get desc() { 'A rusty,old shovel.';}
     toJSON() {return window.storage.Generic_toJSON("Shovel", this); };
     static fromJSON(value) {return(window.storage.Generic_fromJSON(Shovel, value.data));}
     usable(context) {return(this.canEquip());}
@@ -154,9 +168,9 @@ class TailRibbon extends Equipment {
         super('TailRibbon');
         this.tags = ['cloth'];
         this.slotUse = ['TailTip'];
-        this.desc = 'a fancy color band that can be wrapped around someones tailtip';
         window.storage.registerConstructor(TailRibbon);
     }
+    get desc() { 'a fancy color band that can be wrapped around someones tailtip';}
     toJSON() {return window.storage.Generic_toJSON("TailRibbon", this); };
     static fromJSON(value) {return(window.storage.Generic_fromJSON(TailRibbon, value.data));}
     canEquip() { 
@@ -178,9 +192,9 @@ class TailNone extends Equipment {
         super('TailNone');
         this.tags = ['body'];
         this.slotUse = ['bTailBase'];
-        this.desc = ''
         window.storage.registerConstructor(TailNone);
     }
+    get desc() { return '';}
     toJSON() {return window.storage.Generic_toJSON("TailNone", this); };
     static fromJSON(value) {return(window.storage.Generic_fromJSON(TailNone, value.data));}
     canEquip() {return({OK:true, msg:'equipable'});}
@@ -191,11 +205,11 @@ class TailCat extends Equipment {
         super('TailCat');
         this.tags = ['body'];
         this.slotUse = ['bTailBase'];
-        this.desc = 'a flexible,furred tail like that of a cat.'
         this.growth = 0.10; //in %/100 maxGrowth
         this.maxGrowth = 1.2; //in meter, todo depends on bodysize
         window.storage.registerConstructor(TailCat);
     }
+    get desc() { 'a flexible,furred tail like that of a cat.';}
     toJSON() {return window.storage.Generic_toJSON("TailCat", this); };
     static fromJSON(value) {return(window.storage.Generic_fromJSON(TailCat, value.data));}
     canEquip() {return({OK:true, msg:'equipable'});}
@@ -206,11 +220,11 @@ class BreastHuman extends Equipment {
         super('BreastHuman');
         this.tags = ['body'];
         this.slotUse = ['bBreast'];
-        this.desc = 'some human breasts.'
         this.growth = 0.0; //in %/100 maxGrowth
         this.maxGrowth = 0.3; //in meter, todo depends on bodysize
         window.storage.registerConstructor(BreastHuman);
     }
+    get desc() { return 'some human breasts.';}
     toJSON() {return window.storage.Generic_toJSON("BreastHuman", this); };
     static fromJSON(value) {return(window.storage.Generic_fromJSON(BreastHuman, value.data));}
     canEquip() {return({OK:true, msg:'equipable'});}
@@ -221,11 +235,11 @@ class VulvaHuman extends Equipment {
         super('VulvaHuman');
         this.tags = ['body'];
         this.slotUse = ['bVulva'];
-        this.desc = 'a human cooter.'
         this.growth = 0.0; //in %/100 maxGrowth
         this.maxGrowth = 0.2; //in meter, todo depends on bodysize
         window.storage.registerConstructor(VulvaHuman);
     }
+    get desc() { return 'a human cooter.';}
     toJSON() {return window.storage.Generic_toJSON("VulvaHuman", this); };
     static fromJSON(value) {return(window.storage.Generic_fromJSON(VulvaHuman, value.data));}
     canEquip() {return({OK:true, msg:'equipable'});}
@@ -236,6 +250,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(Leggings);
     window.storage.registerConstructor(TankShirt);
     window.storage.registerConstructor(Jeans);
+    window.storage.registerConstructor(Sneakers);
     window.storage.registerConstructor(Pullover);
     window.storage.registerConstructor(Crowbar);
     window.storage.registerConstructor(Shovel);
@@ -244,6 +259,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['Leggings'] = function () { return new Leggings();};
     ItemsLib['Tank-shirt'] = function () { return new TankShirt(); };
     ItemsLib['Jeans'] = function () { return new Jeans();};
+    ItemsLib['Jeans'] = function () { return new Sneakers();};
     ItemsLib['Pullover'] = function () { return new Pullover();};
     ItemsLib['TailRibbon'] = function () { return new TailRibbon();};
     //special wardrobe-item combination

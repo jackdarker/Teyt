@@ -1,60 +1,53 @@
 "use strict";
 class LighterDad extends Item {
-    constructor() {
-        super('LighterDad');
-        this.desc = 'I got this lighter from my real dad.';
-    }
+    constructor() {        super('LighterDad');    }
+    get desc() { return('I got this lighter from my real dad.');}
     toJSON() {return window.storage.Generic_toJSON("LighterDad", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(LighterDad, value.data);};
 };
 class Money extends Item {
-    constructor() {
-        super('Money');
-        this.desc = 'shiny,clinky coin.';
-    }
+    constructor() {super('Money');}
+    get desc() { return('shiny,clinky coin.');}
     toJSON() {return window.storage.Generic_toJSON("Money", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(Money, value.data);};
 };
 
 class LaptopPS extends Item {
-    constructor() {
-        super('Laptop-PS');
-        this.desc = 'Power converter for laptop.';
-    }
+    constructor() {        super('Laptop-PS');    }
+    get desc() { return 'Power converter for laptop.';    }
     toJSON() {return window.storage.Generic_toJSON("LaptopPS", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(LaptopPS, value.data);};
 };
 class Dildo_small extends Item {
-    constructor() {
-        super('Dildo_small');
-        this.desc = 'A dildo, smaller than an average dong, made from rubbery plastic.';
-    }
+    constructor() {        super('Dildo_small');    }
+    get desc() { return 'A dildo, smaller than an average dong, made from rubbery plastic.';    }
     toJSON() {return window.storage.Generic_toJSON("Dildo_small", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(Dildo_small, value.data);};
-};
+}
 class Lube extends Item {
-    constructor() {
-        super('Lube');
-        this.desc = 'Slippery lubricant for personal use.';
-    }
+    constructor() {     super('Lube');    }
+    get desc() { return 'Slippery lubricant for personal use.';    }
     toJSON() {return window.storage.Generic_toJSON("Lube", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(Lube, value.data);};
-};
+}
 class Battery extends Item {
-    constructor() {
-        super('Battery');
-        this.desc = 'Provides electricity for devices.';
-    }
+    constructor() { super('Battery'); }
+    get desc() { return 'Provides electricity for devices.';   }
     toJSON() {return window.storage.Generic_toJSON("Battery", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(Battery, value.data);};
-};
-class SilverPowderBomb extends Item {
-    constructor() {
-        super('SilverPowderBomb');
-        this.desc = 'Very effective against shapeshifters.';
-    }
-    toJSON() {return window.storage.Generic_toJSON("SilverPowderBomb", this); };
-    static fromJSON(value) { return window.storage.Generic_fromJSON(SilverPowderBomb, value.data);};
+}
+class PurpleBerry extends Item {
+    constructor() { super('PurpleBerry'); }
+    get desc() { return 'Those purple berrys grow in the forest.';   }
+    toJSON() {return window.storage.Generic_toJSON("PurpleBerry", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(PurpleBerry, value.data);};
+}
+
+class FlashBang extends Item {
+    constructor() { super('FlashBang');  }
+    get desc() { return 'Stun someone with a blinding light.';  }
+    toJSON() {return window.storage.Generic_toJSON("FlashBang", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(FlashBang, value.data);};
 
     //context is the skillUseItem calling this
     targetFilter(targets,context) {
@@ -76,7 +69,7 @@ class SilverPowderBomb extends Item {
     use(context,on=null) { 
         let result = {OK:false,msg:''};
         if(context instanceof Inventory) {
-            context.removeItem('SilverPowderBomb');
+            context.removeItem('FlashBang');
             if(context.parent instanceof Character){
                 if(on===null) on=context.parent;
                 if(on.length && on.length>0) { 
@@ -86,7 +79,7 @@ class SilverPowderBomb extends Item {
                 }
                 result.msg = context.parent.name+' uses '+this.name+'.';
                 for(let _targ of on) {
-                    _targ.addEffect(effStunned.name,new effStunned());  //todo should 'SilverPowderBomb:Stunned' merge with other stunned? 
+                    _targ.addEffect(effStunned.name,new effStunned());  //todo should 'FlashBang:Stunned' merge with other stunned? 
                     result.msg +=_targ.name+' got stunned. ';
                 }
                 result.OK=true;
@@ -98,7 +91,8 @@ class SilverPowderBomb extends Item {
 class CanOfCoffee extends Item {
     constructor() {
         super('CanOfCoffee');
-        this.desc = 'Cold coffee in a can. Tasty? Not really!';
+    }
+    get desc() { return 'Cold coffee in a can. Tasty? Not really!';
     }
     targetFilter(targets) {
         //Todo
@@ -118,10 +112,8 @@ class CanOfCoffee extends Item {
     }
 };
 class SimpleFood extends Item {
-    constructor() {
-        super('SimpleFood');
-        this.desc = 'Something to eat.';
-    }
+    constructor() {        super('SimpleFood');    }
+    get desc() { return 'Something to eat.';    }
     toJSON() {return window.storage.Generic_toJSON("SimpleFood", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(SimpleFood, value.data);};
     usable(context,on=null) {return({OK:true, msg:'eat'});}
@@ -141,12 +133,6 @@ class SimpleFood extends Item {
 }
 
 window.gm.ItemsLib = (function (ItemsLib) {
-    // Private Objekte
-    /*var privateVariable = "privat";
-    function privateFunktion () {
-        alert("privateFunktion wurde aufgerufen\n" +
-            "Private Variable: " + privateVariable);
-    }*/
     window.storage.registerConstructor(LighterDad);
     window.storage.registerConstructor(Money);
     window.storage.registerConstructor(LaptopPS);
@@ -155,7 +141,8 @@ window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(Lube);
     window.storage.registerConstructor(CanOfCoffee);
     window.storage.registerConstructor(SimpleFood);
-    window.storage.registerConstructor(SilverPowderBomb);
+    window.storage.registerConstructor(PurpleBerry);
+    window.storage.registerConstructor(FlashBang);
     
     ItemsLib['Money'] = function () { return new Money();};
     ItemsLib['LighterDad'] = function () { return new LighterDad();};
@@ -166,7 +153,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['Lube'] = function () { return new Lube();};
     ItemsLib['CanOfCoffee'] = function () { return new CanOfCoffee(); };
     ItemsLib['SimpleFood'] = function () { return new SimpleFood(); };
-    ItemsLib['SilverPowderBomb'] = function () { return new SilverPowderBomb(); };
-
+    ItemsLib['FlashBang'] = function () { return new FlashBang(); };
+    ItemsLib['PurpleBerry'] = function () { return new PurpleBerry(); };
     return ItemsLib; 
 }(window.gm.ItemsLib || {}));

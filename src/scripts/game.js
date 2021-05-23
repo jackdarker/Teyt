@@ -590,7 +590,7 @@ window.gm.printEquipmentSummary= function() {
   var result ='';
   var ids = [];
   for(var i=0;i<window.gm.player.Outfit.count();i++){
-      if(i>=window.gm.OutfitSlotpLib.bTorso) continue; //skip bodyparts
+      if(i<window.gm.OutfitSlotpLib.Feet) continue; //skip bodyparts
       var id = window.gm.player.Outfit.getItemId(i);
       if(id!='' && ids.indexOf(id)<0) {
           ids.push(id);

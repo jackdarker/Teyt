@@ -254,8 +254,8 @@ class Foo {
     this.a = a, this.b = b;
     this._bar = new Bar('fooboo'+this.a.toString());
     this._bar2 = new Bar('ba2'+this.b.toString());
-    this._bar._parent = (function(me){ return function(){return me;}}(this));
-    this._bar2._parent = (function(me){ return function(){return me;}}(this));
+    //this._bar._parent = (function(me){ return function(){return me;}}(this));
+    //this._bar2._parent = (function(me){ return function(){return me;}}(this));
   }
   toJSON() {return window.storage.Generic_toJSON("Foo", this); };
   static fromJSON(value) { return window.storage.Generic_fromJSON(Foo, value.data);};

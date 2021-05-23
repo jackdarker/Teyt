@@ -2,13 +2,15 @@
 class Item {
     constructor(name) {
         this.name = name;
-        this.desc = '';
+
     }
+    get parent() {return this._parent();}
     //called by SkillUseItem
     targetFilter(targets) {
         return([]); //default unuseable in combat
     }
-    get parent() {return this._parent();}
+    //implement this for description
+    get desc() { return(this.name);}
     //context is the owner of item (parent of inventory), on is target (character)
     usable(context,on=null) {return({OK:false, msg:'Cannot use.'});}
     use(context,on=null) {return({OK:false, msg:'Cannot use.'});}
@@ -25,7 +27,7 @@ class Inventory {
         var _x = window.storage.Generic_fromJSON(Inventory, value.data);
         return(_x);
     };
-    _relinkItems() {
+    _relinkItems() {  //call this after loading save data the reparent
         for(var i=0; i<this.list.length; i++) {
             if(this.list[i].item) this.list[i].item._parent=window.gm.util.refToParent(this);
         }

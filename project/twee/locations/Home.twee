@@ -103,10 +103,10 @@ There is a large bed for sleeping with a nightstand aside. </br>
 <%} else {%>
 <a href="javascript:void(0)" onclick='($("tw-passage").fadeOut(1000, function() {window.gm.sleep(700);window.story.show("Sleep");}));'>Sleep Until Morning</a>
 <%}%>
-</br> That bulky VR-hanging scaffold is taking up a lot of space. You could [[try to start it up|VRSuiteUp]]. 
+</br> That bulky VR-scaffold is taking up a lot of space. You could [[try to start it up|VRSuiteUp]]. 
 </br>[[MemoryGame]] [[HangmanGame]]</br> <!--todo-->
 </br>[[NewGamePlus]]</br> <!--todo-->
-<% if(window.gm.player.Outfit.isNaked()) { %>
+<% if(window.gm.player.clothLevel()==="naked") { %>
 <div class="red">You should at least cover up your unmentionables before leaving your room.</div></br>
 <% } else { %>
 Where do you want to go ? </br>
