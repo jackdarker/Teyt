@@ -68,7 +68,7 @@ Someone has painted 'Thetain' on the planks above the wooden gate. Most likely t
 <!--todo--> There arent many people around the place right now.</br> There seems to be a shop of an alchemist, a Inn and another shop where you cant say what kind of wares - if any - they are trading.</br>
 </br> Near the entrance of the Inn is also a [[bulletin-board]]. 
 <div></br>
-[[VillageInn]]  [[VillagePotions]] [[VillagePawnshop]]</br></div>
+[[VillageInn]]  [[VillagePotions]] [[VillagePawnshop]] [[VillageEntrance]]</br></div>
 </article><article id="LogPanel"></article></section>
 
 
@@ -78,7 +78,7 @@ Someone has painted 'Thetain' on the planks above the wooden gate. Most likely t
 <!--todo--> 'This really looks like they scavenged that place from a typical fantasy story book.'</br> 
 </br> 
 <div></br>
-[[VillageMarketPlace]]  [[go to forest|ForestBorder]]</br></div>
+[[VillageMarketPlace]] </br></div>
 </article><article id="LogPanel"></article></section>
 
 
@@ -123,17 +123,43 @@ One direction leads to the settlement close by. The other direction follows the 
 </article><article id="LogPanel"></article></section>
 
 
+:: ForestSearchAround [_back]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<% let args = window.story.state.tmp.args; if(args[0]==='PurpleBerry'){ window.gm.player.Inv.addItem(new window.storage.constructors[args[0]](),args[1]); %>
+On a secluded spot you found a batch of berry bushes. Most of them dont have any more berrys but you are able to collect a handful.</br>
+<%}else{%>
+Unfortunatly you didnt find anything useful.</br>
+<%}%>
+<div></br>
+[[Next|_back]]</br></div>
+</article><article id="LogPanel"></article></section>
+
+
 :: ForestEntrance
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
 <!--todo--> Der Wald macht einen freundlichen Eindruck. Die Bäume stehen noch licht und sind noch nicht so ausladend und groß als das kein Licht mehr durch das Blätterdach gelangt. </br> 
 </br> 
+Maybe you can <a0 onclick='explore(); '>explore</a> the surrounding woods and see if you can find anything useful.</br>
 <div></br><a0 onclick='enterBeehive(); '>Enter Beehive</a></br>
 [[ForestBorder]] [[Forest]] </br></div>
 </article><article id="LogPanel"></article></section>
 <script> function enterBeehive() {
     window.gm.dng = window.gm.dngs.BeeHive();
     window.gm.dng.enterDungeon();
+}
+function explore() {
+    let rnd = _.random(0,100);
+    window.story.state.tmp.args = [];
+    if(rnd > 40) {
+        window.story.state.tmp.args = ['PurpleBerry',1];
+        window.story.show('ForestSearchAround');
+    } else if(rnd > 70) {
+        window.gm.encounters.wolf(window.gm.player.location);
+    }
+    else {
+        window.story.show('ForestSearchAround');
+    }
 }
 </script>
 

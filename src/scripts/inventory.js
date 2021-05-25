@@ -2,7 +2,6 @@
 class Item {
     constructor(name) {
         this.name = name;
-
     }
     get parent() {return this._parent();}
     //called by SkillUseItem
@@ -10,7 +9,9 @@ class Item {
         return([]); //default unuseable in combat
     }
     //implement this for description
-    get desc() { return(this.name);}
+    get desc() { return(this.descShort);}
+    //implement this for description
+    get descShort() { return(this.name);}
     //context is the owner of item (parent of inventory), on is target (character)
     usable(context,on=null) {return({OK:false, msg:'Cannot use.'});}
     use(context,on=null) {return({OK:false, msg:'Cannot use.'});}

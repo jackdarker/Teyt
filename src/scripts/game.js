@@ -8,12 +8,13 @@ window.gm = window.gm || {}; //game related operations
 window.gm.util = window.gm.util || {};  //utility functions
 // define save-game-file-version 1
 
-//you might need to reimplement this to handle version upgrades on load
+//reimplement this to handle version upgrades on load !
 window.gm.rebuildObjects= function(){ 
   var s = window.story.state;
   window.gm.quests.setQuestData(s.quests); //necessary for load support
   window.gm.switchPlayer(s.vars.activePlayer);
 }
+//--------------- time management --------------
 //returns timestamp since start of game
 window.gm.getTime= function() {
   return(window.story.state.vars.time+2400*window.story.state.vars.day);
@@ -96,7 +97,7 @@ window.gm.sleep=function(until) {
   window.gm.pushLog(msg);
   return(msg);
 };
-
+//-------------------------------------------------
 // reimplement to setup the game !
 window.gm.initGame= function(forceReset,NGP=null) {
   window.gm.toasty= new Toasty();
@@ -237,7 +238,7 @@ window.gm.popPassage=function() {
 };
 //overriding show:
 //- to enable back-link
-//- to intercept with deffered events
+//- todo to intercept with deffered events
 var _origStoryShow = window.story.__proto__.show;
 window.story.__proto__.show = function(idOrName, noHistory = false) {
   var next = idOrName;
@@ -590,7 +591,7 @@ window.gm.printEquipmentSummary= function() {
   var result ='';
   var ids = [];
   for(var i=0;i<window.gm.player.Outfit.count();i++){
-      if(i<window.gm.OutfitSlotpLib.Feet) continue; //skip bodyparts
+      if(i<window.gm.OutfitSlotLib.Feet) continue; //skip bodyparts
       var id = window.gm.player.Outfit.getItemId(i);
       if(id!='' && ids.indexOf(id)<0) {
           ids.push(id);

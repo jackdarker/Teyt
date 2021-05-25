@@ -10,13 +10,12 @@ class CombatSetup {
     this.EnemyFunc = null;  //a ctor of Mob
     this.Location = ''  //your actual location-name
     this.scenePic = ''  //bg-image to use
-    this.onDefeat = null;
-    this.onVictory = null;
-    this.onFlee = null;
-    this.onSubmit = null;
-  }
-  onSubmit() {
-    return('You submitted completely.</br>'+ window.gm.printPassageLink('GameOver','GameOver'));
+    //the following function should get reassigned; 
+    //they should return a message what will happen next and provide a link to passage to follow f.e. return to window.gm.player.location
+    this.onDefeat = (function(){return('You are defeated.</br>'+ window.gm.printPassageLink('GameOver','GameOver'));});
+    this.onVictory = (function(){return('You defeated the foe.</br>'+ window.gm.printPassageLink('Next',window.gm.player.location));});
+    this.onFlee = (function(){return('You retreat hastily.</br>'+ window.gm.printPassageLink('Next',window.gm.player.location));});
+    this.onSubmit = (function(){return('You submit to the foe.</br>'+ window.gm.printPassageLink('GameOver','GameOver'));});
   }
   //setup encounter; this calls the Encounter-passage !
 initCombat() {
@@ -114,6 +113,7 @@ printSkillList() {
   var canAct = s.combat.actor._canAct();
   if(canAct.OK===true) {
     var skillIds = s.combat.actor.Skills.getAllIds();
+    //todo how to sort the list in a useful manner?
     for(var i=0; i<skillIds.length;i++) {
       var entry = document.createElement('a');
       entry.href='javascript:void(0)';
@@ -415,20 +415,13 @@ postBattle() {
   var result = {OK:false, msg:''};
   //check if battle done...
   if(s.combat.playerFleeing===true) { 
-    result.OK=true;
-    result.msg = 'You sucessfully escaped '+"</br>";
-    result.msg += window.gm.printPassageLink('Next',window.gm.player.location);
+    result.OK=true,result.msg = this.onFlee();
   } else if(s.combat.playerSubmitting===true) {  
-    result.OK=true;
-    result.msg = this.onSubmit();
+    result.OK=true,result.msg = this.onSubmit();
   } else if(this.isAllDefeated(s.combat.enemyParty)) {
-    result.OK=true;
-    result.msg = 'You defeated the enemy'+"</br>";
-    result.msg += window.gm.printPassageLink('Next',window.gm.player.location);
+    result.OK=true,result.msg = this.onDefeat();
   } else if(this.isAllDefeated(s.combat.playerParty)) {
-    result.OK=true;
-    result.msg = 'You got defeated by the enemy'+"</br>";
-    result.msg += window.gm.printPassageLink('Next',window.gm.player.location);
+    result.OK=true,result.msg = this.onVictory();
   }
   this.endCombat();
   return(result);

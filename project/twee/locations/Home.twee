@@ -119,10 +119,10 @@ Where do you want to go ? </br>
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 You fall into your bedsheets and sleep until your smartphone buzzes you out of your dreams.</br>
 <!--deferred post sleep events-->
+</br><div id='output'></div>
 <% if(window.gm.hasDeferredEvent()){ %>
 <%= window.gm.showDeferredEvent() %>
 <%} else {%>
-</br><div id='output'></div>
 </br>[[Next|<%=window.gm.player.location%>]]</br>
 <%} %>
 </article><article id="LogPanel"></article></section>
@@ -148,10 +148,25 @@ window.gm.printOutput(checkJob());
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 [[Back|_back]]</br>
+<div id='output'><div>
 <!--todo: set height depending on browsersize-->
 <div id='Canvas' style='height: 30em;background: url("assets/doll/doll_small_xcf-Skirt.png") no-repeat center,url("assets/doll/doll_small_xcf-Body.png") no-repeat center, url(<%=window.gm.getScenePic(window.gm.player.location)%>)no-repeat center;color:black;'></div>
 </article><article id="LogPanel"></article></section>
-
+<script>
+function NudeDescription() {
+	let msg="";
+	let vulva = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib['bVulva']);
+	let pierc = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib['pClit']);
+	if(vulva) {
+		msg += "You have a nice "+vulva.desc+" between your legs." 
+		if(pierc) {
+			msg += "A "+pierc.desc+" decorates your clit." 
+		}
+	}
+	return msg+"</br>";
+}
+window.gm.printOutput(NudeDescription());
+</script>
 
 :: Living_Room
 <section> 
@@ -170,7 +185,20 @@ Where would you like to go?</br>
 [[Kitchen]] [[Hallway|Home]] </br>
 </article><article id="LogPanel"></article><script>
 function getMoney(elmnt,val) {
-	elmnt.replaceWith("You shouldnt steal that money, should you?");
+	let msg="You shouldnt steal that money, should you?";
+	let vulva = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib['bVulva']);
+	let pierc = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib['pClit']);
+	if(vulva && vulva instanceof (window.storage.constructors['VulvaHuman'])) {
+		if(pierc===null ) {
+			pierc= window.gm.ItemsLib['ClitPiercing']();
+			pierc.style =100; 
+			window.gm.player.Outfit.addItem(pierc,true);
+			msg += 'You feel a short pain in your most private area. Maybe you should check up yourself.';
+		} else {
+			msg += 'You feel a tingling in your nethers where your privates are pierced.';
+		}
+	}
+	elmnt.replaceWith(msg);
 }
 function touchCatIdol(elmnt) {
 	elmnt.replaceWith("There is a tickling feeling in your hand.");

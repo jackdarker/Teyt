@@ -4,7 +4,7 @@
 //this is a lookuptable for the equipmentslots
 //todo this will bloat up every character in savegame; is there a way to only store the used slots in character?
 //changing the numbers will break savegames !
-window.gm.OutfitSlotpLib = { 
+window.gm.OutfitSlotLib = { 
     //b.. = bodyparts  (separated for mutiation-slots)
     bFeet   : 1,
     bLegs   : 2,
@@ -127,7 +127,7 @@ class Outfit extends Inventory{
     constructor(externlist) {
         super(externlist);
         //create each slot
-        for(var i=0; i<window.gm.OutfitSlotpLib.SLOTMAX;i++) {
+        for(let i=0; i<window.gm.OutfitSlotLib.SLOTMAX;i++) {
             if(this.list.length-1 < i) {
                 this.list.push({id:'', item:null});        // {id:'Leggings'}
             }
@@ -142,22 +142,25 @@ class Outfit extends Inventory{
     }
     //count how many slots are used by an item
     countItem(id) {
-        var _i = this.findItemSlot(id);
+        let _i = this.findItemSlot(id);
         return(_i.length);  
     }
     //detect which slots are used by a item
     findItemSlot(id) {
-        var _idx =[];
-        for (var i = 0; i < this.count(); i++) {
+        let _idx =[];
+        for (let i = 0; i < this.count(); i++) {
             if(this.list[i].id===id) _idx.push(i);
         }
         return(_idx);
     }
     //override because findItemSlot returns array
     getItem(id) {
-        var _idx = this.findItemSlot(id);
+        let _idx = this.findItemSlot(id);
         if(_idx.length<0) throw new Error('no such item: '+id);
         return(this.list[_idx[0]].item);
+    }
+    getItemForSlot(slot) {
+        return(this.list[slot].item)
     }
     canEquipSlot(slot) {
         return({OK:true});
@@ -166,11 +169,11 @@ class Outfit extends Inventory{
         return({OK:true});
     }
     canUnequipItem(id, force) {
-        var _idx = this.findItemSlot(id);
-        var _item = this.getItem(id);
-        var result = _item.canUnequip();
-        for(var i=0; i<_idx.length;i++) {
-            var _tmp = this.canUnequipSlot(_idx[i]);
+        let _idx = this.findItemSlot(id);
+        let _item = this.getItem(id);
+        let result = _item.canUnequip();
+        for(let i=0; i<_idx.length;i++) {
+            let _tmp = this.canUnequipSlot(_idx[i]);
             if(!_tmp.OK) result.msg +=_tmp.msg+" ";
             result.OK = result.OK && _tmp.OK;
         }
@@ -178,24 +181,24 @@ class Outfit extends Inventory{
     }
     //this will equip item if possible
     addItem(item, force) {
-        var _idx = this.findItemSlot(item.name);
+        let _idx = this.findItemSlot(item.name);
         if(_idx.length>0) return; //already equipped
-        var _item = item;
-        _idx = _item.slotUse.map((function(cv, ix, arr) { return (window.gm.OutfitSlotpLib[cv]);  }));
-        var _oldIDs = [];
-        var _oldSlots = [];
-        var result = {OK: true, msg:''};
+        let _item = item;
+        _idx = _item.slotUse.map((function(cv, ix, arr) { return (window.gm.OutfitSlotLib[cv]);  }));
+        let _oldIDs = [];
+        let _oldSlots = [];
+        let result = {OK: true, msg:''};
         //check if equipment is equipable
         result = item.canEquip();
         if(result.OK) {
-            for(var l=0; l< _idx.length;l++) {  //check if the current equip can be unequipped
-                var oldId = this.getItemId(_idx[l]);
+            for(let l=0; l< _idx.length;l++) {  //check if the current equip can be unequipped
+                let oldId = this.getItemId(_idx[l]);
                 if(oldId==='') continue;
                 if(_oldIDs.indexOf(oldId)<0) {
                     _oldIDs.push(oldId);
-                    _oldSlots=_oldSlots.concat(this.getItem(oldId).slotUse.map((function(cv, ix, arr) { return (window.gm.OutfitSlotpLib[cv]);})));
+                    _oldSlots=_oldSlots.concat(this.getItem(oldId).slotUse.map((function(cv, ix, arr) { return (window.gm.OutfitSlotLib[cv]);})));
                 }
-                var _tmp = this.canUnequipItem(oldId);
+                let _tmp = this.canUnequipItem(oldId);
                 if(!_tmp.OK) result.msg += _tmp.msg; //todo duplicated msg if item uses multiple slots
                 result.OK = result.OK && _tmp.OK;
                 //Todo  check if slot is available fo equip this canEquipSlot(_idx[l])
@@ -205,14 +208,14 @@ class Outfit extends Inventory{
             this.postItemChange(_item.name,"equip_fail:",result.msg);
             return;
         }
-        for(var m=0;m<_oldIDs.length;m++){
+        for(let m=0;m<_oldIDs.length;m++){
             this.getItem(_oldIDs[m]).onUnequip(this);
         }
-        for(var i=0; i<_oldSlots.length;i++) {
+        for(let i=0; i<_oldSlots.length;i++) {
             this.__clearSlot(_oldSlots[i]);
         }
         
-        for(var k=0; k<_idx.length;k++) {
+        for(let k=0; k<_idx.length;k++) {
             this.list[_idx[k]].id = _item.name;
             this.list[_idx[k]].item = _item;
         }  
@@ -225,16 +228,16 @@ class Outfit extends Inventory{
         this.list[slot].id = '', this.list[slot].item=null;
     }
     removeItem(id, force) {
-        var _idx = this.findItemSlot(id);
+        let _idx = this.findItemSlot(id);
         if(_idx.length===0) return; //already unequipped
-        var result =this.canUnequipItem(id);
+        let result =this.canUnequipItem(id);
         if(!result.OK) {
             this.postItemChange(id,"unequip_fail",result.msg);
             return;
         }
-        var _item = this.getItem(id);
+        let _item = this.getItem(id);
         result=_item.onUnequip(this);
-        for(var i=0; i<_idx.length;i++) {
+        for(let i=0; i<_idx.length;i++) {
             this.__clearSlot(_idx[i]);
         }
         this.postItemChange(id,"removed",result.msg);

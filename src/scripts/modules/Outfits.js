@@ -97,6 +97,30 @@ class HandCuffs extends Equipment {
     }
     canUnequip() {return({OK:false, msg:'You need to find a key first to be able to remove it!'});}
 }
+class ClitPiercing extends Equipment {
+    constructor() {
+        super('ClitPiercing');
+        this.tags = ['piercing'];
+        this.slotUse = ['pClit'];    
+        this.style = 0;   
+        window.storage.registerConstructor(ClitPiercing);
+    }
+    set style(style) { this._style = style; }
+    get style() {return this._style;}
+    get desc() { 
+        if(this.style===100) return('cursed piercing');
+        return('small clitoris-piercing');
+    }
+    toJSON() {return window.storage.Generic_toJSON("ClitPiercing", this); };
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(ClitPiercing, value.data));}
+    canEquip() {return({OK:true, msg:'equipable'});}
+    canUnequip() {return({OK:true, msg:'unequipable'});}
+    onEquip() {
+        if(this.style===100) window.gm.player.addEffect("effGrowVulva",window.gm.StatsLib.effGrowVulva());
+        return({OK:true, msg:'equipped'});}
+}
+
+
 //this is an Inventory-item, not wardrobe
 class Crowbar extends Equipment {
     constructor() {
@@ -186,66 +210,6 @@ class TailRibbon extends Equipment {
     canUnequip() {return({OK:true, msg:'unequipable'});}
 }
 
-//a bodypart
-class TailNone extends Equipment {
-    constructor() {
-        super('TailNone');
-        this.tags = ['body'];
-        this.slotUse = ['bTailBase'];
-        window.storage.registerConstructor(TailNone);
-    }
-    get desc() { return '';}
-    toJSON() {return window.storage.Generic_toJSON("TailNone", this); };
-    static fromJSON(value) {return(window.storage.Generic_fromJSON(TailNone, value.data));}
-    canEquip() {return({OK:true, msg:'equipable'});}
-    canUnequip() {return({OK:true, msg:'unequipable'});}
-}
-class TailCat extends Equipment {
-    constructor() {
-        super('TailCat');
-        this.tags = ['body'];
-        this.slotUse = ['bTailBase'];
-        this.growth = 0.10; //in %/100 maxGrowth
-        this.maxGrowth = 1.2; //in meter, todo depends on bodysize
-        window.storage.registerConstructor(TailCat);
-    }
-    get desc() { 'a flexible,furred tail like that of a cat.';}
-    toJSON() {return window.storage.Generic_toJSON("TailCat", this); };
-    static fromJSON(value) {return(window.storage.Generic_fromJSON(TailCat, value.data));}
-    canEquip() {return({OK:true, msg:'equipable'});}
-    canUnequip() {return({OK:true, msg:'unequipable'});}
-}
-class BreastHuman extends Equipment {
-    constructor() {
-        super('BreastHuman');
-        this.tags = ['body'];
-        this.slotUse = ['bBreast'];
-        this.growth = 0.0; //in %/100 maxGrowth
-        this.maxGrowth = 0.3; //in meter, todo depends on bodysize
-        window.storage.registerConstructor(BreastHuman);
-    }
-    get desc() { return 'some human breasts.';}
-    toJSON() {return window.storage.Generic_toJSON("BreastHuman", this); };
-    static fromJSON(value) {return(window.storage.Generic_fromJSON(BreastHuman, value.data));}
-    canEquip() {return({OK:true, msg:'equipable'});}
-    canUnequip() {return({OK:true, msg:'unequipable'});}
-}
-class VulvaHuman extends Equipment {
-    constructor() {
-        super('VulvaHuman');
-        this.tags = ['body'];
-        this.slotUse = ['bVulva'];
-        this.growth = 0.0; //in %/100 maxGrowth
-        this.maxGrowth = 0.2; //in meter, todo depends on bodysize
-        window.storage.registerConstructor(VulvaHuman);
-    }
-    get desc() { return 'a human cooter.';}
-    toJSON() {return window.storage.Generic_toJSON("VulvaHuman", this); };
-    static fromJSON(value) {return(window.storage.Generic_fromJSON(VulvaHuman, value.data));}
-    canEquip() {return({OK:true, msg:'equipable'});}
-    canUnequip() {return({OK:true, msg:'unequipable'});}
-}
-
 window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(Leggings);
     window.storage.registerConstructor(TankShirt);
@@ -255,6 +219,8 @@ window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(Crowbar);
     window.storage.registerConstructor(Shovel);
     window.storage.registerConstructor(TailRibbon);
+    window.storage.registerConstructor(ClitPiercing);
+    
     //.. and Wardrobe
     ItemsLib['Leggings'] = function () { return new Leggings();};
     ItemsLib['Tank-shirt'] = function () { return new TankShirt(); };
@@ -262,13 +228,10 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['Jeans'] = function () { return new Sneakers();};
     ItemsLib['Pullover'] = function () { return new Pullover();};
     ItemsLib['TailRibbon'] = function () { return new TailRibbon();};
+    ItemsLib['ClitPiercing'] = function () { return new ClitPiercing();};
     //special wardrobe-item combination
     ItemsLib['Crowbar']  = function () { return new Crowbar();};
-    ItemsLib['Shovel']  = function () { return new Shovel();};//{name: 'Shovel', desc: 'A shovel for the dirty work.', tags: ['tool', 'weapon'], slotUse: ['RHand','LHand'],usable:defaultCanUse, use:defaultOnUse, canEquip:defaultCanUse, canUnequip:defaultCanUnequip };
-    ItemsLib['Handcuffs'] = function () { return new HandCuffs();};//{name: 'Handcuffs', desc: 'You cannot use your hand.', tags: ['restrain'], slotUse: ['RHand','LHand'],usable:defaultCanUse, use:defaultOnUse, canEquip:defaultCanUse, canUnequip:defaultNoUnequip };
-    ItemsLib['TailNone'] = function () { return new TailNone();};
-    ItemsLib['TailCat'] = function () { return new TailCat();};
-    ItemsLib['BreastHuman'] = function () { return new BreastHuman();};
-    ItemsLib['BreastHuman'] = function () { return new VulvaHuman();};
+    ItemsLib['Shovel']  = function () { return new Shovel();};
+    ItemsLib['Handcuffs'] = function () { return new HandCuffs();};
     return ItemsLib; 
 }(window.gm.ItemsLib || {}));

@@ -211,6 +211,8 @@ class SkillAttack extends Skill {
 class SkillStun extends Skill {
     //execute stun attack
     constructor() {  super("Stun");  }
+    toJSON() {return window.storage.Generic_toJSON("SkillStun", this); };
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillStun, value.data));}
     targetFilter(targets){
         var possibletarget = this.targetFilterFighting(this.targetFilterEnemy(targets));
         //[[mole1],[mole2]]
@@ -244,6 +246,8 @@ class SkillStun extends Skill {
 }
 class SkillPoisonCloud extends Skill {
     constructor() {  super("PoisonCloud");  }
+    toJSON() {return window.storage.Generic_toJSON("SkillPoisonCloud", this); };
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillPoisonCloud, value.data));}
     targetFilter(targets){
         return(this.targetFilterFighting(this.targetFilterEnemy(targets)));
     }
@@ -268,6 +272,8 @@ class SkillPoisonCloud extends Skill {
 }
 class SkillHeal extends Skill {
     constructor() { super("Heal");    }
+    toJSON() {return window.storage.Generic_toJSON("SkillHeal", this); };
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillHeal, value.data));}
     targetFilter(targets){
         return(this.targetFilterAlly(this.targetFilterAlive(targets)));
     }
@@ -288,6 +294,8 @@ class SkillHeal extends Skill {
 }
 class SkillFlee extends Skill {
     constructor() { super("Flee");    }
+    toJSON() {return window.storage.Generic_toJSON("SkillFlee", this); };
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillFlee, value.data));}
     targetFilter(targets){
         return(this.targetFilterSelf(targets));
     }
@@ -310,6 +318,8 @@ class SkillFlee extends Skill {
 }
 class SkillSubmit extends Skill {
     constructor() { super("Submit");    }
+    toJSON() {return window.storage.Generic_toJSON("SkillSubmit", this); };
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillSubmit, value.data));}
     targetFilter(targets){
         return(this.targetFilterSelf(targets));
     }
@@ -333,6 +343,8 @@ class SkillSubmit extends Skill {
 class SkillGuard extends Skill {
     //todo improves defense
     constructor() { super("Guard");}
+    toJSON() {return window.storage.Generic_toJSON("SkillGuard", this); };
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillGuard, value.data));}
     targetFilter(targets){
         return(this.targetFilterSelf(targets));
     }
@@ -353,9 +365,11 @@ class SkillGuard extends Skill {
 }
 class SkillUseItem extends Skill {
     constructor() {super("UseItem");
-        this.item=null;
+        this.item='';
         this.msg = '';
     }
+    toJSON() {return window.storage.Generic_toJSON("SkillUseItem", this); };
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillUseItem, value.data));}
 // first item has to be set
 // then when targetFilter is called, forward the filterrequest to the item
 // the item has to implement targetFilter and also check if the item is valid for use in combat    
@@ -387,13 +401,15 @@ class SkillCallHelp extends Skill {
     static setup(item) {
         let sk = new SkillCallHelp();
         sk.item = item;
+        //todo delay and cooldown
         return(sk);
     }
     constructor() {
         super("CallHelp");
-        this.item=null;
-        this.delay = 2;
-    } 
+        this.item='';
+    }
+    toJSON() {return window.storage.Generic_toJSON("SkillCallHelp", this); };
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillCallHelp, value.data));}
     targetFilter(targets){
         return(this.targetFilterSelf(targets));
     }
@@ -419,7 +435,14 @@ class SkillCallHelp extends Skill {
 }
 window.gm.SkillsLib = (function (Lib) {
     window.storage.registerConstructor(SkillAttack);
-TODO    window.storage.registerConstructor(SkillCallHelp);
+    window.storage.registerConstructor(SkillCallHelp);
+    window.storage.registerConstructor(SkillFlee);
+    window.storage.registerConstructor(SkillGuard);
+    window.storage.registerConstructor(SkillHeal);
+    window.storage.registerConstructor(SkillPoisonCloud);
+    window.storage.registerConstructor(SkillStun);
+    window.storage.registerConstructor(SkillSubmit);
+    window.storage.registerConstructor(SkillUseItem);
     //.. and Wardrobe
     Lib['SkillAttack'] = function () { return new SkillAttack();};
     return Lib; 

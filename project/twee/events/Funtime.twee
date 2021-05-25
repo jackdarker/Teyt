@@ -27,7 +27,57 @@ function fondlebreast(elmnt) {
 }
 </script>
 
+:: WolfSubmit
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+The wolf isn't aroused enough and leaves you alone.
+---
+The wolf is quite in the mood to fool around.
+---
+Stiffleged the wolf is strutting over to you. From your point of view you can easily see a red tip poking out of the sheath below his belly.
+You get on all 4 to crawl away, but he quickly jumps on your lower back, pushing you further down with his mass.
+---
+As soon as you can feel his tip hitting your backdoor you pass out.
+[[Pass out]]  
+---
+That bitch seems to be aggresive and submissive at the same time. Does she expect you to take care of her needs?
+[[Lick her]] [[Get behind her]]
+---
+Again she growls baring her teeth as you get behind her. But she also raises her tail giving you a good view of her sex. The black lips of her pussy already swelling in that canine like manner.
+[[Enter her]]
+--- 
+That hot pussy of her is squeezing down on you. 
+You cant hold any longer and shoot your jizzm inside her.
+---
+
+<div></br>
+[[Next|<%=window.gm.player.location%>]]</br></div>
+</article><article id="LogPanel"></article></section>
+
+
+:: WolfVictory
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+You arent horny enough.
+---
+The beast isn't in the mood to have sex with you.
+[[Force]] [[Leave]]
+---
+The beast is quite in the mood to fool around.  
+---
+
+---
+You need some hard wolfcock right now.
+[[Straddle him]] [[On all 4]]
+---
+
+
+
+<div></br>
+[[Next|<%=window.gm.player.location%>]]</br></div>
+</article><article id="LogPanel"></article></section>
+
+
 :: HangmanGame
+<!--adapted from https://remybeumier.be/#creations-anchor-->
 <section> 
 <aside id="sidebar"></aside><article class="main"><%=window.story.render("CenterDialogs") %>
 <main><div class="alphabet" style="">

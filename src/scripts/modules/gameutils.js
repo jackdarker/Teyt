@@ -16,6 +16,7 @@ window.gm.initGame= function(forceReset,NGP=null) {
         debug : 1,   //TODO set to 0 for distribution !   see debug passage for meaning
         dbgShowCombatRoll: false,
         dbgShowQuestInfo: true,
+        debugInv: new Inventory(),
         version : window.gm.getSaveVersion(),
         log : [],
         passageStack : [], //used for passage [back] functionality
@@ -23,7 +24,7 @@ window.gm.initGame= function(forceReset,NGP=null) {
         time : 700, //represented as hours*100 +minutes
         day : 1,
         activePlayer : 'Ratchel', //id of the character that the player controls currently
-        //queststates
+        //flags for global states
         qLaptop : 0,   // see passage _Laptop_
         qDogSit : 0,   // see park
         qUnlockCampus : 0,  //see passage into city
@@ -35,7 +36,10 @@ window.gm.initGame= function(forceReset,NGP=null) {
         qUnlockRedlight : 0,
         qUnlockBeach : 0,
         crowBarLeft: 1,
-        debugInv: new Inventory()
+        // todo character specific ?
+        wolfKnowledge: 0,
+        wolfSubmit: 0,
+        wolfictory: 0
         }; 
         s.vars.debugInv._parent = window.gm.util.refToParent(null);
         s.vars.debugInv.addItem(new Money(),200);
@@ -94,6 +98,7 @@ window.gm.initGame= function(forceReset,NGP=null) {
         s.Ratchel=window.gm.Ratchel;
     }      
     window.gm.switchPlayer(s.Ratchel.name); //start-player
+    //take over flags for newgameplus
     if(NGP) { window.story.state.vars.crowBarLeft = NGP.crowBarLeft; }
     NGP=null; //release memory
 }
@@ -105,9 +110,9 @@ window.gm.getScenePic = function(id){
 }
 //Todo
 window.gm.rollExplore= function() {
-  var s=window.story.state;
-  var places=[];   
-  var r = _.random(0,100);
+  let s=window.story.state;
+  let places=[];   
+  let r = _.random(0,100);
   //todo:depending of your actual location you have a chance to find connected locations or end up in a known one
   if(window.gm.player.location=='Park')   places = ['Mall','Beach','Downtown'];
   if(window.gm.player.location=='Mall')   places = ['Park','Beach','Downtown']; 

@@ -38,3 +38,16 @@ window.gm.encounters.mechanicguy = function(location) {
     window.gm.Encounter.scenePic = window.gm.getScenePic(location);
     window.gm.Encounter.initCombat();
 }
+window.gm.encounters.wolf = function(location) {
+    window.gm.Encounter = new CombatSetup();
+    window.gm.Encounter.EnemyFunc = (function() { var x = new window.gm.Mobs.Wolf(); x.scaleLevel(window.gm.player.level); return([x]);});
+    window.gm.Encounter.Location = location;
+    window.gm.Encounter.scenePic = window.gm.getScenePic(location);
+    window.gm.Encounter.onSubmit =window.gm.Encounter.onDefeat = function() {
+        return('You cannot fight anymore and surrender to the beast.</br>'+ window.gm.printPassageLink('Next','WolfSubmit'));
+    }
+    window.gm.Encounter.onVictory = function() {
+        return('Intimitated, the wolf rolls on its back, whimpering submissively and exposing its throat.</br>'+ window.gm.printPassageLink('Next','WolfVictory'));
+    }
+    window.gm.Encounter.initCombat();
+}

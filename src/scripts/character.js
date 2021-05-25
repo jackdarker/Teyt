@@ -41,9 +41,10 @@ export class Character {
         stPerversion.setup(this.Stats,1,15),stArousal.setup(this.Stats,1,100);
 
         this.Effects.addItem(effNotTired.name, new effNotTired()); //depending on sleep Tired will be set to NotTired or Tired
-        this.Skills.addItem(new SkillFlee()),this.Skills.addItem(new SkillSubmit());
+        
         this.Skills.addItem(new SkillUseItem());this.Skills.addItem(new SkillAttack());this.Skills.addItem(new SkillStun());
         this.Skills.addItem(new SkillHeal());
+        this.Skills.addItem(new SkillFlee()),this.Skills.addItem(new SkillSubmit());    
 
         window.storage.registerConstructor(Character);
     }
@@ -102,11 +103,11 @@ export class Character {
     //"formal" - ...wears underwear too
     clothLevel() { //TODO
         let uwOK = false,civOK =false;
-        if(this.Outfit.getItemId(window.gm.OutfitSlotpLib.uHips)!=='' && this.Outfit.getItemId(window.gm.OutfitSlotpLib.uBreast)!=='')  {
+        if(this.Outfit.getItemId(window.gm.OutfitSlotLib.uHips)!=='' && this.Outfit.getItemId(window.gm.OutfitSlotLib.uBreast)!=='')  {
             uwOK= true;
         }
-        if(this.Outfit.getItemId(window.gm.OutfitSlotpLib.Hips)!=='' && this.Outfit.getItemId(window.gm.OutfitSlotpLib.Breast)!=='' &&
-            this.Outfit.getItemId(window.gm.OutfitSlotpLib.Feet)!=='') {
+        if(this.Outfit.getItemId(window.gm.OutfitSlotLib.Hips)!=='' && this.Outfit.getItemId(window.gm.OutfitSlotLib.Breast)!=='' &&
+            this.Outfit.getItemId(window.gm.OutfitSlotLib.Feet)!=='') {
                 civOK= true;
         }
         if(uwOK && civOK) return "formal";

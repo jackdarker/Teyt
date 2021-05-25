@@ -128,37 +128,6 @@ class stArousal extends Stat{
     toJSON() {return window.storage.Generic_toJSON("stArousal", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stArousal, value.data);};
 }
-class stPerversionMax extends Stat {
-    static setup(context, base,max) {
-        var _stat = new stPerversionMax();
-        var _n = _stat.data;
-        _n.id='perversionMax', _n.hidden=3,_n.base=base, _n.value=base,_n.limits=[{max:99999,min:0}];
-        context.addItem(_stat);
-        _stat.Calc();
-    }
-    constructor() {
-        super();
-        
-    }
-    toJSON() {return window.storage.Generic_toJSON("stPerversionMax", this); };
-    static fromJSON(value) { return window.storage.Generic_fromJSON(stPerversionMax, value.data);};
-}
-class stPerversion extends Stat {
-    static setup(context, base,max) {
-        stPerversionMax.setup(context,max);
-        var _stat = new stPerversion();
-        var _n = _stat.data;
-        _n.id='perversion', _n.hidden=3,_n.base=base, _n.value=base,_n.limits=[{max:'perversionMax',min:0}];
-        context.addItem(_stat);
-        _stat.Calc();
-    }
-    constructor() {
-        super();
-        
-    }
-    toJSON() {return window.storage.Generic_toJSON("stPerversion", this); };
-    static fromJSON(value) { return window.storage.Generic_fromJSON(stPerversion, value.data);};
-}
 class stAgility extends Stat { // core attribute
     static setup(context, base,max) { 
         var _stat = new stAgility();
@@ -247,7 +216,7 @@ class stIntelligence extends Stat { // core attribute
 }
 class stStrength extends Stat { // core attribute
     static setup(context, base,max) { 
-        var _stat = new stAgility();
+        var _stat = new stStrength();
         var _n = _stat.data;
         _n.id='strength',_n.base=base, _n.value=base, _n.modifys=[{id:'healthMax'},{id:'pAttack'}];
         context.addItem(_stat);
@@ -266,7 +235,7 @@ class stStrength extends Stat { // core attribute
 }
 class stEndurance extends Stat { // core attribute
     static setup(context, base,max) { 
-        var _stat = new stAgility();
+        var _stat = new stEndurance();
         var _n = _stat.data;
         _n.id='endurance',_n.base=base, _n.value=base, _n.modifys=[{id:'healthMax'},{id:'pDefense'}];
         context.addItem(_stat);
@@ -279,7 +248,7 @@ class stEndurance extends Stat { // core attribute
     toJSON() {return window.storage.Generic_toJSON("stEndurance", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stEndurance, value.data);};
     updateModifier() {
-        this.parent.addModifier('healthMax',{id:'endurance', bonus:this.arent.get('endurance').value*4});
+        this.parent.addModifier('healthMax',{id:'endurance', bonus:this.parent.get('endurance').value*4});
         this.parent.addModifier('pDefense',{id:'strength', bonus:this.parent.get('endurance').value%4});
     };
 }
@@ -313,7 +282,37 @@ class stPDefense extends Stat {   //physical defense
     toJSON() {return window.storage.Generic_toJSON("stPDefense", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stPDefense, value.data);};
 }
-
+class stPerversionMax extends Stat {
+    static setup(context, base,max) {
+        var _stat = new stPerversionMax();
+        var _n = _stat.data;
+        _n.id='perversionMax', _n.hidden=3,_n.base=base, _n.value=base,_n.limits=[{max:99999,min:0}];
+        context.addItem(_stat);
+        _stat.Calc();
+    }
+    constructor() {
+        super();
+        
+    }
+    toJSON() {return window.storage.Generic_toJSON("stPerversionMax", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(stPerversionMax, value.data);};
+}
+class stPerversion extends Stat {
+    static setup(context, base,max) {
+        stPerversionMax.setup(context,max);
+        var _stat = new stPerversion();
+        var _n = _stat.data;
+        _n.id='perversion', _n.hidden=3,_n.base=base, _n.value=base,_n.limits=[{max:'perversionMax',min:0}];
+        context.addItem(_stat);
+        _stat.Calc();
+    }
+    constructor() {
+        super();
+        
+    }
+    toJSON() {return window.storage.Generic_toJSON("stPerversion", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(stPerversion, value.data);};
+}
 //effects
 class effEnergized extends Effect {
     constructor() {
@@ -475,6 +474,45 @@ class effGrowBreast extends Effect {
                         window.gm.pushDeferredEvent("MutateBreastEnd");
                     }
                     else window.gm.pushDeferredEvent("MutateBreast");
+                });
+            }(this));
+        }
+        return(null);
+    }
+    onApply(){
+        this.data.duration = 60;
+        this.data.time = window.gm.getTime();
+    }
+    merge(neweffect) {
+        if(neweffect.name===this.data.name) {
+            this.data.cycles+= neweffect.data.cycles; //prolong the effect
+            return(true);
+        }
+    }
+}
+class effGrowVulva extends Effect {
+    constructor() {
+        super();
+        this.data.id = this.data.name= effGrowVulva.name, this.data.duration = 60, this.data.hidden=0;
+        this.data.cycles = 3, this.data.magnitude = 3;
+    }
+    toJSON() {return window.storage.Generic_toJSON("effGrowVulva", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(effGrowVulva, value.data);};
+    get desc() {return(effGrowVulva.name);}
+
+    onTimeChange(time) {
+        //after some time you mutate a bit
+        this.data.duration = Math.max(this.data.duration-window.gm.getDeltaTime(time,this.data.time),0);
+        this.data.time = time;
+        if(this.data.duration<=0 && this.data.cycles>0) {
+            this.data.cycles-=1;
+            return(function(me){
+                return (function(Effects){ 
+                    if(me.data.cycles<=0) { 
+                        Effects.removeItem(me.data.id);
+                        window.gm.pushDeferredEvent("MutateVulvaEnd");
+                    }
+                    else window.gm.pushDeferredEvent("MutateVulva");
                 });
             }(this));
         }
@@ -678,6 +716,8 @@ window.gm.StatsLib = (function (StatsLib) {
     StatsLib.effMutateCat = function () { return new effMutateCat();  };  
     window.storage.registerConstructor(effGrowBreast);
     StatsLib.effGrowBreast = function () { return new effGrowBreast();  };
+    window.storage.registerConstructor(effGrowVulva);
+    StatsLib.effGrowVulva = function () { return new effGrowVulva();  };
     //
     window.storage.registerConstructor(skCooking);
 
