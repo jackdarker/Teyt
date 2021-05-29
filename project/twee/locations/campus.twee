@@ -12,16 +12,16 @@
     <!--todo--> In den größeren Gebäuden sind die Vorlesungsräume und Labore der Fachabteilungen untergebracht. </br>
     Natürlich gibt es eine Mensa und auch ein Archiv bzw. Library. In einem Hochhaus ist die Verwaltung und sonstige Dienste für die Studenten untergebracht.  </br>
     </br>
+    <a0 onclick='window.story.show("attend lecture")'>Attend a lecture</a></br>
     <div>Where would you like to go?</br>
-    Electrical & Mechanical Engineering  Chemistry & Process Engineering Micro-Power & Nano-Engineering [[Dining Hall]]  [[ITD Office]]  Library </br>
+    [[Electrical & Mechanical Engineering|NOP]]  [Chemistry & Process Engineering] [Micro-Power & Nano-Engineering] [[Dining Hall]]  [[ITD Office]]  Library </br>
     [[Into the city]]</br></div> 
 <%}%>
 </article><article id="LogPanel"></article></section>
 
 
 :: ITD Office
-<section> 
-<aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
 This is the office-building of the Institute.</br>
 The [[counsellor|NOP]] might be available to give you some guidance about institutional affairs.</br>
@@ -52,3 +52,17 @@ There is an anounce from Harcon Health Inc. for a [[job|Harcon_Logistic_Ad]] in 
 [[Back|_back]]</br></div>
 </article><article id="LogPanel"></article></section>
 
+:: attend lecture
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+todo You attend to lectures all morning.</br>
+<div></br>
+<a0 onclick='work()'>You are done for today</a></br></div>
+</article><article id="LogPanel"></article></section>
+<script>
+function work() {
+    window.gm.player.Stats.increment("energy",-40);
+    window.gm.forwardTime(1300);
+    window.story.show("Campus");
+}
+</script>

@@ -198,7 +198,7 @@ printItemList() {
       entry.href='javascript:void(0)';
       let foo = (function(id,carrier){ 
         this._postItemSelect(id);
-        //let _res=carrier.Inv.use(id); window.gm.refreshScreen();window.gm.printOutput(_res.msg);
+        //let _res=carrier.Inv.use(id); window.gm.refreshAllPanel();window.gm.printOutput(_res.msg);
       }).bind(this,id);
       entry.addEventListener("click",foo);
       entry.textContent=id;
@@ -406,7 +406,7 @@ execMove(){
     result.msg=s.combat.actor.Skills.getItem(s.combat.action).cast(s.combat.target).msg;
   }
   result.OK = true;
-  this.printNextLink(this.checkDefeat);//this.next=this.checkDefeat; result.msg+=window.gm.printPassageLink("Next","EncounterStartTurn");
+  this.printNextLink(this.checkDefeat);//todo continue automatically if next actor is AI
   return(result);
 }
 postBattle() {
@@ -542,7 +542,7 @@ window.gm.combat.calcAbsorb=function(attacker,defender, attack) {
 window.gm.combat.defaultAttackData = function() {
   return({value:0,total:0,crit:false,effects:[]}); 
 }
-// calculates the damage of an attack and applies it
+// calculates the damage of an physical attack
 window.gm.combat.calcAttack=function(attacker,defender,attack) {
   let result = {OK:false,msg:''};
   //var def = defender.Stats.get('pDefense').value;
@@ -564,84 +564,33 @@ window.gm.combat.calcAttack=function(attacker,defender,attack) {
   result.msg = _tmp;
   return(result);
 }
-/////////////////////////////////////////////////////////////
-/*  generic combat moves */
-//used to skip turn
-window.gm.combat.moveNOP = function(actor,target) { 
-  var result= {OK:false,msg:''};
-  return(result);
-}
-//increase defense
-window.gm.combat.moveGuard = function(actor,target) { 
-  //Todo
-  var s = window.story.state;
-  var result= {OK:true,msg:''};
-  return(result);
-}
-//stun caused by blunt weapon, shock
-window.gm.combat.moveStun = function(actor,target) { 
-  var s = window.story.state;
-  var attacker = actor;//s.combat.enemyTurn ? window.story.state.enemy  :window.gm.player;
-  var defender = target;//s.combat.enemyTurn ? window.gm.player :window.story.state.enemy;
-  var result= {OK:true,msg:''};
-  var rnd = _.random(1,100);
-  if(rnd >4) {
-    result.msg += defender.name+" got stunned by "+attacker.name;
-    defender.addEffect(effStunned.name,new effStunned())
-  } else {
-    result.msg += "Attempt to stun "+defender.name +" failed.";
-    result.OK=false;
-  }
-  return(result);
-}
-window.gm.combat.moveFlee = function(actor,target) { 
-  //Todo
-  var s = window.story.state;
-  var result= {OK:true,msg:''};
-  var rnd = _.random(1,100);
-    if(rnd >40) { //Todo fleeing chance calculation
-      result.msg += "You escaped the fight.";
-      s.combat.playerFleeing = true;  //just setting the flag, you have to take care of handling!
-    } else {
-      result.msg += "Your attempts to escape failed.";
-      result.OK=false;
-    }
-  return(result);
-}
-window.gm.combat.moveSubmit = function(actor,target) { 
-  var s = window.story.state;
-  var result= {OK:true,msg:''};
-  var rnd = _.random(1,100);
-    if(rnd >0) { //Todo fleeing chance calculation
-      result.msg += "You submit to your foe.";
-      s.combat.playerSubmitting = true;  //just setting the flag, you have to take care of handling!
-    } else {
-      result.msg += "Your attempts to submit failed.";
-      result.OK=false;
-    }
-  return(result);
-}
-//calculates damage of attack
-window.gm.combat.movePhysicalAttack = function(actor,target) { 
-  var s = window.story.state;
-  var skill = new SkillAttack(actor);
-  skill.cast([target]);
-  return({OK:true,msg:'dealt some damage'});
+// calculates the damage of an tease attack
+// - calculate sluttiness of attacker: 
+//      teaseproficiency
+//      clothing slutiness
+//      nudeness
+//      own arousal
+// - calculate vulnerability of defender
+//      sexcrafing
+//      like/dislike of attacker
+//      fetish
+// dmg = vulnerability*sluttiness
+// self-dmg if exhibitionist/stripper
+window.gm.combat.calcTeaseAttack=function(attacker,defender,attack) {
+  let result = {OK:true,msg:''};
 
-  var attacker = actor;//s.combat.enemyTurn ? window.story.state.enemy  :window.gm.player;
-  var defender = target;//s.combat.enemyTurn ? window.gm.player :window.story.state.enemy;
-  var def = defender.Stats.get('pDefense').value;
-  var att = attacker.Stats.get('pAttack').value;
-  var result = window.gm.combat.calcAttack(attacker,defender,{value:att,total:att});
-  return({OK:result.OK,msg:result.msg});
+  let rnd = _.random(1,100);
+  let att = attacker.Stats.get('lAttack').value;
+  attack.value=att,attack.total=att;
+  let def = defender.Stats.get('lDefense').value;
+  //todo weakness bonus
+  let dmg = Math.max(1,attack.value* (attack.crit?4:1)-def);
+  window.gm.pushLog(`absorb roll:${dmg} vs ${def} `,window.story.state.vars.dbgShowCombatRoll);
+  result.msg = defender.name +' got teased by '+attacker.name+' and suffered '+dmg+ (attack.crit?' critical ':'')+'lustdamage. '
+  attack.total = dmg;
+
+  attack.effects.push( {target:defender,eff:[(new effTeaseDamage(attack.total))]});
+  /*_tmp += result.msg;
+  result.msg = _tmp;*/
+  return(result);
 }
-window.gm.combat.moveUltraKill = function(actor,target) { 
-  var s = window.story.state;
-  var attacker = actor;//s.combat.enemyTurn ? window.story.state.enemy  :window.gm.player;
-  var defender = target;//s.combat.enemyTurn ? window.gm.player :window.story.state.enemy;
-  var msg = '';
-  var rnd = 30;
-  defender.Stats.increment('health',-1*rnd);
-  msg+= attacker.name+' dealt '+rnd+' damage to '+defender.name+'.</br>';
-  return({OK:true , msg:msg})
-};

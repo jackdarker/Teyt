@@ -28,7 +28,7 @@ class Job {
 }
 
 {
-    var job;
+    let job;
 
     job = new Job("Campus","get to the uni","You have to at least attend some of the lectures to keep up with the studys.");
     job.reqEnergy = 5, job.reqTime=15,job.startTimeMin=700,job.startTimeMax=1100,job.DoW =[1,2,3,4,5];
@@ -48,54 +48,4 @@ class Job {
     job.isDisabled = function (){ return(true);};
     job.disabledReason=function() {return("You are not in the mood to waste your time with books.");};
     window.gm.jobs[job.id] = job;
-}
-//this holds the definition of all quests; which quests/ms are active is stored in window.story.state.quests !
-window.gm.questDef = window.gm.questDef || {};
-{
-    var quest = new Quest("qFindGarden","Find the garden","The Garden is somewhere around the house.");
-    var mile1 = new QuestMilestone(1,"Find the garden","You heard rumors that there is a garden behind the house.Find it.",
-        //each milestone should define a function that checks if the milestone is fullfilled or not or if no more milestones
-        function(){ 
-          if(window.passage.name==="Garden") {
-            return(100);
-          }
-          else return (0);
-        });
-    var mile2 = new QuestMilestone(100,"Found the garden","Congratulation. You found the garden.",
-        function(){ return(-1)});
-    quest.addMileStone(mile1),quest.addMileStone(mile2);
-    window.gm.questDef[quest.id]= quest;
-}
-{
-    var quest = new Quest("qStudy","Do some studying","Do something for your success at university.");
-    var mile1 = new QuestMilestone(1,"","Sitting down and reading a book might get you some knowledge.",
-        function(){  return (0); });
-    var mile2 = new QuestMilestone(100,"","At least you feel a little smarter now.",
-        function(){ return(-1)});
-    quest.addMileStone(mile1),quest.addMileStone(mile2);
-    window.gm.questDef[quest.id]= quest;
-}
-{
-    var hidden = (function(){return(window.gm.quests.getMilestoneState("qMyPleasure").id<100);});
-    var quest = new Quest("qMyPleasure","Pleasure yourself","Pleasure yourself.",hidden );
-    var mile1 = new QuestMilestone(1,"","Rub yourself.",
-        function(){  return (0);},hidden);
-    var mile2 = new QuestMilestone(100,"","You created a mmess in your bedsheets.",
-        function(){ return(-1)});
-    quest.addMileStone(mile1),quest.addMileStone(mile2);
-    window.gm.questDef[quest.id]= quest;
-}
-
-{
-    //quest-flag counts the shifts done in week
-    var quest = new Quest("qFindAJob","Find a job","Somehow you have to make a living.");
-    quest.addMileStone( new QuestMilestone(1,"","Maybe you can ask around or check the blackboard at the uni for some offers.",
-        function(){ return (0);}));
-    quest.addMileStone( new QuestMilestone(100,"","You've got that job-ad from Harcon Health Inc that is somewhere in downtown. Maybe you could inquire there whats up with it.",
-        function(){ return(0)}));
-    quest.addMileStone( new QuestMilestone(200,"","They offered you to work in logistic department. You will move boxes and crates around for little money but at least its a start. Check your job-schedule",
-        function(){ return(0)}));
-    quest.addMileStone( new QuestMilestone(300,"","???",
-        function(){ return(0)}));
-    window.gm.questDef[quest.id]= quest;
 }

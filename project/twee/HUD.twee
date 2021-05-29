@@ -26,7 +26,7 @@ Money: <%=window.gm.player.Inv.countItem('Money') %></br>
 <%}%>
 </form>
 <script>
-//document.querySelector('#wait').addEventListener('click', function(){window.gm.addTime(45);window.gm.refreshScreen();}); 
+//document.querySelector('#wait').addEventListener('click', function(){window.gm.addTime(45);window.gm.refreshAllPanel();}); 
 document.querySelector('#inv').addEventListener('click', function(){window.story.show('Inventory');});
 document.querySelector('#dashboard').addEventListener('click', function(){window.story.show('Player_Dashboard');});
 document.querySelector('#status').addEventListener('click', function(){window.story.show('Status');});
@@ -50,7 +50,7 @@ function toggleview(){
   document.querySelector("section").classList.toggle("section_swap");
 }
 function clearview(){
-  window.gm.clearLog();window.gm.refreshScreen();
+  window.gm.clearLog();window.gm.refreshAllPanel();
 }
 </script>
 
@@ -151,12 +151,14 @@ for(var i=0;i<maxSlots;i++){
 <%=window.gm.printRelationSummary()%>
 </article><article id="LogPanel"></article></section>
 
+
 :: Achievements [_back]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 [[Back|_back]]</br>
 <%=window.gm.printAchievements()%>
 </article><article id="LogPanel"></article></section>
+
 
 :: Player_Dashboard [_back]
 <!--a dashboard where the player can check his other stuff-->
@@ -167,6 +169,7 @@ Your outfit can only be changed by using a wardrobe.</br>
 [[Back|_back]] [[Status]] [[Relations]] [[Inventory]] [[QuestList]]</br>
 </article><article id="LogPanel"></article></section>
 
+
 :: TodoList
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
@@ -176,6 +179,7 @@ Picking up your Todo-List you read:</br>
 [[Next|<%=window.gm.player.location%>]]</br>
 </article><article id="LogPanel"></article></section>
 
+
 :: QuestList [_back]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
@@ -183,6 +187,7 @@ Picking up your Todo-List you read:</br>
 <%=window.gm.printQuestList()%>
 </br>[[Back|_back]]</br>
 </article><article id="LogPanel"></article></section>
+
 
 :: Wardrobe [_back]
 <section> 
@@ -238,10 +243,15 @@ img.src = imgsrc;//'https://twinery.org/homepage/img/logo.svg';   //todo the loa
 :: Status [_back]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
-Status of <%=window.gm.player.name%>:</br> 
-<%=window.gm.printEffectSummary()%>
+Status of <%=window.gm.player.name%>:   [[Back|_back]]</br>
+<a0 onclick='window.gm.printOutput(window.gm.printEffectSummary(window.gm.player.id,true,false));'>Stats</a>
+<a0 onclick='window.gm.printOutput(window.gm.printEffectSummary(window.gm.player.id,false,true));'>Fetish</a>
+</br><div id='output'></div></br>   <!--message is rendered here-->
 [[Back|_back]]</br>
 </article><article id="LogPanel"></article></section>
+<script>
+window.gm.printOutput(window.gm.printEffectSummary(window.gm.player.id,true,false));
+</script>
 
 
 :: listsell

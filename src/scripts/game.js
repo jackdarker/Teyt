@@ -29,12 +29,12 @@ window.gm.getDeltaTime = function(a,b){
 }
 //adds MINUTES to time
 window.gm.addTime= function(min) {
-  var v=window.story.state.vars;
-  var m=v.time%100;         
-  var h=((v.time-m)/100);
+  let v=window.story.state.vars;
+  let m=v.time%100;         
+  let h=parseInt((v.time-m)/100);
   m= m+min;
-  var m2 = m%60;
-  var h2 = h+(m-m2)/60;
+  let m2 = m%60;
+  let h2 = h+parseInt((m-m2)/60);
   window.story.state.vars.time = (h2*100+m2%60);
   while(window.story.state.vars.time>=2400) {
     window.story.state.vars.time -= 2400;
@@ -73,14 +73,14 @@ window.gm.getDateString= function() {
 };
 //forward time to until (1025 = 10:25), regenerate player
 //warning dont write 0700 because this would be take as octal number
-window.gm.sleep=function(until) {
-  var v=window.story.state.vars;
-  var msg='';
-  var m=v.time%100;
-  var h=((v.time-m)/100);
-  var m2=until%100;
-  var h2=((until-m)/100);
-  var min = (h2-h)*60+(m2-m);
+window.gm.forwardTime=function(until) {
+  let v=window.story.state.vars;
+  let msg='';
+  let m=v.time%100;
+  let h=parseInt((v.time-m)/100);
+  let m2=until%100;
+  let h2=parseInt((until-m2)/100);
+  let min = (h2-h)*60+(m2-m);
   //if now is 8:00 and until 10:00 we assume you want to sleep 2h and not 2+24h
   //if now is 10:00 and until is 9:00 we assume sleep for 23h
   if(until<v.time) {
@@ -89,9 +89,9 @@ window.gm.sleep=function(until) {
   if(min===0) { //if sleep from 700 to 700, its a day
     min=24*60;
   }
-  msg+="</br>Slept for "+min/60+" hours.</br>";
+  msg+="</br>"+min%60+" hours pass by.</br>";
   window.gm.addTime(min);
-  var regen = min>420 ? 999 : min/60*15;  //todo scaling of regeneration
+  let regen = min>420 ? 999 : parseInt(min/60*15);  //todo scaling of regeneration
   window.gm.player.Stats.increment('health',regen);
   window.gm.player.Stats.increment('energy',regen);
   window.gm.pushLog(msg);
@@ -115,7 +115,7 @@ window.gm.initGame= function(forceReset,NGP=null) {
       console.log('showing '+eventObject.passage.name);
     });
     // Render the passage named HUD into the element todo replace with <%=%>??
-    $(document).on('sm.passage.shown', function (ev,eventObject) { window.gm.updateOtherPanels();});
+    $(document).on('sm.passage.shown', function (ev,eventObject) { window.gm.refreshSidePanel();});
     var s = window.story.state; //s in template is window.story.state from snowman!
     if(!s.quests || forceReset) {
       s.quests =  new QuestData();
@@ -296,11 +296,11 @@ window.gm.isInParty = function(name) {
 
   //---------------------------------------------------------------------------------
   //updates all panels
-window.gm.refreshScreen= function() {
+window.gm.refreshAllPanel= function() {
   window.story.show(window.passage.name);
 };
 //updates only sidepanle,logpanel
-window.gm.updateOtherPanels = function(){
+window.gm.refreshSidePanel = function(){
   renderToSelector("#sidebar", "sidebar");renderToSelector("#LogPanel", "LogPanel"); 
 };
 ///////////////////////////////////////////////////////////////////////
@@ -338,8 +338,8 @@ window.gm.roll=function(n,sides) { //rolls n x dies with sides
   return(rnd); 
 }
 //expects DOM like <section><article>..<div id='output'></div>..</article></section>
-window.gm.printOutput= function(text) {
-  document.querySelector("section article div#output").innerHTML = text;
+window.gm.printOutput= function(text,where="section article div#output") {
+  document.querySelector(where).innerHTML = text;
 };
 //connect to onclick to toggle selected-style for element + un-hiding related text
 //the elmnt (f.e.<img>) needs to be inside a parentnode f.e. <div id="choice">
@@ -465,16 +465,16 @@ window.gm.cbCanBuyPerverse = function(itemid,cost,pervcost) {
 window.gm.buyFromShop=function(itemid, count,cbPostBuy) {
   window.gm.player.Inv.addItem(new window.storage.constructors[itemid](),count);   //Todo item or wardrobe
   if(cbPostBuy) cbPostBuy(itemid);
-  //window.gm.refreshScreen(); dont refresh fullscreen or might reset modified textoutput
-  window.gm.updateOtherPanels(); //just update other panels
+  //window.gm.refreshAllPanel(); dont refresh fullscreen or might reset modified textoutput
+  window.gm.refreshSidePanel(); //just update other panels
   renderToSelector("#panel", "listsell");
 };
 //this will remove item from player; money-deduct or other cost has to be done in cbPostSell ! 
 window.gm.sellToShop=function(itemid, count,cbPostSell) {
   window.gm.player.Inv.removeItem(itemid,count);
   if(cbPostSell) cbPostSell(itemid);
-  //window.gm.refreshScreen(); dont refresh fullscreen or might reset modified textoutput
-  window.gm.updateOtherPanels(); //just update other panels
+  //window.gm.refreshAllPanel(); dont refresh fullscreen or might reset modified textoutput
+  window.gm.refreshSidePanel(); //just update other panels
   renderToSelector("#panel", "listsell");
 };
 //dynamically build a link representing a sell option including display of cost
@@ -529,7 +529,7 @@ window.gm.pickupAndClear=function(itemid, desc,itemleft,cbAfterPickup=null) {
   window.gm.player.Inv.addItem(new window.storage.constructors[itemid]());
   //window.gm.pushLog("added "+itemid+" to inventory.</br>");
   if(cbAfterPickup) cbAfterPickup();
-  window.gm.refreshScreen();
+  window.gm.refreshAllPanel();
 };
 //prints an item with description; used in inventory
 window.gm.printItem= function( id,descr,carrier,useOn=null ) {
@@ -541,7 +541,7 @@ window.gm.printItem= function( id,descr,carrier,useOn=null ) {
   elmt +=`<a0 id='${id}' onclick='(function($event){document.querySelector(\"div#${id}\").toggleAttribute(\"hidden\");})(this);'>${id} (x${_count})</a>`;
   var useable = _inv.usable(id);
   if(_count>0 && useable.OK) {
-      elmt +=`<a0 id='${id}' onclick='(function($event){var _res=window.gm.player.Inv.use(\"${id}\"); window.gm.refreshScreen();window.gm.printOutput(_res.msg);}(this))'>${useable.msg}</a>`;
+      elmt +=`<a0 id='${id}' onclick='(function($event){var _res=window.gm.player.Inv.use(\"${id}\"); window.gm.refreshAllPanel();window.gm.printOutput(_res.msg);}(this))'>${useable.msg}</a>`;
   }
   elmt +=`</br><div hidden id='${id}'>${descr}</div>`;
   if(window.story.passage(id))  elmt +=''.concat("    [[Info|"+id+"]]");  //Todo add comands: drink,eat, use
@@ -559,7 +559,7 @@ window.gm.printItem2= function( id,descr,carrier,useOn=null ) {
     let entry = document.createElement('a');
     entry.href='javascript:void(0)';
     let foo = (function(id,carrier,useOn){ 
-      let _res=carrier.Inv.use(id); window.gm.refreshScreen();window.gm.printOutput(_res.msg);
+      let _res=carrier.Inv.use(id); window.gm.refreshAllPanel();window.gm.printOutput(_res.msg);
     }).bind(null,id,carrier,useOn);
     entry.addEventListener("click",foo);
     entry.textContent=id;
@@ -572,10 +572,10 @@ window.gm.printEquipment= function( id,descr) {
   var s= window.story.state;
   elmt +=`<a0 id='${id}' onclick='(function($event){document.querySelector(\"div#${id}\").toggleAttribute(\"hidden\");})(this);'>${id}</a>`;
   if(window.gm.player.Outfit.countItem(id)<=0) {
-      //elmt +=`<a0 id='${id}' onclick='(function($event){window.gm.player.Outfit.addItem(new window.storage.constructors[\"${id}\"]()); window.gm.refreshScreen();}(this))'>Equip</a>`;
-      elmt +=`<a0 id='${id}' onclick='(function($event){window.gm.player.Outfit.addItem(window.gm.player.Wardrobe.getItem(\"${id}\")); window.gm.refreshScreen();}(this))'>Equip</a>`;
+      //elmt +=`<a0 id='${id}' onclick='(function($event){window.gm.player.Outfit.addItem(new window.storage.constructors[\"${id}\"]()); window.gm.refreshAllPanel();}(this))'>Equip</a>`;
+      elmt +=`<a0 id='${id}' onclick='(function($event){window.gm.player.Outfit.addItem(window.gm.player.Wardrobe.getItem(\"${id}\")); window.gm.refreshAllPanel();}(this))'>Equip</a>`;
   } else {
-      elmt +=`<a0 id='${id}' onclick='(function($event){window.gm.player.Outfit.removeItem(\"${id}\"); window.gm.refreshScreen();}(this))'>Unequip</a>`;
+      elmt +=`<a0 id='${id}' onclick='(function($event){window.gm.player.Outfit.removeItem(\"${id}\"); window.gm.refreshAllPanel();}(this))'>Unequip</a>`;
   }
   elmt +=`</br><div hidden id='${id}'>${descr}</div>`;
 
@@ -635,7 +635,7 @@ window.gm.printAchievements= function() {
   return(result);
 };
 //prints a string listing stats and effects
-window.gm.printEffectSummary= function(who='player') {
+window.gm.printEffectSummary= function(who='player',showstats=true,showfetish=false) {
   var elmt='';
   var s= window.story.state;
   var result ='';
@@ -645,8 +645,18 @@ window.gm.printEffectSummary= function(who='player') {
   ids.sort(); //Todo better sort
   for(var k=0;k<ids.length;k++){
       var data = window.gm[who].Stats.get(ids[k])
+      let isFetish = (data.id.slice(0,2)==='ft'); //Fetish starts with ft
       if(data.hidden!==4) {
+        if(isFetish && showfetish && !(data.id.slice(-4,-2)==='_M') ) {
+          //expects naes of fetish like ftXXX and limits ftXXX_Min ftXXX_Max
+          let min = window.gm[who].Stats.get(ids[k]+"_Min");
+          let max = window.gm[who].Stats.get(ids[k]+"_Max");
+          result+='<tr><td>'+((data.hidden & 0x1)?'???':data.id)+':</td><td>'+((data.hidden & 0x2)?'???':data.value)+'</td>';
+          result+='<td>'+((data.hidden & 0x2)?'???':'('+(min.value+' to '+max.value))+')</td></tr>';
+        }
+        if(!isFetish && showstats) {
           result+='<tr><td>'+((data.hidden & 0x1)?'???':data.id)+':</td><td>'+((data.hidden & 0x2)?'???':data.value)+'</td></tr>';
+        }
       }
   }
   result+='</table>';

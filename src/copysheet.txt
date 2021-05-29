@@ -1,0 +1,9 @@
+window.gm.refreshAllPanel()
+
+window.story.state.vars.day
+window.gm.getTimeStruct().hour
+
+<%=window.gm.printPickupAndClear('LaptopPS','pickup laptop-powersupply from table',1-window.gm.player.Inv.countItem('LaptopPS'))%>
+
+
+<p class=talkPC>""</p>

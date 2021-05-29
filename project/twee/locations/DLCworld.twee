@@ -1,6 +1,9 @@
 :: VRSuiteUp
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <!--todo--> You are eager to try that virtual reallity game. </br>
+"Welcome to the test version of our new game. Lets just clarify some things about the beta-testing process. In most cases you just have to play the game as you like. We will track your actions and progress to adapt and improve the experience of the finished game.
+However, at times you might be requested to do certain things and do it in a certain way.  </br>
+Remember that this is not the final game. We continously modify aspects to get the best experience for the players."   </br>
 <div></br>
 [[Start the game|CharacterEditor]]</br></div>
 </article><article id="LogPanel"></article></section>
@@ -8,7 +11,16 @@
 :: CharacterEditor
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
-<!--todo--> "Please select class and race of your character:"</br>
+You say 'Create new avatar'. The screen switches to those kind of screens that are common to other RPGs.</br>
+You can select class, race, character-traits and some visual aspects.</br>
+'Lets see what classes we have...Staff Zealot..never heard of that one  '</br>
+As you try to flip through the classes you got a message "For testing purpose the following condition is applied: character-class and race restricted"</br>
+'Oh man, I'm stuck with that class? I would at least know what other classes are available.' You try to change race, but find that you are stuck to some kind of elf-youngling. 
+You can toggle between male and female though the difference between the androgyne male and the female seem just to be some perky but small titts.</br>
+The description of the class is sparse. The picture you see indicates that this class uses a 2-handed staff and light armor. You expect also some magic abilities - its an elf, isn't it?.</br>
+'I will choose male. Brad would make fun of me all time if I would choose any other option. On the other hand, it is roleplay right?'</br>
+<!--todo-->[[male elf]] [[female elf]] 
+
 <div></br>
 [[Ready|StartLocation]]</br></div>
 </article><article id="LogPanel"></article></section>
@@ -16,11 +28,13 @@
 
 :: StartLocation
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%window.gm.player.location=window.passage.name;%>
+<%window.gm.player.location=window.passage.name;
+window.gm.enterVR();%>
+<%window.gm.quests.forceQuestMilestone("qDLCMain",700,600)%>
 <!--todo--> "You magically appear near the top of a hill. </br>
-You can see some houses from here, you just need to follow the trail down the hill."</br>
+You can see some houses from here, maybe a small village. You just need to follow the trail down the hill."</br>
 <div></br>
-[[Village|Training1]]</br></div>
+[[Village|VillageEntranceIntro]]</br></div>
 </article><article id="LogPanel"></article></section>
 
 
@@ -52,6 +66,16 @@ You can see some houses from here, you just need to follow the trail down the hi
 </article><article id="LogPanel"></article></section>
 
 
+:: HillSpawn
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+<!--todo--> "You magically appear near the top of a hill. </br>
+You can see some houses from here, maybe a small village. You just need to follow the trail down the hill."</br>
+<div></br>
+[[Village|VillageEntrance]]</br></div>
+</article><article id="LogPanel"></article></section>
+
+
 :: VillageEntrance
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
@@ -68,7 +92,7 @@ Someone has painted 'Thetain' on the planks above the wooden gate. Most likely t
 <!--todo--> There arent many people around the place right now.</br> There seems to be a shop of an alchemist, a Inn and another shop where you cant say what kind of wares - if any - they are trading.</br>
 </br> Near the entrance of the Inn is also a [[bulletin-board]]. 
 <div></br>
-[[VillageInn]]  [[VillagePotions]] [[VillagePawnshop]] [[VillageEntrance]]</br></div>
+[[Inn|VillageInn]]  [[Alchemist|VillagePotions]] [[Shop|VillagePawnshop]] [[Gate|VillageEntrance]]</br></div>
 </article><article id="LogPanel"></article></section>
 
 
@@ -78,7 +102,7 @@ Someone has painted 'Thetain' on the planks above the wooden gate. Most likely t
 <!--todo--> 'This really looks like they scavenged that place from a typical fantasy story book.'</br> 
 </br> 
 <div></br>
-[[VillageMarketPlace]] </br></div>
+[[Square|VillageMarketPlace]] </br></div>
 </article><article id="LogPanel"></article></section>
 
 
@@ -88,7 +112,7 @@ Someone has painted 'Thetain' on the planks above the wooden gate. Most likely t
 <!--todo--> 'Puh, what a stink. I shouldnt stay here for long for I might suffocate'</br> 
 </br> "Hello? Anyone there?"
 <div></br>
-[[VillageMarketPlace]]  [[Alchemist]]</br></div>
+[[Square|VillageMarketPlace]]  [[Alchemist]] [[Clair]]</br></div>
 </article><article id="LogPanel"></article></section>
 
 
@@ -96,9 +120,10 @@ Someone has painted 'Thetain' on the planks above the wooden gate. Most likely t
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
 <!--todo--> If this is a shop, then they sell everything: Shoes, cooking pans, assault ballista and chicken.</br> 
+<!--todo-->On the other side of the room is a large [[Wardrobe]] with a [[Mirror]] where you can take a look at yourself.
 </br> 
 <div></br>
-[[VillageMarketPlace]]  [[Shopkeeper]]</br></div>
+[[Square|VillageMarketPlace]]  [[Shopkeeper]]</br></div>
 </article><article id="LogPanel"></article></section>
 
 
@@ -108,8 +133,18 @@ Someone has painted 'Thetain' on the planks above the wooden gate. Most likely t
 <!--todo--> You are in the sanctum of spawn. Its located on top of the hill above the settlement.</br> 
 </br> There is a path leading downwards to the settlement.</br>
 <div></br>
-[[VillageEntrance]] </br></div>
+[[Village|VillageEntrance]] </br></div>
 </article><article id="LogPanel"></article></section>
+<script>
+if(!window.story.state.vars.diedOnce) {
+    window.story.show('YouDiedOnce'); 
+} else {
+    window.gm.respawn();
+    window.gm.player.Wardrobe.addItem(new window.storage.constructors['RobesZealot']());
+    window.gm.player.Outfit.addItem(new window.storage.constructors['RobesZealot']());
+    window.gm.player.Inv.addItem(new window.storage.constructors['StaffWodden'](),1);
+}
+</script>
 
 
 :: ForestBorder
@@ -119,7 +154,7 @@ Someone has painted 'Thetain' on the planks above the wooden gate. Most likely t
 One direction leads to the settlement close by. The other direction follows the border of the forest but gets out of view quickly.</br> 
 </br> 
 <div></br>
-[[VillageEntrance]] [[ForestEntrance]] [[follow Road]] </br></div>
+[[Village|VillageEntrance]] [[ForestEntrance]] [[follow Road]] </br></div>
 </article><article id="LogPanel"></article></section>
 
 
@@ -142,7 +177,7 @@ Unfortunatly you didnt find anything useful.</br>
 </br> 
 Maybe you can <a0 onclick='explore(); '>explore</a> the surrounding woods and see if you can find anything useful.</br>
 <div></br><a0 onclick='enterBeehive(); '>Enter Beehive</a></br>
-[[ForestBorder]] [[Forest]] </br></div>
+[[ForestBorder]] [[ForestCliff]] </br></div>
 </article><article id="LogPanel"></article></section>
 <script> function enterBeehive() {
     window.gm.dng = window.gm.dngs.BeeHive();
@@ -162,6 +197,66 @@ function explore() {
     }
 }
 </script>
+
+
+:: ForestCliff
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+<!--todo--> Du kämpfst dich durch das dichte Unterholz und bemerkst gerade noch rechtzeitig das du an einer Felsenkante angekommen bist.</br> 
+</br> 
+<% if(!window.story.state.vars.diedOnce) { %>
+<div id='select1' >
+<a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1a")'>Peak into the chasm</a>
+</div>
+<div id='choice1a' hidden>
+Dort liegt eine Felsenplatte, von der du recht gut nach unten schauen können solltest.</br>
+Du schaust vorsichtig über den Rand. Es ist kein richtiger Abgrund aber ein ziemlich steiler,felsiger Hang.</br>
+<div id='select2' >
+<a0 onclick='window.gm.printTalkLink($("div#select2")[0],"div#choice2a")'>Leave</a>
+</div>
+<div id='choice2a' hidden>
+'Da kletter ich jetzt nicht runter.' denkst du als du wieder in den Wald zurückgehen willst.</br>
+Unglücklicherweise scheint die Felsplatte doch nicht so felsenfest zu sein und gerade als du dich zu gehen umdrehst fängt sie an in den Abgrund zu kippen.
+<div id='select3' >
+<a0 onclick='window.gm.printTalkLink($("div#select3")[0],"div#choice3a")'>Leave</a>
+</div>
+<div id='choice3a' hidden>
+Unfortunatly, your jump-ability isn't quite good enough. The slab drags you down with it.</br>
+At some point you somehow end below the massive rock. You see it coming, reaching out with your hands to stop it squishing you.
+But of course its futile trying to catch that crushing weight. </br> 
+[[get squished|VillageRespawnPod]]
+</div></div></div>
+<% } else {%>
+<div>
+[[ForestEntrance]] </br></div> 
+<%}%>
+</article><article id="LogPanel"></article></section>
+
+:: StoneCircle
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+<!--todo--> Aus dem dichten Unterholz trittst du auf eine Lichtung. Das wäre ein idylischer Ort wenn nicht dieser Steinkreis wäre.</br> 
+</br> 
+<% if(!window.story.state.vars.diedOnce) { %>
+<div id='select1' >
+<a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1a")'>Inspect stone circle</a>
+</div>
+<div id='choice1a' hidden>
+Du gehst zu den übermannsgroßen Steinen. Es scheint hier etwas kühler zu sein und etwas Nebel liegt in der Luft.
+Ansonsten gibt es hier nichts.</br>
+<div id='select2' >
+<a0 onclick='window.gm.printTalkLink($("div#select2")[0],"div#choice2a")'>Leave</a>
+</div>
+<div id='choice2a' hidden>
+Als du den Ort verlässt läufst du durch ein Tor das aus 2 großen Steinen und einen darüber liegenenden Felsen gebildet wird.</br>
+[[NOP]]
+</div></div>
+<% } else {%>
+<div>
+[[ForestEntrance]] </br></div> 
+<%}%>
+</article><article id="LogPanel"></article></section>
+
 
 
 :: Dungeon [_nosave]

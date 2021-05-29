@@ -23,9 +23,8 @@ window.gm.initGame= function(forceReset,NGP=null) {
         defferedStack : [], //used for deffered events
         time : 700, //represented as hours*100 +minutes
         day : 1,
-        activePlayer : 'Ratchel', //id of the character that the player controls currently
+        activePlayer : '', //id of the character that the player controls currently
         //flags for global states
-        qLaptop : 0,   // see passage _Laptop_
         qDogSit : 0,   // see park
         qUnlockCampus : 0,  //see passage into city
         qUnlockPark : 0,
@@ -36,10 +35,12 @@ window.gm.initGame= function(forceReset,NGP=null) {
         qUnlockRedlight : 0,
         qUnlockBeach : 0,
         crowBarLeft: 1,
-        // todo character specific ?
+        //VR flags todo character specific ?
+        diedOnce : false,
+        diedOnceWithCursed: false,
         wolfKnowledge: 0,
         wolfSubmit: 0,
-        wolfictory: 0
+        wolfVictory: 0
         }; 
         s.vars.debugInv._parent = window.gm.util.refToParent(null);
         s.vars.debugInv.addItem(new Money(),200);
@@ -61,7 +62,7 @@ window.gm.initGame= function(forceReset,NGP=null) {
     }
     if (!s.Cyril||forceReset) {  //alternative player character
       window.gm.Cyril = new Character()
-      window.gm.Cyril.name="Cyril";
+      window.gm.Cyril.name=window.gm.Cyril.id="Cyril";
       window.gm.Cyril.faction="Player";
       //add some basic inventory
       window.gm.Cyril.Wardrobe.addItem(new Jeans());
@@ -72,32 +73,46 @@ window.gm.initGame= function(forceReset,NGP=null) {
       s.Cyril = window.gm.Cyril;
       //delete window.gm.Cyril; 
     }
-    if (!s.Ratchel||forceReset) {  
-        window.gm.Ratchel = new Character();
-        window.gm.Ratchel.name="Ratchel";
-        window.gm.Ratchel.faction="Player";
-        window.gm.Ratchel.gainRelation('Mom',10);
-        window.gm.Ratchel.Effects.addItem(skCooking.name,new skCooking());
+    if (!s.PlayerVR||forceReset) {  
+      window.gm.PlayerVR = new Character();
+      window.gm.PlayerVR.id="PlayerVR";
+      window.gm.PlayerVR.name="Zeph";
+      window.gm.PlayerVR.faction="Player";
+      window.gm.PlayerVR.Effects.addItem(skCooking.name,new skCooking());
+      //add some basic inventory
+      window.gm.PlayerVR.Outfit.addItem(new VulvaHuman());
+      window.gm.PlayerVR.Wardrobe.addItem(new RobesZealot());
+      window.gm.PlayerVR.Outfit.addItem(new RobesZealot());
+      window.gm.PlayerVR.Inv.addItem(new StaffWodden(),1);
+      s.PlayerVR=window.gm.PlayerVR;
+  }
+    if (!s.PlayerRL||forceReset) {  
+        window.gm.PlayerRL = new Character();
+        window.gm.PlayerRL.id="PlayerRL";
+        window.gm.PlayerRL.name="Ratchel";
+        window.gm.PlayerRL.faction="Player";
+        //window.gm.PlayerVR.gainRelation('Mom',10);
+        window.gm.PlayerRL.Effects.addItem(skCooking.name,new skCooking());
         //add some basic inventory
-        window.gm.Ratchel.Inv.addItem(new Money(),20);
-        window.gm.Ratchel.Inv.addItem(new LighterDad());
-        window.gm.Ratchel.Inv.addItem(new FlashBang(),2);
-        window.gm.Ratchel.Inv.addItem(new CanOfCoffee(),2);
-        window.gm.Ratchel.Wardrobe.addItem(new Jeans());
-        window.gm.Ratchel.Wardrobe.addItem(new Sneakers());
-        window.gm.Ratchel.Wardrobe.addItem(new Leggings());
-        window.gm.Ratchel.Wardrobe.addItem(new TankShirt());
-        window.gm.Ratchel.Wardrobe.addItem(new Pullover());
-        window.gm.Ratchel.Wardrobe.addItem(new TailRibbon());
-        window.gm.Ratchel.Outfit.addItem(new VulvaHuman());
-        window.gm.Ratchel.Outfit.addItem(new Jeans());
-        window.gm.Ratchel.Outfit.addItem(new Sneakers());
-        window.gm.Ratchel.Outfit.addItem(new Pullover());
+        window.gm.PlayerRL.Inv.addItem(new Money(),20);
+        window.gm.PlayerRL.Inv.addItem(new LighterDad());
+        window.gm.PlayerRL.Inv.addItem(new FlashBang(),2);
+        window.gm.PlayerRL.Inv.addItem(new CanOfCoffee(),2);
+        window.gm.PlayerRL.Wardrobe.addItem(new Jeans());
+        window.gm.PlayerRL.Wardrobe.addItem(new Sneakers());
+        window.gm.PlayerRL.Wardrobe.addItem(new Leggings());
+        window.gm.PlayerRL.Wardrobe.addItem(new TankShirt());
+        window.gm.PlayerRL.Wardrobe.addItem(new Pullover());
+        window.gm.PlayerRL.Wardrobe.addItem(new TailRibbon());
+        window.gm.PlayerRL.Outfit.addItem(new VulvaHuman());
+        window.gm.PlayerRL.Outfit.addItem(new Jeans());
+        window.gm.PlayerRL.Outfit.addItem(new Sneakers());
+        window.gm.PlayerRL.Outfit.addItem(new Pullover());
         //special skills
-        window.gm.Ratchel.Skills.addItem(SkillCallHelp.setup('Mole'));
-        s.Ratchel=window.gm.Ratchel;
+        window.gm.PlayerRL.Skills.addItem(SkillCallHelp.setup('Mole'));
+        s.PlayerRL=window.gm.PlayerRL;
     }      
-    window.gm.switchPlayer(s.Ratchel.name); //start-player
+    window.gm.switchPlayer("PlayerRL");
     //take over flags for newgameplus
     if(NGP) { window.story.state.vars.crowBarLeft = NGP.crowBarLeft; }
     NGP=null; //release memory
@@ -108,8 +123,32 @@ window.gm.getScenePic = function(id){
   if(id==='Bedroom' || id==='Your Bedroom')   return('assets/bg_bedroom.png');
   return('assets/bg_park.png');//todo placehodler
 }
-//Todo
-window.gm.rollExplore= function() {
+window.gm.enterVR=function() {
+  //todo update effects in VR but stop RL effects
+  window.gm.switchPlayer("PlayerVR");
+  window.gm.respawn(true);
+}
+window.gm.leaveVR=function() {
+  //todo update effects in VR but stop RL effects
+  window.gm.switchPlayer("PlayerRL");
+}
+//heal player and remove inventory
+window.gm.respawn=function(keepInventory=false) {
+  window.gm.player.Stats.increment("energy",9999);
+  window.gm.player.Stats.increment("health",9999);
+  if(!keepInventory) { //remove inentory and outfit that is not questitem, cursed or permanent
+    for(el of window.gm.player.Outfit.list) {
+      if(el.item && el.item.lossOnRespawn ) window.gm.player.Outfit.removeItem(el.id,true);
+    }
+    for(el of window.gm.player.Wardrobe.list) {
+      if(el.item.lossOnRespawn ) window.gm.player.Wardrobe.removeItem(el.id,el.count);
+    }
+    for(el of window.gm.player.Inv.list) {
+      if(el.item.lossOnRespawn ) window.gm.player.Inv.removeItem(el.id,el.count);
+    }
+  }
+}
+window.gm.rollExploreCity= function() {
   let s=window.story.state;
   let places=[];   
   let r = _.random(0,100);

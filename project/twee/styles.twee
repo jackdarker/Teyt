@@ -133,14 +133,23 @@ statup {
 statdown {
   color:red;
 }
-.talkplayer {
-  color: steelblue;
+.talkPC {
+  color: green;
+  /*slateblue,slategreen,royalblue*/
 }
-.talkfoo1 {
+.talkNPC1 {
   color: Brown;
+}
+.talkNPC2 {
+  color: Darkgreen;
 }
 .author {
   color: lightyellow;
+  background-color: darkred;
+}
+.dev {
+  color: lightblue;
+  background-color:darkblue;
 }
 @keyframes alarm {
         0% {

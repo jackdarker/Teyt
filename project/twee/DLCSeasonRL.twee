@@ -4,26 +4,33 @@ Depending if you played the game already you might skip to a certain point:
 
 
 :: GameInvite
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
 As you check your email, you notice a letter from a Gaming-service where you have your Online-Roleplaying-Account for Dominion-of-SLayers registered.</br>
-"Dear sir or madam, we are happy to announce that your starter subscription will end soon and you will be automatically upgraded to an experienced-member account for free*. 
+<p class='talkNPC2'>"Dear sir or madam, we are happy to announce that your starter subscription will end soon and you will be automatically upgraded to an experienced-member account for free*. 
 If you are no longer interested in our service, click the link below to cancel your membership. However, canceling your membership now would lead to unrecoverable loss of your avatars game-progress, stats and inventory.
-Note*: the upgrade from starter to experienced-member is free of cost; monthly subscription cost will be only 30$ instead of 2$ for your actual starter-membership."
+Note*: the upgrade from starter to experienced-member is free of cost; monthly subscription cost will be only 30$ instead of 2$ for your actual starter-membership."</p>
 
 'WTF...they are going to charge me 30 bucks a month! Those fuckers. I cant afford that. There wasn't much good content update recently anyway. '
-[[Call your friend Brad]][[Click the link to cancel your membership]]
-
-"Hey Brad, did you also receive that mail from GameWorld with account-change?"
+<div id='select1' >
+<a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1a")'>Call your friend Brad</a>
+</div>
+<div id='choice1a' hidden>
+<p class='talkPC'>"Hey Brad, did you also receive that mail from GameWorld with account-change?"</p>
 "Yeah, I just wanted to talk about it with you too. What do you think?"
-"We put so much work into this, I wouldnt like to get all of this to waste. But 30$ is really a lot of money for someone studying."
+<p class='talkPC'>"We put so much work into this, I wouldnt like to get all of this to waste. But 30$ is really a lot of money for someone studying."</p>
 "Even for someone who is working regulary this is alot of oney dude. If you leave the game I will leave too."
-"To tell you the truth, it wasnt that fun to play recently. Somehow they messed up the games balancing with those updates."
+<p class='talkPC'>"To tell you the truth, it wasnt that fun to play recently. Somehow they messed up the games balancing with those updates."</p>
 "Thats on purpose. They just want you to buy those boosters for real money!"
-"Yep. So its set. Lets pull them a finger and quit."
+<p class='talkPC'>"Yep. So its set. Lets pull them a finger and quit."</p>
 "Lets do it together 3..2..1..Sent"
-"Me too. Maybe we should try one of those free-to-play games next? I heard SandyBeachBattle is worth a look."
+<p class='talkPC'>"Me too. Maybe we should try one of those free-to-play games next? I heard SandyBeachBattle is worth a look."</p>
 "Im not sure. ..Hey wait I got a mail. But its not from DoS. Its some kind of Invite to a different game... Lets see..."
-Just in that moment you got mail too: </br> 
-
+Just in that moment you got mail too: </br>  
+<div id='select2' >
+<a0 onclick='window.gm.printTalkLink($("div#select2")[0],"div#choice2a")'>Check mail</a>
+</div></div>
+<div id='choice2a' hidden>
 Dear [insert name here],
 you got selected by ServiceAsGame to receive an invite as beta-tester for our new, MOBDSMRP-Game MiracoulusMultiplayerAlwaysOnlineVirtualReallityMassiveServiceRougue-Game.
 Be part of a growing gaming community and get involved in exciting quests and rakish adventures. 
@@ -32,13 +39,12 @@ Click the personalized link below to sign up for a free selected account in </br
 Because of the high demands on this new generation service-game, only thoose that act quickly will get a chance to parttake on the program. So hurry up!
 </br>
 'A new game, huh? I would really like to see what this is about. If its free of charge, that would be nice. '
-
-"I got an invite too. For something called Season-Quest. Never heard of that."
+<p class='talkPC'>"I got an invite too. For something called Season-Quest. Never heard of that."</p>
 "Thats the same I got! If thats just a coincidence ?! But its from a different company."
-"Should we try this? Its adult only, so no annoying kiddos fucking up our game."
+<p class='talkPC'>"Should we try this? Its adult only, so no annoying kiddos fucking up our game."</p>
 "Yeah lets sign in together. I always wanted to see what beta-testing means about!"
 Clicking the link you got forwared to a registration page where you have to enter personal information.
-"Uhm, they want the passportnumber"
+<p class='talkPC'>"Uhm, they want the passportnumber"</p>
 "Of course, because age-checking"
 Entering the required information you press Next and are presented a window with densly scribbled text that is barely readable and even less understandable: the user-agreement.
 'I should check this...' you start reading but soon just scroll trhough the text.
@@ -46,65 +52,121 @@ Entering the required information you press Next and are presented a window with
 You groan 'Come on now' Just scrolling down and hitting next.
 "Congratulations. You are now registered in our beta-test-program and will receive login-credentials and gaming equipment."
 'What gaming equipment?'
-"Hey Brad did you finish registration? I got a confirmation about receiving gaming equipment."
+<p class='talkPC'>"Hey Brad did you finish registration? I got a confirmation about receiving gaming equipment."</p>
 "Uhm yes, I think I saw something about that there is some new generation MoCap-equipment required to play."
-"MoCap?"
+<p class='talkPC'>"MoCap?"</p>
 "Motion-Capturing dude. Sees you need something more that just your ordinary VR-googles to play this."
-"Do we have to pay."
-"They just stated they lent it for the test."
+<p class='talkPC'>"Do we have to pay."</p>
+"They just stated they lent it for the test....oh .I forgot I have to leave. see ya later."
+<p class='talkPC'>"Sure."</p>
+'Im really tired now. Lets see when the equipment shows up.'</p>
+<a0 onclick='window.gm.quests.addQuest("qDLCMain",100);window.gm.quests.addQuest("qFixLaptop",1);window.story.show("Your Bedroom");'>Close Browser</a>
+</div>
+</article><article id="LogPanel"></article></section>
 
 
 :: ReceiveVREquipment
-As you got home from your daily chores and fiddling with the keys to your dorm, you find a sticky note on your door:</br>
-"Pickup parcel from Melanie/213"</br>
-'Melanie? 213?' You slap your forehead 'Ah yes, thats the dorm up the corridor.'
-[[Walk over to the door and knock]]
-
-A girl opens. You guess she is around 20-something. You have seen her at times before but didnt have the guts to speak up to her. She alway seemed to be annoyed by something.
-Just like now.
-"Hi. You are Michael right?""
-"Yes, from 215. I'm sorry to disturb you but I found this note on my door."
-"There was some delivery for you." she really seems pissed.
-"I hope it wasnt any trouble for you to receive it while I'm..."
-"If I had known its about a furniture delivery I would have rejected it."
-"Furniture?" you ask puzzled. You didnt order any furniture, did you.
-She opens the door and you can now see a large parcels the size of a washer and a smaller one, blocking nearly all of the space after the entrance.
-<!--todo-->
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.quests.forceQuestMilestone("qDLCMain",500,100)%>
+As you got home from your daily chores and fiddling with the keys to your dorm, you find a parcel at the door step.</br>
+By the label on it you guess it might contain the gear from the game.</br> 
+'Lets get started with that.'</br>
+[[Next|SetupVREquipment]]</div></div>
+</article><article id="LogPanel"></article></section>
 
 :: SetupVREquipment
-You unpack the heavier one of the large parcels. It contains a number of metal pipes and plates, cables and screws.
-There seems to be also a assembly-description. 
-The other package contains a VR-headset, some papers and something that looks like a diver's suite ade from neoprene. 
-[[Call Brad]]
-You pull out your phone and choose Brads number. But he doesnt answer the call. Maybe he is still at work.
-[[Check the papers]]
-The first piece of paper welcomes you as to the beta-tester-program for Season-quest and also contains your login credentials.
-The other paper contains a list of the delivery and to your horror sums up a bill at the end 
-'2300$ ! I will send this right back. They never said I have to buy that.'
-You read some more:
-"...the delivered equipment will be lent free of charge for the participation in beta-test. At the end of the test, the equipment might be handed over to the user."
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.quests.forceQuestMilestone("qDLCMain",600,500)%>
+The package contains a VR-headset, some papers and something that looks like gloves for your hands. They have some cables worked into them, so you guess they are used instead of controllers.</br>
+[[Call Brad]]</br>
+You pull out your phone and choose Brads number. But he doesnt answer the call. Maybe he is still at work.</br>
+[[Check the papers]]</br>
+The first piece of paper welcomes you as to the beta-tester-program for Season-quest and also contains your login credentials.</br>
+The other paper contains a list of the delivery and to your horror sums up a bill at the end.</br> 
+'2300$ ! I will send this right back. They never said I have to buy that.'</br>
+You read some more:</br>
+"...the delivered equipment will be lent free of charge for the participation in beta-test. At the end of the test, the equipment might be handed over to the user."</br>
 'Phew. So I dont have to pay it ' Reading some more </br> 
-"...compensation fines might be raised on contract violation as of example: 
+"...compensation fines might be raised on contract violation as of example:</br> 
 * preliminary abort of the participation by the user
 * damage or misuse of the provided equipment
 * obstruction of beta-test-program or the game itself
 * disclosure of game-related information"
-'Ok, no problem yet. I think thats just reasonable for something like a beta-test.'
+</br>'Ok, no problem yet. I think thats just reasonable for something like a beta-test.'</br>
 "Please note that you are responsible to regulary check your test-schedule for your assigned pending task.
-Tasks noted as required have to be fullfilled within the given time window. Continous failing to do so might count as obstruction of the test-program... "
-'Damit, what did I get mmyself into. Lets check online about this schedule.'
-You login with your credentials on the PC and are greeted by a welcomescreen:
-"Welcome Michal, this is your actual profile: </br> 
+Tasks noted as required have to be fullfilled within the given time window. Continous failing to do so might count as obstruction of the test-program... "</br>
+'Damit, what did I get mmyself into. Lets check online about this schedule.'</br>
+You login with your credentials on the PC and are greeted by a welcome screen:</br>
+"Welcome <%=window.gm.player.name%>, this is your actual profile:" </br> 
 * no avatar
-Tasks:
+Tasks:</br>
 * Setup equipment to game
 * Create avatar
 * Finish Game introduction
-Need help?
-"
+</br>
+Adorning the gloves and the VR-googles, you first have to run introductory tutorial. </br>
+You get some info how to use your hands movement for navigationg the screen and you even can use speech-control to do so.</br>
+You are eager to create your avatar and get a look at the game. On the other side, you would like to talk about your current experience with Brad first and see if he has gotten as far as you.</br>
+Besides its already gotten late.</br>
+[[Logout]]
+You remove the headset. Still in the suite you call Brad again. This time he responds after some time.</br>
+"Heya whatsup?"
+<p class='talkPC'>"I got that equipment, you too? Isnt it awesome?"</p>
+"Yeah. You already got it working dude?"
+<p class='talkPC'>"It took me over an hour. Did you already login?"</p>
+"Uh no, I'm still struggling with the gear. Maybe there is something missing here."</br>
+You chuckle to yourself 'So Mr.IKnowEverything failed on the mechanical part already'</br>
+[[Offer your help]]
+<p class='talkPC'>"I can help you tomorrow to get it setup if you want."</p>
+"I will just give it a try tommorow morning on my own. I'm just to tired from work, you know."
+<p class='talkPC'>"So you have a day off tomorrow? Just wait for me before doing quests. Its not fair if you get a head start just because I'm busy all day."
+"Dont worry. As usual I will help your lazy ass leveling up to catch up with me."
+<p class='talkPC'>"For sure"</p> 'I should have already started the game to get a head start.'
+You can hear him yawning "I'm going to sleep now."
+<p class='talkPC'>"Me too. See you tomorrow then, bro."</p>
+"Yup. See ya."
+You put your phone away. A shower and some sleep would be nice.</br>
+[[Next|Your Bedroom]]
+</article><article id="LogPanel"></article></section>
+
+:: ReceiveVREquipment2
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.quests.forceQuestMilestone("qDLCMain",500,100)%>
+As you got home from your daily chores and fiddling with the keys to your dorm, you find a sticky note on your door:</br>
+"Pickup parcel from Melanie"</br>
+'Melanie? parcel?' You slap your forehead 'Ah yes, that might be the gaming equiment.'</br>
+<div id='select1' >
+<a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1a")'>knock at her door</a>
+</div></div>
+<div id='choice1a' hidden>
+Melanie opens. You guess she is around 20-something. She alway seemed to be annoyed by something.</br>
+Just like now.</br>
+"Hello <%=window.gm.player.name%>. " </br>
+<p class='talkPC'>"Hi. I'm sorry to disturb you but I found this note on my door."</p>
+"There was some delivery for you." she really seems pissed.
+<p class='talkPC'>"I hope it wasnt any trouble for you to receive it while I'm..."</p>
+"If I had known its some furniture delivery I would have rejected it."
+<p class='talkPC'>"Furniture?" you ask puzzled. You didnt order any furniture, did you.</p>
+She opens the door and you can now see a large parcel the size of a washer and a smaller one, blocking nearly all of the space after the entrance.
+<!--todo-->
+You are eager to get the equipment into your dorm and setup everything. So you move the boxes out of Melanies room into your own.</br>
+[[Next|SetupVREquipment2]]</div></div>
+</article><article id="LogPanel"></article></section>
+
+:: SetupVREquipment2
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.quests.forceQuestMilestone("qDLCMain",600,500)%>
+You unpack the heavier one of the large parcels. It contains a number of metal pipes and plates, cables and screws.
+The other package contains something that looks like a diver's suite made from neoprene and another VR-headset. 
+
 'I first need to figure out how that equipment needs to be setup.'
 You grab the assembly-instructions. Those metal-pipes and plates have to be assembled together to form a kind of scaffolding where the user hangs inside in the air. 
 That way he can move his hands and feet around and the MoCap-suite can be used to generate steering commands.
+'I dont have enough space here for such a large gear.'
+But where else could you place it?
+There is this room in the basement that was planned to be changed over into a party cellar.</br>
+But that plan was never finished and the room is unused right now.
+[[Move everything into the cellar]]
 [[Assemble the cage]]
 [[Connect VR-Headset]]
 That VR-Headset seems a lot better than your old one. Its not as heavy as your old one and can be better adapt to your skull-shape. There are also several cameras that have to be assembled to the rig. You guess they are used to detect the position of the mocap-suite. 
@@ -139,25 +201,10 @@ Besides its already gotten late.
 [[get out of the rack]]
 You remove the headset and fish with one feet for the stool. Gladly you didnt push it to far away.
 You can undock yourself and disconnect the cables.
-Still in the suite you call Brad again. This time he responds after some time.
-"Heya whatsup?"
-"I got that equipment, you too? Isnt it awesome?"
-"Yeah. You already got it working dude?"
-"It took me 3 hours. Did you already login?"
-"Uh no, I'm still struggling with the rack. maybe there is something missing here."
-You chuckle to yourself 'So Mr.IKnowEverything failed on the mechanical part already'
-[[Offer your help]]
-"I can help you tomorrow to get it setup if you want."
-"I will just give it a try tommorow morning on my own. I'm jsut to tired from work, you know."
-"So you have a day off tomorrow? Just wait for me before doing quests. Its not fair if you get a head start just because I'm busy all day."
-"Dont worry. As usual I will help your lazy ass leveling up to catch up with me."
-"For sure" 'I should have already started the game.'
-You can hear him yawning "I'm going to sleep now."
-"Me too. See you tomorrow then, bro."
-"Yup. See ya."
 You put your phone away. Stripping out of the suite is as difficult as getting inside. That rubbery fabric is painfully pulling at each hair on your body.
-After a shower you crawl into bed.
-[[Sleep]]
+A shower and some sleep would be nice.
+[[Next|Your Bedroom]]
+</article><article id="LogPanel"></article></section>
 
 :: RL_Day1
 In 2 days most of your intramural courses are done and you will have more free time. Just lets get the day started and get to university.

@@ -33,7 +33,7 @@ One of them is [[Alice treasures]], a place where women can buy more private clo
 In a more shady corner you find a shop whose windows are just coverd with dark red and black foils. 
 Its name is 'Adult books and tools' and there is an "adults only" sign at the entrance.</br>
 if(window.gm.player.Stats.get('perversion').value<=10) {%>
-<p class='talkplayer'>No way I'm going in to that smut-shop. Only perverts do that. </p>
+<p class='talkPC'>No way I'm going in to that smut-shop. Only perverts do that. </p>
 <%} else {%> [[Adult books and tools]] </br> <%} %>
 Where would you like to go from here?</br>
 [[Mall 0F|Mall Floor 0]]

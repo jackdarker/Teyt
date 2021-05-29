@@ -282,6 +282,36 @@ class stPDefense extends Stat {   //physical defense
     toJSON() {return window.storage.Generic_toJSON("stPDefense", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stPDefense, value.data);};
 }
+class stLAttack extends Stat {   //tease attack
+    static setup(context, base,max) {
+        var _stat = new stLAttack();
+        var _n = _stat.data;
+        _n.id='lAttack',_n.base=base, _n.value=base,_n.limits=[{max:99999,min:0}];
+        context.addItem(_stat);
+        _stat.Calc();
+    }
+    constructor() {
+        super();
+
+    }
+    toJSON() {return window.storage.Generic_toJSON("stLAttack", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(stLAttack, value.data);};
+}
+class stLDefense extends Stat {   //tease defense
+    static setup(context, base,max) {
+        var _stat = new stLAttack();
+        var _n = _stat.data;
+        _n.id='lDefense',_n.base=base, _n.value=base,_n.limits=[{max:99999,min:0}];
+        context.addItem(_stat);
+        _stat.Calc();
+    }
+    constructor() {
+        super();
+
+    }
+    toJSON() {return window.storage.Generic_toJSON("stLAttack", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(stLAttack, value.data);};
+}
 class stPerversionMax extends Stat {
     static setup(context, base,max) {
         var _stat = new stPerversionMax();
@@ -312,6 +342,37 @@ class stPerversion extends Stat {
     }
     toJSON() {return window.storage.Generic_toJSON("stPerversion", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stPerversion, value.data);};
+}
+//Fetish
+// value >0 means character likes that fetish or <0 hates it  
+class stFetish extends Stat {
+    static setup(context, base,max,name) { 
+        let _stat = new stFetish();
+        let _n = _stat.data;
+        _n.id=name+"_Max",_n.base=max, _n.value=max,_n.limits=[{max:100,min:-100}];
+        context.addItem(_stat);
+        _stat = new stFetish();
+        _n = _stat.data;
+        _n.id=name+"_Min",_n.base=0, _n.value=0,_n.limits=[{max:100,min:-100}];
+        context.addItem(_stat);
+        _stat = new stFetish();
+        _n = _stat.data;
+        _n.id=name,_n.base=base, _n.value=base,_n.limits=[{max:name+"_Max",min:name+"_Min"}];
+        context.addItem(_stat);
+        _stat.Calc();
+    }
+    static listFetish() {
+        let list = [
+        'ftZoophil',
+        'ftBondage',
+        'ftDominant',
+        'ftSubmissive',
+        'ftreceiveAnal',
+        'ftgiveAnal',
+        'ftExhibition'];
+        return(list);
+    }
+    constructor() {   super();  }
 }
 //effects
 class effEnergized extends Effect {
@@ -604,18 +665,36 @@ class effDamage extends CombatEffect {
         this.parent.parent.Stats.increment('health',-1*this.amount);
     }
     merge(neweffect) {
-        if(neweffect.name===this.data.name) {    //extends stun
-            this.onApply();
-            return(true);
+        if(neweffect.name===this.data.name) {    //ignore
+            //this.onApply();
+            return(false);
         }
     }
-    onCombatEnd() {
-        this.parent.removeItem(this.data.id);
+    onCombatEnd() { this.parent.removeItem(this.data.id); }
+    onTurnStart() { this.data.duration-=1; if(this.data.duration<=0) this.parent.removeItem(this.data.id);    }
+}
+class effTeaseDamage extends CombatEffect {
+    constructor(amount) {
+        super();
+        this.amount = amount;
+        this.data.id = this.data.name= effTeaseDamage.name, this.data.duration = 0, this.data.hidden=0;
     }
-    onTurnStart() {
-        this.data.duration-=1;
-        if(this.data.duration<=0) this.parent.removeItem(this.data.id);
+    toJSON() {return window.storage.Generic_toJSON("effTeaseDamage", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(effTeaseDamage, value.data);};
+    get desc() {return(effTeaseDamage.name);}
+    onApply(){
+        this.data.duration = 0;
+        this.parent.parent.Stats.increment('arousal',1*this.amount);
+        if(this.data.duration<1) this.parent.removeItem(this.data.id);  
     }
+    merge(neweffect) {
+        if(neweffect.name===this.data.name) {    //ignore
+            //this.onApply();
+            return(false);
+        }
+    }
+    onCombatEnd() { this.parent.removeItem(this.data.id); }
+    onTurnStart() { this.data.duration-=1; if(this.data.duration<=0) this.parent.removeItem(this.data.id);    }
 }
 class effStunned extends CombatEffect {
     constructor() {
@@ -704,13 +783,16 @@ window.gm.StatsLib = (function (StatsLib) {
     window.storage.registerConstructor(stPAttack);
     window.storage.registerConstructor(stPDefense);
     //...effects
+    window.storage.registerConstructor(effCallHelp);
+    window.storage.registerConstructor(effDamage);
+    window.storage.registerConstructor(effEnergized);    
     window.storage.registerConstructor(effNotTired);
+    window.storage.registerConstructor(effTeaseDamage);
     window.storage.registerConstructor(effTired);
-    window.storage.registerConstructor(effEnergized);
     window.storage.registerConstructor(effStunned);
     window.storage.registerConstructor(effGuard);
     window.storage.registerConstructor(effHeal);
-    window.storage.registerConstructor(effCallHelp);
+    
 
     window.storage.registerConstructor(effMutateCat);
     StatsLib.effMutateCat = function () { return new effMutateCat();  };  

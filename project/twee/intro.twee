@@ -23,13 +23,38 @@ This game is powered by twine/tweego and snowman.</br>
 <%window.gm.initGame();window.gm.player.location=window.passage.name;%>
 Welcome to Meason, a town somewhere in these days. </br>
 You are a student in the local university and live in a shared house with some other fellows. </br>
+<p class='author'>You might see a lot of links that red strikethrough. Those are currently broken and you shouldnt use them.</p>
 
-</br>Confirm your selection and [[Start|Home]] the game. </br>
-Or press <a0 id='reset' onclick='window.gm.initGame(true);window.gm.refreshScreen();'>Reset</a> to reset your selection.  </br></br>
-
-<!--<%=window.gm.printUnlockPerk('skCooking','Your cooking skill is slightly improved.')%>
-<%=window.gm.printUnlockPerk('skSporty','You are sporty.')%>
-<%=window.gm.printUnlockPerk('skTechy','You are technic-affine.')%>
-<%=window.gm.printUnlockPerk('skSlacker','You know how to avoid work.')%>
-<%=window.gm.printUnlockPerk('skMoneymaker','get rich.faster.')%> -->
+</br>Press [[Start|Intro2]] to enter the game. (Loading of savegame is only possible in game).</br>
+Or press <a0 id='reset' onclick='window.gm.initGame(true);window.gm.refreshAllPanel();'>Reset</a> to reset your selection.  </br></br>
+There are also some options to skip ahead: </br>
+[[VR Character creation|Intro3]] </br>
+[[Forest exploration|Intro4]]</br>
 </article>
+
+:: Intro2
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+Here you are: a student in its early twentys sitting around at home, working on the laptop in front.
+Progress in studys isnt going as smooth as expected.
+To divert your self you check you decide to check emails. 
+<div></br>
+[[Next|GameInvite]]</br></div>
+</article><article id="LogPanel"></article></section>
+
+
+:: Intro3
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+Start at the character creation screen in the VR-game.
+<div></br>
+[[Back|Intro]] <a0 onclick='start();'>Start</a></br></div>
+</article><article id="LogPanel"></article></section>
+<script> function start() {
+    window.gm.quests.addQuest("qDLCMain",1);
+    window.gm.quests.addQuest("qFixLaptop",1);
+    window.gm.quests.forceQuestMilestone("qDLCMain",600,1);
+    window.gm.quests.forceQuestMilestone("qFixLaptop",1000,1);
+    window.story.show("CharacterEditor");
+}
+</script>

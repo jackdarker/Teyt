@@ -13,7 +13,7 @@ class Money extends Item {
 };
 
 class LaptopPS extends Item {
-    constructor() {        super('Laptop-PS');    }
+    constructor() {        super('LaptopPS');    }
     get desc() { return 'Power converter for laptop.';    }
     toJSON() {return window.storage.Generic_toJSON("LaptopPS", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(LaptopPS, value.data);};

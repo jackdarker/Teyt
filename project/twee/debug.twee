@@ -1,39 +1,39 @@
-:: debug [_back]
-<section> 
-<aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
-Some things for debugging:</br>
-qDogSit=0x<%=s.vars.qDogSit.toString(16)%></br>
-qLaptop=0x<%=s.vars.qLaptop.toString(16)%></br>
-[[Cheats|debug_cheat]]</br>
-[[Back|_back]]</br>
-</article><article id="LogPanel"></article></section>
 
 :: debug_cheat [_back]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
-Cheat buttons:</br>
-<a href="javascript:void(0)" onclick='window.story.state.vars.debugInv.addItem(new window.storage.constructors["Money"](),200);window.gm.refreshScreen();'><%=window.story.state.vars.debugInv.countItem('Money')+"$ in stash"%></a></br>
+Some things for debugging:</br>
+</br>[[MemoryGame]] [[HangmanGame]]</br> <!--todo-->
+</br>[[NewGamePlus]]</br> <!--todo-->
+[[Cheats|debug]]</br>
+[[Back|_back]]</br>
+</article><article id="LogPanel"></article></section>
+
+
+:: debug [_back]
+<section> 
+<aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+Cheat buttons: those are meant for debugging and might break your game</br>
+<a href="javascript:void(0)" onclick='window.gm.player.Inv.addItem(new window.storage.constructors["Money"](),200);window.gm.refreshAllPanel();'>Get 200$</a></br>
 </br>
-<a href="javascript:void(0)" onclick='window.gm.player.Inv.addItem(new window.storage.constructors["Money"](),200);window.gm.refreshScreen();'>Get 200$</a></br>
-</br>
-<a href="javascript:void(0)" onclick='unhideStats();window.gm.refreshScreen();'>unhide player stats</a></br>
+<a href="javascript:void(0)" onclick='unhideStats();window.gm.refreshAllPanel();'>unhide player stats</a></br>
 <%if(window.story.state.vars.dbgShowCombatRoll) {%>
-<a href="javascript:void(0)" onclick='window.story.state.vars.dbgShowCombatRoll=false;window.gm.refreshScreen();'>disable combat debug</a></br>
+<a href="javascript:void(0)" onclick='window.story.state.vars.dbgShowCombatRoll=false;window.gm.refreshAllPanel();'>disable combat debug</a>
 <%} else {%>
-<a href="javascript:void(0)" onclick='window.story.state.vars.dbgShowCombatRoll=true;window.gm.refreshScreen();'>enable combat debug (log combat calculations)</a></br>
+<a href="javascript:void(0)" onclick='window.story.state.vars.dbgShowCombatRoll=true;window.gm.refreshAllPanel();'>enable combat debug (log combat calculations)</a>
 <%}%>
 <%if(window.story.state.vars.dbgShowQuestInfo) {%>
-<a href="javascript:void(0)" onclick='window.story.state.vars.dbgShowQuestInfo=false;window.gm.refreshScreen();'>disable extended questinfo</a></br>
+<a href="javascript:void(0)" onclick='window.story.state.vars.dbgShowQuestInfo=false;window.gm.refreshAllPanel();'>disable extended questinfo</a>
 <%} else {%>
-<a href="javascript:void(0)" onclick='window.story.state.vars.dbgShowQuestInfo=true;window.gm.refreshScreen();'>enable ext. questinfo</a></br>
+<a href="javascript:void(0)" onclick='window.story.state.vars.dbgShowQuestInfo=true;window.gm.refreshAllPanel();'>enable ext. questinfo</a>
 <%}%>
-<a href="javascript:void(0)" onclick='window.gm.player.Stats.increment("health",25);window.gm.refreshScreen();'>Health +25</a></br>
-<a href="javascript:void(0)" onclick='window.gm.player.Stats.increment("energy",25);window.gm.refreshScreen();'>Energy +25</a></br>
-<a href="javascript:void(0)" onclick='window.gm.player.Stats.increment("perversion",25);window.gm.refreshScreen();'>Perversion +25</a>
-<a href="javascript:void(0)" onclick='window.gm.player.Stats.increment("perversion",-25);window.gm.refreshScreen();'>Perversion -25</a></br>
-<a href="javascript:void(0)" onclick='window.gm.player.Stats.increment("arousal",25);window.gm.refreshScreen();'>Arousal +25</a>
-<a href="javascript:void(0)" onclick='window.gm.player.Stats.increment("arousal",-25);window.gm.refreshScreen();'>Arousal -25</a></br>
-
+<a href="javascript:void(0)" onclick='window.gm.player.Stats.increment("health",25);window.gm.refreshAllPanel();'>Health +25</a></br>
+<a href="javascript:void(0)" onclick='window.gm.player.Stats.increment("energy",25);window.gm.refreshAllPanel();'>Energy +25</a></br>
+<a href="javascript:void(0)" onclick='window.gm.player.Stats.increment("perversion",25);window.gm.refreshAllPanel();'>Perversion +25</a>
+<a href="javascript:void(0)" onclick='window.gm.player.Stats.increment("perversion",-25);window.gm.refreshAllPanel();'>Perversion -25</a></br>
+<a href="javascript:void(0)" onclick='window.gm.player.Stats.increment("arousal",25);window.gm.refreshAllPanel();'>Arousal +25</a>
+<a href="javascript:void(0)" onclick='window.gm.player.Stats.increment("arousal",-25);window.gm.refreshAllPanel();'>Arousal -25</a></br>
+<label for="passage">passage:<input type="text" id="passage" name="passage"></label><a href="javascript:void(0)" onclick='window.story.show(document.getElementById("passage").value)'>Go</a></br>
 </br>
 </br>[[Back|_back]]</br>
 </article><article id="LogPanel"></article></section>
@@ -47,9 +47,8 @@ function unhideStats() {
 </script>
 
 :: NOP [_back]
-<section> 
-<aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<p class='author'>Sorry, this loation is curently not implemented.</p>
+<section> <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<p class='author'>Sorry, this loation is curently not implemented.</p> <!--todo  implement passages pointing to this-->
 <div> </br>
 [[Back|_back]]</br></div>
 </article><article id="LogPanel"></article></section>

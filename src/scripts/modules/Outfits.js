@@ -103,9 +103,13 @@ class ClitPiercing extends Equipment {
         this.tags = ['piercing'];
         this.slotUse = ['pClit'];    
         this.style = 0;   
+        this.lossOnRespawn = true;
         window.storage.registerConstructor(ClitPiercing);
     }
-    set style(style) { this._style = style; }
+    set style(style) { 
+        this._style = style; 
+        if(style===100) this.lossOnRespawn=false;
+    }
     get style() {return this._style;}
     get desc() { 
         if(this.style===100) return('cursed piercing');
@@ -127,6 +131,7 @@ class Crowbar extends Equipment {
         super('Crowbar');
         this.tags = ['tool', 'weapon'];
         this.slotUse = ['RHand'];
+        this.lossOnRespawn = true;
         window.storage.registerConstructor(Crowbar);
     }
     get desc() { return 'A durable crowbar.';}
@@ -160,6 +165,7 @@ class Shovel extends Equipment {
         super('Shovel');
         this.tags = ['tool', 'weapon'];
         this.slotUse = ['RHand','LHand'];
+        this.lossOnRespawn = true;
         window.storage.registerConstructor(Shovel);
     }
     get desc() { 'A rusty,old shovel.';}
@@ -185,6 +191,54 @@ class Shovel extends Equipment {
         return({OK:true, msg:'equipped'});}
     onUnequip() {
         this.parent.parent.Stats.removeModifier('pAttack',{id:'pAttack:Shovel'});
+        return({OK:true, msg:'unequipped'});}
+}
+class RobesZealot extends Equipment {
+    constructor() {
+        super('RobesZealot');
+        this.tags = ['cloth'];
+        this.slotUse = ['Breast','Stomach','Hips','Legs'];    
+        this.lossOnRespawn = true;   
+        window.storage.registerConstructor(RobesZealot);
+    }
+    get desc() { return 'light blue tank-top';}
+    toJSON() {return window.storage.Generic_toJSON("RobesZealot", this); };
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(RobesZealot, value.data));}
+    canEquip() {return({OK:true, msg:'equipable'});}
+    canUnequip() {return({OK:true, msg:'unequipable'});}
+}
+//
+class StaffWodden extends Equipment {
+    constructor() {
+        super('StaffWodden');
+        this.tags = [ 'weapon'];
+        this.slotUse = ['RHand','LHand'];
+        this.lossOnRespawn = true;
+        window.storage.registerConstructor(StaffWodden);
+    }
+    get desc() { 'A staff ade from wood.';}
+    toJSON() {return window.storage.Generic_toJSON("StaffWodden", this); };
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(StaffWodden, value.data));}
+    usable(context) {return(this.canEquip());}
+    use(context) { //context here is inventory not outfit
+        if(this.parent.parent.Outfit.findItemSlot(this.name).length>0) {  
+            this.parent.parent.Outfit.removeItem(this.name); 
+            return( {OK:true, msg:'unequipped '+ this.name}); //todo
+        } else {
+            this.parent.parent.Outfit.addItem(this); 
+            return( {OK:true, msg:'equipped '+ this.name}); //todo
+        }
+    }
+    canEquip() {
+        if(this.parent.parent.Outfit.findItemSlot(this.name).length>0) return({OK:true, msg:'unequip'});
+        else return({OK:true, msg:'equip'});
+    }
+    canUnequip() {return({OK:true, msg:'unequipable'});}
+    onEquip() {
+        this.parent.parent.Stats.addModifier('pAttack',{id:'pAttack:StaffWodden', bonus:2});
+        return({OK:true, msg:'equipped'});}
+    onUnequip() {
+        this.parent.parent.Stats.removeModifier('pAttack',{id:'pAttack:StaffWodden'});
         return({OK:true, msg:'unequipped'});}
 }
 class TailRibbon extends Equipment {
@@ -220,6 +274,8 @@ window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(Shovel);
     window.storage.registerConstructor(TailRibbon);
     window.storage.registerConstructor(ClitPiercing);
+    window.storage.registerConstructor(RobesZealot);
+    window.storage.registerConstructor(StaffWodden);
     
     //.. and Wardrobe
     ItemsLib['Leggings'] = function () { return new Leggings();};
@@ -229,9 +285,11 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['Pullover'] = function () { return new Pullover();};
     ItemsLib['TailRibbon'] = function () { return new TailRibbon();};
     ItemsLib['ClitPiercing'] = function () { return new ClitPiercing();};
+    ItemsLib['RobesZealot'] = function () { return new RobesZealot();};
     //special wardrobe-item combination
     ItemsLib['Crowbar']  = function () { return new Crowbar();};
     ItemsLib['Shovel']  = function () { return new Shovel();};
+    ItemsLib['StaffWodden']  = function () { return new StaffWodden();};
     ItemsLib['Handcuffs'] = function () { return new HandCuffs();};
     return ItemsLib; 
 }(window.gm.ItemsLib || {}));

@@ -4,6 +4,7 @@
 export class Character {
     static defaultData() {
         return({
+        id:'',
         name: '',
         faction: 'Enemy',
         location : "Home",
@@ -35,15 +36,17 @@ export class Character {
         this.Skills = new Inventory(this._data.skills);
         this.Skills._parent = window.gm.util.refToParent(this);
         //create basic stats
-        stHealth.setup(this.Stats,50,60),stEnergy.setup(this.Stats,30,100),stPAttack.setup(this.Stats,6,100),stPDefense.setup(this.Stats,4,100),
+        stHealth.setup(this.Stats,30,40),stEnergy.setup(this.Stats,30,100),stPAttack.setup(this.Stats,6,100),stPDefense.setup(this.Stats,4,100),
         stAgility.setup(this.Stats,10,100),stIntelligence.setup(this.Stats,10,100),stLuck.setup(this.Stats,10,100);
         stCharisma.setup(this.Stats,10,100),stPerception.setup(this.Stats,10,100),stStrength.setup(this.Stats,10,100),stEndurance.setup(this.Stats,10,100);
-        stPerversion.setup(this.Stats,1,15),stArousal.setup(this.Stats,1,100);
-
+        stPerversion.setup(this.Stats,1,15),stArousal.setup(this.Stats,1,100),stLAttack.setup(this.Stats,6,100),stLDefense.setup(this.Stats,2,100);
+        for(let name of stFetish.listFetish()) {
+            stFetish.setup(this.Stats,0,10,name);
+        }
         this.Effects.addItem(effNotTired.name, new effNotTired()); //depending on sleep Tired will be set to NotTired or Tired
         
-        this.Skills.addItem(new SkillUseItem());this.Skills.addItem(new SkillAttack());this.Skills.addItem(new SkillStun());
-        this.Skills.addItem(new SkillHeal());
+        this.Skills.addItem(new SkillUseItem());
+        this.Skills.addItem(new SkillAttack());this.Skills.addItem(new SkillStun());this.Skills.addItem(new SkillHeal());
         this.Skills.addItem(new SkillFlee()),this.Skills.addItem(new SkillSubmit());    
 
         window.storage.registerConstructor(Character);
@@ -67,6 +70,8 @@ export class Character {
     static calcLevelToXP(lvl) {
         return(100*lvl*(lvl+1)/2); //Gauss-Sum
     }
+    get id() { return(this._data.id);  }
+    set id(id) {this._data.id=id;}
     get name() { return(this._data.name);  }
     set name(name) {this._data.name=name;}
     get faction() { return this._data.faction; } 

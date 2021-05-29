@@ -121,7 +121,7 @@ function mutate() {
             vulva.data.clitsize+=0.5;
             msg+= "You arent quite sure but could it be possible that your clitoris is larger then before?</br>";
         }
-        msg += vulva.descLong()+"</br>";
+        msg += "</br>"+vulva.descLong()+"</br>";
     }
     window.gm.printOutput(msg);
 }

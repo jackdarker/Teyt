@@ -1,17 +1,23 @@
 :: Home
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%window.gm.player.location=window.passage.name;
-window.gm.quests.addQuest("qFindGarden",1);
-window.gm.quests.addQuest("qStudy",1); %>
+<%window.gm.player.location=window.passage.name;%>
+<%window.gm.quests.addQuest("qFindGarden",1);window.gm.quests.addQuest("qStudy",1); %>
 At the doorsteps of your home. </br>
 The following things are on your schedule-list:</br>
 <%=window.gm.printSchedule()%>
-</br><div>Where would you like to go?</br>
-[[Living_Room]]   [[Your Bedroom]]  [[Moms Bedroom]] [[Kitchen]]  [[Garden]] [[Cellar]] </br>
-[[Into the city]] [[ForestEntrance]]</br></div>
+</br></br><div>Where would you like to go?</br>
+[[Living_Room]]   [[Your Bedroom]]  [[Melanies Bedroom|NOP]] [[Kitchen]]  [[Garden]] [[Cellar|NOP]] </br>
+[[Into the city]]</br></div>
 </article><article id="LogPanel"></article></section>
-
+<script>
+function checkQuest(){
+	if(window.story.state.vars.day>1 && window.gm.getTimeStruct().hour>12 && window.gm.quests.hasActiveQuest("qDLCMain",100)) {
+		window.story.show('ReceiveVREquipment');
+	}
+}
+checkQuest();
+</script>
 
 :: Kitchen {"position":"1231,613","size":"100,100"}
 <section> 
@@ -27,18 +33,18 @@ Mom will take care to resupply the fridge. But she might be disappointed if you 
 }%>
 <% if(s.mom.location===window.passage.name) { %>
 [[Mom|Info_Mom]] is here. </br>
-<a href="javascript:void(0)" onclick="window.gm.player.gainRelation('Mom',2);window.gm.updateOtherPanels();" >Greet her</a></br></br>
+<a href="javascript:void(0)" onclick="window.gm.player.gainRelation('Mom',2);window.gm.refreshSidePanel();" >Greet her</a></br></br>
 <%}%>
 Where would you like to go?</br>
 [[Living_Room]]   [[Hallway|Home]]</br>
 </article><article id="LogPanel"></article></section>
 
 
-:: Moms Bedroom
+:: Melanies Bedroom
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
-This is the bedroom of your mom.
+This is the bedroom of Melanie.
 A double bed is there with [[nightstands|moms_treasure]] on each side. <br>
 <%if(window.gm.player.name!=='Cyril') {%>
 <a0 onclick='window.story.show("Talk_Cyril")'>Cyril is here</a></br>
@@ -92,27 +98,30 @@ function useHandcuff(elmnt) {
 window.gm.quests.addQuest("qMyPleasure",1);%>
 This is your Bedroom.
 A desk with a wooden chair is setup as workingplace. <br>
-Your [[Laptop|_Laptop_]] is placed on it and also a handwritten [[TodoList]]. </br>
+Your [[Laptop|_Laptop_]] is placed on it and also a handwritten [[TODO-List|QuestList]]. </br>
 Above the desk is a window facing toward the backside of the house.</br>
 On the other side of the room is a large [[Wardrobe]] with a [[Mirror]] where you can take a look at yourself.
 There is a large bed for sleeping with a nightstand aside. </br>
-<!--todo-->You are quite horny right now. Maybe you have some time to [[play with yourself|Masturbate]].</br>
-<a href="javascript:void(0)" onclick='($("tw-passage").fadeOut(1000, function() {window.gm.sleep((window.gm.getTimeStruct().hour+1)*100);window.story.show("Sleep");}));'>Nap 1hour</a>
+<!--todoYou are quite horny right now. Maybe you have some time to [[play with yourself|Masturbate]].</br>-->
+<a href="javascript:void(0)" onclick='($("tw-passage").fadeOut(1000, function() {window.gm.forwardTime((window.story.vars.time+100);window.story.show("Sleep");}));'>Nap 1hour</a>
 <%if(window.gm.getTimeStruct().hour<11) { %>
-<a href="javascript:void(0)" onclick='($("tw-passage").fadeOut(1000, function() {window.gm.sleep(1800);window.story.show("Sleep");}));'>Sleep Until Evening</a> 
+<a href="javascript:void(0)" onclick='($("tw-passage").fadeOut(1000, function() {window.gm.forwardTime(1800);window.story.show("Sleep");}));'>Sleep Until Evening</a> 
 <%} else {%>
-<a href="javascript:void(0)" onclick='($("tw-passage").fadeOut(1000, function() {window.gm.sleep(700);window.story.show("Sleep");}));'>Sleep Until Morning</a>
+<a href="javascript:void(0)" onclick='($("tw-passage").fadeOut(1000, function() {window.gm.forwardTime(700);window.story.show("Sleep");}));'>Sleep Until Morning</a>
 <%}%>
-</br> That bulky VR-scaffold is taking up a lot of space. You could [[try to start it up|VRSuiteUp]]. 
-</br>[[MemoryGame]] [[HangmanGame]]</br> <!--todo-->
-</br>[[NewGamePlus]]</br> <!--todo-->
+<div <%=((window.gm.quests.getMilestoneState("qDLCMain").id<600)?"hidden":"") %> >That bulky VR-scaffold is taking up a lot of space.  
+	<%if(window.gm.getTimeStruct().hour>13){%>
+	You could [[try to start it up|<%=((window.gm.quests.getMilestoneState("qDLCMain").id<700)?"VRSuiteUp":"HillSpawn") %>]].</br> 
+	<%} else {%>
+	You have other things to do then play with it.</br>
+	<%}%>
+</div>
 <% if(window.gm.player.clothLevel()==="naked") { %>
 <div class="red">You should at least cover up your unmentionables before leaving your room.</div></br>
 <% } else { %>
 Where do you want to go ? </br>
 [[Hallway|Home]]</br> <%}%>
 </article><article id="LogPanel"></article></section>
-
 
 :: Sleep
 <section> 
@@ -128,7 +137,7 @@ You fall into your bedsheets and sleep until your smartphone buzzes you out of y
 </article><article id="LogPanel"></article></section>
 <script>
 function checkJob() {
-	var text ='';
+	let text ='';
 	if(window.gm.getTimeStruct().DoW===1 && window.gm.quests.hasActiveQuest("qFindAJob",200)) { 
 		if(window.gm.quests.getQuestState("qFindAJob").flags>=2) { 
 			window.gm.player.Inv.addItem(new window.gm.ItemsLib.Money(),window.gm.quests.getQuestState("qFindAJob").flags*25);
@@ -176,7 +185,9 @@ An old wooden table with 4 chairs rests on a wornout green carpet.</br>
 Some money is laying on the table. Maybe mom forgot it there.</br>
 There is a brown couch with a television in front of it. A smaller table with a lamp on it is close by.</br>
 <a0 onclick="getMoney(this,5)">Get much money</a></br>
-<%=window.gm.printPickupAndClear('LaptopPS','pickup laptop-powersupply from table',1-window.gm.player.Inv.countItem('LaptopPS'))%>
+<%if(window.gm.quests.getMilestoneState("qFixLaptop").id<1000){%>
+<a0 onclick='window.gm.quests.forceQuestMilestone("qFixLaptop",1000,1);window.gm.refreshAllPanel();'>take powerconverter for laptop</a>
+<%}%>
 <%if(s.vars.qDogSit==0x200) {%>
 Your phone rings with an unknown number. [[Answer call|Dogsit_FirstCallBack]] 
 <%}%>
@@ -185,7 +196,7 @@ Where would you like to go?</br>
 [[Kitchen]] [[Hallway|Home]] </br>
 </article><article id="LogPanel"></article><script>
 function getMoney(elmnt,val) {
-	let msg="You shouldnt steal that money, should you?";
+	let msg="</br>You shouldnt steal that money, should you?";
 	let vulva = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib['bVulva']);
 	let pierc = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib['pClit']);
 	if(vulva && vulva instanceof (window.storage.constructors['VulvaHuman'])) {
@@ -219,14 +230,15 @@ There is nothing here
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;window.gm.quests.tick();%>
 The garden behind the house is not very large. </br>
-<p class="talkplayer">There are a lot of molehills on the green. I should teach their creator a lesson.</p></br>
+<p class="talkPC">There are a lot of molehills on the green. I should teach their creator a lesson.</p></br>
 <a href="javascript:void(0)" onclick='window.gm.encounters.moleX2(window.gm.player.location);'>Whack a mole</a> </br>
 You accidently stepped on a mole and killed it. Achievement unlocked ! <%window.gm.achievements.moleKillerGoldMedal=true;%>
 <% if(s.mom.location==window.passage.name) { %>
 [[Mom|Info_Mom]] is wandering around. Maybe she is planning to setup some flower beds. </br>
 <%}%>
+<a0 id='SkillTease' onclick='(function($event){window.gm.player.Skills.addItem(new window.storage.constructors[$event.id]());window.gm.refreshSidePanel();}(this))'>Learn to tease</a></br></br>
 <% if(window.gm.player.Inv.countItem('Shovel')<=0) {%>
-<a0 id='Shovel' onclick='(function($event){window.gm.player.Inv.addItem(new window.storage.constructors[$event.id]());window.gm.refreshScreen();}(this))'>take shovel</a></br>
+<a0 id='Shovel' onclick='(function($event){window.gm.player.Inv.addItem(new window.storage.constructors[$event.id]());window.gm.refreshAllPanel();}(this))'>take shovel</a></br>
 <%} else {%>
 You remeber that you took the shovel from here.</br>
 <%}%>

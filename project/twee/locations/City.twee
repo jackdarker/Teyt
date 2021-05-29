@@ -5,8 +5,8 @@
 <%=window.gm.printPickupAndClear('Crowbar','A crowbar is lying other there.',window.story.state.vars.crowBarLeft,(function(){window.story.state.vars.crowBarLeft-=1;}))%>
 You are actually at [[<%=window.gm.player.location%>]].
 Where would you like to go from here?</br>
-<a0 onclick=window.gm.rollExplore()>Explore your surroundings</a> </br></br>
-[[Home]] [[Pawn shop]]  [[Downtown]]
+<a0 onclick=window.gm.rollExploreCity()>Explore your surroundings</a> </br></br>
+[[Home]]
 <%  if(s.vars.qUnlockPark>0) {      %>[[Park]]
 <%}; if(s.vars.qUnlockMall>0) {     %>[[Mall]]
 <%}; if(s.vars.qUnlockDowntown>0) { %>[[Downtown]]
@@ -25,7 +25,7 @@ You found the <%=window.passage.name%> ! </br></br>
 <%}%>
 You are actually at [[<%=window.gm.player.location%>]].
 Where would you like to go from here?</br>
-<a0 onclick=window.gm.rollExplore()>Explore your surroundings</a> </br></br>
+<a0 onclick=window.gm.rollExploreCity()>Explore your surroundings</a> </br></br>
 [[Into the Mall|Mall Floor 0]]</br> [[Home]]</br>
 <%  if(s.vars.qUnlockPark>0) {      %>[[Park]]</br>
 <%}; if(s.vars.qUnlockBeach>0) {      %>[[Beach]]</br>
@@ -48,7 +48,7 @@ People in sportswear are jogging around the paths or doing gymnastics on the gra
     [[DogSit-ad|Park_DogsitAd]]
 <%}%>
 Where would you like to go from here?</br>
-<a0 onclick=window.gm.rollExplore()>Explore your surroundings</a> </br></br>
+<a0 onclick=window.gm.rollExploreCity()>Explore your surroundings</a> </br></br>
 [[Home]]</br>
 <%  if(s.vars.qUnlockMall>0) {      %>[[Mall]]</br>
 <%};%>
@@ -88,7 +88,7 @@ You could wander at the shoreline. Maybe you find some jetsam.</br>
 
 </br>
 Where would you like to go from here?</br>
-<a0 onclick=window.gm.rollExplore()>Explore your surroundings</a> </br></br>
+<a0 onclick=window.gm.rollExploreCity()>Explore your surroundings</a> </br></br>
 [[Home]]</br>
 <%  if(s.vars.qUnlockMall>0) {      %>[[Mall]]</br>
 <%};%>
@@ -104,7 +104,7 @@ You found the <%=window.passage.name%> ! </br></br>
 <%}%>
 You are actually at [[<%=window.gm.player.location%>]].
 Where would you like to go from here?</br>
-<a0 onclick=window.gm.rollExplore()>Explore your surroundings</a> </br></br>
+<a0 onclick=window.gm.rollExploreCity()>Explore your surroundings</a> </br></br>
 [[Home]]</br>
 <%  if(s.vars.qUnlockMall>0) {      %>[[Mall]]<%};%>
 [[Harcon_Health]]
@@ -124,7 +124,7 @@ A sign denoting "quick money - no questions" sparks your interest. It leads you 
 <div id="choice"></div></br></br>   <!--display buy message-->
 <div id="panel"></div></br></br>    <!--display wares list-->
 Where would you like to go from here?</br>
-<a0 onclick=window.gm.rollExplore()>Explore your surroundings</a> </br></br>
+<a0 onclick=window.gm.rollExploreCity()>Explore your surroundings</a> </br></br>
 [[Back|_back]]</br>
 </article><article id="LogPanel"></article></section>
 <script>

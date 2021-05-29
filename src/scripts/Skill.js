@@ -198,8 +198,36 @@ class SkillAttack extends Skill {
                 let result2 = window.gm.combat.calcAttack(this.caster,target,attack);
                 this.msg+=result2.msg;
                 result.effects = result.effects.concat(attack.effects); 
-                //var eff = this.calculateDamage(this.caster,target);
-                //result.effects.push( {target:target,eff:eff});
+            }
+        }
+        return result
+    }
+    getCastDescription(result) {
+        return(this.msg);
+    }
+}
+class SkillTease extends Skill {
+    //execute simple attack with active weapon
+    constructor() {
+        super("Tease");
+        this.msg = '';
+    }
+    toJSON() {return window.storage.Generic_toJSON("SkillTease", this); };
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillTease, value.data));}
+    targetFilter(targets){
+        return(this.targetFilterEnemy(this.targetFilterAlive(targets)));
+    }
+    previewCast(targets){
+        var result = new SkillResult()
+        result.skill =this,result.source = this.caster,result.targets = targets;
+        this.msg = '';
+        if(this.isValidTarget(targets)) {
+            result.OK = true;
+            for(var target of targets) {
+                let attack =window.gm.combat.defaultAttackData();
+                let result2 = window.gm.combat.calcTeaseAttack(this.caster,target,attack);
+                this.msg+=result2.msg;
+                result.effects = result.effects.concat(attack.effects); 
             }
         }
         return result
@@ -442,6 +470,7 @@ window.gm.SkillsLib = (function (Lib) {
     window.storage.registerConstructor(SkillPoisonCloud);
     window.storage.registerConstructor(SkillStun);
     window.storage.registerConstructor(SkillSubmit);
+    window.storage.registerConstructor(SkillTease);
     window.storage.registerConstructor(SkillUseItem);
     //.. and Wardrobe
     Lib['SkillAttack'] = function () { return new SkillAttack();};
