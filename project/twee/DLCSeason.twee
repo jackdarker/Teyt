@@ -2,7 +2,7 @@
 :: YouDiedOnce
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;
-window.story.state.vars.diedOnce=true;%>
+window.gm.quests.forceQuestMilestone("qDiedAgain",100,1);;%>
 <p class=talkPC>"What happend? Why I'm sitting in a pool of ...goo?"</p>
 "Choosen one, this is a shrine of restoration! ..." a priestess in a white robe with purle borders approachs you.
 <!--todo-->
@@ -29,6 +29,8 @@ But you keep your stats and skills (*1).
 [[Next|VillageRespawnPod]]</br></div>
 </article><article id="LogPanel"></article></section>
 
+
+:: DemonCuffs
 
 :: YouDiedWithCursedGear
 "Choosen one, this is a shrine of restoration!" ... the acolyte starts heir rant.
@@ -356,3 +358,25 @@ The apothecary is here. Maybe you should ask for more information even if you pr
 "I think she has taken some interest at those damn wolves and tried to befriend them."
 "Watch your back and keep your pants up."
 The idea of being hunted down by randy wolves [[worrys you]][[gives you a thrill]]. 
+
+:: HippieSlaver
+Du triffst auf eine friedfertige Gruppe
+Unterwegs triffst du einen verwundeten Krieger den du zur Gruppe bringst damit sie ihn aufpäppeln.
+Er freundet sich mit ihnen an.
+Später bringt er noch einen Freund mit und sie bandeln mit einigen Frauen an.
+Als noch mehr auftauchen wird es problematisch.
+Entscheide was zu tun ist: a) stelle dich gegen die Eindringlinge oder b) bringe die Gruppe dazu sich aufzuteilen
+a) die Fremden ziehen ab aber du verlierst wegen deiner Gewalt das Vertrauen der Gruppe; die Krieger nehmen sich dich ins Korn happy Gangrape
+b) einige Frauen gehen mit den Kriergern mit; sie werden versklavt; später wird dann auch der Rest der geschwächten Gruppe hopsgenommen
+
+
+:: ManOfGoats
+Eine Bauernfamilie hat mehrere Ziegen und stellen Ziegenkäse her von dessen erkauf sie leben.
+Allerdings ist der Geisbock weggelaufen und wenn die Geissen keine Junge haben geben sie keine Milch. 
+Ohne genug Geld kann kein neuer Bock gekauft werden.
+1a) finde den alten Bock
+1b) seine libido muss etwas aufgefrischt werden
+1c) now he is eager for anyone
+2a) oder überzeuge einen Satyr auszuhelfen 
+2b) damit die Geissen ihn ranlassen brauchen sie einen Liebestrank
+

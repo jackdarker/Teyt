@@ -21,9 +21,9 @@ This game is powered by twine/tweego and snowman.</br>
 :: Intro
 <article>
 <%window.gm.initGame();window.gm.player.location=window.passage.name;%>
-Welcome to Meason, a town somewhere in these days. </br>
-You are a student in the local university and live in a shared house with some other fellows. </br>
-<p class='author'>You might see a lot of links that red strikethrough. Those are currently broken and you shouldnt use them.</p>
+<p>Welcome to Meason, a town somewhere in these days. </br>
+You are a student in the local university and live in a shared house with some other fellows. </br></p>
+<p class='author'>The autor: You might see a lot of links that red strikethrough. Those are currently broken and you shouldnt use them.</p>
 
 </br>Press [[Start|Intro2]] to enter the game. (Loading of savegame is only possible in game).</br>
 Or press <a0 id='reset' onclick='window.gm.initGame(true);window.gm.refreshAllPanel();'>Reset</a> to reset your selection.  </br></br>

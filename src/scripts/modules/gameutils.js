@@ -36,8 +36,6 @@ window.gm.initGame= function(forceReset,NGP=null) {
         qUnlockBeach : 0,
         crowBarLeft: 1,
         //VR flags todo character specific ?
-        diedOnce : false,
-        diedOnceWithCursed: false,
         wolfKnowledge: 0,
         wolfSubmit: 0,
         wolfVictory: 0

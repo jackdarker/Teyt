@@ -230,7 +230,7 @@ class Outfit extends Inventory{
     removeItem(id, force) {
         let _idx = this.findItemSlot(id);
         if(_idx.length===0) return; //already unequipped
-        let result =this.canUnequipItem(id);
+        let result =(force)?{OK:true,msg:''}:this.canUnequipItem(id);
         if(!result.OK) {
             this.postItemChange(id,"unequip_fail",result.msg);
             return;

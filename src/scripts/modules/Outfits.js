@@ -4,7 +4,6 @@ class Leggings extends Equipment {
         super('Leggings');
         this.tags = ['cloth'];
         this.slotUse = ['Legs','Hips'];
-        window.storage.registerConstructor(Leggings);
     }
     get desc() { return 'Spandex-leggings for sport. (agility+)';}
     toJSON() {return window.storage.Generic_toJSON("Leggings", this); };
@@ -23,7 +22,6 @@ class Jeans extends Equipment {
         super('Jeans');
         this.tags = ['cloth'];
         this.slotUse = ['Legs','Hips'];
-        window.storage.registerConstructor(Jeans);
     }
     get desc() { return 'plain old blue jeans';    }
     toJSON() {return window.storage.Generic_toJSON("Jeans", this); };
@@ -36,7 +34,6 @@ class Sneakers extends Equipment {
         super('Sneakers');
         this.tags = ['cloth'];
         this.slotUse = ['Feet'];
-        window.storage.registerConstructor(Sneakers);
     }
     get desc() { return 'Sneakers for sport and recreational activities.';    }
     toJSON() {return window.storage.Generic_toJSON("Sneakers", this); };
@@ -48,8 +45,7 @@ class TankShirt extends Equipment {
     constructor() {
         super('TankShirt');
         this.tags = ['cloth'];
-        this.slotUse = ['Breast','Stomach'];       
-        window.storage.registerConstructor(TankShirt);
+        this.slotUse = ['Breast','Stomach'];
     }
     get desc() { return 'light blue tank-top';}
     toJSON() {return window.storage.Generic_toJSON("TankShirt", this); };
@@ -62,7 +58,6 @@ class Pullover extends Equipment {
         super('Pullover');
         this.tags = ['cloth'];
         this.slotUse = ['Breast','Stomach','Arms'];
-        window.storage.registerConstructor(Pullover);
     }
     get desc() { return 'warm pullover';}
     toJSON() {return window.storage.Generic_toJSON("Pullover", this); };
@@ -74,11 +69,9 @@ class HandCuffs extends Equipment {
     constructor() {
         super('HandCuffs');
         this.tags = ['restrain'];
-        this.slotUse = ['RHand','LHand'];   //Todo wrists??
+        this.slotUse = ['RHand','LHand','Wrists'];
     }
-    get desc() { return 'handcuffs'
-        window.storage.registerConstructor(Pullover);
-    }
+    get desc() { return 'handcuffs';  }
     toJSON() {return window.storage.Generic_toJSON("HandCuffs", this); };
     static fromJSON(value) {return(window.storage.Generic_fromJSON(HandCuffs, value.data));}
     usable(context) {return(this.canEquip());}
@@ -97,6 +90,32 @@ class HandCuffs extends Equipment {
     }
     canUnequip() {return({OK:false, msg:'You need to find a key first to be able to remove it!'});}
 }
+class WristCuffs extends Equipment {
+    constructor() {
+        super('WristCuffs');
+        this.tags = [];
+        this.slotUse = ['Wrists'];
+        this.lossOnRespawn = false;
+    }
+    get desc() { return 'handcuffs';  }
+    toJSON() {return window.storage.Generic_toJSON("WristCuffs", this); };
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(WristCuffs, value.data));}
+    usable(context) {return(this.canEquip());}
+    use(context) { //context here is inventory not outfit
+        if(this.parent.parent.Outfit.findItemSlot(this.name).length>0) {  
+            this.parent.parent.Outfit.removeItem(this.name); 
+            return( {OK:true, msg:'unequipped '+ this.name}); //todo
+        } else {
+            this.parent.parent.Outfit.addItem(this); 
+            return( {OK:true, msg:'equipped '+ this.name}); //todo
+        }
+    }
+    canEquip() { 
+        if(this.parent.parent.Outfit.findItemSlot(this.name).length>0) return({OK:true, msg:'unequip'});
+        else return({OK:true, msg:'equip'});
+    }
+    canUnequip() {return({OK:false, msg:'Those cuffs can only be removed by a magican!'});}
+}
 class ClitPiercing extends Equipment {
     constructor() {
         super('ClitPiercing');
@@ -104,7 +123,6 @@ class ClitPiercing extends Equipment {
         this.slotUse = ['pClit'];    
         this.style = 0;   
         this.lossOnRespawn = true;
-        window.storage.registerConstructor(ClitPiercing);
     }
     set style(style) { 
         this._style = style; 
@@ -132,7 +150,6 @@ class Crowbar extends Equipment {
         this.tags = ['tool', 'weapon'];
         this.slotUse = ['RHand'];
         this.lossOnRespawn = true;
-        window.storage.registerConstructor(Crowbar);
     }
     get desc() { return 'A durable crowbar.';}
     toJSON() {return window.storage.Generic_toJSON("Crowbar", this); };
@@ -166,7 +183,6 @@ class Shovel extends Equipment {
         this.tags = ['tool', 'weapon'];
         this.slotUse = ['RHand','LHand'];
         this.lossOnRespawn = true;
-        window.storage.registerConstructor(Shovel);
     }
     get desc() { 'A rusty,old shovel.';}
     toJSON() {return window.storage.Generic_toJSON("Shovel", this); };
@@ -198,8 +214,7 @@ class RobesZealot extends Equipment {
         super('RobesZealot');
         this.tags = ['cloth'];
         this.slotUse = ['Breast','Stomach','Hips','Legs'];    
-        this.lossOnRespawn = true;   
-        window.storage.registerConstructor(RobesZealot);
+        this.lossOnRespawn = true;
     }
     get desc() { return 'light blue tank-top';}
     toJSON() {return window.storage.Generic_toJSON("RobesZealot", this); };
@@ -214,7 +229,6 @@ class StaffWodden extends Equipment {
         this.tags = [ 'weapon'];
         this.slotUse = ['RHand','LHand'];
         this.lossOnRespawn = true;
-        window.storage.registerConstructor(StaffWodden);
     }
     get desc() { 'A staff ade from wood.';}
     toJSON() {return window.storage.Generic_toJSON("StaffWodden", this); };
@@ -246,7 +260,6 @@ class TailRibbon extends Equipment {
         super('TailRibbon');
         this.tags = ['cloth'];
         this.slotUse = ['TailTip'];
-        window.storage.registerConstructor(TailRibbon);
     }
     get desc() { 'a fancy color band that can be wrapped around someones tailtip';}
     toJSON() {return window.storage.Generic_toJSON("TailRibbon", this); };
@@ -276,6 +289,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(ClitPiercing);
     window.storage.registerConstructor(RobesZealot);
     window.storage.registerConstructor(StaffWodden);
+    window.storage.registerConstructor(WristCuffs);
     
     //.. and Wardrobe
     ItemsLib['Leggings'] = function () { return new Leggings();};
@@ -286,6 +300,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['TailRibbon'] = function () { return new TailRibbon();};
     ItemsLib['ClitPiercing'] = function () { return new ClitPiercing();};
     ItemsLib['RobesZealot'] = function () { return new RobesZealot();};
+    ItemsLib['WristCuffs'] = function () { return new WristCuffs();};
     //special wardrobe-item combination
     ItemsLib['Crowbar']  = function () { return new Crowbar();};
     ItemsLib['Shovel']  = function () { return new Shovel();};

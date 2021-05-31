@@ -232,6 +232,23 @@ The description of the class is sparse. The picture you see indicates that this 
 [[male elf]] [[female elf]] 
 
 
+:: AIAwesome
+..."Actually we dont design everything manually. That would be much to tedious."</br>
+"Instead we use an AI that learns while the game is played."
+"You mean an artificial intelligence? But doesnt most games have some AI to control the NPCs?"
+"I didnt talk about AI to control the behaviour of some mobs. And for sure the fewest games have anything near to an AI. Most often its just some logic. Maybe complex logic but still predefined logic."
+"First: our AI is utilized to build the game-world and keep the ecosystem running. But actually most of the NPC aren't really driven by AI. But the logic they follow was created with the help of it."
+"Second: we call it AI because its able to learn. It keeps track what it is doing and if the result isn't like we want it, it changes its doing."
+"That sounds like the game is creating itslef on its own."
+"Better dont tell the management. They might think they just dont need devs anymore."
+"Anyway, its still required that someone supervises the AI and correct the goals."
+...
+"Those darn AI! How can we do qualitychecking if everything can change at every time."
+"I spent 1 week to verify that all trees are growing upside down and then the AI decides to overhaul the entire growth-system and I have to redo it again and again."
+"The problem is, the AI doesnt tell you whats going to change and how it is doing it."
+"And I dont trust it. What if its decide to just delete the game and itself?"
+
+
 :: SisterInTown
 Your mother informs you that your sister has business in town.
 Sis seems to be instructed to watch over you. Lets hope she doesnt find out what game you are playing.

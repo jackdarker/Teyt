@@ -6,4 +6,8 @@ window.gm.getTimeStruct().hour
 <%=window.gm.printPickupAndClear('LaptopPS','pickup laptop-powersupply from table',1-window.gm.player.Inv.countItem('LaptopPS'))%>
 
 
+window.gm.quests.addQuest("qDLCMain",1);
+window.gm.quests.forceQuestMilestone("qDLCMain",600,1);
+window.gm.quests.getMilestoneState("qFixLaptop").id<1000
+
 <p class=talkPC>""</p>

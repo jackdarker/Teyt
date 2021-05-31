@@ -212,11 +212,12 @@ for(var i=0;i<maxSlots;i++){
 <!--TODO what settings ?-->
 <section> 
 <!--<aside id="sidebar"></aside>--><article><%=window.story.render("CenterDialogs") %>
-<div id='combatCanvas' style='height:300px; background: url(<%=s.enemy.pic%>) no-repeat center,url(<%=s.combat.scenePic%>) no-repeat center;color:black;'></div>
-<button onclick='window.gm.printCombatScreen()'>test a</button>
-<button onclick='onimage("assets/favicon.png")'>test b</button>
 [[Back|_back]]</br>
+Theme:
+<a href="javascript:window.styleSwitcher.setStyle('default');window.gm.refreshAllPanel();">default</a>
+<a href="javascript:window.styleSwitcher.setStyle('dark');window.gm.refreshAllPanel();">dark</a>
 </article><article id="LogPanel"></article></section>
+
 
 :: Settings2 [_back]
 <!--just test-->

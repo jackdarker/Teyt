@@ -230,6 +230,7 @@ class QuestManager {
         }
         return({});
     }
+    // cchecks if the quest is active and, if given, has the certain milestone
     hasActiveQuest(questId,msId=null) {
         for (var i=0; i< this.questData.activeQuests.length; i++) {
             if(questId===this.questData.activeQuests[i].id && (msId===null || msId===this.questData.activeQuestsMS[i].id)) 
@@ -252,7 +253,8 @@ class QuestManager {
             this.questData.activeQuestsMS.push({id:msID}); 
             if(!this.questDef[questId].getMileById(msID).HiddenCB()) this.questUpdated(questId);  
         }
-	}
+    }
+    //removes quest from active&finished
     removeQuest(Id) {
         for (var i=this.questData.activeQuests.length-1; i>=0; i--) {
             if(this.questData.activeQuests[i].id===Id) {

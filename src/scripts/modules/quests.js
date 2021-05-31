@@ -51,7 +51,7 @@ window.gm.questDef = window.gm.questDef || {};
     quest.addMileStone( new QuestMilestone(300,"","???",  NOP));
     window.gm.questDef[quest.id]= quest;
 }
-{
+{   // the quest keeps track of the VR-Game main development
     let NOP = (function(){  return (0)});
     let hidden = (function(){return(window.gm.quests.getMilestoneState("qDLCMain").id<100);});
     let quest = new Quest("qDLCMain","qDLCMain","qDLCMain",hidden );
@@ -62,6 +62,15 @@ window.gm.questDef = window.gm.questDef || {};
     quest.addMileStone(new QuestMilestone(700,"","Get to the village.",        NOP,hidden));
     quest.addMileStone(new QuestMilestone(800,"","Ask around for a quest.",        NOP,hidden));
     quest.addMileStone(new QuestMilestone(900,"","Finish the PurpleBerryQuest.",  NOP));
+    window.gm.questDef[quest.id]= quest;
+}
+{   // the quest tracks death for tutorial
+    let NOP = (function(){  return (0)});
+    let hidden = (function(){return(window.gm.quests.getMilestoneState("qDiedAgain").id<100);});
+    let quest = new Quest("qDiedAgain","qDiedAgain","qDiedAgain",hidden );
+    quest.addMileStone(new QuestMilestone(1,"","Find your first death.",        NOP,hidden));
+    quest.addMileStone(new QuestMilestone(100,"","Die with some bonded equipment.",        NOP,hidden));
+    quest.addMileStone(new QuestMilestone(200,"","....",        NOP,hidden));
     window.gm.questDef[quest.id]= quest;
 }
 {

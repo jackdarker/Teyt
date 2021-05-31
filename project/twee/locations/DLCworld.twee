@@ -136,7 +136,7 @@ Someone has painted 'Thetain' on the planks above the wooden gate. Most likely t
 [[Village|VillageEntrance]] </br></div>
 </article><article id="LogPanel"></article></section>
 <script>
-if(!window.story.state.vars.diedOnce) {
+if(!window.gm.quests.getMilestoneState("qDiedAgain").id===1) {
     window.story.show('YouDiedOnce'); 
 } else {
     window.gm.respawn();
@@ -204,7 +204,7 @@ function explore() {
 <%window.gm.player.location=window.passage.name;%>
 <!--todo--> Du kämpfst dich durch das dichte Unterholz und bemerkst gerade noch rechtzeitig das du an einer Felsenkante angekommen bist.</br> 
 </br> 
-<% if(!window.story.state.vars.diedOnce) { %>
+<% if(window.gm.quests.getMilestoneState("qDiedAgain").id===1) { %>
 <div id='select1' >
 <a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1a")'>Peak into the chasm</a>
 </div>
@@ -223,40 +223,51 @@ Unglücklicherweise scheint die Felsplatte doch nicht so felsenfest zu sein und 
 <div id='choice3a' hidden>
 Unfortunatly, your jump-ability isn't quite good enough. The slab drags you down with it.</br>
 At some point you somehow end below the massive rock. You see it coming, reaching out with your hands to stop it squishing you.
-But of course its futile trying to catch that crushing weight. </br> 
-[[get squished|VillageRespawnPod]]
+But of course its futile trying to catch that crushing weight.  
+[[get squished|VillageRespawnPod]] </br>
 </div></div></div>
 <% } else {%>
 <div>
-[[ForestEntrance]] </br></div> 
+A path leads along the cliff until it vanishs behind a [[curve|ForestCliffCave]].  
+Or you might just return to [[ForestEntrance]]. </br></div> 
 <%}%>
 </article><article id="LogPanel"></article></section>
 
-:: StoneCircle
+
+:: ForestCliffCave
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+<% if(window.gm.quests.getMilestoneState("qDiedAgain").id<==100) { %>
+The path leads to an entrance of a cave.
+[[Enter the cave|NOP]]
+<% } else {%>
+<div>
+A path leads along the cliff until it vanishs into the [[underbush|ForestStoneCircle]] again.  
+Or you might just return to [[ForestEntrance]]. </br></div> 
+<%}%>
+</article><article id="LogPanel"></article></section>
+
+window.gm.quests.getMilestoneState("qDiedAgain").id<==100
+
+:: ForestStoneCircle
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
 <!--todo--> Aus dem dichten Unterholz trittst du auf eine Lichtung. Das wäre ein idylischer Ort wenn nicht dieser Steinkreis wäre.</br> 
 </br> 
-<% if(!window.story.state.vars.diedOnce) { %>
+<% if(true) { %>
 <div id='select1' >
 <a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1a")'>Inspect stone circle</a>
 </div>
 <div id='choice1a' hidden>
 Du gehst zu den übermannsgroßen Steinen. Es scheint hier etwas kühler zu sein und etwas Nebel liegt in der Luft.
 Ansonsten gibt es hier nichts.</br>
-<div id='select2' >
-<a0 onclick='window.gm.printTalkLink($("div#select2")[0],"div#choice2a")'>Leave</a>
+[[Leave|NOP]]
 </div>
-<div id='choice2a' hidden>
-Als du den Ort verlässt läufst du durch ein Tor das aus 2 großen Steinen und einen darüber liegenenden Felsen gebildet wird.</br>
-[[NOP]]
-</div></div>
 <% } else {%>
 <div>
 [[ForestEntrance]] </br></div> 
 <%}%>
 </article><article id="LogPanel"></article></section>
-
 
 
 :: Dungeon [_nosave]
@@ -307,3 +318,11 @@ function crashThrough() {
     window.gm.dng.teleport(floor1, Room);
 }
 </script>
+
+:: NOP_VR [_nosave,_back]
+<!--example-scene for onenter/onexit event-->
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<p class='dev'> You cant go that way. Either because its WIP or you need to solve a quest first. </p>
+</br>
+[[Back|_back]]</br>
+</article><article id="LogPanel"></article></section>
