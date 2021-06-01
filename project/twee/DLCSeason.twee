@@ -3,20 +3,23 @@
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;
 window.gm.quests.forceQuestMilestone("qDiedAgain",100,1);;%>
+Darkness... </br>
+After some moments your vision fades in. </br> 
 <p class=talkPC>"What happend? Why I'm sitting in a pool of ...goo?"</p>
-"Choosen one, this is a shrine of restoration! ..." a priestess in a white robe with purle borders approachs you.
+"Choosen one, this is a shrine of restoration! ..." a priestess in a white robe with purple borders approachs you.
 <!--todo-->
 <p class=talkPC>"So I died? And after death I return here?"</p>
 "Those choosen by the goods might be revived in a shrine of restoration after their death or collaps of mind."
 <p class=talkPC>"Collaps of mind? I just need to get stunned and will be sent back here?"</p>
-<p class='dev'>Notes from the devs: As a safeguard against mental trauma (*1) the players neural activity is supervised. If a certain amount of stress is detected (*2), the safeguard is triggered.
+<p class='dev'>As a safeguard against mental trauma (*1) the players neural activity is supervised. If a certain amount of stress is detected (*2), the safeguard is triggered.
 </br>*1): This applys not just to painful trauma but also marvelous sensations to avoid addictive states (*3).
 </br>*2): Chances that the trigger is delayed or supressed might decrease if the user is inclined to the situation and has the proper mindset.
 </br>*3): According to user agreement §34-f2, the service-provider is not responsible for addiction caused by the use of the game.
 </p>
 <p class=talkPC>"Addictive states? I'm pretty sure I will not get addicted on getting killed."</p>
 You decide that you have been sitting in this sizzling pool of mysterious liquid long enough and rise to your feet to step out of it.
-You notice that you are naked and try to hide your privates with your hands. "Uhm...where is my gear?"
+You notice that you are naked and try to hide your privates with your hands. 
+<p class=talkPC>"Uhm...where is my gear?"</p>
 "The gods restored your body and mind but your gear is nowwhere to be found."
 <p class=talkPC>"Oh come on should I ran around in my birthday suite?"</p>
 "Please take this cloth and staff as they are blessed by the gods to help you to live up to your goal."
@@ -30,16 +33,34 @@ But you keep your stats and skills (*1).
 </article><article id="LogPanel"></article></section>
 
 
-:: DemonCuffs
+:: CursedCollar
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+"Let me see. Hm.. I'm not sure but I think I cant you help with that one. There is a lock but I'm not a locksmith."
+"And do you know where to find one?"
+"There is a town east of here, called Elderant. I dont know that place to well but you might be able to find someone that can unlock this thing."
+"There is a town nearby?"
+"Nearby is relative. Its about a 3 or 4 days walk I guess. As I think over it, maybe you shouldnt go. It can be dangerous traveling alone."
+"More dangerous than the forest?"
+"The forest isnt dangerous. I never had any issues. Maybe you just had a little bad luck."
+"I died on the first visit of this damn forest ... by an stupid accident !"
+An idea forms in your mind: when I die, I lose the equipment. 
+Of ourse dying would be bad if it causes a large loss. But right now you just have little to no gear and will be replenished with a new set.
+You smirk to yourself for your ingenuity. 
+'So if I dont have any other option, I still just need to find a way to die to get rid of that thing.'
+[[But I dont wanna die]] [[Death is a solution]] [[I will just ignore the device]]
+<div></br>
+[[Next|NOP]]</br></div>
+</article><article id="LogPanel"></article></section>
+
 
 :: YouDiedWithCursedGear
 "Choosen one, this is a shrine of restoration!" ... the acolyte starts heir rant.
 "Yeah, I know. I just got ass kicked again. At least I got rid of that freaking bracelet... "
-But that damned thing is still on your ankle!
+But that damned thing is still on your wrist!
 "Hey, why is everthing gone except that damn thing?"
 "At times the heros burden is increased by evil deeds and his epic story is extended further by finding closure for his curse." the priestess chants, holding out heir hands upward to heir gods.
 "So I'm stuck with cursed gear but have to let go the good one?"
-[[This sucks]][[Its an incentive to not die]]
+[[This sucks]] [[Would have been to easy]] [[Its an incentive to not die]] 
 
 
 :: Skills

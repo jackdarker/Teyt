@@ -135,13 +135,16 @@ window.gm.respawn=function(keepInventory=false) {
   window.gm.player.Stats.increment("energy",9999);
   window.gm.player.Stats.increment("health",9999);
   if(!keepInventory) { //remove inentory and outfit that is not questitem, cursed or permanent
-    for(el of window.gm.player.Outfit.list) {
+    for(let i =window.gm.player.Outfit.list.length-1;i>=0;i-=1) {
+      let el = window.gm.player.Outfit.list[i];
       if(el.item && el.item.lossOnRespawn ) window.gm.player.Outfit.removeItem(el.id,true);
     }
-    for(el of window.gm.player.Wardrobe.list) {
+    for(let i =window.gm.player.Wardrobe.list.length-1;i>=0;i-=1) {
+      let el = window.gm.player.Wardrobe.list[0];
       if(el.item.lossOnRespawn ) window.gm.player.Wardrobe.removeItem(el.id,el.count);
     }
-    for(el of window.gm.player.Inv.list) {
+    for(let i =window.gm.player.Inv.list.length-1;i>=0;i-=1){
+      let el = window.gm.player.Inv.list[i];
       if(el.item.lossOnRespawn ) window.gm.player.Inv.removeItem(el.id,el.count);
     }
   }

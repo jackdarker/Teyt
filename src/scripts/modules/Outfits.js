@@ -116,6 +116,32 @@ class WristCuffs extends Equipment {
     }
     canUnequip() {return({OK:false, msg:'Those cuffs can only be removed by a magican!'});}
 }
+class CollarQuest extends Equipment {
+    constructor() {
+        super('CollarQuest');
+        this.tags = [];
+        this.slotUse = ['Neck'];
+        this.lossOnRespawn = false;
+    }
+    get desc() { return 'a collar';  }
+    toJSON() {return window.storage.Generic_toJSON("CollarQuest", this); };
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(CollarQuest, value.data));}
+    usable(context) {return(this.canEquip());}
+    use(context) { //context here is inventory not outfit
+        if(this.parent.parent.Outfit.findItemSlot(this.name).length>0) {  
+            this.parent.parent.Outfit.removeItem(this.name); 
+            return( {OK:true, msg:'unequipped '+ this.name}); //todo
+        } else {
+            this.parent.parent.Outfit.addItem(this); 
+            return( {OK:true, msg:'equipped '+ this.name}); //todo
+        }
+    }
+    canEquip() { 
+        if(this.parent && this.parent.parent.Outfit.findItemSlot(this.name).length>0) return({OK:true, msg:'unequip'});
+        else return({OK:true, msg:'equip'});
+    }
+    canUnequip() {return({OK:false, msg:'This can only be removed by a magican!'});}
+}
 class ClitPiercing extends Equipment {
     constructor() {
         super('ClitPiercing');
@@ -278,6 +304,7 @@ class TailRibbon extends Equipment {
 }
 
 window.gm.ItemsLib = (function (ItemsLib) {
+    window.storage.registerConstructor(CollarQuest);
     window.storage.registerConstructor(Leggings);
     window.storage.registerConstructor(TankShirt);
     window.storage.registerConstructor(Jeans);
@@ -292,6 +319,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(WristCuffs);
     
     //.. and Wardrobe
+    ItemsLib['CollarQuest'] = function () { return new CollarQuest();};
     ItemsLib['Leggings'] = function () { return new Leggings();};
     ItemsLib['Tank-shirt'] = function () { return new TankShirt(); };
     ItemsLib['Jeans'] = function () { return new Jeans();};

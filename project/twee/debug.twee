@@ -34,6 +34,8 @@ Cheat buttons: those are meant for debugging and might break your game</br>
 <a href="javascript:void(0)" onclick='window.gm.player.Stats.increment("arousal",25);window.gm.refreshAllPanel();'>Arousal +25</a>
 <a href="javascript:void(0)" onclick='window.gm.player.Stats.increment("arousal",-25);window.gm.refreshAllPanel();'>Arousal -25</a></br>
 <label for="passage">passage:<input type="text" id="passage" name="passage"></label><a href="javascript:void(0)" onclick='window.story.show(document.getElementById("passage").value)'>Go</a></br>
+<label for="additem">add item (not wardrobe):<input type="text" id="additem" name="additem"></label><a href="javascript:void(0)" onclick='window.gm.player.Inv.addItem(new window.storage.constructors[document.getElementById("additem").value]())'>Go</a></br>
+
 </br>
 </br>[[Back|_back]]</br>
 </article><article id="LogPanel"></article></section>

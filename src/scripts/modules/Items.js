@@ -37,7 +37,9 @@ class Battery extends Item {
     static fromJSON(value) { return window.storage.Generic_fromJSON(Battery, value.data);};
 }
 class PurpleBerry extends Item {
-    constructor() { super('PurpleBerry'); }
+    constructor() { super('PurpleBerry'); 
+        this.lossOnRespawn = true;
+    }
     get desc() { return 'Those purple berrys grow in the forest.';   }
     toJSON() {return window.storage.Generic_toJSON("PurpleBerry", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(PurpleBerry, value.data);};

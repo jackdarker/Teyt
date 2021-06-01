@@ -34,8 +34,8 @@ window.gm.OutfitSlotLib = {
     Feet    :   41,
     Ankles  :   42,
     Legs    :   43,
-    Thighs  :   44,
-    Hips     :   45,
+    Thighs  :   44,     //
+    Hips     :   45,    //belt
     Torso   :   46,    //not used !
     Breast  :   47,
     Nipples :   48,
@@ -112,7 +112,7 @@ class Equipment extends Item {
     }
     // Attention !!
     //_parent will be added dynamical
-    get parent() {return this._parent();}
+    get parent() {return(this._parent?this._parent(): null);}   //todo parent might not be set if item is not in wardrobe
     //for compatibility with item
     usable(context) {return({OK:false, msg:'Useable in wardrobe'});}
     use(context) {return({OK:false, msg:'Cannot use.'});}

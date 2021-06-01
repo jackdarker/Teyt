@@ -172,7 +172,7 @@ statdown {
 }
 .dev {
   color: lightblue;
-  background-color:darkblue;
+  background-color:#11114a;
 }
 .dev::before {content: 'dev-note:';}
 .author {

@@ -2,7 +2,6 @@
 <!--this passage is entry-point for combat-statemachine (use together with combat.initCombat) -->
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
-Get ready...
 A <%=window.story.state.combat.enemyParty[0].name%> appears ! </br>
 [[Next|EncounterStartTurn]]
 </article><article id="LogPanel"></article></section>

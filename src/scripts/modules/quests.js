@@ -50,7 +50,7 @@ window.gm.questDef = window.gm.questDef || {};
     quest.addMileStone( new QuestMilestone(200,"","They offered you to work in logistic department. You will move boxes and crates around for little money but at least its a start. Check your job-schedule",NOP));
     quest.addMileStone( new QuestMilestone(300,"","???",  NOP));
     window.gm.questDef[quest.id]= quest;
-}
+}//////////////////////////////////////////////////////////////////////////////////////
 {   // the quest keeps track of the VR-Game main development
     let NOP = (function(){  return (0)});
     let hidden = (function(){return(window.gm.quests.getMilestoneState("qDLCMain").id<100);});
@@ -71,6 +71,33 @@ window.gm.questDef = window.gm.questDef || {};
     quest.addMileStone(new QuestMilestone(1,"","Find your first death.",        NOP,hidden));
     quest.addMileStone(new QuestMilestone(100,"","Die with some bonded equipment.",        NOP,hidden));
     quest.addMileStone(new QuestMilestone(200,"","....",        NOP,hidden));
+    window.gm.questDef[quest.id]= quest;
+}
+{   //
+    let NOP = (function(){  return (0)});
+    let hidden = (function(){return(false);});
+    let quest = new Quest("qPurpleBerry","qPurpleBerry","qPurpleBerry",hidden );
+    quest.addMileStone(new QuestMilestone(1,"","Search the forest for 5 handful of purple berrys and deliver them to the alchemist.",        NOP,hidden));
+    quest.addMileStone(new QuestMilestone(100,"",".",        NOP,hidden));
+    quest.addMileStone(new QuestMilestone(200,"","....",        NOP,hidden));
+    window.gm.questDef[quest.id]= quest;
+}
+{
+    let NOP = (function(){  return (0)});
+    let hidden = (function(){return(window.gm.quests.getMilestoneState("qWolfMate").id<100);});
+    let quest = new Quest("qWolfMate","qWolfMate","qWolfMate",hidden );
+    quest.addMileStone(new QuestMilestone(1,"","Saw a wolf.",        NOP,hidden));
+    quest.addMileStone(new QuestMilestone(400,"","Is that wolf stronger than you? Lets find out.",        NOP,hidden));
+    quest.addMileStone(new QuestMilestone(500,"","",  NOP));
+    window.gm.questDef[quest.id]= quest;
+}
+{   // 
+    let NOP = (function(){  return (0)});
+    let hidden = (function(){return(window.gm.quests.getMilestoneState("qBondageKink").id<100);});
+    let quest = new Quest("qBondageKink","qBondageKink","qBondageKink",hidden );
+    quest.addMileStone(new QuestMilestone(1,"","qBondageKink",        NOP,hidden));
+    quest.addMileStone(new QuestMilestone(100,"","You got some choker on your neck. Find someone that can check on that.",        NOP,hidden));
+    quest.addMileStone(new QuestMilestone(200,"","The alchemist suggested to search for help in [Town].",      NOP,hidden));
     window.gm.questDef[quest.id]= quest;
 }
 {

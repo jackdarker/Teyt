@@ -52,7 +52,10 @@ Start at the character creation screen in the VR-game.
 </article><article id="LogPanel"></article></section>
 <script> function start() {
     window.gm.quests.addQuest("qDLCMain",1);
+    window.gm.quests.addQuest("qDiedAgain",1);
     window.gm.quests.addQuest("qFixLaptop",1);
+    window.gm.quests.addQuest("qBeastKink",1);
+    window.gm.quests.addQuest("qBondageKink",1);
     window.gm.quests.forceQuestMilestone("qDLCMain",600,1);
     window.gm.quests.forceQuestMilestone("qFixLaptop",1000,1);
     window.story.show("CharacterEditor");

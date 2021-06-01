@@ -172,6 +172,9 @@ class QuestManager {
             }
         }
         if(needsUpdate) this.tick();
+        else {
+            window.getMatchedCSSRules.pushLog("cant force "+questId +" to "+mileId);
+        }
     }
     //this will get called - sometimes - and will trigger the conditioncheck of the milestones
     tick() {

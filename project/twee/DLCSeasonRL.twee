@@ -60,9 +60,18 @@ You groan 'Come on now' Just scrolling down and hitting next.
 "They just stated they lent it for the test....oh .I forgot I have to leave. see ya later."
 <p class='talkPC'>"Sure."</p>
 'Im really tired now. Lets see when the equipment shows up.'</p>
-<a0 onclick='window.gm.quests.addQuest("qDLCMain",100);window.gm.quests.addQuest("qFixLaptop",1);window.story.show("Your Bedroom");'>Close Browser</a>
+<a0 onclick='start()'>Close Browser</a>
 </div>
 </article><article id="LogPanel"></article></section>
+<script> function start() {
+    window.gm.quests.addQuest("qDLCMain",100);
+    window.gm.quests.addQuest("qDiedAgain",1);
+    window.gm.quests.addQuest("qFixLaptop",1);
+    window.gm.quests.addQuest("qBeastKink",1);
+    window.gm.quests.addQuest("qBondageKink",1);
+    window.story.show("Your Bedroom");
+}
+</script>
 
 
 :: ReceiveVREquipment
@@ -257,3 +266,14 @@ Sis seems to be instructed to watch over you. Lets hope she doesnt find out what
 ...
 Als du aus dem Suite kletterst bist du hundemüde und deine Muskeln schmerzen als hättest du an einem Ironman-Lauf teilgenommen. Was du vom prinzip ja hast zumindest virtuel.
 'Diese Forcefeedback ist echt krass. Jetzt muss ich kein schlechtes Gewissen mehr haben wenn ich zocke das ich besser Sport machen sollte. Jetzt kann ich beides gleichzeitig!'
+
+
+:: AnalAddict
+As you walk through the city, a thought crosses your mind again and again.
+Its about that situation in the game where a foe had you pushed against the wall pressing his front against your lower back to keep you in place.
+That sensation was rather edgy. But would have been much worse if one of you had their pants down. 
+Of course that werent the case and even then it wouldnt automatically implicate that some butt-rape is imminent.
+Getting your butt ravaged is [[a No-No]] [[an odd idea ]].
+...   
+...Your butt feels kinda empty. Like it needs to be filled with some...some... ugh you dont know.
+Are you really going to stick something up your hole. [[Yeah]] [[No way]] [[not sure]]
