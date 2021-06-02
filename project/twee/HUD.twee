@@ -189,8 +189,8 @@ Checking out <%=window.gm.player.name%>:   [[Back|_back_]]</br>
 <script>
 function TorsoDescription() {
 	let msg="";
-	let vulva = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib['bVulva']);
-	let pierc = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib['pClit']);
+	let vulva = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bVulva);
+	let pierc = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib.pClit);
 	if(vulva) {
 		msg += "You have a nice "+vulva.desc+" between your legs." 
 		if(pierc) {

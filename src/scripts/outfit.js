@@ -4,7 +4,7 @@
 //this is a lookuptable for the equipmentslots
 //todo this will bloat up every character in savegame; is there a way to only store the used slots in character?
 //changing the numbers will break savegames !
-window.gm.OutfitSlotLib = { 
+/*window.gm.OutfitSlotLib = { 
     //b.. = bodyparts  (separated for mutiation-slots)
     bFeet   : 1,
     bLegs   : 2,
@@ -101,6 +101,102 @@ window.gm.OutfitSlotLib = {
     uRHand   :  115,
     //insert more slots before here
     SLOTMAX : 120
+};*/
+window.gm.OutfitSlotLib = { 
+    //b.. = bodyparts  (separated for mutiation-slots)
+    bFeet   : "bFeet",
+    bLegs   : "bLegs",
+    bTorso  : "bTorso",   
+    bWings  : "bWings",
+    bSkin   : "bSkin", // or fur,scales,...
+    bPubicHair  : "bPubicHair",
+    bHeadHair   : "bHeadHair",
+    bArms   :   "bArms",
+    bHands  :   "bHands",
+    bNeck   :   "bNeck",
+    bFace   :   "bFace",
+    bEyes   :   "bEyes",
+    bEars   :   "bEars",
+    bMouth  :   "bMouth",
+    bTongue :   "bTongue",
+    bTailBase : "bTailBase",   
+    bBreast :   "bBreast",
+    bNipples :  "bNipples",
+    bPenis :    "bPenis",
+    bBalls  :   "bBalls",
+    bVulva  :   "bVulva",
+    bClit   :   "bClit",
+    bWomb   :   "bWomb",
+    bAnus   :   "bAnus",
+    // slots for wearables
+    Feet    :   "Feet",
+    Ankles  :   "Ankles",
+    Legs    :   "Legs",
+    Thighs  :   "Thighs",     //
+    Hips    :   "Hips",    //belt
+    Torso   :   "Torso",    //not used !
+    Breast  :   "Breast",
+    Nipples :   "Nipples",
+    Penis :     "Penis",
+    Balls  :    "Balls",
+    Vulva  :    "Vulva",
+    Clit    :   "Clit",
+    Womb   :    "Womb",
+    Anus   :    "Anus",
+    TailBase   :"TailBase",
+    TailTip :   "TailTip",
+    Stomach :   "Stomach",
+    Chest   :   "Chest",
+    Shoulders : "Shoulders",  
+    Wings   :   "Wings",
+    Neck    :   "Neck",
+    Head    :   "Head",
+    HeadHair:   "HeadHair",//for Hats
+    Face    :   "Face",//for facemask
+    Mouth   :   "Mouth",
+    Nose    :   "Nose",
+    Eyes    :   "Eyes",
+    Ears    :   "Ears",
+    Arms    :   "Arms",
+    Wrists  :   "Wrists",
+    LHand   :   "LHand",
+    RHand   :   "RHand",
+    //U  = under wear    P = piercing  T = tattoo
+    uFeet    : "uFeet",   //socks
+    uAnkles  : "uAnkles",    //
+    uLegs    : "uLegs",
+    uThighs  : "uThighs",
+    uHips    : "uHips",
+    uTorso   : "uTorso",    //not used !
+    uBreast  : "uBreast",
+    pNipples : "pNipples",
+    uPenis   : "uPenis",
+    pPenis  :   "pPenis",
+    uBalls  :   "uBalls",
+    pBalls  :   "pBalls",
+    uVulva  :   "uVulva",
+    pVulva  :   "pVulva",
+    pClit   :   "pClit",
+    uWomb   :   "uWomb",
+    uAnus   :   "uAnus",
+    uTailBase  :"uTailBase",
+    uTailTip :  "uTailTip",
+    uStomach :  "uStomach",
+    uChest   :  "uChest",
+    uShoulders :"uShoulders",
+    uWings   :  "uWings",
+    uNeck    :  "uNeck",
+    uHead    :  "uHead",
+    uHeadHair:  "uHeadHair",
+    uFace    :  "uFace",
+    uMouth   :  "uMouth",
+    uNose    :  "uNose",
+    pEyes    :  "pEyes",
+    pEars    :  "pEars",
+    uArms    :  "uArms",
+    uWrists  :  "uWrists",
+    uLHand   :  "uLHand",
+    uRHand   :  "uRHand"
 };
 //Todo equip on other char:
 //move from own inventory to chars, equip, if impossible undo 
@@ -127,12 +223,30 @@ class Outfit extends Inventory{
     constructor(externlist) {
         super(externlist);
         //create each slot
-        for(let i=0; i<window.gm.OutfitSlotLib.SLOTMAX;i++) {
+        /*for(let i=0; i<window.gm.OutfitSlotLib.SLOTMAX;i++) {
             if(this.list.length-1 < i) {
                 this.list.push({id:'', item:null});        // {id:'Leggings'}
             }
-        }
-        //??this.list = {};  //this.list.Legs = {id:'Leggings' item:x}
+        }*/
+        this.list = {};  //this.list.Legs = {id:'Leggings' item:x}
+        this.list[Symbol.iterator] = function() { //need iterator for for..of
+            let index = -1;
+            let arr = this;
+            let items = Object.keys(this);
+            return {
+               next() {
+                  while (true) {
+                     index++;
+                     if (index >= items.length) return { done: true };
+                     if (arr[items[index]] !== undefined) break;
+                  }
+                  return {
+                     done: false,
+                     value: { index:items[index], value:arr[items[index]]}
+                  };
+               }
+            }
+         }
         window.storage.registerConstructor(Outfit);
     }
     get parent() {return this._parent();}
@@ -142,16 +256,19 @@ class Outfit extends Inventory{
         window.gm.pushLog('Outfit: '+operation+' '+id+' '+msg+'</br>');
     }
 
-    /*_relinkItems() {  //call this after loading save data the reparent
-        for(var i=0; i<this.list.length; i++) {
-            if(this.list[i].item) this.list[i].item._parent=window.gm.util.refToParent(this);
+    _relinkItems() {  //call this after loading save data the reparent
+        //let items = Object.keys(this.list);
+        for (el of this.list) {
+            if(el.value.item) el.item._parent=window.gm.util.refToParent(this);;
         }
+        /*for(var i=0; i<items.length; i++) {
+            if(items[i].item) items[i].item._parent=window.gm.util.refToParent(this);
+        }*/
     }
     postItemChange(id,operation,msg) {
         window.gm.pushLog('Outfit: '+operation+' '+id+' '+msg+'</br>');
     }
-    //count() {return(this.list.length);}*/
-
+    count() {return( Object.keys(this.list).length);}
     //count how many slots are used by an item
     countItem(id) {
         let _i = this.findItemSlot(id);
@@ -160,10 +277,18 @@ class Outfit extends Inventory{
     //detect which slots are used by a item
     findItemSlot(id) {
         let _idx =[];
-        for (let i = 0; i < this.count(); i++) {
-            if(this.list[i].id===id) _idx.push(i);
+        for (el of this.list) {
+            if(el.value.id===id) _idx.push(el.index);
         }
+        /*let items = Object.keys(this.list);
+        for (let i = 0; i < items.length; i++) {
+            if(items[i].id===id) _idx.push(id);
+        }*/
         return(_idx);
+    }
+    getItemId(slot) {
+        let item = this.list[slot];
+        return(item?item.id:"");
     }
     //override because findItemSlot returns array
     getItem(id) {
@@ -172,7 +297,8 @@ class Outfit extends Inventory{
         return(this.list[_idx[0]].item);
     }
     getItemForSlot(slot) {
-        return(this.list[slot].item)
+        let item = this.list[slot];
+        return(item?item.item:null);
     }
     canEquipSlot(slot) {
         return({OK:true});
@@ -196,7 +322,7 @@ class Outfit extends Inventory{
         let _idx = this.findItemSlot(item.name);
         if(_idx.length>0) return; //already equipped
         let _item = item;
-        _idx = _item.slotUse.map((function(cv, ix, arr) { return (window.gm.OutfitSlotLib[cv]);  }));
+        _idx = _item.slotUse;//.map((function(cv, ix, arr) { return (window.gm.OutfitSlotLib[cv]);  }));
         let _oldIDs = [];
         let _oldSlots = [];
         let result = {OK: true, msg:''};
@@ -208,7 +334,7 @@ class Outfit extends Inventory{
                 if(oldId==='') continue;
                 if(_oldIDs.indexOf(oldId)<0) {
                     _oldIDs.push(oldId);
-                    _oldSlots=_oldSlots.concat(this.getItem(oldId).slotUse.map((function(cv, ix, arr) { return (window.gm.OutfitSlotLib[cv]);})));
+                    _oldSlots=_oldSlots.concat(this.getItem(oldId).slotUse);//.map((function(cv, ix, arr) { return (window.gm.OutfitSlotLib[cv]);})));
                 }
                 let _tmp = this.canUnequipItem(oldId);
                 if(!_tmp.OK) result.msg += _tmp.msg; //todo duplicated msg if item uses multiple slots
@@ -226,8 +352,11 @@ class Outfit extends Inventory{
         for(let i=0; i<_oldSlots.length;i++) {
             this.__clearSlot(_oldSlots[i]);
         }
-        
         for(let k=0; k<_idx.length;k++) {
+            let _el = this.list[_idx[k]];
+            if(!_el) {
+                this.list[_idx[k]] = _el =  {id:'', item:null};
+            }
             this.list[_idx[k]].id = _item.name;
             this.list[_idx[k]].item = _item;
         }  
@@ -237,7 +366,10 @@ class Outfit extends Inventory{
     }
     //assumme that it was checked before that unequip is allowed
     __clearSlot(slot, force) {
-        this.list[slot].id = '', this.list[slot].item=null;
+        let item = this.list[slot];
+        if(item) {
+            item.id = '', item.item=null;
+        }
     }
     removeItem(id, force) {
         let _idx = this.findItemSlot(id);

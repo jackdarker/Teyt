@@ -169,8 +169,8 @@ Where would you like to go?</br>
 </article><article id="LogPanel"></article><script>
 function getMoney(elmnt,val) {
 	let msg="</br>You shouldnt steal that money, should you?";
-	let vulva = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib['bVulva']);
-	let pierc = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib['pClit']);
+	let vulva = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib.'bVulva');
+	let pierc = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib.'pClit');
 	if(vulva && vulva instanceof (window.storage.constructors['VulvaHuman'])) {
 		if(pierc===null ) {
 			pierc= window.gm.ItemsLib['ClitPiercing']();

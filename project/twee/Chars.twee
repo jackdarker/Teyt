@@ -97,7 +97,7 @@ Somehow you know your breast stopped changing ...</br>
 </article></section>
 <script>
 function mutate() {
-    let vulva = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib["bVulva"]);
+    let vulva = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bVulva);
     let msg = 'Everything is ok, nothing unusual.</br>';
     if(vulva) {
         msg ="An unusual feeling lets you move your hand down to your nethers.</br>"

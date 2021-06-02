@@ -17,7 +17,7 @@
 </head>
 	<body>
 		<tw-story tags></tw-story>
-		<!-- UUID://90EFC306-4C57-4786-8CD3-9789B523C8AF// --><tw-storydata name="teyt" startnode="106" creator="Tweego" creator-version="2.1.1+81d1d71" ifid="90EFC306-4C57-4786-8CD3-9789B523C8AF" zoom="1" format="snowman" format-version="2.0.3" options="" hidden><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css">/* twine-user-stylesheet #1: "user.min.css" */
+		<!-- UUID://90EFC306-4C57-4786-8CD3-9789B523C8AF// --><tw-storydata name="teyt" startnode="107" creator="Tweego" creator-version="2.1.1+81d1d71" ifid="90EFC306-4C57-4786-8CD3-9789B523C8AF" zoom="1" format="snowman" format-version="2.0.3" options="" hidden><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css">/* twine-user-stylesheet #1: "user.min.css" */
 carrots{color:red}carrots{color:#00f}
 /* twine-user-stylesheet #2: "Story Stylesheet" */
 .main {
@@ -516,8 +516,8 @@ var CombatSetup = /*#__PURE__*/function () {
 
       try {
         for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
-          var _el = _step2.value;
-          s.combat.playerParty.push(s[_el]);
+          var _el2 = _step2.value;
+          s.combat.playerParty.push(s[_el2]);
         }
       } catch (err) {
         _iterator2.e(err);
@@ -3430,113 +3430,210 @@ var Mob = /*#__PURE__*/function (_Character) {
 //todo this will bloat up every character in savegame; is there a way to only store the used slots in character?
 //changing the numbers will break savegames !
 
+/*window.gm.OutfitSlotLib = { 
+    //b.. = bodyparts  (separated for mutiation-slots)
+    bFeet   : 1,
+    bLegs   : 2,
+    bTorso  : 3,   
+    bWings  : 4,
+    bSkin   : 5, // or fur,scales,...
+    bPubicHair  : 6,
+    bHeadHair   : 7,
+    bArms   :   8,
+    bHands  :   9,
+    bNeck   :   10,
+    bFace   :   11,
+    bEyes   :   12,
+    bEars   :   13,
+    bMouth  :   14,
+    bTongue :   15,
+    bTailBase : 16,   
+    bBreast :   17,
+    bNipples :  18,
+    bPenis :    19,
+    bBalls  :   20,
+    bVulva  :   21,
+    bClit   :   22,
+    bWomb   :   23,
+    bAnus   :   24,
+    // slots for wearables
+    Feet    :   41,
+    Ankles  :   42,
+    Legs    :   43,
+    Thighs  :   44,     //
+    Hips     :   45,    //belt
+    Torso   :   46,    //not used !
+    Breast  :   47,
+    Nipples :   48,
+    Penis :     49,
+    Balls  :    50,
+    Vulva  :    51,
+    Clit    :   52,
+    Womb   :    53,
+    Anus   :    54,
+    TailBase   :55,
+    TailTip :   56,
+    Stomach :   57,
+    Chest   :   58,
+    Shoulders : 59,  
+    Wings   :   60,
+    Neck    :   61,
+    Head    :   62,
+    HeadHair:   63,//for Hats
+    Face    :   64,//for facemask
+    Mouth   :   65,
+    Nose    :   66,
+    Eyes    :   67,
+    Ears    :   68,
+    Arms    :   69,
+    Wrists  :   70,
+    LHand   :   71,
+    RHand   :   72,
+    //U  = under wear    P = piercing  T = tattoo
+    uFeet    : 81,   //socks
+    uAnkles  : 82,    //
+    uLegs    : 83,
+    uThighs  : 84,
+    uHips    : 85,
+    uTorso   : 86,    //not used !
+    uBreast  : 87,
+    pNipples : 88,
+    uPenis   : 89,
+    pPenis  :   90,
+    uBalls  :   91,
+    pBalls  :   92,
+    uVulva  :   93,
+    pVulva  :   94,
+    pClit   :   95,
+    uWomb   :   96,
+    uAnus   :   97,
+    uTailBase  :98,
+    uTailTip :  99,
+    uStomach :  100,
+    uChest   :  101,
+    uShoulders :102,
+    uWings   :  103,
+    uNeck    :  104,
+    uHead    :  105,
+    uHeadHair:  106,
+    uFace    :  107,
+    uMouth   :  108,
+    uNose    :  109,
+    pEyes    :  110,
+    pEars    :  111,
+    uArms    :  112,
+    uWrists  :  113,
+    uLHand   :  114,
+    uRHand   :  115,
+    //insert more slots before here
+    SLOTMAX : 120
+};*/
+
 
 window.gm.OutfitSlotLib = {
   //b.. = bodyparts  (separated for mutiation-slots)
-  bFeet: 1,
-  bLegs: 2,
-  bTorso: 3,
-  bWings: 4,
-  bSkin: 5,
+  bFeet: "bFeet",
+  bLegs: "bLegs",
+  bTorso: "bTorso",
+  bWings: "bWings",
+  bSkin: "bSkin",
   // or fur,scales,...
-  bPubicHair: 6,
-  bHeadHair: 7,
-  bArms: 8,
-  bHands: 9,
-  bNeck: 10,
-  bFace: 11,
-  bEyes: 12,
-  bEars: 13,
-  bMouth: 14,
-  bTongue: 15,
-  bTailBase: 16,
-  bBreast: 17,
-  bNipples: 18,
-  bPenis: 19,
-  bBalls: 20,
-  bVulva: 21,
-  bClit: 22,
-  bWomb: 23,
-  bAnus: 24,
+  bPubicHair: "bPubicHair",
+  bHeadHair: "bHeadHair",
+  bArms: "bArms",
+  bHands: "bHands",
+  bNeck: "bNeck",
+  bFace: "bFace",
+  bEyes: "bEyes",
+  bEars: "bEars",
+  bMouth: "bMouth",
+  bTongue: "bTongue",
+  bTailBase: "bTailBase",
+  bBreast: "bBreast",
+  bNipples: "bNipples",
+  bPenis: "bPenis",
+  bBalls: "bBalls",
+  bVulva: "bVulva",
+  bClit: "bClit",
+  bWomb: "bWomb",
+  bAnus: "bAnus",
   // slots for wearables
-  Feet: 41,
-  Ankles: 42,
-  Legs: 43,
-  Thighs: 44,
+  Feet: "Feet",
+  Ankles: "Ankles",
+  Legs: "Legs",
+  Thighs: "Thighs",
   //
-  Hips: 45,
+  Hips: "Hips",
   //belt
-  Torso: 46,
+  Torso: "Torso",
   //not used !
-  Breast: 47,
-  Nipples: 48,
-  Penis: 49,
-  Balls: 50,
-  Vulva: 51,
-  Clit: 52,
-  Womb: 53,
-  Anus: 54,
-  TailBase: 55,
-  TailTip: 56,
-  Stomach: 57,
-  Chest: 58,
-  Shoulders: 59,
-  Wings: 60,
-  Neck: 61,
-  Head: 62,
-  HeadHair: 63,
+  Breast: "Breast",
+  Nipples: "Nipples",
+  Penis: "Penis",
+  Balls: "Balls",
+  Vulva: "Vulva",
+  Clit: "Clit",
+  Womb: "Womb",
+  Anus: "Anus",
+  TailBase: "TailBase",
+  TailTip: "TailTip",
+  Stomach: "Stomach",
+  Chest: "Chest",
+  Shoulders: "Shoulders",
+  Wings: "Wings",
+  Neck: "Neck",
+  Head: "Head",
+  HeadHair: "HeadHair",
   //for Hats
-  Face: 64,
+  Face: "Face",
   //for facemask
-  Mouth: 65,
-  Nose: 66,
-  Eyes: 67,
-  Ears: 68,
-  Arms: 69,
-  Wrists: 70,
-  LHand: 71,
-  RHand: 72,
+  Mouth: "Mouth",
+  Nose: "Nose",
+  Eyes: "Eyes",
+  Ears: "Ears",
+  Arms: "Arms",
+  Wrists: "Wrists",
+  LHand: "LHand",
+  RHand: "RHand",
   //U  = under wear    P = piercing  T = tattoo
-  uFeet: 81,
+  uFeet: "uFeet",
   //socks
-  uAnkles: 82,
+  uAnkles: "uAnkles",
   //
-  uLegs: 83,
-  uThighs: 84,
-  uHips: 85,
-  uTorso: 86,
+  uLegs: "uLegs",
+  uThighs: "uThighs",
+  uHips: "uHips",
+  uTorso: "uTorso",
   //not used !
-  uBreast: 87,
-  pNipples: 88,
-  uPenis: 89,
-  pPenis: 90,
-  uBalls: 91,
-  pBalls: 92,
-  uVulva: 93,
-  pVulva: 94,
-  pClit: 95,
-  uWomb: 96,
-  uAnus: 97,
-  uTailBase: 98,
-  uTailTip: 99,
-  uStomach: 100,
-  uChest: 101,
-  uShoulders: 102,
-  uWings: 103,
-  uNeck: 104,
-  uHead: 105,
-  uHeadHair: 106,
-  uFace: 107,
-  uMouth: 108,
-  uNose: 109,
-  pEyes: 110,
-  pEars: 111,
-  uArms: 112,
-  uWrists: 113,
-  uLHand: 114,
-  uRHand: 115,
-  //insert more slots before here
-  SLOTMAX: 120
+  uBreast: "uBreast",
+  pNipples: "pNipples",
+  uPenis: "uPenis",
+  pPenis: "pPenis",
+  uBalls: "uBalls",
+  pBalls: "pBalls",
+  uVulva: "uVulva",
+  pVulva: "pVulva",
+  pClit: "pClit",
+  uWomb: "uWomb",
+  uAnus: "uAnus",
+  uTailBase: "uTailBase",
+  uTailTip: "uTailTip",
+  uStomach: "uStomach",
+  uChest: "uChest",
+  uShoulders: "uShoulders",
+  uWings: "uWings",
+  uNeck: "uNeck",
+  uHead: "uHead",
+  uHeadHair: "uHeadHair",
+  uFace: "uFace",
+  uMouth: "uMouth",
+  uNose: "uNose",
+  pEyes: "pEyes",
+  pEars: "pEars",
+  uArms: "uArms",
+  uWrists: "uWrists",
+  uLHand: "uLHand",
+  uRHand: "uRHand"
 }; //Todo equip on other char:
 //move from own inventory to chars, equip, if impossible undo 
 
@@ -3631,16 +3728,39 @@ var Outfit = /*#__PURE__*/function (_Inventory) {
 
     _this2 = _super3.call(this, externlist); //create each slot
 
-    for (var i = 0; i < window.gm.OutfitSlotLib.SLOTMAX; i++) {
-      if (_this2.list.length - 1 < i) {
-        _this2.list.push({
-          id: '',
-          item: null
-        }); // {id:'Leggings'}
+    /*for(let i=0; i<window.gm.OutfitSlotLib.SLOTMAX;i++) {
+        if(this.list.length-1 < i) {
+            this.list.push({id:'', item:null});        // {id:'Leggings'}
+        }
+    }*/
 
-      }
-    } //??this.list = {};  //this.list.Legs = {id:'Leggings' item:x}
+    _this2.list = {}; //this.list.Legs = {id:'Leggings' item:x}
 
+    _this2.list[Symbol.iterator] = function () {
+      //need iterator for for..of
+      var index = -1;
+      var arr = this;
+      var items = Object.keys(this);
+      return {
+        next: function next() {
+          while (true) {
+            index++;
+            if (index >= items.length) return {
+              done: true
+            };
+            if (arr[items[index]] !== undefined) break;
+          }
+
+          return {
+            done: false,
+            value: {
+              index: items[index],
+              value: arr[items[index]]
+            }
+          };
+        }
+      };
+    };
 
     window.storage.registerConstructor(Outfit);
     return _this2;
@@ -3656,16 +3776,40 @@ var Outfit = /*#__PURE__*/function (_Inventory) {
     value: function postItemChange(id, operation, msg) {
       window.gm.pushLog('Outfit: ' + operation + ' ' + id + ' ' + msg + '</br>');
     }
-    /*_relinkItems() {  //call this after loading save data the reparent
-        for(var i=0; i<this.list.length; i++) {
-            if(this.list[i].item) this.list[i].item._parent=window.gm.util.refToParent(this);
+  }, {
+    key: "_relinkItems",
+    value: function _relinkItems() {
+      //call this after loading save data the reparent
+      //let items = Object.keys(this.list);
+      var _iterator5 = _createForOfIteratorHelper(this.list),
+          _step5;
+
+      try {
+        for (_iterator5.s(); !(_step5 = _iterator5.n()).done;) {
+          el = _step5.value;
+          if (el.value.item) el.item._parent = window.gm.util.refToParent(this);
+          ;
         }
+        /*for(var i=0; i<items.length; i++) {
+            if(items[i].item) items[i].item._parent=window.gm.util.refToParent(this);
+        }*/
+
+      } catch (err) {
+        _iterator5.e(err);
+      } finally {
+        _iterator5.f();
+      }
     }
-    postItemChange(id,operation,msg) {
-        window.gm.pushLog('Outfit: '+operation+' '+id+' '+msg+'</br>');
+  }, {
+    key: "postItemChange",
+    value: function postItemChange(id, operation, msg) {
+      window.gm.pushLog('Outfit: ' + operation + ' ' + id + ' ' + msg + '</br>');
     }
-    //count() {return(this.list.length);}*/
-    //count how many slots are used by an item
+  }, {
+    key: "count",
+    value: function count() {
+      return Object.keys(this.list).length;
+    } //count how many slots are used by an item
 
   }, {
     key: "countItem",
@@ -3680,11 +3824,32 @@ var Outfit = /*#__PURE__*/function (_Inventory) {
     value: function findItemSlot(id) {
       var _idx = [];
 
-      for (var i = 0; i < this.count(); i++) {
-        if (this.list[i].id === id) _idx.push(i);
+      var _iterator6 = _createForOfIteratorHelper(this.list),
+          _step6;
+
+      try {
+        for (_iterator6.s(); !(_step6 = _iterator6.n()).done;) {
+          el = _step6.value;
+          if (el.value.id === id) _idx.push(el.index);
+        }
+        /*let items = Object.keys(this.list);
+        for (let i = 0; i < items.length; i++) {
+            if(items[i].id===id) _idx.push(id);
+        }*/
+
+      } catch (err) {
+        _iterator6.e(err);
+      } finally {
+        _iterator6.f();
       }
 
       return _idx;
+    }
+  }, {
+    key: "getItemId",
+    value: function getItemId(slot) {
+      var item = this.list[slot];
+      return item ? item.id : "";
     } //override because findItemSlot returns array
 
   }, {
@@ -3698,7 +3863,8 @@ var Outfit = /*#__PURE__*/function (_Inventory) {
   }, {
     key: "getItemForSlot",
     value: function getItemForSlot(slot) {
-      return this.list[slot].item;
+      var item = this.list[slot];
+      return item ? item.item : null;
     }
   }, {
     key: "canEquipSlot",
@@ -3741,9 +3907,8 @@ var Outfit = /*#__PURE__*/function (_Inventory) {
       if (_idx.length > 0) return; //already equipped
 
       var _item = item;
-      _idx = _item.slotUse.map(function (cv, ix, arr) {
-        return window.gm.OutfitSlotLib[cv];
-      });
+      _idx = _item.slotUse; //.map((function(cv, ix, arr) { return (window.gm.OutfitSlotLib[cv]);  }));
+
       var _oldIDs = [];
       var _oldSlots = [];
       var result = {
@@ -3762,9 +3927,7 @@ var Outfit = /*#__PURE__*/function (_Inventory) {
           if (_oldIDs.indexOf(oldId) < 0) {
             _oldIDs.push(oldId);
 
-            _oldSlots = _oldSlots.concat(this.getItem(oldId).slotUse.map(function (cv, ix, arr) {
-              return window.gm.OutfitSlotLib[cv];
-            }));
+            _oldSlots = _oldSlots.concat(this.getItem(oldId).slotUse); //.map((function(cv, ix, arr) { return (window.gm.OutfitSlotLib[cv]);})));
           }
 
           var _tmp = this.canUnequipItem(oldId);
@@ -3789,6 +3952,15 @@ var Outfit = /*#__PURE__*/function (_Inventory) {
       }
 
       for (var k = 0; k < _idx.length; k++) {
+        var _el = this.list[_idx[k]];
+
+        if (!_el) {
+          this.list[_idx[k]] = _el = {
+            id: '',
+            item: null
+          };
+        }
+
         this.list[_idx[k]].id = _item.name;
         this.list[_idx[k]].item = _item;
       }
@@ -3802,7 +3974,11 @@ var Outfit = /*#__PURE__*/function (_Inventory) {
   }, {
     key: "__clearSlot",
     value: function __clearSlot(slot, force) {
-      this.list[slot].id = '', this.list[slot].item = null;
+      var item = this.list[slot];
+
+      if (item) {
+        item.id = '', item.item = null;
+      }
     }
   }, {
     key: "removeItem",
@@ -4637,21 +4813,21 @@ var Skill = /*#__PURE__*/function () {
       //target is [dragon] or [mole1,mole2]
       var filtered = this.targetFilter([target]); //[[]] !
 
-      var _iterator5 = _createForOfIteratorHelper(target),
-          _step5;
+      var _iterator7 = _createForOfIteratorHelper(target),
+          _step7;
 
       try {
-        for (_iterator5.s(); !(_step5 = _iterator5.n()).done;) {
-          var targ = _step5.value;
+        for (_iterator7.s(); !(_step7 = _iterator7.n()).done;) {
+          var targ = _step7.value;
 
           var _i = filtered.indexOf(target);
 
           if (_i < 0) return false;
         }
       } catch (err) {
-        _iterator5.e(err);
+        _iterator7.e(err);
       } finally {
-        _iterator5.f();
+        _iterator7.f();
       }
 
       return true;
@@ -4691,33 +4867,33 @@ var Skill = /*#__PURE__*/function () {
       if (result.OK) {
         result.msg = "";
 
-        var _iterator6 = _createForOfIteratorHelper(result.effects),
-            _step6;
+        var _iterator8 = _createForOfIteratorHelper(result.effects),
+            _step8;
 
         try {
-          for (_iterator6.s(); !(_step6 = _iterator6.n()).done;) {
-            var X = _step6.value;
+          for (_iterator8.s(); !(_step8 = _iterator8.n()).done;) {
+            var X = _step8.value;
 
             // for each target
-            var _iterator7 = _createForOfIteratorHelper(X.eff),
-                _step7;
+            var _iterator9 = _createForOfIteratorHelper(X.eff),
+                _step9;
 
             try {
-              for (_iterator7.s(); !(_step7 = _iterator7.n()).done;) {
-                var Y = _step7.value;
+              for (_iterator9.s(); !(_step9 = _iterator9.n()).done;) {
+                var Y = _step9.value;
                 //...multiple effects
                 X.target.addEffect(Y.id, Y);
               }
             } catch (err) {
-              _iterator7.e(err);
+              _iterator9.e(err);
             } finally {
-              _iterator7.f();
+              _iterator9.f();
             }
           }
         } catch (err) {
-          _iterator6.e(err);
+          _iterator8.e(err);
         } finally {
-          _iterator6.f();
+          _iterator8.f();
         }
 
         result.msg += this.getCastDescription(result);
@@ -4729,43 +4905,6 @@ var Skill = /*#__PURE__*/function () {
   }, {
     key: "targetFilterSelf",
     value: function targetFilterSelf(targets) {
-      var possibleTarget = [];
-
-      var _iterator8 = _createForOfIteratorHelper(targets),
-          _step8;
-
-      try {
-        for (_iterator8.s(); !(_step8 = _iterator8.n()).done;) {
-          var target = _step8.value;
-          var valid = true;
-
-          var _iterator9 = _createForOfIteratorHelper(target),
-              _step9;
-
-          try {
-            for (_iterator9.s(); !(_step9 = _iterator9.n()).done;) {
-              var targ = _step9.value;
-              if (this.caster != targ) valid = false;
-            }
-          } catch (err) {
-            _iterator9.e(err);
-          } finally {
-            _iterator9.f();
-          }
-
-          if (valid) possibleTarget.push(target);
-        }
-      } catch (err) {
-        _iterator8.e(err);
-      } finally {
-        _iterator8.f();
-      }
-
-      return possibleTarget;
-    }
-  }, {
-    key: "targetFilterAlly",
-    value: function targetFilterAlly(targets) {
       var possibleTarget = [];
 
       var _iterator10 = _createForOfIteratorHelper(targets),
@@ -4782,7 +4921,7 @@ var Skill = /*#__PURE__*/function () {
           try {
             for (_iterator11.s(); !(_step11 = _iterator11.n()).done;) {
               var targ = _step11.value;
-              if (this.caster.faction != targ.faction) valid = false;
+              if (this.caster != targ) valid = false;
             }
           } catch (err) {
             _iterator11.e(err);
@@ -4801,8 +4940,8 @@ var Skill = /*#__PURE__*/function () {
       return possibleTarget;
     }
   }, {
-    key: "targetFilterEnemy",
-    value: function targetFilterEnemy(targets) {
+    key: "targetFilterAlly",
+    value: function targetFilterAlly(targets) {
       var possibleTarget = [];
 
       var _iterator12 = _createForOfIteratorHelper(targets),
@@ -4819,8 +4958,7 @@ var Skill = /*#__PURE__*/function () {
           try {
             for (_iterator13.s(); !(_step13 = _iterator13.n()).done;) {
               var targ = _step13.value;
-              if (this.caster.faction == targ.faction) valid = false;
-              if (targ.isDead()) valid = false;
+              if (this.caster.faction != targ.faction) valid = false;
             }
           } catch (err) {
             _iterator13.e(err);
@@ -4839,9 +4977,8 @@ var Skill = /*#__PURE__*/function () {
       return possibleTarget;
     }
   }, {
-    key: "targetFilterFighting",
-    value: function targetFilterFighting(targets) {
-      //chars that are not inhibited
+    key: "targetFilterEnemy",
+    value: function targetFilterEnemy(targets) {
       var possibleTarget = [];
 
       var _iterator14 = _createForOfIteratorHelper(targets),
@@ -4858,7 +4995,8 @@ var Skill = /*#__PURE__*/function () {
           try {
             for (_iterator15.s(); !(_step15 = _iterator15.n()).done;) {
               var targ = _step15.value;
-              if (!targ._canAct().OK) valid = false;
+              if (this.caster.faction == targ.faction) valid = false;
+              if (targ.isDead()) valid = false;
             }
           } catch (err) {
             _iterator15.e(err);
@@ -4877,9 +5015,9 @@ var Skill = /*#__PURE__*/function () {
       return possibleTarget;
     }
   }, {
-    key: "targetFilterAlive",
-    value: function targetFilterAlive(targets) {
-      //chars that are not dead
+    key: "targetFilterFighting",
+    value: function targetFilterFighting(targets) {
+      //chars that are not inhibited
       var possibleTarget = [];
 
       var _iterator16 = _createForOfIteratorHelper(targets),
@@ -4896,7 +5034,7 @@ var Skill = /*#__PURE__*/function () {
           try {
             for (_iterator17.s(); !(_step17 = _iterator17.n()).done;) {
               var targ = _step17.value;
-              if (targ.isDead()) valid = false;
+              if (!targ._canAct().OK) valid = false;
             }
           } catch (err) {
             _iterator17.e(err);
@@ -4915,9 +5053,9 @@ var Skill = /*#__PURE__*/function () {
       return possibleTarget;
     }
   }, {
-    key: "targetFilterDead",
-    value: function targetFilterDead(targets) {
-      //chars that are dead
+    key: "targetFilterAlive",
+    value: function targetFilterAlive(targets) {
+      //chars that are not dead
       var possibleTarget = [];
 
       var _iterator18 = _createForOfIteratorHelper(targets),
@@ -4934,7 +5072,7 @@ var Skill = /*#__PURE__*/function () {
           try {
             for (_iterator19.s(); !(_step19 = _iterator19.n()).done;) {
               var targ = _step19.value;
-              if (!targ.isDead()) valid = false;
+              if (targ.isDead()) valid = false;
             }
           } catch (err) {
             _iterator19.e(err);
@@ -4953,6 +5091,44 @@ var Skill = /*#__PURE__*/function () {
       return possibleTarget;
     }
   }, {
+    key: "targetFilterDead",
+    value: function targetFilterDead(targets) {
+      //chars that are dead
+      var possibleTarget = [];
+
+      var _iterator20 = _createForOfIteratorHelper(targets),
+          _step20;
+
+      try {
+        for (_iterator20.s(); !(_step20 = _iterator20.n()).done;) {
+          var target = _step20.value;
+          var valid = true;
+
+          var _iterator21 = _createForOfIteratorHelper(target),
+              _step21;
+
+          try {
+            for (_iterator21.s(); !(_step21 = _iterator21.n()).done;) {
+              var targ = _step21.value;
+              if (!targ.isDead()) valid = false;
+            }
+          } catch (err) {
+            _iterator21.e(err);
+          } finally {
+            _iterator21.f();
+          }
+
+          if (valid) possibleTarget.push(target);
+        }
+      } catch (err) {
+        _iterator20.e(err);
+      } finally {
+        _iterator20.f();
+      }
+
+      return possibleTarget;
+    }
+  }, {
     key: "targetMultiple",
     value: function targetMultiple(targets) {
       var possibletarget = targets.slice(0); //[[mole1],[mole2]]
@@ -4960,19 +5136,19 @@ var Skill = /*#__PURE__*/function () {
       var multi = [];
       multi.name = "all"; //there has to be a name for display
 
-      var _iterator20 = _createForOfIteratorHelper(possibletarget),
-          _step20;
+      var _iterator22 = _createForOfIteratorHelper(possibletarget),
+          _step22;
 
       try {
-        for (_iterator20.s(); !(_step20 = _iterator20.n()).done;) {
-          var el = _step20.value;
+        for (_iterator22.s(); !(_step22 = _iterator22.n()).done;) {
+          var el = _step22.value;
           if (el.length === 1) //dont stack multi-targets
             multi.push(el[0]);
         }
       } catch (err) {
-        _iterator20.e(err);
+        _iterator22.e(err);
       } finally {
-        _iterator20.f();
+        _iterator22.f();
       }
 
       if (multi.length > 0) possibletarget.push(multi); //[[mole1],[mole2],[mole1,mole2]]
@@ -7124,18 +7300,18 @@ window.gm.respawn = function () {
   if (!keepInventory) {
     //remove inentory and outfit that is not questitem, cursed or permanent
     for (var i = window.gm.player.Outfit.list.length - 1; i >= 0; i -= 1) {
-      var _el2 = window.gm.player.Outfit.list[i];
-      if (_el2.item && _el2.item.lossOnRespawn) window.gm.player.Outfit.removeItem(_el2.id, true);
+      var _el3 = window.gm.player.Outfit.list[i];
+      if (_el3.item && _el3.item.lossOnRespawn) window.gm.player.Outfit.removeItem(_el3.id, true);
     }
 
     for (var _i2 = window.gm.player.Wardrobe.list.length - 1; _i2 >= 0; _i2 -= 1) {
-      var _el3 = window.gm.player.Wardrobe.list[0];
-      if (_el3.item.lossOnRespawn) window.gm.player.Wardrobe.removeItem(_el3.id, _el3.count);
+      var _el4 = window.gm.player.Wardrobe.list[0];
+      if (_el4.item.lossOnRespawn) window.gm.player.Wardrobe.removeItem(_el4.id, _el4.count);
     }
 
     for (var _i3 = window.gm.player.Inv.list.length - 1; _i3 >= 0; _i3 -= 1) {
-      var _el4 = window.gm.player.Inv.list[_i3];
-      if (_el4.item.lossOnRespawn) window.gm.player.Inv.removeItem(_el4.id, _el4.count);
+      var _el5 = window.gm.player.Inv.list[_i3];
+      if (_el5.item.lossOnRespawn) window.gm.player.Inv.removeItem(_el5.id, _el5.count);
     }
   }
 }; //sets current player location and advances time
@@ -7592,12 +7768,12 @@ var FlashBang = /*#__PURE__*/function (_Item9) {
 
           result.msg = context.parent.name + ' uses ' + this.name + '.';
 
-          var _iterator21 = _createForOfIteratorHelper(on),
-              _step21;
+          var _iterator23 = _createForOfIteratorHelper(on),
+              _step23;
 
           try {
-            for (_iterator21.s(); !(_step21 = _iterator21.n()).done;) {
-              var _targ = _step21.value;
+            for (_iterator23.s(); !(_step23 = _iterator23.n()).done;) {
+              var _targ = _step23.value;
 
               _targ.addEffect(effStunned.name, new effStunned()); //todo should 'FlashBang:Stunned' merge with other stunned? 
 
@@ -7605,9 +7781,9 @@ var FlashBang = /*#__PURE__*/function (_Item9) {
               result.msg += _targ.name + ' got stunned. ';
             }
           } catch (err) {
-            _iterator21.e(err);
+            _iterator23.e(err);
           } finally {
-            _iterator21.f();
+            _iterator23.f();
           }
 
           result.OK = true;
@@ -9373,21 +9549,21 @@ var SkillAttack = /*#__PURE__*/function (_Skill) {
       if (this.isValidTarget(targets)) {
         result.OK = true;
 
-        var _iterator22 = _createForOfIteratorHelper(targets),
-            _step22;
+        var _iterator24 = _createForOfIteratorHelper(targets),
+            _step24;
 
         try {
-          for (_iterator22.s(); !(_step22 = _iterator22.n()).done;) {
-            var target = _step22.value;
+          for (_iterator24.s(); !(_step24 = _iterator24.n()).done;) {
+            var target = _step24.value;
             var attack = window.gm.combat.defaultAttackData();
             var result2 = window.gm.combat.calcAttack(this.caster, target, attack);
             this.msg += result2.msg;
             result.effects = result.effects.concat(attack.effects);
           }
         } catch (err) {
-          _iterator22.e(err);
+          _iterator24.e(err);
         } finally {
-          _iterator22.f();
+          _iterator24.f();
         }
       }
 
@@ -9444,21 +9620,21 @@ var SkillTease = /*#__PURE__*/function (_Skill2) {
       if (this.isValidTarget(targets)) {
         result.OK = true;
 
-        var _iterator23 = _createForOfIteratorHelper(targets),
-            _step23;
+        var _iterator25 = _createForOfIteratorHelper(targets),
+            _step25;
 
         try {
-          for (_iterator23.s(); !(_step23 = _iterator23.n()).done;) {
-            var target = _step23.value;
+          for (_iterator25.s(); !(_step25 = _iterator25.n()).done;) {
+            var target = _step25.value;
             var attack = window.gm.combat.defaultAttackData();
             var result2 = window.gm.combat.calcTeaseAttack(this.caster, target, attack);
             this.msg += result2.msg;
             result.effects = result.effects.concat(attack.effects);
           }
         } catch (err) {
-          _iterator23.e(err);
+          _iterator25.e(err);
         } finally {
-          _iterator23.f();
+          _iterator25.f();
         }
       }
 
@@ -9504,19 +9680,19 @@ var SkillStun = /*#__PURE__*/function (_Skill3) {
       var multi = [];
       multi.name = "all";
 
-      var _iterator24 = _createForOfIteratorHelper(possibletarget),
-          _step24;
+      var _iterator26 = _createForOfIteratorHelper(possibletarget),
+          _step26;
 
       try {
-        for (_iterator24.s(); !(_step24 = _iterator24.n()).done;) {
-          var el = _step24.value;
+        for (_iterator26.s(); !(_step26 = _iterator26.n()).done;) {
+          var el = _step26.value;
           if (el.length === 1) //dont stack multi-targets
             multi.push(el[0]);
         }
       } catch (err) {
-        _iterator24.e(err);
+        _iterator26.e(err);
       } finally {
-        _iterator24.f();
+        _iterator26.f();
       }
 
       if (multi.length > 1) possibletarget.push(multi); //if there is only [[mole]] we dont want [[mole],[mole]]
@@ -9534,21 +9710,21 @@ var SkillStun = /*#__PURE__*/function (_Skill3) {
       if (this.isValidTarget(targets)) {
         result.OK = true;
 
-        var _iterator25 = _createForOfIteratorHelper(targets),
-            _step25;
+        var _iterator27 = _createForOfIteratorHelper(targets),
+            _step27;
 
         try {
-          for (_iterator25.s(); !(_step25 = _iterator25.n()).done;) {
-            var target = _step25.value;
+          for (_iterator27.s(); !(_step27 = _iterator27.n()).done;) {
+            var target = _step27.value;
             result.effects.push({
               target: target,
               eff: [new effStunned()]
             });
           }
         } catch (err) {
-          _iterator25.e(err);
+          _iterator27.e(err);
         } finally {
-          _iterator25.f();
+          _iterator27.f();
         }
       }
 
@@ -9602,21 +9778,21 @@ var SkillPoisonCloud = /*#__PURE__*/function (_Skill4) {
       if (this.isValidTarget(targets)) {
         result.OK = true;
 
-        var _iterator26 = _createForOfIteratorHelper(targets),
-            _step26;
+        var _iterator28 = _createForOfIteratorHelper(targets),
+            _step28;
 
         try {
-          for (_iterator26.s(); !(_step26 = _iterator26.n()).done;) {
-            var target = _step26.value;
+          for (_iterator28.s(); !(_step28 = _iterator28.n()).done;) {
+            var target = _step28.value;
             result.effects.push({
               target: target,
               eff: [new effPoisoned()]
             });
           }
         } catch (err) {
-          _iterator26.e(err);
+          _iterator28.e(err);
         } finally {
-          _iterator26.f();
+          _iterator28.f();
         }
       }
 
@@ -9670,21 +9846,21 @@ var SkillHeal = /*#__PURE__*/function (_Skill5) {
       if (this.isValidTarget(targets)) {
         result.OK = true;
 
-        var _iterator27 = _createForOfIteratorHelper(targets),
-            _step27;
+        var _iterator29 = _createForOfIteratorHelper(targets),
+            _step29;
 
         try {
-          for (_iterator27.s(); !(_step27 = _iterator27.n()).done;) {
-            var target = _step27.value;
+          for (_iterator29.s(); !(_step29 = _iterator29.n()).done;) {
+            var target = _step29.value;
             result.effects.push({
               target: target,
               eff: [new effHeal(10)]
             });
           }
         } catch (err) {
-          _iterator27.e(err);
+          _iterator29.e(err);
         } finally {
-          _iterator27.f();
+          _iterator29.f();
         }
       }
 
@@ -9839,20 +10015,20 @@ var SkillGuard = /*#__PURE__*/function (_Skill8) {
       if (this.isValidTarget(targets)) {
         result.OK = true;
 
-        var _iterator28 = _createForOfIteratorHelper(targets),
-            _step28;
+        var _iterator30 = _createForOfIteratorHelper(targets),
+            _step30;
 
         try {
-          for (_iterator28.s(); !(_step28 = _iterator28.n()).done;) {
+          for (_iterator30.s(); !(_step30 = _iterator30.n()).done;) {
             /*result.effects.push( {target:target,
                 eff:[new effHeal(10)]})*/
 
-            var target = _step28.value;
+            var target = _step30.value;
           }
         } catch (err) {
-          _iterator28.e(err);
+          _iterator30.e(err);
         } finally {
-          _iterator28.f();
+          _iterator30.f();
         }
       }
 
@@ -9981,12 +10157,12 @@ var SkillCallHelp = /*#__PURE__*/function (_Skill10) {
       if (this.isValidTarget(targets)) {
         result.OK = true;
 
-        var _iterator29 = _createForOfIteratorHelper(targets),
-            _step29;
+        var _iterator31 = _createForOfIteratorHelper(targets),
+            _step31;
 
         try {
-          for (_iterator29.s(); !(_step29 = _iterator29.n()).done;) {
-            var target = _step29.value;
+          for (_iterator31.s(); !(_step31 = _iterator31.n()).done;) {
+            var target = _step31.value;
             var eff = new effCallHelp();
             eff.configureSpawn(this.item, this.caster.faction);
             result.effects.push({
@@ -9995,9 +10171,9 @@ var SkillCallHelp = /*#__PURE__*/function (_Skill10) {
             });
           }
         } catch (err) {
-          _iterator29.e(err);
+          _iterator31.e(err);
         } finally {
-          _iterator29.f();
+          _iterator31.f();
         }
       }
 
@@ -11995,7 +12171,7 @@ window.gm.StatsLib = function (StatsLib) {
   return StatsLib;
 }(window.gm.StatsLib || {});
 /* twine-user-script #2: "Story JavaScript" */
-</script><tw-tag name="_isdeffered_" color="brown"></tw-tag><tw-tag name="template" color="orange"></tw-tag><tw-tag name="_back_" color="gray"></tw-tag><tw-tag name="_nosave_" color="yellow"></tw-tag><tw-tag name="_nodeffered_" color="yellow"></tw-tag><tw-passagedata pid="1" name="Info_Jake" tags="_back_" position="100,100" size="100,100">&lt;section&gt; 
+</script><tw-tag name="_nodeffered_" color="yellow"></tw-tag><tw-tag name="_isdeffered_" color="brown"></tw-tag><tw-tag name="template" color="orange"></tw-tag><tw-tag name="_back_" color="gray"></tw-tag><tw-tag name="_nosave_" color="yellow"></tw-tag><tw-passagedata pid="1" name="Info_Jake" tags="_back_" position="100,100" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 Jake is here.&lt;/br&gt;
 You barely know anything about him.&lt;/br&gt;
@@ -12071,7 +12247,7 @@ Somehow you know your breast stopped changing ...&lt;/br&gt;
 &lt;/article&gt;&lt;/section&gt;
 &lt;script&gt;
 function mutate() {
-    let vulva = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib[&quot;bVulva&quot;]);
+    let vulva = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bVulva);
     let msg = &#39;Everything is ok, nothing unusual.&lt;/br&gt;&#39;;
     if(vulva) {
         msg =&quot;An unusual feeling lets you move your hand down to your nethers.&lt;/br&gt;&quot;
@@ -12538,11 +12714,16 @@ You can hear him yawning &quot;I&#39;m going to sleep now.&quot;
 &quot;Yup. See ya.&quot;
 You put your phone away. A shower and some sleep would be nice.&lt;/br&gt;
 [[Next|Your Bedroom]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="36" name="ReceiveVREquipment2" tags="" position="725,475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="36" name="VREquipment2" tags="" position="725,475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+The email reads:
+&quot;Dear tester, we just noticed that a part of the game equipment was not delivered to you. We will make another attempt to send it to you within short time.&quot;
+&#39;But I have equipment received. I didnt notie anything missing.&#39;
+[[Next]]&lt;/div&gt;&lt;/div&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="37" name="ReceiveVREquipment2" tags="" position="850,475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.quests.forceQuestMilestone(&quot;qDLCMain&quot;,500,100)%&gt;
 As you got home from your daily chores and fiddling with the keys to your dorm, you find a sticky note on your door:&lt;/br&gt;
 &quot;Pickup parcel from Melanie&quot;&lt;/br&gt;
-&#39;Melanie? parcel?&#39; You slap your forehead &#39;Ah yes, that might be the gaming equiment.&#39;&lt;/br&gt;
+&#39;Melanie? parcel?&#39; You slap your forehead &#39;Ah yes, that might be the gaming equipment.&#39;&lt;/br&gt;
 &lt;div id=&#39;select1&#39; &gt;
 &lt;a0 onclick=&#39;window.gm.printTalkLink($(&quot;div#select1&quot;)[0],&quot;div#choice1a&quot;)&#39;&gt;knock at her door&lt;/a&gt;
 &lt;/div&gt;&lt;/div&gt;
@@ -12559,7 +12740,7 @@ She opens the door and you can now see a large parcel the size of a washer and a
 &lt;!--todo--&gt;
 You are eager to get the equipment into your dorm and setup everything. So you move the boxes out of Melanies room into your own.&lt;/br&gt;
 [[Next|SetupVREquipment2]]&lt;/div&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="37" name="SetupVREquipment2" tags="" position="850,475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="38" name="SetupVREquipment2" tags="" position="975,475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.quests.forceQuestMilestone(&quot;qDLCMain&quot;,600,500)%&gt;
 You unpack the heavier one of the large parcels. It contains a number of metal pipes and plates, cables and screws.
 The other package contains something that looks like a diver&#39;s suite made from neoprene and another VR-headset. 
@@ -12609,7 +12790,7 @@ You can undock yourself and disconnect the cables.
 You put your phone away. Stripping out of the suite is as difficult as getting inside. That rubbery fabric is painfully pulling at each hair on your body.
 A shower and some sleep would be nice.
 [[Next|Your Bedroom]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="38" name="RL_Day1" tags="" position="975,475" size="100,100">In 2 days most of your intramural courses are done and you will have more free time. Just lets get the day started and get to university.
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="39" name="RL_Day1" tags="" position="1100,475" size="100,100">In 2 days most of your intramural courses are done and you will have more free time. Just lets get the day started and get to university.
 [[Attend studys]]
 &lt;!--todo--&gt;
 [[Lunch with Ariane&amp;friends]]
@@ -12631,7 +12812,7 @@ As you try to flip through the classes you got a message &quot;For testing purpo
 You can toggle between male and female though the difference between the androgyne male and the female seem just to be some perky but small titts.
 The description of the class is sparse. The picture you see indicates that this class uses a 2-handed staff and light armor. You expect also some magic abilities - its an elf, isn&#39;t it?.
 &#39;I will choose male. Brad would make fun of me all time if I would choose any other option. On the other hand, it is roleplay right?&#39;
-[[male elf]] [[female elf]]</tw-passagedata><tw-passagedata pid="39" name="AIAwesome" tags="" position="1100,475" size="100,100">...&quot;Actually we dont design everything manually. That would be much to tedious.&quot;&lt;/br&gt;
+[[male elf]] [[female elf]]</tw-passagedata><tw-passagedata pid="40" name="AIAwesome" tags="" position="1225,475" size="100,100">...&quot;Actually we dont design everything manually. That would be much to tedious.&quot;&lt;/br&gt;
 &quot;Instead we use an AI that learns while the game is played.&quot;
 &quot;You mean an artificial intelligence? But doesnt most games have some AI to control the NPCs?&quot;
 &quot;I didnt talk about AI to control the behaviour of some mobs. And for sure the fewest games have anything near to an AI. Most often its just some logic. Maybe complex logic but still predefined logic.&quot;
@@ -12644,17 +12825,17 @@ The description of the class is sparse. The picture you see indicates that this 
 &quot;Those darn AI! How can we do qualitychecking if everything can change at every time.&quot;
 &quot;I spent 1 week to verify that all trees are growing upside down and then the AI decides to overhaul the entire growth-system and I have to redo it again and again.&quot;
 &quot;The problem is, the AI doesnt tell you whats going to change and how it is doing it.&quot;
-&quot;And I dont trust it. What if its decide to just delete the game and itself?&quot;</tw-passagedata><tw-passagedata pid="40" name="SisterInTown" tags="" position="1225,475" size="100,100">Your mother informs you that your sister has business in town.
-Sis seems to be instructed to watch over you. Lets hope she doesnt find out what game you are playing.</tw-passagedata><tw-passagedata pid="41" name="ForceFeedback" tags="" position="100,600" size="100,100">...
+&quot;And I dont trust it. What if its decide to just delete the game and itself?&quot;</tw-passagedata><tw-passagedata pid="41" name="SisterInTown" tags="" position="100,600" size="100,100">Your mother informs you that your sister has business in town.
+Sis seems to be instructed to watch over you. Lets hope she doesnt find out what game you are playing.</tw-passagedata><tw-passagedata pid="42" name="ForceFeedback" tags="" position="225,600" size="100,100">...
 Als du aus dem Suite kletterst bist du hundemüde und deine Muskeln schmerzen als hättest du an einem Ironman-Lauf teilgenommen. Was du vom prinzip ja hast zumindest virtuel.
-&#39;Diese Forcefeedback ist echt krass. Jetzt muss ich kein schlechtes Gewissen mehr haben wenn ich zocke das ich besser Sport machen sollte. Jetzt kann ich beides gleichzeitig!&#39;</tw-passagedata><tw-passagedata pid="42" name="AnalAddict" tags="" position="225,600" size="100,100">As you walk through the city, a thought crosses your mind again and again.
+&#39;Diese Forcefeedback ist echt krass. Jetzt muss ich kein schlechtes Gewissen mehr haben wenn ich zocke das ich besser Sport machen sollte. Jetzt kann ich beides gleichzeitig!&#39;</tw-passagedata><tw-passagedata pid="43" name="AnalAddict" tags="" position="350,600" size="100,100">As you walk through the city, a thought crosses your mind again and again.
 Its about that situation in the game where a foe had you pushed against the wall pressing his front against your lower back to keep you in place.
 That sensation was rather edgy. But would have been much worse if one of you had their pants down. 
 Of course that werent the case and even then it wouldnt automatically implicate that some butt-rape is imminent.
 Getting your butt ravaged is [[a No-No]] [[an odd idea ]].
 ...   
 ...Your butt feels kinda empty. Like it needs to be filled with some...some... ugh you dont know.
-Are you really going to stick something up your hole. [[Yeah]] [[No way]] [[not sure]]</tw-passagedata><tw-passagedata pid="43" name="DLCShopWelcome" tags="_back_" position="350,600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+Are you really going to stick something up your hole. [[Yeah]] [[No way]] [[not sure]]</tw-passagedata><tw-passagedata pid="44" name="DLCShopWelcome" tags="_back_" position="475,600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 Welcome to the games Shop where you can buy Quality-of-life-service and equipment for your travel in our game.&lt;/br&gt;
 Please note that you need Tokens to buy something. Token can be bougth for real money or they can be earned in the game or granted by the content managers. 
 
@@ -12669,12 +12850,12 @@ There might also be some pay-by-use offers at respawn like: removal of status al
 
 &lt;div&gt;&lt;/br&gt;
 [[Checkout|_back_]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="44" name="Encounter" tags="" position="500,25" size="100,100">&lt;!--this passage is entry-point for combat-statemachine (use together with combat.initCombat) --&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="45" name="Encounter" tags="" position="500,25" size="100,100">&lt;!--this passage is entry-point for combat-statemachine (use together with combat.initCombat) --&gt;
 &lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 A &lt;%=window.story.state.combat.enemyParty[0].name%&gt; appears ! &lt;/br&gt;
 [[Next|EncounterStartTurn]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="45" name="EncounterStartTurn" tags="" position="650,25" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="46" name="EncounterStartTurn" tags="" position="650,25" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;div id=&#39;combatCanvas&#39; style=&#39;background: url(&lt;%=s.combat.enemyParty[0].pic%&gt;) no-repeat center,url(&lt;%=s.combat.scenePic%&gt;) no-repeat center;color:black;&#39;&gt;&lt;/div&gt;&lt;/br&gt;
 &lt;div id=&quot;panel&quot;&gt;&lt;/div&gt;&lt;/br&gt;&lt;/br&gt; &lt;!--filled by statspanel--&gt;
@@ -12686,16 +12867,16 @@ A &lt;%=window.story.state.combat.enemyParty[0].name%&gt; appears ! &lt;/br&gt;
 &lt;script&gt;
 window.gm.printOutput(window.gm.Encounter.battle().msg);
 renderToSelector(&quot;#panel&quot;, &quot;statspanel&quot;);
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="46" name="statspanel" tags="" position="725,600" size="100,100">&lt;!--subpanel--&gt;
-&lt;%=window.gm.Encounter.printStats()%&gt;</tw-passagedata><tw-passagedata pid="47" name="GameOver" tags="" position="200,275" size="100,100">Game Over. I hope you learned something.&lt;/br&gt;
-&lt;/br&gt;[[New Game|Start]]</tw-passagedata><tw-passagedata pid="48" name="Mole Submit" tags="" position="500,175" size="100,100">&lt;section&gt; 
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="47" name="statspanel" tags="" position="850,600" size="100,100">&lt;!--subpanel--&gt;
+&lt;%=window.gm.Encounter.printStats()%&gt;</tw-passagedata><tw-passagedata pid="48" name="GameOver" tags="" position="200,275" size="100,100">Game Over. I hope you learned something.&lt;/br&gt;
+&lt;/br&gt;[[New Game|Start]]</tw-passagedata><tw-passagedata pid="49" name="Mole Submit" tags="" position="500,175" size="100,100">&lt;section&gt; 
 &lt;!--hide this, we are not in a state ready to save &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;--&gt;
 &lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 The mole took you down into his cave. &lt;/br&gt;
 Which was very difficult since you are far to large - you know?&lt;/br&gt;
 [[Return Home|Home]]
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;
-&lt;/section&gt;</tw-passagedata><tw-passagedata pid="49" name="sidebar" tags="" position="375,500" size="100,100">&lt;h3&gt;&lt;%=window.story.name%&gt;&lt;/h3&gt;V&lt;%=window.gm.getSaveVersion().toString().replaceAll(&quot;,&quot;,&quot;.&quot;)%&gt;&lt;/br&gt;
+&lt;/section&gt;</tw-passagedata><tw-passagedata pid="50" name="sidebar" tags="" position="375,500" size="100,100">&lt;h3&gt;&lt;%=window.story.name%&gt;&lt;/h3&gt;V&lt;%=window.gm.getSaveVersion().toString().replaceAll(&quot;,&quot;,&quot;.&quot;)%&gt;&lt;/br&gt;
 &lt;img src=&quot;https://twinery.org/homepage/img/logo.svg&quot; width=&quot;256&quot; height=&quot;256&quot;&gt;
 &lt;/hr&gt;
 &lt;div style=&quot;font-size: smaller;&quot;&gt;&lt;%=window.gm.player.location%&gt;&lt;/br&gt;
@@ -12729,8 +12910,8 @@ document.querySelector(&#39;#status&#39;).addEventListener(&#39;click&#39;, func
 document.querySelector(&#39;#save&#39;).addEventListener(&#39;click&#39;, function(){window.gm.toggleDialog(&#39;#dialog_save&#39;);});
 document.querySelector(&#39;#help&#39;).addEventListener(&#39;click&#39;, function(){window.story.show(&#39;Help_Index&#39;);}); 
 document.querySelector(&#39;#settings&#39;).addEventListener(&#39;click&#39;, function(){window.story.show(&#39;Settings&#39;);}); 
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="50" name="CenterDialogs" tags="" position="1225,600" size="100,100">&lt;!--called to include important dialogs; mainly the save-Dialog because of special behaviour--&gt;
-&lt;%=window.story.render(&quot;SaveDialog&quot;) %&gt;&lt;/br&gt;</tw-passagedata><tw-passagedata pid="51" name="LogPanel" tags="" position="100,725" size="100,100">&lt;div class=&quot;scroll&quot; style=&quot;font-size: smaller;&quot;&gt;&lt;%=window.gm.getLog()%&gt;&lt;/br&gt;&lt;/br&gt;&lt;/div&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="51" name="CenterDialogs" tags="" position="100,725" size="100,100">&lt;!--called to include important dialogs; mainly the save-Dialog because of special behaviour--&gt;
+&lt;%=window.story.render(&quot;SaveDialog&quot;) %&gt;&lt;/br&gt;</tw-passagedata><tw-passagedata pid="52" name="LogPanel" tags="" position="225,725" size="100,100">&lt;div class=&quot;scroll&quot; style=&quot;font-size: smaller;&quot;&gt;&lt;%=window.gm.getLog()%&gt;&lt;/br&gt;&lt;/br&gt;&lt;/div&gt;
 &lt;button type=&quot;button&quot; id=&quot;toggleview&quot; onclick=toggleview()&gt;toggle View&lt;/button&gt;
 &lt;button type=&quot;button&quot; id=&quot;clearview&quot; onclick=clearview()&gt;clear View&lt;/button&gt;
 &lt;script&gt;
@@ -12740,7 +12921,7 @@ function toggleview(){
 function clearview(){
   window.gm.clearLog();window.gm.refreshAllPanel();
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="52" name="SaveDialog" tags="" position="225,725" size="100,100">&lt;dialog role=&quot;dialog&quot; id=&#39;dialog_save&#39; aria-labelledby=&quot;dialog-heading&quot;&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="53" name="SaveDialog" tags="" position="350,725" size="100,100">&lt;dialog role=&quot;dialog&quot; id=&#39;dialog_save&#39; aria-labelledby=&quot;dialog-heading&quot;&gt;
     &lt;button id=&quot;close-dialog&quot;&gt;Back&lt;/button&gt; &lt;div&gt;&lt;%=(window.story.state._gm.nosave?&quot;save disabled in this scene&quot;:&quot;&quot;)%&gt;&lt;/div&gt;
     &lt;form&gt;
     &lt;label&gt;&lt;output&gt;&lt;/output&gt;&lt;/label&gt;&lt;/br&gt;
@@ -12807,7 +12988,7 @@ function readFile(input) {
       return;
     } //aborted by user
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="53" name="Inventory" tags="_back_" position="350,725" size="100,100">&lt;section&gt; 
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="54" name="Inventory" tags="_back_" position="475,725" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 [[Back|_back_]]&lt;/br&gt;
 &lt;%=window.gm.player.name%&gt; inventory: &lt;/br&gt;&lt;/br&gt;
@@ -12821,27 +13002,27 @@ for(var i=0;i&lt;maxSlots;i++){
 } 
 %&gt;
 &lt;div id=&#39;output&#39;&gt;&lt;/div&gt;&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="54" name="Relations" tags="_back_" position="475,725" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="55" name="Relations" tags="_back_" position="600,725" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 [[Back|_back_]]&lt;/br&gt;
 &lt;%=window.gm.player.name%&gt; relations: &lt;/br&gt;&lt;/br&gt;
 &lt;%=window.gm.printRelationSummary()%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="55" name="Achievements" tags="_back_" position="600,725" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="56" name="Achievements" tags="_back_" position="725,725" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 [[Back|_back_]]&lt;/br&gt;
 &lt;%=window.gm.printAchievements()%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="56" name="Player_Dashboard" tags="_back_" position="725,725" size="100,100">&lt;!--a dashboard where the player can check his other stuff--&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="57" name="Player_Dashboard" tags="_back_" position="850,725" size="100,100">&lt;!--a dashboard where the player can check his other stuff--&gt;
 &lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 Here you can check and modify several options: &lt;/br&gt;
 Your outfit can only be changed by using a wardrobe.&lt;/br&gt;
-[[Back|_back_]] [[Status]] [[View]] [[Inventory]] [[Relations]] [[QuestList]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="57" name="QuestList" tags="_back_" position="850,725" size="100,100">&lt;section&gt; 
+[[Back|_back_]] [[Status]] [[View|Mirror]] [[Inventory]] [[Relations]] [[QuestList]]&lt;/br&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="58" name="QuestList" tags="_back_" position="975,725" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;/br&gt;
 &lt;%=window.gm.printQuestList()%&gt;
 &lt;/br&gt;[[Back|_back_]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="58" name="Mirror" tags="_back_" position="975,725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="59" name="Mirror" tags="_back_" position="1100,725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 Checking out &lt;%=window.gm.player.name%&gt;:   [[Back|_back_]]&lt;/br&gt;
 &lt;div id=&#39;output&#39;&gt;&lt;div&gt;
 &lt;!--todo: set height depending on browsersize--&gt;
@@ -12850,8 +13031,8 @@ Checking out &lt;%=window.gm.player.name%&gt;:   [[Back|_back_]]&lt;/br&gt;
 &lt;script&gt;
 function TorsoDescription() {
 	let msg=&quot;&quot;;
-	let vulva = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib[&#39;bVulva&#39;]);
-	let pierc = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib[&#39;pClit&#39;]);
+	let vulva = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bVulva);
+	let pierc = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib.pClit);
 	if(vulva) {
 		msg += &quot;You have a nice &quot;+vulva.desc+&quot; between your legs.&quot; 
 		if(pierc) {
@@ -12861,7 +13042,7 @@ function TorsoDescription() {
 	return msg+&quot;&lt;/br&gt;&quot;;
 }
 window.gm.printOutput(TorsoDescription());
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="59" name="Wardrobe" tags="_back_" position="1100,725" size="100,100">&lt;section&gt; 
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="60" name="Wardrobe" tags="_back_" position="1225,725" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 [[Back|_back_]]&lt;/br&gt;
 &lt;%=window.gm.player.name%&gt; has equipped: &lt;%=window.gm.printEquipmentSummary()%&gt;&lt;/br&gt;&lt;/br&gt;
@@ -12877,14 +13058,14 @@ for(var i=0;i&lt;maxSlots;i++){
   %&gt;&lt;%=window.gm.printEquipment(id,inv.getItem(id).desc)%&gt;&lt;%
 } 
 %&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="60" name="Settings" tags="_back_" position="1225,725" size="100,100">&lt;!--TODO what settings ?--&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="61" name="Settings" tags="_back_" position="100,850" size="100,100">&lt;!--TODO what settings ?--&gt;
 &lt;section&gt; 
 &lt;!--&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;--&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 [[Back|_back_]]&lt;/br&gt;
 Theme:
 &lt;a href=&quot;javascript:window.styleSwitcher.setStyle(&#39;default&#39;);window.gm.refreshAllPanel();&quot;&gt;default&lt;/a&gt;
 &lt;a href=&quot;javascript:window.styleSwitcher.setStyle(&#39;dark&#39;);window.gm.refreshAllPanel();&quot;&gt;dark&lt;/a&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="61" name="Settings2" tags="_back_" position="100,850" size="100,100">&lt;!--just test--&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="62" name="Settings2" tags="_back_" position="225,850" size="100,100">&lt;!--just test--&gt;
 &lt;section&gt; 
 &lt;!--&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;--&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;div&gt;&lt;canvas id=&quot;exampleCanvas&quot; width=&quot;240&quot; height=&quot;225&quot;&gt;Your browser doesn&#39;t support the canvas tag.    &lt;/canvas&gt;&lt;/div&gt;
@@ -12902,7 +13083,7 @@ img.src = imgsrc;//&#39;https://twinery.org/homepage/img/logo.svg&#39;;   //todo
       onimage(&quot;assets/bird.gif&quot;);
     &lt;/script&gt;
 [[Back|_back_]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="62" name="Status" tags="_back_" position="225,850" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="63" name="Status" tags="_back_" position="350,850" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 Status of &lt;%=window.gm.player.name%&gt;:   [[Back|_back_]]&lt;/br&gt;
 &lt;a0 onclick=&#39;window.gm.printOutput(window.gm.printEffectSummary(window.gm.player.id,true,false));&#39;&gt;Stats&lt;/a&gt;
@@ -12912,7 +13093,7 @@ Status of &lt;%=window.gm.player.name%&gt;:   [[Back|_back_]]&lt;/br&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
 &lt;script&gt;
 window.gm.printOutput(window.gm.printEffectSummary(window.gm.player.id,true,false));
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="63" name="listsell" tags="" position="350,850" size="100,100">&lt;!--this fragment can be used to setup a list of items to sell:
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="64" name="listsell" tags="" position="475,850" size="100,100">&lt;!--this fragment can be used to setup a list of items to sell:
 add into passage: &lt;div id=&quot;choice&quot;&gt;&lt;/div&gt;&lt;/br&gt;&lt;/br&gt; &lt;div id=&quot;panel&quot;&gt;&lt;/div&gt;&lt;/br&gt;&lt;/br&gt;   
 in &lt;script&gt; define variable _Entrys and specify wares to sell
 and run renderToSelector(&quot;#panel&quot;, &quot;listsell&quot;); 
@@ -12928,7 +13109,7 @@ for(var i=0;_Entrys.length&gt;i;i++) {
     cbCanBuy=(function(itemid){return window.gm.defaultCanSell(itemid,_cost)}),
     cbPostBuy=(function(itemid){window.gm.defaultPostSell(itemid,_cost)}));
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="64" name="listbuy" tags="" position="475,850" size="100,100">&lt;!--this fragment can be used to setup a list of items to buy:
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="65" name="listbuy" tags="" position="600,850" size="100,100">&lt;!--this fragment can be used to setup a list of items to buy:
 add into passage: &lt;div id=&quot;choice&quot;&gt;&lt;/div&gt;&lt;/br&gt;&lt;/br&gt; &lt;div id=&quot;panel&quot;&gt;&lt;/div&gt;&lt;/br&gt;&lt;/br&gt;   
 in &lt;script&gt; define variable _Entrys and specify wares to buy
 and run renderToSelector(&quot;#panel&quot;, &quot;listbuy&quot;); 
@@ -12945,15 +13126,15 @@ for(var i=0;_Entrys.length&gt;i;i++) {
     cbCanBuy=(function(itemid){return window.gm.cbCanBuyPerverse(itemid,_cost,_costPerv)}),
     cbPostBuy=(function(itemid){window.gm.defaultPostBuy(itemid,_cost)}));
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="65" name="_back_" tags="" position="600,850" size="100,100">&lt;!--this just exists because Back-links would rendered as non existent--&gt;</tw-passagedata><tw-passagedata pid="66" name="PassageTemplate" tags="template" position="250,500" size="100,100">The page should be setup like this:
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="66" name="_back_" tags="" position="725,850" size="100,100">&lt;!--this just exists because Back-links would rendered as non existent--&gt;</tw-passagedata><tw-passagedata pid="67" name="PassageTemplate" tags="template" position="250,500" size="100,100">The page should be setup like this:
 &lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 content here !
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="67" name="SubpanelTemplate" tags="_back_" position="75,600" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="68" name="SubpanelTemplate" tags="_back_" position="75,600" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 If this is a subpanel you can use back-tag and _back_-Link
 [[Back|_back_]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="68" name="_SaveAndRestore_" tags="" position="975,850" size="100,100">&lt;script&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="69" name="_SaveAndRestore_" tags="" position="1100,850" size="100,100">&lt;script&gt;
 var x = 1; 
 var maxSlots = 4; //number saveslots available; has to fit form below
  do {
@@ -12984,18 +13165,18 @@ function refresh(slot){
 &lt;button type=&quot;button&quot; id=&quot;save4&quot;&gt;save 4&lt;/button&gt;&lt;button type=&quot;button&quot; id=&quot;load4&quot;&gt;load 4&lt;/button&gt;
 &lt;button type=&quot;button&quot; id=&quot;delete4&quot;&gt;delete 4&lt;/button&gt;&lt;label&gt;Info:&lt;output4&gt;&lt;/output4&gt;&lt;/label&gt;&lt;/br&gt;
 &lt;/form&gt;
-[[Start]]</tw-passagedata><tw-passagedata pid="69" name="_SuperSimpleStory_" tags="" position="1200,125" size="100,100">&lt;%if(visited(window.passage.name)&lt;=1) {%&gt;
+[[Start]]</tw-passagedata><tw-passagedata pid="70" name="_SuperSimpleStory_" tags="" position="1200,125" size="100,100">&lt;%if(visited(window.passage.name)&lt;=1) {%&gt;
 Welcome to this short story.&lt;/br&gt;&lt;/br&gt;
 &lt;%}%&gt;
 &lt;mark&gt;The previous part is an example how to conditional build the html output &lt;/br&gt;&lt;/mark&gt;
 You are lying in your bed.&lt;/br&gt;
 What would you like to do.&lt;/br&gt;
 [[Sleep|SleepALittle]]&lt;/br&gt;
-[[Wakeup]] &lt;/br&gt;</tw-passagedata><tw-passagedata pid="70" name="SleepALittle" tags="" position="400,825" size="100,100">You are sleeping some more. &lt;/br&gt;
+[[Wakeup]] &lt;/br&gt;</tw-passagedata><tw-passagedata pid="71" name="SleepALittle" tags="" position="400,825" size="100,100">You are sleeping some more. &lt;/br&gt;
 &lt;mark&gt;The folowing is an example how to print a javascript calculation to html:&lt;/br&gt;&lt;/mark&gt;
 It is now &lt;%= 5*visited(window.passage.name)%&gt; minutes later.&lt;/br&gt;
-[[Continue|_SuperSimpleStory_]]</tw-passagedata><tw-passagedata pid="71" name="Wakeup" tags="" position="575,825" size="100,100">You groan as you wake up. &#39;Damn life&#39;&lt;/br&gt;
-[[Start]]</tw-passagedata><tw-passagedata pid="72" name="_ImagesAndOtherMedia_" tags="" position="1075,125" size="100,100">&lt;mark&gt;embed images in the following way:&lt;/mark&gt;&lt;/br&gt;
+[[Continue|_SuperSimpleStory_]]</tw-passagedata><tw-passagedata pid="72" name="Wakeup" tags="" position="575,825" size="100,100">You groan as you wake up. &#39;Damn life&#39;&lt;/br&gt;
+[[Start]]</tw-passagedata><tw-passagedata pid="73" name="_ImagesAndOtherMedia_" tags="" position="1075,125" size="100,100">&lt;mark&gt;embed images in the following way:&lt;/mark&gt;&lt;/br&gt;
 stored on a server:&lt;/br&gt;
 &lt;img alt=&quot;twinerylogo&quot; src=&quot;https://twinery.org/homepage/img/logo.svg&quot; width=&quot;256&quot; height=&quot;256&quot;&gt;&lt;/br&gt;
 stored in .dist/assets:&lt;/br&gt;
@@ -13028,7 +13209,7 @@ video with integrated and separate controls:&lt;/br&gt;
   document.getElementById(&#39;duration&#39;).addEventListener(&#39;click&#39;, function() { 
   document.getElementById(&#39;ausgabe&#39;).innerHTML = &#39;Die Dauer des Videos beträgt: &#39;+ song.duration; +&#39; Sekunden.&#39;}, false);
 &lt;/script&gt;
-[[Start]]</tw-passagedata><tw-passagedata pid="73" name="_ControlElements_" tags="" position="1200,25" size="100,100">&lt;div id=&quot;choice&quot;&gt;
+[[Start]]</tw-passagedata><tw-passagedata pid="74" name="_ControlElements_" tags="" position="1200,25" size="100,100">&lt;div id=&quot;choice&quot;&gt;
 &lt;p&gt;click on image to show related text and border&lt;/p&gt;
 &lt;table&gt;&lt;tbody&gt;
 &lt;tr&gt;
@@ -13246,7 +13427,7 @@ function datasource(category,key) {
       `${terminCtrl.selectedKey}:${terminCtrl.selectedObject.zeit}` : &quot;&quot;;
   }
 })();//);*/
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="74" name="_ControlElements2_" tags="" position="1200,25" size="100,100">&lt;div id=&quot;choice&quot;&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="75" name="_ControlElements2_" tags="" position="1200,25" size="100,100">&lt;div id=&quot;choice&quot;&gt;
 &lt;p&gt;click on image to show related text and border&lt;/p&gt;
 &lt;table&gt;&lt;tbody&gt;
 &lt;tr&gt;
@@ -13654,7 +13835,7 @@ class VorlesungController extends SelectionController {
     return professor.vorlesungen.find(vorlesung =&gt; vorlesung.nummer ==
       vorlesungNr);
   }
-}</tw-passagedata><tw-passagedata pid="75" name="_VariablesAndScript_" tags="" position="1075,25" size="100,100">&lt;script&gt;
+}</tw-passagedata><tw-passagedata pid="76" name="_VariablesAndScript_" tags="" position="1075,25" size="100,100">&lt;script&gt;
 function getBanana(elmnt,val) {
     window.story.state.vars.bananas +=val;
     //window.story.show(window.passage.name); this would reload the passage but would overwrite the elmnt-replace
@@ -13684,14 +13865,14 @@ You droped a banana and have now &lt;%-window.gm.dropBanana()%&gt;. &lt;/br&gt;
 &lt;a0 id=&#39;money&#39; onclick=&#39;(function ( $event ) { alert(&quot;alert &quot;.concat($event.id)); })(this);&#39;&gt;Get much money&lt;/a&gt;
 &lt;mark&gt;Press refreh to update page display &lt;/br&gt;&lt;/mark&gt;
 [[Refresh|_VariablesAndScript_]] &lt;/br&gt;
-[[Start]]</tw-passagedata><tw-passagedata pid="76" name="debug_cheat" tags="_back_" position="725,975" size="100,100">&lt;section&gt; 
+[[Start]]</tw-passagedata><tw-passagedata pid="77" name="debug_cheat" tags="_back_" position="850,975" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 Some things for debugging:&lt;/br&gt;
 &lt;/br&gt;[[MemoryGame]] [[HangmanGame]]&lt;/br&gt; &lt;!--todo--&gt;
 &lt;/br&gt;[[NewGamePlus]]&lt;/br&gt; &lt;!--todo--&gt;
 [[Cheats|debug]]&lt;/br&gt;
 [[Back|_back_]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="77" name="debug" tags="_back_" position="850,975" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="78" name="debug" tags="_back_" position="975,975" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 Cheat buttons: those are meant for debugging and might break your game&lt;/br&gt;
 &lt;a href=&quot;javascript:void(0)&quot; onclick=&#39;window.gm.player.Inv.addItem(new window.storage.constructors[&quot;Money&quot;](),200);window.gm.refreshAllPanel();&#39;&gt;Get 200$&lt;/a&gt;&lt;/br&gt;
@@ -13726,29 +13907,29 @@ function unhideStats() {
         window.gm.player.Stats.modifyHidden(ids[i],0);
     }
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="78" name="NOP" tags="_back_" position="975,975" size="100,100">&lt;section&gt; &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="79" name="NOP" tags="_back_" position="1100,975" size="100,100">&lt;section&gt; &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;p class=&#39;author&#39;&gt;Sorry, this loation is curently not implemented.&lt;/p&gt; &lt;!--todo  implement passages pointing to this--&gt;
 &lt;div&gt; &lt;/br&gt;
 [[Back|_back_]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="79" name="Deffered1" tags="" position="1100,975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="80" name="Deffered1" tags="" position="1225,975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 Deffered1
 [[Home]]
 &lt;a0 onclick= window.story.show(&quot;&quot;)&gt;Next&lt;/a&gt;&lt;/br&gt;&lt;/br&gt;
-&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="80" name="Deffered2" tags="" position="1225,975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
+&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="81" name="Deffered2" tags="" position="100,1100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 Deffered2
 [[Home]]
 &lt;a0 onclick=&#39;window.gm.pushDeferredEvent(&quot;Deffered3&quot;,[13],true)&#39;&gt;Deffered3&lt;/a&gt;&lt;/br&gt;
 &lt;a0 onclick= window.story.show(&quot;&quot;)&gt;go on&lt;/a&gt;&lt;/br&gt;&lt;/br&gt;
-&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="81" name="Deffered3" tags="" position="100,1100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
+&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="82" name="Deffered3" tags="" position="225,1100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 Deffered3
 [[Home]]
 &lt;a0 onclick=&#39;window.gm.pushDeferredEvent(&quot;Deffered3&quot;,[13])&#39;&gt;Deffered1&lt;/a&gt;&lt;/br&gt;
 &lt;a0 onclick= window.story.show(&quot;&quot;)&gt;go on&lt;/a&gt;&lt;/br&gt;&lt;/br&gt;
-&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="82" name="TFCanineCock" tags="" position="225,1100" size="100,100">getCockType &amp; Rating
+&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="83" name="TFCanineCock" tags="" position="350,1100" size="100,100">getCockType &amp; Rating
 if Type!=this decrease rating
 else increase rating
 if rating drops below 0 ??  &quot;Something in your nethers is changing, you can feel it. Your once average sized human dong has changed its shape. At least that what you think.&quot;
-if rating increases just above 0 &quot;You &quot;</tw-passagedata><tw-passagedata pid="83" name="Masturbate" tags="_nosave_" position="350,1100" size="100,100">&lt;section&gt; 
+if rating increases just above 0 &quot;You &quot;</tw-passagedata><tw-passagedata pid="84" name="Masturbate" tags="_nosave_" position="475,1100" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;div id=&#39;select1&#39; &gt;
 &lt;a0 onclick=&#39;window.gm.printTalkLink($(&quot;div#select1&quot;)[0],&quot;div#choice1a&quot;)&#39;&gt;Pinch your own nipples.&lt;/a&gt;&lt;/br&gt;
@@ -13774,7 +13955,7 @@ function fondlebreast(elmnt) {
     window.gm.player.addEffect(&quot;effGrowBreast&quot;,window.gm.StatsLib.effGrowBreast());
     window.gm.quests.forceQuestMilestone(&quot;qMyPleasure&quot;,100,1);
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="84" name="WolfSubmit" tags="" position="475,1100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="85" name="WolfSubmit" tags="" position="600,1100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 The wolf isn&#39;t aroused enough and leaves you alone.
 ---
 The wolf is quite in the mood to fool around.
@@ -13796,7 +13977,7 @@ You cant hold any longer and shoot your jizzm inside her.
 ---
 &lt;div&gt;&lt;/br&gt;
 [[Next|&lt;%=window.gm.player.location%&gt;]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="85" name="WolfVictory" tags="" position="600,1100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="86" name="WolfVictory" tags="" position="725,1100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 You arent horny enough.
 ---
 The beast isn&#39;t in the mood to have sex with you.
@@ -13814,7 +13995,7 @@ You need some hard wolfcock right now.
 
 &lt;div&gt;&lt;/br&gt;
 [[Next|&lt;%=window.gm.player.location%&gt;]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="86" name="HangmanGame" tags="" position="725,1100" size="100,100">&lt;!--adapted from https://remybeumier.be/#creations-anchor--&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="87" name="HangmanGame" tags="" position="850,1100" size="100,100">&lt;!--adapted from https://remybeumier.be/#creations-anchor--&gt;
 &lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article class=&quot;main&quot;&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;main&gt;&lt;div class=&quot;alphabet&quot; style=&quot;&quot;&gt;
@@ -13910,7 +14091,7 @@ function gameReset() {
   $(&quot;.alphabet, .word&quot;).fadeIn();
   getRandomWord();
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="87" name="MemoryGame" tags="" position="850,1100" size="100,100">&lt;!--adapted from https://remybeumier.be/#creations-anchor--&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="88" name="MemoryGame" tags="" position="975,1100" size="100,100">&lt;!--adapted from https://remybeumier.be/#creations-anchor--&gt;
 &lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article class=&quot;main&quot;&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
   &lt;div class=&quot;box play&quot;&gt;&lt;/div&gt;
@@ -14122,7 +14303,7 @@ activateTheme(&quot;harrypotter&quot;);
 //   }
 // }
 // var checkPageInterval = setInterval(checkPageFocus, 300);
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="88" name="DogSit" tags="" position="975,1100" size="100,100">&lt;script&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="89" name="DogSit" tags="" position="1100,1100" size="100,100">&lt;script&gt;
 //quest milestones
 var qDogSitLib = [ [0,&#39;unknown&#39;],
     [0x100 , &#39;found dogsit annonce&#39; ],
@@ -14133,7 +14314,7 @@ var qDogSitLib = [ [0,&#39;unknown&#39;],
     [0x500 , &#39;interview run done&#39;],
     [0x550 , &#39;training run done&#39;],
     [0x600 , &#39;job offers lv1&#39;]
-];&lt;/script&gt;</tw-passagedata><tw-passagedata pid="89" name="qDogSit_Status" tags="" position="1100,1100" size="100,100">&lt;!--called  to print status---&gt;</tw-passagedata><tw-passagedata pid="90" name="Park_DogsitAd" tags="" position="1225,1100" size="100,100">&lt;section&gt; 
+];&lt;/script&gt;</tw-passagedata><tw-passagedata pid="90" name="qDogSit_Status" tags="" position="1225,1100" size="100,100">&lt;!--called  to print status---&gt;</tw-passagedata><tw-passagedata pid="91" name="Park_DogsitAd" tags="" position="100,1225" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;% window.gm.player.location=window.passage.name;
 if(s.vars.qDogSit&lt;0x200) { s.vars.qDogSit=0x100; %&gt;
@@ -14146,7 +14327,7 @@ if(s.vars.qDogSit&lt;0x200) { s.vars.qDogSit=0x100; %&gt;
     [[Call Dogsit|Dogsit_NewCall]]&lt;/br&gt;
 &lt;% } %&gt;
 [[Ignore the ad|Park]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="91" name="Dogsit_FirstCall" tags="" position="100,1225" size="100,100">&lt;section&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="92" name="Dogsit_FirstCall" tags="" position="225,1225" size="100,100">&lt;section&gt;
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;% window.gm.player.location=window.passage.name;s.vars.qDogSit=0x200;%&gt;
 Using the qr-scanner of your phone you scan the ad and start the call.&lt;/br&gt;
@@ -14155,7 +14336,7 @@ After entering the number manually (just to make sure) you again got no connecti
 Darn. Maybe they are all busy caring for dogs. &lt;/br&gt;
 [[Ignore the ad|Park]]&lt;/br&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt; 
-&lt;/section&gt;</tw-passagedata><tw-passagedata pid="92" name="Dogsit_FirstCallBack" tags="" position="225,1225" size="100,100">&lt;section&gt; 
+&lt;/section&gt;</tw-passagedata><tw-passagedata pid="93" name="Dogsit_FirstCallBack" tags="" position="350,1225" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &quot;Yes hello here is Trisha from Dog-Sit-Agency.&quot; a female voice calls out.&lt;br&gt;
 &quot;Im calling you back because your number was in our phones unanswered list.&quot; &lt;/br&gt;&lt;/br&gt;
@@ -14180,7 +14361,7 @@ function choice(elmt,replaceThis) {
 	}
 	$(replaceThis).replaceWith(msg+window.gm.printPassageLink(&quot;Next&quot;,&quot;Kitchen&quot;));
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="93" name="Dogsit_Center" tags="" position="350,1225" size="100,100">&lt;section&gt; 
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="94" name="Dogsit_Center" tags="" position="475,1225" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;% window.gm.player.location=window.passage.name;
 if(s.vars.qDogSit&lt;0x400) { s.vars.qDogSit=0x400; %&gt;
@@ -14198,22 +14379,22 @@ Please go over there through this door. Micheal is there and he will take care.&
 [[walk a dog|Dogsit_NewJob]]&lt;/br&gt;[[Dogsit_TalkTrisha]] [[Dogsit_TalkMichael]] &lt;/br&gt;
 [[Home]]&lt;/br&gt;
 &lt;%}%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="94" name="Dogsit_TalkTrisha" tags="_back_" position="475,1225" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="95" name="Dogsit_TalkTrisha" tags="_back_" position="600,1225" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;!--&lt;% window.gm.player.location=window.passage.name;%&gt;--&gt;
 todo
 [[Back|_back_]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="95" name="Dogsit_TalkMichael" tags="_back_" position="600,1225" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="96" name="Dogsit_TalkMichael" tags="_back_" position="725,1225" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;!--&lt;% window.gm.player.location=window.passage.name;%&gt;--&gt;
 todo
 [[Back|_back_]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="96" name="Dogsit_NewCall" tags="" position="725,1225" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="97" name="Dogsit_NewCall" tags="" position="850,1225" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;!--&lt;% window.gm.player.location=window.passage.name;%&gt;--&gt;
 Ask for a new job.
 [[Ignore the ad|Park]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="97" name="Dogsit_NewJob" tags="_back_" position="850,1225" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="98" name="Dogsit_NewJob" tags="_back_" position="975,1225" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;!--&lt;% window.gm.player.location=window.passage.name;%&gt;--&gt;
 &quot;Let&#39;s see if there what requests we have...&quot; Trisha starts working on the computer&lt;/br&gt;
@@ -14227,7 +14408,7 @@ Ask for a new job.
 [[Victor]] As a Great Dane this matured male is quite a large breed. While usually not the troublemaker, it could be quite difficult to get him in line should he act unruly.
 
 [[None|_back_]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="98" name="qLaptop_Status" tags="" position="975,1225" size="100,100">&lt;!--called  to print status---&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="99" name="qLaptop_Status" tags="" position="1100,1225" size="100,100">&lt;!--called  to print status---&gt;
 &lt;li&gt;&lt;label&gt;&lt;input type=&quot;checkbox&quot; name=&quot;y&quot; value=&quot;x&quot; readonly disabled&gt;
 &lt;%=function(){
     if(s.vars.qLaptop==0) {
@@ -14236,7 +14417,7 @@ Ask for a new job.
         return(&#39;COMPLETED: Laptop working again&#39;);
     }
 }()%&gt;
-&lt;/label&gt;&lt;/li&gt;</tw-passagedata><tw-passagedata pid="99" name="_Laptop_" tags="_back_" position="1100,1225" size="100,100">&lt;section&gt; 
+&lt;/label&gt;&lt;/li&gt;</tw-passagedata><tw-passagedata pid="100" name="_Laptop_" tags="_back_" position="1225,1225" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 You seat yourself in front of the laptop. &lt;/br&gt;
 &lt;%if(window.gm.quests.getMilestoneState(&quot;qFixLaptop&quot;).id&lt;1000){%&gt;
@@ -14245,7 +14426,7 @@ The battery has run out of power but the powerconverter is missing. You need to 
 After pushing the powerbutton the pc takes ages to start.&lt;/br&gt;
 todo mail,Browser&lt;/br&gt;
 &lt;%}%&gt;
-[[Back|_back_]]</tw-passagedata><tw-passagedata pid="100" name="Help_Index" tags="_back_" position="1225,1225" size="100,100">&lt;section&gt; 
+[[Back|_back_]]</tw-passagedata><tw-passagedata pid="101" name="Help_Index" tags="_back_" position="100,1350" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 Here you can find some information about the gameplay.&lt;/br&gt;&lt;/br&gt;
 [[Your goal|Help_back_ground]]&lt;/br&gt;
@@ -14253,7 +14434,7 @@ Here you can find some information about the gameplay.&lt;/br&gt;&lt;/br&gt;
 [[What should I do, where should I go|Help_Quest]]&lt;/br&gt;
 [[Im stuck!|Help_Fixes]]&lt;/br&gt;
 [[Back|_back_]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="101" name="Help_back_ground" tags="_back_" position="100,1350" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="102" name="Help_back_ground" tags="_back_" position="225,1350" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 Your goal is - to save the earth.&lt;/br&gt;
 No, just joking. You are far from a superhero and earth has so many serious problems, you cant do much about it.&lt;/br&gt;
@@ -14266,27 +14447,27 @@ Here is a task-list for you: &lt;/br&gt;
 5. dont eat yellow snow&lt;/br&gt;
 &lt;/br&gt;
 [[Back|_back_]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="102" name="Help_Basics" tags="_back_" position="225,1350" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="103" name="Help_Basics" tags="_back_" position="350,1350" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 For many activities you have to spend energy and time. F.e. walking into the city takes some time and effort.&lt;/br&gt;
 Energy can be recovered by sleeping. Also some activities, food or drugs can restore energy.&lt;/br&gt;
 Use the sleep-option in your own bedroom to rest.&lt;/br&gt;
 &lt;/br&gt;
 [[Back|_back_]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="103" name="Help_Quest" tags="_back_" position="350,1350" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="104" name="Help_Quest" tags="_back_" position="475,1350" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 In your bedroom on your desk you can find a todo-list that gives some hint on what you should work on.&lt;/br&gt;
 For the beginning try to explore the city.&lt;/br&gt;
 TODO: There isnt much more content right now!&lt;/br&gt;
 [[Back|_back_]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="104" name="Help_Fixes" tags="_back_" position="475,1350" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="105" name="Help_Fixes" tags="_back_" position="600,1350" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 If you are stuck on a page and you cannot escape. Press this [[Button|Home]] to get back to your Home.&lt;/br&gt;&lt;/br&gt;
 If you are even unable to get to this page because you see a weird plain textmessage in your browser:&lt;/br&gt;
 Im sorry but no one can help you. I will try to add some debug-log that shows some more information that you can send me.&lt;/br&gt;
 Then I might be abel to backtrack the error.&lt;/br&gt;
 [[Back|_back_]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="105" name="StartPage" tags="" position="600,1350" size="100,100">&lt;article&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="106" name="StartPage" tags="" position="725,1350" size="100,100">&lt;article&gt;
 
 &lt;h1 align=&quot;center&quot;&gt;Teyt &lt;%-window.gm.getSaveVersion()%&gt;&lt;/h1&gt;
 &lt;h1 align=&quot;center&quot;&gt;DISCLAIMER&lt;/h1&gt;
@@ -14303,7 +14484,7 @@ All explicit images are performed by consenting adults aged 18 or older. Images 
 &lt;hr&gt;
 This game is powered by twine/tweego and snowman.&lt;/br&gt; 
 &lt;img src=&quot;https://twinery.org/homepage/img/logo.svg&quot; width=&quot;256&quot; height=&quot;256&quot;&gt;
-&lt;/article&gt;</tw-passagedata><tw-passagedata pid="106" name="Intro" tags="" position="725,1350" size="100,100">&lt;article&gt;
+&lt;/article&gt;</tw-passagedata><tw-passagedata pid="107" name="Intro" tags="" position="850,1350" size="100,100">&lt;article&gt;
 &lt;%window.gm.initGame();window.gm.player.location=window.passage.name;%&gt;
 &lt;p&gt;Welcome to Meason, a town somewhere in these days. &lt;/br&gt;
 You are a student in the local university and live in a shared house with some other fellows. &lt;/br&gt;&lt;/p&gt;
@@ -14314,14 +14495,14 @@ Or press &lt;a0 id=&#39;reset&#39; onclick=&#39;window.gm.initGame(true);window.
 There are also some options to skip ahead: &lt;/br&gt;
 [[VR Character creation|Intro3]] &lt;/br&gt;
 [[Forest exploration|Intro4]]&lt;/br&gt;
-&lt;/article&gt;</tw-passagedata><tw-passagedata pid="107" name="Intro2" tags="" position="850,1350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;</tw-passagedata><tw-passagedata pid="108" name="Intro2" tags="" position="975,1350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 Here you are: a student in its early twentys sitting around at home, working on the laptop in front.
 Progress in studys isnt going as smooth as expected.
 To divert your self you check you decide to check emails. 
 &lt;div&gt;&lt;/br&gt;
 [[Next|GameInvite]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="108" name="Intro3" tags="" position="975,1350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="109" name="Intro3" tags="" position="1100,1350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 Start at the character creation screen in the VR-game.
 &lt;div&gt;&lt;/br&gt;
@@ -14337,8 +14518,8 @@ Start at the character creation screen in the VR-game.
     window.gm.quests.forceQuestMilestone(&quot;qFixLaptop&quot;,1000,1);
     window.story.show(&quot;CharacterEditor&quot;);
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="109" name="Laptop-PS" tags="" position="1100,1350" size="100,100">A powersupply for a laptop.
-[[Back|&lt;%=window.gm.player.location%&gt;]]</tw-passagedata><tw-passagedata pid="110" name="Into the city" tags="" position="1225,1350" size="100,100">&lt;section&gt; 
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="110" name="Laptop-PS" tags="" position="1225,1350" size="100,100">A powersupply for a laptop.
+[[Back|&lt;%=window.gm.player.location%&gt;]]</tw-passagedata><tw-passagedata pid="111" name="Into the city" tags="" position="100,1475" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;!-- dont overwrite location --&gt;
 &lt;%=window.gm.printPickupAndClear(&#39;Crowbar&#39;,&#39;A crowbar is lying other there.&#39;,window.story.state.vars.crowBarLeft,(function(){window.story.state.vars.crowBarLeft-=1;}))%&gt;
@@ -14353,7 +14534,7 @@ Where would you like to go from here?&lt;/br&gt;
 &lt;%};%&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;div class=&quot;popup&quot; onclick=&#39;(function(){var popup = document.getElementById(&quot;myPopup2&quot;); popup.classList.toggle(&quot;show&quot;);}())&#39;&gt;Click me to toggle the popup!
   &lt;span class=&quot;popuptext&quot; id=&quot;myPopup2&quot;&gt;A Simple window.gm.printPickupAndClear(&#39;Crowbar&#39;,&#39;A crowbar is lying other there.&#39;,window.story.state.vars.crowBarLeft Popup!&lt;/span&gt;
-&lt;/div&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="111" name="Mall" tags="" position="100,1475" size="100,100">&lt;section&gt; 
+&lt;/div&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="112" name="Mall" tags="" position="225,1475" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%window.gm.player.location=window.passage.name;
 if(s.vars.qUnlockMall==0) {s.vars.qUnlockMall=1;%&gt;
@@ -14366,7 +14547,7 @@ Where would you like to go from here?&lt;/br&gt;
 &lt;%  if(s.vars.qUnlockPark&gt;0) {      %&gt;[[Park]]&lt;/br&gt;
 &lt;%}; if(s.vars.qUnlockBeach&gt;0) {      %&gt;[[Beach]]&lt;/br&gt;
 &lt;%};%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="112" name="Park" tags="" position="225,1475" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="113" name="Park" tags="" position="350,1475" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%window.gm.player.location=window.passage.name;
 if(s.vars.qUnlockPark==0) {s.vars.qUnlockPark=1;%&gt;
@@ -14385,7 +14566,7 @@ Where would you like to go from here?&lt;/br&gt;
 [[Home]]&lt;/br&gt;
 &lt;%  if(s.vars.qUnlockMall&gt;0) {      %&gt;[[Mall]]&lt;/br&gt;
 &lt;%};%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="113" name="Park_Jogging" tags="_back_" position="350,1475" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="114" name="Park_Jogging" tags="_back_" position="475,1475" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%if(window.gm.player.Stats.get(&#39;energy&#39;).value&lt;=50) {%&gt;
 You feel you dont have enough energy left to do anything sporty. Maybe another time. &lt;/br&gt;
@@ -14403,7 +14584,7 @@ After a quick warmup and stretching you take a fast pace jog around the outer pa
     This time you didnt feel that kind of exhausted euphoria. Maybe you have to work harder. Or you are as fit as you can get with this workout. &lt;/br&gt; 
 &lt;%}}%&gt;
 &lt;/br&gt;[[Back|_back_]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="114" name="Beach" tags="" position="475,1475" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="115" name="Beach" tags="" position="600,1475" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%window.gm.player.location=window.passage.name;
 if(s.vars.qUnlockBeach==0) {s.vars.qUnlockBeach=1;%&gt;
@@ -14419,7 +14600,7 @@ Where would you like to go from here?&lt;/br&gt;
 [[Home]]&lt;/br&gt;
 &lt;%  if(s.vars.qUnlockMall&gt;0) {      %&gt;[[Mall]]&lt;/br&gt;
 &lt;%};%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="115" name="Downtown" tags="" position="600,1475" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="116" name="Downtown" tags="" position="725,1475" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%window.gm.player.location=window.passage.name;
 if(s.vars.qUnlockDowntown===0) {s.vars.qUnlockDowntown=1;%&gt;
@@ -14432,7 +14613,7 @@ Where would you like to go from here?&lt;/br&gt;
 &lt;%  if(s.vars.qUnlockMall&gt;0) {      %&gt;[[Mall]]&lt;%};%&gt;
 [[Harcon_Health]]
 &lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="116" name="Pawn shop" tags="_back_" position="725,1475" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="117" name="Pawn shop" tags="_back_" position="850,1475" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 if((s.vars.qUnlockDowntown &amp; 0x2)===0) {s.vars.qUnlockDowntown|=0x2;%&gt;
@@ -14450,14 +14631,14 @@ Where would you like to go from here?&lt;/br&gt;
 var _Entrys = [];
 _Entrys.push({id:&quot;Crowbar&quot;,count:1,cost:25});
 _Entrys.push({id:&quot;Battery&quot;,count:3,cost:2});
-renderToSelector(&quot;#panel&quot;, &quot;listsell&quot;);&lt;/script&gt;</tw-passagedata><tw-passagedata pid="117" name="VRSuiteUp" tags="" position="850,1475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+renderToSelector(&quot;#panel&quot;, &quot;listsell&quot;);&lt;/script&gt;</tw-passagedata><tw-passagedata pid="118" name="VRSuiteUp" tags="" position="975,1475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;!--todo--&gt; You are eager to try that virtual reallity game. &lt;/br&gt;
 &quot;Welcome to the test version of our new game. Lets just clarify some things about the beta-testing process. In most cases you just have to play the game as you like. We will track your actions and progress to adapt and improve the experience of the finished game.
 However, at times you might be requested to do certain things and do it in a certain way.  &lt;/br&gt;
 Remember that this is not the final game. We continously modify aspects to get the best experience for the players.&quot;   &lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Start the game|CharacterEditor]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="118" name="CharacterEditor" tags="" position="975,1475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="119" name="CharacterEditor" tags="" position="1100,1475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 You say &#39;Create new avatar&#39;. The screen switches to those kind of screens that are common to other RPGs.&lt;/br&gt;
 You can select class, race, character-traits and some visual aspects.&lt;/br&gt;
@@ -14471,7 +14652,7 @@ The description of the class is sparse. The picture you see indicates that this 
 
 &lt;div&gt;&lt;/br&gt;
 [[Ready|StartLocation]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="119" name="StartLocation" tags="" position="1100,1475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="120" name="StartLocation" tags="" position="1225,1475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;
 window.gm.enterVR();%&gt;
 &lt;%window.gm.quests.forceQuestMilestone(&quot;qDLCMain&quot;,700,600)%&gt;
@@ -14479,49 +14660,49 @@ window.gm.enterVR();%&gt;
 You can see some houses from here, maybe a small village. You just need to follow the trail down the hill.&quot;&lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Village|VillageEntranceIntro]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="120" name="Training1" tags="" position="1225,1475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="121" name="Training1" tags="" position="100,1600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;!--todo--&gt; The path snakes down the grassy flanks of the hill. As you make your way around a large boulder, something strange happens:&lt;/br&gt;
 &lt;devnote&gt;&quot;Welcome to our little world. Just in case you are not used to that kind of game we should get you some training.&quot;&lt;/devnote&gt;&lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Continue|Training1Done]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="121" name="Training1Done" tags="" position="100,1600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="122" name="Training1Done" tags="" position="225,1600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;!--todo--&gt; &lt;/br&gt;
 &lt;devnote&gt;&quot;I wish you good luck in exploring this world. May the gods be with you.&quot;&lt;/devnote&gt;&lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Continue|VillageEntranceIntro]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="122" name="VillageEntranceIntro" tags="" position="225,1600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="123" name="VillageEntranceIntro" tags="" position="350,1600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;!--todo--&gt; A neat little village comes into view as you walk towards its entrance.  &lt;/br&gt;
 &#39;Thats really looks awesome. I wonder if I can really visit those houses or if they are just scenery.&#39;&lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Continue|VillageMarketPlace]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="123" name="HillSpawn" tags="" position="350,1600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="124" name="HillSpawn" tags="" position="475,1600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;!--todo--&gt; &quot;You magically appear near the top of a hill. &lt;/br&gt;
 You can see some houses from here, maybe a small village. You just need to follow the trail down the hill.&quot;&lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Village|VillageEntrance]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="124" name="VillageEntrance" tags="" position="475,1600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="125" name="VillageEntrance" tags="" position="600,1600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.moveHere();%&gt;
 &lt;!--todo--&gt; You are at the crossroads in front of the entrance to the settlement.
 Someone has painted &#39;Thetain&#39; on the planks above the wooden gate. Most likely thats the name of this commune.&lt;/br&gt;&lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Enter village|VillageMarketPlace]]  [[go to forest|ForestBorder]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="125" name="VillageMarketPlace" tags="" position="600,1600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="126" name="VillageMarketPlace" tags="" position="725,1600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.moveHere();%&gt;
 &lt;!--todo--&gt; There arent many people around the place right now.&lt;/br&gt; There seems to be a shop of an alchemist, a Inn and another shop where you cant say what kind of wares - if any - they are trading.&lt;/br&gt;
 &lt;/br&gt; Near the entrance of the Inn is also a [[bulletin-board]]. 
 &lt;div&gt;&lt;/br&gt;
 [[Inn|VillageInn]]  [[Alchemist|VillagePotions]] [[Shop|VillagePawnshop]] [[Gate|VillageEntrance]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="126" name="VillageInn" tags="" position="725,1600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="127" name="VillageInn" tags="" position="850,1600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.moveHere();%&gt;
 &lt;!--todo--&gt; &#39;This really looks like they scavenged that place from a typical fantasy story book.&#39;&lt;/br&gt; 
 &lt;/br&gt; 
 &lt;div&gt;&lt;/br&gt;
 [[Square|VillageMarketPlace]] &lt;/br&gt;&lt;/div&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
-&lt;script&gt; &lt;/script&gt;</tw-passagedata><tw-passagedata pid="127" name="VillagePotions" tags="" position="850,1600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;script&gt; &lt;/script&gt;</tw-passagedata><tw-passagedata pid="128" name="VillagePotions" tags="" position="975,1600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.moveHere();%&gt;
 &lt;!--todo--&gt; &#39;Puh, what a stink. I shouldnt stay here for long for I might suffocate&#39;&lt;/br&gt; &lt;/br&gt;
 &lt;% if(!window.gm.quests.hasActiveQuest(&quot;qPurpleBerry&quot;) || window.gm.quests.getMilestoneState(&quot;qPurpleBerry&quot;).id&lt;1) { %&gt;
@@ -14564,14 +14745,14 @@ Now that I think about it, we could make a trade: you get me some purple berrys,
 &lt;a0 onclick=&#39;window.gm.player.Inv.removeItem(&quot;PurpleBerry&quot;,5);window.gm.player.Inv.addItem(new window.gm.ItemsLib.SimpleFood(),2);window.gm.refreshAllPanel();&#39;&lt;%=(window.gm.player.Inv.countItem(&quot;PurpleBerry&quot;)&gt;=5)?&quot;&quot;:&quot;hidden&quot; %&gt;&gt;Trade 5 purple berries for 1 potion&lt;/a&gt;
 &lt;div&gt;&lt;/br&gt;[[Square|VillageMarketPlace]]  [[Alchemist]] [[Clair]]&lt;/br&gt;&lt;/div&gt;
 &lt;%}%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="128" name="VillagePawnshop" tags="" position="975,1600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="129" name="VillagePawnshop" tags="" position="1100,1600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.moveHere();%&gt;
 &lt;!--todo--&gt; If this is a shop, then they sell everything: Shoes, cooking pans, assault ballista and chicken.&lt;/br&gt; 
 &lt;!--todo--&gt;On the other side of the room is a large [[Wardrobe]] with a [[Mirror]] where you can take a look at yourself.
 &lt;/br&gt; 
 &lt;div&gt;&lt;/br&gt;
 [[Square|VillageMarketPlace]]  [[Shopkeeper]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="129" name="VillageRespawnPod" tags="" position="1100,1600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="130" name="VillageRespawnPod" tags="" position="1225,1600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;!--&lt;%window.gm.player.location=window.passage.name;%&gt;--&gt;
 Player should teleport here on death
 &lt;script&gt;
@@ -14584,20 +14765,20 @@ if(window.gm.quests.getMilestoneState(&quot;qDiedAgain&quot;).id===1) {
     window.gm.player.Inv.addItem(new window.storage.constructors[&#39;StaffWodden&#39;](),1);
     window.story.show(&#39;VillageRespawnPodExit&#39;); 
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="130" name="VillageRespawnPodExit" tags="" position="1225,1600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="131" name="VillageRespawnPodExit" tags="" position="100,1725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;!--todo--&gt; You are in the sanctum of spawn. Its located on top of the hill above the settlement.&lt;/br&gt; 
 &lt;/br&gt; There is a path leading downwards to the settlement.&lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Village|VillageEntrance]] &lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="131" name="ForestBorder" tags="" position="100,1725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="132" name="ForestBorder" tags="" position="225,1725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.moveHere();%&gt;
 &lt;!--todo--&gt; There is a dirt road here crossing the lush grassland that is bordered by the trees of an forest.&lt;/br&gt; 
 One direction leads to the settlement close by. The other direction follows the border of the forest but gets out of view quickly.&lt;/br&gt; 
 &lt;/br&gt; 
 &lt;div&gt;&lt;/br&gt;
 [[Village|VillageEntrance]] [[Into the forest|ForestEntrance]] [[follow Road]] &lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="132" name="ForestSearchAround" tags="_back_" position="225,1725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="133" name="ForestSearchAround" tags="_back_" position="350,1725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;% let args = window.story.state.tmp.args; if(args[0]===&#39;PurpleBerry&#39; &amp;&amp; args[1]&gt;0){ window.gm.player.Inv.addItem(new window.storage.constructors[args[0]](),args[1]); %&gt;
 On a secluded spot you found a batch of berry bushes. Most of them dont have any more berrys but you are able to collect a handful.&lt;/br&gt;
 &lt;%} else if(args[0]===&#39;PurpleBerry&#39;){%&gt;
@@ -14607,7 +14788,7 @@ Unfortunatly you didnt find anything useful.&lt;/br&gt;
 &lt;%}%&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Next|_back_]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="133" name="ForestWolfEncounter" tags="_back_" position="350,1725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="134" name="ForestWolfEncounter" tags="_back_" position="475,1725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;% window.gm.quests.addQuest(&quot;qWolfMate&quot;,1); if(window.gm.quests.getMilestoneState(&quot;qWolfMate&quot;).id&lt;=1) %&gt;
 Distracted by rummaging around in the bushes, you just caught by surprise as you turn around.&lt;/br&gt;
 A dog is staring into your face. Its looks very close to a wolf you think. But it cant be a wolf because they are shy creatures.
@@ -14635,7 +14816,7 @@ There is a wolf again. Or is it the same?&lt;/br&gt;
 &lt;%}%&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Next|_back_]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="134" name="ForestEntrance" tags="" position="475,1725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="135" name="ForestEntrance" tags="" position="600,1725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.moveHere();%&gt;
 The forest makes a friendly impression.  &lt;/br&gt; The trees are still light and are not yet as expansive and large as that no more light can get through the canopy. 
 &lt;/br&gt; 
@@ -14656,7 +14837,7 @@ Maybe you can &lt;a0 onclick=&#39;explore(); &#39;&gt;explore&lt;/a&gt; the surr
         window.story.show(&#39;ForestSearchAround&#39;); //nothing
     }
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="135" name="ForestCliff" tags="" position="600,1725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="136" name="ForestCliff" tags="" position="725,1725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.moveHere();%&gt;
 You fight your way through the dense undergrowth and realize just in time that you have reached the edge of a cliff.&lt;/br&gt; 
 &lt;/br&gt; 
@@ -14687,7 +14868,7 @@ You dont feel any pain, everything is just going [[black|VillageRespawnPod]] as 
 A path leads along the cliff until it vanishs into a [[cave entrance|ForestCliffCave]] .  
 Or you might just return to [[ForestEntrance]]. &lt;/br&gt;&lt;/div&gt; 
 &lt;%}%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="136" name="ForestCliffCave" tags="" position="725,1725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="137" name="ForestCliffCave" tags="" position="850,1725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.moveHere();%&gt;
 &lt;% if(window.gm.quests.getMilestoneState(&quot;qBondageKink&quot;).id&lt;=1) { %&gt;
 &lt;%window.gm.player.Outfit.addItem(new window.gm.ItemsLib[&quot;CollarQuest&quot;]());window.gm.quests.forceQuestMilestone(&quot;qBondageKink&quot;,100,1);%&gt;
@@ -14706,7 +14887,7 @@ Or you might just return to [[ForestEntrance]]. &lt;/br&gt;&lt;/div&gt;
 &lt;script&gt; function enterBeehive() {
     window.gm.dng = window.gm.dngs.BeeHive();
     window.gm.dng.enterDungeon();
-}</tw-passagedata><tw-passagedata pid="137" name="ForestStoneCircle" tags="" position="850,1725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+}</tw-passagedata><tw-passagedata pid="138" name="ForestStoneCircle" tags="" position="975,1725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.moveHere();%&gt;
 &lt;!--todo--&gt; Aus dem dichten Unterholz trittst du auf eine Lichtung. Das wäre ein idylischer Ort wenn nicht dieser Steinkreis wäre.&lt;/br&gt; 
 &lt;/br&gt; 
@@ -14723,7 +14904,7 @@ Ansonsten gibt es hier nichts.&lt;/br&gt;
 &lt;div&gt;
 [[ForestEntrance]] &lt;/br&gt;&lt;/div&gt; 
 &lt;%}%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="138" name="Dungeon" tags="_nosave_" position="975,1725" size="100,100">&lt;!--dont &quot;show&quot; this! setup the dungeon and call enterDungeon--&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="139" name="Dungeon" tags="_nosave_" position="1100,1725" size="100,100">&lt;!--dont &quot;show&quot; this! setup the dungeon and call enterDungeon--&gt;
 &lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%= window.gm.dng.name%&gt; &lt;%= window.gm.dng.actualRoom.descr%&gt;&lt;/br&gt;
 &lt;/br&gt; 
@@ -14731,20 +14912,20 @@ Ansonsten gibt es hier nichts.&lt;/br&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
 &lt;script&gt;
 window.gm.dng.printButtons()
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="139" name="DungeonMap" tags="_nosave_" position="1100,1725" size="100,100">&lt;!--dont &quot;show&quot; this! setup the dungeon and call displayMap--&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="140" name="DungeonMap" tags="_nosave_" position="1225,1725" size="100,100">&lt;!--dont &quot;show&quot; this! setup the dungeon and call displayMap--&gt;
 &lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;!--pre-formatted or messup allignment of ascii-rows--&gt;
 &lt;pre&gt;&lt;%= window.gm.dng.Mapper.printMap( window.gm.dng.actualRoom)%&gt;&lt;/pre&gt;&lt;/br&gt;
 &lt;pre&gt;Legend: P=Player, S=Stair, E=Entry/Exit&lt;pre&gt;&lt;/br&gt;
 &lt;/br&gt; 
 [[Back|Dungeon]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="140" name="DungeonFoundNothing" tags="_nosave_" position="1225,1725" size="100,100">&lt;!--example-scene for onenter/onexit event--&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="141" name="DungeonFoundNothing" tags="_nosave_" position="100,1850" size="100,100">&lt;!--example-scene for onenter/onexit event--&gt;
 &lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%= window.gm.dng.actualRoom.descr%&gt;&lt;/br&gt;
 There are some buckets here, but there is nothing useful inside.&lt;/br&gt;
 &lt;/br&gt;
 &lt;a0 onclick=&#39;window.gm.dng.resumeRoom();&#39;&gt;Go on&lt;/a&gt;&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="141" name="DungeonCrashedThroughFloor" tags="_nosave_" position="100,1850" size="100,100">&lt;!--example-scene for onenter/onexit event--&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="142" name="DungeonCrashedThroughFloor" tags="_nosave_" position="225,1850" size="100,100">&lt;!--example-scene for onenter/onexit event--&gt;
 &lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%= window.gm.dng.actualRoom.descr%&gt;&lt;/br&gt;
 You crash down through the floor and find yourself back on the lowest level of the area.&lt;/br&gt;
@@ -14757,12 +14938,12 @@ function crashThrough() {
     var Room = floor1.getRoom(window.gm.dng.actualRoom.name);  //room names are the same at same position of floor
     window.gm.dng.teleport(floor1, Room);
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="142" name="NOP_VR" tags="_nosave_,_back_" position="225,1850" size="100,100">&lt;!--example-scene for onenter/onexit event--&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="143" name="NOP_VR" tags="_nosave_,_back_" position="350,1850" size="100,100">&lt;!--example-scene for onenter/onexit event--&gt;
 &lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;p class=&#39;dev&#39;&gt; You cant go that way. Either because its WIP or you need to solve a quest first. &lt;/p&gt;
 &lt;/br&gt;
 [[Back|_back_]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="143" name="Home" tags="" position="350,1850" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="144" name="Home" tags="" position="475,1850" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;%window.gm.quests.addQuest(&quot;qFindGarden&quot;,1);window.gm.quests.addQuest(&quot;qStudy&quot;,1); %&gt;
@@ -14780,7 +14961,7 @@ function checkQuest(){
 	}
 }
 checkQuest();
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="144" name="Kitchen" tags="" position="1231,613" size="100,100">&lt;section&gt; 
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="145" name="Kitchen" tags="" position="1231,613" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 You are in the kitchen. &lt;/br&gt;
@@ -14797,7 +14978,7 @@ Mom will take care to resupply the fridge. But she might be disappointed if you 
 &lt;%}%&gt;
 Where would you like to go?&lt;/br&gt;
 [[Living_Room]]   [[Hallway|Home]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="145" name="Melanies Bedroom" tags="" position="600,1850" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="146" name="Melanies Bedroom" tags="" position="725,1850" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 This is the bedroom of Melanie.
@@ -14828,7 +15009,7 @@ function inviteChar(elmnt) {
 		elmnt.outerHTML=(&quot;&lt;div class=&#39;red&#39;&gt;Cyril added to your team. &lt;/div&gt;&quot;);
 	}
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="146" name="moms_treasure" tags="_back_" position="725,1850" size="100,100">&lt;section&gt; 
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="147" name="moms_treasure" tags="_back_" position="850,1850" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 In one of the nightstand you find some handcuffs.They look thorough but you think they just might be used for some bedplay.&lt;/br&gt;
 &lt;a0 onclick=&#39;useHandcuff(this)&#39;&gt;Play with them&lt;/a&gt;&lt;/br&gt;
@@ -14840,7 +15021,7 @@ function useHandcuff(elmnt) {
 	window.gm.player.Outfit.addItem(new Handcuffs());
 	elmnt.replaceWith(&quot;&lt;div class=&#39;red&#39;&gt;Playing around with the cuffs you suddenly find yourself locked up with them. You panick as you find the locking-mechanic quite tight. You need a key and maybe some help to unlock them!&lt;/div&gt;&quot;);
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="147" name="Your Bedroom" tags="" position="1033,470" size="100,100">&lt;section&gt; 
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="148" name="Your Bedroom" tags="" position="1033,470" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%window.gm.player.location=window.passage.name; 
 window.gm.quests.addQuest(&quot;qMyPleasure&quot;,1);%&gt;
@@ -14869,7 +15050,7 @@ There is a large bed for sleeping with a nightstand aside. &lt;/br&gt;
 &lt;% } else { %&gt;
 Where do you want to go ? &lt;/br&gt;
 [[Hallway|Home]]&lt;/br&gt; &lt;%}%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="148" name="Sleep" tags="" position="975,1850" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="149" name="Sleep" tags="" position="1100,1850" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 You fall into your bedsheets and sleep until your smartphone buzzes you out of your dreams.&lt;/br&gt;
 &lt;!--deferred post sleep events--&gt;
@@ -14891,7 +15072,7 @@ function checkJob() {
 	return(text);
 }
 window.gm.printOutput(checkJob());
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="149" name="Living_Room" tags="" position="1100,1850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="150" name="Living_Room" tags="" position="1225,1850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 The living room that you share with your mom is sparsely decorated (until now).&lt;/br&gt;
 An old wooden table with 4 chairs rests on a wornout green carpet.&lt;/br&gt;
 Some money is laying on the table. Maybe mom forgot it there.&lt;/br&gt;
@@ -14911,8 +15092,8 @@ Where would you like to go?&lt;/br&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;script&gt;
 function getMoney(elmnt,val) {
 	let msg=&quot;&lt;/br&gt;You shouldnt steal that money, should you?&quot;;
-	let vulva = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib[&#39;bVulva&#39;]);
-	let pierc = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib[&#39;pClit&#39;]);
+	let vulva = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib.&#39;bVulva&#39;);
+	let pierc = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib.&#39;pClit&#39;);
 	if(vulva &amp;&amp; vulva instanceof (window.storage.constructors[&#39;VulvaHuman&#39;])) {
 		if(pierc===null ) {
 			pierc= window.gm.ItemsLib[&#39;ClitPiercing&#39;]();
@@ -14929,11 +15110,11 @@ function touchCatIdol(elmnt) {
 	elmnt.replaceWith(&quot;There is a tickling feeling in your hand.&quot;);
 	window.gm.player.addEffect(&quot;effMutateCat&quot;,window.gm.StatsLib.effMutateCat());
 }
-&lt;/script&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="150" name="Cabinet" tags="" position="1225,1850" size="100,100">&lt;section&gt; 
+&lt;/script&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="151" name="Cabinet" tags="" position="100,1975" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 There is nothing here
 [[Living_Room]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="151" name="Garden" tags="" position="100,1975" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="152" name="Garden" tags="" position="225,1975" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;window.gm.quests.tick();%&gt;
 The garden behind the house is not very large. &lt;/br&gt;
@@ -14951,18 +15132,18 @@ You remeber that you took the shovel from here.&lt;/br&gt;
 &lt;%}%&gt;
 Where would you like to go?&lt;/br&gt;
 [[Hallway|Home]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="152" name="Cellar" tags="" position="225,1975" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="153" name="Cellar" tags="" position="350,1975" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 The portal is still active. Do you dare to [[enter|Cellar_Portal]] it? &lt;/br&gt;&lt;/br&gt;
 Where would you like to go?&lt;/br&gt;
 [[Hallway|Home]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="153" name="Cellar_PortalReverse" tags="" position="350,1975" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="154" name="Cellar_PortalReverse" tags="" position="475,1975" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;!--&lt;%window.gm.player.location=window.passage.name;%&gt;--&gt;
 The portal spits you out in the dim light of your cellar.&lt;/br&gt;&lt;/br&gt;
 [[Next|Cellar]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="154" name="Cellar_Portal" tags="" position="475,1975" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="155" name="Cellar_Portal" tags="" position="600,1975" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;!--&lt;%window.gm.player.location=window.passage.name;%&gt;--&gt;
 A blinding light engulfs you just for a second and then a deafening darkness.  &lt;/br&gt;&lt;/br&gt;
@@ -14971,7 +15152,7 @@ As you come back to your senses you find yourself cowering on the floor, still c
 Time to move on.&lt;/br&gt;&lt;/br&gt;&lt;/br&gt;
 Where would you like to go?&lt;/br&gt;
 [[Home|Cellar_PortalReverse]] [[Mall|Mall Floor 0 (postapocalypse)]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="155" name="HairGrow" tags="deferred" position="600,1975" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="156" name="HairGrow" tags="deferred" position="725,1975" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 A blinding light engulfs you just for a second and then a deafening darkness.  &lt;/br&gt;&lt;/br&gt;
 Its impossible to tell what else happens or how long the process takes.&lt;/br&gt;&lt;/br&gt;
@@ -14979,12 +15160,12 @@ As you come back to your senses you find yourself cowering on the floor, still c
 Time to move on.&lt;/br&gt;&lt;/br&gt;&lt;/br&gt;
 Where would you like to go?&lt;/br&gt;
 [[Next|&lt;%=window.gm.player.location%&gt;]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="156" name="Home_Study" tags="" position="725,1975" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="157" name="Home_Study" tags="" position="850,1975" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;% window.gm.player.Stats.increment(&#39;energy&#39;,-20);window.gm.addTime(120);window.gm.quests.forceQuestMilestone(&quot;qStudy&quot;,100,1);%&gt;
 You sit down with your books and scriblings and try to get some sense out of it.&lt;/br&gt;
 [[Give up|&lt;%=window.gm.player.location%&gt;]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="157" name="Campus" tags="" position="825,825" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="158" name="Campus" tags="" position="825,825" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;%if(!window.gm.quests.hasActiveQuest(&quot;qFindAJob&quot;)){  %&gt;
@@ -15002,21 +15183,21 @@ You sit down with your books and scriblings and try to get some sense out of it.
     [[Electrical &amp; Mechanical Engineering|NOP]]  [Chemistry &amp; Process Engineering] [Micro-Power &amp; Nano-Engineering] [[Dining Hall]]  [[ITD Office]]  Library &lt;/br&gt;
     [[Into the city]]&lt;/br&gt;&lt;/div&gt; 
 &lt;%}%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="158" name="ITD Office" tags="" position="975,1975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="159" name="ITD Office" tags="" position="1100,1975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 This is the office-building of the Institute.&lt;/br&gt;
 The [[counsellor|NOP]] might be available to give you some guidance about institutional affairs.&lt;/br&gt;
 Here in the lobby of the building is also a [[blackboard]]. Maybe you can find some job offers there or informations about upcoming events. &lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Campus]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="159" name="Dining Hall" tags="" position="1100,1975" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="160" name="Dining Hall" tags="" position="1225,1975" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 Die Mensa ist wahrscheinlich das beliebteste Gebäude des Campus bei den Studenten; es gibt was zu essen und an kann miteinander quatschen.&lt;/br&gt;
 Das Essen ist vielleicht nicht gerade das beste auf der Welt aber dafür ist es recht günstig. Hast du Hunger?&lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Campus]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="160" name="blackboard" tags="_back_" position="1225,1975" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="161" name="blackboard" tags="_back_" position="100,2100" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &#39;Lets see if there is anything interesting.&#39;&lt;/br&gt;
@@ -15025,7 +15206,7 @@ There is an anounce from Harcon Health Inc. for a [[job|Harcon_Logistic_Ad]] in 
 &lt;%}%&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Back|_back_]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="161" name="attend lecture" tags="" position="100,2100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="162" name="attend lecture" tags="" position="225,2100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 todo You attend to lectures all morning.&lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
@@ -15037,14 +15218,14 @@ function work() {
     window.gm.forwardTime(1300);
     window.story.show(&quot;Campus&quot;);
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="162" name="Harcon_Logistic_Ad" tags="_back_" position="225,2100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="163" name="Harcon_Logistic_Ad" tags="_back_" position="350,2100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;!--todo--&gt; Auf dem maschinen-geschriebenen Zettel ist eine Teilzeit-Stelle in der Logistik-Abteilung ausgeschrieben.&lt;/br&gt;
 &#39;Logistic doesnt sound that interesting and I doubt that position is targeted to an engineer. Maybe I should show up there in person and check if that would be an option.&#39;&lt;/br&gt;
 The adress points to be somehwere around downtonw.&lt;/br&gt;
 &lt;a0 onclick=&#39;window.gm.quests.forceQuestMilestone(&quot;qFindAJob&quot;,100,1); window.story.show(&quot;ITD Office&quot;);&#39;&gt;Note down the adress&lt;/a&gt;&lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Back|_back_]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="163" name="Harcon_Health" tags="" position="350,2100" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="164" name="Harcon_Health" tags="" position="475,2100" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;%if(window.gm.quests.hasActiveQuest(&quot;qFindAJob&quot;,100)){  %&gt;
@@ -15076,7 +15257,7 @@ The adress points to be somehwere around downtonw.&lt;/br&gt;
     This seems to be some kind of factory. You have no business here.&lt;/br&gt;
     &lt;div&gt;&lt;/br&gt;[[Downtown]]&lt;/br&gt;&lt;/div&gt;
 &lt;%}%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="164" name="Harcon_Logistic_Intro" tags="" position="475,2100" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="165" name="Harcon_Logistic_Intro" tags="" position="600,2100" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 ...&lt;!--todo--&gt;
@@ -15097,7 +15278,7 @@ The adress points to be somehwere around downtonw.&lt;/br&gt;
     Mr. Erichson looks quite disappointed.  &lt;/br&gt;
     [[Next|Downtown]]&lt;/br&gt; 
 &lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="165" name="Harcon_work" tags="" position="600,2100" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="166" name="Harcon_work" tags="" position="725,2100" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;%if(window.gm.quests.hasActiveQuest(&quot;qFindAJob&quot;,200)){  %&gt;
@@ -15114,7 +15295,7 @@ function work() {
     window.gm.quests.getQuestState(&quot;qFindAJob&quot;).flags+=1;
     window.story.show(&quot;Downtown&quot;);
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="166" name="Mall Floor 0" tags="" position="1250,850" size="100,100">&lt;section&gt; 
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="167" name="Mall Floor 0" tags="" position="1250,850" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 You are actually at [[&lt;%=window.gm.player.location%&gt;]].&lt;/br&gt;
@@ -15134,7 +15315,7 @@ _Entrys.push({id:&quot;Lube&quot;,count:10,cost:4,costPerv:10});
 _Entrys.push({id:&quot;Battery&quot;,count:4,cost:4,costPerv:0});
 _Entrys.push({id:&quot;Dildo_small&quot;,count:1,cost:25,costPerv:14});
 renderToSelector(&quot;#panel&quot;, &quot;listbuy&quot;); 
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="167" name="Mall Floor 1" tags="" position="1125,850" size="100,100">&lt;section&gt; 
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="168" name="Mall Floor 1" tags="" position="1125,850" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;%window.gm.printShopBuyEntry(&quot;Lube&quot;,4,cbCanBuy=(function(itemid){return window.gm.cbCanBuyPerverse(itemid,15,10)}),cbPostBuy=(function(itemid){window.gm.defaultPostBuy(itemid,15)}))%&gt;
@@ -15149,7 +15330,7 @@ if(window.gm.player.Stats.get(&#39;perversion&#39;).value&lt;=10) {%&gt;
 &lt;%} else {%&gt; [[Adult books and tools]] &lt;/br&gt; &lt;%} %&gt;
 Where would you like to go from here?&lt;/br&gt;
 [[Mall 0F|Mall Floor 0]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="168" name="Mall Floor -1" tags="" position="1000,825" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="169" name="Mall Floor -1" tags="" position="1000,825" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 You are actually at [[&lt;%=window.gm.player.location%&gt;]].&lt;/br&gt;
@@ -15157,7 +15338,7 @@ This level of the mall seems to be reserved for the less fancy business. &lt;/br
 Most of the space is occupied by the usual [[electronics store]] and a [[food store]].
 Where would you like to go from here?&lt;/br&gt;
 [[Mall 0F|Mall Floor 0]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="169" name="Adult books and tools" tags="" position="1025,650" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="170" name="Adult books and tools" tags="" position="1025,650" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 You are actually at [[&lt;%=window.gm.player.location%&gt;]].&lt;/br&gt;
@@ -15170,11 +15351,11 @@ No way I&#39;m going in to that smut-shop. Only perverts do that. &lt;/br&gt;
 &lt;%} %&gt;
 Where would you like to go from here?&lt;/br&gt;
 [[Mall 0F|Mall Floor 0]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="170" name="Buy" tags="_back_" position="850,350" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="171" name="Buy" tags="_back_" position="850,350" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 
 [[Back|_back_]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="171" name="Mall Floor 0 (postapocalypse)" tags="" position="100,2225" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="172" name="Mall Floor 0 (postapocalypse)" tags="" position="225,2225" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 You are actually at [[&lt;%=window.gm.player.location%&gt;]].&lt;/br&gt;
@@ -15185,7 +15366,7 @@ Where would you like to go from here?&lt;/br&gt;
 [[Mall 1F|Mall Floor 1 (postapocalypse)]]
 The stairway to the lower floor is blocked by parts of the building that fell down from top. But there might be other options to get there. &lt;/br&gt; 
 [[Exit|Into the city]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="172" name="Mall Floor 1 (postapocalypse)" tags="" position="225,2225" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="173" name="Mall Floor 1 (postapocalypse)" tags="" position="350,2225" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 
@@ -15200,11 +15381,11 @@ Where would you like to go from here?&lt;/br&gt;
 You are on the hunt for useful resources as...
 &lt;a href=&quot;javascript:void(0)&quot; onclick=&#39;window.gm.encounters.mole(window.gm.player.location);&#39;&gt;Next&lt;/a&gt; &lt;/br&gt;
 
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="173" name="skCooking" tags="" position="825,625" size="100,100">You can create tasty meals from basic ingredients. No need to rely on fastfood.
-[[Back|&lt;%=window.gm.player.location%&gt;]]</tw-passagedata><tw-passagedata pid="174" name="skSporty" tags="" position="725,625" size="100,100">You like to do sports.
-[[Back|&lt;%=window.gm.player.location%&gt;]]</tw-passagedata><tw-passagedata pid="175" name="skTechy" tags="" position="825,525" size="100,100">Tinkering and repairing gadgets is your thing.
-[[Back|&lt;%=window.gm.player.location%&gt;]]</tw-passagedata><tw-passagedata pid="176" name="skMoneymaker" tags="" position="725,525" size="100,100">You often find ways to increase your profit a little bit.
-[[Back|&lt;%=window.gm.player.location%&gt;]]</tw-passagedata><tw-passagedata pid="177" name="Start" tags="" position="850,2225" size="100,100">Select a Link:
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="174" name="skCooking" tags="" position="825,625" size="100,100">You can create tasty meals from basic ingredients. No need to rely on fastfood.
+[[Back|&lt;%=window.gm.player.location%&gt;]]</tw-passagedata><tw-passagedata pid="175" name="skSporty" tags="" position="725,625" size="100,100">You like to do sports.
+[[Back|&lt;%=window.gm.player.location%&gt;]]</tw-passagedata><tw-passagedata pid="176" name="skTechy" tags="" position="825,525" size="100,100">Tinkering and repairing gadgets is your thing.
+[[Back|&lt;%=window.gm.player.location%&gt;]]</tw-passagedata><tw-passagedata pid="177" name="skMoneymaker" tags="" position="725,525" size="100,100">You often find ways to increase your profit a little bit.
+[[Back|&lt;%=window.gm.player.location%&gt;]]</tw-passagedata><tw-passagedata pid="178" name="Start" tags="" position="975,2225" size="100,100">Select a Link:
 &lt;ul&gt;
     &lt;li&gt;[[_SuperSimpleStory_]]&lt;/li&gt;
 	&lt;li&gt;[[_ImagesAndOtherMedia_]]&lt;/li&gt;
@@ -15213,7 +15394,7 @@ You are on the hunt for useful resources as...
     &lt;li&gt;[[_Inventory_]]&lt;/li&gt;
     &lt;li&gt;[[_SaveAndRestore_]]&lt;/li&gt;
     &lt;li&gt;[[StartPage]]&lt;/li&gt;
-&lt;/ul&gt;</tw-passagedata><tw-passagedata pid="178" name="NewGamePlus" tags="" position="975,2225" size="100,100">You finished the game in some way but maybe you have missed something. &lt;/br&gt;
+&lt;/ul&gt;</tw-passagedata><tw-passagedata pid="179" name="NewGamePlus" tags="" position="1100,2225" size="100,100">You finished the game in some way but maybe you have missed something. &lt;/br&gt;
 Would you like to start a new game while taking some of your equipment/skills with you?&lt;/br&gt;
 &lt;a0 onclick=&#39;window.gm.newGamePlus()&#39;&gt;Start new game plus&lt;/a&gt;&lt;/br&gt;</tw-passagedata></tw-storydata>
 		<script>
