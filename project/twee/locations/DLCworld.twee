@@ -78,7 +78,7 @@ You can see some houses from here, maybe a small village. You just need to follo
 
 :: VillageEntrance
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%window.gm.player.location=window.passage.name;%>
+<%window.gm.moveHere();%>
 <!--todo--> You are at the crossroads in front of the entrance to the settlement.
 Someone has painted 'Thetain' on the planks above the wooden gate. Most likely thats the name of this commune.</br></br>
 <div></br>
@@ -88,7 +88,7 @@ Someone has painted 'Thetain' on the planks above the wooden gate. Most likely t
 
 :: VillageMarketPlace
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%window.gm.player.location=window.passage.name;%>
+<%window.gm.moveHere();%>
 <!--todo--> There arent many people around the place right now.</br> There seems to be a shop of an alchemist, a Inn and another shop where you cant say what kind of wares - if any - they are trading.</br>
 </br> Near the entrance of the Inn is also a [[bulletin-board]]. 
 <div></br>
@@ -98,17 +98,18 @@ Someone has painted 'Thetain' on the planks above the wooden gate. Most likely t
 
 :: VillageInn
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%window.gm.player.location=window.passage.name;%>
+<%window.gm.moveHere();%>
 <!--todo--> 'This really looks like they scavenged that place from a typical fantasy story book.'</br> 
 </br> 
 <div></br>
 [[Square|VillageMarketPlace]] </br></div>
 </article><article id="LogPanel"></article></section>
+<script> </script>
 
 
 :: VillagePotions
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%window.gm.player.location=window.passage.name;%>
+<%window.gm.moveHere();%>
 <!--todo--> 'Puh, what a stink. I shouldnt stay here for long for I might suffocate'</br> </br>
 <% if(!window.gm.quests.hasActiveQuest("qPurpleBerry") || window.gm.quests.getMilestoneState("qPurpleBerry").id<1) { %>
 "Hello? Anyone there?"</br>
@@ -154,7 +155,7 @@ Now that I think about it, we could make a trade: you get me some purple berrys,
 
 :: VillagePawnshop
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%window.gm.player.location=window.passage.name;%>
+<%window.gm.moveHere();%>
 <!--todo--> If this is a shop, then they sell everything: Shoes, cooking pans, assault ballista and chicken.</br> 
 <!--todo-->On the other side of the room is a large [[Wardrobe]] with a [[Mirror]] where you can take a look at yourself.
 </br> 
@@ -192,16 +193,16 @@ if(window.gm.quests.getMilestoneState("qDiedAgain").id===1) {
 
 :: ForestBorder
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%window.gm.player.location=window.passage.name;%>
+<%window.gm.moveHere();%>
 <!--todo--> There is a dirt road here crossing the lush grassland that is bordered by the trees of an forest.</br> 
 One direction leads to the settlement close by. The other direction follows the border of the forest but gets out of view quickly.</br> 
 </br> 
 <div></br>
-[[Village|VillageEntrance]] [[ForestEntrance]] [[follow Road]] </br></div>
+[[Village|VillageEntrance]] [[Into the forest|ForestEntrance]] [[follow Road]] </br></div>
 </article><article id="LogPanel"></article></section>
 
 
-:: ForestSearchAround [_back]
+:: ForestSearchAround [_back_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <% let args = window.story.state.tmp.args; if(args[0]==='PurpleBerry' && args[1]>0){ window.gm.player.Inv.addItem(new window.storage.constructors[args[0]](),args[1]); %>
 On a secluded spot you found a batch of berry bushes. Most of them dont have any more berrys but you are able to collect a handful.</br>
@@ -211,10 +212,10 @@ There arent any purple berrys left. You have to search on a different place.
 Unfortunatly you didnt find anything useful.</br>
 <%}%>
 <div></br>
-[[Next|_back]]</br></div>
+[[Next|_back_]]</br></div>
 </article><article id="LogPanel"></article></section>
 
-:: ForestWolfEncounter [_back]
+:: ForestWolfEncounter [_back_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <% window.gm.quests.addQuest("qWolfMate",1); if(window.gm.quests.getMilestoneState("qWolfMate").id<=1) %>
 Distracted by rummaging around in the bushes, you just caught by surprise as you turn around.</br>
@@ -242,13 +243,13 @@ There is a wolf again. Or is it the same?</br>
 <a0 onclick='window.gm.encounters.wolf(window.gm.player.location)'>Next</a>
 <%}%>
 <div></br>
-[[Next|_back]]</br></div>
+[[Next|_back_]]</br></div>
 </article><article id="LogPanel"></article></section>
 
 
 :: ForestEntrance
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%window.gm.player.location=window.passage.name;%>
+<%window.gm.moveHere();%>
 The forest makes a friendly impression.  </br> The trees are still light and are not yet as expansive and large as that no more light can get through the canopy. 
 </br> 
 Maybe you can <a0 onclick='explore(); '>explore</a> the surrounding woods and see if you can find anything useful.</br>
@@ -273,7 +274,7 @@ Maybe you can <a0 onclick='explore(); '>explore</a> the surrounding woods and se
 
 :: ForestCliff
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%window.gm.player.location=window.passage.name;%>
+<%window.gm.moveHere();%>
 You fight your way through the dense undergrowth and realize just in time that you have reached the edge of a cliff.</br> 
 </br> 
 <% if(window.gm.quests.getMilestoneState("qDiedAgain").id===1) { %>
@@ -308,7 +309,7 @@ Or you might just return to [[ForestEntrance]]. </br></div>
 
 :: ForestCliffCave
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%window.gm.player.location=window.passage.name;%>
+<%window.gm.moveHere();%>
 <% if(window.gm.quests.getMilestoneState("qBondageKink").id<=1) { %>
 <%window.gm.player.Outfit.addItem(new window.gm.ItemsLib["CollarQuest"]());window.gm.quests.forceQuestMilestone("qBondageKink",100,1);%>
 <!--todo--> !!! You got some kind of collar !!!
@@ -330,7 +331,7 @@ Or you might just return to [[ForestEntrance]]. </br></div>
 
 :: ForestStoneCircle
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%window.gm.player.location=window.passage.name;%>
+<%window.gm.moveHere();%>
 <!--todo--> Aus dem dichten Unterholz trittst du auf eine Lichtung. Das wäre ein idylischer Ort wenn nicht dieser Steinkreis wäre.</br> 
 </br> 
 <% if(true) { %>
@@ -349,7 +350,7 @@ Ansonsten gibt es hier nichts.</br>
 </article><article id="LogPanel"></article></section>
 
 
-:: Dungeon [_nosave]
+:: Dungeon [_nosave_]
 <!--dont "show" this! setup the dungeon and call enterDungeon-->
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%= window.gm.dng.name%> <%= window.gm.dng.actualRoom.descr%></br>
@@ -361,7 +362,7 @@ window.gm.dng.printButtons()
 </script>
 
 
-:: DungeonMap [_nosave]
+:: DungeonMap [_nosave_]
 <!--dont "show" this! setup the dungeon and call displayMap-->
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <!--pre-formatted or messup allignment of ascii-rows-->
@@ -372,7 +373,7 @@ window.gm.dng.printButtons()
 </article><article id="LogPanel"></article></section>
 
 
-:: DungeonFoundNothing [_nosave]
+:: DungeonFoundNothing [_nosave_]
 <!--example-scene for onenter/onexit event-->
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%= window.gm.dng.actualRoom.descr%></br>
@@ -382,7 +383,7 @@ There are some buckets here, but there is nothing useful inside.</br>
 </article><article id="LogPanel"></article></section>
 
 
-:: DungeonCrashedThroughFloor [_nosave]
+:: DungeonCrashedThroughFloor [_nosave_]
 <!--example-scene for onenter/onexit event-->
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%= window.gm.dng.actualRoom.descr%></br>
@@ -398,10 +399,10 @@ function crashThrough() {
 }
 </script>
 
-:: NOP_VR [_nosave,_back]
+:: NOP_VR [_nosave_,_back_]
 <!--example-scene for onenter/onexit event-->
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <p class='dev'> You cant go that way. Either because its WIP or you need to solve a quest first. </p>
 </br>
-[[Back|_back]]</br>
+[[Back|_back_]]</br>
 </article><article id="LogPanel"></article></section>

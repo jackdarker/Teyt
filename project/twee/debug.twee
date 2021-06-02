@@ -1,16 +1,16 @@
 
-:: debug_cheat [_back]
+:: debug_cheat [_back_]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 Some things for debugging:</br>
 </br>[[MemoryGame]] [[HangmanGame]]</br> <!--todo-->
 </br>[[NewGamePlus]]</br> <!--todo-->
 [[Cheats|debug]]</br>
-[[Back|_back]]</br>
+[[Back|_back_]]</br>
 </article><article id="LogPanel"></article></section>
 
 
-:: debug [_back]
+:: debug [_back_]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 Cheat buttons: those are meant for debugging and might break your game</br>
@@ -37,7 +37,7 @@ Cheat buttons: those are meant for debugging and might break your game</br>
 <label for="additem">add item (not wardrobe):<input type="text" id="additem" name="additem"></label><a href="javascript:void(0)" onclick='window.gm.player.Inv.addItem(new window.storage.constructors[document.getElementById("additem").value]())'>Go</a></br>
 
 </br>
-</br>[[Back|_back]]</br>
+</br>[[Back|_back_]]</br>
 </article><article id="LogPanel"></article></section>
 <script>
 function unhideStats() {
@@ -48,9 +48,36 @@ function unhideStats() {
 }
 </script>
 
-:: NOP [_back]
+:: NOP [_back_]
 <section> <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <p class='author'>Sorry, this loation is curently not implemented.</p> <!--todo  implement passages pointing to this-->
 <div> </br>
-[[Back|_back]]</br></div>
+[[Back|_back_]]</br></div>
 </article><article id="LogPanel"></article></section>
+
+
+
+:: Deffered1
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+Deffered1
+[[Home]]
+<a0 onclick= window.story.show("")>Next</a></br></br>
+</article></section>
+
+
+:: Deffered2
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+Deffered2
+[[Home]]
+<a0 onclick='window.gm.pushDeferredEvent("Deffered3",[13],true)'>Deffered3</a></br>
+<a0 onclick= window.story.show("")>go on</a></br></br>
+</article></section>
+
+
+:: Deffered3
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+Deffered3
+[[Home]]
+<a0 onclick='window.gm.pushDeferredEvent("Deffered3",[13])'>Deffered1</a></br>
+<a0 onclick= window.story.show("")>go on</a></br></br>
+</article></section>

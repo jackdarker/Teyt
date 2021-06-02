@@ -63,7 +63,7 @@ window.gm.OutfitSlotLib = {
     Wrists  :   70,
     LHand   :   71,
     RHand   :   72,
-    //U  = under wear    P = piercing
+    //U  = under wear    P = piercing  T = tattoo
     uFeet    : 81,   //socks
     uAnkles  : 82,    //
     uLegs    : 83,
@@ -132,6 +132,7 @@ class Outfit extends Inventory{
                 this.list.push({id:'', item:null});        // {id:'Leggings'}
             }
         }
+        //??this.list = {};  //this.list.Legs = {id:'Leggings' item:x}
         window.storage.registerConstructor(Outfit);
     }
     get parent() {return this._parent();}
@@ -140,6 +141,17 @@ class Outfit extends Inventory{
     postItemChange(id,operation,msg) {
         window.gm.pushLog('Outfit: '+operation+' '+id+' '+msg+'</br>');
     }
+
+    /*_relinkItems() {  //call this after loading save data the reparent
+        for(var i=0; i<this.list.length; i++) {
+            if(this.list[i].item) this.list[i].item._parent=window.gm.util.refToParent(this);
+        }
+    }
+    postItemChange(id,operation,msg) {
+        window.gm.pushLog('Outfit: '+operation+' '+id+' '+msg+'</br>');
+    }
+    //count() {return(this.list.length);}*/
+
     //count how many slots are used by an item
     countItem(id) {
         let _i = this.findItemSlot(id);

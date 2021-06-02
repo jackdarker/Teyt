@@ -40,7 +40,7 @@ Das Essen ist vielleicht nicht gerade das beste auf der Welt aber dafür ist es 
 [[Campus]]</br></div>
 </article><article id="LogPanel"></article></section>
 
-:: blackboard [_back]
+:: blackboard [_back_]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
@@ -49,7 +49,7 @@ Das Essen ist vielleicht nicht gerade das beste auf der Welt aber dafür ist es 
 There is an anounce from Harcon Health Inc. for a [[job|Harcon_Logistic_Ad]] in logistics-department.</br>
 <%}%>
 <div></br>
-[[Back|_back]]</br></div>
+[[Back|_back_]]</br></div>
 </article><article id="LogPanel"></article></section>
 
 :: attend lecture

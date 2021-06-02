@@ -67,9 +67,9 @@ Where would you like to go from here?</br>
 </article><article id="LogPanel"></article></section>
 
 
-:: Buy [_back] {"position":"850,350"}
+:: Buy [_back_] {"position":"850,350"}
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 
-[[Back|_back]]</br>
+[[Back|_back_]]</br>
 </article><article id="LogPanel"></article></section>

@@ -1,6 +1,6 @@
 window.gm.refreshAllPanel()
 
-window.story.state.vars.day
+window.story.state._gm.day
 window.gm.getTimeStruct().hour
 
 <%=window.gm.printPickupAndClear('LaptopPS','pickup laptop-powersupply from table',1-window.gm.player.Inv.countItem('LaptopPS'))%>

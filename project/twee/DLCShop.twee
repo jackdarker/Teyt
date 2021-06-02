@@ -1,4 +1,4 @@
-:: DLCShopWelcome [_back]
+:: DLCShopWelcome [_back_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 Welcome to the games Shop where you can buy Quality-of-life-service and equipment for your travel in our game.</br>
 Please note that you need Tokens to buy something. Token can be bougth for real money or they can be earned in the game or granted by the content managers. 
@@ -13,5 +13,5 @@ Options to retain equipment after death:</br>
 There might also be some pay-by-use offers at respawn like: removal of status alignment and deseases
 
 <div></br>
-[[Checkout|_back]]</br></div>
+[[Checkout|_back_]]</br></div>
 </article><article id="LogPanel"></article></section>

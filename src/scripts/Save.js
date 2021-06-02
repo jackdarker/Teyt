@@ -8,6 +8,7 @@ window.storage = {
   // A list of constructors the smart reviver should know about  
   // you need to register the class of each object that you want to serialize to this list
   // and each class also has to have a method toJSON and static method fromJSON (calling Generic_-versions, see below )
+  // the namme of ctor needs to be unique !
   constructors : {}, 
   registerConstructor: function(ctor) {
     window.storage.constructors[ctor.name] = ctor;

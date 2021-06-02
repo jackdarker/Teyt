@@ -6,97 +6,7 @@ core functionality
 
 window.gm = window.gm || {}; //game related operations
 window.gm.util = window.gm.util || {};  //utility functions
-// define save-game-file-version 1
 
-//reimplement this to handle version upgrades on load !
-window.gm.rebuildObjects= function(){ 
-  var s = window.story.state;
-  window.gm.quests.setQuestData(s.quests); //necessary for load support
-  window.gm.switchPlayer(s.vars.activePlayer);
-}
-//--------------- time management --------------
-//returns timestamp since start of game
-window.gm.getTime= function() {
-  return(window.story.state.vars.time+2400*window.story.state.vars.day);
-}
-//calculates timedifference for hhmm time format
-window.gm.getDeltaTime = function(a,b){
-  var m=a%100;         
-  var h=((a-m)/100);
-  var m2=b%100;         
-  var h2=((b-m2)/100);
-  return((h*60+m)-(h2*60+m2));
-}
-//adds MINUTES to time
-window.gm.addTime= function(min) {
-  let v=window.story.state.vars;
-  let m=v.time%100;         
-  let h=parseInt((v.time-m)/100);
-  m= m+min;
-  let m2 = m%60;
-  let h2 = h+parseInt((m-m2)/60);
-  window.story.state.vars.time = (h2*100+m2%60);
-  while(window.story.state.vars.time>=2400) {
-    window.story.state.vars.time -= 2400;
-    window.story.state.vars.day += 1;
-  }
-  window.gm.player.Effects.updateTime();
-};
-window.gm.getTimeString= function() {
-  var c=window.gm.getTimeStruct();
-  return (c.hour<10?"0":"")+c.hour.toString()+":"+(c.min<10?"0":"")+c.min.toString()+"("+c.daytime+")";
-};
-// DoW = DayOfWeek  7 = Sunday, 1 = Monday,...6 = Saturday 
-window.gm.getTimeStruct=function() {
-  var v=window.story.state.vars;
-  var m=v.time%100;
-  var h=((v.time-m)/100);
-  var daytime = '';
-  if(v.time>500 && v.time<1000) {
-    daytime = 'morning';
-  } else if(v.time>=1000 && v.time<1400) {
-    daytime = 'noon';
-  } else if(v.time>=1400 && v.time<1800) {
-    daytime = 'afternoon';
-  } else if(v.time>=1800 && v.time<2200) {
-    daytime = 'evening';
-  } else {
-    daytime = 'night';
-  }
-  var DoW = window.story.state.vars.day%7;
-  return({'hour':h,'min':m, 'daytime': daytime, 'DoW':DoW});
-};
-window.gm.DoWs = ['Monday', 'Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-window.gm.getDateString= function() {
-  var v=window.story.state.vars;
-  return v.day.toString()+". day "+ window.gm.DoWs[(v.day%8)-1];
-};
-//forward time to until (1025 = 10:25), regenerate player
-//warning dont write 0700 because this would be take as octal number
-window.gm.forwardTime=function(until) {
-  let v=window.story.state.vars;
-  let msg='';
-  let m=v.time%100;
-  let h=parseInt((v.time-m)/100);
-  let m2=until%100;
-  let h2=parseInt((until-m2)/100);
-  let min = (h2-h)*60+(m2-m);
-  //if now is 8:00 and until 10:00 we assume you want to sleep 2h and not 2+24h
-  //if now is 10:00 and until is 9:00 we assume sleep for 23h
-  if(until<v.time) {
-    min = 24*60-(h-h2)*60+(m-m2);
-  }
-  if(min===0) { //if sleep from 700 to 700, its a day
-    min=24*60;
-  }
-  msg+="</br>"+min%60+" hours pass by.</br>";
-  window.gm.addTime(min);
-  let regen = min>420 ? 999 : parseInt(min/60*15);  //todo scaling of regeneration
-  window.gm.player.Stats.increment('health',regen);
-  window.gm.player.Stats.increment('energy',regen);
-  window.gm.pushLog(msg);
-  return(msg);
-};
 //-------------------------------------------------
 // reimplement to setup the game !
 window.gm.initGame= function(forceReset,NGP=null) {
@@ -125,6 +35,14 @@ window.gm.initGame= function(forceReset,NGP=null) {
     }
     if (!s._gm||forceReset) {
       s._gm = {
+        version : window.gm.getSaveVersion(),
+        log : [],
+        passageStack : [], //used for passage [back] functionality
+        defferedStack : [], //used for deffered events
+        onholdStack : [], //used for deffered events
+        time : 700, //represented as hours*100 +minutes
+        day : 1,  //daycount
+        activePlayer : '', //id of the character that the player controls currently
         nosave : false,
         playerParty: []  //names of NPC in playerParty 
       }
@@ -165,6 +83,96 @@ window.gm.newGamePlus = function() {
   window.gm.initGame(true,NGP);
   window.story.show('Home');
 };
+//reimplement this to handle version upgrades on load !
+window.gm.rebuildObjects= function(){ 
+  var s = window.story.state;
+  window.gm.quests.setQuestData(s.quests); //necessary for load support
+  window.gm.switchPlayer(s._gm.activePlayer);
+}
+//--------------- time management --------------
+//returns timestamp since start of game
+window.gm.getTime= function() {
+  return(window.story.state._gm.time+2400*window.story.state._gm.day);
+}
+//calculates timedifference for hhmm time format
+window.gm.getDeltaTime = function(a,b){
+  var m=a%100;         
+  var h=((a-m)/100);
+  var m2=b%100;         
+  var h2=((b-m2)/100);
+  return((h*60+m)-(h2*60+m2));
+}
+//adds MINUTES to time
+window.gm.addTime= function(min) {
+  let v=window.story.state._gm;
+  let m=v.time%100;         
+  let h=parseInt((v.time-m)/100);
+  m= m+min;
+  let m2 = m%60;
+  let h2 = h+parseInt((m-m2)/60);
+  window.story.state._gm.time = (h2*100+m2%60);
+  while(window.story.state._gm.time>=2400) {
+    window.story.state._gm.time -= 2400;
+    window.story.state._gm.day += 1;
+  }
+  window.gm.player.Effects.updateTime();
+};
+window.gm.getTimeString= function() {
+  var c=window.gm.getTimeStruct();
+  return (c.hour<10?"0":"")+c.hour.toString()+":"+(c.min<10?"0":"")+c.min.toString()+"("+c.daytime+")";
+};
+// DoW = DayOfWeek  7 = Sunday, 1 = Monday,...6 = Saturday 
+window.gm.getTimeStruct=function() {
+  var v=window.story.state._gm;
+  var m=v.time%100;
+  var h=((v.time-m)/100);
+  var daytime = '';
+  if(v.time>500 && v.time<1000) {
+    daytime = 'morning';
+  } else if(v.time>=1000 && v.time<1400) {
+    daytime = 'noon';
+  } else if(v.time>=1400 && v.time<1800) {
+    daytime = 'afternoon';
+  } else if(v.time>=1800 && v.time<2200) {
+    daytime = 'evening';
+  } else {
+    daytime = 'night';
+  }
+  var DoW = window.story.state._gm.day%7;
+  return({'hour':h,'min':m, 'daytime': daytime, 'DoW':DoW});
+};
+window.gm.DoWs = ['Monday', 'Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+window.gm.getDateString= function() {
+  var v=window.story.state._gm;
+  return v.day.toString()+". day "+ window.gm.DoWs[(v.day%8)-1];
+};
+//forward time to until (1025 = 10:25), regenerate player
+//warning dont write 0700 because this would be take as octal number
+window.gm.forwardTime=function(until) {
+  let v=window.story.state._gm;
+  let msg='';
+  let m=v.time%100;
+  let h=parseInt((v.time-m)/100);
+  let m2=until%100;
+  let h2=parseInt((until-m2)/100);
+  let min = (h2-h)*60+(m2-m);
+  //if now is 8:00 and until 10:00 we assume you want to sleep 2h and not 2+24h
+  //if now is 10:00 and until is 9:00 we assume sleep for 23h
+  if(until<v.time) {
+    min = 24*60-(h-h2)*60+(m-m2);
+  }
+  if(min===0) { //if sleep from 700 to 700, its a day
+    min=24*60;
+  }
+  msg+="</br>"+min%60+" hours pass by.</br>";
+  window.gm.addTime(min);
+  let regen = min>420 ? 999 : parseInt(min/60*15);  //todo scaling of regeneration
+  window.gm.player.Stats.increment('health',regen);
+  window.gm.player.Stats.increment('energy',regen);
+  window.gm.pushLog(msg);
+  return(msg);
+};
+
 
 // use: child._parent = window.gm.util.refToParent(parent);
 window.gm.util.refToParent = function(me){ return function(){return(me);}};
@@ -177,89 +185,131 @@ window.gm.util.refToParent = function(me){ return function(){return(me);}};
 //the passage will trigger under the given condition: minimum time, location-tag, at a certain time-window
 //the passage will show when a new passage is requested and will be removed from stack
 //if this passage is already pushed, only its condition will be updated
-window.gm.pushDeferredEvent=function(id,args) {
-    var cond1 = {waitTime: 6,
+window.gm.pushDeferredEvent=function(id,args,front=false) {
+    /*var cond1 = {waitTime: 6,
                 locationTags: ['Home','City'],      //Never trigger in Combat
                 dayTime: [1100,600]
               },
         cond2 = { waitTime: 60,
                   locationTags: ['Letterbox'],
         };
-  
-    var cond = [cond1,cond2]; //passage is executed if any of the conds is met
-    window.story.state.vars.defferedStack.push({id:id,cond:cond,args:args});
+      */
+    let cond = [];//[cond1,cond2]; //passage is executed if any of the conds is met
+    if(front) {
+      window.story.state._gm.defferedStack.unshift({id:id,cond:cond,args:args});
+    } else {
+      window.story.state._gm.defferedStack.push({id:id,cond:cond,args:args});
+    }
 };
+window.gm.popDeferredEvent= function() {
+  let evt = window.story.state._gm.defferedStack.shift();
+  window.story.state.tmp.args = evt.args;
+  return evt.id;
+}
 window.gm.removeDefferedEvent=function(id=""){
   if(id!=="") {
-    for(var i=window.story.state.vars.defferedStack.length-1;i>0;i--) {
-      if(window.story.state.vars.defferedStack[i].id===id) 
-      window.story.state.vars.defferedStack.splice(i,1);
+    for(var i=window.story.state._gm.defferedStack.length-1;i>0;i--) {
+      if(window.story.state._gm.defferedStack[i].id===id) 
+      window.story.state._gm.defferedStack.splice(i,1);
     }
   }else {
-    window.story.state.vars.defferedStack = [];
+    window.story.state._gm.defferedStack = [];
   }
 }
-window.gm.hasDeferredEvent = function(id="") {
+/*window.gm.hasDeferredEvent = function(id="") {
   if(id!=="") {
-    for(var i=0;i<window.story.state.vars.defferedStack.length;i++) {
-      if(window.story.state.vars.defferedStack[i].id===id) return(true);
+    for(var i=0;i<window.story.state._gm.defferedStack.length;i++) {
+      if(window.story.state._gm.defferedStack[i].id===id) return(true);
     }
     return(false);
   } else {
-    return(window.story.state.vars.defferedStack.length>0);
+    return(window.story.state._gm.defferedStack.length>0);
   }
 }
 window.gm.showDeferredEvent= function() {
   var msg = '';
 
   var namenext = window.passage.name;
-  var tagsnext = window.story.passage(namenext).tags;
-  var evt = window.story.state.vars.defferedStack.shift();
+  //var tagsnext = window.story.passage(namenext).tags;
+  var evt = window.story.state._gm.defferedStack.shift();
   if(evt!==null) {
     msg += window.gm.printPassageLink("Next",evt.id);
   }
   return msg;
-}
-//when show is called the previous passage is stored if the new has [_back]-tag
+}*/
+//when show is called the previous passage is stored if the new has [_back_]-tag
 //if the new has no back-tag, the stack gets cleared
-window.gm.pushPassage=function(id) {
-  if(!window.story.state.hasOwnProperty("vars")) return;  //vars exist only after initGame
-  if(window.story.state.vars.passageStack.length>0 && window.story.state.vars.passageStack[window.story.state.vars.passageStack.length-1]===id){
+window.gm.pushBackPassage=function(id) {
+  if(!window.story.state.hasOwnProperty("_gm")) return;  //exist only after initGame
+  if(window.story.state._gm.passageStack.length>0 && window.story.state._gm.passageStack[window.story.state._gm.passageStack.length-1]===id){
     //already pushed
   } else {
-    window.story.state.vars.passageStack.push(id);
+    window.story.state._gm.passageStack.push(id);
   }
 };
-//call on [_back]-passages to get the previous passage
-window.gm.popPassage=function() {
-    var pass = window.story.state.vars.passageStack.pop();
+//call on [_back_]-passages to get the previous passage
+window.gm.popBackPassage=function() {
+    let pass = window.story.state._gm.passageStack.pop();
     if(!pass) return('nothing to pop from stack');
     return(pass);
+};
+window.gm.pushOnHold=function(id) {
+  if(!window.story.state.hasOwnProperty("_gm")) return;  //exist only after initGame
+  if(window.story.state._gm.onholdStack.length>0){// && window.story.state._gm.defferedStack[window.story.state._gm.defferedStack.length-1].id===id){
+    throw new Error('passage allready onHold: '+id); //already some pushed
+  } else {
+    window.story.state._gm.onholdStack.push({id:id, args:window.story.state.tmp.args});
+  }
+};
+//
+window.gm.popOnHold=function() {
+    let pass = window.story.state._gm.onholdStack.pop();
+    if(!pass) throw new Error('nothing on hold to pop.');
+    window.story.state.tmp.args=pass.args;
+    return(pass.id);
 };
 //overriding show:
 //- to enable back-link
 //- todo to intercept with deffered events
-var _origStoryShow = window.story.__proto__.show;
+let _origStoryShow = window.story.__proto__.show;
 window.story.__proto__.show = function(idOrName, noHistory = false) {
-  var next = idOrName;
-  var inGame = window.story.state.hasOwnProperty("vars");
-  var tagsnext;
-  if(idOrName === '_back') { //going back
-    next = window.gm.popPassage();
+  let next = idOrName;
+  let inGame = window.story.state.hasOwnProperty("_gm"); //the logic doesnt work if initGame not already done
+  let tagsnext,namenext,nextp,namenow;
+  if(idOrName==='') tagsnext=[];
+  else tagsnext = window.story.passage(idOrName).tags;
+  if(idOrName === '_back_') { //going back
+    next = window.gm.popBackPassage();
     tagsnext = window.story.passage(next).tags;
+  } else if(inGame && window.story.state._gm.defferedStack.length>0 && //deffered event if allowed and requested
+      tagsnext.indexOf('_back_')<0 && tagsnext.indexOf('_nosave_')<0 && tagsnext.indexOf('_nodeffered_')<0 ) { 
+    if(idOrName!=='') window.gm.pushOnHold(idOrName); //only push when not returning from other deffered or not passage with back
+    next = window.gm.popDeferredEvent();
+    nextp = window.story.passage(next);
+    tagsnext =  nextp.tags;
+  } else if(inGame && idOrName==='' && window.story.state._gm.onholdStack.length>0) { //continue event onhold
+    next =window.gm.popOnHold()
+    nextp = window.story.passage(next);
+    tagsnext =  nextp.tags;
   } else {  //going forward
-    tagsnext = window.story.passage(next).tags;
-    var namenext = window.story.passage(next).name;
-    if(tagsnext.indexOf('_back')>=0 ) { //push on stack but only if not re-showing itself
-      if(namenext!=window.passage.name) window.gm.pushPassage(window.passage.name); 
-    } else if(inGame) { //...otherwise error on game start
-      window.story.state.vars.passageStack.splice(0,window.story.state.vars.passageStack.length);
+    nextp = window.story.passage(next);
+    if(!nextp) throw new Error('no such passage: '+next);
+    tagsnext = nextp.tags;
+    namenext = nextp.name;
+    if(tagsnext.indexOf('_back_')>=0 ) { //push on stack but only if not re-showing itself
+      namenow = window.passage.name;
+      if(namenext!=namenow) window.gm.pushBackPassage(namenow); 
+    } else if(inGame) { 
+      //if not in _back_-passage, drop the _back_-stack
+      window.story.state._gm.passageStack.splice(0,window.story.state._gm.passageStack.length);
     }
-}
-
-//disable save-menu on _nosave-tag 
-if(inGame) {
-    window.story.state._gm.nosave = (tagsnext.indexOf('_nosave')>=0 );
+    //todo not sure about this: a deffered event should not link to normal passages because this would disentangle the original story-chain
+    //this I think could cause issues and should be detected and throw an error
+    //uncoment the following to bypass this 
+    //window.story.state._gm.onholdStack.splice(0,window.story.state._gm.onholdStack.length);
+  }
+if(inGame) {//disable save-menu on _nosave_-tag 
+    window.story.state._gm.nosave = (tagsnext.indexOf('_nosave_')>=0 );
 }
   //Todo
   //before entering a new passage check if there is a defferedEvent that we should do first
@@ -273,7 +323,7 @@ if(inGame) {
 window.gm.switchPlayer = function(playername) {
   var s = window.story.state;
   window.gm.player= s[playername];
-  s.vars.activePlayer = playername;
+  s._gm.activePlayer = playername;
   window.gm.addToParty(playername);
 }
 window.gm.removeFromParty= function(name) {
@@ -306,14 +356,14 @@ window.gm.refreshSidePanel = function(){
 ///////////////////////////////////////////////////////////////////////
 window.gm.pushLog=function(msg,Cond=true) {
   if(!Cond) return;
-  var log = window.story.state.vars.log;
+  var log = window.story.state._gm.log;
   log.unshift(msg);
   if(log.length>10) {
       log.splice(log.length-1,1);
   }
 };
 window.gm.getLog=function() {
-  var log = window.story.state.vars.log;
+  var log = window.story.state._gm.log;
   var msg ='';
   for(var i=0;i<log.length;i++) {
       msg+=log[i];
@@ -321,12 +371,12 @@ window.gm.getLog=function() {
   return(msg);
 };
 window.gm.clearLog=function() {
-  var log = window.story.state.vars.log;
+  var log = window.story.state._gm.log;
   var msg ='';
   for(var i=0;i<log.length;i++) {
       msg+=log[i];
   }
-  window.story.state.vars.log = [];
+  window.story.state._gm.log = [];
   return(msg);
 };
 //////////////////////////////////////////////////////////////////////

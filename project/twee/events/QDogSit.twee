@@ -94,21 +94,21 @@ Please go over there through this door. Micheal is there and he will take care."
 </article><article id="LogPanel"></article></section>
 
 
-:: Dogsit_TalkTrisha [_back]
+:: Dogsit_TalkTrisha [_back_]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 <!--<% window.gm.player.location=window.passage.name;%>-->
 todo
-[[Back|_back]]</br>
+[[Back|_back_]]</br>
 </article><article id="LogPanel"></article></section>
 
 
-:: Dogsit_TalkMichael [_back]
+:: Dogsit_TalkMichael [_back_]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 <!--<% window.gm.player.location=window.passage.name;%>-->
 todo
-[[Back|_back]]</br>
+[[Back|_back_]]</br>
 </article><article id="LogPanel"></article></section>
 
 
@@ -121,7 +121,7 @@ Ask for a new job.
 </article><article id="LogPanel"></article></section>
 
 
-:: Dogsit_NewJob [_back]
+:: Dogsit_NewJob [_back_]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 <!--<% window.gm.player.location=window.passage.name;%>-->
@@ -135,5 +135,5 @@ Ask for a new job.
 [[Klaus]] That doberman-stud isn't a easy one. He will question your role as a leader costantly.
 [[Victor]] As a Great Dane this matured male is quite a large breed. While usually not the troublemaker, it could be quite difficult to get him in line should he act unruly.
 
-[[None|_back]]</br>
+[[None|_back_]]</br>
 </article><article id="LogPanel"></article></section>

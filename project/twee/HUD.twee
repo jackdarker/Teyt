@@ -125,10 +125,10 @@ function readFile(input) {
 </script>
 
 
-:: Inventory [_back]
+:: Inventory [_back_]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
-[[Back|_back]]</br>
+[[Back|_back_]]</br>
 <%=window.gm.player.name%> inventory: </br></br>
 <%
 var x = 0, id=''; 
@@ -143,56 +143,70 @@ for(var i=0;i<maxSlots;i++){
 </article><article id="LogPanel"></article></section>
 
 
-:: Relations [_back]
+:: Relations [_back_]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
-[[Back|_back]]</br>
+[[Back|_back_]]</br>
 <%=window.gm.player.name%> relations: </br></br>
 <%=window.gm.printRelationSummary()%>
 </article><article id="LogPanel"></article></section>
 
 
-:: Achievements [_back]
+:: Achievements [_back_]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
-[[Back|_back]]</br>
+[[Back|_back_]]</br>
 <%=window.gm.printAchievements()%>
 </article><article id="LogPanel"></article></section>
 
 
-:: Player_Dashboard [_back]
+:: Player_Dashboard [_back_]
 <!--a dashboard where the player can check his other stuff-->
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 Here you can check and modify several options: </br>
 Your outfit can only be changed by using a wardrobe.</br>
-[[Back|_back]] [[Status]] [[Relations]] [[Inventory]] [[QuestList]]</br>
+[[Back|_back_]] [[Status]] [[View|Mirror]] [[Inventory]] [[Relations]] [[QuestList]]</br>
 </article><article id="LogPanel"></article></section>
 
 
-:: TodoList
-<section> 
-<aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
-Picking up your Todo-List you read:</br>
-<%=window.gm.printTodoList()%>
-<%=window.story.render('qLaptop_Status')%>
-[[Next|<%=window.gm.player.location%>]]</br>
-</article><article id="LogPanel"></article></section>
-
-
-:: QuestList [_back]
+:: QuestList [_back_]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 </br>
 <%=window.gm.printQuestList()%>
-</br>[[Back|_back]]</br>
+</br>[[Back|_back_]]</br>
 </article><article id="LogPanel"></article></section>
 
 
-:: Wardrobe [_back]
+:: Mirror [_back_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+Checking out <%=window.gm.player.name%>:   [[Back|_back_]]</br>
+<div id='output'><div>
+<!--todo: set height depending on browsersize-->
+<!--<div id='Canvas' style='height: 30em;background: url("assets/doll/doll_small_xcf-Skirt.png") no-repeat center,url("assets/doll/doll_small_xcf-Body.png") no-repeat center, url(<%=window.gm.getScenePic(window.gm.player.location)%>)no-repeat center;color:black;'></div>-->
+</article><article id="LogPanel"></article></section>
+<script>
+function TorsoDescription() {
+	let msg="";
+	let vulva = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib['bVulva']);
+	let pierc = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib['pClit']);
+	if(vulva) {
+		msg += "You have a nice "+vulva.desc+" between your legs." 
+		if(pierc) {
+			msg += "A "+pierc.desc+" decorates your clit." 
+		}
+	}
+	return msg+"</br>";
+}
+window.gm.printOutput(TorsoDescription());
+</script>
+
+
+:: Wardrobe [_back_]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
-[[Back|_back]]</br>
+[[Back|_back_]]</br>
 <%=window.gm.player.name%> has equipped: <%=window.gm.printEquipmentSummary()%></br></br>
 (Tools and weapons can be changed via Inventory.)</br></br>
 In <%=window.gm.player.name%> wardrobe you find: </br></br>
@@ -208,18 +222,18 @@ for(var i=0;i<maxSlots;i++){
 %>
 </article><article id="LogPanel"></article></section>
 
-:: Settings [_back]
+:: Settings [_back_]
 <!--TODO what settings ?-->
 <section> 
 <!--<aside id="sidebar"></aside>--><article><%=window.story.render("CenterDialogs") %>
-[[Back|_back]]</br>
+[[Back|_back_]]</br>
 Theme:
 <a href="javascript:window.styleSwitcher.setStyle('default');window.gm.refreshAllPanel();">default</a>
 <a href="javascript:window.styleSwitcher.setStyle('dark');window.gm.refreshAllPanel();">dark</a>
 </article><article id="LogPanel"></article></section>
 
 
-:: Settings2 [_back]
+:: Settings2 [_back_]
 <!--just test-->
 <section> 
 <!--<aside id="sidebar"></aside>--><article><%=window.story.render("CenterDialogs") %>
@@ -237,18 +251,18 @@ img.src = imgsrc;//'https://twinery.org/homepage/img/logo.svg';   //todo the loa
       };
       onimage("assets/bird.gif");
     </script>
-[[Back|_back]]</br>
+[[Back|_back_]]</br>
 </article><article id="LogPanel"></article></section>
 
 
-:: Status [_back]
+:: Status [_back_]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
-Status of <%=window.gm.player.name%>:   [[Back|_back]]</br>
+Status of <%=window.gm.player.name%>:   [[Back|_back_]]</br>
 <a0 onclick='window.gm.printOutput(window.gm.printEffectSummary(window.gm.player.id,true,false));'>Stats</a>
 <a0 onclick='window.gm.printOutput(window.gm.printEffectSummary(window.gm.player.id,false,true));'>Fetish</a>
 </br><div id='output'></div></br>   <!--message is rendered here-->
-[[Back|_back]]</br>
+[[Back|_back_]]</br>
 </article><article id="LogPanel"></article></section>
 <script>
 window.gm.printOutput(window.gm.printEffectSummary(window.gm.player.id,true,false));
@@ -295,7 +309,7 @@ for(var i=0;_Entrys.length>i;i++) {
 }
 </script>
 
-:: _back
+:: _back_
 <!--this just exists because Back-links would rendered as non existent-->
 
 :: PassageTemplate [template] {"position":"250,500"}
@@ -305,9 +319,9 @@ The page should be setup like this:
 content here !
 </article><article id="LogPanel"></article></section>
 
-:: SubpanelTemplate [_back] {"position":"75,600"}
+:: SubpanelTemplate [_back_] {"position":"75,600"}
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
-If this is a subpanel you can use back-tag and _back-Link
-[[Back|_back]]</br>
+If this is a subpanel you can use back-tag and _back_-Link
+[[Back|_back_]]</br>
 </article><article id="LogPanel"></article></section>

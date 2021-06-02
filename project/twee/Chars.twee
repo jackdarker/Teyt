@@ -1,22 +1,22 @@
-:: Info_Jake [_back]
+:: Info_Jake [_back_]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 Jake is here.</br>
 You barely know anything about him.</br>
-[[Back|_back]]</br></br>
+[[Back|_back_]]</br></br>
 </article></section>
 
-:: Talk_Cyril [_back]
-<section> 
-<aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+:: Talk_Cyril [_back_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 Cyril is here.</br>
 <a0 onclick='window.gm.giveCyrilFood()'>Give him some food</a></br>
+<a0 onclick='window.gm.giveCyrilFood()'>Give him some food</a></br>
 </br><div id='output'></div></br>   <!--message is rendered here-->
-[[Back|_back]]</br></br>
+[[Back|_back_]]</br></br>
 </article></section>
 
 
-:: Info_Mom [_back]
+:: Info_Mom [_back_]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 Your mom is here.</br>
@@ -26,19 +26,14 @@ She gives you a hug.
 You can see a disapproving look on her face.
 <% }  %>
 </br>
-
-[[Back|_back]]</br></br>
+[[Back|_back_]]</br></br>
 </article></section>
 
-:: MutateTailCat
+:: MutateCat [_isdeffered_]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 <div id='output'></div></br>   <!--message is rendered here-->
-<% if(window.gm.hasDeferredEvent()){ %>
-<%= window.gm.showDeferredEvent() %>
-<%} else {%>
-[[Next|<%=window.gm.player.location%>]]</br>
-<%}%>
+<a0 onclick= window.story.show("")>Next</a></br>
 </article></section>
 <script>
 function mutate() {
@@ -59,20 +54,16 @@ function mutate() {
 mutate();
 </script>
 
-:: CatHabit
+:: CatHabit [_isdeffered_]
 <section> <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 You feel the urge to sit down and give yourself a good licking...</br>
-<% if(window.gm.hasDeferredEvent()){ %><%= window.gm.showDeferredEvent() %><%} else {%>
-[[Next|<%=window.gm.player.location%>]]</br>
-<%}%>
+<a0 onclick= window.story.show("")>Next</a></br>
 </article></section>
 
-:: MutateBreast
+:: MutateBreast [_isdeffered_]
 <section> <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 <div id='output'></div></br>   <!--message is rendered here-->
-<% if(window.gm.hasDeferredEvent()){ %> <%= window.gm.showDeferredEvent() %> <%} else {%>
-[[Next|<%=window.gm.player.location%>]]</br>
-<%}%>
+<a0 onclick= window.story.show("")>Next</a></br>
 </article></section>
 <script>
 function mutate() {
@@ -93,20 +84,16 @@ function mutate() {
 mutate();
 </script>
 
-:: MutateBreastEnd
+:: MutateBreastEnd [_isdeffered_]
 <section> <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 Somehow you know your breast stopped changing ...</br>
-<% if(window.gm.hasDeferredEvent()){ %><%= window.gm.showDeferredEvent() %><%} else {%>
-[[Next|<%=window.gm.player.location%>]]</br>
-<%}%>
+<a0 onclick= window.story.show("")>Next</a></br>
 </article></section>
 
-:: MutateVulva
+:: MutateVulva [_isdeffered_]
 <section> <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 <div id='output'></div></br>   <!--message is rendered here-->
-<% if(window.gm.hasDeferredEvent()){ %> <%= window.gm.showDeferredEvent() %> <%} else {%>
-[[Next|<%=window.gm.player.location%>]]</br>
-<%}%>
+<a0 onclick= window.story.show("")>Next</a></br>
 </article></section>
 <script>
 function mutate() {
@@ -129,10 +116,8 @@ mutate();
 </script>
 
 
-:: MutateVulvaEnd
+:: MutateVulvaEnd [_isdeffered_]
 <section> <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 Your cunt didnt change since some time now. At least you cant see any... </br>
-<% if(window.gm.hasDeferredEvent()){ %><%= window.gm.showDeferredEvent() %><%} else {%>
-[[Next|<%=window.gm.player.location%>]]</br>
-<%}%>
+<a0 onclick= window.story.show("")>Next</a></br>
 </article></section>

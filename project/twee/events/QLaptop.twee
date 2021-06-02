@@ -11,7 +11,7 @@
 </label></li>
 
 
-:: _Laptop_ [_back]
+:: _Laptop_ [_back_]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 You seat yourself in front of the laptop. </br>
@@ -21,4 +21,4 @@ The battery has run out of power but the powerconverter is missing. You need to 
 After pushing the powerbutton the pc takes ages to start.</br>
 todo mail,Browser</br>
 <%}%>
-[[Back|_back]]
+[[Back|_back_]]

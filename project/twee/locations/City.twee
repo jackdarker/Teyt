@@ -54,7 +54,7 @@ Where would you like to go from here?</br>
 <%};%>
 </article><article id="LogPanel"></article></section>
 
-:: Park_Jogging [_back]
+:: Park_Jogging [_back_]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 <%if(window.gm.player.Stats.get('energy').value<=50) {%>
@@ -72,7 +72,7 @@ After a quick warmup and stretching you take a fast pace jog around the outer pa
 } else {%>
     This time you didnt feel that kind of exhausted euphoria. Maybe you have to work harder. Or you are as fit as you can get with this workout. </br> 
 <%}}%>
-</br>[[Back|_back]]</br>
+</br>[[Back|_back_]]</br>
 </article><article id="LogPanel"></article></section>
 
 :: Beach
@@ -112,7 +112,7 @@ Where would you like to go from here?</br>
 </article><article id="LogPanel"></article></section>
 
 
-:: Pawn shop [_back]
+:: Pawn shop [_back_]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 <%window.gm.player.location=window.passage.name;%>
@@ -125,7 +125,7 @@ A sign denoting "quick money - no questions" sparks your interest. It leads you 
 <div id="panel"></div></br></br>    <!--display wares list-->
 Where would you like to go from here?</br>
 <a0 onclick=window.gm.rollExploreCity()>Explore your surroundings</a> </br></br>
-[[Back|_back]]</br>
+[[Back|_back_]]</br>
 </article><article id="LogPanel"></article></section>
 <script>
 var _Entrys = [];

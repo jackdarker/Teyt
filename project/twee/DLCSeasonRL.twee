@@ -138,12 +138,22 @@ You put your phone away. A shower and some sleep would be nice.</br>
 [[Next|Your Bedroom]]
 </article><article id="LogPanel"></article></section>
 
+:: VREquipment2
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+The email reads:
+"Dear tester, we just noticed that a part of the game equipment was not delivered to you. We will make another attempt to send it to you within short time."
+'But I have equipment received. I didnt notie anything missing.'
+[[Next]]</div></div>
+</article><article id="LogPanel"></article></section>
+
+
+
 :: ReceiveVREquipment2
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.quests.forceQuestMilestone("qDLCMain",500,100)%>
 As you got home from your daily chores and fiddling with the keys to your dorm, you find a sticky note on your door:</br>
 "Pickup parcel from Melanie"</br>
-'Melanie? parcel?' You slap your forehead 'Ah yes, that might be the gaming equiment.'</br>
+'Melanie? parcel?' You slap your forehead 'Ah yes, that might be the gaming equipment.'</br>
 <div id='select1' >
 <a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1a")'>knock at her door</a>
 </div></div>

@@ -480,25 +480,29 @@ class effTired extends Effect {
 class effMutateCat extends Effect {
     constructor() {
         super();
-        this.data.id = this.data.name= effMutateCat.name, this.data.duration = 60, this.data.hidden=0;
-
+        this.data.id = this.data.name= effMutateCat.name, this.data.hidden=0;
+        this.data.duration = 60,this.data.cycles = 3, this.data.magnitude = 3;
     }
     toJSON() {return window.storage.Generic_toJSON("effMutateCat", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(effMutateCat, value.data);};
-    get desc() {return(effMutateCat.name);}
+    get desc() {return("cat-tastic");}
 
     onTimeChange(time) {
         //after some time you mutate a bit
         this.data.duration-= window.gm.getDeltaTime(time,this.data.time);
         this.data.time = time;
         if(this.data.duration<=0) {
-        return(function(me){
-            return (function(Effects){ 
-                window.gm.pushDeferredEvent("MutateTailCat");
-                window.gm.pushDeferredEvent("CatHabit");
-                Effects.removeItem(me.data.id);});
-            }(this));
-        }
+            return(function(me){
+                return (function(Effects){ 
+                    if(me.data.cycles<=0) { 
+                        Effects.removeItem(me.data.id);
+                        window.gm.pushDeferredEvent("MutateCatEnd");
+                    }
+                    else window.gm.pushDeferredEvent("MutateCat");
+                    //window.gm.pushDeferredEvent("CatHabit");
+                    Effects.removeItem(me.data.id);});
+                }(this));
+            }
         return(null);
     }
     onApply(){

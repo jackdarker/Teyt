@@ -7,12 +7,12 @@ At the doorsteps of your home. </br>
 The following things are on your schedule-list:</br>
 <%=window.gm.printSchedule()%>
 </br></br><div>Where would you like to go?</br>
-[[Living_Room]]   [[Your Bedroom]]  [[Melanies Bedroom|NOP]] [[Kitchen]]  [[Garden]] [[Cellar|NOP]] </br>
+[[Living_Room]]   [[Your Bedroom]]  [[Melanies Bedroom]] [[Kitchen]]  [[Garden]] [[Cellar|NOP]] </br>
 [[Into the city]]</br></div>
 </article><article id="LogPanel"></article></section>
 <script>
 function checkQuest(){
-	if(window.story.state.vars.day>1 && window.gm.getTimeStruct().hour>12 && window.gm.quests.hasActiveQuest("qDLCMain",100)) {
+	if(window.story.state._gm.day>1 && window.gm.getTimeStruct().hour>12 && window.gm.quests.hasActiveQuest("qDLCMain",100)) {
 		window.story.show('ReceiveVREquipment');
 	}
 }
@@ -56,12 +56,12 @@ A double bed is there with [[nightstands|moms_treasure]] on each side. <br>
 </article><article id="LogPanel"></article></section>
 <script>
 function switchChar(elmnt) {
-	if(window.story.state.vars.activePlayer ==='Ratchel') {
+	if(window.story.state._gm.activePlayer ==='Ratchel') {
 		window.gm.switchPlayer('Cyril');
 	} else {
 		window.gm.switchPlayer('Ratchel');
 	}
-	elmnt.outerHTML=("<div class='red'>You are now playing as "+window.story.state.vars.activePlayer+". </div>");
+	elmnt.outerHTML=("<div class='red'>You are now playing as "+window.story.state._gm.activePlayer+". </div>");
 }
 function inviteChar(elmnt) {
 	if(window.gm.isInParty('Cyril')) {
@@ -75,12 +75,12 @@ function inviteChar(elmnt) {
 </script>
 
 
-:: moms_treasure [_back]
+:: moms_treasure [_back_]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 In one of the nightstand you find some handcuffs.They look thorough but you think they just might be used for some bedplay.</br>
 <a0 onclick='useHandcuff(this)'>Play with them</a></br>
-[[Back|_back]]</br>
+[[Back|_back_]]</br>
 </article><article id="LogPanel"></article></section>
 <script>
 function useHandcuff(elmnt) {
@@ -103,7 +103,7 @@ Above the desk is a window facing toward the backside of the house.</br>
 On the other side of the room is a large [[Wardrobe]] with a [[Mirror]] where you can take a look at yourself.
 There is a large bed for sleeping with a nightstand aside. </br>
 <!--todoYou are quite horny right now. Maybe you have some time to [[play with yourself|Masturbate]].</br>-->
-<a href="javascript:void(0)" onclick='($("tw-passage").fadeOut(1000, function() {window.gm.forwardTime((window.story.vars.time+100);window.story.show("Sleep");}));'>Nap 1hour</a>
+<a href="javascript:void(0)" onclick='($("tw-passage").fadeOut(1000, function() {window.gm.addTime(60);window.story.show("Sleep");}));'>Nap 1hour</a>
 <%if(window.gm.getTimeStruct().hour<11) { %>
 <a href="javascript:void(0)" onclick='($("tw-passage").fadeOut(1000, function() {window.gm.forwardTime(1800);window.story.show("Sleep");}));'>Sleep Until Evening</a> 
 <%} else {%>
@@ -129,11 +129,7 @@ Where do you want to go ? </br>
 You fall into your bedsheets and sleep until your smartphone buzzes you out of your dreams.</br>
 <!--deferred post sleep events-->
 </br><div id='output'></div>
-<% if(window.gm.hasDeferredEvent()){ %>
-<%= window.gm.showDeferredEvent() %>
-<%} else {%>
 </br>[[Next|<%=window.gm.player.location%>]]</br>
-<%} %>
 </article><article id="LogPanel"></article></section>
 <script>
 function checkJob() {
@@ -152,38 +148,14 @@ function checkJob() {
 window.gm.printOutput(checkJob());
 </script>
 
-
-:: Mirror [_back]
-<section> 
-<aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
-[[Back|_back]]</br>
-<div id='output'><div>
-<!--todo: set height depending on browsersize-->
-<div id='Canvas' style='height: 30em;background: url("assets/doll/doll_small_xcf-Skirt.png") no-repeat center,url("assets/doll/doll_small_xcf-Body.png") no-repeat center, url(<%=window.gm.getScenePic(window.gm.player.location)%>)no-repeat center;color:black;'></div>
-</article><article id="LogPanel"></article></section>
-<script>
-function NudeDescription() {
-	let msg="";
-	let vulva = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib['bVulva']);
-	let pierc = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib['pClit']);
-	if(vulva) {
-		msg += "You have a nice "+vulva.desc+" between your legs." 
-		if(pierc) {
-			msg += "A "+pierc.desc+" decorates your clit." 
-		}
-	}
-	return msg+"</br>";
-}
-window.gm.printOutput(NudeDescription());
-</script>
-
 :: Living_Room
-<section> 
-<aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 The living room that you share with your mom is sparsely decorated (until now).</br>
 An old wooden table with 4 chairs rests on a wornout green carpet.</br>
 Some money is laying on the table. Maybe mom forgot it there.</br>
 There is a brown couch with a television in front of it. A smaller table with a lamp on it is close by.</br>
+<a0 onclick='window.gm.pushDeferredEvent("Deffered1",[1,2])'>Deffered1</a></br>
+<a0 onclick='window.gm.pushDeferredEvent("Deffered2",[4,5])'>Deffered2</a></br>
 <a0 onclick="getMoney(this,5)">Get much money</a></br>
 <%if(window.gm.quests.getMilestoneState("qFixLaptop").id<1000){%>
 <a0 onclick='window.gm.quests.forceQuestMilestone("qFixLaptop",1000,1);window.gm.refreshAllPanel();'>take powerconverter for laptop</a>

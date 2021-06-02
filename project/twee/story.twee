@@ -10,8 +10,10 @@ teyt
 	"Start": "Intro",
 	"tag-colors": {
 		"template": "orange",
-		"_back": "gray",
-		"_nosave": "yellow"
+		"_back_": "gray",
+		"_nosave_": "yellow",
+		"_nodeffered_": "yellow",
+		"_isdeffered_": "brown"
 	},
 	"zoom": 1
 }

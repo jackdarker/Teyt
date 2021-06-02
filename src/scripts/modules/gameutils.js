@@ -1,10 +1,7 @@
 "use strict";
 /* bundles some utility operations*/
 
-window.gm.getSaveVersion= function(){
-    var version = [0,1,0];
-      return(version);    
-};
+window.gm.getSaveVersion= function(){   return([0,1,0]); };
 // reimplement to setup the game
 var _origInitGame = window.gm.initGame;
 window.gm.initGame= function(forceReset,NGP=null) {
@@ -17,13 +14,6 @@ window.gm.initGame= function(forceReset,NGP=null) {
         dbgShowCombatRoll: false,
         dbgShowQuestInfo: true,
         debugInv: new Inventory(),
-        version : window.gm.getSaveVersion(),
-        log : [],
-        passageStack : [], //used for passage [back] functionality
-        defferedStack : [], //used for deffered events
-        time : 700, //represented as hours*100 +minutes
-        day : 1,
-        activePlayer : '', //id of the character that the player controls currently
         //flags for global states
         qDogSit : 0,   // see park
         qUnlockCampus : 0,  //see passage into city
@@ -149,6 +139,14 @@ window.gm.respawn=function(keepInventory=false) {
     }
   }
 }
+//sets current player location and advances time
+//call this in passage header
+window.gm.moveHere = function(time=10){
+  if(window.gm.player.location!==window.passage.name) {
+    window.gm.player.location=window.passage.name;
+    window.gm.addTime(time); 
+  }
+};
 window.gm.rollExploreCity= function() {
   let s=window.story.state;
   let places=[];   
@@ -165,14 +163,14 @@ window.gm.rollExploreCity= function() {
   window.gm.addTime(20);
   window.story.show(places[r]);
 };
-window.gm.giveCyrilFood=function(){
+window.gm.giveCyrilFood= function(){
     if(window.gm.player.Inv.countItem('SimpleFood')>0) {
         var res=window.gm.player.Inv.use('SimpleFood', window.story.state.Cyril);
         window.gm.printOutput(res.msg);
     } else {
         window.gm.printOutput("you have no food to spare");
     }
-}
+};
 //print list of actions for actual day and hour
 window.gm.printSchedule = function(){
   var elmt='';
@@ -186,7 +184,7 @@ window.gm.printSchedule = function(){
       //NOP;
     } else if(jobs[i].isDisabled()===true) {
       elmt +=`<div>${jobs[i].disabledReason()}</div></br>`;
-    } else if(jobs[i].DoW.includes(now.DoW)&& s.vars.time>=jobs[i].startTimeMin && s.vars.time<jobs[i].startTimeMax) {
+    } else if(jobs[i].DoW.includes(now.DoW)&& s._gm.time>=jobs[i].startTimeMin && s._gm.time<jobs[i].startTimeMax) {
       if(window.gm.player.energy().value>=jobs[i].reqEnergy) {
         elmt +=`<a0 id='${id}' onclick='(function($event){window.story.show("${id}");})(this);'>${jobs[i].name} </a>`;
         elmt +=`</br><div>${jobs[i].descr} It might require ${(jobs[i].reqTime)} minutes of your time and around ${jobs[i].reqEnergy} energy.</div></br>`;

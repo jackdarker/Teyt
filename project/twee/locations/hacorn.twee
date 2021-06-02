@@ -1,11 +1,11 @@
-:: Harcon_Logistic_Ad [_back]
+:: Harcon_Logistic_Ad [_back_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <!--todo--> Auf dem maschinen-geschriebenen Zettel ist eine Teilzeit-Stelle in der Logistik-Abteilung ausgeschrieben.</br>
 'Logistic doesnt sound that interesting and I doubt that position is targeted to an engineer. Maybe I should show up there in person and check if that would be an option.'</br>
 The adress points to be somehwere around downtonw.</br>
 <a0 onclick='window.gm.quests.forceQuestMilestone("qFindAJob",100,1); window.story.show("ITD Office");'>Note down the adress</a></br>
 <div></br>
-[[Back|_back]]</br></div>
+[[Back|_back_]]</br></div>
 </article><article id="LogPanel"></article></section>
 
 :: Harcon_Health
