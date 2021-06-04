@@ -389,7 +389,10 @@ class effEnergized extends Effect {
         var delta = window.gm.getDeltaTime(time,this.data.time);
         this.data.time = time;
         this.data.duration-= delta;
-        if(this.data.duration<0) delta = delta+this.data.duration; // if delta is 20 but remaining duration is only 5, delta should be capped to 5
+        if(this.data.duration<0) {
+            delta = delta+this.data.duration; // if delta is 20 but remaining duration is only 5, delta should be capped to 5
+            this.data.duration =0;
+        }
         //Effects impact Stats:  Effect->Effects->Character->Stats    is there a prettier wy?
         this.parent.parent.Stats.increment('energy',10*delta/60);
         if(this.data.duration<=0) { //remove yourself
@@ -465,7 +468,7 @@ class effTired extends Effect {
         this.parent.parent.Stats.removeModifier('energyMax',{id:'energyMax:Tired'});
     }
     merge(neweffect) {
-        if(neweffect.name==='NotTired') {
+        if(neweffect.name==='effNotTired') {
             return(function(me){
                 return (function(Effects){ 
                 var newdata =new effNotTired(); Effects.replace(me.data.id,newdata);});

@@ -353,6 +353,24 @@ var Character = /*#__PURE__*/function () {
       };
     }
   }, {
+    key: "sleep",
+    value: function sleep() {
+      var until = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 700;
+
+      var _window$gm$forwardTim = window.gm.forwardTime(until),
+          msg = _window$gm$forwardTim.msg,
+          delta = _window$gm$forwardTim.delta;
+
+      var regen = delta >= 360 ? 9999 : parseInt(delta / 60 * 15); //todo scaling of regeneration
+
+      this.Stats.increment('health', regen);
+      this.Stats.increment('energy', regen);
+
+      if (delta > 360) {
+        this.Effects.addItem(effNotTired.name, new effNotTired());
+      }
+    }
+  }, {
     key: "addEffect",
     value: function addEffect(id, effect) {
       this.Effects.addItem(id, effect);
@@ -2209,8 +2227,36 @@ core functionality
 window.gm = window.gm || {}; //game related operations
 
 window.gm.util = window.gm.util || {}; //utility functions
-//-------------------------------------------------
+// helper for publisher/subscriber-pattern; myObject.ps =PubSub(); myObject.ps.subscribe(...
+
+window.gm.util.PubSub = function () {
+  return {
+    events: {},
+    subscribe: function subscribe(event, handler) {
+      if (!this.events[event]) {
+        this.events[event] = [];
+      }
+
+      this.events[event].push(handler);
+    },
+    unsubscribe: function unsubscribe(event, handler) {
+      if (!this.events[event]) return;
+      var i = this.events[event].indexOf(handler);
+      if (i >= 0) this.events.splice(i, 1);
+    },
+    publish: function publish(event, data) {
+      this.events[event] && this.events[event].forEach(publishData);
+
+      function publishData(handler) {
+        handler(data);
+      }
+
+      ;
+    }
+  };
+}; //-------------------------------------------------
 // reimplement to setup the game !
+
 
 window.gm.initGame = function (forceReset) {
   var NGP = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
@@ -2234,6 +2280,11 @@ window.gm.initGame = function (forceReset) {
     window.gm.refreshSidePanel();
   });
   var s = window.story.state; //s in template is window.story.state from snowman!
+
+  if (!window.gm.timeEvent || forceReset) {
+    window.gm.timeEvent = window.gm.util.PubSub(); //subscribe to "change" event to receive time updates
+    // !! make sure to reregister after load !
+  }
 
   if (!s.quests || forceReset) {
     s.quests = new QuestData();
@@ -2352,9 +2403,10 @@ window.gm.addTime = function (min) {
   while (window.story.state._gm.time >= 2400) {
     window.story.state._gm.time -= 2400;
     window.story.state._gm.day += 1;
-  }
+  } //window.gm.player.Effects.updateTime();
 
-  window.gm.player.Effects.updateTime();
+
+  window.gm.timeEvent.publish("change", min);
 };
 
 window.gm.getTimeString = function () {
@@ -2420,12 +2472,11 @@ window.gm.forwardTime = function (until) {
 
   msg += "</br>" + min % 60 + " hours pass by.</br>";
   window.gm.addTime(min);
-  var regen = min > 420 ? 999 : parseInt(min / 60 * 15); //todo scaling of regeneration
-
-  window.gm.player.Stats.increment('health', regen);
-  window.gm.player.Stats.increment('energy', regen);
   window.gm.pushLog(msg);
-  return msg;
+  return {
+    msg: msg,
+    delta: min
+  };
 }; // use: child._parent = window.gm.util.refToParent(parent);
 
 
@@ -3605,11 +3656,19 @@ var Equipment = /*#__PURE__*/function (_Item) {
         OK: false,
         msg: 'Cannot use.'
       };
-    }
+    } //more detailed description that should reflet if the item is worn or not; 
+
   }, {
     key: "descLong",
     value: function descLong(fconv) {
-      return fconv('$[I]$ $[have]$ ' + this.name + ".");
+      var msg = '';
+      if (this.isEquipped()) msg = '$[I]$ $[wear]$ ' + this.name + ".";else msg = '$[I]$ $[have]$ ' + this.name + ".";
+      return fconv(msg);
+    }
+  }, {
+    key: "isEquipped",
+    value: function isEquipped() {
+      return this.parent.parent.Outfit && this.parent.parent.Outfit.findItemSlot(this.id).length > 0;
     }
   }, {
     key: "canEquip",
@@ -3975,30 +4034,7 @@ var Outfit = /*#__PURE__*/function () {
 "use strict";
 /* classes to manage a quest
  */
-// helper for publisher/subscriber-pattern
-
-
-function PubSub() {
-  return {
-    events: {},
-    subscribe: function subscribe(event, handler) {
-      if (!this.events[event]) {
-        this.events[event] = [];
-      }
-
-      this.events[event].push(handler);
-    },
-    publish: function publish(event, data) {
-      this.events[event] && this.events[event].forEach(publishData);
-
-      function publishData(handler) {
-        handler(data);
-      }
-
-      ;
-    }
-  };
-} ///////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
 
 
 var QuestMilestone = /*#__PURE__*/function () {
@@ -4046,12 +4082,10 @@ var Quest = /*#__PURE__*/function () {
 
     _classCallCheck(this, Quest);
 
-    //this.pubSub = PubSub();
     this.id = id, this.name = name, this.descr = descr;
     this.HiddenCB = HiddenCB === null ? function () {
       return false;
-    } : HiddenCB; //this.finished = false; this.mile = null; 
-
+    } : HiddenCB;
     this.miles = new Map();
     window.storage.registerConstructor(Quest);
   }
@@ -4180,7 +4214,7 @@ var QuestManager = /*#__PURE__*/function () {
   function QuestManager(questDef) {
     _classCallCheck(this, QuestManager);
 
-    this.pubSub = PubSub();
+    this.pubSub = window.gm.util.PubSub();
     this.questDef = questDef;
   } // data is a QuestData-Object
 
@@ -4215,7 +4249,7 @@ var QuestManager = /*#__PURE__*/function () {
       }
 
       if (needsUpdate) this.tick();else {
-        window.getMatchedCSSRules.pushLog("cant force " + questId + " to " + mileId);
+        window.gm.pushLog("cant force " + questId + " to " + mileId);
       }
     } //this will get called - sometimes - and will trigger the conditioncheck of the milestones
 
@@ -5347,9 +5381,9 @@ var Stat = /*#__PURE__*/function () {
     key: "formatMsgStatChange",
     value: function formatMsgStatChange(attr, _new, _old) {
       if (_new - _old > 0) {
-        return '<statup>' + attr.id + " regenerated by " + (_new - _old).toFixed(1).toString() + "</statup></br>";
+        return '<statup>' + attr.id + "off" + this.parent.parent.name + " regenerated by " + (_new - _old).toFixed(1).toString() + "</statup></br>";
       } else if (_new - _old < 0) {
-        return '<statdown>' + attr.id + " decreased by " + (_new - _old).toFixed(1).toString() + "</statdown></br>";
+        return '<statdown>' + attr.id + "off" + this.parent.parent.name + " decreased by " + (_new - _old).toFixed(1).toString() + "</statdown></br>";
       }
 
       return "";
@@ -5401,6 +5435,7 @@ var Effects = /*#__PURE__*/function (_Inventory2) {
 
     _this3 = _super4.call(this, externlist);
     window.storage.registerConstructor(Effects);
+    window.gm.timeEvent.subscribe("change", _this3.updateTime.bind(_assertThisInitialized(_this3)));
     return _this3;
   }
 
@@ -5463,12 +5498,11 @@ var Effects = /*#__PURE__*/function (_Inventory2) {
           return;
         }
       } //or if there are similiar effects try to merge with them
+      //var _k = this.findEffect(effect.name);  
 
 
-      var _k = this.findEffect(effect.name);
-
-      for (var i = 0; i < _k.length; i++) {
-        var _old = this.list[_k];
+      for (var i = 0; i < this.list.length; i++) {
+        var _old = this.list[i].item;
         res = _old.merge(effect);
 
         if (res != null) {
@@ -5476,7 +5510,7 @@ var Effects = /*#__PURE__*/function (_Inventory2) {
 
 
           this.postItemChange(id, "merged", "");
-          break;
+          return;
         }
       } //else add it to list
 
@@ -5503,7 +5537,7 @@ var Effects = /*#__PURE__*/function (_Inventory2) {
 
 
       neweffect._parent = window.gm.util.refToParent(this);
-      this.list[_i].item = neweffect;
+      this.list[_i].id = neweffect.id, this.list[_i].item = neweffect;
       neweffect.onApply();
     }
   }, {
@@ -7639,7 +7673,9 @@ window.gm.initGame = function (forceReset) {
 
   _origInitGame(forceReset, NGP);
 
-  var s = window.story.state; //s in template is window.story.state from snowman!
+  var s = window.story.state;
+  s._gm.timeRL = s._gm.timeVR = s._gm.time;
+  s._gm.dayRL = s._gm.dayVR = s._gm.day;
 
   if (!s.vars || forceReset) {
     var _s$vars;
@@ -7838,13 +7874,22 @@ window.gm.getScenePic = function (id) {
 
 window.gm.enterVR = function () {
   //todo update effects in VR but stop RL effects
-  window.gm.switchPlayer("PlayerVR");
+  var s = window.story.state;
+  window.gm.switchPlayer("PlayerVR"); //time in VR is paused when in RL
+
+  s._gm.timeRL = s._gm.time, s._gm.dayRL = s._gm.day;
+  s._gm.time = s._gm.timeVR, s._gm.day = s._gm.dayVR;
+  window.gm.addTime(0);
   window.gm.respawn(true);
 };
 
 window.gm.leaveVR = function () {
   //todo update effects in VR but stop RL effects
-  window.gm.switchPlayer("PlayerRL");
+  window.gm.switchPlayer("PlayerRL"); //while in VR time in RL is paused but advances 1h on leave??
+
+  s._gm.timeVR = s._gm.time, s._gm.dayVR = s._gm.day;
+  s._gm.time = s._gm.timeRL, s._gm.day = s._gm.dayRL;
+  window.gm.addTime(60);
 }; //heal player and remove inventory
 
 
@@ -9139,7 +9184,9 @@ var Pullover = /*#__PURE__*/function (_Equipment16) {
   _createClass(Pullover, [{
     key: "descLong",
     value: function descLong(fconv) {
-      return fconv('A warm pullover adorns $[me]$.');
+      var msg = '';
+      if (this.isEquipped()) msg = 'A warm pullover adorns $[me]$.';else msg = '$[I]$ $[have]$ ' + this.name + ".";
+      return fconv(msg);
     }
   }, {
     key: "toJSON",
@@ -9207,8 +9254,8 @@ var HandCuffs = /*#__PURE__*/function (_Equipment17) {
     key: "use",
     value: function use(context) {
       //context here is inventory not outfit
-      if (this.parent.parent.Outfit.findItemSlot(this.name).length > 0) {
-        this.parent.parent.Outfit.removeItem(this.name);
+      if (this.parent.parent.Outfit.findItemSlot(this.id).length > 0) {
+        this.parent.parent.Outfit.removeItem(this.id);
         return {
           OK: true,
           msg: 'unequipped ' + this.name
@@ -9224,7 +9271,7 @@ var HandCuffs = /*#__PURE__*/function (_Equipment17) {
   }, {
     key: "canEquip",
     value: function canEquip() {
-      if (this.parent.parent.Outfit.findItemSlot(this.name).length > 0) return {
+      if (this.parent.parent.Outfit.findItemSlot(this.id).length > 0) return {
         OK: true,
         msg: 'unequip'
       }; //todo check for key
@@ -9287,8 +9334,8 @@ var WristCuffs = /*#__PURE__*/function (_Equipment18) {
     key: "use",
     value: function use(context) {
       //context here is inventory not outfit
-      if (this.parent.parent.Outfit.findItemSlot(this.name).length > 0) {
-        this.parent.parent.Outfit.removeItem(this.name);
+      if (this.parent.parent.Outfit.findItemSlot(this.id).length > 0) {
+        this.parent.parent.Outfit.removeItem(this.id);
         return {
           OK: true,
           msg: 'unequipped ' + this.name
@@ -9304,7 +9351,7 @@ var WristCuffs = /*#__PURE__*/function (_Equipment18) {
   }, {
     key: "canEquip",
     value: function canEquip() {
-      if (this.parent.parent.Outfit.findItemSlot(this.name).length > 0) return {
+      if (this.parent.parent.Outfit.findItemSlot(this.id).length > 0) return {
         OK: true,
         msg: 'unequip'
       };else return {
@@ -9366,8 +9413,8 @@ var CollarQuest = /*#__PURE__*/function (_Equipment19) {
     key: "use",
     value: function use(context) {
       //context here is inventory not outfit
-      if (this.parent.parent.Outfit.findItemSlot(this.name).length > 0) {
-        this.parent.parent.Outfit.removeItem(this.name);
+      if (this.parent.parent.Outfit.findItemSlot(this.id).length > 0) {
+        this.parent.parent.Outfit.removeItem(this.id);
         return {
           OK: true,
           msg: 'unequipped ' + this.name
@@ -9383,7 +9430,7 @@ var CollarQuest = /*#__PURE__*/function (_Equipment19) {
   }, {
     key: "canEquip",
     value: function canEquip() {
-      if (this.parent && this.parent.parent.Outfit.findItemSlot(this.name).length > 0) return {
+      if (this.parent && this.parent.parent.Outfit.findItemSlot(this.id).length > 0) return {
         OK: true,
         msg: 'unequip'
       };else return {
@@ -9506,6 +9553,11 @@ var Crowbar = /*#__PURE__*/function (_Equipment21) {
   }
 
   _createClass(Crowbar, [{
+    key: "descLong",
+    value: function descLong(fconv) {
+      return fconv('A warm pullover adorns $[me]$.');
+    }
+  }, {
     key: "toJSON",
     value: function toJSON() {
       return window.storage.Generic_toJSON("Crowbar", this);
@@ -9519,8 +9571,8 @@ var Crowbar = /*#__PURE__*/function (_Equipment21) {
     key: "use",
     value: function use(context) {
       //context here is inventory not outfit
-      if (this.parent.parent.Outfit.findItemSlot(this.name).length > 0) {
-        this.parent.parent.Outfit.removeItem(this.name);
+      if (this.parent.parent.Outfit.findItemSlot(this.id).length > 0) {
+        this.parent.parent.Outfit.removeItem(this.id);
         return {
           OK: true,
           msg: 'unequipped ' + this.name
@@ -9536,7 +9588,7 @@ var Crowbar = /*#__PURE__*/function (_Equipment21) {
   }, {
     key: "canEquip",
     value: function canEquip() {
-      if (this.parent.parent.Outfit.findItemSlot(this.name).length > 0) return {
+      if (this.parent.parent.Outfit.findItemSlot(this.id).length > 0) return {
         OK: true,
         msg: 'unequip'
       };else return {
@@ -9578,7 +9630,7 @@ var Crowbar = /*#__PURE__*/function (_Equipment21) {
   }, {
     key: "desc",
     get: function get() {
-      return 'A durable crowbar.';
+      return 'durable crowbar.';
     }
   }], [{
     key: "fromJSON",
@@ -9622,8 +9674,8 @@ var Shovel = /*#__PURE__*/function (_Equipment22) {
     key: "use",
     value: function use(context) {
       //context here is inventory not outfit
-      if (this.parent.parent.Outfit.findItemSlot(this.name).length > 0) {
-        this.parent.parent.Outfit.removeItem(this.name);
+      if (this.parent.parent.Outfit.findItemSlot(this.id).length > 0) {
+        this.parent.parent.Outfit.removeItem(this.id);
         return {
           OK: true,
           msg: 'unequipped ' + this.name
@@ -9639,7 +9691,7 @@ var Shovel = /*#__PURE__*/function (_Equipment22) {
   }, {
     key: "canEquip",
     value: function canEquip() {
-      if (this.parent.parent.Outfit.findItemSlot(this.name).length > 0) return {
+      if (this.parent.parent.Outfit.findItemSlot(this.id).length > 0) return {
         OK: true,
         msg: 'unequip'
       };else return {
@@ -9778,8 +9830,8 @@ var StaffWodden = /*#__PURE__*/function (_Equipment24) {
     key: "use",
     value: function use(context) {
       //context here is inventory not outfit
-      if (this.parent.parent.Outfit.findItemSlot(this.name).length > 0) {
-        this.parent.parent.Outfit.removeItem(this.name);
+      if (this.parent.parent.Outfit.findItemSlot(this.id).length > 0) {
+        this.parent.parent.Outfit.removeItem(this.id);
         return {
           OK: true,
           msg: 'unequipped ' + this.name
@@ -9795,7 +9847,7 @@ var StaffWodden = /*#__PURE__*/function (_Equipment24) {
   }, {
     key: "canEquip",
     value: function canEquip() {
-      if (this.parent.parent.Outfit.findItemSlot(this.name).length > 0) return {
+      if (this.parent.parent.Outfit.findItemSlot(this.id).length > 0) return {
         OK: true,
         msg: 'unequip'
       };else return {
@@ -9873,7 +9925,7 @@ var TailRibbon = /*#__PURE__*/function (_Equipment25) {
   }, {
     key: "canEquip",
     value: function canEquip() {
-      if (this.parent.parent.Outfit.findItemSlot(this.name).length > 0) return {
+      if (this.parent.parent.Outfit.findItemSlot(this.id).length > 0) return {
         OK: true,
         msg: 'unequip'
       }; //todo check for key
@@ -12047,8 +12099,13 @@ var effEnergized = /*#__PURE__*/function (_Effect2) {
       var delta = window.gm.getDeltaTime(time, this.data.time);
       this.data.time = time;
       this.data.duration -= delta;
-      if (this.data.duration < 0) delta = delta + this.data.duration; // if delta is 20 but remaining duration is only 5, delta should be capped to 5
-      //Effects impact Stats:  Effect->Effects->Character->Stats    is there a prettier wy?
+
+      if (this.data.duration < 0) {
+        delta = delta + this.data.duration; // if delta is 20 but remaining duration is only 5, delta should be capped to 5
+
+        this.data.duration = 0;
+      } //Effects impact Stats:  Effect->Effects->Character->Stats    is there a prettier wy?
+
 
       this.parent.parent.Stats.increment('energy', 10 * delta / 60);
 
@@ -12210,7 +12267,7 @@ var effTired = /*#__PURE__*/function (_Effect4) {
   }, {
     key: "merge",
     value: function merge(neweffect) {
-      if (neweffect.name === 'NotTired') {
+      if (neweffect.name === 'effNotTired') {
         return function (me) {
           return function (Effects) {
             var newdata = new effNotTired();
@@ -13951,13 +14008,19 @@ for(var i=0;i&lt;maxSlots;i++){
   %&gt;&lt;%=window.gm.printEquipment(id,inv.getItem(id).desc)%&gt;&lt;%
 } 
 %&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="64" name="Settings" tags="_back_" position="475,850" size="100,100">&lt;!--TODO what settings ?--&gt;
-&lt;section&gt; 
-&lt;!--&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;--&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="64" name="Settings" tags="_back_" position="475,850" size="100,100">&lt;section&gt; &lt;!--&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;--&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 [[Back|_back_]]&lt;/br&gt;
 Theme:
 &lt;a href=&quot;javascript:window.styleSwitcher.setStyle(&#39;default&#39;);window.gm.refreshAllPanel();&quot;&gt;default&lt;/a&gt;
-&lt;a href=&quot;javascript:window.styleSwitcher.setStyle(&#39;dark&#39;);window.gm.refreshAllPanel();&quot;&gt;dark&lt;/a&gt;
+&lt;a href=&quot;javascript:window.styleSwitcher.setStyle(&#39;dark&#39;);window.gm.refreshAllPanel();&quot;&gt;dark&lt;/a&gt;&lt;/br&gt;
+&lt;!--TODO what settings ?--&gt;
+*  Disable over-penetration &lt;/br&gt;
+A lot of female are not happy about the fact that many erotic fiction or imagery picture the penetration of cervix because its pretty painful. You might disable this here therefore. &lt;/br&gt;
+On the other hand a lot of males have some kind of fetish for this. &lt;/br&gt;
+
+*  Less-sex-mode
+If you enable this your route to bad end by sex-related action is much shorter. This should enforce a more chaste play.&lt;/br&gt;
+
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="65" name="Settings2" tags="_back_" position="600,850" size="100,100">&lt;!--just test--&gt;
 &lt;section&gt; 
 &lt;!--&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;--&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
@@ -15971,9 +16034,9 @@ There is a large bed for sleeping with a nightstand aside. &lt;/br&gt;
 &lt;!--todoYou are quite horny right now. Maybe you have some time to [[play with yourself|Masturbate]].&lt;/br&gt;--&gt;
 &lt;a href=&quot;javascript:void(0)&quot; onclick=&#39;($(&quot;tw-passage&quot;).fadeOut(1000, function() {window.gm.addTime(60);window.story.show(&quot;Sleep&quot;);}));&#39;&gt;Nap 1hour&lt;/a&gt;
 &lt;%if(window.gm.getTimeStruct().hour&lt;11) { %&gt;
-&lt;a href=&quot;javascript:void(0)&quot; onclick=&#39;($(&quot;tw-passage&quot;).fadeOut(1000, function() {window.gm.forwardTime(1800);window.story.show(&quot;Sleep&quot;);}));&#39;&gt;Sleep Until Evening&lt;/a&gt; 
+&lt;a href=&quot;javascript:void(0)&quot; onclick=&#39;($(&quot;tw-passage&quot;).fadeOut(1000, function() {window.gm.player.sleep(1800);window.story.show(&quot;Sleep&quot;);}));&#39;&gt;Sleep Until Evening&lt;/a&gt; 
 &lt;%} else {%&gt;
-&lt;a href=&quot;javascript:void(0)&quot; onclick=&#39;($(&quot;tw-passage&quot;).fadeOut(1000, function() {window.gm.forwardTime(700);window.story.show(&quot;Sleep&quot;);}));&#39;&gt;Sleep Until Morning&lt;/a&gt;
+&lt;a href=&quot;javascript:void(0)&quot; onclick=&#39;($(&quot;tw-passage&quot;).fadeOut(1000, function() {window.gm.player.sleep(700);window.story.show(&quot;Sleep&quot;);}));&#39;&gt;Sleep Until Morning&lt;/a&gt;
 &lt;%}%&gt;
 &lt;div &lt;%=((window.gm.quests.getMilestoneState(&quot;qDLCMain&quot;).id&lt;600)?&quot;hidden&quot;:&quot;&quot;) %&gt; &gt;That bulky VR-scaffold is taking up a lot of space.  
 	&lt;%if(window.gm.getTimeStruct().hour&gt;13){%&gt;
@@ -15990,7 +16053,6 @@ Where do you want to go ? &lt;/br&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="155" name="Sleep" tags="" position="600,1975" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 You fall into your bedsheets and sleep until your smartphone buzzes you out of your dreams.&lt;/br&gt;
-&lt;!--deferred post sleep events--&gt;
 &lt;/br&gt;&lt;div id=&#39;output&#39;&gt;&lt;/div&gt;
 &lt;/br&gt;[[Next|&lt;%=window.gm.player.location%&gt;]]&lt;/br&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;

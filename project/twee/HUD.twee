@@ -208,13 +208,20 @@ for(var i=0;i<maxSlots;i++){
 </article><article id="LogPanel"></article></section>
 
 :: Settings [_back_]
-<!--TODO what settings ?-->
-<section> 
-<!--<aside id="sidebar"></aside>--><article><%=window.story.render("CenterDialogs") %>
+
+<section> <!--<aside id="sidebar"></aside>--><article><%=window.story.render("CenterDialogs") %>
 [[Back|_back_]]</br>
 Theme:
 <a href="javascript:window.styleSwitcher.setStyle('default');window.gm.refreshAllPanel();">default</a>
-<a href="javascript:window.styleSwitcher.setStyle('dark');window.gm.refreshAllPanel();">dark</a>
+<a href="javascript:window.styleSwitcher.setStyle('dark');window.gm.refreshAllPanel();">dark</a></br>
+<!--TODO what settings ?-->
+*  Disable over-penetration </br>
+A lot of female are not happy about the fact that many erotic fiction or imagery picture the penetration of cervix because its pretty painful. You might disable this here therefore. </br>
+On the other hand a lot of males have some kind of fetish for this. </br>
+
+*  Less-sex-mode
+If you enable this your route to bad end by sex-related action is much shorter. This should enforce a more chaste play.</br>
+
 </article><article id="LogPanel"></article></section>
 
 

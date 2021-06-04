@@ -105,9 +105,9 @@ There is a large bed for sleeping with a nightstand aside. </br>
 <!--todoYou are quite horny right now. Maybe you have some time to [[play with yourself|Masturbate]].</br>-->
 <a href="javascript:void(0)" onclick='($("tw-passage").fadeOut(1000, function() {window.gm.addTime(60);window.story.show("Sleep");}));'>Nap 1hour</a>
 <%if(window.gm.getTimeStruct().hour<11) { %>
-<a href="javascript:void(0)" onclick='($("tw-passage").fadeOut(1000, function() {window.gm.forwardTime(1800);window.story.show("Sleep");}));'>Sleep Until Evening</a> 
+<a href="javascript:void(0)" onclick='($("tw-passage").fadeOut(1000, function() {window.gm.player.sleep(1800);window.story.show("Sleep");}));'>Sleep Until Evening</a> 
 <%} else {%>
-<a href="javascript:void(0)" onclick='($("tw-passage").fadeOut(1000, function() {window.gm.forwardTime(700);window.story.show("Sleep");}));'>Sleep Until Morning</a>
+<a href="javascript:void(0)" onclick='($("tw-passage").fadeOut(1000, function() {window.gm.player.sleep(700);window.story.show("Sleep");}));'>Sleep Until Morning</a>
 <%}%>
 <div <%=((window.gm.quests.getMilestoneState("qDLCMain").id<600)?"hidden":"") %> >That bulky VR-scaffold is taking up a lot of space.  
 	<%if(window.gm.getTimeStruct().hour>13){%>
@@ -127,7 +127,6 @@ Where do you want to go ? </br>
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 You fall into your bedsheets and sleep until your smartphone buzzes you out of your dreams.</br>
-<!--deferred post sleep events-->
 </br><div id='output'></div>
 </br>[[Next|<%=window.gm.player.location%>]]</br>
 </article><article id="LogPanel"></article></section>

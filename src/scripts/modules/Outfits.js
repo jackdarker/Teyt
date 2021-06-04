@@ -59,7 +59,12 @@ class Pullover extends Equipment {
         this.tags = ['cloth'];
         this.slotUse = ['Breast','Stomach','Arms'];
     }
-    descLong(fconv) {return(fconv('A warm pullover adorns $[me]$.'));}
+    descLong(fconv) {
+        let msg='';
+        if(this.isEquipped()) msg='A warm pullover adorns $[me]$.';
+        else msg='$[I]$ $[have]$ '+this.name+".";
+        return(fconv(msg));
+    }
     get desc() { return 'warm pullover';}
     toJSON() {return window.storage.Generic_toJSON("Pullover", this); };
     static fromJSON(value) {return(window.storage.Generic_fromJSON(Pullover, value.data));}
@@ -77,8 +82,8 @@ class HandCuffs extends Equipment {
     static fromJSON(value) {return(window.storage.Generic_fromJSON(HandCuffs, value.data));}
     usable(context) {return(this.canEquip());}
     use(context) { //context here is inventory not outfit
-        if(this.parent.parent.Outfit.findItemSlot(this.name).length>0) {  
-            this.parent.parent.Outfit.removeItem(this.name); 
+        if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) {  
+            this.parent.parent.Outfit.removeItem(this.id); 
             return( {OK:true, msg:'unequipped '+ this.name}); //todo
         } else {
             this.parent.parent.Outfit.addItem(this); 
@@ -86,7 +91,7 @@ class HandCuffs extends Equipment {
         }
     }
     canEquip() { 
-        if(this.parent.parent.Outfit.findItemSlot(this.name).length>0) return({OK:true, msg:'unequip'});    //todo check for key
+        if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) return({OK:true, msg:'unequip'});    //todo check for key
         else return({OK:true, msg:'equip'});
     }
     canUnequip() {return({OK:false, msg:'You need to find a key first to be able to remove it!'});}
@@ -103,8 +108,8 @@ class WristCuffs extends Equipment {
     static fromJSON(value) {return(window.storage.Generic_fromJSON(WristCuffs, value.data));}
     usable(context) {return(this.canEquip());}
     use(context) { //context here is inventory not outfit
-        if(this.parent.parent.Outfit.findItemSlot(this.name).length>0) {  
-            this.parent.parent.Outfit.removeItem(this.name); 
+        if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) {  
+            this.parent.parent.Outfit.removeItem(this.id); 
             return( {OK:true, msg:'unequipped '+ this.name}); //todo
         } else {
             this.parent.parent.Outfit.addItem(this); 
@@ -112,7 +117,7 @@ class WristCuffs extends Equipment {
         }
     }
     canEquip() { 
-        if(this.parent.parent.Outfit.findItemSlot(this.name).length>0) return({OK:true, msg:'unequip'});
+        if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) return({OK:true, msg:'unequip'});
         else return({OK:true, msg:'equip'});
     }
     canUnequip() {return({OK:false, msg:'Those cuffs can only be removed by a magican!'});}
@@ -129,8 +134,8 @@ class CollarQuest extends Equipment {
     static fromJSON(value) {return(window.storage.Generic_fromJSON(CollarQuest, value.data));}
     usable(context) {return(this.canEquip());}
     use(context) { //context here is inventory not outfit
-        if(this.parent.parent.Outfit.findItemSlot(this.name).length>0) {  
-            this.parent.parent.Outfit.removeItem(this.name); 
+        if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) {  
+            this.parent.parent.Outfit.removeItem(this.id); 
             return( {OK:true, msg:'unequipped '+ this.name}); //todo
         } else {
             this.parent.parent.Outfit.addItem(this); 
@@ -138,7 +143,7 @@ class CollarQuest extends Equipment {
         }
     }
     canEquip() { 
-        if(this.parent && this.parent.parent.Outfit.findItemSlot(this.name).length>0) return({OK:true, msg:'unequip'});
+        if(this.parent && this.parent.parent.Outfit.findItemSlot(this.id).length>0) return({OK:true, msg:'unequip'});
         else return({OK:true, msg:'equip'});
     }
     canUnequip() {return({OK:false, msg:'This can only be removed by a magican!'});}
@@ -178,13 +183,14 @@ class Crowbar extends Equipment {
         this.slotUse = ['RHand'];
         this.lossOnRespawn = true;
     }
-    get desc() { return 'A durable crowbar.';}
+    descLong(fconv) {return(fconv('A warm pullover adorns $[me]$.'));}
+    get desc() { return 'durable crowbar.';}
     toJSON() {return window.storage.Generic_toJSON("Crowbar", this); };
     static fromJSON(value) {return(window.storage.Generic_fromJSON(Crowbar, value.data));}
     usable(context) {return(this.canEquip());}
     use(context) { //context here is inventory not outfit
-        if(this.parent.parent.Outfit.findItemSlot(this.name).length>0) {  
-            this.parent.parent.Outfit.removeItem(this.name); 
+        if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) {  
+            this.parent.parent.Outfit.removeItem(this.id); 
             return( {OK:true, msg:'unequipped '+ this.name}); //todo
         } else {
             this.parent.parent.Outfit.addItem(this); 
@@ -192,7 +198,7 @@ class Crowbar extends Equipment {
         }
     }
     canEquip() { 
-        if(this.parent.parent.Outfit.findItemSlot(this.name).length>0) return({OK:true, msg:'unequip'});
+        if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) return({OK:true, msg:'unequip'});
         else return({OK:true, msg:'equip'});
     }
     canUnequip() {return({OK:true, msg:'unequipable'});}
@@ -216,8 +222,8 @@ class Shovel extends Equipment {
     static fromJSON(value) {return(window.storage.Generic_fromJSON(Shovel, value.data));}
     usable(context) {return(this.canEquip());}
     use(context) { //context here is inventory not outfit
-        if(this.parent.parent.Outfit.findItemSlot(this.name).length>0) {  
-            this.parent.parent.Outfit.removeItem(this.name); 
+        if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) {  
+            this.parent.parent.Outfit.removeItem(this.id); 
             return( {OK:true, msg:'unequipped '+ this.name}); //todo
         } else {
             this.parent.parent.Outfit.addItem(this); 
@@ -225,7 +231,7 @@ class Shovel extends Equipment {
         }
     }
     canEquip() {
-        if(this.parent.parent.Outfit.findItemSlot(this.name).length>0) return({OK:true, msg:'unequip'});
+        if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) return({OK:true, msg:'unequip'});
         else return({OK:true, msg:'equip'});
     }
     canUnequip() {return({OK:true, msg:'unequipable'});}
@@ -262,8 +268,8 @@ class StaffWodden extends Equipment {
     static fromJSON(value) {return(window.storage.Generic_fromJSON(StaffWodden, value.data));}
     usable(context) {return(this.canEquip());}
     use(context) { //context here is inventory not outfit
-        if(this.parent.parent.Outfit.findItemSlot(this.name).length>0) {  
-            this.parent.parent.Outfit.removeItem(this.name); 
+        if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) {  
+            this.parent.parent.Outfit.removeItem(this.id); 
             return( {OK:true, msg:'unequipped '+ this.name}); //todo
         } else {
             this.parent.parent.Outfit.addItem(this); 
@@ -271,7 +277,7 @@ class StaffWodden extends Equipment {
         }
     }
     canEquip() {
-        if(this.parent.parent.Outfit.findItemSlot(this.name).length>0) return({OK:true, msg:'unequip'});
+        if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) return({OK:true, msg:'unequip'});
         else return({OK:true, msg:'equip'});
     }
     canUnequip() {return({OK:true, msg:'unequipable'});}
@@ -292,7 +298,7 @@ class TailRibbon extends Equipment {
     toJSON() {return window.storage.Generic_toJSON("TailRibbon", this); };
     static fromJSON(value) {return(window.storage.Generic_fromJSON(TailRibbon, value.data));}
     canEquip() { 
-        if(this.parent.parent.Outfit.findItemSlot(this.name).length>0) return({OK:true, msg:'unequip'});    //todo check for key
+        if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) return({OK:true, msg:'unequip'});    //todo check for key
         else {
             if(this.parent.parent.Outfit.countItem("TailCat")>0) {
                 return({OK:true, msg:'equip'}); 

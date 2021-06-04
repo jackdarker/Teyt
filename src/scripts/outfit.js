@@ -113,7 +113,14 @@ class Equipment extends Item {
     //for compatibility with item
     usable(context) {return({OK:false, msg:'Useable in wardrobe'});}
     use(context) {return({OK:false, msg:'Cannot use.'});}
-    descLong(fconv) {return(fconv('$[I]$ $[have]$ '+this.name+"."));}
+    //more detailed description that should reflet if the item is worn or not; 
+    descLong(fconv) { 
+        let msg='';
+        if(this.isEquipped()) msg='$[I]$ $[wear]$ '+this.name+".";
+        else msg='$[I]$ $[have]$ '+this.name+".";
+        return(fconv(msg));
+    }
+    isEquipped() { return(this.parent.parent.Outfit && this.parent.parent.Outfit.findItemSlot(this.id).length>0);}
     canEquip() {return({OK:false, msg:'unusable'});}
     canUnequip() {return({OK:false, msg:'unusable'});}
     onEquip() {return({OK:true, msg:'equipped'});}

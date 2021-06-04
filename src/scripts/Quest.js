@@ -2,25 +2,7 @@
 /* classes to manage a quest
  */
 
-// helper for publisher/subscriber-pattern
-function PubSub() {
-    return {
-        events: {},
-        subscribe: function (event, handler) {
-            if (!this.events[event]) {
-                this.events[event] = [];    
-            }
-            this.events[event].push(handler);
-        },
-        publish: function (event, data) {
-            this.events[event] && this.events[event].forEach(publishData);
 
-            function publishData(handler) {
-                handler(data);   
-            };
-        }
-    };   
-}
 
 ///////////////////////////////////////////////////////////////
 class QuestMilestone {
@@ -44,10 +26,8 @@ class QuestMilestone {
 // a Quest contains multiple milestones
 class Quest  { 
     constructor(id,name,descr,HiddenCB=null) {
-        //this.pubSub = PubSub();
         this.id =id,this.name=name,this.descr =descr;
         this.HiddenCB = (HiddenCB===null)? (function(){return(false);}): HiddenCB;
-        //this.finished = false; this.mile = null; 
         this.miles=new Map();
         window.storage.registerConstructor(Quest);
     }
@@ -146,7 +126,7 @@ class QuestData {
 class QuestManager {
     //questDef is an object with properties that contain a quest-object and its milestones: questDef["myQuest"] = new Quest("myQuest") 
     constructor(questDef) {
-        this.pubSub = PubSub();
+        this.pubSub = window.gm.util.PubSub();
         this.questDef = questDef;           
     }
     // data is a QuestData-Object
@@ -173,7 +153,7 @@ class QuestManager {
         }
         if(needsUpdate) this.tick();
         else {
-            window.getMatchedCSSRules.pushLog("cant force "+questId +" to "+mileId);
+            window.gm.pushLog("cant force "+questId +" to "+mileId);
         }
     }
     //this will get called - sometimes - and will trigger the conditioncheck of the milestones

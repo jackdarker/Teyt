@@ -126,7 +126,15 @@ class Character {
     energy() {
         return({value:this.Stats.get('energy').value, max:this.Stats.get('energyMax').value, min:0});
     }
-
+    sleep(until=700) {
+        let {msg,delta}=window.gm.forwardTime(until);
+        let regen = delta>=360 ? 9999 : parseInt(delta/60*15);  //todo scaling of regeneration
+        this.Stats.increment('health',regen);
+        this.Stats.increment('energy',regen);
+        if(delta>360) {
+            this.Effects.addItem(effNotTired.name, new effNotTired());
+        } 
+    }
     addEffect(id,effect) {
         this.Effects.addItem(id,effect);
     }

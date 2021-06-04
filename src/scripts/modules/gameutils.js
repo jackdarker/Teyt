@@ -3,11 +3,13 @@
 
 window.gm.getSaveVersion= function(){   return([0,1,0]); };
 // reimplement to setup the game
-var _origInitGame = window.gm.initGame;
+let _origInitGame = window.gm.initGame;
 window.gm.initGame= function(forceReset,NGP=null) {
   _origInitGame(forceReset,NGP);
     
-    var s = window.story.state; //s in template is window.story.state from snowman!
+    var s = window.story.state;
+    s._gm.timeRL= s._gm.timeVR = s._gm.time;
+    s._gm.dayRL= s._gm.dayVR = s._gm.day;
     if (!s.vars||forceReset) { // storage of variables that doesnt fit player
         s.vars = {
         debug : 1,   //TODO set to 0 for distribution !   see debug passage for meaning
@@ -147,12 +149,21 @@ window.gm.getScenePic = function(id){
 }
 window.gm.enterVR=function() {
   //todo update effects in VR but stop RL effects
+  let s= window.story.state;
   window.gm.switchPlayer("PlayerVR");
+  //time in VR is paused when in RL
+  s._gm.timeRL = s._gm.time,s._gm.dayRL = s._gm.day;
+  s._gm.time = s._gm.timeVR,s._gm.day = s._gm.dayVR;
+  window.gm.addTime(0);
   window.gm.respawn(true);
 }
 window.gm.leaveVR=function() {
   //todo update effects in VR but stop RL effects
   window.gm.switchPlayer("PlayerRL");
+  //while in VR time in RL is paused but advances 1h on leave??
+  s._gm.timeVR = s._gm.time,s._gm.dayVR = s._gm.day;
+  s._gm.time = s._gm.timeRL,s._gm.day = s._gm.dayRL;
+  window.gm.addTime(60);
 }
 //heal player and remove inventory
 window.gm.respawn=function(keepInventory=false) {

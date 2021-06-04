@@ -6,7 +6,29 @@ core functionality
 
 window.gm = window.gm || {}; //game related operations
 window.gm.util = window.gm.util || {};  //utility functions
-
+// helper for publisher/subscriber-pattern; myObject.ps =PubSub(); myObject.ps.subscribe(...
+window.gm.util.PubSub = function(){ 
+  return ({
+    events: {},
+    subscribe: function (event, handler) {
+        if (!this.events[event]) {
+            this.events[event] = [];    
+        }
+        this.events[event].push(handler);
+    },
+    unsubscribe: function (event, handler) {
+      if (!this.events[event]) return;
+      let i= this.events[event].indexOf(handler);
+      if(i>=0) this.events.splice(i,1);
+    },
+    publish: function (event, data) {
+        this.events[event] && this.events[event].forEach(publishData);
+        function publishData(handler) {
+            handler(data);   
+        };
+    }
+  }); 
+};
 //-------------------------------------------------
 // reimplement to setup the game !
 window.gm.initGame= function(forceReset,NGP=null) {
@@ -27,6 +49,10 @@ window.gm.initGame= function(forceReset,NGP=null) {
     // Render the passage named HUD into the element todo replace with <%=%>??
     $(document).on('sm.passage.shown', function (ev,eventObject) { window.gm.refreshSidePanel();});
     var s = window.story.state; //s in template is window.story.state from snowman!
+    if (!window.gm.timeEvent||forceReset) {
+      window.gm.timeEvent = window.gm.util.PubSub();  //subscribe to "change" event to receive time updates
+      // !! make sure to reregister after load !
+    }
     if(!s.quests || forceReset) {
       s.quests =  new QuestData();
       window.gm.quests = new QuestManager(window.gm.questDef);
@@ -116,7 +142,8 @@ window.gm.addTime= function(min) {
     window.story.state._gm.time -= 2400;
     window.story.state._gm.day += 1;
   }
-  window.gm.player.Effects.updateTime();
+  //window.gm.player.Effects.updateTime();
+  window.gm.timeEvent.publish("change",min);
 };
 window.gm.getTimeString= function() {
   var c=window.gm.getTimeStruct();
@@ -167,11 +194,8 @@ window.gm.forwardTime=function(until) {
   }
   msg+="</br>"+min%60+" hours pass by.</br>";
   window.gm.addTime(min);
-  let regen = min>420 ? 999 : parseInt(min/60*15);  //todo scaling of regeneration
-  window.gm.player.Stats.increment('health',regen);
-  window.gm.player.Stats.increment('energy',regen);
   window.gm.pushLog(msg);
-  return(msg);
+  return({msg:msg,delta:min});
 };
 
 
