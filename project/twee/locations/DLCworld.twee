@@ -100,7 +100,6 @@ Someone has painted 'Thetain' on the planks above the wooden gate. Most likely t
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.moveHere();%>
 <!--todo--> 'This really looks like they scavenged that place from a typical fantasy story book.'</br> 
-</br> 
 <div></br>
 [[Square|VillageMarketPlace]] </br></div>
 </article><article id="LogPanel"></article></section>

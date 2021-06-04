@@ -27,16 +27,18 @@ Note*: the upgrade from starter to experienced-member is free of cost; monthly s
 <p class='talkPC'>"Me too. Maybe we should try one of those free-to-play games next? I heard SandyBeachBattle is worth a look."</p>
 "Im not sure. ..Hey wait I got a mail. But its not from DoS. Its some kind of Invite to a different game... Lets see..."
 Just in that moment you got mail too: </br>  
-<div id='select2' >
-<a0 onclick='window.gm.printTalkLink($("div#select2")[0],"div#choice2a")'>Check mail</a>
-</div></div>
-<div id='choice2a' hidden>
-Dear [insert name here],
+[[Check mail|GameInvite1b]]</div>
+</article><article id="LogPanel"></article></section>
+
+:: GameInvite1b
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+<p class='talkNPC2'>Dear [insert name here],
 you got selected by ServiceAsGame to receive an invite as beta-tester for our new, MOBDSMRP-Game MiracoulusMultiplayerAlwaysOnlineVirtualReallityMassiveServiceRougue-Game.
 Be part of a growing gaming community and get involved in exciting quests and rakish adventures. 
 Please note that the content rating of the game is pending and is therefore restricted to adult audience only.
 Click the personalized link below to sign up for a free selected account in </br>Season-Quest</br>
-Because of the high demands on this new generation service-game, only thoose that act quickly will get a chance to parttake on the program. So hurry up!
+Because of the high demands on this new generation service-game, only thoose that act quickly will get a chance to parttake on the program. So hurry up!</p>
 </br>
 'A new game, huh? I would really like to see what this is about. If its free of charge, that would be nice. '
 <p class='talkPC'>"I got an invite too. For something called Season-Quest. Never heard of that."</p>
@@ -61,7 +63,7 @@ You groan 'Come on now' Just scrolling down and hitting next.
 <p class='talkPC'>"Sure."</p>
 'Im really tired now. Lets see when the equipment shows up.'</p>
 <a0 onclick='start()'>Close Browser</a>
-</div>
+
 </article><article id="LogPanel"></article></section>
 <script> function start() {
     window.gm.quests.addQuest("qDLCMain",100);

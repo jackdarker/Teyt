@@ -56,10 +56,10 @@ A double bed is there with [[nightstands|moms_treasure]] on each side. <br>
 </article><article id="LogPanel"></article></section>
 <script>
 function switchChar(elmnt) {
-	if(window.story.state._gm.activePlayer ==='Ratchel') {
-		window.gm.switchPlayer('Cyril');
+	if(window.story.state._gm.activePlayer ==='Cyril') {
+		window.gm.switchPlayer('PlayerRL');
 	} else {
-		window.gm.switchPlayer('Ratchel');
+		window.gm.switchPlayer('Cyril');
 	}
 	elmnt.outerHTML=("<div class='red'>You are now playing as "+window.story.state._gm.activePlayer+". </div>");
 }
@@ -169,11 +169,11 @@ Where would you like to go?</br>
 </article><article id="LogPanel"></article><script>
 function getMoney(elmnt,val) {
 	let msg="</br>You shouldnt steal that money, should you?";
-	let vulva = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib.'bVulva');
-	let pierc = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib.'pClit');
+	let vulva = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bVulva);
+	let pierc = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib.pClit);
 	if(vulva && vulva instanceof (window.storage.constructors['VulvaHuman'])) {
 		if(pierc===null ) {
-			pierc= window.gm.ItemsLib['ClitPiercing']();
+			pierc= new window.gm.ItemsLib['ClitPiercing']();
 			pierc.style =100; 
 			window.gm.player.Outfit.addItem(pierc,true);
 			msg += 'You feel a short pain in your most private area. Maybe you should check up yourself.';

@@ -98,7 +98,20 @@ img {
   outline: solid 2px #34495e;
   background: #9b59b6;
 }
-
+.meter {
+	position: relative;
+	height: 1.5em;
+	width: 90%;
+	background-color: gray;
+	text-align: center;
+}
+.bar {
+	position: absolute;
+	left: 0;
+	top: 0;
+	height: 1.5em;
+	background-color: red;
+}
 /*hangman game*/
 main .alphabet span {
   border: solid 1px;
@@ -110,7 +123,7 @@ main .alphabet span {
   text-align: center;
   display: inline-block;
 }
-.green {
+.green2 {
 /*   background: #43a047; */
   background: white;
   color: black;

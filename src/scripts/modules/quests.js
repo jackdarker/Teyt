@@ -70,7 +70,8 @@ window.gm.questDef = window.gm.questDef || {};
     let quest = new Quest("qDiedAgain","qDiedAgain","qDiedAgain",hidden );
     quest.addMileStone(new QuestMilestone(1,"","Find your first death.",        NOP,hidden));
     quest.addMileStone(new QuestMilestone(100,"","Die with some bonded equipment.",        NOP,hidden));
-    quest.addMileStone(new QuestMilestone(200,"","....",        NOP,hidden));
+    quest.addMileStone(new QuestMilestone(200,"","Die by pleasure.",        NOP,hidden));
+    quest.addMileStone(new QuestMilestone(300,"",".",        NOP,hidden));
     window.gm.questDef[quest.id]= quest;
 }
 {   //

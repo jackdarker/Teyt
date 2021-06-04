@@ -182,25 +182,10 @@ Your outfit can only be changed by using a wardrobe.</br>
 :: Mirror [_back_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 Checking out <%=window.gm.player.name%>:   [[Back|_back_]]</br>
-<div id='output'><div>
+<div id='output'><%=window.gm.printBodyDescription(window.gm.player)%><div>
 <!--todo: set height depending on browsersize-->
 <!--<div id='Canvas' style='height: 30em;background: url("assets/doll/doll_small_xcf-Skirt.png") no-repeat center,url("assets/doll/doll_small_xcf-Body.png") no-repeat center, url(<%=window.gm.getScenePic(window.gm.player.location)%>)no-repeat center;color:black;'></div>-->
 </article><article id="LogPanel"></article></section>
-<script>
-function TorsoDescription() {
-	let msg="";
-	let vulva = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bVulva);
-	let pierc = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib.pClit);
-	if(vulva) {
-		msg += "You have a nice "+vulva.desc+" between your legs." 
-		if(pierc) {
-			msg += "A "+pierc.desc+" decorates your clit." 
-		}
-	}
-	return msg+"</br>";
-}
-window.gm.printOutput(TorsoDescription());
-</script>
 
 
 :: Wardrobe [_back_]

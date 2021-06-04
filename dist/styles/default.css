@@ -171,13 +171,13 @@ statdown {
   color: Darkgreen;
 }
 .dev {
-  color: lightblue;
+  color: #7bedf3;
   background-color:#11114a;
 }
 .dev::before {content: 'dev-note:';}
 .author {
   color: lightyellow;
-  background-color: darkblue;
+  background-color: darkred;
 }
 .author::before {content: 'authors-note:';}
 @keyframes alarm {

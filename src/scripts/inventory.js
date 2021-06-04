@@ -1,7 +1,7 @@
 "use strict";
 class Item {
     constructor(name) {
-        this.name = name;   //todo add id
+        this.id = this.name = name;   //todo add id
     }
     get parent() {return this._parent();}
     //called by SkillUseItem

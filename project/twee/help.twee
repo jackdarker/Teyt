@@ -18,8 +18,8 @@ No, just joking. You are far from a superhero and earth has so many serious prob
 If you can make a living for yourself and find friends then you are on a good way.</br>  </br>
 Here is a task-list for you: </br>
 1. explore your surroundings to unlock new places and events</br>
-2. talk to others and help them to build your relationship and unlock content</br>
-3. work on your carreer (whichever that is). Partake in schooling f.e. </br>
+2. check your quest-log regulary
+3. talk to others and help them to build your relationship and unlock content</br>
 4. find ways to earn money. Money can unlock things,you know? </br>
 5. dont eat yellow snow</br>
 </br>
@@ -33,6 +33,8 @@ Here is a task-list for you: </br>
 For many activities you have to spend energy and time. F.e. walking into the city takes some time and effort.</br>
 Energy can be recovered by sleeping. Also some activities, food or drugs can restore energy.</br>
 Use the sleep-option in your own bedroom to rest.</br>
+Leaving the VR is only possible at the spawn-points, and only if in freeplay. If there is some storyrelevant stage running, you cant leave.
+Entering VR is also only possible if the story-stage is at a certain points and requires it or freeplay is on.
 </br>
 [[Back|_back_]]</br>
 </article><article id="LogPanel"></article></section>
@@ -41,8 +43,10 @@ Use the sleep-option in your own bedroom to rest.</br>
 :: Help_Quest [_back_]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
-In your bedroom on your desk you can find a todo-list that gives some hint on what you should work on.</br>
-For the beginning try to explore the city.</br>
+For the beginning:
+- you should receive game equipment and get thrown into the game after 2 days
+- try to explore the city.</br>
+
 TODO: There isnt much more content right now!</br>
 [[Back|_back_]]</br>
 </article><article id="LogPanel"></article></section>
@@ -51,7 +55,7 @@ TODO: There isnt much more content right now!</br>
 :: Help_Fixes [_back_]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
-If you are stuck on a page and you cannot escape. Press this [[Button|Home]] to get back to your Home.</br></br>
+If you are stuck on a page and you cannot escape. Press this [[Button|NOP]] to get back to your Home.</br></br>
 If you are even unable to get to this page because you see a weird plain textmessage in your browser:</br>
 Im sorry but no one can help you. I will try to add some debug-log that shows some more information that you can send me.</br>
 Then I might be abel to backtrack the error.</br>

@@ -59,6 +59,7 @@ class Pullover extends Equipment {
         this.tags = ['cloth'];
         this.slotUse = ['Breast','Stomach','Arms'];
     }
+    descLong(fconv) {return(fconv('A warm pullover adorns $[me]$.'));}
     get desc() { return 'warm pullover';}
     toJSON() {return window.storage.Generic_toJSON("Pullover", this); };
     static fromJSON(value) {return(window.storage.Generic_fromJSON(Pullover, value.data));}
@@ -323,7 +324,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['Leggings'] = function () { return new Leggings();};
     ItemsLib['Tank-shirt'] = function () { return new TankShirt(); };
     ItemsLib['Jeans'] = function () { return new Jeans();};
-    ItemsLib['Jeans'] = function () { return new Sneakers();};
+    ItemsLib['Sneakers'] = function () { return new Sneakers();};
     ItemsLib['Pullover'] = function () { return new Pullover();};
     ItemsLib['TailRibbon'] = function () { return new TailRibbon();};
     ItemsLib['ClitPiercing'] = function () { return new ClitPiercing();};

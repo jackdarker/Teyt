@@ -312,11 +312,11 @@ class stLDefense extends Stat {   //tease defense
     toJSON() {return window.storage.Generic_toJSON("stLAttack", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stLAttack, value.data);};
 }
-class stPerversionMax extends Stat {
+class stCorruptionMax extends Stat {
     static setup(context, base,max) {
-        var _stat = new stPerversionMax();
+        var _stat = new stCorruptionMax();
         var _n = _stat.data;
-        _n.id='perversionMax', _n.hidden=3,_n.base=base, _n.value=base,_n.limits=[{max:99999,min:0}];
+        _n.id='corruptionMax', _n.hidden=3,_n.base=base, _n.value=base,_n.limits=[{max:99999,min:0}];
         context.addItem(_stat);
         _stat.Calc();
     }
@@ -324,15 +324,15 @@ class stPerversionMax extends Stat {
         super();
         
     }
-    toJSON() {return window.storage.Generic_toJSON("stPerversionMax", this); };
-    static fromJSON(value) { return window.storage.Generic_fromJSON(stPerversionMax, value.data);};
+    toJSON() {return window.storage.Generic_toJSON("stCorruptionMax", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(stCorruptionMax, value.data);};
 }
-class stPerversion extends Stat {
+class stCorruption extends Stat {
     static setup(context, base,max) {
-        stPerversionMax.setup(context,max);
-        var _stat = new stPerversion();
+        stCorruptionMax.setup(context,max);
+        var _stat = new stCorruption();
         var _n = _stat.data;
-        _n.id='perversion', _n.hidden=3,_n.base=base, _n.value=base,_n.limits=[{max:'perversionMax',min:0}];
+        _n.id='corruption', _n.hidden=3,_n.base=base, _n.value=base,_n.limits=[{max:'corruptionMax',min:0}];
         context.addItem(_stat);
         _stat.Calc();
     }
@@ -340,8 +340,8 @@ class stPerversion extends Stat {
         super();
         
     }
-    toJSON() {return window.storage.Generic_toJSON("stPerversion", this); };
-    static fromJSON(value) { return window.storage.Generic_fromJSON(stPerversion, value.data);};
+    toJSON() {return window.storage.Generic_toJSON("stCorruption", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(stCorruption, value.data);};
 }
 //Fetish
 // value >0 means character likes that fetish or <0 hates it  
@@ -496,9 +496,8 @@ class effMutateCat extends Effect {
                 return (function(Effects){ 
                     if(me.data.cycles<=0) { 
                         Effects.removeItem(me.data.id);
-                        window.gm.pushDeferredEvent("MutateCatEnd");
                     }
-                    else window.gm.pushDeferredEvent("MutateCat");
+                    window.gm.pushDeferredEvent("MutateCat",[me.data.cycles]);
                     //window.gm.pushDeferredEvent("CatHabit");
                     Effects.removeItem(me.data.id);});
                 }(this));
@@ -506,12 +505,48 @@ class effMutateCat extends Effect {
         return(null);
     }
     onApply(){
-        this.data.duration = 60;
+        this.data.duration = 60,this.data.cycles = 3;
         this.data.time = window.gm.getTime();
     }
     merge(neweffect) {
-        if(neweffect.name===this.data.name) {
-            //dont refresh
+        if(neweffect.name===this.data.name) {//dont refresh
+            return(true);
+        }
+    }
+}
+class effMutateWolf extends Effect {
+    constructor() {
+        super();
+        this.data.id = this.data.name= effMutateWolf.name, this.data.hidden=0;
+        this.data.duration = 60,this.data.cycles = 3, this.data.magnitude = 3;
+    }
+    toJSON() {return window.storage.Generic_toJSON("effMutateWolf", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(effMutateWolf, value.data);};
+    get desc() {return("cat-tastic");}
+
+    onTimeChange(time) {
+        //after some time you mutate a bit
+        this.data.duration-= window.gm.getDeltaTime(time,this.data.time);
+        this.data.time = time;
+        if(this.data.duration<=0) {
+            return(function(me){
+                return (function(Effects){ 
+                    if(me.data.cycles<=0) { 
+                        Effects.removeItem(me.data.id);
+                    }
+                    window.gm.pushDeferredEvent("MutateWolf",[me.data.cycles]);
+                    //window.gm.pushDeferredEvent("CatHabit");
+                    Effects.removeItem(me.data.id);});
+                }(this));
+            }
+        return(null);
+    }
+    onApply(){
+        this.data.duration = 60,this.data.cycles = 3;
+        this.data.time = window.gm.getTime();
+    }
+    merge(neweffect) {
+        if(neweffect.name===this.data.name) {//dont refresh
             return(true);
         }
     }
@@ -782,8 +817,8 @@ window.gm.StatsLib = (function (StatsLib) {
     window.storage.registerConstructor(stArousalMax);
     window.storage.registerConstructor(stArousalMin);
     window.storage.registerConstructor(stArousal);
-    window.storage.registerConstructor(stPerversionMax);
-    window.storage.registerConstructor(stPerversion);
+    window.storage.registerConstructor(stCorruptionMax);
+    window.storage.registerConstructor(stCorruption);
     window.storage.registerConstructor(stPAttack);
     window.storage.registerConstructor(stPDefense);
     //...effects

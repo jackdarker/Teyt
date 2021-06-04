@@ -199,7 +199,7 @@ window.storage = {
       window.story.history = save.history;
       window.story.checkpointName = save.checkpointName;
       window.gm.rebuildObjects();  // this is for handling version-upgrades
-      window.story.show(window.story.history[window.story.history.length - 1], true);      
+      window.story.show(window.gm.player.location);//history disabled ! window.story.history[window.story.history.length - 1], true);      
   },
   getAchievements: function() {
     var ahash = JSON.stringify({achievements : window.gm.achievements});

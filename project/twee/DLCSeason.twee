@@ -54,13 +54,48 @@ You smirk to yourself for your ingenuity.
 
 
 :: YouDiedWithCursedGear
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 "Choosen one, this is a shrine of restoration!" ... the acolyte starts heir rant.
 "Yeah, I know. I just got ass kicked again. At least I got rid of that freaking bracelet... "
 But that damned thing is still on your wrist!
 "Hey, why is everthing gone except that damn thing?"
 "At times the heros burden is increased by evil deeds and his epic story is extended further by finding closure for his curse." the priestess chants, holding out heir hands upward to heir gods.
 "So I'm stuck with cursed gear but have to let go the good one?"
-[[This sucks]] [[Would have been to easy]] [[Its an incentive to not die]] 
+[[This sucks]] [[Would have been to easy]] [[Its an incentive to not die]] <!--todo-->
+</article><article id="LogPanel"></article></section>
+
+
+:: YouDiedBeforeOrgasm
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+Delicate sensations builds in your nethers. 
+'Uh..yeah.. thats nice. '
+Longing for the carnal pleasure that this is promissing, you lose your eyes. But as you open them, the stimulation is gone and your surrounding is still black.
+"Whut ?!  What happend?"
+"Choosen one, this is a shrine of restoration!" 
+"Noo, the fun was just starting. Why are I'm suddenly at the respawn again."
+"The gods saved you before your mind was breaking apart by onslaught of unsettling feelings."
+"Unsettling feelings? I didnt feel unsettleed by the prospect of getting fucked in the slightest!"
+'Didn't they say that they supervise my stress-level and trigger a safeguard?'
+"Hey dev !" you scream out "Can you hear me?"
+"Anyone there listening? I want some adjustments here please."
+As it seems dev-gods are right now not around or dont bother to answer to you.
+'Damit, I will just quit for now.' 
+[[Leave game]]  <!--todo-->
+... receive chat from dev
+"Its difficult to separate the good stress from the bad one. Every persons has a different tolerance and it can change over time. Currently its in general set to be more on the safe side."
+There isnt a slider controller or switch to simply adjust the setting to your liking. I can try to tweak it in a way.
+...
+I got kicked out again. 
+"That I expected. I wasnt able to change the setting directly. But I could activate the auto-tuning."
+"auto-tuning?."
+"Yes, the game will learn your individual excitation. Just calm yourself when you get in a situation you would like to hold on. It might be necessary to rerun a situation to improve the reaction."
+"OK, I will try it again."
+"Be careful, though. This can also lead to the fact that you have to endure unpleasant experiences longer."
+"I will keep that in mind." 
+<p class='author'>Scenes might gradually unlock depending how often you see them and how you react (also to other situations). </p>
+
+</article><article id="LogPanel"></article></section>
+
 
 
 :: Skills

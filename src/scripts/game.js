@@ -58,7 +58,8 @@ window.gm.initGame= function(forceReset,NGP=null) {
       // storage of temporary variables; dont use them in stacking passages or deffered events      
       s.tmp = {
         rnd : 0,  // can be used as a random variable for use in CURRENT passage
-        args: []  // can be used to set arguments before another passage is called (passage-arguments) 
+        args: [],  // can be used to set arguments before another passage is called (passage-arguments) 
+        msg: ''   // memorizes a message to display when returning from _back-passage; please clear it when leaving the passage
       }
     }
 
@@ -175,7 +176,14 @@ window.gm.forwardTime=function(until) {
 
 
 // use: child._parent = window.gm.util.refToParent(parent);
-window.gm.util.refToParent = function(me){ return function(){return(me);}};
+window.gm.util.refToParent = function(me){ return function(){return(me);}};  //todo causes problem with replaceState??
+//since there is no builtin function to format numbers here is one: formatNumber(-1002.4353,2) -> 1,002.44  
+window.gm.formatNumber = function(n, dp){
+  var s = ''+(Math.floor(n)), d = Math.abs(n % 1), i = s.length, r = '';
+  while ( (i -= 3) > 0 ) { r = ',' + s.substr(i, 3) + r; }  //todo . & , is hardcoded
+  return s.substr(0, i + 3) + r + 
+    (d ? '.' + Math.round(d * Math.pow(10, dp || 2)) : '');
+};
 //---------------------------------------------------------------------------------
 //TODO 
 //maybe you sometimes dont want to trigger an event immediatly, 
@@ -283,6 +291,10 @@ window.story.__proto__.show = function(idOrName, noHistory = false) {
     tagsnext = window.story.passage(next).tags;
   } else if(inGame && window.story.state._gm.defferedStack.length>0 && //deffered event if allowed and requested
       tagsnext.indexOf('_back_')<0 && tagsnext.indexOf('_nosave_')<0 && tagsnext.indexOf('_nodeffered_')<0 ) { 
+        //before entering a new passage check if there is a defferedEvent that we should do first
+        //if so, push the normal-passage onto stack, show deffered passage
+        //after the deffered passage(s) finish, make sure to show the original passage
+        //this is a problem?how do I know the deffered passage is done? 
     if(idOrName!=='') window.gm.pushOnHold(idOrName); //only push when not returning from other deffered or not passage with back
     next = window.gm.popDeferredEvent();
     nextp = window.story.passage(next);
@@ -306,16 +318,12 @@ window.story.__proto__.show = function(idOrName, noHistory = false) {
     //todo not sure about this: a deffered event should not link to normal passages because this would disentangle the original story-chain
     //this I think could cause issues and should be detected and throw an error
     //uncoment the following to bypass this 
-    //window.story.state._gm.onholdStack.splice(0,window.story.state._gm.onholdStack.length);
+    //    window.story.state._gm.onholdStack.splice(0,window.story.state._gm.onholdStack.length);
   }
 if(inGame) {//disable save-menu on _nosave_-tag 
     window.story.state._gm.nosave = (tagsnext.indexOf('_nosave_')>=0 );
 }
-  //Todo
-  //before entering a new passage check if there is a defferedEvent that we should do first
-  //if so, push the normal-passage onto stack, show deffered passage
-  //after the deffered passage(s) finish, make sure to show the original passage
-  //this is a problem?how do I know the deffered passage is done? 
+  noHistory = true; //the engines object auses problems with history, namely refToParent
   _origStoryShow.call(window.story,next, noHistory);
 };
 //-----------------------------------------------------------------------------
@@ -344,7 +352,7 @@ window.gm.isInParty = function(name) {
 //-----------------------------------------------------------------------------
 
 
-  //---------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------
   //updates all panels
 window.gm.refreshAllPanel= function() {
   window.story.show(window.passage.name);
@@ -436,7 +444,7 @@ window.gm.printShopBuyEntry= function(itemid,count,cbCanBuy,cbPostBuy=null){
   entry.id=itemid;
   entry.href='javascript:void(0)';
   var showDesc=function($event){var elmt =document.querySelector("div#"+$event.srcElement.id);
-      elmt.innerHTML =window.gm.ItemsLib[$event.srcElement.id].desc+"</br>";
+      elmt.innerHTML =window.gm.ItemsLib[$event.srcElement.id].desc+"</br>"; //?? new ...
       elmt.toggleAttribute("hidden");};
   entry.addEventListener("click", showDesc, false);
   var div = document.createElement('div');
@@ -505,8 +513,8 @@ window.gm.defaultPostBuy =function(itemid,cost){
 };
 window.gm.cbCanBuyPerverse = function(itemid,cost,pervcost) {
   var result = window.gm.defaultCanBuy(itemid,cost);
-  if(window.gm.player.Stats.get('perversion').value<pervcost) {
-      result.msg += ' ; requires Perversion> '+pervcost;
+  if(window.gm.player.Stats.get('corruption').value<pervcost) {
+      result.msg += ' ; requires corruption> '+pervcost;
       result.OK=false;
   }
   return(result);
@@ -536,7 +544,7 @@ window.gm.printShopSellEntry= function(itemid,count,cbCanSell,cbPostSell){
   entry.id=itemid;
   entry.href='javascript:void(0)';
   var showDesc=function($event){var elmt =document.querySelector("div#"+$event.srcElement.id);
-      elmt.innerHTML =window.gm.ItemsLib[$event.srcElement.id].desc+"</br>";
+      elmt.innerHTML =window.gm.ItemsLib[$event.srcElement.id].desc+"</br>"; //?? new...
       elmt.toggleAttribute("hidden");};
   entry.addEventListener("click", showDesc, false);
   var div = document.createElement('div');

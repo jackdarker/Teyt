@@ -1,7 +1,7 @@
 "use strict";
 /* a class to provide methods to work with PC & NPC
 */
-export class Character {
+class Character {
     static defaultData() {
         return({
         id:'',
@@ -39,7 +39,7 @@ export class Character {
         stHealth.setup(this.Stats,30,40),stEnergy.setup(this.Stats,30,100),stPAttack.setup(this.Stats,6,100),stPDefense.setup(this.Stats,4,100),
         stAgility.setup(this.Stats,10,100),stIntelligence.setup(this.Stats,10,100),stLuck.setup(this.Stats,10,100);
         stCharisma.setup(this.Stats,10,100),stPerception.setup(this.Stats,10,100),stStrength.setup(this.Stats,10,100),stEndurance.setup(this.Stats,10,100);
-        stPerversion.setup(this.Stats,1,15),stArousal.setup(this.Stats,1,100),stLAttack.setup(this.Stats,6,100),stLDefense.setup(this.Stats,2,100);
+        stCorruption.setup(this.Stats,0,50),stArousal.setup(this.Stats,1,100),stLAttack.setup(this.Stats,6,100),stLDefense.setup(this.Stats,2,100);
         for(let name of stFetish.listFetish()) {
             stFetish.setup(this.Stats,0,10,name);
         }

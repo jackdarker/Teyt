@@ -49,56 +49,90 @@ window.gm.initGame= function(forceReset,NGP=null) {
       };
     }
     if (!s.Cyril||forceReset) {  //alternative player character
-      window.gm.Cyril = new Character()
-      window.gm.Cyril.name=window.gm.Cyril.id="Cyril";
-      window.gm.Cyril.faction="Player";
+      let ch = new Character()
+      ch.name=ch.id="Cyril";
+      ch.faction="Player";
       //add some basic inventory
-      window.gm.Cyril.Wardrobe.addItem(new Jeans());
-      window.gm.Cyril.Wardrobe.addItem(new TankShirt());
-      window.gm.Cyril.Outfit.addItem(new Jeans());
-      window.gm.Cyril.Outfit.addItem(new TankShirt());
-      window.gm.Cyril.Stats.increment('strength',3);
-      s.Cyril = window.gm.Cyril;
-      //delete window.gm.Cyril; 
+      ch.Outfit.addItem(new BaseHumanoid());
+      ch.Outfit.addItem(new SkinHuman());
+      ch.Outfit.addItem(new FaceHuman());
+      ch.Wardrobe.addItem(new Jeans());
+      ch.Wardrobe.addItem(new TankShirt());
+      ch.Outfit.addItem(new Jeans());
+      ch.Outfit.addItem(new TankShirt());
+      ch.Stats.increment('strength',3);
+      s.Cyril =window.gm.Cyril= ch;
+    }
+    if (!s.Ruff||forceReset) {  //Ruff the wolf
+      let ch = new Character()
+      ch.name=ch.id="Ruff";
+      ch.faction="Enemy";
+      //add some basic inventory
+      ch.Outfit.addItem(new BaseQuadruped());
+      ch.Outfit.addItem(new SkinFur());
+      ch.Outfit.addItem(new FaceWolf());
+      ch.Outfit.addItem(new PenisHuman());
+      ch.Stats.increment('strength',3);
+      s.Ruff = window.gm.Ruff=ch;
+    }
+    if (!s.Trent||forceReset) {  //the horse-bully from the bridge
+      let ch = new Character()
+      ch.name=ch.id="Trent";
+      ch.faction="Enemy";
+      //add some basic inventory
+      ch.Outfit.addItem(new BaseHumanoid());
+      ch.Outfit.addItem(new SkinFur());
+      ch.Outfit.addItem(new FaceHorse());
+      ch.Outfit.addItem(new PenisHuman());
+      ch.Stats.increment('strength',3);
+      s.Trent = window.gm.Trent = ch;
     }
     if (!s.PlayerVR||forceReset) {  
-      window.gm.PlayerVR = new Character();
-      window.gm.PlayerVR.id="PlayerVR";
-      window.gm.PlayerVR.name="Zeph";
-      window.gm.PlayerVR.faction="Player";
-      window.gm.PlayerVR.Effects.addItem(skCooking.name,new skCooking());
+      let ch = new Character();
+      ch.id="PlayerVR";
+      ch.name="Zeph";
+      ch.faction="Player";
+      ch.Effects.addItem(skCooking.name,new skCooking());
+      //body
+      ch.Outfit.addItem(new BaseHumanoid());
+      ch.Outfit.addItem(new SkinHuman());
+      ch.Outfit.addItem(new FaceHuman());
+      ch.Outfit.addItem(new PenisHuman());
       //add some basic inventory
-      window.gm.PlayerVR.Outfit.addItem(new VulvaHuman());
-      window.gm.PlayerVR.Wardrobe.addItem(new RobesZealot());
-      window.gm.PlayerVR.Outfit.addItem(new RobesZealot());
-      window.gm.PlayerVR.Inv.addItem(new StaffWodden(),1);
-      s.PlayerVR=window.gm.PlayerVR;
-  }
+      ch.Wardrobe.addItem(new RobesZealot());
+      ch.Outfit.addItem(new RobesZealot());
+      ch.Inv.addItem(new StaffWodden(),1);
+      s.PlayerVR=window.gm.PlayerVR= ch;
+    }
     if (!s.PlayerRL||forceReset) {  
-        window.gm.PlayerRL = new Character();
-        window.gm.PlayerRL.id="PlayerRL";
-        window.gm.PlayerRL.name="Ratchel";
-        window.gm.PlayerRL.faction="Player";
+        let ch = new Character();
+        ch.id="PlayerRL";
+        ch.name="Ratchel";
+        ch.faction="Player";
         //window.gm.PlayerVR.gainRelation('Mom',10);
-        window.gm.PlayerRL.Effects.addItem(skCooking.name,new skCooking());
+        ch.Effects.addItem(skCooking.name,new skCooking());
         //add some basic inventory
-        window.gm.PlayerRL.Inv.addItem(new Money(),20);
-        window.gm.PlayerRL.Inv.addItem(new LighterDad());
-        window.gm.PlayerRL.Inv.addItem(new FlashBang(),2);
-        window.gm.PlayerRL.Inv.addItem(new CanOfCoffee(),2);
-        window.gm.PlayerRL.Wardrobe.addItem(new Jeans());
-        window.gm.PlayerRL.Wardrobe.addItem(new Sneakers());
-        window.gm.PlayerRL.Wardrobe.addItem(new Leggings());
-        window.gm.PlayerRL.Wardrobe.addItem(new TankShirt());
-        window.gm.PlayerRL.Wardrobe.addItem(new Pullover());
-        window.gm.PlayerRL.Wardrobe.addItem(new TailRibbon());
-        window.gm.PlayerRL.Outfit.addItem(new VulvaHuman());
-        window.gm.PlayerRL.Outfit.addItem(new Jeans());
-        window.gm.PlayerRL.Outfit.addItem(new Sneakers());
-        window.gm.PlayerRL.Outfit.addItem(new Pullover());
+        ch.Inv.addItem(new Money(),20);
+        ch.Inv.addItem(new LighterDad());
+        ch.Inv.addItem(new FlashBang(),2);
+        ch.Inv.addItem(new CanOfCoffee(),2);
+        ch.Wardrobe.addItem(new Jeans());
+        ch.Wardrobe.addItem(new Sneakers());
+        ch.Wardrobe.addItem(new Leggings());
+        ch.Wardrobe.addItem(new TankShirt());
+        ch.Wardrobe.addItem(new Pullover());
+        ch.Wardrobe.addItem(new TailRibbon());
+        
+        ch.Outfit.addItem(new BaseHumanoid());
+        ch.Outfit.addItem(new FaceHuman());
+        ch.Outfit.addItem(new SkinHuman());
+        ch.Outfit.addItem(new VulvaHuman());
+        ch.Outfit.addItem(new Jeans());
+        ch.Outfit.addItem(new Sneakers());
+        ch.Outfit.addItem(new Pullover());
         //special skills
-        window.gm.PlayerRL.Skills.addItem(SkillCallHelp.setup('Mole'));
-        s.PlayerRL=window.gm.PlayerRL;
+        ch.Skills.addItem(SkillCallHelp.setup('Mole'));
+        s.PlayerRL=window.gm.PlayerRL=ch;
     }      
     window.gm.switchPlayer("PlayerRL");
     //take over flags for newgameplus
@@ -271,3 +305,120 @@ window.gm.printUnlockPerk= function(id, descr) {
         return(elmt);
 };
 
+//prints a description of the chars-body
+window.gm.printBodyDescription= function(whom,onlyvisible=false) {
+  let msg = "";
+  let conv = window.gm.util.descFixer(whom);
+  let worn =whom.Outfit.getAllIds(); //todo this returns wearables & bodyparts
+  // todo filter by visibility and sort the order: plae Breast & Nipple-Piercing together 
+  for(el of worn) {
+    msg+= whom.Outfit.getItem(el).descLong(conv)+"</br>";
+  }
+  /*let base = whom.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bBase);
+  let skin = whom.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bSkin);
+  let face = whom.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bFace);
+  msg+= base.descLong(conv)+"</br>";
+  msg+= skin.descLong(conv)+"</br>";
+  msg+= face.descLong(conv)+"</br>";
+  let breast = whom.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bBreast);
+  if(breast) msg+= breast.descLong(conv)+"</br>";
+  let penis = whom.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bPenis);
+  if(penis) penis.descLong(conv)+"</br>";
+  let vulva = whom.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bVulva);
+	if(vulva) { 
+    let pierc = whom.Outfit.getItemForSlot(window.gm.OutfitSlotLib.pClit);
+    msg +=vulva.descLong(conv) + ((pierc)?("A "+pierc.desc+" decorates your clit."):"")+"</br>";
+  }*/
+	return msg+"</br>";
+};
+// returns singular pronoun for the char depending on gender
+window.gm.util.estimatePronoun= function(whom) {
+    let isplayer = (whom.name===window.gm.player.name);
+    let vulva = whom.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bVulva);
+    let penis = whom.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bPenis);
+    //todo what if whom is a gang of imps?
+    if(isplayer) {
+      return('i')
+    } else if(vulva && penis) {
+      return('shi');
+    } else if(vulva) {
+      return('she');
+    } else if(penis) {
+      return('he');
+    }
+    return('it');
+};
+//returns a function that accept a text and fixes the word-phrases
+window.gm.util.descFixer = function(whom) {
+  let pron = window.gm.util.estimatePronoun(whom);
+  return(function(pron) { 
+    return function(text) {
+      let repl = [],br = 0, aft,bef,found;
+      //search brackets like $[dff]$ $[[sdff]]$ dont find [ ] or \[ \] ; 
+      //using no regex because couldnt get it get working:(!\[|[^\[])([\[]{1})(!\]|!\[|[^\[\]])+[\]]{1}([^\]]|!\])
+      for(let i=text.length-1, max=text.length-1;i>=0;i-=1){ //in backward direction !
+        bef= (i>0)? text[i-1]:'';
+        aft= (i<max)?text[i+1]:'';
+        if(text[i]===']' && aft==='$') { //opening braket
+          br+=1;
+          if(br>1) {  //there was already opening but no closing bracket !
+            //no bracket in bracket allowed; ignore previous bracket
+            br =1;
+          }
+          found = {end:i};
+        }
+        if(text[i]==='[' && bef==='$') { //opening braket
+          br-=1;
+          if(br<0) {  //there was already closing but no opening bracket !
+            //no bracket in bracket allowed; ignore previous bracket
+            br =0;
+          } else {
+            found.start=i;
+            found.text=text.slice(found.start+1,found.end); //text within brackets
+            found.start -=1,found.end +=1;  // inlude $ $
+            repl.push(found);
+          }
+        }
+      }
+      for(el of repl) {//replace bracket+bracketcontent,
+        el.new = window.gm.util.lookupWord(el.text,pron);
+        let bef = text.substring(0,el.start), aft = text.substr(el.end+1);
+        text= bef+el.new+aft;
+      }
+      // $[I]$ $[have]$ some rough [hair] that needs a lot combing. He has some rough...
+      // c. She buys those pants. 
+      // That hat [I] [wear] is ugly. That hat she wears is ugly.  
+      // A dense fur covers $[my]$ body. A dense fur covers your body.  
+      return(text);
+    }
+  }(pron))
+};
+// add irregular words here
+window.gm.util.wordlist = function buildWordList(list) {
+  //defines for each word a list to match to pronoun to replace with
+  //have = [I have, you have, he/she has, we have, you have, they have ]
+  list['i'] = {def:'I',i:'I',you:'you',he:'he',she:'she',shi:'shi',it:'it'};
+  list['me'] = {def:'me',i:'me',you:'you',he:'him',she:'her',shi:'hir',it:'it'};
+  list['my'] = {def:'my',i:'my',you:'your',he:'his',she:'her',shi:'hir',it:'its'};
+  list['have'] = {def:'have',he:'has',she:'has',shi:'has',it:'has'};
+  list['am'] = {def:'is',i:'am',he:'is',she:'is',shi:'is',it:'is'};
+  return(list);
+}(window.gm.util.wordlist || {});
+
+//looks up a word in the wordlist and retourns the version fitting pronoun
+window.gm.util.lookupWord = function(word,pron) {
+  let output = word;
+  let x = word.toLowerCase();
+  let repl =window.gm.util.wordlist[x];
+  if(repl) {
+    output = (repl[pron])?repl[pron]:repl.def;
+    if(word[0]===word[0].toUpperCase()) { //check if first letter needs to be large; 'I' is always large
+      output= output[0].toUpperCase()+output.substr(1);
+    }
+  } else {
+    if(pron==='he' || pron==='she'|| pron==='shi' ) {  
+      output+='s';//wear -> wears
+    }
+  }
+  return(output);
+}

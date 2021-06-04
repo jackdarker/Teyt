@@ -11,8 +11,8 @@ Some things for debugging:</br>
 
 
 :: debug [_back_]
-<section> 
-<aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+<section> <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+[[Back|_back_]] [[DebugTransform]] [[Styletest]]</br>
 Cheat buttons: those are meant for debugging and might break your game</br>
 <a href="javascript:void(0)" onclick='window.gm.player.Inv.addItem(new window.storage.constructors["Money"](),200);window.gm.refreshAllPanel();'>Get 200$</a></br>
 </br>
@@ -29,24 +29,57 @@ Cheat buttons: those are meant for debugging and might break your game</br>
 <%}%>
 <a href="javascript:void(0)" onclick='window.gm.player.Stats.increment("health",25);window.gm.refreshAllPanel();'>Health +25</a></br>
 <a href="javascript:void(0)" onclick='window.gm.player.Stats.increment("energy",25);window.gm.refreshAllPanel();'>Energy +25</a></br>
-<a href="javascript:void(0)" onclick='window.gm.player.Stats.increment("perversion",25);window.gm.refreshAllPanel();'>Perversion +25</a>
-<a href="javascript:void(0)" onclick='window.gm.player.Stats.increment("perversion",-25);window.gm.refreshAllPanel();'>Perversion -25</a></br>
+<a href="javascript:void(0)" onclick='window.gm.player.Stats.increment("corruption",25);window.gm.refreshAllPanel();'>corruption +25</a>
+<a href="javascript:void(0)" onclick='window.gm.player.Stats.increment("corruption",-25);window.gm.refreshAllPanel();'>corruption -25</a></br>
 <a href="javascript:void(0)" onclick='window.gm.player.Stats.increment("arousal",25);window.gm.refreshAllPanel();'>Arousal +25</a>
 <a href="javascript:void(0)" onclick='window.gm.player.Stats.increment("arousal",-25);window.gm.refreshAllPanel();'>Arousal -25</a></br>
 <label for="passage">passage:<input type="text" id="passage" name="passage"></label><a href="javascript:void(0)" onclick='window.story.show(document.getElementById("passage").value)'>Go</a></br>
 <label for="additem">add item (not wardrobe):<input type="text" id="additem" name="additem"></label><a href="javascript:void(0)" onclick='window.gm.player.Inv.addItem(new window.storage.constructors[document.getElementById("additem").value]())'>Go</a></br>
-
-</br>
-</br>[[Back|_back_]]</br>
+<label for="addoutfit">add outfit:<input type="text" id="addoutfit" name="addoutfit"></label><a href="javascript:void(0)" onclick='window.gm.player.Wardrobe.addItem(new window.storage.constructors[document.getElementById("addoutfit").value]())'>Go</a></br>
 </article><article id="LogPanel"></article></section>
-<script>
-function unhideStats() {
+<script> function unhideStats() {
     var ids = window.gm.player.Stats.getAllIds();
     for(var i=0; ids.length>i;i++) {
         window.gm.player.Stats.modifyHidden(ids[i],0);
     }
 }
 </script>
+
+:: DebugTransform  [_back_]
+<section> <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<div></br>[[Back|_back_]]</br>
+Test transformation events. Because they are deffered-events you need to return to story and move between rooms.</br>
+<a0 onclick='window.gm.pushDeferredEvent("MutateCat",[1])'>Cat</a>
+<a0 onclick='window.gm.pushDeferredEvent("MutateWolf",[1])'>Wolf</a></br>
+</article><article id="LogPanel"></article></section>
+<script>
+/*window.gm.initGame();window.gm.player.location=window.passage.name;
+let conv = window.gm.descFixer(window.gm.player);
+let text = conv('$[I]$ $[have]$ [some] rough [[hair]].$[I]$ $[buy]$ those pants.dense fur covers $[my]$ body."');
+conv = window.gm.descFixer(window.gm.Ruff);
+let text2 = conv('$[I]$ $[have]$ [some] rough [[hair]].$[I]$ $[buy]$ those pants.dense fur covers $[my]$ body."');
+window.gm.printOutput(text2,where="div#output");*/
+</script>
+
+:: Styletest [_back_]
+<section> <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<div></br>[[Back|_back_]]
+Theme:
+<a href="javascript:window.styleSwitcher.setStyle('default');window.gm.refreshAllPanel();">default</a>
+<a href="javascript:window.styleSwitcher.setStyle('dark');window.gm.refreshAllPanel();">dark</a></br></div>
+</br><hr>
+<p class='talkPC'>PC-talk</p><p class='talkNPC1'>NPC1-talk</p><p class='talkNPC2'>NPC2-talk</p>
+<p class='dev'>notes from developer.</p>
+<p class='author'>notes from author.</p>
+<form><ul style="list-style-type: none; padding-inline-start: 0px;" ><legend>List</legend>
+<button type="button" id="button1">Button1</button>
+<div class="meter"><div class="bar" style="width:23%"></div><div style="position:absolute; top:0; left:0; width:100%">5/45</div></div>
+<li style="padding-bottom: 0.5em;"><input type="checkbox" name="y" value="x" readonly disabled><label>chekbox disabled</label></li>
+</ul></form></br>
+<statup>Statup</statup>  <statdown>Statdown</statdown> <p class='red'>RED</p><p class='green'>GREEN</p>
+<p class='div_alarm'>ALARM</p>
+</article><article id="LogPanel"></article></section>
+
 
 :: NOP [_back_]
 <section> <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>

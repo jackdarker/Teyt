@@ -19,17 +19,16 @@ This game is powered by twine/tweego and snowman.</br>
 </article>
 
 :: Intro
-<article>
-<%window.gm.initGame();window.gm.player.location=window.passage.name;%>
+<article><%window.gm.initGame();window.gm.player.location=window.passage.name;%>
+<div id='output'></div>
 <p>Welcome to Meason, a town somewhere in these days. </br>
 You are a student in the local university and live in a shared house with some other fellows. </br></p>
-<p class='author'>The autor: You might see a lot of links that red strikethrough. Those are currently broken and you shouldnt use them.</p>
-
+<p class='author'>You might see a lot of links that are formated red-strikethrough. Those are currently broken and you shouldnt use them.</p>
 </br>Press [[Start|Intro2]] to enter the game. (Loading of savegame is only possible in game).</br>
-Or press <a0 id='reset' onclick='window.gm.initGame(true);window.gm.refreshAllPanel();'>Reset</a> to reset your selection.  </br></br>
+Please note: player name and start gender are currently unchangeable.</br>
 There are also some options to skip ahead: </br>
 [[VR Character creation|Intro3]] </br>
-[[Forest exploration|Intro4]]</br>
+[[Forest freeplay|Intro4]]</br>
 </article>
 
 :: Intro2
@@ -48,7 +47,7 @@ To divert your self you check you decide to check emails.
 <%window.gm.player.location=window.passage.name;%>
 Start at the character creation screen in the VR-game.
 <div></br>
-[[Back|Intro]] <a0 onclick='start();'>Start</a></br></div>
+[[Back|Intro]] <a0 onclick='start();window.story.show("CharacterEditor");'>Start</a></br></div>
 </article><article id="LogPanel"></article></section>
 <script> function start() {
     window.gm.quests.addQuest("qDLCMain",1);
@@ -58,6 +57,25 @@ Start at the character creation screen in the VR-game.
     window.gm.quests.addQuest("qBondageKink",1);
     window.gm.quests.forceQuestMilestone("qDLCMain",600,1);
     window.gm.quests.forceQuestMilestone("qFixLaptop",1000,1);
-    window.story.show("CharacterEditor");
+    window.gm.enterVR();
+}
+</script>
+
+
+:: Intro4
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+Start at forest with introductory quest done so far. Roam around and prepare to defeat bridge boss.
+<div></br>
+[[Back|Intro]] <a0 onclick='start();window.story.show("ForestEntrance");'>Start</a></br></div>
+</article><article id="LogPanel"></article></section>
+<script> function start() {
+    window.gm.quests.addQuest("qBeastKink",1);
+    window.gm.quests.addQuest("qBondageKink",1);
+    window.gm.quests.addQuest("qDLCMain",600);
+    window.gm.quests.addQuest("qFixLaptop",1000);
+    window.gm.quests.addQuest("qDiedAgain",300);
+    window.gm.quests.addQuest("qPurpleBerry",100);
+    window.gm.enterVR();
 }
 </script>
