@@ -1,4 +1,4 @@
-//this holds the definition of all quests; which quests/ms are active is stored in window.story.state.quests !
+//this holds the definition of all quests; but which quests/ms are active is stored in window.story.state.quests !
 window.gm.questDef = window.gm.questDef || {};
 {
     let quest = new Quest("qFindGarden","Find the garden","The Garden is somewhere around the house.");
@@ -59,9 +59,10 @@ window.gm.questDef = window.gm.questDef || {};
     quest.addMileStone(new QuestMilestone(100,"","It will take some days until the game-equipment arrives. Spent some time studying or working.",        NOP,hidden));
     quest.addMileStone(new QuestMilestone(500,"","Setup VR-equipment.",        NOP,hidden));
     quest.addMileStone(new QuestMilestone(600,"","Enter the game.",        NOP,hidden));
-    quest.addMileStone(new QuestMilestone(700,"","Get to the village.",        NOP,hidden));
+    quest.addMileStone(new QuestMilestone(700,"","Get to the settlement.",        NOP,hidden));
     quest.addMileStone(new QuestMilestone(800,"","Ask around for a quest.",        NOP,hidden));
     quest.addMileStone(new QuestMilestone(900,"","Finish the PurpleBerryQuest.",  NOP));
+    quest.addMileStone(new QuestMilestone(1000,"",".",  NOP));
     window.gm.questDef[quest.id]= quest;
 }
 {   // the quest tracks death for tutorial
@@ -70,7 +71,7 @@ window.gm.questDef = window.gm.questDef || {};
     let quest = new Quest("qDiedAgain","qDiedAgain","qDiedAgain",hidden );
     quest.addMileStone(new QuestMilestone(1,"","Find your first death.",        NOP,hidden));
     quest.addMileStone(new QuestMilestone(100,"","Die with some bonded equipment.",        NOP,hidden));
-    quest.addMileStone(new QuestMilestone(200,"","Die by pleasure.",        NOP,hidden));
+    quest.addMileStone(new QuestMilestone(200,"","Die by pleasure.",        NOP,hidden));   //todo what if this is before previous?
     quest.addMileStone(new QuestMilestone(300,"",".",        NOP,hidden));
     window.gm.questDef[quest.id]= quest;
 }
@@ -79,7 +80,7 @@ window.gm.questDef = window.gm.questDef || {};
     let hidden = (function(){return(false);});
     let quest = new Quest("qPurpleBerry","qPurpleBerry","qPurpleBerry",hidden );
     quest.addMileStone(new QuestMilestone(1,"","Search the forest for 5 handful of purple berrys and deliver them to the alchemist.",        NOP,hidden));
-    quest.addMileStone(new QuestMilestone(100,"",".",        NOP,hidden));
+    quest.addMileStone(new QuestMilestone(100,"","You delivered the berries to the alchemist.",        NOP,hidden));
     quest.addMileStone(new QuestMilestone(200,"","....",        NOP,hidden));
     window.gm.questDef[quest.id]= quest;
 }
@@ -97,8 +98,11 @@ window.gm.questDef = window.gm.questDef || {};
     let hidden = (function(){return(window.gm.quests.getMilestoneState("qBondageKink").id<100);});
     let quest = new Quest("qBondageKink","qBondageKink","qBondageKink",hidden );
     quest.addMileStone(new QuestMilestone(1,"","qBondageKink",        NOP,hidden));
-    quest.addMileStone(new QuestMilestone(100,"","You got some choker on your neck. Find someone that can check on that.",        NOP,hidden));
-    quest.addMileStone(new QuestMilestone(200,"","The alchemist suggested to search for help in [Town].",      NOP,hidden));
+    quest.addMileStone(new QuestMilestone(100,"","You got some collar on your neck. Find someone that can check on that.",        NOP,hidden));
+    quest.addMileStone(new QuestMilestone(200,"","The alchemist suggested to search for help in the next town.",      NOP,hidden));
+    quest.addMileStone(new QuestMilestone(300,"","You found the bridge on your route blocked by a bully. Get rid of him.",      NOP,hidden));
+    quest.addMileStone(new QuestMilestone(400,"","Find your way past the bridge to the town.",      NOP,hidden));
+    quest.addMileStone(new QuestMilestone(500,"","...",      NOP,hidden));
     window.gm.questDef[quest.id]= quest;
 }
 {

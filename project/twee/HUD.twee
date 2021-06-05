@@ -1,26 +1,28 @@
 :: sidebar {"position":"375,500"}
-<h3><%=window.story.name%></h3>V<%=window.gm.getSaveVersion().toString().replaceAll(",",".")%></br>
-<img src="https://twinery.org/homepage/img/logo.svg" width="256" height="256">
-</hr>
-<div style="font-size: smaller;"><%=window.gm.player.location%></br>
+<h3><%=window.story.name%></h3><h3>V<%=window.gm.getSaveVersion().toString().replaceAll(",",".")%></h3>
+<img src='<%=window.gm.getSidebarPic()%>' width="256" height="256">
+<hr>
+<div style="font-size: smaller;"><%=window.gm.util.printLocationName(window.gm.player.location)%></br> <!--this looks often weird, extract [name:Forest] instead ??-->
 <%=window.gm.getTimeString()%> <%=window.gm.getDateString()%></br>
+<hr>
+<%=window.gm.player.name%></br>
 Energy: <%=window.gm.player.energy().value%>/<%=window.gm.player.energy().max%></br>
 Health: <%=window.gm.player.health().value%>/<%=window.gm.player.health().max%></br>
 Money: <%=window.gm.player.Inv.countItem('Money') %></br>
 </div>
-</hr>
+<hr>
 <form>
 <label>Info:    <output></output>  </label></br>
 <button type="button" id="status">Status</button>
 <button type="button" id="inv">Inventory</button>
 <button type="button" id="dashboard">More</button>
 <!--<button type="button" id="wait" style="width: 100%">Rest 45min</button>-->
-</hr>
+<hr>
 <button type="button" id="save" style="width: 80%">Save/load</button>
 <button type="button" id="help" style="width: 80%">Help</button>
 <button type="button" id="settings" style="width: 80%">Settings</button>
 <button type="button" id="achievements" onclick='window.story.show("Achievements");' style="width: 80%">Achievements</button>
-<%if(s.vars.debug & 0x1>0){%>
+<%if(s._gm.debug& 0x1>0){%>
 <button type="button" id="debug" style="width: 80%">Debug</button>
 <script>document.querySelector('#debug').addEventListener('click', function(){window.story.show('debug');});</script>
 <%}%>
@@ -166,6 +168,7 @@ for(var i=0;i<maxSlots;i++){
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 Here you can check and modify several options: </br>
 Your outfit can only be changed by using a wardrobe.</br>
+Your party consist of <%=(function(){var msg=[];for(el of window.story.state._gm.playerParty){msg.push(window.story.state[el].name);}return(msg);}()).join(',')%></br>
 [[Back|_back_]] [[Status]] [[View|Mirror]] [[Inventory]] [[Relations]] [[QuestList]]</br>
 </article><article id="LogPanel"></article></section>
 

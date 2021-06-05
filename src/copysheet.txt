@@ -13,7 +13,7 @@ window.gm.quests.addQuest("qDLCMain",1);
 window.gm.quests.forceQuestMilestone("qDLCMain",600,1);
 window.gm.quests.getMilestoneState("qFixLaptop").id<1000
 
-<p class=talkPC>""</p>
+<p class='talkPC'>""</p>
 
 <div id='select1' >
 <a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1a")'>Call your friend Brad</a>

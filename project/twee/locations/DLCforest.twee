@@ -1,0 +1,292 @@
+:: ForestSpawn
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+<!--todo--> "You magically appear near the top of a hill. </br>
+You can see some kind of house at the foot ogf the hill. You just need to follow the trail down the hill."</br>
+<div></br>
+[[Settlement|ForestBorder]]</br></div>
+</article><article id="LogPanel"></article></section>
+
+
+:: ForestRespawnPod
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<!--<%window.gm.player.location=window.passage.name;%>-->
+Player should teleport here on death
+<script>
+window.gm.respawn();
+if(window.gm.quests.getMilestoneState("qDiedAgain").id===1) {
+    window.story.show('YouDiedOnce'); 
+} else if(window.gm.quests.getMilestoneState("qDiedAgain").id<=100){
+    window.story.show('YouDiedWithCursedGear');
+} else {
+    window.gm.player.Wardrobe.addItem(new window.storage.constructors['RobesZealot']());
+    window.gm.player.Outfit.addItem(new window.storage.constructors['RobesZealot']());
+    window.gm.player.Inv.addItem(new window.storage.constructors['StaffWodden'](),1);
+    window.story.show('ForestRespawnPodExit'); 
+}
+</script>
+
+
+:: ForestRespawnPodExit
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+<!--todo--> You are in the sanctum of spawn. Its located on top of the hill above the settlement.</br> 
+</br> There is a path leading downwards to the settlement.</br>
+<div></br>
+[[Settlement|ForestBorder]] </br></div>
+</article><article id="LogPanel"></article></section>
+
+
+:: ForestBorder
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.moveHere();%>
+<!--todo--> There is a dirt road here crossing the lush grassland that is bordered by the trees of an forest.</br> 
+One direction leads to the hut close by. The other direction follows the border of the forest but gets out of view quickly.</br> 
+</br> 
+<div></br>
+[[Enter Hut|ForestAlchemistHut]] [[Into the forest|ForestEntrance]] [[follow Road|ForestBridge]] </br></div>
+</article><article id="LogPanel"></article></section>
+
+
+:: ForestSearchAround [_back_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<% let args = window.story.state.tmp.args; if(args[0]==='PurpleBerry' && args[1]>0){ window.gm.player.Inv.addItem(new window.storage.constructors[args[0]](),args[1]); %>
+On a secluded spot you found a batch of berry bushes. Most of them dont have any more berrys but you are able to collect a handful.</br>
+<%} else if(args[0]==='PurpleBerry'){%>
+There arent any purple berrys left. You have to search on a different place.
+<%} else {%>
+Unfortunatly you didnt find anything useful.</br>
+<%}%>
+<div></br>
+[[Next|_back_]]</br></div>
+</article><article id="LogPanel"></article></section>
+
+
+:: ForestWolfEncounter [_back_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<% window.gm.quests.addQuest("qWolfMate",1); if(window.gm.quests.getMilestoneState("qWolfMate").id<=1) {%>
+Distracted by rummaging around in the bushes, you just caught by surprise as you turn around.</br>
+A dog is staring into your face. Its looks very close to a wolf you think. But wolfs would stay away from humans.
+'Oh wait, I'm in the game. In games wolves are nether to shy to attack.'
+The wolf doesnt do a thing, just stands there and looks at you.
+<div id='select1' >
+<a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1a")'>First strike</a>
+<a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1b")'>Dont move</a>
+</div>
+<div id='choice1a' hidden>
+I'm in this game right now for how long and havent killed anything? </br>
+Lets get started to earn some XP. </br>
+<a0 onclick='window.gm.encounters.wolf(window.gm.player.location)'>Next</a>
+</div>
+<div id='choice1b' hidden>
+There is nearly no chance in real life to accidently run into a wolf. So lets saviour that thrilling feeling even if this is not reallity.</br>
+That wolf is around 1m large from tip to toe. It has a dark gray fur with some darker areas on its back and feet.</br>
+Dark yellow eyes stare into your own and you stare back.</br>
+...Which provokes the wolf to attack...  
+<a0 onclick='window.gm.encounters.wolf(window.gm.player.location)'>Next</a>
+</div>
+<%} else {%>
+There is a wolf again. Or is it the same?</br>
+<a0 onclick='window.gm.encounters.wolf(window.gm.player.location)'>Next</a>
+<%}%></br>
+<%=(window.story.state._gm.debug)?("[[Skip|_back_]]"):("")%></br>
+</article><article id="LogPanel"></article></section>
+
+
+:: ForestEntrance
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.moveHere();%>
+The forest makes a friendly impression.  </br> The trees are still light and are not yet as expansive and large as that no more light can get through the canopy. 
+</br> 
+Maybe you can <a0 onclick='explore(); '>explore</a> the surrounding woods and see if you can find anything useful.</br>
+<%=(window.story.state._gm.debug)?("[[ForestWolfEncounter]]"):("")%></br>
+<div></br>[[ForestBorder]] [[ForestCliff]] </br></div>
+</article><article id="LogPanel"></article></section>
+<script> function explore() {
+    let rnd = _.random(0,100);
+    window.story.state.tmp.args = [];
+    if(window.gm.quests.getMilestoneState("qDiedAgain").id<=1 && window.gm.player.Inv.countItem('PurpleBerry')>=3) {
+        window.story.state.tmp.args = ['PurpleBerry',0];window.story.show('ForestSearchAround'); //find nothing !
+    } else if(rnd > 70 ) {
+         window.story.show('ForestWolfEncounter');
+    } else if(rnd > 20) { //todo limit berys per day
+        window.story.state.tmp.args = ['PurpleBerry',1];window.story.show('ForestSearchAround');
+    }
+    else {
+        window.story.show('ForestSearchAround'); //nothing
+    }
+}
+</script>
+
+
+:: ForestCliff
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.moveHere();%>
+You fight your way through the dense undergrowth and realize just in time that you have reached the edge of a cliff.</br> 
+</br> 
+<% if(window.gm.quests.getMilestoneState("qDiedAgain").id===1) { %>
+<div id='select1' >
+<a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1a")'>Peak into the chasm</a>
+</div>
+<div id='choice1a' hidden>
+There is a slab of rock from which you should be able to look down quite well.</br>
+You look carefully over the edge. It's not a real abyss, but a pretty steep, rocky slope. </br>
+'I'm not climbing down there now.' you think when you want to go back to the forest. </br>
+<div id='select2' >
+<a0 onclick='window.gm.printTalkLink($("div#select2")[0],"div#choice2a")'>Next</a>
+</div>
+<div id='choice2a' hidden>
+The rock slab is not so rock-solid and just as you turn around it begins to tip into the abyss. 
+Unfortunatly, your jump-ability isn't quite good enough. The slab drags you down with it.</br>
+At some point you see a massive rock coming onto you, reaching out with your hands to stop it squishing you.
+<div id='select3' >
+<a0 onclick='window.gm.printTalkLink($("div#select3")[0],"div#choice3a")'>Next</a>
+</div>
+<div id='choice3a' hidden>
+But of course its futile trying to catch that crushing weight. </br>  
+You dont feel any pain, everything is just going [[black|ForestRespawnPod]] as if pulling the cord from a TV.</br>  
+</div></div></div>
+<% } else {%>
+<div>
+A path leads along the cliff until it vanishs into a [[cave entrance|ForestCliffCave]] .  
+Or you might just return to [[ForestEntrance]]. </br></div> 
+<%}%>
+</article><article id="LogPanel"></article></section>
+
+
+:: ForestCliffCave
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.moveHere();%>
+<% if(window.gm.quests.getMilestoneState("qBondageKink").id<=1) { %>
+<%window.gm.player.Outfit.addItem(new window.gm.ItemsLib["CollarQuest"]());window.gm.quests.forceQuestMilestone("qBondageKink",100,1);%>
+<!--todo--> !!! You got some kind of collar !!!
+Using both hands to feel up that ring around your neck, trying to get an idea what it is.</br>
+It is made from some rigid material, maybe leather. The surface is mostly smooth and flat. Its broad as a thumb but only half a cm thick.</br>
+'Its some kind of choker. How do I get it off ?!' </br> You cant make out a latch or buckle.</br></br>
+Maybe you can ask someone for help. 
+[[Leave|ForestCliff]].
+<% } else {%>
+<div>
+<a0 onclick='enterBeehive(); '>Enter Beehive</a></br>
+Or you might just return to [[ForestEntrance]]. </br></div> 
+<%}%>
+</article><article id="LogPanel"></article></section>
+<script> function enterBeehive() {
+    window.gm.dng = window.gm.dngs.BeeHive();
+    window.gm.dng.enterDungeon();
+}
+
+:: ForestStoneCircle
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.moveHere();%>
+<!--todo--> Aus dem dichten Unterholz trittst du auf eine Lichtung. Das wäre ein idylischer Ort wenn nicht dieser Steinkreis wäre.</br> 
+</br> 
+<% if(true) { %>
+<div id='select1' >
+<a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1a")'>Inspect stone circle</a>
+</div>
+<div id='choice1a' hidden>
+Du gehst zu den übermannsgroßen Steinen. Es scheint hier etwas kühler zu sein und etwas Nebel liegt in der Luft.
+Ansonsten gibt es hier nichts.</br>
+[[Leave|NOP]]
+</div>
+<% } else {%>
+<div>
+[[ForestEntrance]] </br></div> 
+<%}%>
+</article><article id="LogPanel"></article></section>
+
+:: ForestAlchemistHut
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.moveHere();%>
+<!--todo--> 'Puh, what a stink. I shouldnt stay here for long for I might suffocate'</br> </br>
+<% if(!window.gm.quests.hasActiveQuest("qPurpleBerry") || window.gm.quests.getMilestoneState("qPurpleBerry").id<1) { %>
+<p class='talkPC'>"Hello? Anyone there?"</p>
+A man appears from a door at the side of the room. Worn old clothing adorns his lithe frame. 
+<p class='talkPC'>"I would like to ask if you have a quest for me."</p>
+"A quest? Thats an odd question. Do you mean a job?"
+<p class='talkPC'>"Not a job. Something that is really important to you but you cant do it yourself."</p>
+Ah, you mean cake. I like cake but I cant bake a deent one myself.
+<p class='talkPC'>"What?! No I mean something that is a matter of life."</p>
+"Cake is important for my life. Its a tasty treat that sweetens my existance."
+<p class='talkPC'>"No listen. Do you need help with some task? I could help you and you give me something. Except for baking a cake."
+"I should give you something? What could I give you? A potion maybe. I dont have much else I could give away."
+<p class='talkPC'>"What potions do you create."</p>
+"Oh hoho now we are talking my language. I could make a lot of useful potions. Unfortunatly my alembic is broken so I can only do the basic stuff.
+Now that I think about it, we could make a trade: you get me some purple berrys, and you get some berry juice I create from it."
+<p class='talkPC'>"I could crush them myself and have all of the juice for myself!"</p>
+"Uhm.. but you cant do it like I do .. I have special equipment for that. It empowers the natural healing benefit."
+<p class='talkPC'>"So that juice is some kind of health potion?"</p>
+"For sure it is. Therefore I say: bring me 5 handful of berries and you get to 2 bottles of potion."
+<p class='talkPC'>"Sigh. Whatever. Seems to be the only possible quest I an get right now."</p>
+"Are they with caramel? I like caramel. And choclat."
+<p class='talkPC'>"Please? What do you talk about?"</p>
+"About the cakes. What kind of cake are we speaking about."
+<p class='talkPC'>"I will get you your berries now."</p>
+<a0 onclick='window.gm.quests.addQuest("qPurpleBerry",1);window.story.show("ForestBorder");'>Leave</a>
+<% } else if(window.gm.quests.getMilestoneState("qPurpleBerry").id===1 && window.gm.player.Inv.countItem("PurpleBerry")>=5) { %>
+<div id='select1' > You got enough purple berries to trade in for the alchemist. Will you do so?
+<a0 onclick='window.gm.player.Inv.removeItem("PurpleBerry",5);window.gm.player.Inv.addItem(new window.gm.ItemsLib.SimpleFood(),2);window.gm.quests.forceQuestMilestone("qPurpleBerry",100,1);window.gm.printTalkLink($("div#select1")[0],"div#choice1a");'>Yes</a>
+<a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1b");window.gm.refreshAllPanel();'>No</a>
+</div>
+<div id='choice1a' hidden>
+<p class='talkPC'>"I've got those berries for you."</p> You place them on the desk and wait for the approval of the alchemist.</br>
+"Very good. Like I said I will give you 2 potions for those."
+<a0 onclick='window.gm.refreshAllPanel();'>Next</a>
+</div><div id='choice1b' hidden></div>
+<%} else {%>
+"About that cake we talked earlier - what kind of cake are we speaking about."
+<p class='talkPC'>NOO CAKE !</p>
+<a0 onclick='window.gm.player.Inv.removeItem("PurpleBerry",5);window.gm.player.Inv.addItem(new window.gm.ItemsLib.SimpleFood(),2);window.gm.refreshAllPanel();' 
+<%=(window.gm.player.Inv.countItem("PurpleBerry")>=5)?(""):("hidden")%>>Trade 5 purple berries for 1 potion</a>
+<div></br>[[Outside|ForestBorder]]  [[Alchemist]] [[Clair]]</br></div>
+<%}%>
+</article><article id="LogPanel"></article></section>
+
+
+:: ForestBridge
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.moveHere();%>
+<% if(window.gm.quests.getMilestoneState("qBondageKink").id<100) { %>
+Somehow you cant go into this direction. Maybe this route unlocks later.
+[[Leave|ForestBorder]]
+<% } else if(window.gm.quests.getMilestoneState("qBondageKink").id<=200) { %>
+'I guess this road leads to that town the alchemist mentioned.'</br>
+You follow the path until after a curve a wooden bridge comes into view.
+The bridge spans about the canyon,a deep chasm between the forest and the eastern area thereof.</br>
+You carefully set a foot on it, so far it looks stable enough to carry ones weight.
+<div id='select1' >
+<a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1a")'>Go on</a>
+</div>
+<div id='choice1a' hidden>
+When you have half of the bridge behind you, a large figure steps into view.</br>
+"Stop. You have to pay a fee to pass the bridge." it shouts over to you.
+Squinching your eyes and slowing down your steps, you try to get a better view of that hindrance.</br> <!--todo-->
+<p class='talkPC'>"A fee? I didnt see a sign. Who are you?" </p>
+"There is no sign yet beause...we where busy with...bridge repair. You give ...20coin and then you may pass."</br>
+'Looks more like highwayman then a craftsman' you think to yourself. </br>
+<div id='select2' >
+<a0 onclick='window.gm.printTalkLink($("div#select2")[0],"div#choice2a")'>Cant pay</a>
+</div>
+<div id='choice2a' hidden>
+<p class='talkPC'>"I cant pay you, I have nothing of value."</p>
+"Then, just turn around and walk back before I force you to do so."</br>
+'I could tackle him. I bet he wouldnt take the risk of a fight if he is alone and cant expect some loot from me.'</br>
+"Nice collar. So you are a slave? Maybe you have fled from your master huh? I should just take you into custody for some reward?"</br>
+<div id='select3' >
+<a0 onclick='window.gm.printTalkLink($("div#select3")[0],"div#choice3a")'>I'm not a slave!</a>
+</div>
+<div id='choice3a' hidden>
+While screaming at your offender, he bolts forward trying to knock you over.</br>
+You are in a <a0 onclick='window.gm.encounters.Trent(window.gm.player.location)>fight!</a></br>
+</div></div></div></div>
+<% } else if(window.gm.quests.getMilestoneState("qBondageKink").id<=300) { %>
+That horse-man is leaning at the handrail of the bridge and says with a smug grin: </br>
+"There you are again. Are you here for another lesson?"</br>
+At least two other people are sitting around a firepit near the eastern end of the bridge.</br>
+[[wrestle with him(again)]] [[offer him something]]  [[retreat]]
+<% } else {%>
+A large bridge made of wood crosses a deep canyon that separates the forest from the land east of it.</br>
+<div>[[to Forest|ForestBorder]] [[to Plains]]. </br></div>
+<%}%>
+</article><article id="LogPanel"></article></section>

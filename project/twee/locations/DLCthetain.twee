@@ -1,0 +1,49 @@
+:: VillageEntranceIntro
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<!--todo--> A neat little village comes into view as you walk towards its entrance.  </br>
+Someone has painted 'Thetain' on the planks above the wooden gate. Most likely thats the name of this commune.
+'Thats really looks awesome. I wonder if I can really visit those houses or if they are just scenery.'</br>
+<div></br>
+[[Continue|VillageMarketPlace]]</br></div>
+</article><article id="LogPanel"></article></section>
+
+
+:: VillageEntrance
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.moveHere();%>
+<!--todo--> You are at the crossroads in front of the entrance to the town Thetain.
+</br></br>
+<div></br>
+[[Enter village|VillageMarketPlace]]  [[go to forest|ForestBridge]]</br></div>
+</article><article id="LogPanel"></article></section>
+
+
+:: VillageMarketPlace
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.moveHere();%>
+<!--todo--> There arent many people around the place right now.</br> There seems to be a shop of an alchemist, a Inn and another shop where you cant say what kind of wares - if any - they are trading.</br>
+</br> Near the entrance of the Inn is also a [[bulletin-board]]. 
+<div></br>
+[[Gate|VillageEntrance]] [[Inn|VillageInn]]  [[Alchemist]] [[Shop|VillagePawnshop]]</br></div>
+</article><article id="LogPanel"></article></section>
+
+
+:: VillageInn
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.moveHere();%>
+<!--todo--> 'This really looks like they scavenged that place from a typical fantasy story book.'</br> 
+<div></br>
+[[Square|VillageMarketPlace]] </br></div>
+</article><article id="LogPanel"></article></section>
+<script> </script>
+
+
+:: VillagePawnshop
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.moveHere();%>
+<!--todo--> If this is a shop, then they sell everything: Shoes, cooking pans, assault ballista and chicken.</br> 
+<!--todo-->On the other side of the room is a large [[Wardrobe]] with a [[Mirror]] where you can take a look at yourself.
+</br> 
+<div></br>
+[[Square|VillageMarketPlace]]  [[Shopkeeper]]</br></div>
+</article><article id="LogPanel"></article></section>

@@ -17,15 +17,15 @@ Cheat buttons: those are meant for debugging and might break your game</br>
 <a href="javascript:void(0)" onclick='window.gm.player.Inv.addItem(new window.storage.constructors["Money"](),200);window.gm.refreshAllPanel();'>Get 200$</a></br>
 </br>
 <a href="javascript:void(0)" onclick='unhideStats();window.gm.refreshAllPanel();'>unhide player stats</a></br>
-<%if(window.story.state.vars.dbgShowCombatRoll) {%>
-<a href="javascript:void(0)" onclick='window.story.state.vars.dbgShowCombatRoll=false;window.gm.refreshAllPanel();'>disable combat debug</a>
+<%if(window.story.state._gm.dbgShowCombatRoll) {%>
+<a href="javascript:void(0)" onclick='window.story.state._gm.dbgShowCombatRoll=false;window.gm.refreshAllPanel();'>disable combat debug</a>
 <%} else {%>
-<a href="javascript:void(0)" onclick='window.story.state.vars.dbgShowCombatRoll=true;window.gm.refreshAllPanel();'>enable combat debug (log combat calculations)</a>
+<a href="javascript:void(0)" onclick='window.story.state._gm.dbgShowCombatRoll=true;window.gm.refreshAllPanel();'>enable combat debug (log combat calculations)</a>
 <%}%>
-<%if(window.story.state.vars.dbgShowQuestInfo) {%>
-<a href="javascript:void(0)" onclick='window.story.state.vars.dbgShowQuestInfo=false;window.gm.refreshAllPanel();'>disable extended questinfo</a>
+<%if(window.story.state._gm.dbgShowQuestInfo) {%>
+<a href="javascript:void(0)" onclick='window.story.state._gm.dbgShowQuestInfo=false;window.gm.refreshAllPanel();'>disable extended questinfo</a>
 <%} else {%>
-<a href="javascript:void(0)" onclick='window.story.state.vars.dbgShowQuestInfo=true;window.gm.refreshAllPanel();'>enable ext. questinfo</a>
+<a href="javascript:void(0)" onclick='window.story.state._gm.dbgShowQuestInfo=true;window.gm.refreshAllPanel();'>enable ext. questinfo</a>
 <%}%>
 <a href="javascript:void(0)" onclick='window.gm.player.Stats.increment("health",25);window.gm.refreshAllPanel();'>Health +25</a></br>
 <a href="javascript:void(0)" onclick='window.gm.player.Stats.increment("energy",25);window.gm.refreshAllPanel();'>Energy +25</a></br>

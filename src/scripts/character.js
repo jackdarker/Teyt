@@ -42,9 +42,7 @@ class Character {
         stCorruption.setup(this.Stats,0,50),stArousal.setup(this.Stats,1,100),stLAttack.setup(this.Stats,6,100),stLDefense.setup(this.Stats,2,100);
         for(let name of stFetish.listFetish()) {
             stFetish.setup(this.Stats,0,10,name);
-        }
-        this.Effects.addItem(effNotTired.name, new effNotTired()); //depending on sleep Tired will be set to NotTired or Tired
-        
+        }        
         this.Skills.addItem(new SkillUseItem());
         this.Skills.addItem(new SkillAttack());this.Skills.addItem(new SkillStun());this.Skills.addItem(new SkillHeal());
         this.Skills.addItem(new SkillFlee()),this.Skills.addItem(new SkillSubmit());    

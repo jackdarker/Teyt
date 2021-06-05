@@ -7,8 +7,7 @@ A <%=window.story.state.combat.enemyParty[0].name%> appears ! </br>
 </article><article id="LogPanel"></article></section>
 
 :: EncounterStartTurn {"position":"650,25"}
-<section> 
-<aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 <div id='combatCanvas' style='background: url(<%=s.combat.enemyParty[0].pic%>) no-repeat center,url(<%=s.combat.scenePic%>) no-repeat center;color:black;'></div></br>
 <div id="panel"></div></br></br> <!--filled by statspanel-->
 <div id="choice"></div></br></br> <!--filled by combat-statemachine-->
@@ -28,8 +27,10 @@ renderToSelector("#panel", "statspanel");
 
 
 :: GameOver {"position":"200,275"}
-Game Over. I hope you learned something.</br>
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+Game Over. Better luck next time.</br>
 </br>[[New Game|Start]]
+</article><article id="LogPanel"></article></section>
 
 
 :: Mole Submit {"position":"500,175"}

@@ -12,7 +12,7 @@
     }
     toJSON() {return window.storage.Generic_toJSON("StatsDictionary", this); };
     static fromJSON(value) {
-        var _x = window.storage.Generic_fromJSON(StatsDictionary, value.data);
+        let _x = window.storage.Generic_fromJSON(StatsDictionary, value.data);
         return(_x);
     }
     //
@@ -20,15 +20,15 @@
         return(this.getItem(id));
     }
     modifyHidden(id,hidden) {
-        var _data = this.get(id).data;
+        let _data = this.get(id).data;
         _data.hidden=hidden;
     }
     // adds a modifier to a Stat or replaces it
     addModifier(toId, modData) {
-        var _stat = this.get(toId);
-        var _oldMods = _stat.data.modifier;
-        var _x=-1;
-        for(var i=0;i<_oldMods.length;i++){
+        let _stat = this.get(toId);
+        let _oldMods = _stat.data.modifier;
+        let _x=-1;
+        for(let i=0;i<_oldMods.length;i++){
             if(_oldMods[i].id===modData.id) _x=i;
         }
         if(_x>=0) _oldMods.splice(_x,1);
@@ -36,10 +36,10 @@
         window.gm.pushLog(_stat.Calc().msg);
     }
     removeModifier(toId,modData) {
-        var _stat = this.get(toId);
-        var _oldMods = _stat.data.modifier;
-        var _x=-1;
-        for(var i=0;i<_oldMods.length;i++){
+        let _stat = this.get(toId);
+        let _oldMods = _stat.data.modifier;
+        let _x=-1;
+        for(let i=0;i<_oldMods.length;i++){
             if(_oldMods[i].id===modData.id) _x=i;
         }
         if(_x>=0) _oldMods.splice(_x,1);
@@ -51,7 +51,7 @@
     }
     //override; only use to create new stats !
     addItem(stat) {
-        var _i = this.findItemSlot(stat.name);
+        let _i = this.findItemSlot(stat.name);
         if(_i<0) {
             stat._parent=window.gm.util.refToParent(this);
             this.list.push({'id': stat.name,'count': 1, item:stat});
@@ -59,14 +59,14 @@
     }
     //override
     removeItem(id) {
-        var _i = this.findItemSlot(id);
+        let _i = this.findItemSlot(id);
         if(_i<0) return; //just skip if not found
-        var _stat = this.get(id);
+        let _stat = this.get(id);
         this.list.splice(_i,1);
         _stat.calc();   //trigger update of dependent stat
     }
     increment( id, value) {
-        var attr = this.get(id);
+        let attr = this.get(id);
         attr.data.base += value;
         window.gm.pushLog(attr.Calc(this,id).msg);
     }
@@ -98,12 +98,12 @@ class Stat {
     get hidden() {return(this.data.hidden);}
     //this is called to update value of the stat and will trigger calculation of dependend stats 
     Calc( ) {
-        var attr = this.data;
-        var min = -99999;
-        var max = 99999;
-        var msg = '';
+        let attr = this.data;
+        let min = -99999;
+        let max = 99999;
+        let msg = '';
         //get limits
-        for(var k=0;k<attr.limits.length;k++) {//this might behave odly if any min>max
+        for(let k=0;k<attr.limits.length;k++) {//this might behave odly if any min>max
             let lmin = attr.limits[k].min, lmax = attr.limits[k].max;  //lm__ is id or number
             if (lmin || lmin===0) {
                 min= (typeof lmin ==='string')? Math.max(this.parent.get(lmin).value,min): Math.max(lmin,min);
@@ -113,17 +113,17 @@ class Stat {
             }
         }
         //recalculate modifiers
-        var _old =  attr.value;
+        let _old =  attr.value;
         attr.base = attr.value = Math.max(min,Math.min(max,attr.base));  
-        for(var i=0;i<attr.modifier.length;i++) {
+        for(let i=0;i<attr.modifier.length;i++) {
             attr.value += attr.modifier[i].bonus;
         }
-        var _new = Math.max(min,Math.min(max,attr.value));
+        let _new = Math.max(min,Math.min(max,attr.value));
         attr.value = _new;
         msg+=this.formatMsgStatChange(attr,_new,_old);//todo no log hidden
         this.updateModifier();
         //trigger recalculation of dependend Stats
-        for(var m=0;m<attr.modifys.length;m++) {
+        for(let m=0;m<attr.modifys.length;m++) {
             msg+=this.parent.get(attr.modifys[m].id).Calc().msg;
         }
         return({OK:true,msg:msg});
@@ -145,11 +145,12 @@ class Effects extends Inventory {  //Todo a collection of Stats is similiar to I
     constructor(externlist) {
         super(externlist);
         window.storage.registerConstructor(Effects);
-        window.gm.timeEvent.subscribe("change", this.updateTime.bind(this) );
+        //! this doesnt work after load! see PubSub comments
+        //window.gm.timeEvent.subscribe("change", this.updateTime.bind(this) ); 
     }
     toJSON() {return window.storage.Generic_toJSON("Effects", this); };
     static fromJSON(value) {
-        var _x = window.storage.Generic_fromJSON(Effects, value.data);
+        let _x = window.storage.Generic_fromJSON(Effects, value.data);
         return(_x);
     }
     get(id){
@@ -157,27 +158,27 @@ class Effects extends Inventory {  //Todo a collection of Stats is similiar to I
     }
     //findItemslot uses id, this one finds all effects(-slot) of one type
     findEffect(name) {
-        var _items = [] ;
-        for (var i = 0; i < this.count(); i++) {
+        let _items = [] ;
+        for (let i = 0; i < this.count(); i++) {
             if(this.list[i].item.name===name) _items.push(i);
         }
         return(_items);
     }
     //override
     removeItem(id) {
-        var _i = this.findItemSlot(id);
+        let _i = this.findItemSlot(id);
         if(_i<0) return; //just skip if not found
-        var _eff = this.get(id);
+        let _eff = this.get(id);
         this.list.splice(_i,1);
         _eff.onRemove(this,this.list[_i]);
         this.postItemChange(id,"removed","");
     }
     addItem(id,effect) {
-        var _i = this.findItemSlot(id);
-        var res;
+        let _i = this.findItemSlot(id);
+        let res;
         //if effect with same id is already present, merge them
         if(_i>-1) {
-            var _old = this.get(id);//effect.id);
+            let _old = this.get(id);//effect.id);
             res = _old.merge(effect);
             if(res!=null) {
                 if(res===true) {}
@@ -187,9 +188,9 @@ class Effects extends Inventory {  //Todo a collection of Stats is similiar to I
             }  
         }
         //or if there are similiar effects try to merge with them
-        //var _k = this.findEffect(effect.name);  
+        //let _k = this.findEffect(effect.name);  
         for(let i=0;i<this.list.length;i++) {
-            var _old = this.list[i].item;
+            let _old = this.list[i].item;
             res = _old.merge(effect);
             if(res!=null) {
                 if(res===true) {}
@@ -205,9 +206,9 @@ class Effects extends Inventory {  //Todo a collection of Stats is similiar to I
         this.postItemChange(id,"added","");
     }
     replace(id, neweffect) {
-        var _i = this.findItemSlot(id);
+        let _i = this.findItemSlot(id);
         if(_i<0) return; //Todo do nothing
-        var _old = this.get(id);
+        let _old = this.get(id);
         _old.onRemove();
         //window.gm.EffectLib[this.list[_i].name].onRemove(this,this.list[_i]);
         neweffect._parent = window.gm.util.refToParent(this);
@@ -215,16 +216,19 @@ class Effects extends Inventory {  //Todo a collection of Stats is similiar to I
         neweffect.onApply();
     }
     updateTime() {
-        var now =window.gm.getTime();
-        for(var i=0;i<this.list.length;i++){
-            var _eff = this.list[i].item;
-            var foo = _eff.onTimeChange(now);   
+        let now =window.gm.getTime();           //todo only update RL-char in RL and VR-char in VR 
+        for(let i=0;i<this.list.length;i++){
+            let _eff = this.list[i].item;
+            let foo = _eff.onTimeChange(now);   
             if(foo) foo(this);
         }
     }
     //override
     postItemChange(id,operation,msg) {
-        window.gm.pushLog('Effects: '+operation+' '+id+' '+msg+'</br>');  todo only show logs for player?
+        window.gm.pushLog('Effects: '+operation+' '+id+' '+msg+'</br>',
+            window.story.state._gm.debug || 
+            window.gm.player.name===window.story.state.playerVR.name ||
+            window.gm.player.name===window.story.state.playerRL.name);  //todo only show logs for player?
     }
 }
 

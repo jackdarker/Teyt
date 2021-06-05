@@ -4,3 +4,145 @@ if Type!=this decrease rating
 else increase rating
 if rating drops below 0 ??  "Something in your nethers is changing, you can feel it. Your once average sized human dong has changed its shape. At least that what you think."
 if rating increases just above 0 "You "
+
+
+:: MutateCat [_isdeffered_]
+<section> 
+<aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+<div id='output'></div></br>   <!--message is rendered here-->
+<a0 onclick= 'window.story.state.msg="";window.story.show("")'>Next</a></br>
+</article></section>
+<script>
+function mutate() {
+    if(window.gm.player.Outfit.countItem("TailCat")>0) {
+        var growth = window.gm.player.Outfit.getItem("TailCat").growth+0.25;
+        var maxGrowth = 2;//window.gm.player.Outfit.getItem("TailCat").maxGrowth;
+        if(growth >= 1) {
+            window.gm.printOutput("You already changed to a cat as far as possible.</br>");
+        } else {
+            window.gm.player.Outfit.getItem("TailCat").growth=growth;
+            window.gm.printOutput("Your tail must have grown and is now "+growth*maxGrowth+" meter long.</br>");
+        }
+    } else {
+        window.gm.player.Outfit.addItem(new window.storage.constructors['TailCat']());
+        window.gm.printOutput("You have grown a cat tail !</br>");
+    }
+}
+mutate();
+</script>
+
+
+:: MutateWolf [_isdeffered_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+<div id='output'></div></br>   <!--message is rendered here-->
+<a0 onclick='window.story.state.msg="";window.story.show("")'>Next</a></br>
+</article></section>
+<script>
+function mutate() {
+    if(window.story.state.tmp.args===null) {
+        window.gm.printOutput(window.story.state.msg);
+        return;
+    }
+    let _rnd =_.random(1,100);
+    let msg='';
+    if(window.gm.player.Outfit.countItem("TailCat")>0) {
+        let tail = window.gm.player.Outfit.getItem("TailCat");
+        let growth = tail.growth+0.25;
+        let maxGrowth = tail.maxGrowth;
+        if(growth >= 1) {
+            msg+="That tail didnt grow any further.</br>";
+        } else {
+            tail.growth=growth;
+            msg+="Your bushy tail must have grown and is now "+window.gm.formatNumber(growth*maxGrowth,1)+" meter long.</br>";
+        }
+    } else {
+        window.gm.player.Outfit.addItem(new window.storage.constructors['TailCat']());
+        msg+="You have grown a short tail !</br>";
+    }
+    let face = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bFace);
+    let skin = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bSkin);
+    if(face ===null || face.id !="FaceWolf") {
+        window.gm.player.Outfit.addItem(new window.storage.constructors['FaceWolf']());
+        msg+= "Your face got transformed into a dog-like muzzle.</br>"; 
+    } else if(skin ===null || skin.id !="SkinFur") {
+        window.gm.player.Outfit.addItem(new window.storage.constructors['SkinFur']());
+        msg+= "A dense coat of fur spreads over your body.</br>";
+    }
+    if(msg==='') msg= "Your anxiety goes by as you didnt get any more wolflike."
+    window.gm.printOutput(msg);
+    window.story.state.msg = msg;
+    window.story.state.tmp.args=null; //
+}
+mutate();
+</script>
+
+
+
+:: CatHabit [_isdeffered_]
+<section> <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+You feel the urge to sit down and give yourself a good licking...</br>
+<a0 onclick= window.story.show("")>Next</a></br>
+</article></section>
+
+:: MutateBreast [_isdeffered_]
+<section> <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+<div id='output'></div></br>   <!--message is rendered here-->
+<a0 onclick='window.story.state.msg="";window.story.show("")'>Next</a></br>
+</article></section>
+<script>
+function mutate() {
+    if(window.gm.player.Outfit.countItem("BreastHuman")>0) {
+        var growth = window.gm.player.Outfit.getItem("BreastHuman").growth+=0.1;
+        var maxGrowth = 0.3;//window.gm.player.Outfit.getItem("TailCat").maxGrowth;
+        if(growth >= 1) {
+            window.gm.printOutput("Your teats are as big as they can get.</br>");
+        } else {
+            window.gm.player.Outfit.getItem("BreastHuman").growth=growth;
+            window.gm.printOutput("Your breasts seems to have enlarged again to a size of "+growth*maxGrowth*100+" cm.</br>");
+        }
+    } else {
+        window.gm.player.Outfit.addItem(new window.storage.constructors['BreastHuman']());
+        window.gm.printOutput("As you feel up your pecks you notice that they seem to be softer than before !</br>");
+    }
+}
+mutate();
+</script>
+
+
+:: MutateBreastEnd [_isdeffered_]
+<section> <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+Somehow you know your breast stopped changing ...</br>
+<a0 onclick='window.story.state.msg="";window.story.show("")'>Next</a></br>
+</article></section>
+
+:: MutateVulva [_isdeffered_]
+<section> <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+<div id='output'></div></br>   <!--message is rendered here-->
+<a0 onclick='window.story.state.msg="";window.story.show("")'>Next</a></br>
+</article></section>
+<script>
+function mutate() {
+    let vulva = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bVulva);
+    let msg = 'Everything is ok, nothing unusual.</br>';
+    if(vulva) {
+        msg ="An unusual feeling lets you move your hand down to your nethers.</br>"
+        if(vulva.data.clitsize>0.9) {
+            vulva.data.stretch+=0.5;
+            msg+= "Your muff seems to be more loose then before !</br>";
+        } else {
+            vulva.data.clitsize+=0.5;
+            msg+= "You arent quite sure but could it be possible that your clitoris is larger then before?</br>";
+        }
+        msg += "</br>"+vulva.descLong()+"</br>";
+    }
+    window.gm.printOutput(msg);
+}
+mutate();
+</script>
+
+
+:: MutateVulvaEnd [_isdeffered_]
+<section> <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+Your cunt didnt change since some time now. At least you cant see any... </br>
+<a0 onclick= window.story.show("")>Next</a></br>
+</article></section>

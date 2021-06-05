@@ -10,12 +10,16 @@ window.gm.initGame= function(forceReset,NGP=null) {
     var s = window.story.state;
     s._gm.timeRL= s._gm.timeVR = s._gm.time;
     s._gm.dayRL= s._gm.dayVR = s._gm.day;
+    //TODO set debug to 0 for distribution !
+    s._gm.debug = 1,   
+    s._gm.dbgShowCombatRoll= false,
+    s._gm.dbgShowQuestInfo= true;
     if (!s.vars||forceReset) { // storage of variables that doesnt fit player
         s.vars = {
-        debug : 1,   //TODO set to 0 for distribution !   see debug passage for meaning
-        dbgShowCombatRoll: false,
-        dbgShowQuestInfo: true,
         debugInv: new Inventory(),
+        inVR: false,
+        playerPartyVR:[],
+        playerPartyRL:[],
         //flags for global states
         qDogSit : 0,   // see park
         qUnlockCampus : 0,  //see passage into city
@@ -124,7 +128,6 @@ window.gm.initGame= function(forceReset,NGP=null) {
         ch.Wardrobe.addItem(new TankShirt());
         ch.Wardrobe.addItem(new Pullover());
         ch.Wardrobe.addItem(new TailRibbon());
-        
         ch.Outfit.addItem(new BaseHumanoid());
         ch.Outfit.addItem(new FaceHuman());
         ch.Outfit.addItem(new SkinHuman());
@@ -133,6 +136,7 @@ window.gm.initGame= function(forceReset,NGP=null) {
         ch.Outfit.addItem(new Sneakers());
         ch.Outfit.addItem(new Pullover());
         //special skills
+        ch.Effects.addItem(effNotTired.name, new effNotTired()); //depending on sleep Tired will be set to NotTired or Tired
         ch.Skills.addItem(SkillCallHelp.setup('Mole'));
         s.PlayerRL=window.gm.PlayerRL=ch;
     }      
@@ -140,6 +144,13 @@ window.gm.initGame= function(forceReset,NGP=null) {
     //take over flags for newgameplus
     if(NGP) { window.story.state.vars.crowBarLeft = NGP.crowBarLeft; }
     NGP=null; //release memory
+}
+// lookup function for sidebar icon
+window.gm.getSidebarPic = function(){ //todo display doll ??
+  if(window.story.state.vars.inVR) {
+    return("assets/icons/icon_swordspade.svg");
+  }
+  return('assets/icons/icon_cityskyline.svg');
 }
 // lookup function for scene background
 window.gm.getScenePic = function(id){
@@ -150,7 +161,10 @@ window.gm.getScenePic = function(id){
 window.gm.enterVR=function() {
   //todo update effects in VR but stop RL effects
   let s= window.story.state;
+  s.vars.playerPartyRL = s._gm.playerParty;
+  s._gm.playerParty = s.vars.playerPartyVR;
   window.gm.switchPlayer("PlayerVR");
+  s.vars.inVR =true;
   //time in VR is paused when in RL
   s._gm.timeRL = s._gm.time,s._gm.dayRL = s._gm.day;
   s._gm.time = s._gm.timeVR,s._gm.day = s._gm.dayVR;
@@ -159,7 +173,10 @@ window.gm.enterVR=function() {
 }
 window.gm.leaveVR=function() {
   //todo update effects in VR but stop RL effects
+  s.vars.playerPartyVR = s._gm.playerParty;
+  s._gm.playerParty = s.vars.playerPartyRL;
   window.gm.switchPlayer("PlayerRL");
+  s.vars.inVR =false;
   //while in VR time in RL is paused but advances 1h on leave??
   s._gm.timeVR = s._gm.time,s._gm.dayVR = s._gm.day;
   s._gm.time = s._gm.timeRL,s._gm.day = s._gm.dayRL;
@@ -283,7 +300,7 @@ window.gm.printQuestList= function() {
       var mile = quest.getMileById(msId);
       if(!quest.HiddenCB()) {
         elmt +="<li style=\"padding-bottom: 0.5em;\"><input type=\"checkbox\" name=\"y\" value=\"x\" readonly disabled><label>"+
-          quest.name+(window.story.state.vars.dbgShowQuestInfo?(" "+msId+" 0x"+flags.toString(16)):(""))+" : "+ ((mile.HiddenCB()===true)?("???"):(mile.descr))+"</label></li>"; //checked="checked"
+          quest.name+(window.story.state._gm.dbgShowQuestInfo?(" "+msId+" 0x"+flags.toString(16)):(""))+" : "+ ((mile.HiddenCB()===true)?("???"):(mile.descr))+"</label></li>"; //checked="checked"
       }
   }
   elmt +="</ul></form></br>";
@@ -296,7 +313,7 @@ window.gm.printQuestList= function() {
     var mile = quest.getMileById(msId);
     if(!quest.HiddenCB()) {
       elmt +="<li><input type=\"checkbox\" name=\"y\" value=\"x\" readonly disabled checked=\"checked\"><label>"+
-        quest.name+(window.story.state.vars.dbgShowQuestInfo?(" "+msId+" 0x"+flags.toString(16)):(""))+" : "+ mile.descr+"</label></li>"; 
+        quest.name+(window.story.state._gm.dbgShowQuestInfo?(" "+msId+" 0x"+flags.toString(16)):(""))+" : "+ mile.descr+"</label></li>"; 
     }
 }
   elmt +="</ul></form></br>";

@@ -5,31 +5,31 @@
 window.gm.quests.forceQuestMilestone("qDiedAgain",100,1);;%>
 Darkness... </br>
 After some moments your vision fades in. </br> 
-<p class=talkPC>"What happend? Why I'm sitting in a pool of ...goo?"</p>
+<p class='talkPC'>"What happend? Why I'm sitting in a pool of ...goo?"</p>
 "Choosen one, this is a shrine of restoration! ..." a priestess in a white robe with purple borders approachs you.
 <!--todo-->
-<p class=talkPC>"So I died? And after death I return here?"</p>
+<p class='talkPC'>"So I died? And after death I return here?"</p>
 "Those choosen by the goods might be revived in a shrine of restoration after their death or collaps of mind."
-<p class=talkPC>"Collaps of mind? I just need to get stunned and will be sent back here?"</p>
+<p class='talkPC'>"Collaps of mind? I just need to get stunned and will be sent back here?"</p>
 <p class='dev'>As a safeguard against mental trauma (*1) the players neural activity is supervised. If a certain amount of stress is detected (*2), the safeguard is triggered.
 </br>*1): This applys not just to painful trauma but also marvelous sensations to avoid addictive states (*3).
 </br>*2): Chances that the trigger is delayed or supressed might decrease if the user is inclined to the situation and has the proper mindset.
 </br>*3): According to user agreement §34-f2, the service-provider is not responsible for addiction caused by the use of the game.
 </p>
-<p class=talkPC>"Addictive states? I'm pretty sure I will not get addicted on getting killed."</p>
+<p class='talkPC'>"Addictive states? I'm pretty sure I will not get addicted on getting killed."</p>
 You decide that you have been sitting in this sizzling pool of mysterious liquid long enough and rise to your feet to step out of it.
 You notice that you are naked and try to hide your privates with your hands. 
-<p class=talkPC>"Uhm...where is my gear?"</p>
+<p class='talkPC'>"Uhm...where is my gear?"</p>
 "The gods restored your body and mind but your gear is nowwhere to be found."
-<p class=talkPC>"Oh come on should I ran around in my birthday suite?"</p>
+<p class='talkPC'>"Oh come on should I ran around in my birthday suite?"</p>
 "Please take this cloth and staff as they are blessed by the gods to help you to live up to your goal."
 <p class='dev'> For testing purpose the game is set to rougelike mode: on death you will loose your equipment and get the starter-gear. 
 But you keep your stats and skills (*1).  
 </br>*1): It might occur that the questline has to be started from the beginning. We are doing our best to solve the problem in the next updates. 
 </p> 
-<p class=talkPC>"Start the questline from the beginning? I really hope they get that fixed soon."</p>
+<p class='talkPC'>"Start the questline from the beginning? I really hope they get that fixed soon."</p>
 <div></br>
-[[Next|VillageRespawnPod]]</br></div>
+[[Next|ForestRespawnPod]]</br></div>
 </article><article id="LogPanel"></article></section>
 
 
@@ -55,15 +55,23 @@ You smirk to yourself for your ingenuity.
 
 :: YouDiedWithCursedGear
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-"Choosen one, this is a shrine of restoration!" ... the acolyte starts heir rant.
-"Yeah, I know. I just got ass kicked again. At least I got rid of that freaking bracelet... "
-But that damned thing is still on your wrist!
-"Hey, why is everthing gone except that damn thing?"
-"At times the heros burden is increased by evil deeds and his epic story is extended further by finding closure for his curse." the priestess chants, holding out heir hands upward to heir gods.
+"Choosen one, this is a shrine of restoration!" ... the acolyte starts heir rant.</br>
+"Yeah, I know. I just got ass kicked again. At least I got rid of that freaking ... "</br>
+But that damned thing is still there!</br>
+"Hey, why is everthing gone except this?"
+"At times the heros burden is increased by evil deeds and his epic story is extended further by finding closure for his curse." the priestess chants, holding out heir hands upward to heir gods.</br>
 "So I'm stuck with cursed gear but have to let go the good one?"
-[[This sucks]] [[Would have been to easy]] [[Its an incentive to not die]] <!--todo-->
-</article><article id="LogPanel"></article></section>
+<p class='dev'></p>
+<p class="dev">
 
+</p>
+
+</br><a0 id='1' onclick='foo(this)'>This sucks</a> <a0 id='2' onclick='foo(this)'>Would have been to easy</a> <a0 id='3' onclick='foo(this)'>Its an incentive to not die</a></br>
+</article><article id="LogPanel"></article></section>
+<script> function foo(select) {
+    window.gm.quests.forceQuestMilestone("qDiedAgain",200,100);
+}
+</script>
 
 :: YouDiedBeforeOrgasm
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>

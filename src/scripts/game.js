@@ -7,6 +7,9 @@ core functionality
 window.gm = window.gm || {}; //game related operations
 window.gm.util = window.gm.util || {};  //utility functions
 // helper for publisher/subscriber-pattern; myObject.ps =PubSub(); myObject.ps.subscribe(...
+// !! warning, dont use for objects that need to be loaded from savegame
+// the reviver calls constructor of nested objects multiple times which lead to multiple registrations with partially incomplete objects in the PubSub;
+// since there are no destructors, there is no easy way to cleanup
 window.gm.util.PubSub = function(){ 
   return ({
     events: {},
@@ -29,18 +32,22 @@ window.gm.util.PubSub = function(){
     }
   }); 
 };
+//create pretty namme for passage; requires a tag [name:"My Room"]
+window.gm.util.printLocationName=function(passage) {
+  let tags = window.story.passage(passage).tags;
+  for(el of tags) {
+    let ar = el.split(":");    
+    if(ar.length>1 && ar[0]==='name') {
+      return(ar[1].split('_').join(' '));
+    }
+  }
+  return(passage);
+}
+
 //-------------------------------------------------
 // reimplement to setup the game !
 window.gm.initGame= function(forceReset,NGP=null) {
   window.gm.toasty= new Toasty();
-
-    //this does not work because hidden is called to late
-    /*$(window).on('sm.passage.hidden', function(event, eventObject) {
-      
-      if(eventObject.passage) {// No passage to hide when story starts
-          console.log('hiding'+eventObject.passage.name);        
-      }
-    });*/
     $(window).on('sm.passage.showing', function(event, eventObject) {
         // Current Passage object
         $("tw-passage").fadeIn(500);  //fade in if was previously faded out
@@ -70,7 +77,10 @@ window.gm.initGame= function(forceReset,NGP=null) {
         day : 1,  //daycount
         activePlayer : '', //id of the character that the player controls currently
         nosave : false,
-        playerParty: []  //names of NPC in playerParty 
+        playerParty: [],  //names of NPC in playerParty 
+        debug : false,    //globally enables debug
+        dbgShowCombatRoll : false,  //log combat calculation details
+        dbgShowQuestInfo : false  //show internal quest state
       }
     }
     if (!s.dng||forceReset) { //stores the state of the current dungeon
@@ -142,8 +152,12 @@ window.gm.addTime= function(min) {
     window.story.state._gm.time -= 2400;
     window.story.state._gm.day += 1;
   }
-  //window.gm.player.Effects.updateTime();
   window.gm.timeEvent.publish("change",min);
+  window.gm.player.Effects.updateTime(); //todo not happy with that; see PubSub-comment
+  // updating all existing chars might not be wise (some could be dead)
+  // but what if I have to update other chars too
+  //
+  
 };
 window.gm.getTimeString= function() {
   var c=window.gm.getTimeStruct();

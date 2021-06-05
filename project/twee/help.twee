@@ -6,6 +6,7 @@ Here you can find some information about the gameplay.</br></br>
 [[Basics|Help_Basics]]</br>
 [[What should I do, where should I go|Help_Quest]]</br>
 [[Im stuck!|Help_Fixes]]</br>
+[[Credits]]
 [[Back|_back_]]</br>
 </article><article id="LogPanel"></article></section>
 
@@ -63,3 +64,9 @@ Then I might be abel to backtrack the error.</br>
 </article><article id="LogPanel"></article></section>
 
 
+:: Credits [_back_]
+<section> <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+Credits go to:</br>
+
+[[Back|_back_]]</br>
+</article><article id="LogPanel"></article></section>

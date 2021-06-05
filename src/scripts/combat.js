@@ -419,9 +419,9 @@ postBattle() {
   } else if(s.combat.playerSubmitting===true) {  
     result.OK=true,result.msg = this.onSubmit();
   } else if(this.isAllDefeated(s.combat.enemyParty)) {
-    result.OK=true,result.msg = this.onDefeat();
-  } else if(this.isAllDefeated(s.combat.playerParty)) {
     result.OK=true,result.msg = this.onVictory();
+  } else if(this.isAllDefeated(s.combat.playerParty)) {
+    result.OK=true,result.msg = this.onDefeat();
   }
   this.endCombat();
   return(result);
@@ -467,7 +467,7 @@ window.gm.combat.calcEvasion=function(attacker,target, attack) {
   var lvlDiff = target.level-attacker.level;
   var chance = target.Stats.get("agility").value + target.Stats.get("endurance").value;
   chance += lvlDiff*4;
-  window.gm.pushLog(`evasion roll:${chance} vs ${rnd} `,window.story.state.vars.dbgShowCombatRoll);
+  window.gm.pushLog(`evasion roll:${chance} vs ${rnd} `,window.story.state._gm.dbgShowCombatRoll);
   if(chance>rnd) {
     result.OK = false;
     result.msg += 'Using agility, '+ target.name +' was able to dodge the attack. '
@@ -500,7 +500,7 @@ window.gm.combat.calcParry=function(attacker,target, attack) {
   var lvlDiff = target.level-attacker.level;
   var chance = target.Stats.get("agility").value + target.Stats.get("perception").value;
   chance += lvlDiff*4;
-  window.gm.pushLog(`parry roll:${chance} vs ${rnd} `,window.story.state.vars.dbgShowCombatRoll);
+  window.gm.pushLog(`parry roll:${chance} vs ${rnd} `,window.story.state._gm.dbgShowCombatRoll);
   if(chance>rnd && rnd<10) {
     result.OK = false;
     if(rnd<10) {
@@ -530,7 +530,7 @@ window.gm.combat.calcAbsorb=function(attacker,defender, attack) {
   let def = defender.Stats.get('pDefense').value;
   //todo weakness bonus
   var dmg = Math.max(1,attack.value* (attack.crit?4:1)-def);
-  window.gm.pushLog(`absorb roll:${dmg} vs ${def} `,window.story.state.vars.dbgShowCombatRoll);
+  window.gm.pushLog(`absorb roll:${dmg} vs ${def} `,window.story.state._gm.dbgShowCombatRoll);
   result.msg = defender.name +' got hit by '+attacker.name+' and suffered '+dmg+ (attack.crit?' critical ':'')+'damage. '
   attack.total = dmg;
   //foo should add fraction of attack to defender-health
@@ -585,7 +585,7 @@ window.gm.combat.calcTeaseAttack=function(attacker,defender,attack) {
   let def = defender.Stats.get('lDefense').value;
   //todo weakness bonus
   let dmg = Math.max(1,attack.value* (attack.crit?4:1)-def);
-  window.gm.pushLog(`absorb roll:${dmg} vs ${def} `,window.story.state.vars.dbgShowCombatRoll);
+  window.gm.pushLog(`absorb roll:${dmg} vs ${def} `,window.story.state._gm.dbgShowCombatRoll);
   result.msg = defender.name +' got teased by '+attacker.name+' and suffered '+dmg+ (attack.crit?' critical ':'')+'lustdamage. '
   attack.total = dmg;
 

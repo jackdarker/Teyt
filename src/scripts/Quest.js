@@ -1,7 +1,18 @@
 "use strict";
 /* classes to manage a quest
  */
-
+class demo {
+    constructor() {}
+    get parent() {return this._parent();}
+    signalWithDelay(text, delay) {
+      this.text = text;
+      setTimeout(this.signal.bind(this), delay);    
+      this._parent = window.gm.util.refToParent(this);
+   }
+    signal() {
+      console.log(this.text);
+   }
+  }
 
 
 ///////////////////////////////////////////////////////////////
