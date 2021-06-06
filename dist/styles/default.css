@@ -161,14 +161,14 @@ statdown {
   color:red;
 }
 .talkPC {
-  color: green;
+  color: #001eb1;
   /*slateblue,slategreen,royalblue*/
 }
 .talkNPC1 {
   color: Brown;
 }
 .talkNPC2 {
-  color: Darkgreen;
+  color: green;
 }
 .dev {
   color: #7bedf3;

@@ -8,13 +8,14 @@
 <%=window.gm.player.name%></br>
 Energy: <%=window.gm.player.energy().value%>/<%=window.gm.player.energy().max%></br>
 Health: <%=window.gm.player.health().value%>/<%=window.gm.player.health().max%></br>
-Money: <%=window.gm.player.Inv.countItem('Money') %></br>
+Money: <%=window.gm.player.Inv.countItem('Money') %> <div <%=window.gm.player.canLevelUp?"class=\"green\"":""%>>XP/Level: <%=window.gm.player._data.XP+"/"+window.gm.player._data.level%></div></br>
 </div>
 <hr>
 <form>
 <label>Info:    <output></output>  </label></br>
 <button type="button" id="status">Status</button>
 <button type="button" id="inv">Inventory</button>
+<button type="button" id="quests">Quests</button>
 <button type="button" id="dashboard">More</button>
 <!--<button type="button" id="wait" style="width: 100%">Rest 45min</button>-->
 <hr>
@@ -30,6 +31,7 @@ Money: <%=window.gm.player.Inv.countItem('Money') %></br>
 <script>
 //document.querySelector('#wait').addEventListener('click', function(){window.gm.addTime(45);window.gm.refreshAllPanel();}); 
 document.querySelector('#inv').addEventListener('click', function(){window.story.show('Inventory');});
+document.querySelector('#quests').addEventListener('click', function(){window.story.show('QuestList');});
 document.querySelector('#dashboard').addEventListener('click', function(){window.story.show('Player_Dashboard');});
 document.querySelector('#status').addEventListener('click', function(){window.story.show('Status');});
 document.querySelector('#save').addEventListener('click', function(){window.gm.toggleDialog('#dialog_save');});
@@ -128,8 +130,7 @@ function readFile(input) {
 
 
 :: Inventory [_back_]
-<section> 
-<aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 [[Back|_back_]]</br>
 <%=window.gm.player.name%> inventory: </br></br>
 <%
@@ -146,8 +147,7 @@ for(var i=0;i<maxSlots;i++){
 
 
 :: Relations [_back_]
-<section> 
-<aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 [[Back|_back_]]</br>
 <%=window.gm.player.name%> relations: </br></br>
 <%=window.gm.printRelationSummary()%>
@@ -155,8 +155,7 @@ for(var i=0;i<maxSlots;i++){
 
 
 :: Achievements [_back_]
-<section> 
-<aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 [[Back|_back_]]</br>
 <%=window.gm.printAchievements()%>
 </article><article id="LogPanel"></article></section>
@@ -164,21 +163,19 @@ for(var i=0;i<maxSlots;i++){
 
 :: Player_Dashboard [_back_]
 <!--a dashboard where the player can check his other stuff-->
-<section> 
-<aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 Here you can check and modify several options: </br>
 Your outfit can only be changed by using a wardrobe.</br>
 Your party consist of <%=(function(){var msg=[];for(el of window.story.state._gm.playerParty){msg.push(window.story.state[el].name);}return(msg);}()).join(',')%></br>
-[[Back|_back_]] [[Status]] [[View|Mirror]] [[Inventory]] [[Relations]] [[QuestList]]</br>
+[[Back|_back_]] [[Status]] [[Levelup]] [[View|Mirror]] [[Inventory]] [[Relations]] [[QuestList]]</br>
 </article><article id="LogPanel"></article></section>
 
 
 :: QuestList [_back_]
-<section> 
-<aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
-</br>
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+[[Back|_back_]]</br>
 <%=window.gm.printQuestList()%>
-</br>[[Back|_back_]]</br>
+</br>[[Back|_back_]]
 </article><article id="LogPanel"></article></section>
 
 
@@ -192,8 +189,7 @@ Checking out <%=window.gm.player.name%>:   [[Back|_back_]]</br>
 
 
 :: Wardrobe [_back_]
-<section> 
-<aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 [[Back|_back_]]</br>
 <%=window.gm.player.name%> has equipped: <%=window.gm.printEquipmentSummary()%></br></br>
 (Tools and weapons can be changed via Inventory.)</br></br>
@@ -211,7 +207,6 @@ for(var i=0;i<maxSlots;i++){
 </article><article id="LogPanel"></article></section>
 
 :: Settings [_back_]
-
 <section> <!--<aside id="sidebar"></aside>--><article><%=window.story.render("CenterDialogs") %>
 [[Back|_back_]]</br>
 Theme:
@@ -230,8 +225,7 @@ If you enable this your route to bad end by sex-related action is much shorter. 
 
 :: Settings2 [_back_]
 <!--just test-->
-<section> 
-<!--<aside id="sidebar"></aside>--><article><%=window.story.render("CenterDialogs") %>
+<section><!--<aside id="sidebar"></aside>--><article><%=window.story.render("CenterDialogs") %>
 <div><canvas id="exampleCanvas" width="240" height="225">Your browser doesn't support the canvas tag.    </canvas></div>
 <button onclick='window.gm.printCombatScreen()'>test a</button>
 <button onclick='onimage("assets/favicon.png")'>test b</button>
@@ -251,16 +245,53 @@ img.src = imgsrc;//'https://twinery.org/homepage/img/logo.svg';   //todo the loa
 
 
 :: Status [_back_]
-<section> 
-<aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
-Status of <%=window.gm.player.name%>:   [[Back|_back_]]</br>
-<a0 onclick='window.gm.printOutput(window.gm.printEffectSummary(window.gm.player.id,true,false));'>Stats</a>
-<a0 onclick='window.gm.printOutput(window.gm.printEffectSummary(window.gm.player.id,false,true));'>Fetish</a>
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+<%let char=window.gm.player;%>
+Status of <%=char.name%>:   [[Back|_back_]]</br>
+<a0 onclick='window.gm.printOutput(window.gm.printEffectSummary("<%=char.id%>",true,false));'>Stats</a>
+<a0 onclick='window.gm.printOutput(window.gm.printEffectSummary("<%=char.id%>",false,true));'>Fetish</a>
 </br><div id='output'></div></br>   <!--message is rendered here-->
 [[Back|_back_]]</br>
 </article><article id="LogPanel"></article></section>
 <script>
 window.gm.printOutput(window.gm.printEffectSummary(window.gm.player.id,true,false));
+</script>
+
+
+:: Levelup [_back_ _nosave_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+[[Back|_back_]]</br>
+<% let char=window.gm.player;if(char.canLevelUp){%>
+<%=char.name%> has enough XP to <a0 onclick='levelUp("<%=char.id%>")'>Level up</a>!</br>
+<% }else{%>
+<%=char.name%> need more XP to level up.</br>
+<% }%>
+<div id='output'></div>
+</article><article id="LogPanel"></article></section>
+<script>function levelUp(char) {
+  window.gm[char].levelUp(1);
+  window.gm.refreshAllPanel();
+}
+function statUp(statid,charname) {
+  let char =window.gm[charname];
+  char.Stats.increment(statid,1);
+  char._data.unspentStat-=1; //todo ugly
+  window.gm.refreshAllPanel();
+}
+function showStats(charname) {
+  let char =window.gm[charname];
+  let _wheights = char.autolevelWheight();
+  let msg='';
+  if(char._data.unspentStat>0) {
+    msg=char._data.unspentStat+' points can be distributed on stats:</br><table>';
+    for(el of _wheights) {
+      msg+="<tr><td><a href=\"javascript:void(0)\" onclick='statUp(\""+el.id+"\",\""+char.id+"\")'>"+el.id+"</a></td><td>is "+char.Stats.getItem(el.id).base+"</td></tr>";
+    }
+    msg+='</table>';
+  }
+  window.gm.printOutput(msg);
+}
+showStats(<%="\""+char.id+"\""%>);
 </script>
 
 

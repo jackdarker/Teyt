@@ -29,6 +29,7 @@ class Wolf extends Mob {
         super();
         this.name = this.id = 'Wolf';
         this.pic= 'assets/bw_wolf1.png';
+        this.level_min =3;
         //this.Stats.increment('healthMax',-1*(this.health().max+20));
     }
 };

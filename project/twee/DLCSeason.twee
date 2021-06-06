@@ -32,17 +32,23 @@ But you keep your stats and skills (*1).
 [[Next|ForestRespawnPod]]</br></div>
 </article><article id="LogPanel"></article></section>
 
+<div id='select1' >
+<a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1a")'>click a</a>
+<a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1b")'>click b</a>
+</div><div id='choice1a' hidden>
+</div>
+<div id='choice1a' hidden>
+</div>
 
 :: CursedCollar
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 "Let me see. Hm.. I'm not sure but I think I cant you help with that one. There is a lock but I'm not a locksmith."
-"And do you know where to find one?"
+<p class="talkPC">"And do you know where to find one?"</p>
 "There is a town east of here, called Elderant. I dont know that place to well but you might be able to find someone that can unlock this thing."
-"There is a town nearby?"
+<p class="talkPC">"There is a town nearby?"</p>
 "Nearby is relative. Its about a 3 or 4 days walk I guess. As I think over it, maybe you shouldnt go. It can be dangerous traveling alone."
-"More dangerous than the forest?"
+<p class="talkPC">"More dangerous than the forest? I died on the first visit of this damn forest ... by an stupid accident !"</p>
 "The forest isnt dangerous. I never had any issues. Maybe you just had a little bad luck."
-"I died on the first visit of this damn forest ... by an stupid accident !"
 An idea forms in your mind: when I die, I lose the equipment. 
 Of ourse dying would be bad if it causes a large loss. But right now you just have little to no gear and will be replenished with a new set.
 You smirk to yourself for your ingenuity. 
@@ -61,11 +67,7 @@ But that damned thing is still there!</br>
 "Hey, why is everthing gone except this?"
 "At times the heros burden is increased by evil deeds and his epic story is extended further by finding closure for his curse." the priestess chants, holding out heir hands upward to heir gods.</br>
 "So I'm stuck with cursed gear but have to let go the good one?"
-<p class='dev'></p>
-<p class="dev">
-
-</p>
-
+<p class='dev'>Some gear will stick to you. That doesnt need to be cursed one. In fact you can buy special gear that is bonded to you.</p>
 </br><a0 id='1' onclick='foo(this)'>This sucks</a> <a0 id='2' onclick='foo(this)'>Would have been to easy</a> <a0 id='3' onclick='foo(this)'>Its an incentive to not die</a></br>
 </article><article id="LogPanel"></article></section>
 <script> function foo(select) {
@@ -103,7 +105,6 @@ I got kicked out again.
 <p class='author'>Scenes might gradually unlock depending how often you see them and how you react (also to other situations). </p>
 
 </article><article id="LogPanel"></article></section>
-
 
 
 :: Skills

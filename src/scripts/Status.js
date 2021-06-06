@@ -68,7 +68,7 @@
     increment( id, value) {
         let attr = this.get(id);
         attr.data.base += value;
-        window.gm.pushLog(attr.Calc(this,id).msg);
+        window.gm.pushLog(attr.Calc(this,id).msg); // todo show only for player
     }
 }
 //class for an Attribute

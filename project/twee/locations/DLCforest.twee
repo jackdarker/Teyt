@@ -281,12 +281,22 @@ While screaming at your offender, he bolts forward trying to knock you over.</br
 You are in a <a0 onclick='window.gm.encounters.Trent(window.gm.player.location)>fight!</a></br>
 </div></div></div></div>
 <% } else if(window.gm.quests.getMilestoneState("qBondageKink").id<=300) { %>
-That horse-man is leaning at the handrail of the bridge and says with a smug grin: </br>
-"There you are again. Are you here for another lesson?"</br>
+Carefully approaching the bridge, you are scanning the surrounding.</br>
+Trent is over there, watching that no one passes the bridge without payment. </br>
 At least two other people are sitting around a firepit near the eastern end of the bridge.</br>
-[[wrestle with him(again)]] [[offer him something]]  [[retreat]]
+Maybe you can [[speak up to him|TrentTalk]].</br>
+[[Leave|ForestBorder]] </br>
 <% } else {%>
 A large bridge made of wood crosses a deep canyon that separates the forest from the land east of it.</br>
 <div>[[to Forest|ForestBorder]] [[to Plains]]. </br></div>
 <%}%>
 </article><article id="LogPanel"></article></section>
+
+:: TrentTalk
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+Trent the horse-man is leaning at the handrail of the bridge and says with a smug grin: </br>
+"There you are again. Are you here for another lesson?"</br>
+<div> [[Leave|ForestBridge]] [[offer him something]] <a0 onclick='window.story.show(xxx);'>wrestle with him(again)</a></br></div>
+</article><article id="LogPanel"></article></section>
+<script></script>

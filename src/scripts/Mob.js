@@ -1,7 +1,12 @@
 "use strict";
 
 class Mob extends Character {
-
+    constructor() {
+        super();
+        this.level_min = 1;     
+        this.levelUp(1);
+        this.autoLeveling();
+    }
     //override to return the next move to execute
     //OK = false if no action, else true
     //msg should contain a message formatted for view (move description )g 
@@ -27,7 +32,14 @@ class Mob extends Character {
         return(result);
     }
     //override to adjust the mobs attributes to player level
-    scaleLevel(lvl) {    };
+    scaleLevel(lvl) { 
+        let x = Math.max(this.level_min,_.random(lvl-3,lvl+3));
+        x=x-this.level;   
+        if(x>0) {
+            this.levelUp(1);
+            this.autoLeveling();
+        }
+    };
 
 }
 

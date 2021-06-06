@@ -230,7 +230,7 @@ class stStrength extends Stat { // core attribute
     static fromJSON(value) { return window.storage.Generic_fromJSON(stStrength, value.data);};
     updateModifier() {
         this.parent.addModifier('healthMax',{id:'strength', bonus:this.parent.get('strength').value*4});
-        this.parent.addModifier('pAttack',{id:'strength', bonus:this.parent.get('strength').value%4});
+        this.parent.addModifier('pAttack',{id:'strength', bonus:Math.floor(this.parent.get('strength').value/4)});
     };
 }
 class stEndurance extends Stat { // core attribute
@@ -269,7 +269,7 @@ class stPAttack extends Stat {   //physical attack
 }
 class stPDefense extends Stat {   //physical defense
     static setup(context, base,max) {
-        var _stat = new stPAttack();
+        var _stat = new stPDefense();
         var _n = _stat.data;
         _n.id='pDefense',_n.base=base, _n.value=base,_n.limits=[{max:99999,min:0}];
         context.addItem(_stat);

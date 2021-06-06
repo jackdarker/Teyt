@@ -91,6 +91,8 @@ window.gm.initGame= function(forceReset,NGP=null) {
       ch.Outfit.addItem(new FaceHorse());
       ch.Outfit.addItem(new PenisHuman());
       ch.Stats.increment('strength',3);
+      ch.levelUp(3);
+      ch.autoLeveling();
       s.Trent = window.gm.Trent = ch;
     }
     if (!s.PlayerVR||forceReset) {  

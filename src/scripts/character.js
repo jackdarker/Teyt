@@ -8,8 +8,9 @@ class Character {
         name: '',
         faction: 'Enemy',
         location : "Home",
-        XP: 0,  
-        level: 1,  
+        XP: 0,  //this is the XP you have earned but not yet spent
+        level: 0,  
+        unspentStat: 0, //on level up you get Stat-points to distribute
         inv: [],  //inventory data, needs to be mapped to Inventory-Instance
         wardrobe: [],  //separate wardobe data, needs to be mapped to outfit-Instance
         outfit: [],  // needs to be mapped to outfit-Instance
@@ -62,8 +63,9 @@ class Character {
         _x.Skills._relinkItems();
         return(_x);
     };
-    static calcXPToLevel(XP) {
-        return(Math.abs(Math.SQRT2(XP/100+0.25)-0.5));
+    static calcXPToLevel(XP,fromLvl=1) {
+        let XP2 = Character.calcLevelToXP(fromLvl);
+        return(Math.floor((-1+Math.sqrt(1+(XP+XP2)*4/50))/2));
     }
     static calcLevelToXP(lvl) {
         return(100*lvl*(lvl+1)/2); //Gauss-Sum
@@ -78,25 +80,52 @@ class Character {
         return(this._data.location);    
     }
     set location(name) {this._data.location=name;}
-    get level() {
-        return(this._data.level);
-    }
-    get levelPoints() {
-        //for each attribute('strength','perception','endurance','charisma','intelligence','agility','luck','willpower')
-        //we start with 10pts at lvl1 and for each lvl receive 2pts
-        return(this._data.level-1*2+7*10);
-    }
+    get level() {return(this._data.level);  }
     get canLevelUp() {
-        return(Character.calcXPToLevel(this._data.XP)!==this._data.level);
+        let next = Character.calcXPToLevel(this._data.XP,this._data.level)
+        return(next!==this._data.level);
     }
-    addXP(XP) {
-        this._data.XP+=XP;
-    }
+    get level(){return(this._data.level);}
+    addXP(XP) { this._data.XP+=XP; }
     //upgrade level by 1;this will increase level even if not enough XP !
-    levelUp() {
-        var reqXP=Character.calcLevelToXP(this._data.level+1);
-        this._data.XP=reqXP;
-        this._data.level+=1;
+    levelUp(add=1) { 
+        if(add<1) return;
+        let reqXP=Character.calcLevelToXP(this._data.level+add)-Character.calcLevelToXP(this._data.level);
+        this._data.XP-=reqXP; //calculate requires XP and subtract from already gained
+        if(this._data.XP<0) this._data.XP=0;
+        this._data.level+=add;
+        this._data.unspentStat+=add*5;  //todo 5pt per Level?
+    }
+    //overwrite this to define the wheighting for autoLeveling
+    //returns an array of objects with "id" matching the statname and "wgt" as a number that defines the relativ wheight (f.e. if 1 stat should be 50% more then other set this to 20 and all other to 10)
+    autolevelWheight() {return([{id:"strength",wgt:10},{id:"agility",wgt:11},{id:"intelligence",wgt:10},{id:"luck",wgt:8},{id:"charisma",wgt:8},{id:"perception",wgt:8},{id:"endurance",wgt:9}]);}
+    // this is called for NPC to automatically spent XP and distribute stat-points according to autolevelWheight-property
+    autoLeveling() {
+        let add = Character.calcXPToLevel(this._data.XP,this._data.level)-this._data.level;
+        this.levelUp(add);
+        let weight = this.autolevelWheight();        
+        let sort = function(a,b){return(b.new-a.new);};
+        while(this._data.unspentStat>0) {
+            //get the actual stats; immagine wgt as the goal-shape how the values are set at a certain level 
+            let sumC =0, sumG = 0; 
+            for(el of weight){
+                el.value = this.Stats.get(el.id).base;
+                sumC += el.value, sumG +=el.wgt;
+            }
+            //calculate the difference between current value and goal defined by playstyle
+            for(el of weight){ //new is the difference in points; +1 to force distribution if the current matches the goal
+                el.new = Math.ceil(((el.wgt/sumG) -(el.value/sumC))*sumC) +1 ;
+                if(el.new<=0) el.new =1;
+            }   
+            //and distribute pt
+            weight=weight.sort(sort);
+            for(el of weight){
+                let x = Math.floor(el.new);
+                x =  Math.min(this._data.unspentStat,2,x);
+                this.Stats.increment(el.id,x);
+                this._data.unspentStat-=x;
+            }
+        }
     }
     isDead() {return(this.Stats.get('health').value<=0);}
     //naked returns: 

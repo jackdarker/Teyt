@@ -738,13 +738,14 @@ window.gm.printEffectSummary= function(who='player',showstats=true,showfetish=fa
   var ids = [];
   result+='<table>';
   var ids =window.gm[who].Stats.getAllIds();
+  
   ids.sort(); //Todo better sort
   for(var k=0;k<ids.length;k++){
       var data = window.gm[who].Stats.get(ids[k])
       let isFetish = (data.id.slice(0,2)==='ft'); //Fetish starts with ft
       if(data.hidden!==4) {
         if(isFetish && showfetish && !(data.id.slice(-4,-2)==='_M') ) {
-          //expects naes of fetish like ftXXX and limits ftXXX_Min ftXXX_Max
+          //expects names of fetish like ftXXX and limits ftXXX_Min ftXXX_Max
           let min = window.gm[who].Stats.get(ids[k]+"_Min");
           let max = window.gm[who].Stats.get(ids[k]+"_Max");
           result+='<tr><td>'+((data.hidden & 0x1)?'???':data.id)+':</td><td>'+((data.hidden & 0x2)?'???':data.value)+'</td>';
