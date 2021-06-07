@@ -12,6 +12,7 @@ class CombatSetup {
     this.scenePic = ''  //bg-image to use
     //the following function should get reassigned; 
     //they should return a message what will happen next and provide a link to passage to follow f.e. return to window.gm.player.location
+    this.onStart = (function(){return('A '+window.story.state.combat.enemyParty[0].name+' appears !'+ window.gm.printPassageLink('GameOver','GameOver'));});
     this.onDefeat = (function(){return('You are defeated.</br>'+ window.gm.printPassageLink('GameOver','GameOver'));});
     this.onVictory = (function(){return('You defeated the foe.</br>'+ window.gm.printPassageLink('Next',window.gm.player.location));});
     this.onFlee = (function(){return('You retreat hastily.</br>'+ window.gm.printPassageLink('Next',window.gm.player.location));});
@@ -94,12 +95,12 @@ printStats() {
   for(let i=0;(i<players.length || i<enemys.length);i++) {
     elmt += "<tr>";
     if(i<players.length) {
-      elmt += "<td>" + (s.combat.actor && s.combat.actor.name==players[i].name?">>": "")+ "</td><td>"+players[i].name+"</td><td>"+players[i].health().value.toString()+'/'+players[i].health().max.toString()+"</td><td>"+players[i].Stats.get("arousal").value.toString()+'/'+players[i].Stats.get("arousalMax").value.toString()+"</td><td style=\"font-size:smaller\">"+window.gm.Encounter.printCombatEffects(players[i])+"</td>";
+      elmt += "<td>" + (s.combat.actor && s.combat.actor.name==players[i].name?">>": "")+ "</td><td>"+players[i].name+" Lv"+players[i].level+"</td><td>"+players[i].health().value.toString()+'/'+players[i].health().max.toString()+"</td><td>"+players[i].Stats.get("arousal").value.toString()+'/'+players[i].Stats.get("arousalMax").value.toString()+"</td><td style=\"font-size:smaller\">"+window.gm.Encounter.printCombatEffects(players[i])+"</td>";
     } else {
       elmt += "<tr><td></td><td></td><td></td><td></td><td></td>";
     }
     if(i<enemys.length) {
-      elmt += "<td>" + (s.combat.actor==enemys[i]?">>>": "")+ "</td><td>"+enemys[i].name+"</td><td>"+enemys[i].health().value.toString()+'/'+enemys[i].health().max.toString()+"</td><td>"+enemys[i].Stats.get("arousal").value.toString()+'/'+enemys[i].Stats.get("arousalMax").value.toString()+"</td><td style=\"font-size:smaller\">"+window.gm.Encounter.printCombatEffects(enemys[i])+"</td>";
+      elmt += "<td>" + (s.combat.actor==enemys[i]?">>>": "")+ "</td><td>"+enemys[i].name+" Lv"+enemys[i].level+"</td><td>"+enemys[i].health().value.toString()+'/'+enemys[i].health().max.toString()+"</td><td>"+enemys[i].Stats.get("arousal").value.toString()+'/'+enemys[i].Stats.get("arousalMax").value.toString()+"</td><td style=\"font-size:smaller\">"+window.gm.Encounter.printCombatEffects(enemys[i])+"</td>";
     } else {
       elmt += "<tr><td></td><td></td><td></td><td></td><td></td>";
     }
@@ -291,6 +292,7 @@ calcTurnOrder(){
 //
 battleInit() {
   var result = {OK:false, msg:''};
+  result.OK=true,result.msg = this.onStart();
   this.next=this.preTurn;
   return(result);
 };

@@ -14,8 +14,7 @@ window.gm.questDef = window.gm.questDef || {};
         function(){ return(-1)});
     quest.addMileStone(mile1),quest.addMileStone(mile2);
     window.gm.questDef[quest.id]= quest;
-}
-{
+}{
     let NOP = (function(){  return (0)});
     let quest = new Quest("qFixLaptop","Upgrade your Laptop","");
     quest.addMileStone(new QuestMilestone(1,"","The powerconverter for your laptop should be somewhere around in the house. ",
@@ -24,15 +23,13 @@ window.gm.questDef = window.gm.questDef || {};
     NOP));
     // install webcam
     window.gm.questDef[quest.id]= quest;
-}
-{
+}{
     let NOP = (function(){  return (0)});
     let quest = new Quest("qStudy","Do some studying","Do something for your success at university.");
     quest.addMileStone(new QuestMilestone(1,"","Sitting down and reading a book might get you some knowledge.",    NOP));
     quest.addMileStone(new QuestMilestone(100,"","At least you feel a little smarter now.",     function(){ return(-1)}));
     window.gm.questDef[quest.id]= quest;
-}
-{
+}{
     let NOP = (function(){  return (0)});
     let hidden = (function(){return(window.gm.quests.getMilestoneState("qMyPleasure").id<100);});
     let quest = new Quest("qMyPleasure","Pleasure yourself","Pleasure yourself.",hidden );
@@ -40,8 +37,7 @@ window.gm.questDef = window.gm.questDef || {};
     quest.addMileStone(new QuestMilestone(100,"","You created a mess in your bedsheets.",
         function(){ return(-1)}));
     window.gm.questDef[quest.id]= quest;
-}
-{
+}{
     //quest-flag counts the shifts done in week
     let NOP = (function(){  return (0)});
     let quest = new Quest("qFindAJob","Find a job","Somehow you have to make a living.");
@@ -64,8 +60,7 @@ window.gm.questDef = window.gm.questDef || {};
     quest.addMileStone(new QuestMilestone(900,"","Finish the PurpleBerryQuest.",  NOP));
     quest.addMileStone(new QuestMilestone(1000,"",".",  NOP));
     window.gm.questDef[quest.id]= quest;
-}
-{   // the quest tracks death for tutorial
+}{   // the quest tracks death for tutorial
     let NOP = (function(){  return (0)});
     let hidden = (function(){return(window.gm.quests.getMilestoneState("qDiedAgain").id<100);});
     let quest = new Quest("qDiedAgain","qDiedAgain","qDiedAgain",hidden );
@@ -74,17 +69,16 @@ window.gm.questDef = window.gm.questDef || {};
     quest.addMileStone(new QuestMilestone(200,"","Die by pleasure.",        NOP,hidden));   //todo what if this is before previous?
     quest.addMileStone(new QuestMilestone(300,"",".",        NOP,hidden));
     window.gm.questDef[quest.id]= quest;
-}
-{   //
+}{   //
     let NOP = (function(){  return (0)});
     let hidden = (function(){return(false);});
     let quest = new Quest("qPurpleBerry","qPurpleBerry","qPurpleBerry",hidden );
     quest.addMileStone(new QuestMilestone(1,"","Search the forest for 5 handful of purple berrys and deliver them to the alchemist.",        NOP,hidden));
     quest.addMileStone(new QuestMilestone(100,"","You delivered the berries to the alchemist.",        NOP,hidden));
-    quest.addMileStone(new QuestMilestone(200,"","....",        NOP,hidden));
+    quest.addMileStone(new QuestMilestone(200,"","Find 4 purple berrys, 2 apoca-blossoms, 2 bloated mushrooms.",        NOP,hidden));
+    quest.addMileStone(new QuestMilestone(300,"","....",        NOP,hidden));
     window.gm.questDef[quest.id]= quest;
-}
-{
+}{
     let NOP = (function(){  return (0)});
     let hidden = (function(){return(window.gm.quests.getMilestoneState("qWolfMate").id<100);});
     let quest = new Quest("qWolfMate","qWolfMate","qWolfMate",hidden );
@@ -92,8 +86,7 @@ window.gm.questDef = window.gm.questDef || {};
     quest.addMileStone(new QuestMilestone(400,"","Is that wolf stronger than you? Lets find out.",        NOP,hidden));
     quest.addMileStone(new QuestMilestone(500,"","",  NOP));
     window.gm.questDef[quest.id]= quest;
-}
-{   // 
+}{   // 
     let NOP = (function(){  return (0)});
     let hidden = (function(){return(window.gm.quests.getMilestoneState("qBondageKink").id<100);});
     let quest = new Quest("qBondageKink","qBondageKink","qBondageKink",hidden );
@@ -104,8 +97,7 @@ window.gm.questDef = window.gm.questDef || {};
     quest.addMileStone(new QuestMilestone(400,"","Find your way past the bridge to the town.",      NOP,hidden));
     quest.addMileStone(new QuestMilestone(500,"","...",      NOP,hidden));
     window.gm.questDef[quest.id]= quest;
-}
-{
+}{
     let NOP = (function(){  return (0)});
     let hidden = (function(){return(window.gm.quests.getMilestoneState("qBeastKink").id<100);});
     let quest = new Quest("qBeastKink","BeastKink","Humans are fun to fool around with. But how about beasts.",hidden );

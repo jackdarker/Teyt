@@ -21,7 +21,7 @@
 		},
 		"Insert <p-talk": {
 			"prefix": "pp",
-			"body": ["<p class=\"${1|dev,author,talkPC,talkNPC1,talkNPC2|}\">${2:${TM_SELECTED_TEXT}}</p>$0"]
+			"body": ["<${1|p,span|} class=\"${2|dev,author,tPC,tNPC1,tNPC2|}\">${3:${TM_SELECTED_TEXT}}</$1>$0"]
 		},
 		"Insert </br>": {
 			"prefix": "bb",

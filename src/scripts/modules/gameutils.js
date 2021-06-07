@@ -12,7 +12,7 @@ window.gm.initGame= function(forceReset,NGP=null) {
     s._gm.dayRL= s._gm.dayVR = s._gm.day;
     //TODO set debug to 0 for distribution !
     s._gm.debug = 1,   
-    s._gm.dbgShowCombatRoll= false,
+    s._gm.dbgShowCombatRoll= true,
     s._gm.dbgShowQuestInfo= true;
     if (!s.vars||forceReset) { // storage of variables that doesnt fit player
         s.vars = {
@@ -93,6 +93,7 @@ window.gm.initGame= function(forceReset,NGP=null) {
       ch.Stats.increment('strength',3);
       ch.levelUp(3);
       ch.autoLeveling();
+      ch.calcCombatMove=Mob.calcCombatMove; //ennable AI todo how to toggle later
       s.Trent = window.gm.Trent = ch;
     }
     if (!s.PlayerVR||forceReset) {  

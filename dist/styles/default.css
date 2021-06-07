@@ -56,6 +56,13 @@ a:hover {
 #sidebar p {
   color: black;
 }
+#combatstats th { 
+  min-width:1em;/*minimum width empty col*/
+  padding-right: 1em;
+}
+#combatstats tbody td:nth-child(5n+1) { 
+  background-color: #e4ebf2; 
+}
 tw-story {
   height:100vh; 
   /*width:95vW;*/
@@ -160,14 +167,14 @@ statup {
 statdown {
   color:red;
 }
-.talkPC {
+.tPC {	/*talk player*/
   color: #001eb1;
   /*slateblue,slategreen,royalblue*/
 }
-.talkNPC1 {
+.tNPC1 {
   color: Brown;
 }
-.talkNPC2 {
+.tNPC2 {
   color: green;
 }
 .dev {

@@ -37,7 +37,7 @@ class Battery extends Item {
     static fromJSON(value) { return window.storage.Generic_fromJSON(Battery, value.data);};
 }
 class PurpleBerry extends Item {
-    constructor() { super('PurpleBerry'); 
+    constructor() { super('PurpleBerry');       todo instead of creating full class for every useless junk I use this and just add variable that will be restored after load
         this.lossOnRespawn = true;
     }
     get desc() { return 'Those purple berrys grow in the forest.';   }

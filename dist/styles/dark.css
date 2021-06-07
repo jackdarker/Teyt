@@ -42,13 +42,13 @@ statup {
 statdown {
   color:red;
 }
-.talkPC {
-  color: #51a043
+.tPC {
+  color: floralwhite;
   /*slateblue,slategreen,royalblue*/
 }
-.talkNPC1 {
+.tNPC1 {
   color: Brown;
 }
-.talkNPC2 {
+.tNPC2 {
   color: green;
 }

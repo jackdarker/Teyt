@@ -466,7 +466,8 @@ window.gm.onSelect = function(elmnt,ex_choice,ex_info) {
 window.gm.printTalkLink =function(elmt,unhideThis,cb=null) {
   elmt.toggleAttribute("hidden");
   if(cb!==null) cb(elmt);
-$(unhideThis)[0].toggleAttribute("hidden");
+  $(unhideThis)[0].toggleAttribute("hidden");
+  $(unhideThis)[0].scrollIntoView({behavior: "smooth"});
 }
 //prints the same kind of link like [[Next]] but can be called from code
 window.gm.printPassageLink= function(label,target) {

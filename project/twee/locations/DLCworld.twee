@@ -13,14 +13,14 @@ Remember that this is not the final game. We continously modify aspects to get t
 <%window.gm.player.location=window.passage.name;%>
 You say 'Create new avatar'. The screen switches to those kind of screens that are common to other RPGs.</br>
 You can select class, race, character-traits and some visual aspects.</br>
-'Lets see what classes we have...Staff Zealot..never heard of that one  '</br>
+<p class="tPC">'Lets see what classes we have...Staff Zealot..never heard of that one  '</p>
 As you try to flip through the classes you got a message "For testing purpose the following condition is applied: character-class and race restricted"</br>
-'Oh man, I'm stuck with that class? I would at least know what other classes are available.' You try to change race, but find that you are stuck to some kind of elf-youngling. 
+<p class="tPC">'Oh man, I'm stuck with that class? I would at least know what other classes are available.'</p> 
+You try to change race, but find that you are stuck to some kind of elf-boy. 
 You can toggle between male and female though the difference between the androgyne male and the female seem just to be some perky but small titts.</br>
 The description of the class is sparse. The picture you see indicates that this class uses a 2-handed staff and light armor. You expect also some magic abilities - its an elf, isn't it?.</br>
-'I will choose male. Brad would make fun of me all time if I would choose any other option. On the other hand, it is roleplay right?'</br>
+<p class="tPC">'I will choose male. Brad would make fun of me all time if I would choose any other option. On the other hand, it is roleplay right?'</p></br>
 <!--todo-->[[male elf]] [[female elf]] 
-
 <div></br>
 [[Ready|StartLocation]]</br></div>
 </article><article id="LogPanel"></article></section>

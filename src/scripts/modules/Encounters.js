@@ -53,7 +53,11 @@ window.gm.encounters.wolf = function(location) {
 }
 window.gm.encounters.Trent = function(location) {
     window.gm.Encounter = new CombatSetup();
-    window.gm.Encounter.EnemyFunc = (function() { let x = new window.story.state.Trent(); x.scaleLevel(window.gm.player.level); return([x]);});
+    window.gm.Encounter.EnemyFunc = (function() { 
+        let x = window.story.state.Trent; 
+        //no leveadaption? x.scaleLevel(window.gm.player.level);
+        x.Stats.increment("health",9999); 
+        return([x]);});
     window.gm.Encounter.Location = location;
     window.gm.Encounter.scenePic = window.gm.getScenePic(location);
     window.gm.Encounter.onSubmit =window.gm.Encounter.onDefeat = function() {

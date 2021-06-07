@@ -7,7 +7,7 @@ Depending if you played the game already you might skip to a certain point:
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
 As you check your email, you notice a letter from a Gaming-service where you have your Online-Roleplaying-Account for Dominion-of-SLayers registered.</br>
-<p class='talkNPC2'>"Dear sir or madam, we are happy to announce that your starter subscription will end soon and you will be automatically upgraded to an experienced-member account for free*. 
+<p class='tNPC2'>"Dear sir or madam, we are happy to announce that your starter subscription will end soon and you will be automatically upgraded to an experienced-member account for free*. 
 If you are no longer interested in our service, click the link below to cancel your membership. However, canceling your membership now would lead to unrecoverable loss of your avatars game-progress, stats and inventory.
 Note*: the upgrade from starter to experienced-member is free of cost; monthly subscription cost will be only 30$ instead of 2$ for your actual starter-membership."</p>
 
@@ -16,15 +16,15 @@ Note*: the upgrade from starter to experienced-member is free of cost; monthly s
 <a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1a")'>Call your friend Brad</a>
 </div>
 <div id='choice1a' hidden>
-<p class='talkPC'>"Hey Brad, did you also receive that mail from GameWorld with account-change?"</p>
+<p class='tPC'>"Hey Brad, did you also receive that mail from GameWorld with account-change?"</p>
 "Yeah, I just wanted to talk about it with you too. What do you think?"
-<p class='talkPC'>"We put so much work into this, I wouldnt like to get all of this to waste. But 30$ is really a lot of money for someone studying."</p>
+<p class='tPC'>"We put so much work into this, I wouldnt like to get all of this to waste. But 30$ is really a lot of money for someone studying."</p>
 "Even for someone who is working regulary this is alot of oney dude. If you leave the game I will leave too."
-<p class='talkPC'>"To tell you the truth, it wasnt that fun to play recently. Somehow they messed up the games balancing with those updates."</p>
+<p class='tPC'>"To tell you the truth, it wasnt that fun to play recently. Somehow they messed up the games balancing with those updates."</p>
 "Thats on purpose. They just want you to buy those boosters for real money!"
-<p class='talkPC'>"Yep. So its set. Lets pull them a finger and quit."</p>
+<p class='tPC'>"Yep. So its set. Lets pull them a finger and quit."</p>
 "Lets do it together 3..2..1..Sent"
-<p class='talkPC'>"Me too. Maybe we should try one of those free-to-play games next? I heard SandyBeachBattle is worth a look."</p>
+<p class='tPC'>"Me too. Maybe we should try one of those free-to-play games next? I heard SandyBeachBattle is worth a look."</p>
 "Im not sure. ..Hey wait I got a mail. But its not from DoS. Its some kind of Invite to a different game... Lets see..."
 Just in that moment you got mail too: </br>  
 [[Check mail|GameInvite1b]]</div>
@@ -33,7 +33,7 @@ Just in that moment you got mail too: </br>
 :: GameInvite1b
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
-<p class='talkNPC2'>Dear [insert name here],
+<p class='tNPC2'>Dear [insert name here],
 you got selected by ServiceAsGame to receive an invite as beta-tester for our new, MOBDSMRP-Game MiracoulusMultiplayerAlwaysOnlineVirtualReallityMassiveServiceRougue-Game.
 Be part of a growing gaming community and get involved in exciting quests and rakish adventures. 
 Please note that the content rating of the game is pending and is therefore restricted to adult audience only.
@@ -41,12 +41,12 @@ Click the personalized link below to sign up for a free selected account in </br
 Because of the high demands on this new generation service-game, only thoose that act quickly will get a chance to parttake on the program. So hurry up!</p>
 </br>
 'A new game, huh? I would really like to see what this is about. If its free of charge, that would be nice. '
-<p class='talkPC'>"I got an invite too. For something called Season-Quest. Never heard of that."</p>
+<p class='tPC'>"I got an invite too. For something called Season-Quest. Never heard of that."</p>
 "Thats the same I got! If thats just a coincidence ?! But its from a different company."
-<p class='talkPC'>"Should we try this? Its adult only, so no annoying kiddos fucking up our game."</p>
+<p class='tPC'>"Should we try this? Its adult only, so no annoying kiddos fucking up our game."</p>
 "Yeah lets sign in together. I always wanted to see what beta-testing means about!"
 Clicking the link you got forwared to a registration page where you have to enter personal information.
-<p class='talkPC'>"Uhm, they want the passportnumber"</p>
+<p class='tPC'>"Uhm, they want the passportnumber"</p>
 "Of course, because age-checking"
 Entering the required information you press Next and are presented a window with densly scribbled text that is barely readable and even less understandable: the user-agreement.
 'I should check this...' you start reading but soon just scroll trhough the text.
@@ -54,13 +54,13 @@ Entering the required information you press Next and are presented a window with
 You groan 'Come on now' Just scrolling down and hitting next.
 "Congratulations. You are now registered in our beta-test-program and will receive login-credentials and gaming equipment."
 'What gaming equipment?'
-<p class='talkPC'>"Hey Brad did you finish registration? I got a confirmation about receiving gaming equipment."</p>
+<p class='tPC'>"Hey Brad did you finish registration? I got a confirmation about receiving gaming equipment."</p>
 "Uhm yes, I think I saw something about that there is some new generation MoCap-equipment required to play."
-<p class='talkPC'>"MoCap?"</p>
+<p class='tPC'>"MoCap?"</p>
 "Motion-Capturing dude. Sees you need something more that just your ordinary VR-googles to play this."
-<p class='talkPC'>"Do we have to pay."</p>
+<p class='tPC'>"Do we have to pay."</p>
 "They just stated they lent it for the test....oh .I forgot I have to leave. see ya later."
-<p class='talkPC'>"Sure."</p>
+<p class='tPC'>"Sure."</p>
 'Im really tired now. Lets see when the equipment shows up.'</p>
 <a0 onclick='start()'>Close Browser</a>
 
@@ -122,19 +122,19 @@ Besides its already gotten late.</br>
 [[Logout]]
 You remove the headset. Still in the suite you call Brad again. This time he responds after some time.</br>
 "Heya whatsup?"
-<p class='talkPC'>"I got that equipment, you too? Isnt it awesome?"</p>
+<p class='tPC'>"I got that equipment, you too? Isnt it awesome?"</p>
 "Yeah. You already got it working dude?"
-<p class='talkPC'>"It took me over an hour. Did you already login?"</p>
+<p class='tPC'>"It took me over an hour. Did you already login?"</p>
 "Uh no, I'm still struggling with the gear. Maybe there is something missing here."</br>
 You chuckle to yourself 'So Mr.IKnowEverything failed on the mechanical part already'</br>
 [[Offer your help]]
-<p class='talkPC'>"I can help you tomorrow to get it setup if you want."</p>
+<p class='tPC'>"I can help you tomorrow to get it setup if you want."</p>
 "I will just give it a try tommorow morning on my own. I'm just to tired from work, you know."
-<p class='talkPC'>"So you have a day off tomorrow? Just wait for me before doing quests. Its not fair if you get a head start just because I'm busy all day."
+<p class='tPC'>"So you have a day off tomorrow? Just wait for me before doing quests. Its not fair if you get a head start just because I'm busy all day."
 "Dont worry. As usual I will help your lazy ass leveling up to catch up with me."
-<p class='talkPC'>"For sure"</p> 'I should have already started the game to get a head start.'
+<p class='tPC'>"For sure"</p> 'I should have already started the game to get a head start.'
 You can hear him yawning "I'm going to sleep now."
-<p class='talkPC'>"Me too. See you tomorrow then, bro."</p>
+<p class='tPC'>"Me too. See you tomorrow then, bro."</p>
 "Yup. See ya."
 You put your phone away. A shower and some sleep would be nice.</br>
 [[Next|Your Bedroom]]
@@ -163,11 +163,11 @@ As you got home from your daily chores and fiddling with the keys to your dorm, 
 Melanie opens. You guess she is around 20-something. She alway seemed to be annoyed by something.</br>
 Just like now.</br>
 "Hello <%=window.gm.player.name%>. " </br>
-<p class='talkPC'>"Hi. I'm sorry to disturb you but I found this note on my door."</p>
+<p class='tPC'>"Hi. I'm sorry to disturb you but I found this note on my door."</p>
 "There was some delivery for you." she really seems pissed.
-<p class='talkPC'>"I hope it wasnt any trouble for you to receive it while I'm..."</p>
+<p class='tPC'>"I hope it wasnt any trouble for you to receive it while I'm..."</p>
 "If I had known its some furniture delivery I would have rejected it."
-<p class='talkPC'>"Furniture?" you ask puzzled. You didnt order any furniture, did you.</p>
+<p class='tPC'>"Furniture?" you ask puzzled. You didnt order any furniture, did you.</p>
 She opens the door and you can now see a large parcel the size of a washer and a smaller one, blocking nearly all of the space after the entrance.
 <!--todo-->
 You are eager to get the equipment into your dorm and setup everything. So you move the boxes out of Melanies room into your own.</br>

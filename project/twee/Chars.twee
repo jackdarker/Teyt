@@ -38,16 +38,16 @@ You walk over to Trent. He is a horse-man.
 :: TrentVictory [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 <!--<%window.gm.player.location=window.passage.name;%>-->
-window.gm.quests.forceQuestMilestone("qDLCMain",600,1);
 <% if(window.gm.quests.getMilestoneState("qBondageKink").id<=300) { window.gm.quests.forceQuestMilestone("qBondageKink",400,300);%>
 Finally you found a weak spot in the defense of the stud. Reluctantly he gives up fighting.  </br><!--todo-->
-"Fine, you won...this time."</br> 
+<p class="dev">"Fine, you won...this time."</p> 
 You dont have any breath left to give him a quirky response. </br>
-His comrades strut over to you and you are worried if they could intervene. </br>
+His comrades strut over to you and you are worried if they will give you some trouble. </br>
 But they just snicker and mock your opponent.</br>
-"Whats up trent ? Did this whimp give your pony-ass a hard spanking."</br>
-"I'm not a pony you fuckers !" he yells. Being called a pony really pisses him off.</br>
-"I'm on my way then." Better to leave now before things get troublesome.</br>
+<p class="tNPC2">"Whats up trent ? Did this whimp give your pony-ass a hard spanking."</p>
+<span class="dev">"I'm not a pony you fuckers !"</span> he yells. Being called a pony seems really to piss him off.</br>
+<p class="tPC">"I'm on my way then."</p> Better to leave now before things get troublesome.</br>
+<p class="author">This is right now the end of the story. As you can see there is need for a lot of polishing.</p>
 [[Forward to new places]]</br>
 <%} else {%>
 "You just were lucky to pull that trick. Next time I will show you - SLAVE."
@@ -55,7 +55,8 @@ But they just snicker and mock your opponent.</br>
 "You are really though." admits the horse "or I'm just a little out of shape."
 ...
 [[The winner takes it all]]
-"So horsie how about we go for a ride?" Trent looks up to you, he already knows what that means. | Trent looks up to you with lust in his eyes. You should be careful not to end under his muscular body. | The recent acitivties got him quite pent up. But not that much that he will get involved with you. Maybe if you know each other better...  
+<p class="tPC">"So horsie how about we go for a ride?"</p> 
+Trent looks up to you, he already knows what that means. | Trent looks up to you with lust in his eyes. You should be careful not to end under his muscular body. | The recent acitivties got him quite pent up. But not that much that he will get involved with you. Maybe if you know each other better...  
 [[Walk away|ForestBridge]]
 <%}%>
 </br></br>
@@ -68,7 +69,8 @@ But they just snicker and mock your opponent.</br>
 <% if(window.gm.quests.getMilestoneState("qBondageKink").id<=300) { %>
 <%} else {%>
 <%}%>
-That didnt went as planned. That bully delivered a though blow and knocked you out.It didnt felt that lethal but the game has decided that you earned your death. </br>
+That didnt went as planned. That bully delivered a though blow and knocked you out. It didnt felt that lethal but the game has decided that you earned your death. </br>
+<p class="tPC">'I need to do some leveling and get stronger or find another way to give myself a head start. Maybe the alchemist could help.'</p>
 [[ForestRespawnPod]]</br>
 </br></br>
 </article><article id="LogPanel"></article></section>

@@ -1,18 +1,7 @@
 "use strict";
 
 class Mob extends Character {
-    constructor() {
-        super();
-        this.level_min = 1;     
-        this.levelUp(1);
-        this.autoLeveling();
-    }
-    //override to return the next move to execute
-    //OK = false if no action, else true
-    //msg should contain a message formatted for view (move description )g 
-    //this function should decide what actions the mob takes; 
-    //query _canAct to check if stunned or otherwise incapaciated, then run execCombatCmd(moveNOP) 
-    calcCombatMove(enemys,friends){
+    static calcCombatMove(enemys,friends){
         let rnd = _.random(1,100);
         let result = this._canAct();
         result.action =result.target= null;
@@ -31,6 +20,21 @@ class Mob extends Character {
         }
         return(result);
     }
+    constructor() {
+        super();
+        this.level_min = 1;     
+        this.levelUp(1);
+        this.autoLeveling();
+    }
+    //override to return the next move to execute
+    //OK = false if no action, else true
+    //msg should contain a message formatted for view (move description )g 
+    //this function should decide what actions the mob takes; 
+    //query _canAct to check if stunned or otherwise incapaciated, then run execCombatCmd(moveNOP) 
+    calcCombatMove(enemys,friends){
+        return(Mob.calcCombatMove(enemys,friends));
+    }
+
     //override to adjust the mobs attributes to player level
     scaleLevel(lvl) { 
         let x = Math.max(this.level_min,_.random(lvl-3,lvl+3));
