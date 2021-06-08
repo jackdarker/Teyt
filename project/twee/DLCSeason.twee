@@ -2,7 +2,7 @@
 :: YouDiedOnce
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;
-window.gm.quests.forceQuestMilestone("qDiedAgain",100,1);;%>
+window.gm.quests.forceQuestMilestone("qDiedAgain",100,2);%>
 Darkness... </br>
 After some moments your vision fades in. </br> 
 <p class='tPC'>"What happend? Why I'm sitting in a pool of ...goo?"</p>
@@ -29,7 +29,7 @@ But you keep your stats and skills (*1).
 </p> 
 <p class='tPC'>"Start the questline from the beginning? I really hope they get that fixed soon."</p>
 <div></br>
-[[Next|ForestRespawnPod]]</br></div>
+[[Next|ForestRespawnPodExit]]</br></div>
 </article><article id="LogPanel"></article></section>
 
 <div id='select1' >
@@ -72,6 +72,7 @@ But that damned thing is still there!</br>
 </article><article id="LogPanel"></article></section>
 <script> function foo(select) {
     window.gm.quests.forceQuestMilestone("qDiedAgain",200,100);
+    window.story.show("")
 }
 </script>
 
@@ -118,7 +119,7 @@ lets you endure stressful situations better and reduces blackout chance;increase
 
 Animal Comprehension: cast on self or other; silently understand what animals say
 having a chorus of thrilled animals in your mind might cause headache 
-"No I can discuss the hen-egg-problem with chicken"
+"Now I can discuss the hen-egg-problem with chicken"
 
 Regeneration: cast on self or other; healing over time ; might increase fertility/virility for a limited time
 overhealing friendly target might get them randy
@@ -141,6 +142,11 @@ Vial of slipery: a small vial with an unending supply of some slimy, greasy liqu
 can be used as grease for machinery or other parts that need lubrication. 
 upgraded version can change color and taste
 "Unending huh? Will the world drown in goo if i put it upside down?"
+
+
+:: HowWillKnow
+Its not like you do hand out blowjobs in real. This is virtual, right? No one will know beause this dude isnt just a mob.
+
 
 :: PostDefeatCombat
 <devnote>"We are happy to announce that we have extended combat with exceptional new possibilities to allow more variety in tactics and better chances for certain character builds.

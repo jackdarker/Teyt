@@ -71,6 +71,5 @@ Trent looks up to you, he already knows what that means. | Trent looks up to you
 <%}%>
 That didnt went as planned. That bully delivered a though blow and knocked you out. It didnt felt that lethal but the game has decided that you earned your death. </br>
 <p class="tPC">'I need to do some leveling and get stronger or find another way to give myself a head start. Maybe the alchemist could help.'</p>
-[[ForestRespawnPod]]</br>
-</br></br>
+<a0 onclick='window.gm.respawn();'>Black out</a>
 </article><article id="LogPanel"></article></section>

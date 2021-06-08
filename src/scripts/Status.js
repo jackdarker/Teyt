@@ -54,7 +54,7 @@
         let _i = this.findItemSlot(stat.name);
         if(_i<0) {
             stat._parent=window.gm.util.refToParent(this);
-            this.list.push({'id': stat.name,'count': 1, item:stat});
+            this.list.push({'id': stat.id,'count': 1, item:stat});
         }
     }
     //override
@@ -156,7 +156,7 @@ class Effects extends Inventory {  //Todo a collection of Stats is similiar to I
     get(id){
         return(this.getItem(id));
     }
-    //findItemslot uses id, this one finds all effects(-slot) of one type
+    //findItemslot uses id, this one finds all effects(-slot) with a name
     findEffect(name) {
         let _items = [] ;
         for (let i = 0; i < this.count(); i++) {
@@ -188,7 +188,6 @@ class Effects extends Inventory {  //Todo a collection of Stats is similiar to I
             }  
         }
         //or if there are similiar effects try to merge with them
-        //let _k = this.findEffect(effect.name);  
         for(let i=0;i<this.list.length;i++) {
             let _old = this.list[i].item;
             res = _old.merge(effect);
@@ -210,7 +209,6 @@ class Effects extends Inventory {  //Todo a collection of Stats is similiar to I
         if(_i<0) return; //Todo do nothing
         let _old = this.get(id);
         _old.onRemove();
-        //window.gm.EffectLib[this.list[_i].name].onRemove(this,this.list[_i]);
         neweffect._parent = window.gm.util.refToParent(this);
         this.list[_i].id= neweffect.id,this.list[_i].item = neweffect;
         neweffect.onApply();

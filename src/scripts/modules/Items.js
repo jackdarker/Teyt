@@ -36,13 +36,27 @@ class Battery extends Item {
     toJSON() {return window.storage.Generic_toJSON("Battery", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(Battery, value.data);};
 }
-class PurpleBerry extends Item {
-    constructor() { super('PurpleBerry');       todo instead of creating full class for every useless junk I use this and just add variable that will be restored after load
+class Ingredient extends Item {
+    constructor() { super('Ingredient');   
         this.lossOnRespawn = true;
     }
-    get desc() { return 'Those purple berrys grow in the forest.';   }
-    toJSON() {return window.storage.Generic_toJSON("PurpleBerry", this); };
-    static fromJSON(value) { return window.storage.Generic_fromJSON(PurpleBerry, value.data);};
+    static lookupId(id) {
+        let info ={desc:''};
+        switch(id){
+            case "ApocaFlower": 
+                info.desc= "A yellow bluish flower growing in forests.";
+                break;
+            case "PurpleBerry":
+                info.desc="Those purple berrys grow in the forest.";
+                break;
+            default:
+        }
+        return(info);
+    }
+    changeId(id) {this.id = id;} //todo instead of creating full class for every useless junk I use this and just add variable that will be restored after load
+    get desc() { return Ingredient.lookupId(this.id).desc;   }
+    toJSON() {return window.storage.Generic_toJSON("Ingredient", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(Ingredient, value.data);};
 }
 
 class FlashBang extends Item {
@@ -81,7 +95,7 @@ class FlashBang extends Item {
                 }
                 result.msg = context.parent.name+' uses '+this.name+'.';
                 for(let _targ of on) {
-                    _targ.addEffect(effStunned.name,new effStunned());  //todo should 'FlashBang:Stunned' merge with other stunned? 
+                    _targ.addEffect(effStunned.id,new effStunned());  //todo should 'FlashBang:Stunned' merge with other stunned? 
                     result.msg +=_targ.name+' got stunned. ';
                 }
                 result.OK=true;
@@ -143,7 +157,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(Lube);
     window.storage.registerConstructor(CanOfCoffee);
     window.storage.registerConstructor(SimpleFood);
-    window.storage.registerConstructor(PurpleBerry);
+    window.storage.registerConstructor(Ingredient);
     window.storage.registerConstructor(FlashBang);
     
     ItemsLib['Money'] = function () { return new Money();};
@@ -153,9 +167,11 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['Dildo_small'] = function () { return new Dildo_small();};
     // consumables
     ItemsLib['Lube'] = function () { return new Lube();};
+    ItemsLib['Ingredient'] = function () { return new Ingredient();};
     ItemsLib['CanOfCoffee'] = function () { return new CanOfCoffee(); };
     ItemsLib['SimpleFood'] = function () { return new SimpleFood(); };
     ItemsLib['FlashBang'] = function () { return new FlashBang(); };
-    ItemsLib['PurpleBerry'] = function () { return new PurpleBerry(); };
+    ItemsLib['PurpleBerry'] = function () { let x= new Ingredient();x.changeId("PurpleBerry");return(x); };
+    ItemsLib['ApocaFlower'] = function () { let x= new Ingredient();x.changeId("ApocaFlower");return(x); };
     return ItemsLib; 
 }(window.gm.ItemsLib || {}));

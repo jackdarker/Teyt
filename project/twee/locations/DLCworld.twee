@@ -30,7 +30,7 @@ The description of the class is sparse. The picture you see indicates that this 
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;
 window.gm.enterVR();%>
-<%window.gm.quests.forceQuestMilestone("qDLCMain",700,600)%>
+<%window.gm.quests.forceQuestMilestone("qDiedAgain",2,1);window.gm.quests.forceQuestMilestone("qDLCMain",700,600)%>
 <!--todo--> "You magically appear near the top of a hill. </br>
 You can see some hut from here. You just need to follow the trail down the hill."</br>
 <div></br>

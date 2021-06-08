@@ -459,7 +459,7 @@ window.gm.combat.calcEvasion=function(attacker,target, attack) {
   var result = {OK:true,msg:''}
   var rnd = window.gm.roll(1,100);
 
-  if(target.Effects.findItemSlot(effStunned.name)>=0) {
+  if(target.Effects.findItemSlot(effStunned.id)>=0) {
     result.OK = true; 
     result.msg = target.name+' is stunned and cannot evade. '
     attack.crit = true; //when stunned always critical hit
@@ -498,7 +498,7 @@ window.gm.combat.calcParry=function(attacker,target, attack) {
     attack.crit = true; //when stunned always critical hit
     return(result);
   }
-
+  //todo block if has shield, parry if has weapon
   var lvlDiff = target.level-attacker.level;
   var chance = target.Stats.get("agility").value + target.Stats.get("perception").value;
   chance += lvlDiff*4;
@@ -555,7 +555,7 @@ window.gm.combat.calcAttack=function(attacker,defender,attack) {
   if(result.OK===false) { return(result);  }
   var _tmp = result.msg;
   //check if target can block or parry
-  result = window.gm.combat.calcParry(attacker,defender,attack);  //todo or block
+  result = window.gm.combat.calcParry(attacker,defender,attack);
   //if(result.foo!==null) result.foo(attacker,attack);
   if(result.OK===false) {    return(result);  }
   _tmp += result.msg;

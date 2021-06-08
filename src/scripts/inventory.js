@@ -65,13 +65,13 @@ class Inventory {
         return(ids);
     }
     addItem(item,count=1) {
-        var _i = this.findItemSlot(item.name);
+        var _i = this.findItemSlot(item.id);
         if(_i<0) {
             item._parent=window.gm.util.refToParent(this)
-            this.list.push({id: item.name,count: count, item:item});
+            this.list.push({id: item.id,count: count, item:item});
         }
         else this.list[_i].count+=count;
-        this.postItemChange(item.name,"added","");
+        this.postItemChange(item.id,"added","");
     }
     removeItem(id,count=1) {
         var _i = this.findItemSlot(id);

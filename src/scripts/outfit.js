@@ -230,7 +230,7 @@ class Outfit { //extends Inventory{
     }
     //this will equip item if possible
     addItem(item, force) {
-        let _idx = this.findItemSlot(item.name);
+        let _idx = this.findItemSlot(item.id);
         if(_idx.length>0) return; //already equipped
         let _item = item;
         _idx = _item.slotUse;//.map((function(cv, ix, arr) { return (window.gm.OutfitSlotLib[cv]);  }));
@@ -268,7 +268,7 @@ class Outfit { //extends Inventory{
             if(!_el) {
                 this.list[_idx[k]] = _el =  {id:'', item:null};
             }
-            this.list[_idx[k]].id = _item.name;
+            this.list[_idx[k]].id = _item.id;
             this.list[_idx[k]].item = _item;
         }  
         _item._parent = window.gm.util.refToParent(this);       //Todo currently we have 2 copies of equipment - 1 for wardrobe 1 for outfit otherwise this will not work

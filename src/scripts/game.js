@@ -51,7 +51,7 @@ window.gm.initGame= function(forceReset,NGP=null) {
     $(window).on('sm.passage.showing', function(event, eventObject) {
         // Current Passage object
         $("tw-passage").fadeIn(500);  //fade in if was previously faded out
-      console.log('showing '+eventObject.passage.name);
+      //console.log('showing '+eventObject.passage.name);
     });
     // Render the passage named HUD into the element todo replace with <%=%>??
     $(document).on('sm.passage.shown', function (ev,eventObject) { window.gm.refreshSidePanel();});

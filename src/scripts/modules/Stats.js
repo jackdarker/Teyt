@@ -417,7 +417,7 @@ class effEnergized extends Effect {
 class effNotTired extends Effect {
     constructor() {
         super();
-        this.data.id = this.data.name= effNotTired.name, this.data.duration = 120, this.data.hidden=4;
+        this.data.id = effNotTired.name,this.data.name="not tired" , this.data.duration = 120, this.data.hidden=4;
     }
     toJSON() {return window.storage.Generic_toJSON("effNotTired", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(effNotTired, value.data);};
@@ -449,7 +449,7 @@ class effNotTired extends Effect {
 class effTired extends Effect {
     constructor() {
         super();
-        this.data.id = this.data.name= effTired.name, this.data.duration = 120, this.data.hidden=0;
+        this.data.id = effTired.name, this.data.name="tired", this.data.duration = 120, this.data.hidden=0;
     }
     toJSON() {return window.storage.Generic_toJSON("effTired", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(effTired, value.data);};

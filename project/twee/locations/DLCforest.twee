@@ -8,27 +8,6 @@ You can see some kind of house at the foot ogf the hill. You just need to follow
 </article><article id="LogPanel"></article></section>
 
 
-:: ForestRespawnPod
-<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<!--<%window.gm.player.location=window.passage.name;%>-->
-Player should teleport here on death
-<script>
-window.gm.respawn();
-if(window.gm.quests.getMilestoneState("qDiedAgain").id===1) {
-    window.story.show('YouDiedOnce'); 
-} else if(window.gm.quests.getMilestoneState("qDiedAgain").id<=100){
-    window.story.show('YouDiedWithCursedGear');
-} else {
-    window.gm.player.Wardrobe.addItem(new window.storage.constructors['RobesZealot']());
-    window.gm.player.Outfit.addItem(new window.storage.constructors['RobesZealot']());
-    let staff = new window.storage.constructors['StaffWodden']();
-    window.gm.player.Inv.addItem(staff);
-    window.gm.player.Outfit.addItem(staff);
-    window.story.show('ForestRespawnPodExit'); 
-}
-</script>
-
-
 :: ForestRespawnPodExit
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
@@ -52,10 +31,12 @@ One direction leads to the hut close by. The other direction follows the border 
 
 :: ForestSearchAround [_back_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<% let args = window.story.state.tmp.args; if(args[0]==='PurpleBerry' && args[1]>0){ window.gm.player.Inv.addItem(new window.storage.constructors[args[0]](),args[1]); %>
+<% let args = window.story.state.tmp.args; if(args[0]==='PurpleBerry' && args[1]>0){ window.gm.player.Inv.addItem(window.gm.ItemsLib[args[0]](),args[1]); %>
 On a secluded spot you found a batch of berry bushes. Most of them dont have any more berrys but you are able to collect a handful.</br>
 <%} else if(args[0]==='PurpleBerry'){%>
-There arent any purple berrys left. You have to search on a different place.
+There arent any purple berrys left. You have to search on a different place.</br>
+<%} else if(args[0]==='ApocaFlower' && args[1]>0){ window.gm.player.Inv.addItem(window.gm.ItemsLib[args[0]](),args[1]);%>
+You found some pretty flowers with blue and yellow blossoms.</br>
 <%} else {%>
 Unfortunatly you didnt find anything useful.</br>
 <%}%>
@@ -107,12 +88,15 @@ Maybe you can <a0 onclick='explore(); '>explore</a> the surrounding woods and se
 <script> function explore() {
     let rnd = _.random(0,100);
     window.story.state.tmp.args = [];
-    if(window.gm.quests.getMilestoneState("qDiedAgain").id<=1 && window.gm.player.Inv.countItem('PurpleBerry')>=3) {
+    if(window.gm.quests.getMilestoneState("qDiedAgain").id<=2 && window.gm.player.Inv.countItem('PurpleBerry')>=3) {
         window.story.state.tmp.args = ['PurpleBerry',0];window.story.show('ForestSearchAround'); //find nothing !
     } else if(rnd > 70 ) {
          window.story.show('ForestWolfEncounter');
     } else if(rnd > 20) { //todo limit berys per day
-        window.story.state.tmp.args = ['PurpleBerry',1];window.story.show('ForestSearchAround');
+        let find = ['PurpleBerry','ApocaFlower'];
+        let rnd2 = _.random(0,find.length-1);
+        window.story.state.tmp.args = [find[rnd2],1]
+        window.story.show('ForestSearchAround');
     }
     else {
         window.story.show('ForestSearchAround'); //nothing
@@ -126,7 +110,7 @@ Maybe you can <a0 onclick='explore(); '>explore</a> the surrounding woods and se
 <%window.gm.moveHere();%>
 You fight your way through the dense undergrowth and realize just in time that you have reached the edge of a cliff.</br> 
 </br> 
-<% if(window.gm.quests.getMilestoneState("qDiedAgain").id===1) { %>
+<% if(window.gm.quests.getMilestoneState("qDiedAgain").id===2) { %>
 <div id='select1' >
 <a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1a")'>Peak into the chasm</a>
 </div>
@@ -146,7 +130,7 @@ At some point you see a massive rock coming onto you, reaching out with your han
 </div>
 <div id='choice3a' hidden>
 But of course its futile trying to catch that crushing weight. </br>  
-You dont feel any pain, everything is just going [[black|ForestRespawnPod]] as if pulling the cord from a TV.</br>  
+You dont feel any pain, everything is just going <a0 onclick='window.gm.respawn();'>black</a> as if pulling the cord from a TV.</br>  
 </div></div></div>
 <% } else {%>
 <div>
@@ -198,10 +182,8 @@ Ansonsten gibt es hier nichts.</br>
 <%}%>
 </article><article id="LogPanel"></article></section>
 
-:: ForestAlchemistHut
+:: ForestAlchemistTalk [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%window.gm.moveHere();%>
-<p class="t></p>'Puh, what a stink. I shouldnt stay here for long for I might suffocate'</p>
 <% if(!window.gm.quests.hasActiveQuest("qPurpleBerry") || window.gm.quests.getMilestoneState("qPurpleBerry").id<1) { %>
 <p class='tPC'>"Hello? Anyone there?"</p>
 A man appears from a door at the side of the room. Worn old clothing adorns his lithe frame. 
@@ -229,34 +211,42 @@ Now that I think about it, we could make a trade: you get me some purple berrys,
 <% } else if(window.gm.quests.getMilestoneState("qPurpleBerry").id===1 && window.gm.player.Inv.countItem("PurpleBerry")>=5) { %>
 <div id='select1' > You got enough purple berries to trade in for the alchemist. Will you do so?
 <a0 onclick='window.gm.player.Inv.removeItem("PurpleBerry",5);window.gm.player.Inv.addItem(new window.gm.ItemsLib.SimpleFood(),2);window.gm.quests.forceQuestMilestone("qPurpleBerry",100,1);window.gm.printTalkLink($("div#select1")[0],"div#choice1a");'>Yes</a>
-<a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1b");window.gm.refreshAllPanel();'>No</a>
+<a0 onclick='window.story.show("ForestBorder");'>Leave</a>
 </div>
 <div id='choice1a' hidden>
 <p class='tPC'>"I've got those berries for you."</p> You place them on the desk and wait for the approval of the alchemist.</br>
 "Very good. Like I said I will give you 2 potions for those."
 <a0 onclick='window.gm.refreshAllPanel();'>Next</a>
 </div><div id='choice1b' hidden></div>
-<% } else if(window.gm.quests.getMilestoneState("qBondageKink").id<=300) { %>
+<% } else if(window.gm.quests.getMilestoneState("qBondageKink").id===300) { %>
 As you stumble into the hut, the alchemists greets you: "Ah, nice to see you again. You fine so far?"
-<p class="t>"Nope. There are some thugs at the bridge, they dont let me pass."</p>
+<p class="tPC">"Nope. There are some thugs at the bridge, they dont let me pass."</p>
 "Thugs? Did they rob you?"
-<p class="t>"I got away before they got that idea. Is there an alternative to get over the canyon."</p>
+<p class="tPC">"I got away before they got that idea. Is there an alternative to get over the canyon."</p>
 He shakes his head "Not that I know. Cant you sneak around them or trick them somehow to let you pass?"
-<p class="t>"Well, thats what I wanted to ask you. You dont have an elixier or something that makes me hardier and stronger?"</p> 
+<p class="tPC">"Well, thats what I wanted to ask you. You dont have an elixier or something that makes me hardier and stronger?"</p> 
 "Huff, no. I'm still out of stock. I can give you those berry-potions if you bring me enough berries. It wouldnt take much to improve it though..."
 "If you can get me 4 purple berries, 2 apoca flowers and 2 bloated mushroom I can mix up some potion to boost your strength."
-<p class="t>"Thats exactly what I need ! But where can I find them?"</p>
+<p class="tPC">"Thats exactly what I need ! But where can I find them?"</p>
 "The flowers grow in the forest too. They have colorful blue and yellow blossoms. But those mushrooms...they grow in dark,humid places, caves and such."
-<p class="t>"I will see to get some."</p>
+<p class="tPC">"I will see to get some."</p>
 <a0 onclick='window.gm.quests.forceQuestMilestone("qPurpleBerry",200,1);window.story.show("ForestBorder");'>Leave</a></br>
-<%} else {%>
+<%} else {%> He seems busy right now. [[Back|ForestAlchemistHut]] <%}%>
+</article><article id="LogPanel"></article></section>
+
+
+:: ForestAlchemistHut
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.moveHere();%>
+<p class="tPC"></p>'Puh, what a stink. I shouldnt stay here for long for I might suffocate'</p>
 "About that cake we talked earlier - what kind of cake are we speaking about."
 <p class='tPC'>NOO CAKE !</p>
-<%} if(window.gm.quests.getMilestoneState("qPurpleBerry").id>=100%) {%>
+<% if(window.gm.quests.getMilestoneState("qPurpleBerry").id>=100) {%>
 <a0 onclick='window.gm.player.Inv.removeItem("PurpleBerry",5);window.gm.player.Inv.addItem(new window.gm.ItemsLib.SimpleFood(),2);window.gm.refreshAllPanel();' <%=(window.gm.player.Inv.countItem("PurpleBerry")>=5)?(""):("hidden")%>>Trade 5 purple berries for 1 potion</a>
 <%}%>
-<div></br>[[Outside|ForestBorder]]  [[Alchemist]] [[Clair]]</br></div>
+<div></br>[[Outside|ForestBorder]]  [[Alchemist|ForestAlchemistTalk]] [[Clair]]</br></div>
 </article><article id="LogPanel"></article></section>
+
 
 
 :: ForestBridge

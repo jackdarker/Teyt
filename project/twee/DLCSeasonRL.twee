@@ -176,7 +176,6 @@ You are eager to get the equipment into your dorm and setup everything. So you m
 
 :: SetupVREquipment2
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%window.gm.quests.forceQuestMilestone("qDLCMain",600,500)%>
 You unpack the heavier one of the large parcels. It contains a number of metal pipes and plates, cables and screws.
 The other package contains something that looks like a diver's suite made from neoprene and another VR-headset. 
 

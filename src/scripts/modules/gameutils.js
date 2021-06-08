@@ -101,16 +101,12 @@ window.gm.initGame= function(forceReset,NGP=null) {
       ch.id="PlayerVR";
       ch.name="Zeph";
       ch.faction="Player";
-      ch.Effects.addItem(skCooking.name,new skCooking());
+      ch.Effects.addItem(skCooking.id,new skCooking());
       //body
       ch.Outfit.addItem(new BaseHumanoid());
       ch.Outfit.addItem(new SkinHuman());
       ch.Outfit.addItem(new FaceHuman());
       ch.Outfit.addItem(new PenisHuman());
-      //add some basic inventory
-      ch.Wardrobe.addItem(new RobesZealot());
-      ch.Outfit.addItem(new RobesZealot());
-      ch.Inv.addItem(new StaffWodden(),1);
       s.PlayerVR=window.gm.PlayerVR= ch;
     }
     if (!s.PlayerRL||forceReset) {  
@@ -119,7 +115,7 @@ window.gm.initGame= function(forceReset,NGP=null) {
         ch.name="Ratchel";
         ch.faction="Player";
         //window.gm.PlayerVR.gainRelation('Mom',10);
-        ch.Effects.addItem(skCooking.name,new skCooking());
+        ch.Effects.addItem(skCooking.id,new skCooking());
         //add some basic inventory
         ch.Inv.addItem(new Money(),20);
         ch.Inv.addItem(new LighterDad());
@@ -139,7 +135,7 @@ window.gm.initGame= function(forceReset,NGP=null) {
         ch.Outfit.addItem(new Sneakers());
         ch.Outfit.addItem(new Pullover());
         //special skills
-        ch.Effects.addItem(effNotTired.name, new effNotTired()); //depending on sleep Tired will be set to NotTired or Tired
+        ch.Effects.addItem(effNotTired.id, new effNotTired()); //depending on sleep Tired will be set to NotTired or Tired
         ch.Skills.addItem(SkillCallHelp.setup('Mole'));
         s.PlayerRL=window.gm.PlayerRL=ch;
     }      
@@ -172,7 +168,7 @@ window.gm.enterVR=function() {
   s._gm.timeRL = s._gm.time,s._gm.dayRL = s._gm.day;
   s._gm.time = s._gm.timeVR,s._gm.day = s._gm.dayVR;
   window.gm.addTime(0);
-  window.gm.respawn(true);
+  window.gm.respawn({keepInventory:true});
 }
 window.gm.leaveVR=function() {
   //todo update effects in VR but stop RL effects
@@ -185,11 +181,11 @@ window.gm.leaveVR=function() {
   s._gm.time = s._gm.timeRL,s._gm.day = s._gm.dayRL;
   window.gm.addTime(60);
 }
-//heal player and remove inventory
-window.gm.respawn=function(keepInventory=false) {
+//heal player and remove inventory {keepInventory=false,location=''}
+window.gm.respawn=function(conf={keepInventory:false}) {
   window.gm.player.Stats.increment("energy",9999);
   window.gm.player.Stats.increment("health",9999);
-  if(!keepInventory) { //remove inentory and outfit that is not questitem, cursed or permanent
+  if(!conf.keepInventory) { //remove inentory and outfit that is not questitem, cursed or permanent
     for(let i =window.gm.player.Outfit.list.length-1;i>=0;i-=1) {
       let el = window.gm.player.Outfit.list[i];
       if(el.item && el.item.lossOnRespawn ) window.gm.player.Outfit.removeItem(el.id,true);
@@ -202,6 +198,18 @@ window.gm.respawn=function(keepInventory=false) {
       let el = window.gm.player.Inv.list[i];
       if(el.item.lossOnRespawn ) window.gm.player.Inv.removeItem(el.id,el.count);
     }
+  }
+  if(window.gm.quests.getMilestoneState("qDiedAgain").id===2) {
+    window.story.show('YouDiedOnce'); 
+  } else if(window.gm.quests.getMilestoneState("qBondageKink").id===100){
+      window.story.show('YouDiedWithCursedGear');
+  } else {
+      window.gm.player.Wardrobe.addItem(new window.storage.constructors['RobesZealot']());
+      window.gm.player.Outfit.addItem(new window.storage.constructors['RobesZealot']());
+      let staff = new window.storage.constructors['StaffWodden']();
+      window.gm.player.Inv.addItem(staff);
+      window.gm.player.Outfit.addItem(staff);
+      window.story.show('ForestRespawnPodExit'); //todo what location
   }
 }
 //sets current player location and advances time

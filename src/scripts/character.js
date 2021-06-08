@@ -159,7 +159,7 @@ class Character {
         this.Stats.increment('health',regen);
         this.Stats.increment('energy',regen);
         if(delta>360) {
-            this.Effects.addItem(effNotTired.name, new effNotTired());
+            this.Effects.addItem(effNotTired.id, new effNotTired());
         } 
     }
     addEffect(id,effect) {
