@@ -159,7 +159,7 @@ class Character {
         this.Stats.increment('health',regen);
         this.Stats.increment('energy',regen);
         if(delta>360) {
-            this.Effects.addItem(effNotTired.id, new effNotTired());
+            this.Effects.addItem(effNotTired.name, new effNotTired());
         } 
     }
     addEffect(id,effect) {
@@ -175,13 +175,27 @@ class Character {
         }
     }
     //combat related
-    _canAct() {
+    _canAct() { //todo even if stunned we should be able to struggle
         var result = {OK:true,msg:''};
         if(this.Effects.findEffect("effStunned").length>0) {    //findItemSlot annot use since there might be different effect ids
             result.OK=false;
             result.msg =this.name+ " is stunned and cannot react."
             return(result);
         }
+        return(result);
+    }
+    //combat related; return a msg describing the state of the character
+    //"Wolf is currently entangled by fines."
+    //"You have you towershield raised to guard against damage. Your mana is drained by a opponents spell."
+    _stateDesc() {
+        let result = {OK:true,msg:''};
+        let isPlayer = window.gm.player.id === this.id;
+        for(let list = this.Effects.getAllIds(), i=list.length-1;i>=0;i-=1) {
+            if(list[i]==="effStunned") {
+                result.msg = "$[I]$ $[am]$ stunned and cant do a thing.";
+            }
+        }
+        result.msg = window.gm.util.descFixer(this)(result.msg);
         return(result);
     }
 }

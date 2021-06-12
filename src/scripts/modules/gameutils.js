@@ -101,7 +101,7 @@ window.gm.initGame= function(forceReset,NGP=null) {
       ch.id="PlayerVR";
       ch.name="Zeph";
       ch.faction="Player";
-      ch.Effects.addItem(skCooking.id,new skCooking());
+      ch.Effects.addItem(skCooking.name,new skCooking());
       //body
       ch.Outfit.addItem(new BaseHumanoid());
       ch.Outfit.addItem(new SkinHuman());
@@ -115,7 +115,7 @@ window.gm.initGame= function(forceReset,NGP=null) {
         ch.name="Ratchel";
         ch.faction="Player";
         //window.gm.PlayerVR.gainRelation('Mom',10);
-        ch.Effects.addItem(skCooking.id,new skCooking());
+        ch.Effects.addItem(skCooking.name,new skCooking());
         //add some basic inventory
         ch.Inv.addItem(new Money(),20);
         ch.Inv.addItem(new LighterDad());
@@ -135,7 +135,7 @@ window.gm.initGame= function(forceReset,NGP=null) {
         ch.Outfit.addItem(new Sneakers());
         ch.Outfit.addItem(new Pullover());
         //special skills
-        ch.Effects.addItem(effNotTired.id, new effNotTired()); //depending on sleep Tired will be set to NotTired or Tired
+        ch.Effects.addItem(effNotTired.name, new effNotTired()); //depending on sleep Tired will be set to NotTired or Tired
         ch.Skills.addItem(SkillCallHelp.setup('Mole'));
         s.PlayerRL=window.gm.PlayerRL=ch;
     }      
@@ -201,7 +201,7 @@ window.gm.respawn=function(conf={keepInventory:false}) {
   }
   if(window.gm.quests.getMilestoneState("qDiedAgain").id===2) {
     window.story.show('YouDiedOnce'); 
-  } else if(window.gm.quests.getMilestoneState("qBondageKink").id===100){
+  } else if([100,200,300].includes(window.gm.quests.getMilestoneState("qBondageKink").id)){
       window.story.show('YouDiedWithCursedGear');
   } else {
       window.gm.player.Wardrobe.addItem(new window.storage.constructors['RobesZealot']());
@@ -299,30 +299,30 @@ window.gm.printTodoList= function() {
 };
 //prints a list of quest
 window.gm.printQuestList= function() {
-  var elmt='<hr><form><ul style=\"list-style-type: none; padding-inline-start: 0px;\" ><legend>In progress</legend>';
-  var s= window.story.state;
+  let elmt='<hr><form><ul style=\"list-style-type: none; padding-inline-start: 0px;\" ><legend>In progress</legend>';
+  let s= window.story.state;
   
   //elmt +="<li><label><input type=\"checkbox\" name=\"y\" value=\"x\" readonly disabled>always: keep the fridge filled</label></li>";
-  for(var i=0; i<s.quests.activeQuests.length; i++) {
-      var qId = s.quests.activeQuests[i].id;
-      var flags = s.quests.activeQuests[i].flags;
-      var msId = s.quests.activeQuestsMS[i].id;
-      var quest = window.gm.questDef[qId];
-      var mile = quest.getMileById(msId);
-      if(!quest.HiddenCB()) {
+  for(let i=0; i<s.quests.activeQuests.length; i++) {
+      let qId = s.quests.activeQuests[i].id;
+      let flags = s.quests.activeQuests[i].flags;
+      let msId = s.quests.activeQuestsMS[i].id;
+      let quest = window.gm.questDef[qId];
+      let mile = quest.getMileById(msId);
+      if(!quest.HiddenCB() || window.story.state._gm.dbgShowQuestInfo) {
         elmt +="<li style=\"padding-bottom: 0.5em;\"><input type=\"checkbox\" name=\"y\" value=\"x\" readonly disabled><label>"+
           quest.name+(window.story.state._gm.dbgShowQuestInfo?(" "+msId+" 0x"+flags.toString(16)):(""))+" : "+ ((mile.HiddenCB()===true)?("???"):(mile.descr))+"</label></li>"; //checked="checked"
       }
   }
   elmt +="</ul></form></br>";
   elmt +='<hr><form><ul style=\"list-style-type: none\" ><legend>Completed</legend>';
-  for(var i=0; i<s.quests.finishedQuests.length; i++) {
-    var qId = s.quests.finishedQuests[i].id;
-    var flags = s.quests.activeQuests[i].flags;
-    var msId = s.quests.finishedQuestsMS[i].id;
-    var quest = window.gm.questDef[qId];
-    var mile = quest.getMileById(msId);
-    if(!quest.HiddenCB()) {
+  for(let i=0; i<s.quests.finishedQuests.length; i++) {
+    let qId = s.quests.finishedQuests[i].id;
+    let flags = s.quests.activeQuests[i].flags;
+    let msId = s.quests.finishedQuestsMS[i].id;
+    let quest = window.gm.questDef[qId];
+    let mile = quest.getMileById(msId);
+    if(!quest.HiddenCB() || window.story.state._gm.dbgShowQuestInfo) {
       elmt +="<li><input type=\"checkbox\" name=\"y\" value=\"x\" readonly disabled checked=\"checked\"><label>"+
         quest.name+(window.story.state._gm.dbgShowQuestInfo?(" "+msId+" 0x"+flags.toString(16)):(""))+" : "+ mile.descr+"</label></li>"; 
     }
@@ -387,7 +387,7 @@ window.gm.util.estimatePronoun= function(whom) {
     }
     return('it');
 };
-//returns a function that accept a text and fixes the word-phrases
+//returns a function that accept a text and fixes the word-phrases: let fixer = window.gm.util.descFixer(this.actor);msg=fixer('[I] [like] this shit.');
 window.gm.util.descFixer = function(whom) {
   let pron = window.gm.util.estimatePronoun(whom);
   return(function(pron) { 
@@ -437,10 +437,12 @@ window.gm.util.wordlist = function buildWordList(list) {
   //defines for each word a list to match to pronoun to replace with
   //have = [I have, you have, he/she has, we have, you have, they have ]
   list['i'] = {def:'I',i:'I',you:'you',he:'he',she:'she',shi:'shi',it:'it'};
+  list['you'] = list['i']; //if you use you instead I as it would be required ...
   list['me'] = {def:'me',i:'me',you:'you',he:'him',she:'her',shi:'hir',it:'it'};
   list['my'] = {def:'my',i:'my',you:'your',he:'his',she:'her',shi:'hir',it:'its'};
   list['have'] = {def:'have',he:'has',she:'has',shi:'has',it:'has'};
   list['am'] = {def:'is',i:'am',he:'is',she:'is',shi:'is',it:'is'};
+  list['them'] = {def:'them',i:'me',he:'him',she:'her',shi:'hir',it:'it'}; //I snap at them -> He snaps at me.
   return(list);
 }(window.gm.util.wordlist || {});
 

@@ -42,18 +42,7 @@ But you keep your stats and skills (*1).
 
 :: CursedCollar
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-"Let me see. Hm.. I'm not sure but I think I cant you help with that one. There is a lock but I'm not a locksmith."
-<p class="tPC">"And do you know where to find one?"</p>
-"There is a town east of here, called Elderant. I dont know that place to well but you might be able to find someone that can unlock this thing."
-<p class="tPC">"There is a town nearby?"</p>
-"Nearby is relative. Its about a 3 or 4 days walk I guess. As I think over it, maybe you shouldnt go. It can be dangerous traveling alone."
-<p class="tPC">"More dangerous than the forest? I died on the first visit of this damn forest ... by an stupid accident !"</p>
-"The forest isnt dangerous. I never had any issues. Maybe you just had a little bad luck."
-An idea forms in your mind: when I die, I lose the equipment. 
-Of ourse dying would be bad if it causes a large loss. But right now you just have little to no gear and will be replenished with a new set.
-You smirk to yourself for your ingenuity. 
-'So if I dont have any other option, I still just need to find a way to die to get rid of that thing.'
-[[But I dont wanna die]] [[Death is a solution]] [[I will just ignore the device]]
+
 <div></br>
 [[Next|NOP]]</br></div>
 </article><article id="LogPanel"></article></section>
@@ -62,17 +51,17 @@ You smirk to yourself for your ingenuity.
 :: YouDiedWithCursedGear
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 "Choosen one, this is a shrine of restoration!" ... the acolyte starts heir rant.</br>
-"Yeah, I know. I just got ass kicked again. At least I got rid of that freaking ... "</br>
+<p class="tPC">"Yeah, I know. I just got ass kicked again. At least I got rid of that freaking cursed... "</p></br>
 But that damned thing is still there!</br>
-"Hey, why is everthing gone except this?"
+<p class="tPC">"Hey, why is everthing gone except this?"</p>
 "At times the heros burden is increased by evil deeds and his epic story is extended further by finding closure for his curse." the priestess chants, holding out heir hands upward to heir gods.</br>
-"So I'm stuck with cursed gear but have to let go the good one?"
+<p class="tPC">"So I'm stuck with cursed gear but have to let go the good one?"</p>
 <p class='dev'>Some gear will stick to you. That doesnt need to be cursed one. In fact you can buy special gear that is bonded to you.</p>
 </br><a0 id='1' onclick='foo(this)'>This sucks</a> <a0 id='2' onclick='foo(this)'>Would have been to easy</a> <a0 id='3' onclick='foo(this)'>Its an incentive to not die</a></br>
 </article><article id="LogPanel"></article></section>
 <script> function foo(select) {
     window.gm.quests.forceQuestMilestone("qDiedAgain",200,100);
-    window.story.show("")
+    window.story.show("ForestRespawnPodExit");
 }
 </script>
 

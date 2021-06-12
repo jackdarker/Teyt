@@ -32,7 +32,7 @@ window.gm.util.PubSub = function(){
     }
   }); 
 };
-//create pretty namme for passage; requires a tag [name:"My Room"]
+//create pretty namme for passage; requires a tag (replace space with _ !) [name:"My_Room"]
 window.gm.util.printLocationName=function(passage) {
   let tags = window.story.passage(passage).tags;
   for(el of tags) {

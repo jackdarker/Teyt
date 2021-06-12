@@ -62,9 +62,10 @@ window.gm.questDef = window.gm.questDef || {};
     window.gm.questDef[quest.id]= quest;
 }{   // the quest tracks death for tutorial
     let NOP = (function(){  return (0)});
-    let hidden = (function(){return(window.gm.quests.getMilestoneState("qDiedAgain").id<100);});
+    let hidden = (function(){return(window.gm.quests.getMilestoneState("qDiedAgain").id<0);});
     let quest = new Quest("qDiedAgain","qDiedAgain","qDiedAgain",hidden );
-    quest.addMileStone(new QuestMilestone(1,"","Find your first death.",        NOP,hidden));
+    quest.addMileStone(new QuestMilestone(1,"","Life is a game.",        NOP,hidden));
+    quest.addMileStone(new QuestMilestone(2,"","Find your first death.",        NOP,hidden));
     quest.addMileStone(new QuestMilestone(100,"","Die with some bonded equipment.",        NOP,hidden));
     quest.addMileStone(new QuestMilestone(200,"","Die by pleasure.",        NOP,hidden));   //todo what if this is before previous?
     quest.addMileStone(new QuestMilestone(300,"",".",        NOP,hidden));
@@ -77,6 +78,18 @@ window.gm.questDef = window.gm.questDef || {};
     quest.addMileStone(new QuestMilestone(100,"","You delivered the berries to the alchemist.",        NOP,hidden));
     quest.addMileStone(new QuestMilestone(200,"","Find 4 purple berrys, 2 apoca-blossoms, 2 bloated mushrooms.",        NOP,hidden));
     quest.addMileStone(new QuestMilestone(300,"","....",        NOP,hidden));
+    window.gm.questDef[quest.id]= quest;
+}{
+    let NOP = (function(){  return (0)});
+    let hidden = (function(){return(window.gm.quests.getMilestoneState("qCarlia").id<100);});
+    let quest = new Quest("qCarlia","qCarlia","qCarlia",hidden );
+    quest.addMileStone(new QuestMilestone(1,"","",        NOP,hidden));
+    quest.addMileStone(new QuestMilestone(100,"","A strange individual is stalking you.",        NOP,hidden));
+    quest.addMileStone(new QuestMilestone(200,"","That stalker was eying you again. He was disappearing into the cliffs direction.",        NOP,hidden));
+    quest.addMileStone(new QuestMilestone(300,"","There were some footprint at the cliff that led you to a concealed path.",  NOP));
+    quest.addMileStone(new QuestMilestone(400,"","Someone setup a camp in a cave entrance. Maybe you an find some clues there.",  NOP));
+    quest.addMileStone(new QuestMilestone(500,"","Pooking around in other peoples stuff got you a \"present\".",  NOP));
+    quest.addMileStone(new QuestMilestone(600,"","The stalker didnt care to hide any longer and accused you of thievery.",  NOP));
     window.gm.questDef[quest.id]= quest;
 }{
     let NOP = (function(){  return (0)});

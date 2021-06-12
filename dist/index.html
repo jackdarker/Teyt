@@ -472,7 +472,7 @@ var Character = /*#__PURE__*/function () {
       this.Stats.increment('energy', regen);
 
       if (delta > 360) {
-        this.Effects.addItem(effNotTired.id, new effNotTired());
+        this.Effects.addItem(effNotTired.name, new effNotTired());
       }
     }
   }, {
@@ -496,6 +496,7 @@ var Character = /*#__PURE__*/function () {
   }, {
     key: "_canAct",
     value: function _canAct() {
+      //todo even if stunned we should be able to struggle
       var result = {
         OK: true,
         msg: ''
@@ -508,6 +509,27 @@ var Character = /*#__PURE__*/function () {
         return result;
       }
 
+      return result;
+    } //combat related; return a msg describing the state of the character
+    //"Wolf is currently entangled by fines."
+    //"You have you towershield raised to guard against damage. Your mana is drained by a opponents spell."
+
+  }, {
+    key: "_stateDesc",
+    value: function _stateDesc() {
+      var result = {
+        OK: true,
+        msg: ''
+      };
+      var isPlayer = window.gm.player.id === this.id;
+
+      for (var list = this.Effects.getAllIds(), i = list.length - 1; i >= 0; i -= 1) {
+        if (list[i] === "effStunned") {
+          result.msg = "$[I]$ $[am]$ stunned and cant do a thing.";
+        }
+      }
+
+      result.msg = window.gm.util.descFixer(this)(result.msg);
       return result;
     }
   }, {
@@ -1063,7 +1085,7 @@ var CombatSetup = /*#__PURE__*/function () {
           var effect = list[k].Effects.get(effects[i]);
 
           if (effect.onCombatEnd !== null && effect.onCombatEnd !== undefined) {
-            //typeof effect === CombatEffect doesnt work? so we check presencse of attribut
+            //typeof effect === CombatEffect doesnt work? so we check presense of attribut
             effect.onTurnStart();
           }
         }
@@ -1101,7 +1123,8 @@ var CombatSetup = /*#__PURE__*/function () {
 
       this.next = this.selectChar;
       return result;
-    }
+    } //slect the next char to move
+
   }, {
     key: "selectChar",
     value: function selectChar() {
@@ -1139,12 +1162,15 @@ var CombatSetup = /*#__PURE__*/function () {
         return result;
       }
 
+      var stateDesc = s.combat.actor._stateDesc();
+
       var canAct = s.combat.actor._canAct();
 
       if (canAct.OK === false) {
         //skip char if not dead but incapaciated and show msg
-        result.msg = canAct.msg;
+        result.OK = true, result.msg = stateDesc.msg + "</br>" + canAct.msg;
         this.next = this.checkDefeat;
+        this.printNextLink(this.checkDefeat);
         return result;
       } else {
         if (s.combat.actor.calcCombatMove) {
@@ -1159,7 +1185,7 @@ var CombatSetup = /*#__PURE__*/function () {
           result.OK = false;
         } else {
           this.printSkillList();
-          result.OK = true, result.msg = "Choose your action !"; //
+          result.OK = true, result.msg = stateDesc.msg + "</br>Choose your action !</br>";
         }
       }
 
@@ -1280,7 +1306,7 @@ window.gm.combat.calcEvasion = function (attacker, target, attack) {
   };
   var rnd = window.gm.roll(1, 100);
 
-  if (target.Effects.findItemSlot(effStunned.id) >= 0) {
+  if (target.Effects.findItemSlot(effStunned.name) >= 0) {
     result.OK = true;
     result.msg = target.name + ' is stunned and cannot evade. ';
     attack.crit = true; //when stunned always critical hit
@@ -1289,7 +1315,7 @@ window.gm.combat.calcEvasion = function (attacker, target, attack) {
   }
 
   var lvlDiff = target.level - attacker.level;
-  var chance = target.Stats.get("agility").value + target.Stats.get("endurance").value;
+  var chance = target.Stats.get("agility").value + target.Stats.get("perception").value;
   chance += lvlDiff * 4;
   window.gm.pushLog("evasion roll:".concat(chance, " vs ").concat(rnd, " "), window.story.state._gm.dbgShowCombatRoll);
 
@@ -1333,7 +1359,7 @@ window.gm.combat.calcParry = function (attacker, target, attack) {
 
 
   var lvlDiff = target.level - attacker.level;
-  var chance = target.Stats.get("agility").value + target.Stats.get("perception").value;
+  var chance = target.Stats.get("agility").value + target.Stats.get("endurance").value;
   chance += lvlDiff * 4;
   window.gm.pushLog("parry roll:".concat(chance, " vs ").concat(rnd, " "), window.story.state._gm.dbgShowCombatRoll);
 
@@ -1408,9 +1434,9 @@ window.gm.combat.calcAttack = function (attacker, defender, attack) {
     OK: false,
     msg: ''
   }; //var def = defender.Stats.get('pDefense').value;
-
-  var att = attacker.Stats.get('pAttack').value;
-  attack.value = att, attack.total = att; //check if target an evade
+  //let att = attacker.Stats.get('pAttack').value;
+  //attack.value=attack.total=att; 
+  //check if target an evade
 
   result = window.gm.combat.calcEvasion(attacker, defender, attack);
 
@@ -2363,7 +2389,7 @@ window.gm.util.PubSub = function () {
       ;
     }
   };
-}; //create pretty namme for passage; requires a tag [name:"My Room"]
+}; //create pretty namme for passage; requires a tag (replace space with _ !) [name:"My_Room"]
 
 
 window.gm.util.printLocationName = function (passage) {
@@ -3592,35 +3618,6 @@ var Mob = /*#__PURE__*/function (_Character) {
 
   var _super = _createSuper(Mob);
 
-  _createClass(Mob, null, [{
-    key: "calcCombatMove",
-    value: function calcCombatMove(enemys, friends) {
-      var rnd = _.random(1, 100);
-
-      var result = this._canAct();
-
-      result.action = result.target = null;
-
-      if (result.OK === false) {
-        //window.gm.Encounter.execCombatCmd(window.gm.combat.moveNOP);
-        return result;
-      }
-
-      if (rnd > 30) {
-        rnd = _.random(0, enemys.length - 1);
-        result.action = "Attack"; // window.gm.Encounter.execCombatCmd(window.gm.combat.movePhysicalAttack);
-
-        result.target = [enemys[rnd]];
-        result.msg = this.name + " trys to attack you.</br>" + result.msg;
-      } else {
-        //result=window.gm.Encounter.execCombatCmd(window.gm.combat.moveGuard);
-        result.msg = this.name + " takes a defensive stance.</br>" + result.msg;
-      }
-
-      return result;
-    }
-  }]);
-
   function Mob() {
     var _this;
 
@@ -3644,7 +3641,27 @@ var Mob = /*#__PURE__*/function (_Character) {
   _createClass(Mob, [{
     key: "calcCombatMove",
     value: function calcCombatMove(enemys, friends) {
-      return Mob.calcCombatMove(enemys, friends);
+      var rnd = _.random(1, 100);
+
+      var result = this._canAct();
+
+      result.action = result.target = null;
+
+      if (result.OK === false) {
+        return result;
+      }
+
+      if (rnd > 20) {
+        rnd = _.random(0, enemys.length - 1);
+        result.action = "Attack";
+        result.target = [enemys[rnd]];
+        result.msg = this.name + " trys to attack you.</br>" + result.msg;
+      } else {
+        //result=window.gm.Encounter.execCombatCmd(window.gm.combat.moveGuard);
+        result.msg = this.name + " takes a defensive stance.</br>" + result.msg;
+      }
+
+      return result;
     } //override to adjust the mobs attributes to player level
 
   }, {
@@ -4428,9 +4445,11 @@ var QuestManager = /*#__PURE__*/function () {
 
         var Next = -1;
 
-        if (mile !== null) {
-          Next = mile.evaluateCondition();
+        if (!mile) {
+          throw new Error("cant find mileId " + msID + " in " + quest.id);
         }
+
+        Next = mile.evaluateCondition();
 
         if (Next === -1) {
           tmpfinishedQuest.push(i);
@@ -5779,7 +5798,8 @@ var Effect = /*#__PURE__*/function () {
     },
     set: function set(id) {
       this.data.id = id;
-    }
+    } // Attention !!  effTired.name returns constructor-name but Effects.getById('effTired').name returns data.name
+
   }, {
     key: "name",
     get: function get() {
@@ -6847,10 +6867,72 @@ var BaseQuadruped = /*#__PURE__*/function (_Equipment2) {
   return BaseQuadruped;
 }(Equipment);
 
-var FaceHuman = /*#__PURE__*/function (_Equipment3) {
-  _inherits(FaceHuman, _Equipment3);
+var BaseWorm = /*#__PURE__*/function (_Equipment3) {
+  _inherits(BaseWorm, _Equipment3);
 
-  var _super8 = _createSuper(FaceHuman);
+  var _super8 = _createSuper(BaseWorm);
+
+  function BaseWorm() {
+    var _this7;
+
+    _classCallCheck(this, BaseWorm);
+
+    _this7 = _super8.call(this, 'BaseWorm');
+    _this7.tags = ['body'];
+    _this7.slotUse = ['bBase'];
+    return _this7;
+  }
+
+  _createClass(BaseWorm, [{
+    key: "toJSON",
+    value: function toJSON() {
+      return window.storage.Generic_toJSON("BaseWorm", this);
+    }
+  }, {
+    key: "canEquip",
+    value: function canEquip() {
+      return {
+        OK: true,
+        msg: 'equipable'
+      };
+    }
+  }, {
+    key: "canUnequip",
+    value: function canUnequip() {
+      return {
+        OK: true,
+        msg: 'unequipable'
+      };
+    }
+  }, {
+    key: "descLong",
+    value: function descLong(fconv) {
+      return fconv('$[I]$ $[am]$ wriggling around like a snake.');
+    }
+  }, {
+    key: "descShort",
+    get: function get() {
+      return this.desc;
+    }
+  }, {
+    key: "desc",
+    get: function get() {
+      return '';
+    }
+  }], [{
+    key: "fromJSON",
+    value: function fromJSON(value) {
+      return window.storage.Generic_fromJSON(BaseWorm, value.data);
+    }
+  }]);
+
+  return BaseWorm;
+}(Equipment);
+
+var FaceHuman = /*#__PURE__*/function (_Equipment4) {
+  _inherits(FaceHuman, _Equipment4);
+
+  var _super9 = _createSuper(FaceHuman);
 
   _createClass(FaceHuman, null, [{
     key: "dataPrototype",
@@ -6862,15 +6944,15 @@ var FaceHuman = /*#__PURE__*/function (_Equipment3) {
   }]);
 
   function FaceHuman() {
-    var _this7;
+    var _this8;
 
     _classCallCheck(this, FaceHuman);
 
-    _this7 = _super8.call(this, 'FaceHuman');
-    _this7.tags = ['body'];
-    _this7.slotUse = ['bFace'];
-    _this7.data = FaceHuman.dataPrototype();
-    return _this7;
+    _this8 = _super9.call(this, 'FaceHuman');
+    _this8.tags = ['body'];
+    _this8.slotUse = ['bFace', 'bMouth'];
+    _this8.data = FaceHuman.dataPrototype();
+    return _this8;
   }
 
   _createClass(FaceHuman, [{
@@ -6919,10 +7001,10 @@ var FaceHuman = /*#__PURE__*/function (_Equipment3) {
   return FaceHuman;
 }(Equipment);
 
-var FaceWolf = /*#__PURE__*/function (_Equipment4) {
-  _inherits(FaceWolf, _Equipment4);
+var FaceWolf = /*#__PURE__*/function (_Equipment5) {
+  _inherits(FaceWolf, _Equipment5);
 
-  var _super9 = _createSuper(FaceWolf);
+  var _super10 = _createSuper(FaceWolf);
 
   _createClass(FaceWolf, null, [{
     key: "dataPrototype",
@@ -6934,15 +7016,16 @@ var FaceWolf = /*#__PURE__*/function (_Equipment4) {
   }]);
 
   function FaceWolf() {
-    var _this8;
+    var _this9;
 
     _classCallCheck(this, FaceWolf);
 
-    _this8 = _super9.call(this, 'FaceWolf');
-    _this8.tags = ['body'];
-    _this8.slotUse = ['bFace'];
-    _this8.data = FaceWolf.dataPrototype();
-    return _this8;
+    _this9 = _super10.call(this, 'FaceWolf');
+    _this9.tags = ['body'];
+    _this9.slotUse = ['bFace', 'bMouth']; //todo separate mouth-bodypart??
+
+    _this9.data = FaceWolf.dataPrototype();
+    return _this9;
   }
 
   _createClass(FaceWolf, [{
@@ -6964,6 +7047,27 @@ var FaceWolf = /*#__PURE__*/function (_Equipment4) {
       return {
         OK: true,
         msg: 'unequipable'
+      };
+    }
+  }, {
+    key: "onEquip",
+    value: function onEquip() {
+      var old = this.parent.parent.Skills.countItem(SkillBite.name);
+      if (old > 0) this.parent.parent.Skills.removeItem(SkillBite.name, old);
+      this.parent.parent.Skills.addItem(new SkillBite());
+      return {
+        OK: true,
+        msg: 'shifted'
+      };
+    }
+  }, {
+    key: "onUnequip",
+    value: function onUnequip() {
+      var old = this.parent.parent.Skills.countItem(SkillBite.name);
+      if (old > 0) this.parent.parent.Skills.removeItem(SkillBite.name, old);
+      return {
+        OK: true,
+        msg: 'shifted'
       };
     }
   }, {
@@ -6991,10 +7095,10 @@ var FaceWolf = /*#__PURE__*/function (_Equipment4) {
   return FaceWolf;
 }(Equipment);
 
-var FaceHorse = /*#__PURE__*/function (_Equipment5) {
-  _inherits(FaceHorse, _Equipment5);
+var FaceHorse = /*#__PURE__*/function (_Equipment6) {
+  _inherits(FaceHorse, _Equipment6);
 
-  var _super10 = _createSuper(FaceHorse);
+  var _super11 = _createSuper(FaceHorse);
 
   _createClass(FaceHorse, null, [{
     key: "dataPrototype",
@@ -7006,15 +7110,15 @@ var FaceHorse = /*#__PURE__*/function (_Equipment5) {
   }]);
 
   function FaceHorse() {
-    var _this9;
+    var _this10;
 
     _classCallCheck(this, FaceHorse);
 
-    _this9 = _super10.call(this, 'FaceHorse');
-    _this9.tags = ['body'];
-    _this9.slotUse = ['bFace'];
-    _this9.data = FaceHorse.dataPrototype();
-    return _this9;
+    _this10 = _super11.call(this, 'FaceHorse');
+    _this10.tags = ['body'];
+    _this10.slotUse = ['bFace', 'bMouth'];
+    _this10.data = FaceHorse.dataPrototype();
+    return _this10;
   }
 
   _createClass(FaceHorse, [{
@@ -7063,20 +7167,20 @@ var FaceHorse = /*#__PURE__*/function (_Equipment5) {
   return FaceHorse;
 }(Equipment);
 
-var SkinHuman = /*#__PURE__*/function (_Equipment6) {
-  _inherits(SkinHuman, _Equipment6);
+var SkinHuman = /*#__PURE__*/function (_Equipment7) {
+  _inherits(SkinHuman, _Equipment7);
 
-  var _super11 = _createSuper(SkinHuman);
+  var _super12 = _createSuper(SkinHuman);
 
   function SkinHuman() {
-    var _this10;
+    var _this11;
 
     _classCallCheck(this, SkinHuman);
 
-    _this10 = _super11.call(this, 'SkinHuman');
-    _this10.tags = ['body'];
-    _this10.slotUse = ['bSkin'];
-    return _this10;
+    _this11 = _super12.call(this, 'SkinHuman');
+    _this11.tags = ['body'];
+    _this11.slotUse = ['bSkin'];
+    return _this11;
   }
 
   _createClass(SkinHuman, [{
@@ -7120,10 +7224,10 @@ var SkinHuman = /*#__PURE__*/function (_Equipment6) {
   return SkinHuman;
 }(Equipment);
 
-var SkinFur = /*#__PURE__*/function (_Equipment7) {
-  _inherits(SkinFur, _Equipment7);
+var SkinFur = /*#__PURE__*/function (_Equipment8) {
+  _inherits(SkinFur, _Equipment8);
 
-  var _super12 = _createSuper(SkinFur);
+  var _super13 = _createSuper(SkinFur);
 
   _createClass(SkinFur, null, [{
     key: "dataPrototype",
@@ -7136,15 +7240,15 @@ var SkinFur = /*#__PURE__*/function (_Equipment7) {
   }]);
 
   function SkinFur() {
-    var _this11;
+    var _this12;
 
     _classCallCheck(this, SkinFur);
 
-    _this11 = _super12.call(this, 'SkinFur');
-    _this11.tags = ['body'];
-    _this11.slotUse = ['bSkin'];
-    _this11.data = SkinFur.dataPrototype();
-    return _this11;
+    _this12 = _super13.call(this, 'SkinFur');
+    _this12.tags = ['body'];
+    _this12.slotUse = ['bSkin'];
+    _this12.data = SkinFur.dataPrototype();
+    return _this12;
   }
 
   _createClass(SkinFur, [{
@@ -7194,24 +7298,24 @@ var SkinFur = /*#__PURE__*/function (_Equipment7) {
   return SkinFur;
 }(Equipment);
 
-var TailCat = /*#__PURE__*/function (_Equipment8) {
-  _inherits(TailCat, _Equipment8);
+var TailCat = /*#__PURE__*/function (_Equipment9) {
+  _inherits(TailCat, _Equipment9);
 
-  var _super13 = _createSuper(TailCat);
+  var _super14 = _createSuper(TailCat);
 
   function TailCat() {
-    var _this12;
+    var _this13;
 
     _classCallCheck(this, TailCat);
 
-    _this12 = _super13.call(this, 'TailCat');
-    _this12.tags = ['body'];
-    _this12.slotUse = ['bTailBase'];
-    _this12.growth = 0.10; //in %/100 maxGrowth
+    _this13 = _super14.call(this, 'TailCat');
+    _this13.tags = ['body'];
+    _this13.slotUse = ['bTailBase'];
+    _this13.growth = 0.10; //in %/100 maxGrowth
 
-    _this12.maxGrowth = 1.2; //in meter, todo depends on bodysize
+    _this13.maxGrowth = 1.2; //in meter, todo depends on bodysize
 
-    return _this12;
+    return _this13;
   }
 
   _createClass(TailCat, [{
@@ -7260,24 +7364,181 @@ var TailCat = /*#__PURE__*/function (_Equipment8) {
   return TailCat;
 }(Equipment);
 
-var BreastHuman = /*#__PURE__*/function (_Equipment9) {
-  _inherits(BreastHuman, _Equipment9);
+var HandsPaw = /*#__PURE__*/function (_Equipment10) {
+  _inherits(HandsPaw, _Equipment10);
 
-  var _super14 = _createSuper(BreastHuman);
+  var _super15 = _createSuper(HandsPaw);
+
+  _createClass(HandsPaw, null, [{
+    key: "dataPrototype",
+    value: function dataPrototype() {
+      var id = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'cat';
+      return {
+        style: 'cat',
+        pDamage: 10
+      };
+    }
+  }, {
+    key: "factory",
+    value: function factory(id) {
+      var obj = new HandsPaw();
+      obj.setStyle(id);
+      return obj;
+    }
+  }]);
+
+  function HandsPaw() {
+    var _this14;
+
+    _classCallCheck(this, HandsPaw);
+
+    _this14 = _super15.call(this, 'HandsPaw');
+    _this14.tags = ['body'];
+    _this14.slotUse = ['bHands'];
+    _this14.data = HandsPaw.dataPrototype();
+    return _this14;
+  }
+
+  _createClass(HandsPaw, [{
+    key: "setStyle",
+    value: function setStyle(id) {
+      switch (id) {
+        case 'cat':
+        case 'dog':
+        case 'lizard':
+          this.data.id = id;
+          break;
+
+        default:
+          throw new Error("unknown HandsPaw-style " + id);
+      }
+    }
+  }, {
+    key: "toJSON",
+    value: function toJSON() {
+      return window.storage.Generic_toJSON("HandsPaw", this);
+    }
+  }, {
+    key: "canEquip",
+    value: function canEquip() {
+      return {
+        OK: true,
+        msg: 'equipable'
+      };
+    }
+  }, {
+    key: "canUnequip",
+    value: function canUnequip() {
+      return {
+        OK: true,
+        msg: 'unequipable'
+      };
+    }
+  }, {
+    key: "descLong",
+    value: function descLong(fconv) {
+      return fconv('$[I]$ $[have]$ paws like that of a ' + this.data.style + '.');
+    }
+  }, {
+    key: "descShort",
+    get: function get() {
+      return this.desc;
+    }
+  }, {
+    key: "desc",
+    get: function get() {
+      return this.data.style + '\'like paws.';
+    }
+  }], [{
+    key: "fromJSON",
+    value: function fromJSON(value) {
+      return window.storage.Generic_fromJSON(HandsPaw, value.data);
+    }
+  }]);
+
+  return HandsPaw;
+}(Equipment);
+
+var HandsHuman = /*#__PURE__*/function (_Equipment11) {
+  _inherits(HandsHuman, _Equipment11);
+
+  var _super16 = _createSuper(HandsHuman);
+
+  function HandsHuman() {
+    var _this15;
+
+    _classCallCheck(this, HandsHuman);
+
+    _this15 = _super16.call(this, 'HandsHuman');
+    _this15.tags = ['body'];
+    _this15.slotUse = ['bHands'];
+    return _this15;
+  }
+
+  _createClass(HandsHuman, [{
+    key: "toJSON",
+    value: function toJSON() {
+      return window.storage.Generic_toJSON("HandsHuman", this);
+    }
+  }, {
+    key: "canEquip",
+    value: function canEquip() {
+      return {
+        OK: true,
+        msg: 'equipable'
+      };
+    }
+  }, {
+    key: "canUnequip",
+    value: function canUnequip() {
+      return {
+        OK: true,
+        msg: 'unequipable'
+      };
+    }
+  }, {
+    key: "descLong",
+    value: function descLong(fconv) {
+      return fconv('$[My]$ hands consist of a palm and fingers.');
+    }
+  }, {
+    key: "descShort",
+    get: function get() {
+      return this.desc;
+    }
+  }, {
+    key: "desc",
+    get: function get() {
+      return ' human hands.';
+    }
+  }], [{
+    key: "fromJSON",
+    value: function fromJSON(value) {
+      return window.storage.Generic_fromJSON(HandsHuman, value.data);
+    }
+  }]);
+
+  return HandsHuman;
+}(Equipment);
+
+var BreastHuman = /*#__PURE__*/function (_Equipment12) {
+  _inherits(BreastHuman, _Equipment12);
+
+  var _super17 = _createSuper(BreastHuman);
 
   function BreastHuman() {
-    var _this13;
+    var _this16;
 
     _classCallCheck(this, BreastHuman);
 
-    _this13 = _super14.call(this, 'BreastHuman');
-    _this13.tags = ['body'];
-    _this13.slotUse = ['bBreast'];
-    _this13.growth = 0.0; //in %/100 maxGrowth
+    _this16 = _super17.call(this, 'BreastHuman');
+    _this16.tags = ['body'];
+    _this16.slotUse = ['bBreast'];
+    _this16.growth = 0.0; //in %/100 maxGrowth
 
-    _this13.maxGrowth = 0.3; //in meter, todo depends on bodysize
+    _this16.maxGrowth = 0.3; //in meter, todo depends on bodysize
 
-    return _this13;
+    return _this16;
   }
 
   _createClass(BreastHuman, [{
@@ -7326,10 +7587,10 @@ var BreastHuman = /*#__PURE__*/function (_Equipment9) {
   return BreastHuman;
 }(Equipment);
 
-var VulvaHuman = /*#__PURE__*/function (_Equipment10) {
-  _inherits(VulvaHuman, _Equipment10);
+var VulvaHuman = /*#__PURE__*/function (_Equipment13) {
+  _inherits(VulvaHuman, _Equipment13);
 
-  var _super15 = _createSuper(VulvaHuman);
+  var _super18 = _createSuper(VulvaHuman);
 
   _createClass(VulvaHuman, null, [{
     key: "dataPrototype",
@@ -7354,15 +7615,15 @@ var VulvaHuman = /*#__PURE__*/function (_Equipment10) {
   }]);
 
   function VulvaHuman() {
-    var _this14;
+    var _this17;
 
     _classCallCheck(this, VulvaHuman);
 
-    _this14 = _super15.call(this, 'VulvaHuman');
-    _this14.tags = ['body'];
-    _this14.slotUse = ['bVulva'];
-    _this14.data = VulvaHuman.dataPrototype();
-    return _this14;
+    _this17 = _super18.call(this, 'VulvaHuman');
+    _this17.tags = ['body'];
+    _this17.slotUse = ['bVulva'];
+    _this17.data = VulvaHuman.dataPrototype();
+    return _this17;
   }
 
   _createClass(VulvaHuman, [{
@@ -7413,10 +7674,10 @@ var VulvaHuman = /*#__PURE__*/function (_Equipment10) {
   return VulvaHuman;
 }(Equipment);
 
-var PenisHuman = /*#__PURE__*/function (_Equipment11) {
-  _inherits(PenisHuman, _Equipment11);
+var PenisHuman = /*#__PURE__*/function (_Equipment14) {
+  _inherits(PenisHuman, _Equipment14);
 
-  var _super16 = _createSuper(PenisHuman);
+  var _super19 = _createSuper(PenisHuman);
 
   _createClass(PenisHuman, null, [{
     key: "dataPrototype",
@@ -7441,15 +7702,15 @@ var PenisHuman = /*#__PURE__*/function (_Equipment11) {
   }]);
 
   function PenisHuman() {
-    var _this15;
+    var _this18;
 
     _classCallCheck(this, PenisHuman);
 
-    _this15 = _super16.call(this, 'PenisHuman');
-    _this15.tags = ['body'];
-    _this15.slotUse = ['bPenis', 'bBalls'];
-    _this15.data = PenisHuman.dataPrototype();
-    return _this15;
+    _this18 = _super19.call(this, 'PenisHuman');
+    _this18.tags = ['body'];
+    _this18.slotUse = ['bPenis', 'bBalls'];
+    _this18.data = PenisHuman.dataPrototype();
+    return _this18;
   }
 
   _createClass(PenisHuman, [{
@@ -7504,6 +7765,9 @@ var PenisHuman = /*#__PURE__*/function (_Equipment11) {
 window.gm.ItemsLib = function (ItemsLib) {
   window.storage.registerConstructor(BaseHumanoid);
   window.storage.registerConstructor(BaseQuadruped);
+  window.storage.registerConstructor(BaseWorm);
+  window.storage.registerConstructor(HandsHuman);
+  window.storage.registerConstructor(HandsPaw);
   window.storage.registerConstructor(FaceHorse);
   window.storage.registerConstructor(FaceHuman);
   window.storage.registerConstructor(FaceWolf);
@@ -7530,18 +7794,18 @@ window.gm.ItemsLib = function (ItemsLib) {
 var BeeHive = /*#__PURE__*/function (_DngDungeon) {
   _inherits(BeeHive, _DngDungeon);
 
-  var _super17 = _createSuper(BeeHive);
+  var _super20 = _createSuper(BeeHive);
 
   function BeeHive() {
-    var _this16;
+    var _this19;
 
     _classCallCheck(this, BeeHive);
 
-    _this16 = _super17.call(this, "BeeHive", "There seem to live alot of giant bees here.");
+    _this19 = _super20.call(this, "BeeHive", "There seem to live alot of giant bees here.");
 
-    _this16.buildFloors();
+    _this19.buildFloors();
 
-    return _this16;
+    return _this19;
   }
 
   _createClass(BeeHive, [{
@@ -7800,6 +8064,8 @@ window.gm.encounters.wolf = function (location) {
   window.gm.Encounter.EnemyFunc = function () {
     var x = new window.gm.Mobs.Wolf();
     x.scaleLevel(window.gm.player.level);
+    x.Stats.increment("health", 9999);
+    x.Stats.increment("energy", 9999);
     return [x];
   };
 
@@ -7976,7 +8242,7 @@ window.gm.initGame = function (forceReset) {
     _ch3.name = "Zeph";
     _ch3.faction = "Player";
 
-    _ch3.Effects.addItem(skCooking.id, new skCooking()); //body
+    _ch3.Effects.addItem(skCooking.name, new skCooking()); //body
 
 
     _ch3.Outfit.addItem(new BaseHumanoid());
@@ -7997,7 +8263,7 @@ window.gm.initGame = function (forceReset) {
     _ch4.name = "Ratchel";
     _ch4.faction = "Player"; //window.gm.PlayerVR.gainRelation('Mom',10);
 
-    _ch4.Effects.addItem(skCooking.id, new skCooking()); //add some basic inventory
+    _ch4.Effects.addItem(skCooking.name, new skCooking()); //add some basic inventory
 
 
     _ch4.Inv.addItem(new Money(), 20);
@@ -8035,7 +8301,7 @@ window.gm.initGame = function (forceReset) {
     _ch4.Outfit.addItem(new Pullover()); //special skills
 
 
-    _ch4.Effects.addItem(effNotTired.id, new effNotTired()); //depending on sleep Tired will be set to NotTired or Tired
+    _ch4.Effects.addItem(effNotTired.name, new effNotTired()); //depending on sleep Tired will be set to NotTired or Tired
 
 
     _ch4.Skills.addItem(SkillCallHelp.setup('Mole'));
@@ -8125,7 +8391,7 @@ window.gm.respawn = function () {
 
   if (window.gm.quests.getMilestoneState("qDiedAgain").id === 2) {
     window.story.show('YouDiedOnce');
-  } else if (window.gm.quests.getMilestoneState("qBondageKink").id === 100) {
+  } else if ([100, 200, 300].includes(window.gm.quests.getMilestoneState("qBondageKink").id)) {
     window.story.show('YouDiedWithCursedGear');
   } else {
     window.gm.player.Wardrobe.addItem(new window.storage.constructors['RobesZealot']());
@@ -8255,7 +8521,7 @@ window.gm.printQuestList = function () {
     var quest = window.gm.questDef[qId];
     var mile = quest.getMileById(msId);
 
-    if (!quest.HiddenCB()) {
+    if (!quest.HiddenCB() || window.story.state._gm.dbgShowQuestInfo) {
       elmt += "<li style=\"padding-bottom: 0.5em;\"><input type=\"checkbox\" name=\"y\" value=\"x\" readonly disabled><label>" + quest.name + (window.story.state._gm.dbgShowQuestInfo ? " " + msId + " 0x" + flags.toString(16) : "") + " : " + (mile.HiddenCB() === true ? "???" : mile.descr) + "</label></li>"; //checked="checked"
     }
   }
@@ -8263,15 +8529,16 @@ window.gm.printQuestList = function () {
   elmt += "</ul></form></br>";
   elmt += '<hr><form><ul style=\"list-style-type: none\" ><legend>Completed</legend>';
 
-  for (var i = 0; i < s.quests.finishedQuests.length; i++) {
-    var qId = s.quests.finishedQuests[i].id;
-    var flags = s.quests.activeQuests[i].flags;
-    var msId = s.quests.finishedQuestsMS[i].id;
-    var quest = window.gm.questDef[qId];
-    var mile = quest.getMileById(msId);
+  for (var _i4 = 0; _i4 < s.quests.finishedQuests.length; _i4++) {
+    var _qId = s.quests.finishedQuests[_i4].id;
+    var _flags = s.quests.activeQuests[_i4].flags;
+    var _msId = s.quests.finishedQuestsMS[_i4].id;
+    var _quest = window.gm.questDef[_qId];
 
-    if (!quest.HiddenCB()) {
-      elmt += "<li><input type=\"checkbox\" name=\"y\" value=\"x\" readonly disabled checked=\"checked\"><label>" + quest.name + (window.story.state._gm.dbgShowQuestInfo ? " " + msId + " 0x" + flags.toString(16) : "") + " : " + mile.descr + "</label></li>";
+    var _mile = _quest.getMileById(_msId);
+
+    if (!_quest.HiddenCB() || window.story.state._gm.dbgShowQuestInfo) {
+      elmt += "<li><input type=\"checkbox\" name=\"y\" value=\"x\" readonly disabled checked=\"checked\"><label>" + _quest.name + (window.story.state._gm.dbgShowQuestInfo ? " " + _msId + " 0x" + _flags.toString(16) : "") + " : " + _mile.descr + "</label></li>";
     }
   }
 
@@ -8353,7 +8620,7 @@ window.gm.util.estimatePronoun = function (whom) {
   }
 
   return 'it';
-}; //returns a function that accept a text and fixes the word-phrases
+}; //returns a function that accept a text and fixes the word-phrases: let fixer = window.gm.util.descFixer(this.actor);msg=fixer('[I] [like] this shit.');
 
 
 window.gm.util.descFixer = function (whom) {
@@ -8406,8 +8673,8 @@ window.gm.util.descFixer = function (whom) {
         }
       }
 
-      for (var _i4 = 0, _repl = repl; _i4 < _repl.length; _i4++) {
-        el = _repl[_i4];
+      for (var _i5 = 0, _repl = repl; _i5 < _repl.length; _i5++) {
+        el = _repl[_i5];
         //replace bracket+bracketcontent,
         el.new = window.gm.util.lookupWord(el.text, pron);
 
@@ -8439,6 +8706,8 @@ window.gm.util.wordlist = function buildWordList(list) {
     shi: 'shi',
     it: 'it'
   };
+  list['you'] = list['i']; //if you use you instead I as it would be required ...
+
   list['me'] = {
     def: 'me',
     i: 'me',
@@ -8472,6 +8741,15 @@ window.gm.util.wordlist = function buildWordList(list) {
     shi: 'is',
     it: 'is'
   };
+  list['them'] = {
+    def: 'them',
+    i: 'me',
+    he: 'him',
+    she: 'her',
+    shi: 'hir',
+    it: 'it'
+  }; //I snap at them -> He snaps at me.
+
   return list;
 }(window.gm.util.wordlist || {}); //looks up a word in the wordlist and retourns the version fitting pronoun
 
@@ -8502,12 +8780,12 @@ window.gm.util.lookupWord = function (word, pron) {
 var LighterDad = /*#__PURE__*/function (_Item2) {
   _inherits(LighterDad, _Item2);
 
-  var _super18 = _createSuper(LighterDad);
+  var _super21 = _createSuper(LighterDad);
 
   function LighterDad() {
     _classCallCheck(this, LighterDad);
 
-    return _super18.call(this, 'LighterDad');
+    return _super21.call(this, 'LighterDad');
   }
 
   _createClass(LighterDad, [{
@@ -8535,12 +8813,12 @@ var LighterDad = /*#__PURE__*/function (_Item2) {
 var Money = /*#__PURE__*/function (_Item3) {
   _inherits(Money, _Item3);
 
-  var _super19 = _createSuper(Money);
+  var _super22 = _createSuper(Money);
 
   function Money() {
     _classCallCheck(this, Money);
 
-    return _super19.call(this, 'Money');
+    return _super22.call(this, 'Money');
   }
 
   _createClass(Money, [{
@@ -8568,12 +8846,12 @@ var Money = /*#__PURE__*/function (_Item3) {
 var LaptopPS = /*#__PURE__*/function (_Item4) {
   _inherits(LaptopPS, _Item4);
 
-  var _super20 = _createSuper(LaptopPS);
+  var _super23 = _createSuper(LaptopPS);
 
   function LaptopPS() {
     _classCallCheck(this, LaptopPS);
 
-    return _super20.call(this, 'LaptopPS');
+    return _super23.call(this, 'LaptopPS');
   }
 
   _createClass(LaptopPS, [{
@@ -8601,12 +8879,12 @@ var LaptopPS = /*#__PURE__*/function (_Item4) {
 var Dildo_small = /*#__PURE__*/function (_Item5) {
   _inherits(Dildo_small, _Item5);
 
-  var _super21 = _createSuper(Dildo_small);
+  var _super24 = _createSuper(Dildo_small);
 
   function Dildo_small() {
     _classCallCheck(this, Dildo_small);
 
-    return _super21.call(this, 'Dildo_small');
+    return _super24.call(this, 'Dildo_small');
   }
 
   _createClass(Dildo_small, [{
@@ -8632,12 +8910,12 @@ var Dildo_small = /*#__PURE__*/function (_Item5) {
 var Lube = /*#__PURE__*/function (_Item6) {
   _inherits(Lube, _Item6);
 
-  var _super22 = _createSuper(Lube);
+  var _super25 = _createSuper(Lube);
 
   function Lube() {
     _classCallCheck(this, Lube);
 
-    return _super22.call(this, 'Lube');
+    return _super25.call(this, 'Lube');
   }
 
   _createClass(Lube, [{
@@ -8663,12 +8941,12 @@ var Lube = /*#__PURE__*/function (_Item6) {
 var Battery = /*#__PURE__*/function (_Item7) {
   _inherits(Battery, _Item7);
 
-  var _super23 = _createSuper(Battery);
+  var _super26 = _createSuper(Battery);
 
   function Battery() {
     _classCallCheck(this, Battery);
 
-    return _super23.call(this, 'Battery');
+    return _super26.call(this, 'Battery');
   }
 
   _createClass(Battery, [{
@@ -8694,16 +8972,16 @@ var Battery = /*#__PURE__*/function (_Item7) {
 var Ingredient = /*#__PURE__*/function (_Item8) {
   _inherits(Ingredient, _Item8);
 
-  var _super24 = _createSuper(Ingredient);
+  var _super27 = _createSuper(Ingredient);
 
   function Ingredient() {
-    var _this17;
+    var _this20;
 
     _classCallCheck(this, Ingredient);
 
-    _this17 = _super24.call(this, 'Ingredient');
-    _this17.lossOnRespawn = true;
-    return _this17;
+    _this20 = _super27.call(this, 'Ingredient');
+    _this20.lossOnRespawn = true;
+    return _this20;
   }
 
   _createClass(Ingredient, [{
@@ -8731,11 +9009,15 @@ var Ingredient = /*#__PURE__*/function (_Item8) {
 
       switch (id) {
         case "ApocaFlower":
-          info.desc = "A yellow bluish flower growing in forests.";
+          info.desc = "yellow bluish flower growing";
           break;
 
         case "PurpleBerry":
-          info.desc = "Those purple berrys grow in the forest.";
+          info.desc = "purple berrys grown in the forest";
+          break;
+
+        case "BloatedMushroom":
+          info.desc = "mushrooms from a cave";
           break;
 
         default:
@@ -8756,12 +9038,12 @@ var Ingredient = /*#__PURE__*/function (_Item8) {
 var FlashBang = /*#__PURE__*/function (_Item9) {
   _inherits(FlashBang, _Item9);
 
-  var _super25 = _createSuper(FlashBang);
+  var _super28 = _createSuper(FlashBang);
 
   function FlashBang() {
     _classCallCheck(this, FlashBang);
 
-    return _super25.call(this, 'FlashBang');
+    return _super28.call(this, 'FlashBang');
   }
 
   _createClass(FlashBang, [{
@@ -8861,12 +9143,12 @@ var FlashBang = /*#__PURE__*/function (_Item9) {
 var CanOfCoffee = /*#__PURE__*/function (_Item10) {
   _inherits(CanOfCoffee, _Item10);
 
-  var _super26 = _createSuper(CanOfCoffee);
+  var _super29 = _createSuper(CanOfCoffee);
 
   function CanOfCoffee() {
     _classCallCheck(this, CanOfCoffee);
 
-    return _super26.call(this, 'CanOfCoffee');
+    return _super29.call(this, 'CanOfCoffee');
   }
 
   _createClass(CanOfCoffee, [{
@@ -8924,12 +9206,12 @@ var CanOfCoffee = /*#__PURE__*/function (_Item10) {
 var SimpleFood = /*#__PURE__*/function (_Item11) {
   _inherits(SimpleFood, _Item11);
 
-  var _super27 = _createSuper(SimpleFood);
+  var _super30 = _createSuper(SimpleFood);
 
   function SimpleFood() {
     _classCallCheck(this, SimpleFood);
 
-    return _super27.call(this, 'SimpleFood');
+    return _super30.call(this, 'SimpleFood');
   }
 
   _createClass(SimpleFood, [{
@@ -9033,6 +9315,12 @@ window.gm.ItemsLib = function (ItemsLib) {
     return new FlashBang();
   };
 
+  ItemsLib['BloatedMushroom'] = function () {
+    var x = new Ingredient();
+    x.changeId("BloatedMushroom");
+    return x;
+  };
+
   ItemsLib['PurpleBerry'] = function () {
     var x = new Ingredient();
     x.changeId("PurpleBerry");
@@ -9069,20 +9357,20 @@ window.gm.ItemsLib = function (ItemsLib) {
 var Mole = /*#__PURE__*/function (_Mob) {
   _inherits(Mole, _Mob);
 
-  var _super28 = _createSuper(Mole);
+  var _super31 = _createSuper(Mole);
 
   function Mole() {
-    var _this18;
+    var _this21;
 
     _classCallCheck(this, Mole);
 
-    _this18 = _super28.call(this);
-    _this18.name = _this18.id = 'Mole';
-    _this18.pic = 'assets/mole.jpg';
+    _this21 = _super31.call(this);
+    _this21.name = _this21.id = 'Mole';
+    _this21.pic = 'assets/mole.jpg';
 
-    _this18.Stats.increment('healthMax', -1 * (_this18.health().max - 20));
+    _this21.Stats.increment('healthMax', -1 * (_this21.health().max - 20));
 
-    return _this18;
+    return _this21;
   }
 
   return Mole;
@@ -9093,45 +9381,74 @@ var Mole = /*#__PURE__*/function (_Mob) {
 var Wolf = /*#__PURE__*/function (_Mob2) {
   _inherits(Wolf, _Mob2);
 
-  var _super29 = _createSuper(Wolf);
+  var _super32 = _createSuper(Wolf);
 
   function Wolf() {
-    var _this19;
+    var _this22;
 
     _classCallCheck(this, Wolf);
 
-    _this19 = _super29.call(this);
-    _this19.name = _this19.id = 'Wolf';
-    _this19.pic = 'assets/bw_wolf1.png';
-    _this19.level_min = 3; //this.Stats.increment('healthMax',-1*(this.health().max+20));
+    _this22 = _super32.call(this);
+    _this22.name = _this22.id = 'Wolf';
+    _this22.pic = 'assets/bw_wolf1.png';
+    _this22.level_min = 3;
 
-    return _this19;
+    _this22.Outfit.addItem(HandsPaw.factory('dog'));
+
+    _this22.Outfit.addItem(new FaceWolf());
+
+    _this22.fconv = window.gm.util.descFixer(_assertThisInitialized(_this22));
+    return _this22;
   }
+
+  _createClass(Wolf, [{
+    key: "calcCombatMove",
+    value: function calcCombatMove(enemys, friends) {
+      var result = this._canAct();
+
+      if (result.OK === false) return result;
+
+      var rnd = _.random(1, 100);
+
+      result.action = result.target = null;
+
+      if (window.story.state.combat.turnCount % 2 === 0) {
+        rnd = _.random(0, enemys.length - 1);
+        result.action = "Bite";
+        result.target = [enemys[rnd]];
+        result.msg = this.fconv("$[I]$ $[snap]$ at " + result.target.name + ".</br>") + result.msg;
+        return result;
+      }
+
+      return _get(_getPrototypeOf(Wolf.prototype), "calcCombatMove", this).call(this, enemys, friends);
+    }
+  }]);
 
   return Wolf;
 }(Mob);
 
 ;
 
-var Imp = /*#__PURE__*/function (_Mob3) {
-  _inherits(Imp, _Mob3);
+var Leech = /*#__PURE__*/function (_Mob3) {
+  _inherits(Leech, _Mob3);
 
-  var _super30 = _createSuper(Imp);
+  var _super33 = _createSuper(Leech);
 
-  function Imp() {
-    var _this20;
+  function Leech() {
+    var _this23;
 
-    _classCallCheck(this, Imp);
+    _classCallCheck(this, Leech);
 
-    _this20 = _super30.call(this);
-    _this20.name = _this20.id = 'Imp';
-    _this20.pic = 'assets/bw_wolf1.png'; //todo
-    //this.Stats.increment('healthMax',-1*(this.health().max+20));
+    _this23 = _super33.call(this);
+    _this23.name = _this23.id = 'Leech';
+    _this23.pic = 'assets/Leech.png'; //todo
 
-    return _this20;
+    _this23.level_min = 1; //this.Stats.increment('healthMax',-1*(this.health().max+20));
+
+    return _this23;
   }
 
-  return Imp;
+  return Leech;
 }(Mob);
 
 ;
@@ -9139,17 +9456,17 @@ var Imp = /*#__PURE__*/function (_Mob3) {
 var Mechanic = /*#__PURE__*/function (_Mob4) {
   _inherits(Mechanic, _Mob4);
 
-  var _super31 = _createSuper(Mechanic);
+  var _super34 = _createSuper(Mechanic);
 
   function Mechanic() {
-    var _this21;
+    var _this24;
 
     _classCallCheck(this, Mechanic);
 
-    _this21 = _super31.call(this);
-    _this21.name = _this21.id = 'Mechanic-Guy';
-    _this21.pic = 'assets/mechanic.jpg';
-    return _this21;
+    _this24 = _super34.call(this);
+    _this24.name = _this24.id = 'Mechanic-Guy';
+    _this24.pic = 'assets/mechanic.jpg';
+    return _this24;
   }
 
   _createClass(Mechanic, [{
@@ -9157,16 +9474,21 @@ var Mechanic = /*#__PURE__*/function (_Mob4) {
     value: function calcCombatMove(enemys, friends) {
       var result = this._canAct();
 
+      if (result.OK === false) return result;
+
+      var rnd = _.random(1, 100);
+
       result.action = result.target = null;
 
       if (window.story.state.combat.turnCount < 3) {
+        rnd = _.random(0, enemys.length - 1);
         result.action = "Stun";
         result.target = [enemys[rnd]];
         result.msg = this.name + " trys to hit your head whith his wrench.</br>" + result.msg;
         return result;
       }
 
-      return _get(_getPrototypeOf(Mechanic.prototype), "calcCombatMove", this).call(this);
+      return _get(_getPrototypeOf(Mechanic.prototype), "calcCombatMove", this).call(this, enemys, friends);
     }
   }]);
 
@@ -9194,20 +9516,20 @@ window.gm.Mobs = function (Mobs) {
 
 "use strict";
 
-var Leggings = /*#__PURE__*/function (_Equipment12) {
-  _inherits(Leggings, _Equipment12);
+var Leggings = /*#__PURE__*/function (_Equipment15) {
+  _inherits(Leggings, _Equipment15);
 
-  var _super32 = _createSuper(Leggings);
+  var _super35 = _createSuper(Leggings);
 
   function Leggings() {
-    var _this22;
+    var _this25;
 
     _classCallCheck(this, Leggings);
 
-    _this22 = _super32.call(this, 'Leggings');
-    _this22.tags = ['cloth'];
-    _this22.slotUse = ['Legs', 'Hips'];
-    return _this22;
+    _this25 = _super35.call(this, 'Leggings');
+    _this25.tags = ['cloth'];
+    _this25.slotUse = ['Legs', 'Hips'];
+    return _this25;
   }
 
   _createClass(Leggings, [{
@@ -9269,20 +9591,20 @@ var Leggings = /*#__PURE__*/function (_Equipment12) {
   return Leggings;
 }(Equipment);
 
-var Jeans = /*#__PURE__*/function (_Equipment13) {
-  _inherits(Jeans, _Equipment13);
+var Jeans = /*#__PURE__*/function (_Equipment16) {
+  _inherits(Jeans, _Equipment16);
 
-  var _super33 = _createSuper(Jeans);
+  var _super36 = _createSuper(Jeans);
 
   function Jeans() {
-    var _this23;
+    var _this26;
 
     _classCallCheck(this, Jeans);
 
-    _this23 = _super33.call(this, 'Jeans');
-    _this23.tags = ['cloth'];
-    _this23.slotUse = ['Legs', 'Hips'];
-    return _this23;
+    _this26 = _super36.call(this, 'Jeans');
+    _this26.tags = ['cloth'];
+    _this26.slotUse = ['Legs', 'Hips'];
+    return _this26;
   }
 
   _createClass(Jeans, [{
@@ -9321,20 +9643,20 @@ var Jeans = /*#__PURE__*/function (_Equipment13) {
   return Jeans;
 }(Equipment);
 
-var Sneakers = /*#__PURE__*/function (_Equipment14) {
-  _inherits(Sneakers, _Equipment14);
+var Sneakers = /*#__PURE__*/function (_Equipment17) {
+  _inherits(Sneakers, _Equipment17);
 
-  var _super34 = _createSuper(Sneakers);
+  var _super37 = _createSuper(Sneakers);
 
   function Sneakers() {
-    var _this24;
+    var _this27;
 
     _classCallCheck(this, Sneakers);
 
-    _this24 = _super34.call(this, 'Sneakers');
-    _this24.tags = ['cloth'];
-    _this24.slotUse = ['Feet'];
-    return _this24;
+    _this27 = _super37.call(this, 'Sneakers');
+    _this27.tags = ['cloth'];
+    _this27.slotUse = ['Feet'];
+    return _this27;
   }
 
   _createClass(Sneakers, [{
@@ -9373,20 +9695,20 @@ var Sneakers = /*#__PURE__*/function (_Equipment14) {
   return Sneakers;
 }(Equipment);
 
-var TankShirt = /*#__PURE__*/function (_Equipment15) {
-  _inherits(TankShirt, _Equipment15);
+var TankShirt = /*#__PURE__*/function (_Equipment18) {
+  _inherits(TankShirt, _Equipment18);
 
-  var _super35 = _createSuper(TankShirt);
+  var _super38 = _createSuper(TankShirt);
 
   function TankShirt() {
-    var _this25;
+    var _this28;
 
     _classCallCheck(this, TankShirt);
 
-    _this25 = _super35.call(this, 'TankShirt');
-    _this25.tags = ['cloth'];
-    _this25.slotUse = ['Breast', 'Stomach'];
-    return _this25;
+    _this28 = _super38.call(this, 'TankShirt');
+    _this28.tags = ['cloth'];
+    _this28.slotUse = ['Breast', 'Stomach'];
+    return _this28;
   }
 
   _createClass(TankShirt, [{
@@ -9425,20 +9747,20 @@ var TankShirt = /*#__PURE__*/function (_Equipment15) {
   return TankShirt;
 }(Equipment);
 
-var Pullover = /*#__PURE__*/function (_Equipment16) {
-  _inherits(Pullover, _Equipment16);
+var Pullover = /*#__PURE__*/function (_Equipment19) {
+  _inherits(Pullover, _Equipment19);
 
-  var _super36 = _createSuper(Pullover);
+  var _super39 = _createSuper(Pullover);
 
   function Pullover() {
-    var _this26;
+    var _this29;
 
     _classCallCheck(this, Pullover);
 
-    _this26 = _super36.call(this, 'Pullover');
-    _this26.tags = ['cloth'];
-    _this26.slotUse = ['Breast', 'Stomach', 'Arms'];
-    return _this26;
+    _this29 = _super39.call(this, 'Pullover');
+    _this29.tags = ['cloth'];
+    _this29.slotUse = ['Breast', 'Stomach', 'Arms'];
+    return _this29;
   }
 
   _createClass(Pullover, [{
@@ -9484,20 +9806,20 @@ var Pullover = /*#__PURE__*/function (_Equipment16) {
   return Pullover;
 }(Equipment);
 
-var HandCuffs = /*#__PURE__*/function (_Equipment17) {
-  _inherits(HandCuffs, _Equipment17);
+var HandCuffs = /*#__PURE__*/function (_Equipment20) {
+  _inherits(HandCuffs, _Equipment20);
 
-  var _super37 = _createSuper(HandCuffs);
+  var _super40 = _createSuper(HandCuffs);
 
   function HandCuffs() {
-    var _this27;
+    var _this30;
 
     _classCallCheck(this, HandCuffs);
 
-    _this27 = _super37.call(this, 'HandCuffs');
-    _this27.tags = ['restrain'];
-    _this27.slotUse = ['RHand', 'LHand', 'Wrists'];
-    return _this27;
+    _this30 = _super40.call(this, 'HandCuffs');
+    _this30.tags = ['restrain'];
+    _this30.slotUse = ['RHand', 'LHand', 'Wrists'];
+    return _this30;
   }
 
   _createClass(HandCuffs, [{
@@ -9563,21 +9885,21 @@ var HandCuffs = /*#__PURE__*/function (_Equipment17) {
   return HandCuffs;
 }(Equipment);
 
-var WristCuffs = /*#__PURE__*/function (_Equipment18) {
-  _inherits(WristCuffs, _Equipment18);
+var WristCuffs = /*#__PURE__*/function (_Equipment21) {
+  _inherits(WristCuffs, _Equipment21);
 
-  var _super38 = _createSuper(WristCuffs);
+  var _super41 = _createSuper(WristCuffs);
 
   function WristCuffs() {
-    var _this28;
+    var _this31;
 
     _classCallCheck(this, WristCuffs);
 
-    _this28 = _super38.call(this, 'WristCuffs');
-    _this28.tags = [];
-    _this28.slotUse = ['Wrists'];
-    _this28.lossOnRespawn = false;
-    return _this28;
+    _this31 = _super41.call(this, 'WristCuffs');
+    _this31.tags = [];
+    _this31.slotUse = ['Wrists'];
+    _this31.lossOnRespawn = false;
+    return _this31;
   }
 
   _createClass(WristCuffs, [{
@@ -9642,21 +9964,21 @@ var WristCuffs = /*#__PURE__*/function (_Equipment18) {
   return WristCuffs;
 }(Equipment);
 
-var CollarQuest = /*#__PURE__*/function (_Equipment19) {
-  _inherits(CollarQuest, _Equipment19);
+var CollarQuest = /*#__PURE__*/function (_Equipment22) {
+  _inherits(CollarQuest, _Equipment22);
 
-  var _super39 = _createSuper(CollarQuest);
+  var _super42 = _createSuper(CollarQuest);
 
   function CollarQuest() {
-    var _this29;
+    var _this32;
 
     _classCallCheck(this, CollarQuest);
 
-    _this29 = _super39.call(this, 'CollarQuest');
-    _this29.tags = [];
-    _this29.slotUse = ['Neck'];
-    _this29.lossOnRespawn = false;
-    return _this29;
+    _this32 = _super42.call(this, 'CollarQuest');
+    _this32.tags = [];
+    _this32.slotUse = ['Neck'];
+    _this32.lossOnRespawn = false;
+    return _this32;
   }
 
   _createClass(CollarQuest, [{
@@ -9721,22 +10043,22 @@ var CollarQuest = /*#__PURE__*/function (_Equipment19) {
   return CollarQuest;
 }(Equipment);
 
-var ClitPiercing = /*#__PURE__*/function (_Equipment20) {
-  _inherits(ClitPiercing, _Equipment20);
+var ClitPiercing = /*#__PURE__*/function (_Equipment23) {
+  _inherits(ClitPiercing, _Equipment23);
 
-  var _super40 = _createSuper(ClitPiercing);
+  var _super43 = _createSuper(ClitPiercing);
 
   function ClitPiercing() {
-    var _this30;
+    var _this33;
 
     _classCallCheck(this, ClitPiercing);
 
-    _this30 = _super40.call(this, 'ClitPiercing');
-    _this30.tags = ['piercing'];
-    _this30.slotUse = ['pClit'];
-    _this30.style = 0;
-    _this30.lossOnRespawn = true;
-    return _this30;
+    _this33 = _super43.call(this, 'ClitPiercing');
+    _this33.tags = ['piercing'];
+    _this33.slotUse = ['pClit'];
+    _this33.style = 0;
+    _this33.lossOnRespawn = true;
+    return _this33;
   }
 
   _createClass(ClitPiercing, [{
@@ -9795,21 +10117,21 @@ var ClitPiercing = /*#__PURE__*/function (_Equipment20) {
 }(Equipment); //this is an Inventory-item, not wardrobe
 
 
-var Crowbar = /*#__PURE__*/function (_Equipment21) {
-  _inherits(Crowbar, _Equipment21);
+var Crowbar = /*#__PURE__*/function (_Equipment24) {
+  _inherits(Crowbar, _Equipment24);
 
-  var _super41 = _createSuper(Crowbar);
+  var _super44 = _createSuper(Crowbar);
 
   function Crowbar() {
-    var _this31;
+    var _this34;
 
     _classCallCheck(this, Crowbar);
 
-    _this31 = _super41.call(this, 'Crowbar');
-    _this31.tags = ['tool', 'weapon'];
-    _this31.slotUse = ['RHand'];
-    _this31.lossOnRespawn = true;
-    return _this31;
+    _this34 = _super44.call(this, 'Crowbar');
+    _this34.tags = ['tool', 'weapon'];
+    _this34.slotUse = ['RHand'];
+    _this34.lossOnRespawn = true;
+    return _this34;
   }
 
   _createClass(Crowbar, [{
@@ -9903,21 +10225,21 @@ var Crowbar = /*#__PURE__*/function (_Equipment21) {
 }(Equipment); //this is an Inventory-item, not wardrobe
 
 
-var Shovel = /*#__PURE__*/function (_Equipment22) {
-  _inherits(Shovel, _Equipment22);
+var Shovel = /*#__PURE__*/function (_Equipment25) {
+  _inherits(Shovel, _Equipment25);
 
-  var _super42 = _createSuper(Shovel);
+  var _super45 = _createSuper(Shovel);
 
   function Shovel() {
-    var _this32;
+    var _this35;
 
     _classCallCheck(this, Shovel);
 
-    _this32 = _super42.call(this, 'Shovel');
-    _this32.tags = ['tool', 'weapon'];
-    _this32.slotUse = ['RHand', 'LHand'];
-    _this32.lossOnRespawn = true;
-    return _this32;
+    _this35 = _super45.call(this, 'Shovel');
+    _this35.tags = ['tool', 'weapon'];
+    _this35.slotUse = ['RHand', 'LHand'];
+    _this35.lossOnRespawn = true;
+    return _this35;
   }
 
   _createClass(Shovel, [{
@@ -10005,21 +10327,21 @@ var Shovel = /*#__PURE__*/function (_Equipment22) {
   return Shovel;
 }(Equipment);
 
-var RobesZealot = /*#__PURE__*/function (_Equipment23) {
-  _inherits(RobesZealot, _Equipment23);
+var RobesZealot = /*#__PURE__*/function (_Equipment26) {
+  _inherits(RobesZealot, _Equipment26);
 
-  var _super43 = _createSuper(RobesZealot);
+  var _super46 = _createSuper(RobesZealot);
 
   function RobesZealot() {
-    var _this33;
+    var _this36;
 
     _classCallCheck(this, RobesZealot);
 
-    _this33 = _super43.call(this, 'RobesZealot');
-    _this33.tags = ['cloth'];
-    _this33.slotUse = ['Breast', 'Stomach', 'Hips', 'Legs'];
-    _this33.lossOnRespawn = true;
-    return _this33;
+    _this36 = _super46.call(this, 'RobesZealot');
+    _this36.tags = ['cloth'];
+    _this36.slotUse = ['Breast', 'Stomach', 'Hips', 'Legs'];
+    _this36.lossOnRespawn = true;
+    return _this36;
   }
 
   _createClass(RobesZealot, [{
@@ -10059,21 +10381,22 @@ var RobesZealot = /*#__PURE__*/function (_Equipment23) {
 }(Equipment); //
 
 
-var StaffWodden = /*#__PURE__*/function (_Equipment24) {
-  _inherits(StaffWodden, _Equipment24);
+var StaffWodden = /*#__PURE__*/function (_Equipment27) {
+  _inherits(StaffWodden, _Equipment27);
 
-  var _super44 = _createSuper(StaffWodden);
+  var _super47 = _createSuper(StaffWodden);
 
   function StaffWodden() {
-    var _this34;
+    var _this37;
 
     _classCallCheck(this, StaffWodden);
 
-    _this34 = _super44.call(this, 'StaffWodden');
-    _this34.tags = ['weapon'];
-    _this34.slotUse = ['RHand', 'LHand'];
-    _this34.lossOnRespawn = true;
-    return _this34;
+    _this37 = _super47.call(this, 'StaffWodden');
+    _this37.tags = ['weapon'];
+    _this37.slotUse = ['RHand', 'LHand'];
+    _this37.lossOnRespawn = true;
+    _this37.pDamage = 5;
+    return _this37;
   }
 
   _createClass(StaffWodden, [{
@@ -10126,10 +10449,7 @@ var StaffWodden = /*#__PURE__*/function (_Equipment24) {
   }, {
     key: "onEquip",
     value: function onEquip() {
-      this.parent.parent.Stats.addModifier('pAttack', {
-        id: 'pAttack:StaffWodden',
-        bonus: 2
-      });
+      //this.parent.parent.Stats.addModifier('pAttack',{id:'pAttack:StaffWodden', bonus:2});
       return {
         OK: true,
         msg: 'equipped'
@@ -10138,9 +10458,7 @@ var StaffWodden = /*#__PURE__*/function (_Equipment24) {
   }, {
     key: "onUnequip",
     value: function onUnequip() {
-      this.parent.parent.Stats.removeModifier('pAttack', {
-        id: 'pAttack:StaffWodden'
-      });
+      //this.parent.parent.Stats.removeModifier('pAttack',{id:'pAttack:StaffWodden'});
       return {
         OK: true,
         msg: 'unequipped'
@@ -10161,20 +10479,20 @@ var StaffWodden = /*#__PURE__*/function (_Equipment24) {
   return StaffWodden;
 }(Equipment);
 
-var TailRibbon = /*#__PURE__*/function (_Equipment25) {
-  _inherits(TailRibbon, _Equipment25);
+var TailRibbon = /*#__PURE__*/function (_Equipment28) {
+  _inherits(TailRibbon, _Equipment28);
 
-  var _super45 = _createSuper(TailRibbon);
+  var _super48 = _createSuper(TailRibbon);
 
   function TailRibbon() {
-    var _this35;
+    var _this38;
 
     _classCallCheck(this, TailRibbon);
 
-    _this35 = _super45.call(this, 'TailRibbon');
-    _this35.tags = ['cloth'];
-    _this35.slotUse = ['TailTip'];
-    return _this35;
+    _this38 = _super48.call(this, 'TailRibbon');
+    _this38.tags = ['cloth'];
+    _this38.slotUse = ['TailTip'];
+    return _this38;
   }
 
   _createClass(TailRibbon, [{
@@ -10322,29 +10640,29 @@ window.gm.questDef = window.gm.questDef || {};
     return 0;
   };
 
-  var _quest = new Quest("qFixLaptop", "Upgrade your Laptop", "");
+  var _quest2 = new Quest("qFixLaptop", "Upgrade your Laptop", "");
 
-  _quest.addMileStone(new QuestMilestone(1, "", "The powerconverter for your laptop should be somewhere around in the house. ", NOP));
+  _quest2.addMileStone(new QuestMilestone(1, "", "The powerconverter for your laptop should be somewhere around in the house. ", NOP));
 
-  _quest.addMileStone(new QuestMilestone(1000, "", "The Laptop is working.", NOP)); // install webcam
+  _quest2.addMileStone(new QuestMilestone(1000, "", "The Laptop is working.", NOP)); // install webcam
 
 
-  window.gm.questDef[_quest.id] = _quest;
+  window.gm.questDef[_quest2.id] = _quest2;
 }
 {
   var _NOP = function _NOP() {
     return 0;
   };
 
-  var _quest2 = new Quest("qStudy", "Do some studying", "Do something for your success at university.");
+  var _quest3 = new Quest("qStudy", "Do some studying", "Do something for your success at university.");
 
-  _quest2.addMileStone(new QuestMilestone(1, "", "Sitting down and reading a book might get you some knowledge.", _NOP));
+  _quest3.addMileStone(new QuestMilestone(1, "", "Sitting down and reading a book might get you some knowledge.", _NOP));
 
-  _quest2.addMileStone(new QuestMilestone(100, "", "At least you feel a little smarter now.", function () {
+  _quest3.addMileStone(new QuestMilestone(100, "", "At least you feel a little smarter now.", function () {
     return -1;
   }));
 
-  window.gm.questDef[_quest2.id] = _quest2;
+  window.gm.questDef[_quest3.id] = _quest3;
 }
 {
   var _NOP2 = function _NOP2() {
@@ -10355,15 +10673,15 @@ window.gm.questDef = window.gm.questDef || {};
     return window.gm.quests.getMilestoneState("qMyPleasure").id < 100;
   };
 
-  var _quest3 = new Quest("qMyPleasure", "Pleasure yourself", "Pleasure yourself.", hidden);
+  var _quest4 = new Quest("qMyPleasure", "Pleasure yourself", "Pleasure yourself.", hidden);
 
-  _quest3.addMileStone(new QuestMilestone(1, "", "Rub yourself.", _NOP2, hidden));
+  _quest4.addMileStone(new QuestMilestone(1, "", "Rub yourself.", _NOP2, hidden));
 
-  _quest3.addMileStone(new QuestMilestone(100, "", "You created a mess in your bedsheets.", function () {
+  _quest4.addMileStone(new QuestMilestone(100, "", "You created a mess in your bedsheets.", function () {
     return -1;
   }));
 
-  window.gm.questDef[_quest3.id] = _quest3;
+  window.gm.questDef[_quest4.id] = _quest4;
 }
 {
   //quest-flag counts the shifts done in week
@@ -10371,17 +10689,17 @@ window.gm.questDef = window.gm.questDef || {};
     return 0;
   };
 
-  var _quest4 = new Quest("qFindAJob", "Find a job", "Somehow you have to make a living.");
+  var _quest5 = new Quest("qFindAJob", "Find a job", "Somehow you have to make a living.");
 
-  _quest4.addMileStone(new QuestMilestone(1, "", "Maybe you can ask around or check the blackboard at the uni for some offers.", _NOP3));
+  _quest5.addMileStone(new QuestMilestone(1, "", "Maybe you can ask around or check the blackboard at the uni for some offers.", _NOP3));
 
-  _quest4.addMileStone(new QuestMilestone(100, "", "You've got that job-ad from Harcon Health Inc that is somewhere in downtown. Maybe you could inquire there whats up with it.", _NOP3));
+  _quest5.addMileStone(new QuestMilestone(100, "", "You've got that job-ad from Harcon Health Inc that is somewhere in downtown. Maybe you could inquire there whats up with it.", _NOP3));
 
-  _quest4.addMileStone(new QuestMilestone(200, "", "They offered you to work in logistic department. You will move boxes and crates around for little money but at least its a start. Check your job-schedule", _NOP3));
+  _quest5.addMileStone(new QuestMilestone(200, "", "They offered you to work in logistic department. You will move boxes and crates around for little money but at least its a start. Check your job-schedule", _NOP3));
 
-  _quest4.addMileStone(new QuestMilestone(300, "", "???", _NOP3));
+  _quest5.addMileStone(new QuestMilestone(300, "", "???", _NOP3));
 
-  window.gm.questDef[_quest4.id] = _quest4;
+  window.gm.questDef[_quest5.id] = _quest5;
 } //////////////////////////////////////////////////////////////////////////////////////
 
 {
@@ -10394,25 +10712,25 @@ window.gm.questDef = window.gm.questDef || {};
     return window.gm.quests.getMilestoneState("qDLCMain").id < 100;
   };
 
-  var _quest5 = new Quest("qDLCMain", "qDLCMain", "qDLCMain", _hidden);
+  var _quest6 = new Quest("qDLCMain", "qDLCMain", "qDLCMain", _hidden);
 
-  _quest5.addMileStone(new QuestMilestone(1, "", "Sign betatestcontract.", _NOP4, _hidden));
+  _quest6.addMileStone(new QuestMilestone(1, "", "Sign betatestcontract.", _NOP4, _hidden));
 
-  _quest5.addMileStone(new QuestMilestone(100, "", "It will take some days until the game-equipment arrives. Spent some time studying or working.", _NOP4, _hidden));
+  _quest6.addMileStone(new QuestMilestone(100, "", "It will take some days until the game-equipment arrives. Spent some time studying or working.", _NOP4, _hidden));
 
-  _quest5.addMileStone(new QuestMilestone(500, "", "Setup VR-equipment.", _NOP4, _hidden));
+  _quest6.addMileStone(new QuestMilestone(500, "", "Setup VR-equipment.", _NOP4, _hidden));
 
-  _quest5.addMileStone(new QuestMilestone(600, "", "Enter the game.", _NOP4, _hidden));
+  _quest6.addMileStone(new QuestMilestone(600, "", "Enter the game.", _NOP4, _hidden));
 
-  _quest5.addMileStone(new QuestMilestone(700, "", "Get to the settlement.", _NOP4, _hidden));
+  _quest6.addMileStone(new QuestMilestone(700, "", "Get to the settlement.", _NOP4, _hidden));
 
-  _quest5.addMileStone(new QuestMilestone(800, "", "Ask around for a quest.", _NOP4, _hidden));
+  _quest6.addMileStone(new QuestMilestone(800, "", "Ask around for a quest.", _NOP4, _hidden));
 
-  _quest5.addMileStone(new QuestMilestone(900, "", "Finish the PurpleBerryQuest.", _NOP4));
+  _quest6.addMileStone(new QuestMilestone(900, "", "Finish the PurpleBerryQuest.", _NOP4));
 
-  _quest5.addMileStone(new QuestMilestone(1000, "", ".", _NOP4));
+  _quest6.addMileStone(new QuestMilestone(1000, "", ".", _NOP4));
 
-  window.gm.questDef[_quest5.id] = _quest5;
+  window.gm.questDef[_quest6.id] = _quest6;
 }
 {
   // the quest tracks death for tutorial
@@ -10421,21 +10739,23 @@ window.gm.questDef = window.gm.questDef || {};
   };
 
   var _hidden2 = function _hidden2() {
-    return window.gm.quests.getMilestoneState("qDiedAgain").id < 100;
+    return window.gm.quests.getMilestoneState("qDiedAgain").id < 0;
   };
 
-  var _quest6 = new Quest("qDiedAgain", "qDiedAgain", "qDiedAgain", _hidden2);
+  var _quest7 = new Quest("qDiedAgain", "qDiedAgain", "qDiedAgain", _hidden2);
 
-  _quest6.addMileStone(new QuestMilestone(1, "", "Find your first death.", _NOP5, _hidden2));
+  _quest7.addMileStone(new QuestMilestone(1, "", "Life is a game.", _NOP5, _hidden2));
 
-  _quest6.addMileStone(new QuestMilestone(100, "", "Die with some bonded equipment.", _NOP5, _hidden2));
+  _quest7.addMileStone(new QuestMilestone(2, "", "Find your first death.", _NOP5, _hidden2));
 
-  _quest6.addMileStone(new QuestMilestone(200, "", "Die by pleasure.", _NOP5, _hidden2)); //todo what if this is before previous?
+  _quest7.addMileStone(new QuestMilestone(100, "", "Die with some bonded equipment.", _NOP5, _hidden2));
+
+  _quest7.addMileStone(new QuestMilestone(200, "", "Die by pleasure.", _NOP5, _hidden2)); //todo what if this is before previous?
 
 
-  _quest6.addMileStone(new QuestMilestone(300, "", ".", _NOP5, _hidden2));
+  _quest7.addMileStone(new QuestMilestone(300, "", ".", _NOP5, _hidden2));
 
-  window.gm.questDef[_quest6.id] = _quest6;
+  window.gm.questDef[_quest7.id] = _quest7;
 }
 {
   //
@@ -10447,17 +10767,17 @@ window.gm.questDef = window.gm.questDef || {};
     return false;
   };
 
-  var _quest7 = new Quest("qPurpleBerry", "qPurpleBerry", "qPurpleBerry", _hidden3);
+  var _quest8 = new Quest("qPurpleBerry", "qPurpleBerry", "qPurpleBerry", _hidden3);
 
-  _quest7.addMileStone(new QuestMilestone(1, "", "Search the forest for 5 handful of purple berrys and deliver them to the alchemist.", _NOP6, _hidden3));
+  _quest8.addMileStone(new QuestMilestone(1, "", "Search the forest for 5 handful of purple berrys and deliver them to the alchemist.", _NOP6, _hidden3));
 
-  _quest7.addMileStone(new QuestMilestone(100, "", "You delivered the berries to the alchemist.", _NOP6, _hidden3));
+  _quest8.addMileStone(new QuestMilestone(100, "", "You delivered the berries to the alchemist.", _NOP6, _hidden3));
 
-  _quest7.addMileStone(new QuestMilestone(200, "", "Find 4 purple berrys, 2 apoca-blossoms, 2 bloated mushrooms.", _NOP6, _hidden3));
+  _quest8.addMileStone(new QuestMilestone(200, "", "Find 4 purple berrys, 2 apoca-blossoms, 2 bloated mushrooms.", _NOP6, _hidden3));
 
-  _quest7.addMileStone(new QuestMilestone(300, "", "....", _NOP6, _hidden3));
+  _quest8.addMileStone(new QuestMilestone(300, "", "....", _NOP6, _hidden3));
 
-  window.gm.questDef[_quest7.id] = _quest7;
+  window.gm.questDef[_quest8.id] = _quest8;
 }
 {
   var _NOP7 = function _NOP7() {
@@ -10465,63 +10785,90 @@ window.gm.questDef = window.gm.questDef || {};
   };
 
   var _hidden4 = function _hidden4() {
-    return window.gm.quests.getMilestoneState("qWolfMate").id < 100;
+    return window.gm.quests.getMilestoneState("qCarlia").id < 100;
   };
 
-  var _quest8 = new Quest("qWolfMate", "qWolfMate", "qWolfMate", _hidden4);
+  var _quest9 = new Quest("qCarlia", "qCarlia", "qCarlia", _hidden4);
 
-  _quest8.addMileStone(new QuestMilestone(1, "", "Saw a wolf.", _NOP7, _hidden4));
+  _quest9.addMileStone(new QuestMilestone(1, "", "", _NOP7, _hidden4));
 
-  _quest8.addMileStone(new QuestMilestone(400, "", "Is that wolf stronger than you? Lets find out.", _NOP7, _hidden4));
+  _quest9.addMileStone(new QuestMilestone(100, "", "A strange individual is stalking you.", _NOP7, _hidden4));
 
-  _quest8.addMileStone(new QuestMilestone(500, "", "", _NOP7));
+  _quest9.addMileStone(new QuestMilestone(200, "", "That stalker was eying you again. He was disappearing into the cliffs direction.", _NOP7, _hidden4));
 
-  window.gm.questDef[_quest8.id] = _quest8;
+  _quest9.addMileStone(new QuestMilestone(300, "", "There were some footprint at the cliff that led you to a concealed path.", _NOP7));
+
+  _quest9.addMileStone(new QuestMilestone(400, "", "Someone setup a camp in a cave entrance. Maybe you an find some clues there.", _NOP7));
+
+  _quest9.addMileStone(new QuestMilestone(500, "", "Pooking around in other peoples stuff got you a \"present\".", _NOP7));
+
+  _quest9.addMileStone(new QuestMilestone(600, "", "The stalker didnt care to hide any longer and accused you of thievery.", _NOP7));
+
+  window.gm.questDef[_quest9.id] = _quest9;
 }
 {
-  // 
   var _NOP8 = function _NOP8() {
     return 0;
   };
 
   var _hidden5 = function _hidden5() {
-    return window.gm.quests.getMilestoneState("qBondageKink").id < 100;
+    return window.gm.quests.getMilestoneState("qWolfMate").id < 100;
   };
 
-  var _quest9 = new Quest("qBondageKink", "qBondageKink", "qBondageKink", _hidden5);
+  var _quest10 = new Quest("qWolfMate", "qWolfMate", "qWolfMate", _hidden5);
 
-  _quest9.addMileStone(new QuestMilestone(1, "", "qBondageKink", _NOP8, _hidden5));
+  _quest10.addMileStone(new QuestMilestone(1, "", "Saw a wolf.", _NOP8, _hidden5));
 
-  _quest9.addMileStone(new QuestMilestone(100, "", "You got some collar on your neck. Find someone that can check on that.", _NOP8, _hidden5));
+  _quest10.addMileStone(new QuestMilestone(400, "", "Is that wolf stronger than you? Lets find out.", _NOP8, _hidden5));
 
-  _quest9.addMileStone(new QuestMilestone(200, "", "The alchemist suggested to search for help in the next town.", _NOP8, _hidden5));
+  _quest10.addMileStone(new QuestMilestone(500, "", "", _NOP8));
 
-  _quest9.addMileStone(new QuestMilestone(300, "", "You found the bridge on your route blocked by a bully. Get rid of him.", _NOP8, _hidden5));
-
-  _quest9.addMileStone(new QuestMilestone(400, "", "Find your way past the bridge to the town.", _NOP8, _hidden5));
-
-  _quest9.addMileStone(new QuestMilestone(500, "", "...", _NOP8, _hidden5));
-
-  window.gm.questDef[_quest9.id] = _quest9;
+  window.gm.questDef[_quest10.id] = _quest10;
 }
 {
+  // 
   var _NOP9 = function _NOP9() {
     return 0;
   };
 
   var _hidden6 = function _hidden6() {
+    return window.gm.quests.getMilestoneState("qBondageKink").id < 100;
+  };
+
+  var _quest11 = new Quest("qBondageKink", "qBondageKink", "qBondageKink", _hidden6);
+
+  _quest11.addMileStone(new QuestMilestone(1, "", "qBondageKink", _NOP9, _hidden6));
+
+  _quest11.addMileStone(new QuestMilestone(100, "", "You got some collar on your neck. Find someone that can check on that.", _NOP9, _hidden6));
+
+  _quest11.addMileStone(new QuestMilestone(200, "", "The alchemist suggested to search for help in the next town.", _NOP9, _hidden6));
+
+  _quest11.addMileStone(new QuestMilestone(300, "", "You found the bridge on your route blocked by a bully. Get rid of him.", _NOP9, _hidden6));
+
+  _quest11.addMileStone(new QuestMilestone(400, "", "Find your way past the bridge to the town.", _NOP9, _hidden6));
+
+  _quest11.addMileStone(new QuestMilestone(500, "", "...", _NOP9, _hidden6));
+
+  window.gm.questDef[_quest11.id] = _quest11;
+}
+{
+  var _NOP10 = function _NOP10() {
+    return 0;
+  };
+
+  var _hidden7 = function _hidden7() {
     return window.gm.quests.getMilestoneState("qBeastKink").id < 100;
   };
 
-  var _quest10 = new Quest("qBeastKink", "BeastKink", "Humans are fun to fool around with. But how about beasts.", _hidden6);
+  var _quest12 = new Quest("qBeastKink", "BeastKink", "Humans are fun to fool around with. But how about beasts.", _hidden7);
 
-  _quest10.addMileStone(new QuestMilestone(1, "", "Beasts have sex too.", _NOP9, _hidden6));
+  _quest12.addMileStone(new QuestMilestone(1, "", "Beasts have sex too.", _NOP10, _hidden7));
 
-  _quest10.addMileStone(new QuestMilestone(400, "", "SEEING is BELIEVING. Catch someone having intercourse with animal.", _NOP9, _hidden6));
+  _quest12.addMileStone(new QuestMilestone(400, "", "SEEING is BELIEVING. Catch someone having intercourse with animal.", _NOP10, _hidden7));
 
-  _quest10.addMileStone(new QuestMilestone(500, "", "Maybe you can find a dog or other canine and play with him.", _NOP9));
+  _quest12.addMileStone(new QuestMilestone(500, "", "Maybe you can find a dog or other canine and play with him.", _NOP10));
 
-  window.gm.questDef[_quest10.id] = _quest10;
+  window.gm.questDef[_quest12.id] = _quest12;
 }
 "use strict";
 
@@ -10597,22 +10944,23 @@ var Job = /*#__PURE__*/function () {
 
   window.gm.jobs[job.id] = job;
 }
-"use strict";
+"use strict"; //execute simple attack with active weapon or claws
+//todo class SkillInspect extends Skill
+
 
 var SkillAttack = /*#__PURE__*/function (_Skill) {
   _inherits(SkillAttack, _Skill);
 
-  var _super46 = _createSuper(SkillAttack);
+  var _super49 = _createSuper(SkillAttack);
 
-  //execute simple attack with active weapon
   function SkillAttack() {
-    var _this36;
+    var _this39;
 
     _classCallCheck(this, SkillAttack);
 
-    _this36 = _super46.call(this, "Attack");
-    _this36.msg = '';
-    return _this36;
+    _this39 = _super49.call(this, "Attack");
+    _this39.msg = '';
+    return _this39;
   }
 
   _createClass(SkillAttack, [{
@@ -10643,7 +10991,9 @@ var SkillAttack = /*#__PURE__*/function (_Skill) {
         try {
           for (_iterator30.s(); !(_step30 = _iterator30.n()).done;) {
             var target = _step30.value;
-            var attack = window.gm.combat.defaultAttackData();
+
+            var attack = this.__estimateAttack();
+
             var result2 = window.gm.combat.calcAttack(this.caster, target, attack);
             this.msg += result2.msg;
             result.effects = result.effects.concat(attack.effects);
@@ -10658,6 +11008,43 @@ var SkillAttack = /*#__PURE__*/function (_Skill) {
       return result;
     }
   }, {
+    key: "__estimateAttack",
+    value: function __estimateAttack() {
+      var attack = window.gm.combat.defaultAttackData();
+      var lHand = this.caster.Outfit.getItemForSlot(window.gm.OutfitSlotLib.LHand);
+      var rHand = this.caster.Outfit.getItemForSlot(window.gm.OutfitSlotLib.RHand);
+      var lHDmg = 0,
+          rHDmg = 0;
+
+      if (lHand) {
+        //get weapon damage info
+        lHDmg = lHand.pDamage || 0;
+      }
+
+      if (rHand) {
+        rHDmg = rHand.pDamage || 0;
+      }
+
+      if (!lHand && !rHand) {
+        //if has no weapon get body damage
+        rHand = this.caster.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bHands);
+
+        if (rHand) {
+          rHDmg = rHand.pDamage || 0;
+        }
+      }
+
+      if (lHand === rHand) {
+        attack.value = lHDmg;
+      } else {
+        attack.value = lHDmg + rHDmg;
+      }
+
+      attack.value += this.caster.Stats.get('pAttack').value;
+      attack.total = attack.value;
+      return attack;
+    }
+  }, {
     key: "getCastDescription",
     value: function getCastDescription(result) {
       return this.msg;
@@ -10670,22 +11057,69 @@ var SkillAttack = /*#__PURE__*/function (_Skill) {
   }]);
 
   return SkillAttack;
-}(Skill);
+}(Skill); //execute attack with Face
+
+
+var SkillBite = /*#__PURE__*/function (_SkillAttack) {
+  _inherits(SkillBite, _SkillAttack);
+
+  var _super50 = _createSuper(SkillBite);
+
+  function SkillBite() {
+    var _this40;
+
+    _classCallCheck(this, SkillBite);
+
+    _this40 = _super50.call(this);
+    _this40.id = _this40.name = 'Bite';
+    return _this40;
+  }
+
+  _createClass(SkillBite, [{
+    key: "toJSON",
+    value: function toJSON() {
+      return window.storage.Generic_toJSON("SkillBite", this);
+    }
+  }, {
+    key: "__estimateAttack",
+    value: function __estimateAttack() {
+      var attack = window.gm.combat.defaultAttackData();
+      var mouth = this.caster.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bMouth);
+      var mouthDmg = 0;
+
+      if (mouth) {
+        //get weapon damage info
+        mouthDmg = mouth.pDamage || 0;
+      }
+
+      attack.value += mouthDmg + this.caster.Stats.get('pAttack').value;
+      attack.total = attack.value;
+      return attack;
+    }
+  }], [{
+    key: "fromJSON",
+    value: function fromJSON(value) {
+      return window.storage.Generic_fromJSON(SkillBite, value.data);
+    }
+  }]);
+
+  return SkillBite;
+}(SkillAttack);
 
 var SkillTease = /*#__PURE__*/function (_Skill2) {
   _inherits(SkillTease, _Skill2);
 
-  var _super47 = _createSuper(SkillTease);
+  var _super51 = _createSuper(SkillTease);
 
   //execute simple attack with active weapon
   function SkillTease() {
-    var _this37;
+    var _this41;
 
     _classCallCheck(this, SkillTease);
 
-    _this37 = _super47.call(this, "Tease");
-    _this37.msg = '';
-    return _this37;
+    _this41 = _super51.call(this, "Tease");
+    _this41.msg = '';
+    return _this41;
   }
 
   _createClass(SkillTease, [{
@@ -10746,13 +11180,13 @@ var SkillTease = /*#__PURE__*/function (_Skill2) {
 var SkillStun = /*#__PURE__*/function (_Skill3) {
   _inherits(SkillStun, _Skill3);
 
-  var _super48 = _createSuper(SkillStun);
+  var _super52 = _createSuper(SkillStun);
 
   //execute stun attack
   function SkillStun() {
     _classCallCheck(this, SkillStun);
 
-    return _super48.call(this, "Stun");
+    return _super52.call(this, "Stun");
   }
 
   _createClass(SkillStun, [{
@@ -10837,12 +11271,12 @@ var SkillStun = /*#__PURE__*/function (_Skill3) {
 var SkillPoisonCloud = /*#__PURE__*/function (_Skill4) {
   _inherits(SkillPoisonCloud, _Skill4);
 
-  var _super49 = _createSuper(SkillPoisonCloud);
+  var _super53 = _createSuper(SkillPoisonCloud);
 
   function SkillPoisonCloud() {
     _classCallCheck(this, SkillPoisonCloud);
 
-    return _super49.call(this, "PoisonCloud");
+    return _super53.call(this, "PoisonCloud");
   }
 
   _createClass(SkillPoisonCloud, [{
@@ -10905,12 +11339,12 @@ var SkillPoisonCloud = /*#__PURE__*/function (_Skill4) {
 var SkillHeal = /*#__PURE__*/function (_Skill5) {
   _inherits(SkillHeal, _Skill5);
 
-  var _super50 = _createSuper(SkillHeal);
+  var _super54 = _createSuper(SkillHeal);
 
   function SkillHeal() {
     _classCallCheck(this, SkillHeal);
 
-    return _super50.call(this, "Heal");
+    return _super54.call(this, "Heal");
   }
 
   _createClass(SkillHeal, [{
@@ -10967,12 +11401,12 @@ var SkillHeal = /*#__PURE__*/function (_Skill5) {
 var SkillFlee = /*#__PURE__*/function (_Skill6) {
   _inherits(SkillFlee, _Skill6);
 
-  var _super51 = _createSuper(SkillFlee);
+  var _super55 = _createSuper(SkillFlee);
 
   function SkillFlee() {
     _classCallCheck(this, SkillFlee);
 
-    return _super51.call(this, "Flee");
+    return _super55.call(this, "Flee");
   }
 
   _createClass(SkillFlee, [{
@@ -10994,9 +11428,9 @@ var SkillFlee = /*#__PURE__*/function (_Skill6) {
       if (this.isValidTarget(targets)) {
         result.OK = true;
 
-        var _rnd = _.random(1, 100);
+        var rnd = _.random(1, 100);
 
-        if (_rnd > 40) {
+        if (rnd > 40) {
           //Todo fleeing chance calculation
           result.msg += "You escaped the fight.";
           window.story.state.combat.playerFleeing = true; //just setting the flag, you have to take care of handling!
@@ -11020,12 +11454,12 @@ var SkillFlee = /*#__PURE__*/function (_Skill6) {
 var SkillSubmit = /*#__PURE__*/function (_Skill7) {
   _inherits(SkillSubmit, _Skill7);
 
-  var _super52 = _createSuper(SkillSubmit);
+  var _super56 = _createSuper(SkillSubmit);
 
   function SkillSubmit() {
     _classCallCheck(this, SkillSubmit);
 
-    return _super52.call(this, "Submit");
+    return _super56.call(this, "Submit");
   }
 
   _createClass(SkillSubmit, [{
@@ -11047,9 +11481,9 @@ var SkillSubmit = /*#__PURE__*/function (_Skill7) {
       if (this.isValidTarget(targets)) {
         result.OK = true;
 
-        var _rnd2 = _.random(1, 100);
+        var rnd = _.random(1, 100);
 
-        if (_rnd2 > 0) {
+        if (rnd > 0) {
           //Todo fleeing chance calculation
           result.msg += "You submit to your foe.";
           window.story.state.combat.playerSubmitting = true; //just setting the flag, you have to take care of handling!
@@ -11073,13 +11507,13 @@ var SkillSubmit = /*#__PURE__*/function (_Skill7) {
 var SkillGuard = /*#__PURE__*/function (_Skill8) {
   _inherits(SkillGuard, _Skill8);
 
-  var _super53 = _createSuper(SkillGuard);
+  var _super57 = _createSuper(SkillGuard);
 
   //todo improves defense
   function SkillGuard() {
     _classCallCheck(this, SkillGuard);
 
-    return _super53.call(this, "Guard");
+    return _super57.call(this, "Guard");
   }
 
   _createClass(SkillGuard, [{
@@ -11135,17 +11569,17 @@ var SkillGuard = /*#__PURE__*/function (_Skill8) {
 var SkillUseItem = /*#__PURE__*/function (_Skill9) {
   _inherits(SkillUseItem, _Skill9);
 
-  var _super54 = _createSuper(SkillUseItem);
+  var _super58 = _createSuper(SkillUseItem);
 
   function SkillUseItem() {
-    var _this38;
+    var _this42;
 
     _classCallCheck(this, SkillUseItem);
 
-    _this38 = _super54.call(this, "UseItem");
-    _this38.item = '';
-    _this38.msg = '';
-    return _this38;
+    _this42 = _super58.call(this, "UseItem");
+    _this42.item = '';
+    _this42.msg = '';
+    return _this42;
   }
 
   _createClass(SkillUseItem, [{
@@ -11204,7 +11638,7 @@ var SkillUseItem = /*#__PURE__*/function (_Skill9) {
 var SkillCallHelp = /*#__PURE__*/function (_Skill10) {
   _inherits(SkillCallHelp, _Skill10);
 
-  var _super55 = _createSuper(SkillCallHelp);
+  var _super59 = _createSuper(SkillCallHelp);
 
   _createClass(SkillCallHelp, null, [{
     key: "setup",
@@ -11217,13 +11651,13 @@ var SkillCallHelp = /*#__PURE__*/function (_Skill10) {
   }]);
 
   function SkillCallHelp() {
-    var _this39;
+    var _this43;
 
     _classCallCheck(this, SkillCallHelp);
 
-    _this39 = _super55.call(this, "CallHelp");
-    _this39.item = '';
-    return _this39;
+    _this43 = _super59.call(this, "CallHelp");
+    _this43.item = '';
+    return _this43;
   }
 
   _createClass(SkillCallHelp, [{
@@ -11293,6 +11727,7 @@ var SkillCallHelp = /*#__PURE__*/function (_Skill10) {
 
 window.gm.SkillsLib = function (Lib) {
   window.storage.registerConstructor(SkillAttack);
+  window.storage.registerConstructor(SkillBite);
   window.storage.registerConstructor(SkillCallHelp);
   window.storage.registerConstructor(SkillFlee);
   window.storage.registerConstructor(SkillGuard);
@@ -11317,7 +11752,7 @@ window.gm.SkillsLib = function (Lib) {
 var stRelation = /*#__PURE__*/function (_Stat) {
   _inherits(stRelation, _Stat);
 
-  var _super56 = _createSuper(stRelation);
+  var _super60 = _createSuper(stRelation);
 
   _createClass(stRelation, null, [{
     key: "setup",
@@ -11353,7 +11788,7 @@ var stRelation = /*#__PURE__*/function (_Stat) {
   function stRelation() {
     _classCallCheck(this, stRelation);
 
-    return _super56.call(this);
+    return _super60.call(this);
   }
 
   _createClass(stRelation, [{
@@ -11385,7 +11820,7 @@ var stRelation = /*#__PURE__*/function (_Stat) {
 var stHealthMax = /*#__PURE__*/function (_Stat2) {
   _inherits(stHealthMax, _Stat2);
 
-  var _super57 = _createSuper(stHealthMax);
+  var _super61 = _createSuper(stHealthMax);
 
   _createClass(stHealthMax, null, [{
     key: "setup",
@@ -11406,7 +11841,7 @@ var stHealthMax = /*#__PURE__*/function (_Stat2) {
   function stHealthMax() {
     _classCallCheck(this, stHealthMax);
 
-    return _super57.call(this);
+    return _super61.call(this);
   }
 
   _createClass(stHealthMax, [{
@@ -11427,7 +11862,7 @@ var stHealthMax = /*#__PURE__*/function (_Stat2) {
 var stHealth = /*#__PURE__*/function (_Stat3) {
   _inherits(stHealth, _Stat3);
 
-  var _super58 = _createSuper(stHealth);
+  var _super62 = _createSuper(stHealth);
 
   _createClass(stHealth, null, [{
     key: "setup",
@@ -11450,7 +11885,7 @@ var stHealth = /*#__PURE__*/function (_Stat3) {
   function stHealth() {
     _classCallCheck(this, stHealth);
 
-    return _super58.call(this);
+    return _super62.call(this);
   }
 
   _createClass(stHealth, [{
@@ -11471,7 +11906,7 @@ var stHealth = /*#__PURE__*/function (_Stat3) {
 var stEnergyMax = /*#__PURE__*/function (_Stat4) {
   _inherits(stEnergyMax, _Stat4);
 
-  var _super59 = _createSuper(stEnergyMax);
+  var _super63 = _createSuper(stEnergyMax);
 
   _createClass(stEnergyMax, null, [{
     key: "setup",
@@ -11492,7 +11927,7 @@ var stEnergyMax = /*#__PURE__*/function (_Stat4) {
   function stEnergyMax() {
     _classCallCheck(this, stEnergyMax);
 
-    return _super59.call(this);
+    return _super63.call(this);
   }
 
   _createClass(stEnergyMax, [{
@@ -11513,7 +11948,7 @@ var stEnergyMax = /*#__PURE__*/function (_Stat4) {
 var stEnergy = /*#__PURE__*/function (_Stat5) {
   _inherits(stEnergy, _Stat5);
 
-  var _super60 = _createSuper(stEnergy);
+  var _super64 = _createSuper(stEnergy);
 
   _createClass(stEnergy, null, [{
     key: "setup",
@@ -11536,7 +11971,7 @@ var stEnergy = /*#__PURE__*/function (_Stat5) {
   function stEnergy() {
     _classCallCheck(this, stEnergy);
 
-    return _super60.call(this);
+    return _super64.call(this);
   }
 
   _createClass(stEnergy, [{
@@ -11557,7 +11992,7 @@ var stEnergy = /*#__PURE__*/function (_Stat5) {
 var stArousalMax = /*#__PURE__*/function (_Stat6) {
   _inherits(stArousalMax, _Stat6);
 
-  var _super61 = _createSuper(stArousalMax);
+  var _super65 = _createSuper(stArousalMax);
 
   _createClass(stArousalMax, null, [{
     key: "setup",
@@ -11578,7 +12013,7 @@ var stArousalMax = /*#__PURE__*/function (_Stat6) {
   function stArousalMax() {
     _classCallCheck(this, stArousalMax);
 
-    return _super61.call(this);
+    return _super65.call(this);
   }
 
   _createClass(stArousalMax, [{
@@ -11599,7 +12034,7 @@ var stArousalMax = /*#__PURE__*/function (_Stat6) {
 var stArousalMin = /*#__PURE__*/function (_Stat7) {
   _inherits(stArousalMin, _Stat7);
 
-  var _super62 = _createSuper(stArousalMin);
+  var _super66 = _createSuper(stArousalMin);
 
   _createClass(stArousalMin, null, [{
     key: "setup",
@@ -11620,7 +12055,7 @@ var stArousalMin = /*#__PURE__*/function (_Stat7) {
   function stArousalMin() {
     _classCallCheck(this, stArousalMin);
 
-    return _super62.call(this);
+    return _super66.call(this);
   }
 
   _createClass(stArousalMin, [{
@@ -11641,7 +12076,7 @@ var stArousalMin = /*#__PURE__*/function (_Stat7) {
 var stArousal = /*#__PURE__*/function (_Stat8) {
   _inherits(stArousal, _Stat8);
 
-  var _super63 = _createSuper(stArousal);
+  var _super67 = _createSuper(stArousal);
 
   _createClass(stArousal, null, [{
     key: "setup",
@@ -11665,7 +12100,7 @@ var stArousal = /*#__PURE__*/function (_Stat8) {
   function stArousal() {
     _classCallCheck(this, stArousal);
 
-    return _super63.call(this);
+    return _super67.call(this);
   }
 
   _createClass(stArousal, [{
@@ -11686,7 +12121,7 @@ var stArousal = /*#__PURE__*/function (_Stat8) {
 var stAgility = /*#__PURE__*/function (_Stat9) {
   _inherits(stAgility, _Stat9);
 
-  var _super64 = _createSuper(stAgility);
+  var _super68 = _createSuper(stAgility);
 
   _createClass(stAgility, null, [{
     key: "setup",
@@ -11710,7 +12145,7 @@ var stAgility = /*#__PURE__*/function (_Stat9) {
   function stAgility() {
     _classCallCheck(this, stAgility);
 
-    return _super64.call(this);
+    return _super68.call(this);
   }
 
   _createClass(stAgility, [{
@@ -11739,7 +12174,7 @@ var stAgility = /*#__PURE__*/function (_Stat9) {
 var stPerception = /*#__PURE__*/function (_Stat10) {
   _inherits(stPerception, _Stat10);
 
-  var _super65 = _createSuper(stPerception);
+  var _super69 = _createSuper(stPerception);
 
   _createClass(stPerception, null, [{
     key: "setup",
@@ -11761,7 +12196,7 @@ var stPerception = /*#__PURE__*/function (_Stat10) {
   function stPerception() {
     _classCallCheck(this, stPerception);
 
-    return _super65.call(this);
+    return _super69.call(this);
   }
 
   _createClass(stPerception, [{
@@ -11785,7 +12220,7 @@ var stPerception = /*#__PURE__*/function (_Stat10) {
 var stLuck = /*#__PURE__*/function (_Stat11) {
   _inherits(stLuck, _Stat11);
 
-  var _super66 = _createSuper(stLuck);
+  var _super70 = _createSuper(stLuck);
 
   _createClass(stLuck, null, [{
     key: "setup",
@@ -11807,7 +12242,7 @@ var stLuck = /*#__PURE__*/function (_Stat11) {
   function stLuck() {
     _classCallCheck(this, stLuck);
 
-    return _super66.call(this);
+    return _super70.call(this);
   }
 
   _createClass(stLuck, [{
@@ -11831,7 +12266,7 @@ var stLuck = /*#__PURE__*/function (_Stat11) {
 var stCharisma = /*#__PURE__*/function (_Stat12) {
   _inherits(stCharisma, _Stat12);
 
-  var _super67 = _createSuper(stCharisma);
+  var _super71 = _createSuper(stCharisma);
 
   _createClass(stCharisma, null, [{
     key: "setup",
@@ -11853,7 +12288,7 @@ var stCharisma = /*#__PURE__*/function (_Stat12) {
   function stCharisma() {
     _classCallCheck(this, stCharisma);
 
-    return _super67.call(this);
+    return _super71.call(this);
   }
 
   _createClass(stCharisma, [{
@@ -11877,7 +12312,7 @@ var stCharisma = /*#__PURE__*/function (_Stat12) {
 var stIntelligence = /*#__PURE__*/function (_Stat13) {
   _inherits(stIntelligence, _Stat13);
 
-  var _super68 = _createSuper(stIntelligence);
+  var _super72 = _createSuper(stIntelligence);
 
   _createClass(stIntelligence, null, [{
     key: "setup",
@@ -11899,7 +12334,7 @@ var stIntelligence = /*#__PURE__*/function (_Stat13) {
   function stIntelligence() {
     _classCallCheck(this, stIntelligence);
 
-    return _super68.call(this);
+    return _super72.call(this);
   }
 
   _createClass(stIntelligence, [{
@@ -11923,7 +12358,7 @@ var stIntelligence = /*#__PURE__*/function (_Stat13) {
 var stStrength = /*#__PURE__*/function (_Stat14) {
   _inherits(stStrength, _Stat14);
 
-  var _super69 = _createSuper(stStrength);
+  var _super73 = _createSuper(stStrength);
 
   _createClass(stStrength, null, [{
     key: "setup",
@@ -11946,7 +12381,7 @@ var stStrength = /*#__PURE__*/function (_Stat14) {
   function stStrength() {
     _classCallCheck(this, stStrength);
 
-    return _super69.call(this);
+    return _super73.call(this);
   }
 
   _createClass(stStrength, [{
@@ -11979,7 +12414,7 @@ var stStrength = /*#__PURE__*/function (_Stat14) {
 var stEndurance = /*#__PURE__*/function (_Stat15) {
   _inherits(stEndurance, _Stat15);
 
-  var _super70 = _createSuper(stEndurance);
+  var _super74 = _createSuper(stEndurance);
 
   _createClass(stEndurance, null, [{
     key: "setup",
@@ -12002,7 +12437,7 @@ var stEndurance = /*#__PURE__*/function (_Stat15) {
   function stEndurance() {
     _classCallCheck(this, stEndurance);
 
-    return _super70.call(this);
+    return _super74.call(this);
   }
 
   _createClass(stEndurance, [{
@@ -12035,7 +12470,7 @@ var stEndurance = /*#__PURE__*/function (_Stat15) {
 var stPAttack = /*#__PURE__*/function (_Stat16) {
   _inherits(stPAttack, _Stat16);
 
-  var _super71 = _createSuper(stPAttack);
+  var _super75 = _createSuper(stPAttack);
 
   _createClass(stPAttack, null, [{
     key: "setup",
@@ -12057,7 +12492,7 @@ var stPAttack = /*#__PURE__*/function (_Stat16) {
   function stPAttack() {
     _classCallCheck(this, stPAttack);
 
-    return _super71.call(this);
+    return _super75.call(this);
   }
 
   _createClass(stPAttack, [{
@@ -12078,7 +12513,7 @@ var stPAttack = /*#__PURE__*/function (_Stat16) {
 var stPDefense = /*#__PURE__*/function (_Stat17) {
   _inherits(stPDefense, _Stat17);
 
-  var _super72 = _createSuper(stPDefense);
+  var _super76 = _createSuper(stPDefense);
 
   _createClass(stPDefense, null, [{
     key: "setup",
@@ -12100,7 +12535,7 @@ var stPDefense = /*#__PURE__*/function (_Stat17) {
   function stPDefense() {
     _classCallCheck(this, stPDefense);
 
-    return _super72.call(this);
+    return _super76.call(this);
   }
 
   _createClass(stPDefense, [{
@@ -12121,7 +12556,7 @@ var stPDefense = /*#__PURE__*/function (_Stat17) {
 var stLAttack = /*#__PURE__*/function (_Stat18) {
   _inherits(stLAttack, _Stat18);
 
-  var _super73 = _createSuper(stLAttack);
+  var _super77 = _createSuper(stLAttack);
 
   _createClass(stLAttack, null, [{
     key: "setup",
@@ -12143,7 +12578,7 @@ var stLAttack = /*#__PURE__*/function (_Stat18) {
   function stLAttack() {
     _classCallCheck(this, stLAttack);
 
-    return _super73.call(this);
+    return _super77.call(this);
   }
 
   _createClass(stLAttack, [{
@@ -12164,7 +12599,7 @@ var stLAttack = /*#__PURE__*/function (_Stat18) {
 var stLDefense = /*#__PURE__*/function (_Stat19) {
   _inherits(stLDefense, _Stat19);
 
-  var _super74 = _createSuper(stLDefense);
+  var _super78 = _createSuper(stLDefense);
 
   _createClass(stLDefense, null, [{
     key: "setup",
@@ -12186,7 +12621,7 @@ var stLDefense = /*#__PURE__*/function (_Stat19) {
   function stLDefense() {
     _classCallCheck(this, stLDefense);
 
-    return _super74.call(this);
+    return _super78.call(this);
   }
 
   _createClass(stLDefense, [{
@@ -12207,7 +12642,7 @@ var stLDefense = /*#__PURE__*/function (_Stat19) {
 var stCorruptionMax = /*#__PURE__*/function (_Stat20) {
   _inherits(stCorruptionMax, _Stat20);
 
-  var _super75 = _createSuper(stCorruptionMax);
+  var _super79 = _createSuper(stCorruptionMax);
 
   _createClass(stCorruptionMax, null, [{
     key: "setup",
@@ -12228,7 +12663,7 @@ var stCorruptionMax = /*#__PURE__*/function (_Stat20) {
   function stCorruptionMax() {
     _classCallCheck(this, stCorruptionMax);
 
-    return _super75.call(this);
+    return _super79.call(this);
   }
 
   _createClass(stCorruptionMax, [{
@@ -12249,7 +12684,7 @@ var stCorruptionMax = /*#__PURE__*/function (_Stat20) {
 var stCorruption = /*#__PURE__*/function (_Stat21) {
   _inherits(stCorruption, _Stat21);
 
-  var _super76 = _createSuper(stCorruption);
+  var _super80 = _createSuper(stCorruption);
 
   _createClass(stCorruption, null, [{
     key: "setup",
@@ -12272,7 +12707,7 @@ var stCorruption = /*#__PURE__*/function (_Stat21) {
   function stCorruption() {
     _classCallCheck(this, stCorruption);
 
-    return _super76.call(this);
+    return _super80.call(this);
   }
 
   _createClass(stCorruption, [{
@@ -12295,7 +12730,7 @@ var stCorruption = /*#__PURE__*/function (_Stat21) {
 var stFetish = /*#__PURE__*/function (_Stat22) {
   _inherits(stFetish, _Stat22);
 
-  var _super77 = _createSuper(stFetish);
+  var _super81 = _createSuper(stFetish);
 
   _createClass(stFetish, null, [{
     key: "setup",
@@ -12336,7 +12771,7 @@ var stFetish = /*#__PURE__*/function (_Stat22) {
   function stFetish() {
     _classCallCheck(this, stFetish);
 
-    return _super77.call(this);
+    return _super81.call(this);
   }
 
   return stFetish;
@@ -12346,16 +12781,16 @@ var stFetish = /*#__PURE__*/function (_Stat22) {
 var effEnergized = /*#__PURE__*/function (_Effect2) {
   _inherits(effEnergized, _Effect2);
 
-  var _super78 = _createSuper(effEnergized);
+  var _super82 = _createSuper(effEnergized);
 
   function effEnergized() {
-    var _this40;
+    var _this44;
 
     _classCallCheck(this, effEnergized);
 
-    _this40 = _super78.call(this);
-    _this40.data.id = _this40.data.name = effEnergized.name, _this40.data.duration = 120;
-    return _this40;
+    _this44 = _super82.call(this);
+    _this44.data.id = _this44.data.name = effEnergized.name, _this44.data.duration = 120;
+    return _this44;
   }
 
   _createClass(effEnergized, [{
@@ -12426,16 +12861,16 @@ var effEnergized = /*#__PURE__*/function (_Effect2) {
 var effNotTired = /*#__PURE__*/function (_Effect3) {
   _inherits(effNotTired, _Effect3);
 
-  var _super79 = _createSuper(effNotTired);
+  var _super83 = _createSuper(effNotTired);
 
   function effNotTired() {
-    var _this41;
+    var _this45;
 
     _classCallCheck(this, effNotTired);
 
-    _this41 = _super79.call(this);
-    _this41.data.id = effNotTired.name, _this41.data.name = "not tired", _this41.data.duration = 120, _this41.data.hidden = 4;
-    return _this41;
+    _this45 = _super83.call(this);
+    _this45.data.id = effNotTired.name, _this45.data.name = "not tired", _this45.data.duration = 120, _this45.data.hidden = 4;
+    return _this45;
   }
 
   _createClass(effNotTired, [{
@@ -12495,16 +12930,16 @@ var effNotTired = /*#__PURE__*/function (_Effect3) {
 var effTired = /*#__PURE__*/function (_Effect4) {
   _inherits(effTired, _Effect4);
 
-  var _super80 = _createSuper(effTired);
+  var _super84 = _createSuper(effTired);
 
   function effTired() {
-    var _this42;
+    var _this46;
 
     _classCallCheck(this, effTired);
 
-    _this42 = _super80.call(this);
-    _this42.data.id = effTired.name, _this42.data.name = "tired", _this42.data.duration = 120, _this42.data.hidden = 0;
-    return _this42;
+    _this46 = _super84.call(this);
+    _this46.data.id = effTired.name, _this46.data.name = "tired", _this46.data.duration = 120, _this46.data.hidden = 0;
+    return _this46;
   }
 
   _createClass(effTired, [{
@@ -12570,17 +13005,17 @@ var effTired = /*#__PURE__*/function (_Effect4) {
 var effMutateCat = /*#__PURE__*/function (_Effect5) {
   _inherits(effMutateCat, _Effect5);
 
-  var _super81 = _createSuper(effMutateCat);
+  var _super85 = _createSuper(effMutateCat);
 
   function effMutateCat() {
-    var _this43;
+    var _this47;
 
     _classCallCheck(this, effMutateCat);
 
-    _this43 = _super81.call(this);
-    _this43.data.id = _this43.data.name = effMutateCat.name, _this43.data.hidden = 0;
-    _this43.data.duration = 60, _this43.data.cycles = 3, _this43.data.magnitude = 3;
-    return _this43;
+    _this47 = _super85.call(this);
+    _this47.data.id = _this47.data.name = effMutateCat.name, _this47.data.hidden = 0;
+    _this47.data.duration = 60, _this47.data.cycles = 3, _this47.data.magnitude = 3;
+    return _this47;
   }
 
   _createClass(effMutateCat, [{
@@ -12643,17 +13078,17 @@ var effMutateCat = /*#__PURE__*/function (_Effect5) {
 var effMutateWolf = /*#__PURE__*/function (_Effect6) {
   _inherits(effMutateWolf, _Effect6);
 
-  var _super82 = _createSuper(effMutateWolf);
+  var _super86 = _createSuper(effMutateWolf);
 
   function effMutateWolf() {
-    var _this44;
+    var _this48;
 
     _classCallCheck(this, effMutateWolf);
 
-    _this44 = _super82.call(this);
-    _this44.data.id = _this44.data.name = effMutateWolf.name, _this44.data.hidden = 0;
-    _this44.data.duration = 60, _this44.data.cycles = 3, _this44.data.magnitude = 3;
-    return _this44;
+    _this48 = _super86.call(this);
+    _this48.data.id = _this48.data.name = effMutateWolf.name, _this48.data.hidden = 0;
+    _this48.data.duration = 60, _this48.data.cycles = 3, _this48.data.magnitude = 3;
+    return _this48;
   }
 
   _createClass(effMutateWolf, [{
@@ -12716,17 +13151,17 @@ var effMutateWolf = /*#__PURE__*/function (_Effect6) {
 var effGrowBreast = /*#__PURE__*/function (_Effect7) {
   _inherits(effGrowBreast, _Effect7);
 
-  var _super83 = _createSuper(effGrowBreast);
+  var _super87 = _createSuper(effGrowBreast);
 
   function effGrowBreast() {
-    var _this45;
+    var _this49;
 
     _classCallCheck(this, effGrowBreast);
 
-    _this45 = _super83.call(this);
-    _this45.data.id = _this45.data.name = effGrowBreast.name, _this45.data.duration = 60, _this45.data.hidden = 0;
-    _this45.data.cycles = 3, _this45.data.magnitude = 3;
-    return _this45;
+    _this49 = _super87.call(this);
+    _this49.data.id = _this49.data.name = effGrowBreast.name, _this49.data.duration = 60, _this49.data.hidden = 0;
+    _this49.data.cycles = 3, _this49.data.magnitude = 3;
+    return _this49;
   }
 
   _createClass(effGrowBreast, [{
@@ -12788,17 +13223,17 @@ var effGrowBreast = /*#__PURE__*/function (_Effect7) {
 var effGrowVulva = /*#__PURE__*/function (_Effect8) {
   _inherits(effGrowVulva, _Effect8);
 
-  var _super84 = _createSuper(effGrowVulva);
+  var _super88 = _createSuper(effGrowVulva);
 
   function effGrowVulva() {
-    var _this46;
+    var _this50;
 
     _classCallCheck(this, effGrowVulva);
 
-    _this46 = _super84.call(this);
-    _this46.data.id = _this46.data.name = effGrowVulva.name, _this46.data.duration = 60, _this46.data.hidden = 0;
-    _this46.data.cycles = 3, _this46.data.magnitude = 3;
-    return _this46;
+    _this50 = _super88.call(this);
+    _this50.data.id = _this50.data.name = effGrowVulva.name, _this50.data.duration = 60, _this50.data.hidden = 0;
+    _this50.data.cycles = 3, _this50.data.magnitude = 3;
+    return _this50;
   }
 
   _createClass(effGrowVulva, [{
@@ -12861,17 +13296,17 @@ var effGrowVulva = /*#__PURE__*/function (_Effect8) {
 var effHeal = /*#__PURE__*/function (_CombatEffect) {
   _inherits(effHeal, _CombatEffect);
 
-  var _super85 = _createSuper(effHeal);
+  var _super89 = _createSuper(effHeal);
 
   function effHeal(amount) {
-    var _this47;
+    var _this51;
 
     _classCallCheck(this, effHeal);
 
-    _this47 = _super85.call(this);
-    _this47.amount = amount;
-    _this47.data.id = _this47.data.name = effHeal.name, _this47.data.duration = 0, _this47.data.hidden = 0;
-    return _this47;
+    _this51 = _super89.call(this);
+    _this51.amount = amount;
+    _this51.data.id = _this51.data.name = effHeal.name, _this51.data.duration = 0, _this51.data.hidden = 0;
+    return _this51;
   }
 
   _createClass(effHeal, [{
@@ -12925,17 +13360,17 @@ var effHeal = /*#__PURE__*/function (_CombatEffect) {
 var effGuard = /*#__PURE__*/function (_CombatEffect2) {
   _inherits(effGuard, _CombatEffect2);
 
-  var _super86 = _createSuper(effGuard);
+  var _super90 = _createSuper(effGuard);
 
   function effGuard(amount) {
-    var _this48;
+    var _this52;
 
     _classCallCheck(this, effGuard);
 
-    _this48 = _super86.call(this);
-    _this48.amount = amount;
-    _this48.data.id = _this48.data.name = effGuard.name, _this48.data.duration = 0, _this48.data.hidden = 0;
-    return _this48;
+    _this52 = _super90.call(this);
+    _this52.amount = amount;
+    _this52.data.id = _this52.data.name = effGuard.name, _this52.data.duration = 0, _this52.data.hidden = 0;
+    return _this52;
   }
 
   _createClass(effGuard, [{
@@ -12997,17 +13432,17 @@ var effGuard = /*#__PURE__*/function (_CombatEffect2) {
 var effDamage = /*#__PURE__*/function (_CombatEffect3) {
   _inherits(effDamage, _CombatEffect3);
 
-  var _super87 = _createSuper(effDamage);
+  var _super91 = _createSuper(effDamage);
 
   function effDamage(amount) {
-    var _this49;
+    var _this53;
 
     _classCallCheck(this, effDamage);
 
-    _this49 = _super87.call(this);
-    _this49.amount = amount;
-    _this49.data.id = _this49.data.name = effDamage.name, _this49.data.duration = 0, _this49.data.hidden = 0;
-    return _this49;
+    _this53 = _super91.call(this);
+    _this53.amount = amount;
+    _this53.data.id = _this53.data.name = effDamage.name, _this53.data.duration = 0, _this53.data.hidden = 0;
+    return _this53;
   }
 
   _createClass(effDamage, [{
@@ -13059,17 +13494,17 @@ var effDamage = /*#__PURE__*/function (_CombatEffect3) {
 var effTeaseDamage = /*#__PURE__*/function (_CombatEffect4) {
   _inherits(effTeaseDamage, _CombatEffect4);
 
-  var _super88 = _createSuper(effTeaseDamage);
+  var _super92 = _createSuper(effTeaseDamage);
 
   function effTeaseDamage(amount) {
-    var _this50;
+    var _this54;
 
     _classCallCheck(this, effTeaseDamage);
 
-    _this50 = _super88.call(this);
-    _this50.amount = amount;
-    _this50.data.id = _this50.data.name = effTeaseDamage.name, _this50.data.duration = 0, _this50.data.hidden = 0;
-    return _this50;
+    _this54 = _super92.call(this);
+    _this54.amount = amount;
+    _this54.data.id = _this54.data.name = effTeaseDamage.name, _this54.data.duration = 0, _this54.data.hidden = 0;
+    return _this54;
   }
 
   _createClass(effTeaseDamage, [{
@@ -13122,16 +13557,16 @@ var effTeaseDamage = /*#__PURE__*/function (_CombatEffect4) {
 var effStunned = /*#__PURE__*/function (_CombatEffect5) {
   _inherits(effStunned, _CombatEffect5);
 
-  var _super89 = _createSuper(effStunned);
+  var _super93 = _createSuper(effStunned);
 
   function effStunned() {
-    var _this51;
+    var _this55;
 
     _classCallCheck(this, effStunned);
 
-    _this51 = _super89.call(this);
-    _this51.data.id = _this51.data.name = effStunned.name, _this51.data.duration = 2;
-    return _this51;
+    _this55 = _super93.call(this);
+    _this55.data.id = _this55.data.name = effStunned.name, _this55.data.duration = 2;
+    return _this55;
   }
 
   _createClass(effStunned, [{
@@ -13182,16 +13617,16 @@ var effStunned = /*#__PURE__*/function (_CombatEffect5) {
 var effCallHelp = /*#__PURE__*/function (_CombatEffect6) {
   _inherits(effCallHelp, _CombatEffect6);
 
-  var _super90 = _createSuper(effCallHelp);
+  var _super94 = _createSuper(effCallHelp);
 
   function effCallHelp() {
-    var _this52;
+    var _this56;
 
     _classCallCheck(this, effCallHelp);
 
-    _this52 = _super90.call(this);
-    _this52.data.id = _this52.data.name = effCallHelp.name, _this52.data.duration = 2;
-    return _this52;
+    _this56 = _super94.call(this);
+    _this56.data.id = _this56.data.name = effCallHelp.name, _this56.data.duration = 2;
+    return _this56;
   }
 
   _createClass(effCallHelp, [{
@@ -13252,16 +13687,16 @@ var effCallHelp = /*#__PURE__*/function (_CombatEffect6) {
 var skCooking = /*#__PURE__*/function (_Effect9) {
   _inherits(skCooking, _Effect9);
 
-  var _super91 = _createSuper(skCooking);
+  var _super95 = _createSuper(skCooking);
 
   function skCooking() {
-    var _this53;
+    var _this57;
 
     _classCallCheck(this, skCooking);
 
-    _this53 = _super91.call(this);
-    _this53.data.id = _this53.data.name = skCooking.name;
-    return _this53;
+    _this57 = _super95.call(this);
+    _this57.data.id = _this57.data.name = skCooking.name;
+    return _this57;
   }
 
   _createClass(skCooking, [{
@@ -13337,7 +13772,7 @@ window.gm.StatsLib = function (StatsLib) {
   return StatsLib;
 }(window.gm.StatsLib || {});
 /* twine-user-script #2: "Story JavaScript" */
-</script><tw-tag name="_isdeffered_" color="brown"></tw-tag><tw-tag name="template" color="orange"></tw-tag><tw-tag name="_back_" color="gray"></tw-tag><tw-tag name="_nosave_" color="yellow"></tw-tag><tw-tag name="_nodeffered_" color="yellow"></tw-tag><tw-passagedata pid="1" name="Info_Jake" tags="_back_" position="100,100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
+</script><tw-tag name="_back_" color="gray"></tw-tag><tw-tag name="_nosave_" color="yellow"></tw-tag><tw-tag name="_nodeffered_" color="yellow"></tw-tag><tw-tag name="_isdeffered_" color="brown"></tw-tag><tw-tag name="template" color="orange"></tw-tag><tw-passagedata pid="1" name="Info_Jake" tags="_back_" position="100,100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 Jake is here.&lt;/br&gt;
 You barely know anything about him.&lt;/br&gt;
 [[Back|_back_]]&lt;/br&gt;&lt;/br&gt;
@@ -13430,33 +13865,22 @@ But you keep your stats and skills (*1).
 &lt;/div&gt;
 &lt;div id=&#39;choice1a&#39; hidden&gt;
 &lt;/div&gt;</tw-passagedata><tw-passagedata pid="8" name="CursedCollar" tags="" position="975,100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
-&quot;Let me see. Hm.. I&#39;m not sure but I think I cant you help with that one. There is a lock but I&#39;m not a locksmith.&quot;
-&lt;p class=&quot;tPC&quot;&gt;&quot;And do you know where to find one?&quot;&lt;/p&gt;
-&quot;There is a town east of here, called Elderant. I dont know that place to well but you might be able to find someone that can unlock this thing.&quot;
-&lt;p class=&quot;tPC&quot;&gt;&quot;There is a town nearby?&quot;&lt;/p&gt;
-&quot;Nearby is relative. Its about a 3 or 4 days walk I guess. As I think over it, maybe you shouldnt go. It can be dangerous traveling alone.&quot;
-&lt;p class=&quot;tPC&quot;&gt;&quot;More dangerous than the forest? I died on the first visit of this damn forest ... by an stupid accident !&quot;&lt;/p&gt;
-&quot;The forest isnt dangerous. I never had any issues. Maybe you just had a little bad luck.&quot;
-An idea forms in your mind: when I die, I lose the equipment. 
-Of ourse dying would be bad if it causes a large loss. But right now you just have little to no gear and will be replenished with a new set.
-You smirk to yourself for your ingenuity. 
-&#39;So if I dont have any other option, I still just need to find a way to die to get rid of that thing.&#39;
-[[But I dont wanna die]] [[Death is a solution]] [[I will just ignore the device]]
+
 &lt;div&gt;&lt;/br&gt;
 [[Next|NOP]]&lt;/br&gt;&lt;/div&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="9" name="YouDiedWithCursedGear" tags="" position="1100,100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &quot;Choosen one, this is a shrine of restoration!&quot; ... the acolyte starts heir rant.&lt;/br&gt;
-&quot;Yeah, I know. I just got ass kicked again. At least I got rid of that freaking ... &quot;&lt;/br&gt;
+&lt;p class=&quot;tPC&quot;&gt;&quot;Yeah, I know. I just got ass kicked again. At least I got rid of that freaking cursed... &quot;&lt;/p&gt;&lt;/br&gt;
 But that damned thing is still there!&lt;/br&gt;
-&quot;Hey, why is everthing gone except this?&quot;
+&lt;p class=&quot;tPC&quot;&gt;&quot;Hey, why is everthing gone except this?&quot;&lt;/p&gt;
 &quot;At times the heros burden is increased by evil deeds and his epic story is extended further by finding closure for his curse.&quot; the priestess chants, holding out heir hands upward to heir gods.&lt;/br&gt;
-&quot;So I&#39;m stuck with cursed gear but have to let go the good one?&quot;
+&lt;p class=&quot;tPC&quot;&gt;&quot;So I&#39;m stuck with cursed gear but have to let go the good one?&quot;&lt;/p&gt;
 &lt;p class=&#39;dev&#39;&gt;Some gear will stick to you. That doesnt need to be cursed one. In fact you can buy special gear that is bonded to you.&lt;/p&gt;
 &lt;/br&gt;&lt;a0 id=&#39;1&#39; onclick=&#39;foo(this)&#39;&gt;This sucks&lt;/a&gt; &lt;a0 id=&#39;2&#39; onclick=&#39;foo(this)&#39;&gt;Would have been to easy&lt;/a&gt; &lt;a0 id=&#39;3&#39; onclick=&#39;foo(this)&#39;&gt;Its an incentive to not die&lt;/a&gt;&lt;/br&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
 &lt;script&gt; function foo(select) {
     window.gm.quests.forceQuestMilestone(&quot;qDiedAgain&quot;,200,100);
-    window.story.show(&quot;&quot;)
+    window.story.show(&quot;ForestRespawnPodExit&quot;);
 }
 &lt;/script&gt;</tw-passagedata><tw-passagedata pid="10" name="YouDiedBeforeOrgasm" tags="" position="1225,100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 Delicate sensations builds in your nethers. 
@@ -16071,21 +16495,25 @@ There is a wolf again. Or is it the same?&lt;/br&gt;
 &lt;%=(window.story.state._gm.debug)?(&quot;[[Skip|_back_]]&quot;):(&quot;&quot;)%&gt;&lt;/br&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="136" name="ForestEntrance" tags="" position="725,1725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.moveHere();%&gt;
-The forest makes a friendly impression.  &lt;/br&gt; The trees are still light and are not yet as expansive and large as that no more light can get through the canopy. 
-&lt;/br&gt; 
+The forest makes a friendly impression.&lt;/br&gt; The trees are still light and are not yet as expansive and large as that no more light can get through the canopy.&lt;/br&gt; 
 Maybe you can &lt;a0 onclick=&#39;explore(); &#39;&gt;explore&lt;/a&gt; the surrounding woods and see if you can find anything useful.&lt;/br&gt;
 &lt;%=(window.story.state._gm.debug)?(&quot;[[ForestWolfEncounter]]&quot;):(&quot;&quot;)%&gt;&lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;[[ForestBorder]] [[ForestCliff]] &lt;/br&gt;&lt;/div&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
 &lt;script&gt; function explore() {
     let rnd = _.random(0,100);
+    window.gm.pushLog(&quot;rolled &quot;+rnd);
     window.story.state.tmp.args = [];
-    if(window.gm.quests.getMilestoneState(&quot;qDiedAgain&quot;).id&lt;=2 &amp;&amp; window.gm.player.Inv.countItem(&#39;PurpleBerry&#39;)&gt;=3) {
+    if(window.gm.quests.getMilestoneState(&quot;qDiedAgain&quot;).id&lt;=2 &amp;&amp; window.gm.player.Inv.countItem(&#39;PurpleBerry&#39;)&gt;=2) {
         window.story.state.tmp.args = [&#39;PurpleBerry&#39;,0];window.story.show(&#39;ForestSearchAround&#39;); //find nothing !
+    } else if(!window.gm.quests.hasActiveQuest(&quot;qCarlia&quot;) &amp;&amp; window.gm.player.Inv.countItem(&#39;PurpleBerry&#39;)&gt;=3) {
+        window.story.show(&#39;ForestMeetCarlia1&#39;);
+    } else if(window.gm.quests.getMilestoneState(&quot;qCarlia&quot;).id===100 &amp;&amp; window.gm.player.Inv.countItem(&#39;PurpleBerry&#39;)&gt;=4) {
+        window.story.show(&#39;ForestMeetCarlia2&#39;);
     } else if(rnd &gt; 70 ) {
          window.story.show(&#39;ForestWolfEncounter&#39;);
     } else if(rnd &gt; 20) { //todo limit berys per day
-        let find = [&#39;PurpleBerry&#39;,&#39;ApocaFlower&#39;];
+        let find = [&#39;PurpleBerry&#39;,&#39;PurpleBerry&#39;,&#39;ApocaFlower&#39;];
         let rnd2 = _.random(0,find.length-1);
         window.story.state.tmp.args = [find[rnd2],1]
         window.story.show(&#39;ForestSearchAround&#39;);
@@ -16094,11 +16522,36 @@ Maybe you can &lt;a0 onclick=&#39;explore(); &#39;&gt;explore&lt;/a&gt; the surr
         window.story.show(&#39;ForestSearchAround&#39;); //nothing
     }
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="137" name="ForestCliff" tags="" position="850,1725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="137" name="ForestMeetCarlia1" tags="_nosave_ _back_" position="850,1725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+Standing around and thinking where to go next, you get the feeling of beeing watched.&lt;/br&gt;
+You listen carefully but can&#39;t pickup any unusual noise or other sign that something is sneaking up on you.&lt;/br&gt;&lt;/br&gt;
+Then you turn around.&lt;/br&gt;&lt;/br&gt;
+Nothing.&lt;/br&gt;
+You turn slowly and let your eyes wander. &lt;/br&gt;
+That tree there, did you just see something vanishing behind it?&lt;/br&gt;&lt;/br&gt;
+&lt;/br&gt;&lt;div&gt; &lt;a0 onclick=&#39;window.gm.quests.addQuest(&quot;qCarlia&quot;,100);window.story.show(&quot;_back_&quot;);&#39;&gt;Next&lt;/a&gt;&lt;/br&gt;&lt;/div&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="138" name="ForestMeetCarlia2" tags="_nosave_ _back_" position="975,1725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+Again you have the feeling on beeing watched, maybe you also heard some rustling in one of those bushes behind you.&lt;/br&gt;
+You decide to go onward. Some way ahead are several large trees and as you already know one of them has a large hollow.&lt;/br&gt;
+As you make your way through the trees, as soon as you think you are out of line of sight, you hide into the musty opening and fall silent.&lt;/br&gt;
+Holding your breath, you listen carefully.The birds are singing and the wind lets the leaves rustle but nothing else.&lt;/br&gt;
+You wait a minute and just as you decide to get back on your way, you hear a dry twig breaking some meters back where you came from.&lt;/br&gt;
+&lt;div id=&#39;select1&#39; &gt;
+&lt;a0 onclick=&#39;window.gm.printTalkLink($(&quot;div#select1&quot;)[0],&quot;div#choice1a&quot;)&#39;&gt;Jump out of your cover&lt;/a&gt;
+&lt;/div&gt;&lt;div id=&#39;choice1a&#39; hidden&gt;&lt;/br&gt;
+Ejecting yourself out of your cover and facing the direction of the noise, you can discern a figure trying to hide in the shadow of a tree trunk.
+Your eyes need to adapt a moment and in that moment the figur starts running away.
+&lt;p class=&quot;tPC&quot;&gt;&quot;Hey you wait !&quot;&lt;/p&gt;
+But however it was has vanished in the undergrow.
+You werent sure what you saw, but it seemed to be around your size and was moving upright. The murky cloak it was wearing preented to see more details.
+&lt;p class=&quot;tPC&quot;&gt;&#39;So I were right, someone is hiding around. If I can follow their trail, I might find out who it is.&#39;&lt;/p&gt;
+The figure was running into the direction of the cliff. But that might also be a diversion.
+&lt;div&gt; &lt;a0 onclick=&#39;window.gm.quests.forceQuestMilestone(&quot;qCarlia&quot;,200,100);window.story.show(&quot;_back_&quot;);&#39;&gt;Next&lt;/a&gt;&lt;/br&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="139" name="ForestCliff" tags="" position="1100,1725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.moveHere();%&gt;
-You fight your way through the dense undergrowth and realize just in time that you have reached the edge of a cliff.&lt;/br&gt; 
-&lt;/br&gt; 
 &lt;% if(window.gm.quests.getMilestoneState(&quot;qDiedAgain&quot;).id===2) { %&gt;
+You fight your way through the dense undergrowth and realize just in time that you have reached the edge of a cliff.&lt;/br&gt; 
 &lt;div id=&#39;select1&#39; &gt;
 &lt;a0 onclick=&#39;window.gm.printTalkLink($(&quot;div#select1&quot;)[0],&quot;div#choice1a&quot;)&#39;&gt;Peak into the chasm&lt;/a&gt;
 &lt;/div&gt;
@@ -16120,31 +16573,51 @@ At some point you see a massive rock coming onto you, reaching out with your han
 But of course its futile trying to catch that crushing weight. &lt;/br&gt;  
 You dont feel any pain, everything is just going &lt;a0 onclick=&#39;window.gm.respawn();&#39;&gt;black&lt;/a&gt; as if pulling the cord from a TV.&lt;/br&gt;  
 &lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;% } else if(window.gm.quests.getMilestoneState(&quot;qCarlia&quot;).id===200) { %&gt;
+Walking along the edge of the cliff, you check the ground. Maybe you can find some footprints or something that would help you track down the figure that stalked you.
+And really you can find one footprint in the muddy leftovers of a rain puddle. 
+&lt;p class=&quot;tPC&quot;&gt;&#39;It looks like from a boot - is it my own? No, mine is not as broad but longer&#39; &lt;/p&gt;
+You go forward where you would guess someone would be walking, carefully watching not to miss another clue or falling down the cliff. 
+&lt;a0 onclick=&#39;window.gm.quests.forceQuestMilestone(&quot;qCarlia&quot;,300,200);window.story.show(&quot;ForestCliff&quot;);&#39;&gt;Next&lt;/a&gt;&lt;/br&gt;
 &lt;% } else {%&gt;
 &lt;div&gt;
 A path leads along the cliff until it vanishs into a [[cave entrance|ForestCliffCave]] .  
 Or you might just return to [[ForestEntrance]]. &lt;/br&gt;&lt;/div&gt; 
 &lt;%}%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="138" name="ForestCliffCave" tags="" position="975,1725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="140" name="ForestCliffCave" tags="" position="1225,1725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.moveHere();%&gt;
-&lt;% if(window.gm.quests.getMilestoneState(&quot;qBondageKink&quot;).id&lt;=1) { %&gt;
-&lt;%window.gm.player.Outfit.addItem(new window.gm.ItemsLib[&quot;CollarQuest&quot;]());window.gm.quests.forceQuestMilestone(&quot;qBondageKink&quot;,100,1);%&gt;
-&lt;!--todo--&gt; !!! You got some kind of collar !!!
-Using both hands to feel up that ring around your neck, trying to get an idea what it is.&lt;/br&gt;
-It is made from some rigid material, maybe leather. The surface is mostly smooth and flat. Its broad as a thumb but only half a cm thick.&lt;/br&gt;
-&#39;Its some kind of choker. How do I get it off ?!&#39; &lt;/br&gt; You cant make out a latch or buckle.&lt;/br&gt;&lt;/br&gt;
-Maybe you can ask someone for help. 
-[[Leave|ForestCliff]].
+&lt;% if(window.gm.quests.getMilestoneState(&quot;qBondageKink&quot;).id&lt;=1 &amp;&amp; window.gm.quests.getMilestoneState(&quot;qCarlia&quot;).id===300) { %&gt;
+At some point the small path leads further downward the cliff, makes a curve and ends in front of a cave.&lt;/br&gt;
+The cave entrance is possibly 5m in width and around 3m at its heighest point. It tapers while it goes inside the cliff but maybe it doesnt end soon, its just to dark to see if it goes on. 
+Someone made himself a home here. There is a small fireplace with burned up charcoal and a sleeping mat.&lt;/br&gt;
+As you snoop around you find a worn bag or satchel made of leather and fur.&lt;/br&gt;
+It could give you some information about its owner if you take a look at it.&lt;/br&gt;
+&lt;div id=&#39;select1&#39; &gt;
+&lt;a0 onclick=&#39;window.gm.printTalkLink($(&quot;div#select1&quot;)[0],&quot;div#choice1a&quot;)&#39;&gt;Peek inside&lt;/a&gt;
+&lt;a0 onclick=&#39;window.gm.printTalkLink($(&quot;div#select1&quot;)[0],&quot;div#choice1b&quot;)&#39;&gt;or dont&lt;/a&gt;
+&lt;/div&gt;&lt;div id=&#39;choice1a&#39; hidden&gt;
+After undoing the clasp, you carefuly peek inside the bag.
+&lt;p class=&quot;tPC&quot;&gt;&#39;I&#39;m not going to stick my hand in it - better safe then sorry.&#39;&lt;/p&gt;
+Just as you think those smartass-words, something bursts out of the void into your face.&lt;/br&gt;
+You stumble backwards in surprise, letting the bag fall to the ground and trying to grab whatever is now moving around on your front.&lt;/br&gt;
+The uneven floor lets you loose your footing and you fall on your back beeing stunned just for an blink of an eye.&lt;/br&gt;
+But in this moment, the snake - you guess - squirms up around your neck and ... enclose it ??&lt;/br&gt;
+Using both hands to feel up around your neck, trying to get an idea what is now circling it. It doesnt move anymore and thats a good sign, right?&lt;/br&gt;
+You feel a ring made from some rigid material, most likely leather. The surface is mostly smooth and flat. Its broad as a thumb but only half a cm thick.&lt;/br&gt;
+&#39;Its some kind of choker. How do I get it off ?!&#39; &lt;/br&gt; 
+You cant make out a latch or buckle.&lt;/br&gt; Fitting 2 fingers between it and your throat is barely possible without choking yourself&lt;/br&gt;
+Maybe you can ask someone for help.&lt;/br&gt;
+&lt;a0 onclick=&#39;window.gm.player.Outfit.addItem(new window.gm.ItemsLib[&quot;CollarQuest&quot;]());window.gm.quests.forceQuestMilestone(&quot;qCarlia&quot;,500,300);window.gm.quests.forceQuestMilestone(&quot;qBondageKink&quot;,100,1);window.story.show(&quot;ForestCliff&quot;)&#39;&gt;Leave&lt;/a&gt;
+&lt;/div&gt;
+&lt;div id=&#39;choice1b&#39; hidden&gt;
+Come on, what kind of adventurer are you? How will you ever get good loot if you dont open every chest and jar you find - or stinky old leatherbags.
+&lt;a0 onclick=&#39;window.gm.printTalkLink($(&quot;div#choice1b&quot;)[0],&quot;div#choice1a&quot;)&#39;&gt;Peek inside&lt;/a&gt;
+&lt;/div&gt;
 &lt;% } else {%&gt;
 &lt;div&gt;
-&lt;a0 onclick=&#39;enterBeehive(); &#39;&gt;Enter Beehive&lt;/a&gt;&lt;/br&gt;
-Or you might just return to [[ForestEntrance]]. &lt;/br&gt;&lt;/div&gt; 
+Just return to [[ForestCliff]]. &lt;/br&gt;&lt;/div&gt; 
 &lt;%}%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
-&lt;script&gt; function enterBeehive() {
-    window.gm.dng = window.gm.dngs.BeeHive();
-    window.gm.dng.enterDungeon();
-}</tw-passagedata><tw-passagedata pid="139" name="ForestStoneCircle" tags="" position="1100,1725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="141" name="ForestStoneCircle" tags="" position="100,1850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.moveHere();%&gt;
 &lt;!--todo--&gt; Aus dem dichten Unterholz trittst du auf eine Lichtung. Das wäre ein idylischer Ort wenn nicht dieser Steinkreis wäre.&lt;/br&gt; 
 &lt;/br&gt; 
@@ -16159,9 +16632,13 @@ Ansonsten gibt es hier nichts.&lt;/br&gt;
 &lt;/div&gt;
 &lt;% } else {%&gt;
 &lt;div&gt;
-[[ForestEntrance]] &lt;/br&gt;&lt;/div&gt; 
+[[ForestEntrance]] &lt;a0 onclick=&#39;enterBeehive(); &#39;&gt;Enter Beehive&lt;/a&gt;&lt;/br&gt; &lt;/br&gt;&lt;/div&gt; 
 &lt;%}%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="140" name="ForestAlchemistTalk" tags="_nosave_" position="1225,1725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
+&lt;script&gt; function enterBeehive() {
+    window.gm.dng = window.gm.dngs.BeeHive();
+    window.gm.dng.enterDungeon();
+}</tw-passagedata><tw-passagedata pid="142" name="ForestAlchemistTalk" tags="_nosave_" position="225,1850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;% if(!window.gm.quests.hasActiveQuest(&quot;qPurpleBerry&quot;) || window.gm.quests.getMilestoneState(&quot;qPurpleBerry&quot;).id&lt;1) { %&gt;
 &lt;p class=&#39;tPC&#39;&gt;&quot;Hello? Anyone there?&quot;&lt;/p&gt;
 A man appears from a door at the side of the room. Worn old clothing adorns his lithe frame. 
@@ -16196,6 +16673,25 @@ Now that I think about it, we could make a trade: you get me some purple berrys,
 &quot;Very good. Like I said I will give you 2 potions for those.&quot;
 &lt;a0 onclick=&#39;window.gm.refreshAllPanel();&#39;&gt;Next&lt;/a&gt;
 &lt;/div&gt;&lt;div id=&#39;choice1b&#39; hidden&gt;&lt;/div&gt;
+&lt;% } else if(window.gm.quests.getMilestoneState(&quot;qBondageKink&quot;).id===100) {%&gt;
+&lt;p class=&quot;tPC&quot;&gt;&quot;Hello. sorry to bother you again but can you take a look at this.&quot;&lt;/p&gt;
+You tilt your head to a side and point at the choker.&lt;/br&gt;
+&quot;Fancy. You are in this sort of thing?&quot;&lt;/br&gt;
+&lt;p class=&quot;tPC&quot;&gt;&quot;What? No! This somehow attached itself on me. I want to get it off!&lt;/p&gt;
+&quot;Let me see. Hm.. I&#39;m not sure if this here is a locking mechanic.. I think I cant help you with that one. A locksmith might be the right person to ask.&quot;
+&lt;p class=&quot;tPC&quot;&gt;&quot;And do you know where to find one?&quot;&lt;/p&gt;
+&quot;There is a town east of here, called Elderant. You might be able to find someone that can unlock this thing there.&quot;
+&lt;p class=&quot;tPC&quot;&gt;&quot;There is a town nearby?&quot;&lt;/p&gt;
+&quot;Nearby is relative. Its about a 3 or 4 days walk I guess. As I think over it, maybe you shouldnt go. It can be dangerous traveling alone.&quot;
+&lt;p class=&quot;tPC&quot;&gt;&quot;More dangerous than the forest? I died on the first visit of this damn forest ... by an stupid accident !&quot;&lt;/p&gt;
+&quot;The forest isnt dangerous. I never had any issues. Maybe you just had a little bad luck.&quot;
+An idea forms in your mind: &lt;span class=&quot;tPC&quot;&gt;&#39;when I die, I lose the equipment&#39;&lt;/span&gt;&lt;/br&gt;
+Of ourse dying would be bad if it causes a large loss. But right now you just have little to no gear and will be replenished with a new set.
+You smirk to yourself for your ingenuity.&lt;/br&gt; 
+&lt;p class=&quot;tPC&quot;&gt;&#39;So if I dont have any other option, I still just need to find a way to die to get rid of that thing.&#39;&lt;/p&gt;
+&lt;a0 onclick=&#39;window.gm.quests.forceQuestMilestone(&quot;qBondageKink&quot;,200,100);window.story.show(&quot;ForestAlchemistHut&quot;);&#39;&gt;Death is a solution&lt;/a&gt;
+&lt;a0 onclick=&#39;window.gm.quests.forceQuestMilestone(&quot;qBondageKink&quot;,200,100);window.story.show(&quot;ForestAlchemistHut&quot;);&#39;&gt;Its not worth dieing to get rid of it&lt;/a&gt;
+&lt;a0 onclick=&#39;window.gm.quests.forceQuestMilestone(&quot;qBondageKink&quot;,200,100);window.story.show(&quot;ForestAlchemistHut&quot;);&#39;&gt;Strangely, it doesnt bother me that much anymore&lt;/a&gt;&lt;!--todo increase submissive--&gt;
 &lt;% } else if(window.gm.quests.getMilestoneState(&quot;qBondageKink&quot;).id===300) { %&gt;
 As you stumble into the hut, the alchemists greets you: &quot;Ah, nice to see you again. You fine so far?&quot;
 &lt;p class=&quot;tPC&quot;&gt;&quot;Nope. There are some thugs at the bridge, they dont let me pass.&quot;&lt;/p&gt;
@@ -16210,16 +16706,16 @@ He shakes his head &quot;Not that I know. Cant you sneak around them or trick th
 &lt;p class=&quot;tPC&quot;&gt;&quot;I will see to get some.&quot;&lt;/p&gt;
 &lt;a0 onclick=&#39;window.gm.quests.forceQuestMilestone(&quot;qPurpleBerry&quot;,200,1);window.story.show(&quot;ForestBorder&quot;);&#39;&gt;Leave&lt;/a&gt;&lt;/br&gt;
 &lt;%} else {%&gt; He seems busy right now. [[Back|ForestAlchemistHut]] &lt;%}%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="141" name="ForestAlchemistHut" tags="" position="100,1850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="143" name="ForestAlchemistHut" tags="name:shaby_hut" position="350,1850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.moveHere();%&gt;
 &lt;p class=&quot;tPC&quot;&gt;&lt;/p&gt;&#39;Puh, what a stink. I shouldnt stay here for long for I might suffocate&#39;&lt;/p&gt;
 &quot;About that cake we talked earlier - what kind of cake are we speaking about.&quot;
 &lt;p class=&#39;tPC&#39;&gt;NOO CAKE !&lt;/p&gt;
 &lt;% if(window.gm.quests.getMilestoneState(&quot;qPurpleBerry&quot;).id&gt;=100) {%&gt;
-&lt;a0 onclick=&#39;window.gm.player.Inv.removeItem(&quot;PurpleBerry&quot;,5);window.gm.player.Inv.addItem(new window.gm.ItemsLib.SimpleFood(),2);window.gm.refreshAllPanel();&#39; &lt;%=(window.gm.player.Inv.countItem(&quot;PurpleBerry&quot;)&gt;=5)?(&quot;&quot;):(&quot;hidden&quot;)%&gt;&gt;Trade 5 purple berries for 1 potion&lt;/a&gt;
+&lt;a0 onclick=&#39;window.gm.player.Inv.removeItem(&quot;PurpleBerry&quot;,5);window.gm.player.Inv.addItem(new window.gm.ItemsLib.SimpleFood(),1);window.gm.refreshAllPanel();&#39; &lt;%=(window.gm.player.Inv.countItem(&quot;PurpleBerry&quot;)&gt;=5)?(&quot;&quot;):(&quot;hidden&quot;)%&gt;&gt;Trade 5 purple berries for 1 potion&lt;/a&gt;
 &lt;%}%&gt;
 &lt;div&gt;&lt;/br&gt;[[Outside|ForestBorder]]  [[Alchemist|ForestAlchemistTalk]] [[Clair]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="142" name="ForestBridge" tags="" position="225,1850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="144" name="ForestBridge" tags="" position="475,1850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.moveHere();%&gt;
 &lt;% if(window.gm.quests.getMilestoneState(&quot;qBondageKink&quot;).id&lt;100) { %&gt;
 Somehow you cant go into this direction. Maybe this route unlocks later.
@@ -16238,13 +16734,13 @@ When you have half of the bridge behind you, a large figure steps into view.&lt;
 Squinching your eyes and slowing down your steps, you try to get a better view of that hindrance.&lt;/br&gt; &lt;!--todo--&gt;
 &lt;p class=&#39;tPC&#39;&gt;&quot;A fee? I didnt see a sign. Who are you?&quot; &lt;/p&gt;
 &lt;p class=&quot;tNPC1&quot;&gt;&quot;There is no sign yet beause...we where busy with...bridge repair. You give ...20coin and then you may pass.&quot;&lt;/p&gt;
-&lt;p class=&quot;tPC&quot;&gt;&#39;Looks more like highwayman then a craftsman&#39;&lt;/p&gt; you think to yourself. &lt;/br&gt;
+&lt;span class=&quot;tPC&quot;&gt;&#39;Looks more like highwayman then a craftsman&#39;&lt;/span&gt; you think to yourself. &lt;/br&gt;
 &lt;div id=&#39;select2&#39; &gt;
 &lt;a0 onclick=&#39;window.gm.printTalkLink($(&quot;div#select2&quot;)[0],&quot;div#choice2a&quot;)&#39;&gt;Cant pay&lt;/a&gt;
 &lt;/div&gt;
 &lt;div id=&#39;choice2a&#39; hidden&gt;
 &lt;p class=&#39;tPC&#39;&gt;&quot;I cant pay you, I have nothing of value.&quot;&lt;/p&gt;
-&lt;p class=&quot;dev&quot;&gt;&quot;Then, just turn around and walk back before I force you to do so.&quot;&lt;/p&gt;
+&lt;p class=&quot;tNPC1&quot;&gt;&quot;Then, just turn around and walk back before I force you to do so.&quot;&lt;/p&gt;
 &lt;p class=&quot;tPC&quot;&gt;&#39;I could tackle him. I bet he wouldnt take the risk of a fight if he is alone and cant expect some loot from me.&#39;&lt;/p&gt;
 &lt;p class=&quot;tNPC1&quot;&gt;&quot;Nice collar. So you are a slave? Maybe you have fled from your master huh? I should just take you into custody for some reward?&quot;&lt;/p&gt;
 &lt;div id=&#39;select3&#39; &gt;
@@ -16264,51 +16760,51 @@ Maybe you can [[speak up to him|TrentTalk]].&lt;/br&gt;
 A large bridge made of wood crosses a deep canyon that separates the forest from the land east of it.&lt;/br&gt;
 &lt;div&gt;[[to Forest|ForestBorder]] [[to Plains]]. &lt;/br&gt;&lt;/div&gt;
 &lt;%}%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="143" name="TrentTalk" tags="" position="350,1850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="145" name="TrentTalk" tags="" position="600,1850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 Trent the horse-man is leaning at the handrail of the bridge and says with a smug grin: &lt;/br&gt;
 &lt;p class=&quot;tNPC1&quot;&gt;&quot;There you are again. Are you here for another lesson?&quot;&lt;/p&gt;
 &lt;div&gt; [[Leave|ForestBridge]] [[offer him something]] &lt;a0 onclick=&#39;window.gm.encounters.Trent(window.gm.player.location);&#39;&gt;wrestle with him(again)&lt;/a&gt;&lt;/br&gt;&lt;/div&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
-&lt;script&gt;&lt;/script&gt;</tw-passagedata><tw-passagedata pid="144" name="VillageEntranceIntro" tags="" position="475,1850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;script&gt;&lt;/script&gt;</tw-passagedata><tw-passagedata pid="146" name="VillageEntranceIntro" tags="" position="725,1850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;!--todo--&gt; A neat little village comes into view as you walk towards its entrance.  &lt;/br&gt;
 Someone has painted &#39;Thetain&#39; on the planks above the wooden gate. Most likely thats the name of this commune.
 &#39;Thats really looks awesome. I wonder if I can really visit those houses or if they are just scenery.&#39;&lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Continue|VillageMarketPlace]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="145" name="VillageEntrance" tags="" position="600,1850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="147" name="VillageEntrance" tags="" position="850,1850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.moveHere();%&gt;
 &lt;!--todo--&gt; You are at the crossroads in front of the entrance to the town Thetain.
 &lt;/br&gt;&lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Enter village|VillageMarketPlace]]  [[go to forest|ForestBridge]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="146" name="VillageMarketPlace" tags="" position="725,1850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="148" name="VillageMarketPlace" tags="" position="975,1850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.moveHere();%&gt;
 &lt;!--todo--&gt; There arent many people around the place right now.&lt;/br&gt; There seems to be a shop of an alchemist, a Inn and another shop where you cant say what kind of wares - if any - they are trading.&lt;/br&gt;
 &lt;/br&gt; Near the entrance of the Inn is also a [[bulletin-board]]. 
 &lt;div&gt;&lt;/br&gt;
 [[Gate|VillageEntrance]] [[Inn|VillageInn]]  [[Alchemist]] [[Shop|VillagePawnshop]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="147" name="VillageInn" tags="" position="850,1850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="149" name="VillageInn" tags="" position="1100,1850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.moveHere();%&gt;
 &lt;!--todo--&gt; &#39;This really looks like they scavenged that place from a typical fantasy story book.&#39;&lt;/br&gt; 
 &lt;div&gt;&lt;/br&gt;
 [[Square|VillageMarketPlace]] &lt;/br&gt;&lt;/div&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
-&lt;script&gt; &lt;/script&gt;</tw-passagedata><tw-passagedata pid="148" name="VillagePawnshop" tags="" position="975,1850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;script&gt; &lt;/script&gt;</tw-passagedata><tw-passagedata pid="150" name="VillagePawnshop" tags="" position="1225,1850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.moveHere();%&gt;
 &lt;!--todo--&gt; If this is a shop, then they sell everything: Shoes, cooking pans, assault ballista and chicken.&lt;/br&gt; 
 &lt;!--todo--&gt;On the other side of the room is a large [[Wardrobe]] with a [[Mirror]] where you can take a look at yourself.
 &lt;/br&gt; 
 &lt;div&gt;&lt;/br&gt;
 [[Square|VillageMarketPlace]]  [[Shopkeeper]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="149" name="VRSuiteUp" tags="" position="1100,1850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="151" name="VRSuiteUp" tags="" position="100,1975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;!--todo--&gt; You are eager to try that virtual reallity game. &lt;/br&gt;
 &quot;Welcome to the test version of our new game. Lets just clarify some things about the beta-testing process. In most cases you just have to play the game as you like. We will track your actions and progress to adapt and improve the experience of the finished game.
 However, at times you might be requested to do certain things and do it in a certain way.  &lt;/br&gt;
 Remember that this is not the final game. We continously modify aspects to get the best experience for the players.&quot;   &lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Start the game|CharacterEditor]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="150" name="CharacterEditor" tags="" position="1225,1850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="152" name="CharacterEditor" tags="" position="225,1975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 You say &#39;Create new avatar&#39;. The screen switches to those kind of screens that are common to other RPGs.&lt;/br&gt;
 You can select class, race, character-traits and some visual aspects.&lt;/br&gt;
@@ -16322,7 +16818,7 @@ The description of the class is sparse. The picture you see indicates that this 
 &lt;!--todo--&gt;[[male elf]] [[female elf]] 
 &lt;div&gt;&lt;/br&gt;
 [[Ready|StartLocation]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="151" name="StartLocation" tags="" position="100,1975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="153" name="StartLocation" tags="" position="350,1975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;
 window.gm.enterVR();%&gt;
 &lt;%window.gm.quests.forceQuestMilestone(&quot;qDiedAgain&quot;,2,1);window.gm.quests.forceQuestMilestone(&quot;qDLCMain&quot;,700,600)%&gt;
@@ -16330,19 +16826,19 @@ window.gm.enterVR();%&gt;
 You can see some hut from here. You just need to follow the trail down the hill.&quot;&lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Settlement|ForestBorder]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="152" name="Training1" tags="" position="225,1975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="154" name="Training1" tags="" position="475,1975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;!--todo--&gt; The path snakes down the grassy flanks of the hill. As you make your way around a large boulder, something strange happens:&lt;/br&gt;
 &lt;devnote&gt;&quot;Welcome to our little world. Just in case you are not used to that kind of game we should get you some training.&quot;&lt;/devnote&gt;&lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Continue|Training1Done]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="153" name="Training1Done" tags="" position="350,1975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="155" name="Training1Done" tags="" position="600,1975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;!--todo--&gt; &lt;/br&gt;
 &lt;devnote&gt;&quot;I wish you good luck in exploring this world. May the gods be with you.&quot;&lt;/devnote&gt;&lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Continue|ForestBorder]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="154" name="Dungeon" tags="_nosave_" position="475,1975" size="100,100">&lt;!--dont &quot;show&quot; this! setup the dungeon and call enterDungeon--&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="156" name="Dungeon" tags="_nosave_" position="725,1975" size="100,100">&lt;!--dont &quot;show&quot; this! setup the dungeon and call enterDungeon--&gt;
 &lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%= window.gm.dng.name%&gt; &lt;%= window.gm.dng.actualRoom.descr%&gt;&lt;/br&gt;
 &lt;/br&gt; 
@@ -16350,20 +16846,20 @@ You can see some hut from here. You just need to follow the trail down the hill.
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
 &lt;script&gt;
 window.gm.dng.printButtons()
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="155" name="DungeonMap" tags="_nosave_" position="600,1975" size="100,100">&lt;!--dont &quot;show&quot; this! setup the dungeon and call displayMap--&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="157" name="DungeonMap" tags="_nosave_" position="850,1975" size="100,100">&lt;!--dont &quot;show&quot; this! setup the dungeon and call displayMap--&gt;
 &lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;!--pre-formatted or messup allignment of ascii-rows--&gt;
 &lt;pre&gt;&lt;%= window.gm.dng.Mapper.printMap( window.gm.dng.actualRoom)%&gt;&lt;/pre&gt;&lt;/br&gt;
 &lt;pre&gt;Legend: P=Player, S=Stair, E=Entry/Exit&lt;pre&gt;&lt;/br&gt;
 &lt;/br&gt; 
 [[Back|Dungeon]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="156" name="DungeonFoundNothing" tags="_nosave_" position="725,1975" size="100,100">&lt;!--example-scene for onenter/onexit event--&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="158" name="DungeonFoundNothing" tags="_nosave_" position="975,1975" size="100,100">&lt;!--example-scene for onenter/onexit event--&gt;
 &lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%= window.gm.dng.actualRoom.descr%&gt;&lt;/br&gt;
 There are some buckets here, but there is nothing useful inside.&lt;/br&gt;
 &lt;/br&gt;
 &lt;a0 onclick=&#39;window.gm.dng.resumeRoom();&#39;&gt;Go on&lt;/a&gt;&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="157" name="DungeonCrashedThroughFloor" tags="_nosave_" position="850,1975" size="100,100">&lt;!--example-scene for onenter/onexit event--&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="159" name="DungeonCrashedThroughFloor" tags="_nosave_" position="1100,1975" size="100,100">&lt;!--example-scene for onenter/onexit event--&gt;
 &lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%= window.gm.dng.actualRoom.descr%&gt;&lt;/br&gt;
 You crash down through the floor and find yourself back on the lowest level of the area.&lt;/br&gt;
@@ -16376,12 +16872,12 @@ function crashThrough() {
     var Room = floor1.getRoom(window.gm.dng.actualRoom.name);  //room names are the same at same position of floor
     window.gm.dng.teleport(floor1, Room);
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="158" name="NOP_VR" tags="_nosave_,_back_" position="975,1975" size="100,100">&lt;!--example-scene for onenter/onexit event--&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="160" name="NOP_VR" tags="_nosave_,_back_" position="1225,1975" size="100,100">&lt;!--example-scene for onenter/onexit event--&gt;
 &lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;p class=&#39;dev&#39;&gt; You cant go that way. Either because its WIP or you need to solve a quest first. &lt;/p&gt;
 &lt;/br&gt;
 [[Back|_back_]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="159" name="Home" tags="name:your_dorms_hallway" position="1100,1975" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="161" name="Home" tags="name:your_dorms_hallway" position="100,2100" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;%window.gm.quests.addQuest(&quot;qFindGarden&quot;,1);window.gm.quests.addQuest(&quot;qStudy&quot;,1); %&gt;
@@ -16399,7 +16895,7 @@ function checkQuest(){
 	}
 }
 checkQuest();
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="160" name="Kitchen" tags="" position="1231,613" size="100,100">&lt;section&gt; 
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="162" name="Kitchen" tags="" position="1231,613" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 You are in the kitchen. &lt;/br&gt;
@@ -16416,7 +16912,7 @@ Mom will take care to resupply the fridge. But she might be disappointed if you 
 &lt;%}%&gt;
 Where would you like to go?&lt;/br&gt;
 [[Living_Room]]   [[Hallway|Home]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="161" name="Melanies Bedroom" tags="" position="100,2100" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="163" name="Melanies Bedroom" tags="" position="350,2100" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 This is the bedroom of Melanie.
@@ -16447,7 +16943,7 @@ function inviteChar(elmnt) {
 		elmnt.outerHTML=(&quot;&lt;div class=&#39;red&#39;&gt;Cyril added to your team. &lt;/div&gt;&quot;);
 	}
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="162" name="moms_treasure" tags="_back_" position="225,2100" size="100,100">&lt;section&gt; 
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="164" name="moms_treasure" tags="_back_" position="475,2100" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 In one of the nightstand you find some handcuffs.They look thorough but you think they just might be used for some bedplay.&lt;/br&gt;
 &lt;a0 onclick=&#39;useHandcuff(this)&#39;&gt;Play with them&lt;/a&gt;&lt;/br&gt;
@@ -16459,7 +16955,7 @@ function useHandcuff(elmnt) {
 	window.gm.player.Outfit.addItem(new Handcuffs());
 	elmnt.replaceWith(&quot;&lt;div class=&#39;red&#39;&gt;Playing around with the cuffs you suddenly find yourself locked up with them. You panick as you find the locking-mechanic quite tight. You need a key and maybe some help to unlock them!&lt;/div&gt;&quot;);
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="163" name="Your Bedroom" tags="" position="1033,470" size="100,100">&lt;section&gt; 
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="165" name="Your Bedroom" tags="" position="1033,470" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%window.gm.player.location=window.passage.name; 
 window.gm.quests.addQuest(&quot;qMyPleasure&quot;,1);%&gt;
@@ -16488,7 +16984,7 @@ There is a large bed for sleeping with a nightstand aside. &lt;/br&gt;
 &lt;% } else { %&gt;
 Where do you want to go ? &lt;/br&gt;
 [[Hallway|Home]]&lt;/br&gt; &lt;%}%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="164" name="Sleep" tags="" position="475,2100" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="166" name="Sleep" tags="" position="725,2100" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 You fall into your bedsheets and sleep until your smartphone buzzes you out of your dreams.&lt;/br&gt;
 &lt;/br&gt;&lt;div id=&#39;output&#39;&gt;&lt;/div&gt;
@@ -16509,7 +17005,7 @@ function checkJob() {
 	return(text);
 }
 window.gm.printOutput(checkJob());
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="165" name="Living_Room" tags="" position="600,2100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="167" name="Living_Room" tags="" position="850,2100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 The living room that you share with your mom is sparsely decorated (until now).&lt;/br&gt;
 An old wooden table with 4 chairs rests on a wornout green carpet.&lt;/br&gt;
 Some money is laying on the table. Maybe mom forgot it there.&lt;/br&gt;
@@ -16547,11 +17043,11 @@ function touchCatIdol(elmnt) {
 	elmnt.replaceWith(&quot;There is a tickling feeling in your hand.&quot;);
 	window.gm.player.addEffect(&quot;effMutateCat&quot;,window.gm.StatsLib.effMutateCat());
 }
-&lt;/script&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="166" name="Cabinet" tags="" position="725,2100" size="100,100">&lt;section&gt; 
+&lt;/script&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="168" name="Cabinet" tags="" position="975,2100" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 There is nothing here
 [[Living_Room]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="167" name="Garden" tags="" position="850,2100" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="169" name="Garden" tags="" position="1100,2100" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;window.gm.quests.tick();%&gt;
 The garden behind the house is not very large. &lt;/br&gt;
@@ -16569,18 +17065,18 @@ You remeber that you took the shovel from here.&lt;/br&gt;
 &lt;%}%&gt;
 Where would you like to go?&lt;/br&gt;
 [[Hallway|Home]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="168" name="Cellar" tags="" position="975,2100" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="170" name="Cellar" tags="" position="1225,2100" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 The portal is still active. Do you dare to [[enter|Cellar_Portal]] it? &lt;/br&gt;&lt;/br&gt;
 Where would you like to go?&lt;/br&gt;
 [[Hallway|Home]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="169" name="Cellar_PortalReverse" tags="" position="1100,2100" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="171" name="Cellar_PortalReverse" tags="" position="100,2225" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;!--&lt;%window.gm.player.location=window.passage.name;%&gt;--&gt;
 The portal spits you out in the dim light of your cellar.&lt;/br&gt;&lt;/br&gt;
 [[Next|Cellar]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="170" name="Cellar_Portal" tags="" position="1225,2100" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="172" name="Cellar_Portal" tags="" position="225,2225" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;!--&lt;%window.gm.player.location=window.passage.name;%&gt;--&gt;
 A blinding light engulfs you just for a second and then a deafening darkness.  &lt;/br&gt;&lt;/br&gt;
@@ -16589,7 +17085,7 @@ As you come back to your senses you find yourself cowering on the floor, still c
 Time to move on.&lt;/br&gt;&lt;/br&gt;&lt;/br&gt;
 Where would you like to go?&lt;/br&gt;
 [[Home|Cellar_PortalReverse]] [[Mall|Mall Floor 0 (postapocalypse)]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="171" name="HairGrow" tags="deferred" position="100,2225" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="173" name="HairGrow" tags="deferred" position="350,2225" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 A blinding light engulfs you just for a second and then a deafening darkness.  &lt;/br&gt;&lt;/br&gt;
 Its impossible to tell what else happens or how long the process takes.&lt;/br&gt;&lt;/br&gt;
@@ -16597,12 +17093,12 @@ As you come back to your senses you find yourself cowering on the floor, still c
 Time to move on.&lt;/br&gt;&lt;/br&gt;&lt;/br&gt;
 Where would you like to go?&lt;/br&gt;
 [[Next|&lt;%=window.gm.player.location%&gt;]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="172" name="Home_Study" tags="" position="225,2225" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="174" name="Home_Study" tags="" position="475,2225" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;% window.gm.player.Stats.increment(&#39;energy&#39;,-20);window.gm.addTime(120);window.gm.quests.forceQuestMilestone(&quot;qStudy&quot;,100,1);%&gt;
 You sit down with your books and scriblings and try to get some sense out of it.&lt;/br&gt;
 [[Give up|&lt;%=window.gm.player.location%&gt;]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="173" name="Campus" tags="" position="825,825" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="175" name="Campus" tags="" position="825,825" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;%if(!window.gm.quests.hasActiveQuest(&quot;qFindAJob&quot;)){  %&gt;
@@ -16620,21 +17116,21 @@ You sit down with your books and scriblings and try to get some sense out of it.
     [[Electrical &amp; Mechanical Engineering|NOP]]  [Chemistry &amp; Process Engineering] [Micro-Power &amp; Nano-Engineering] [[Dining Hall]]  [[ITD Office]]  Library &lt;/br&gt;
     [[Into the city]]&lt;/br&gt;&lt;/div&gt; 
 &lt;%}%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="174" name="ITD Office" tags="" position="475,2225" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="176" name="ITD Office" tags="" position="725,2225" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 This is the office-building of the Institute.&lt;/br&gt;
 The [[counsellor|NOP]] might be available to give you some guidance about institutional affairs.&lt;/br&gt;
 Here in the lobby of the building is also a [[blackboard]]. Maybe you can find some job offers there or informations about upcoming events. &lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Campus]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="175" name="Dining Hall" tags="" position="600,2225" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="177" name="Dining Hall" tags="" position="850,2225" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 Die Mensa ist wahrscheinlich das beliebteste Gebäude des Campus bei den Studenten; es gibt was zu essen und an kann miteinander quatschen.&lt;/br&gt;
 Das Essen ist vielleicht nicht gerade das beste auf der Welt aber dafür ist es recht günstig. Hast du Hunger?&lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Campus]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="176" name="blackboard" tags="_back_" position="725,2225" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="178" name="blackboard" tags="_back_" position="975,2225" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &#39;Lets see if there is anything interesting.&#39;&lt;/br&gt;
@@ -16643,7 +17139,7 @@ There is an anounce from Harcon Health Inc. for a [[job|Harcon_Logistic_Ad]] in 
 &lt;%}%&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Back|_back_]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="177" name="attend lecture" tags="" position="850,2225" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="179" name="attend lecture" tags="" position="1100,2225" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 todo You attend to lectures all morning.&lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
@@ -16655,14 +17151,14 @@ function work() {
     window.gm.forwardTime(1300);
     window.story.show(&quot;Campus&quot;);
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="178" name="Harcon_Logistic_Ad" tags="_back_" position="975,2225" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="180" name="Harcon_Logistic_Ad" tags="_back_" position="1225,2225" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;!--todo--&gt; Auf dem maschinen-geschriebenen Zettel ist eine Teilzeit-Stelle in der Logistik-Abteilung ausgeschrieben.&lt;/br&gt;
 &#39;Logistic doesnt sound that interesting and I doubt that position is targeted to an engineer. Maybe I should show up there in person and check if that would be an option.&#39;&lt;/br&gt;
 The adress points to be somehwere around downtonw.&lt;/br&gt;
 &lt;a0 onclick=&#39;window.gm.quests.forceQuestMilestone(&quot;qFindAJob&quot;,100,1); window.story.show(&quot;ITD Office&quot;);&#39;&gt;Note down the adress&lt;/a&gt;&lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Back|_back_]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="179" name="Harcon_Health" tags="" position="1100,2225" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="181" name="Harcon_Health" tags="" position="100,2350" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;%if(window.gm.quests.hasActiveQuest(&quot;qFindAJob&quot;,100)){  %&gt;
@@ -16694,7 +17190,7 @@ The adress points to be somehwere around downtonw.&lt;/br&gt;
     This seems to be some kind of factory. You have no business here.&lt;/br&gt;
     &lt;div&gt;&lt;/br&gt;[[Downtown]]&lt;/br&gt;&lt;/div&gt;
 &lt;%}%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="180" name="Harcon_Logistic_Intro" tags="" position="1225,2225" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="182" name="Harcon_Logistic_Intro" tags="" position="225,2350" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 ...&lt;!--todo--&gt;
@@ -16715,7 +17211,7 @@ The adress points to be somehwere around downtonw.&lt;/br&gt;
     Mr. Erichson looks quite disappointed.  &lt;/br&gt;
     [[Next|Downtown]]&lt;/br&gt; 
 &lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="181" name="Harcon_work" tags="" position="100,2350" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="183" name="Harcon_work" tags="" position="350,2350" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;%if(window.gm.quests.hasActiveQuest(&quot;qFindAJob&quot;,200)){  %&gt;
@@ -16732,7 +17228,7 @@ function work() {
     window.gm.quests.getQuestState(&quot;qFindAJob&quot;).flags+=1;
     window.story.show(&quot;Downtown&quot;);
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="182" name="Mall Floor 0" tags="" position="1250,850" size="100,100">&lt;section&gt; 
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="184" name="Mall Floor 0" tags="" position="1250,850" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 You are actually at [[&lt;%=window.gm.player.location%&gt;]].&lt;/br&gt;
@@ -16752,7 +17248,7 @@ _Entrys.push({id:&quot;Lube&quot;,count:10,cost:4,costPerv:10});
 _Entrys.push({id:&quot;Battery&quot;,count:4,cost:4,costPerv:0});
 _Entrys.push({id:&quot;Dildo_small&quot;,count:1,cost:25,costPerv:14});
 renderToSelector(&quot;#panel&quot;, &quot;listbuy&quot;); 
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="183" name="Mall Floor 1" tags="" position="1125,850" size="100,100">&lt;section&gt; 
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="185" name="Mall Floor 1" tags="" position="1125,850" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;%window.gm.printShopBuyEntry(&quot;Lube&quot;,4,cbCanBuy=(function(itemid){return window.gm.cbCanBuyPerverse(itemid,15,10)}),cbPostBuy=(function(itemid){window.gm.defaultPostBuy(itemid,15)}))%&gt;
@@ -16767,7 +17263,7 @@ if(window.gm.player.Stats.get(&#39;corruption&#39;).value&lt;=10) {%&gt;
 &lt;%} else {%&gt; [[Adult books and tools]] &lt;/br&gt; &lt;%} %&gt;
 Where would you like to go from here?&lt;/br&gt;
 [[Mall 0F|Mall Floor 0]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="184" name="Mall Floor -1" tags="" position="1000,825" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="186" name="Mall Floor -1" tags="" position="1000,825" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 You are actually at [[&lt;%=window.gm.player.location%&gt;]].&lt;/br&gt;
@@ -16775,7 +17271,7 @@ This level of the mall seems to be reserved for the less fancy business. &lt;/br
 Most of the space is occupied by the usual [[electronics store]] and a [[food store]].
 Where would you like to go from here?&lt;/br&gt;
 [[Mall 0F|Mall Floor 0]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="185" name="Adult books and tools" tags="" position="1025,650" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="187" name="Adult books and tools" tags="" position="1025,650" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 You are actually at [[&lt;%=window.gm.player.location%&gt;]].&lt;/br&gt;
@@ -16788,11 +17284,11 @@ No way I&#39;m going in to that smut-shop. Only perverts do that. &lt;/br&gt;
 &lt;%} %&gt;
 Where would you like to go from here?&lt;/br&gt;
 [[Mall 0F|Mall Floor 0]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="186" name="Buy" tags="_back_" position="850,350" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="188" name="Buy" tags="_back_" position="850,350" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 
 [[Back|_back_]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="187" name="Mall Floor 0 (postapocalypse)" tags="" position="850,2350" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="189" name="Mall Floor 0 (postapocalypse)" tags="" position="1100,2350" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 You are actually at [[&lt;%=window.gm.player.location%&gt;]].&lt;/br&gt;
@@ -16803,7 +17299,7 @@ Where would you like to go from here?&lt;/br&gt;
 [[Mall 1F|Mall Floor 1 (postapocalypse)]]
 The stairway to the lower floor is blocked by parts of the building that fell down from top. But there might be other options to get there. &lt;/br&gt; 
 [[Exit|Into the city]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="188" name="Mall Floor 1 (postapocalypse)" tags="" position="975,2350" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="190" name="Mall Floor 1 (postapocalypse)" tags="" position="1225,2350" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 
@@ -16818,11 +17314,11 @@ Where would you like to go from here?&lt;/br&gt;
 You are on the hunt for useful resources as...
 &lt;a href=&quot;javascript:void(0)&quot; onclick=&#39;window.gm.encounters.mole(window.gm.player.location);&#39;&gt;Next&lt;/a&gt; &lt;/br&gt;
 
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="189" name="skCooking" tags="" position="825,625" size="100,100">You can create tasty meals from basic ingredients. No need to rely on fastfood.
-[[Back|&lt;%=window.gm.player.location%&gt;]]</tw-passagedata><tw-passagedata pid="190" name="skSporty" tags="" position="725,625" size="100,100">You like to do sports.
-[[Back|&lt;%=window.gm.player.location%&gt;]]</tw-passagedata><tw-passagedata pid="191" name="skTechy" tags="" position="825,525" size="100,100">Tinkering and repairing gadgets is your thing.
-[[Back|&lt;%=window.gm.player.location%&gt;]]</tw-passagedata><tw-passagedata pid="192" name="skMoneymaker" tags="" position="725,525" size="100,100">You often find ways to increase your profit a little bit.
-[[Back|&lt;%=window.gm.player.location%&gt;]]</tw-passagedata><tw-passagedata pid="193" name="Start" tags="" position="350,2475" size="100,100">Select a Link:
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="191" name="skCooking" tags="" position="825,625" size="100,100">You can create tasty meals from basic ingredients. No need to rely on fastfood.
+[[Back|&lt;%=window.gm.player.location%&gt;]]</tw-passagedata><tw-passagedata pid="192" name="skSporty" tags="" position="725,625" size="100,100">You like to do sports.
+[[Back|&lt;%=window.gm.player.location%&gt;]]</tw-passagedata><tw-passagedata pid="193" name="skTechy" tags="" position="825,525" size="100,100">Tinkering and repairing gadgets is your thing.
+[[Back|&lt;%=window.gm.player.location%&gt;]]</tw-passagedata><tw-passagedata pid="194" name="skMoneymaker" tags="" position="725,525" size="100,100">You often find ways to increase your profit a little bit.
+[[Back|&lt;%=window.gm.player.location%&gt;]]</tw-passagedata><tw-passagedata pid="195" name="Start" tags="" position="600,2475" size="100,100">Select a Link:
 &lt;ul&gt;
     &lt;li&gt;[[_SuperSimpleStory_]]&lt;/li&gt;
 	&lt;li&gt;[[_ImagesAndOtherMedia_]]&lt;/li&gt;
@@ -16831,7 +17327,7 @@ You are on the hunt for useful resources as...
     &lt;li&gt;[[_Inventory_]]&lt;/li&gt;
     &lt;li&gt;[[_SaveAndRestore_]]&lt;/li&gt;
     &lt;li&gt;[[StartPage]]&lt;/li&gt;
-&lt;/ul&gt;</tw-passagedata><tw-passagedata pid="194" name="NewGamePlus" tags="" position="475,2475" size="100,100">You finished the game in some way but maybe you have missed something. &lt;/br&gt;
+&lt;/ul&gt;</tw-passagedata><tw-passagedata pid="196" name="NewGamePlus" tags="" position="725,2475" size="100,100">You finished the game in some way but maybe you have missed something. &lt;/br&gt;
 Would you like to start a new game while taking some of your equipment/skills with you?&lt;/br&gt;
 &lt;a0 onclick=&#39;window.gm.newGamePlus()&#39;&gt;Start new game plus&lt;/a&gt;&lt;/br&gt;</tw-passagedata></tw-storydata>
 		<script>

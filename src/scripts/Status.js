@@ -246,6 +246,7 @@ class Effect {
     // id = SlumberPotion:Stunned;  name = Stunned
     get id() {return(this.data.id);}
     set id(id) { this.data.id=id;}
+    // Attention !!  effTired.name returns constructor-name but Effects.getById('effTired').name returns data.name
     get name() {return(this.data.name);}
     get time() {return(this.data.time);}
     get duration() {return(this.data.duration);}

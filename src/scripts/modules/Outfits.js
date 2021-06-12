@@ -262,6 +262,7 @@ class StaffWodden extends Equipment {
         this.tags = [ 'weapon'];
         this.slotUse = ['RHand','LHand'];
         this.lossOnRespawn = true;
+        this.pDamage = 5;
     }
     get desc() { 'A staff ade from wood.';}
     toJSON() {return window.storage.Generic_toJSON("StaffWodden", this); };
@@ -282,10 +283,10 @@ class StaffWodden extends Equipment {
     }
     canUnequip() {return({OK:true, msg:'unequipable'});}
     onEquip() {
-        this.parent.parent.Stats.addModifier('pAttack',{id:'pAttack:StaffWodden', bonus:2});
+        //this.parent.parent.Stats.addModifier('pAttack',{id:'pAttack:StaffWodden', bonus:2});
         return({OK:true, msg:'equipped'});}
     onUnequip() {
-        this.parent.parent.Stats.removeModifier('pAttack',{id:'pAttack:StaffWodden'});
+        //this.parent.parent.Stats.removeModifier('pAttack',{id:'pAttack:StaffWodden'});
         return({OK:true, msg:'unequipped'});}
 }
 class TailRibbon extends Equipment {

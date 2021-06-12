@@ -28,6 +28,20 @@ class BaseQuadruped extends Equipment {
     canUnequip() {return({OK:true, msg:'unequipable'});}
     descLong(fconv) {return(fconv('$[I]$ $[am]$ walking on 4 legs like a feral mammal.'));}
 }
+class BaseWorm extends Equipment {
+    constructor() {
+        super('BaseWorm');
+        this.tags = ['body'];
+        this.slotUse = ['bBase'];
+    }
+    get descShort() {return this.desc;};
+    get desc() { return '';}
+    toJSON() {return window.storage.Generic_toJSON("BaseWorm", this); };
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(BaseWorm, value.data));}
+    canEquip() {return({OK:true, msg:'equipable'});}
+    canUnequip() {return({OK:true, msg:'unequipable'});}
+    descLong(fconv) {return(fconv('$[I]$ $[am]$ wriggling around like a snake.'));}
+}
 class FaceHuman extends Equipment {
     static dataPrototype() {    
         return({femininity:0.2});
@@ -36,7 +50,7 @@ class FaceHuman extends Equipment {
     constructor() {
         super('FaceHuman');
         this.tags = ['body'];
-        this.slotUse = ['bFace'];
+        this.slotUse = ['bFace','bMouth'];
         this.data = FaceHuman.dataPrototype();   
     }
     get descShort() { return 'human face';}
@@ -51,11 +65,11 @@ class FaceHuman extends Equipment {
 }
 class FaceWolf extends Equipment {
     static dataPrototype() {    
-        return({femininity:0.2});    }
+        return({femininity:0.2,pDamage:10});    }
     constructor() {
         super('FaceWolf');
         this.tags = ['body'];
-        this.slotUse = ['bFace'];
+        this.slotUse = ['bFace','bMouth'];  //todo separate mouth-bodypart??
         this.data = FaceWolf.dataPrototype();   
     }
     get descShort() { return 'wolf muzzle';}
@@ -64,6 +78,17 @@ class FaceWolf extends Equipment {
     static fromJSON(value) {return(window.storage.Generic_fromJSON(FaceWolf, value.data));}
     canEquip() {return({OK:true, msg:'equipable'});}
     canUnequip() {return({OK:true, msg:'unequipable'});}
+    onEquip() {
+        let old = this.parent.parent.Skills.countItem(SkillBite.name);
+        if(old>0) this.parent.parent.Skills.removeItem(SkillBite.name,old);
+        this.parent.parent.Skills.addItem(new SkillBite());
+        return({OK:true, msg:'shifted'});
+    }
+    onUnequip() {
+        let old = this.parent.parent.Skills.countItem(SkillBite.name);
+        if(old>0) this.parent.parent.Skills.removeItem(SkillBite.name,old);
+        return({OK:true, msg:'shifted'});
+    }
     descLong(fconv) {
         return(fconv('$[I]$ $[have]$ a muzzle like a wolf'));
     }
@@ -74,7 +99,7 @@ class FaceHorse extends Equipment {
     constructor() {
         super('FaceHorse');
         this.tags = ['body'];
-        this.slotUse = ['bFace'];
+        this.slotUse = ['bFace','bMouth'];
         this.data = FaceHorse.dataPrototype();   
     }
     get descShort() { return 'wolf muzzle';}
@@ -137,6 +162,58 @@ class TailCat extends Equipment {
     canUnequip() {return({OK:true, msg:'unequipable'});}
     descLong(fconv) { 
         return(fconv('Some cat-like tail is attached to $[my]$ spine.'));
+    }
+}
+class HandsPaw extends Equipment {
+    static dataPrototype(id='cat') {    
+        return({style:'cat', pDamage:10 });
+    }
+    static factory(id) {
+        let obj =  new HandsPaw();
+        obj.setStyle(id);
+        return(obj);
+    }
+    constructor() {
+        super('HandsPaw');
+        this.tags = ['body'];
+        this.slotUse = ['bHands'];
+        this.data = HandsPaw.dataPrototype();
+    }
+    setStyle(id) {
+        switch(id) {
+            case 'cat':
+            case 'dog':
+            case 'lizard':
+                this.data.id = id; 
+                break;
+            default:
+                throw new Error("unknown HandsPaw-style "+id);
+        }
+    }
+    get descShort() { return (this.desc);}
+    get desc() { return this.data.style+'\'like paws.';}
+    toJSON() {return window.storage.Generic_toJSON("HandsPaw", this); };
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(HandsPaw, value.data));}
+    canEquip() {return({OK:true, msg:'equipable'});}
+    canUnequip() {return({OK:true, msg:'unequipable'});}
+    descLong(fconv) { 
+        return(fconv('$[I]$ $[have]$ paws like that of a '+this.data.style+'.'));
+    }
+}
+class HandsHuman extends Equipment {
+    constructor() {
+        super('HandsHuman');
+        this.tags = ['body'];
+        this.slotUse = ['bHands'];
+    }
+    get descShort() { return (this.desc);}
+    get desc() { return ' human hands.';}
+    toJSON() {return window.storage.Generic_toJSON("HandsHuman", this); };
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(HandsHuman, value.data));}
+    canEquip() {return({OK:true, msg:'equipable'});}
+    canUnequip() {return({OK:true, msg:'unequipable'});}
+    descLong(fconv) { 
+        return(fconv('$[My]$ hands consist of a palm and fingers.'));
     }
 }
 class BreastHuman extends Equipment {
@@ -217,6 +294,9 @@ class PenisHuman extends Equipment {
 window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(BaseHumanoid);
     window.storage.registerConstructor(BaseQuadruped);
+    window.storage.registerConstructor(BaseWorm);
+    window.storage.registerConstructor(HandsHuman);
+    window.storage.registerConstructor(HandsPaw);
     window.storage.registerConstructor(FaceHorse);
     window.storage.registerConstructor(FaceHuman);
     window.storage.registerConstructor(FaceWolf);

@@ -44,10 +44,13 @@ class Ingredient extends Item {
         let info ={desc:''};
         switch(id){
             case "ApocaFlower": 
-                info.desc= "A yellow bluish flower growing in forests.";
+                info.desc= "yellow bluish flower growing";
                 break;
             case "PurpleBerry":
-                info.desc="Those purple berrys grow in the forest.";
+                info.desc="purple berrys grown in the forest";
+                break;
+            case "BloatedMushroom":
+                info.desc="mushrooms from a cave";
                 break;
             default:
         }
@@ -171,6 +174,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['CanOfCoffee'] = function () { return new CanOfCoffee(); };
     ItemsLib['SimpleFood'] = function () { return new SimpleFood(); };
     ItemsLib['FlashBang'] = function () { return new FlashBang(); };
+    ItemsLib['BloatedMushroom'] = function () { let x= new Ingredient();x.changeId("BloatedMushroom");return(x); };
     ItemsLib['PurpleBerry'] = function () { let x= new Ingredient();x.changeId("PurpleBerry");return(x); };
     ItemsLib['ApocaFlower'] = function () { let x= new Ingredient();x.changeId("ApocaFlower");return(x); };
     return ItemsLib; 

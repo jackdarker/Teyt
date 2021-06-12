@@ -164,9 +164,10 @@ class QuestManager {
             var mile = quest.getMileById(msID);
             //if (quest.finished ) continue;
             var Next = -1;
-            if(mile !== null) {
-                Next = mile.evaluateCondition();
+            if(!mile) {
+                throw new Error("cant find mileId "+msID+" in "+quest.id);
             } 
+            Next = mile.evaluateCondition();
             if (Next === -1) {
                 tmpfinishedQuest.push(i);
             }else if (Next > 0) {

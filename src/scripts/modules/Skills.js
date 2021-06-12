@@ -1,7 +1,9 @@
 "use strict";
+//execute simple attack with active weapon or claws
+
+//todo class SkillInspect extends Skill
 
 class SkillAttack extends Skill {
-    //execute simple attack with active weapon
     constructor() {
         super("Attack");
         this.msg = '';
@@ -20,7 +22,7 @@ class SkillAttack extends Skill {
         if(this.isValidTarget(targets)) {
             result.OK = true;
             for(var target of targets) {
-                let attack =window.gm.combat.defaultAttackData();
+                let attack = this.__estimateAttack()
                 let result2 = window.gm.combat.calcAttack(this.caster,target,attack);
                 this.msg+=result2.msg;
                 result.effects = result.effects.concat(attack.effects); 
@@ -28,8 +30,54 @@ class SkillAttack extends Skill {
         }
         return result
     }
+    __estimateAttack() {
+        let attack =window.gm.combat.defaultAttackData();
+        let lHand=this.caster.Outfit.getItemForSlot(window.gm.OutfitSlotLib.LHand);
+        let rHand=this.caster.Outfit.getItemForSlot(window.gm.OutfitSlotLib.RHand);
+        let lHDmg=0,rHDmg=0;
+        if(lHand) { //get weapon damage info
+            lHDmg = lHand.pDamage || 0;
+        }
+        if(rHand) {
+            rHDmg = rHand.pDamage || 0;
+        }
+        if(!lHand && ! rHand) { //if has no weapon get body damage
+            rHand=this.caster.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bHands);
+            if(rHand) {
+                rHDmg = rHand.data.pDamage || 0;
+            }
+        }
+        if(lHand===rHand) {
+            attack.value=lHDmg;
+        } else {
+            attack.value=lHDmg+rHDmg;
+        }
+        attack.value+=this.caster.Stats.get('pAttack').value;
+        attack.total = attack.value;
+        return(attack);
+    }
     getCastDescription(result) {
         return(this.msg);
+    }
+}
+//execute attack with Face
+class SkillBite extends SkillAttack {
+    constructor() {
+        super();
+        this.id=this.name='Bite';
+    }
+    toJSON() {return window.storage.Generic_toJSON("SkillBite", this); };
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillBite, value.data));}
+    __estimateAttack() {
+        let attack =window.gm.combat.defaultAttackData();
+        let mouth=this.caster.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bMouth);
+        let mouthDmg =0;
+        if(mouth) { //get teeth damage info
+            mouthDmg = mouth.data.pDamage || 0;
+        }
+        attack.value+= mouthDmg+ this.caster.Stats.get('pAttack').value;
+        attack.total = attack.value;
+        return(attack);
     }
 }
 class SkillTease extends Skill {
@@ -289,6 +337,7 @@ class SkillCallHelp extends Skill {
 }
 window.gm.SkillsLib = (function (Lib) {
     window.storage.registerConstructor(SkillAttack);
+    window.storage.registerConstructor(SkillBite);
     window.storage.registerConstructor(SkillCallHelp);
     window.storage.registerConstructor(SkillFlee);
     window.storage.registerConstructor(SkillGuard);

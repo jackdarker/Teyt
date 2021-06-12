@@ -311,7 +311,7 @@ preTurn() {
     let effects = list[k].Effects.getAllIds();
     for(let i=0; i<effects.length; i++) {
       let effect = list[k].Effects.get(effects[i]);
-      if(effect.onCombatEnd!==null && effect.onCombatEnd!==undefined) {  //typeof effect === CombatEffect doesnt work? so we check presencse of attribut
+      if(effect.onCombatEnd!==null && effect.onCombatEnd!==undefined) {  //typeof effect === CombatEffect doesnt work? so we check presense of attribut
         effect.onTurnStart();
       }
     }
@@ -341,6 +341,7 @@ checkDefeat() { //check if party is defeated
   this.next=this.selectChar;
   return(result);
 }
+//slect the next char to move
 selectChar() { 
   var s = window.story.state;
   var result = {OK:false, msg:''};
@@ -364,10 +365,12 @@ selectMove() {
     this.next=this.selectChar;
     return(result);
   }
+  let stateDesc = s.combat.actor._stateDesc();
   let canAct = s.combat.actor._canAct();
   if(canAct.OK===false) { //skip char if not dead but incapaciated and show msg
-    result.msg = canAct.msg;
+    result.OK = true, result.msg = stateDesc.msg+"</br>"+canAct.msg;
     this.next=this.checkDefeat;
+    this.printNextLink(this.checkDefeat);
     return(result);
   } else {
     if(s.combat.actor.calcCombatMove) { //selected by AI
@@ -381,7 +384,7 @@ selectMove() {
       result.OK=false;
     } else {
       this.printSkillList();
-      result.OK=true, result.msg="Choose your action !";//
+      result.OK=true, result.msg=stateDesc.msg+"</br>Choose your action !</br>";
     }
   }
   return(result);
@@ -459,7 +462,7 @@ window.gm.combat.calcEvasion=function(attacker,target, attack) {
   var result = {OK:true,msg:''}
   var rnd = window.gm.roll(1,100);
 
-  if(target.Effects.findItemSlot(effStunned.id)>=0) {
+  if(target.Effects.findItemSlot(effStunned.name)>=0) {
     result.OK = true; 
     result.msg = target.name+' is stunned and cannot evade. '
     attack.crit = true; //when stunned always critical hit
@@ -467,7 +470,7 @@ window.gm.combat.calcEvasion=function(attacker,target, attack) {
   }
 
   var lvlDiff = target.level-attacker.level;
-  var chance = target.Stats.get("agility").value + target.Stats.get("endurance").value;
+  var chance = target.Stats.get("agility").value + target.Stats.get("perception").value;
   chance += lvlDiff*4;
   window.gm.pushLog(`evasion roll:${chance} vs ${rnd} `,window.story.state._gm.dbgShowCombatRoll);
   if(chance>rnd) {
@@ -500,7 +503,7 @@ window.gm.combat.calcParry=function(attacker,target, attack) {
   }
   //todo block if has shield, parry if has weapon
   var lvlDiff = target.level-attacker.level;
-  var chance = target.Stats.get("agility").value + target.Stats.get("perception").value;
+  var chance = target.Stats.get("agility").value + target.Stats.get("endurance").value;
   chance += lvlDiff*4;
   window.gm.pushLog(`parry roll:${chance} vs ${rnd} `,window.story.state._gm.dbgShowCombatRoll);
   if(chance>rnd && rnd<10) {
@@ -548,8 +551,8 @@ window.gm.combat.defaultAttackData = function() {
 window.gm.combat.calcAttack=function(attacker,defender,attack) {
   let result = {OK:false,msg:''};
   //var def = defender.Stats.get('pDefense').value;
-  let att = attacker.Stats.get('pAttack').value;
-  attack.value=att,attack.total=att; 
+  //let att = attacker.Stats.get('pAttack').value;
+  //attack.value=attack.total=att; 
   //check if target an evade
   result = window.gm.combat.calcEvasion(attacker,defender,attack);
   if(result.OK===false) { return(result);  }
