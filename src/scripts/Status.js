@@ -230,7 +230,7 @@ class Effects extends Inventory {  //Todo a collection of Stats is similiar to I
     }
 }
 
-//
+/////////////////////////////////////////////////////////////////////////
 class Effect {  
     constructor() {
         this.data = Effect.dataPrototype();
@@ -251,7 +251,8 @@ class Effect {
     get time() {return(this.data.time);}
     get duration() {return(this.data.duration);}
     get hidden() {return(this.data.hidden);}
-    get shortDesc() {return('');}
+    get desc() {return(this.name);}
+    get shortDesc() {return(this.name);}
         //add Reviver support:
     //window.storage.registerConstructor(???);
     //toJSON() {return window.storage.Generic_toJSON("???", this); };
@@ -270,6 +271,7 @@ class Effect {
     onApply(){}
     onRemove(){}
 }
+/////////////////////////////////////////////////////////////////////////
 //combat effect use turn-count instead of realtime as duration
 class CombatEffect extends Effect {
     constructor() {
@@ -283,6 +285,7 @@ class CombatEffect extends Effect {
     //at end of targets turn
     static onTurnEnd(context,data) {}
 }
+
 
 
 

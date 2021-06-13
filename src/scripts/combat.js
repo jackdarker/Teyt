@@ -116,12 +116,12 @@ printSkillList() {
     var skillIds = s.combat.actor.Skills.getAllIds();
     //todo how to sort the list in a useful manner?
     for(var i=0; i<skillIds.length;i++) {
-      var entry = document.createElement('a');
-      entry.href='javascript:void(0)';
+      var entry = document.createElement('button');
+      //entry.href='javascript:void(0)';
       entry.addEventListener("click",(function(me,target){ 
         return(window.gm.Encounter._postSkillSelect.bind(me,target));}(this,skillIds[i])));
       entry.textContent=s.combat.actor.Skills.getItem(skillIds[i]).name;
-      //entry.disabled=this.buttons[y*5+x].disabled;
+      entry.disabled=s.combat.actor.Skills.getItem(skillIds[i]).isDisabled().OK;
       $("div#choice")[0].appendChild(entry);      // <- requires this node in html
     }
   } else {  //cannot do a thing
@@ -129,8 +129,8 @@ printSkillList() {
     entry.textContent=canAct.msg;
     $("div#choice")[0].appendChild(entry);
   }
-  var entry = document.createElement('a');
-  entry.href='javascript:void(0)';
+  var entry = document.createElement('button');
+  //entry.href='javascript:void(0)';
   entry.addEventListener('click',(function(me){return(window.gm.Encounter._postSkillAbort.bind(me));}(this)));
   entry.textContent="Do nothing";
   $("div#choice")[0].appendChild(entry);
@@ -157,6 +157,9 @@ printTargetList() {
   for( el of all) {
     targets.push([el]); //need [[],[]]
   }
+  var info = document.createElement('p');
+  info.textContent = skill.desc;
+  $("div#choice")[0].appendChild(info);
   targets = skill.targetFilter(targets);
   for(var i=0; i<targets.length;i++) {
     var entry = document.createElement('a');
@@ -301,7 +304,6 @@ preTurn() {
   let result = {OK:false, msg:''};
   let s = window.story.state;
   s.combat.turnCount+=1;
-  
   let list = s.combat.enemyParty.concat(s.combat.playerParty);
   //update combateffects
   for(let k=list.length-1; k>=0;k--){
@@ -341,7 +343,7 @@ checkDefeat() { //check if party is defeated
   this.next=this.selectChar;
   return(result);
 }
-//slect the next char to move
+//select the next char to move
 selectChar() { 
   var s = window.story.state;
   var result = {OK:false, msg:''};

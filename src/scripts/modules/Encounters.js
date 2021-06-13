@@ -30,7 +30,19 @@ window.gm.encounters.moleX2 = function(location) {
     }
     window.gm.Encounter.initCombat();
 }
-
+window.gm.encounters.leech = function(location,amount=1) {
+    window.gm.Encounter = new CombatSetup();
+    window.gm.Encounter.EnemyFunc = (function() { 
+        let mobs =[];
+        for(var i=amount;i>0;i-=1) {
+            let x = new window.gm.Mobs.Leech(); x.scaleLevel(window.gm.player.level);
+            mobs.push(x)
+        }
+        return(mobs);});
+    window.gm.Encounter.Location = location;
+    window.gm.Encounter.scenePic = window.gm.getScenePic(location);
+    window.gm.Encounter.initCombat();
+}
 window.gm.encounters.mechanicguy = function(location) {
     window.gm.Encounter = new CombatSetup();
     window.gm.Encounter.EnemyFunc = window.gm.Mobs.Mechanic;

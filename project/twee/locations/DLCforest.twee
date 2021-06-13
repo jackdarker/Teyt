@@ -81,7 +81,6 @@ There is a wolf again. Or is it the same?</br>
 <%window.gm.moveHere();%>
 The forest makes a friendly impression.</br> The trees are still light and are not yet as expansive and large as that no more light can get through the canopy.</br> 
 Maybe you can <a0 onclick='explore(); '>explore</a> the surrounding woods and see if you can find anything useful.</br>
-<%=(window.story.state._gm.debug)?("[[ForestWolfEncounter]]"):("")%></br>
 <div></br>[[ForestBorder]] [[ForestCliff]] </br></div>
 </article><article id="LogPanel"></article></section>
 <script> function explore() {
@@ -96,7 +95,9 @@ Maybe you can <a0 onclick='explore(); '>explore</a> the surrounding woods and se
         window.story.show('ForestMeetCarlia2');
     } else if(rnd > 70 ) {
          window.story.show('ForestWolfEncounter');
-    } else if(rnd > 20) { //todo limit berys per day
+    } else if(rnd > 65 ) {
+         window.story.show('ForestMudGlade');
+    }else if(rnd > 20) { //todo limit berys per day
         let find = ['PurpleBerry','PurpleBerry','ApocaFlower'];
         let rnd2 = _.random(0,find.length-1);
         window.story.state.tmp.args = [find[rnd2],1]
@@ -140,6 +141,33 @@ The figure was running into the direction of the cliff. But that might also be a
 </div>
 </article><article id="LogPanel"></article></section>
 
+:: ForestMudGlade
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+This area of the forest seems to be more watery and sludgy. Your feet sink into the muddy soil.
+<a0 onclick='explore();'>Searching around</a> might only get you wet and dirty.</br>
+<div></br>[[ForestEntrance]] </br></div>
+</article><article id="LogPanel"></article></section>
+<script> function explore() {
+    let rnd = _.random(0,100);
+    window.gm.pushLog("rolled "+rnd);
+    window.story.state.tmp.args = [];
+    if(rnd > 40 ) {
+         window.story.show('ForestLeechEncounter');
+    } else {
+        window.story.show('ForestSearchAround'); //nothing
+    }
+}
+</script>
+
+:: ForestLeechEncounter [_back_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<% if(true) {%>
+Some sludgy leeches are crawling up your legs, each easily long as a hand !</br>
+<a0 onclick='window.gm.encounters.leech(window.gm.player.location,_.random(1,3))'>Next</a>
+<%}%></br>
+<%=(window.story.state._gm.debug)?("[[Skip|_back_]]"):("")%></br>
+</article><article id="LogPanel"></article></section>
 
 :: ForestCliff
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
@@ -213,7 +241,7 @@ Come on, what kind of adventurer are you? How will you ever get good loot if you
 </div>
 <% } else {%>
 <div>
-Just return to [[ForestCliff]]. </br></div> 
+The path leads up to [[ForestCliff]] or further down to a [[river|ForestRiver]]. </br></div> 
 <%}%>
 </article><article id="LogPanel"></article></section>
 

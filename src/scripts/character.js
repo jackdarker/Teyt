@@ -44,7 +44,7 @@ class Character {
         for(let name of stFetish.listFetish()) {
             stFetish.setup(this.Stats,0,10,name);
         }        
-        this.Skills.addItem(new SkillUseItem());
+        this.Skills.addItem(new SkillUseItem());this.Skills.addItem(new SkillStruggle());
         this.Skills.addItem(new SkillAttack());this.Skills.addItem(new SkillStun());this.Skills.addItem(new SkillHeal());
         this.Skills.addItem(new SkillFlee()),this.Skills.addItem(new SkillSubmit());    
 
@@ -185,8 +185,8 @@ class Character {
         return(result);
     }
     //combat related; return a msg describing the state of the character
-    //"Wolf is currently entangled by fines."
-    //"You have you towershield raised to guard against damage. Your mana is drained by a opponents spell."
+    //"Wolf is currently entangled by vines."
+    //"You have your towershield raised to guard against damage. Your mana is drained by an opponents spell."
     _stateDesc() {
         let result = {OK:true,msg:''};
         let isPlayer = window.gm.player.id === this.id;

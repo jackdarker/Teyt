@@ -634,16 +634,16 @@ class effGrowVulva extends Effect {
 }
 /////////////// combateffects /////////////////////////
 class effHeal extends CombatEffect {
-    constructor(amount) {
+    constructor(amount,duration=0) {
         super();
         this.amount = amount;
-        this.data.id = this.data.name= effHeal.name, this.data.duration = 0, this.data.hidden=0;
+        this.data.id = this.data.name= effHeal.name, this.data.startduration = duration, this.data.hidden=0;
     }
     toJSON() {return window.storage.Generic_toJSON("effHeal", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(effHeal, value.data);};
     get desc() {return(effHeal.name);}
     onApply(){
-        this.data.duration = 2;
+        this.data.duration=this.data.startduration;
         this.parent.parent.Stats.increment('health',this.amount);
     }
     merge(neweffect) {
@@ -693,6 +693,34 @@ class effGuard extends CombatEffect {
         this.parent.parent.Stats.removeModifier('pDefense',{id:'pDefense:Guard'});
     }
 }
+//to combine multiple effects that get dispelled together 
+class effCombined extends CombatEffect {
+    constructor(EffectsA,EffectsB) {
+        super();
+        this.effects = EffectsA.concat(EffectsB);
+        this.data.id = this.data.name= effCombined.name, this.data.duration = 0, this.data.hidden=0;
+        for(el of EffectsA) {
+            el.onRemove = (function(me){
+                let _old = el.onRemove.bind(el); 
+                let foo = function() {
+                    _old.call(el); //override onRemove but call orignial fct
+                    let i = me.effects.indexOf(el);
+                    if(i>=0) me.effects.splice(i,1);
+                    me.removeAll();
+                }
+                return(foo);
+            } (this));
+        }
+    }
+    removeAll(){
+        for(el of this.effects) {
+            if(el) el.parent.removeItem(el.id);
+        }
+        this.parent.removeItem(this.id);
+    }
+    toJSON() {return window.storage.Generic_toJSON("effCombined", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(effCombined, value.data);};
+}
 class effDamage extends CombatEffect {
     constructor(amount) {
         super();
@@ -701,15 +729,135 @@ class effDamage extends CombatEffect {
     }
     toJSON() {return window.storage.Generic_toJSON("effDamage", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(effDamage, value.data);};
-    get desc() {return(effDamage.name);}
     onApply(){
         this.data.duration = 0;
         this.parent.parent.Stats.increment('health',-1*this.amount);
     }
     merge(neweffect) {
         if(neweffect.name===this.data.name) {    //ignore
+            return;
+        }
+    }
+    onCombatEnd() { this.parent.removeItem(this.data.id); }
+    onTurnStart() { this.data.duration-=1; if(this.data.duration<=0) this.parent.removeItem(this.data.id);    }
+}
+//damage over time todo affects only bleedable targets 
+class effBleed extends CombatEffect {
+    constructor(amount) {
+        super();
+        this.amount = amount;
+        this.data.id = this.data.name= effBleed.name, this.data.duration = 0, this.data.hidden=0;
+    }
+    toJSON() {return window.storage.Generic_toJSON("effBleed", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(effBleed, value.data);};
+    onApply(){
+        this.data.duration = 3;
+        this.parent.parent.Stats.increment('health',-1*this.amount);
+    }
+    merge(neweffect) {
+        if(neweffect.name===this.data.name) {    //ignore
             //this.onApply();
-            return(false);
+            return(true);
+        }
+    }
+    onCombatEnd() { this.parent.removeItem(this.data.id); }
+    onTurnStart() { this.data.duration-=1; 
+        if(this.data.duration<=0) {
+            this.parent.removeItem(this.data.id);   
+        } else {
+            this.parent.parent.Stats.increment('health',-1*this.amount);
+        }
+    }
+}
+//the character is in close combat with whom; 
+class effGrappled extends CombatEffect {
+    static factory() {
+        let grappled = new effGrappled(2), grappling= new effGrappling();
+        grappled.source = grappling, grappling.target = grappled;
+        return({targetEff:grappled,sourceEff:grappling});
+    }
+    constructor(amount) {
+        super();
+        this.source=null;
+        this.data.id = this.data.name= effGrappled.name, this.data.duration = 0, this.data.hidden=0;
+    }
+    toJSON() {return window.storage.Generic_toJSON("effGrappled", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(effGrappled, value.data);};
+    onApply(){
+        this.data.duration = 5;
+        this.data.name = this.data.name+"("+this.source.parent.parent.name+")";
+    }
+    merge(neweffect) {
+        if(neweffect.name===this.data.name) {    //ignore
+            //this.onApply();
+            return(true);
+        }
+    }
+    onRemove(){
+        if(this.source) {
+            this.source.parent.removeItem(effGrappling.name);
+            this.source=null;
+        }
+    }
+    onCombatEnd() { this.parent.removeItem(this.data.id); }
+    onTurnStart() { 
+        this.data.duration-=1; 
+        if(this.data.duration<=0) {this.parent.removeItem(this.data.id);}  
+        else {
+        }
+    }
+}
+//when a char casts grappling, the target gets effGrappled and the caster gets effGrappling
+//if one of the effects got removed, it will also remove the other
+class effGrappling extends CombatEffect {
+    constructor( targetEffect) {
+        super();
+        this.target=targetEffect;
+        this.data.id = this.data.name= effGrappling.name, this.data.duration = 0, this.data.hidden=0;
+    }
+    toJSON() {return window.storage.Generic_toJSON("effGrappling", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(effGrappling, value.data);};
+    get desc() {return(this.data.name);}
+    onApply(){
+        this.data.duration = 5;
+    }
+    merge(neweffect) {
+        if(neweffect.name===this.data.name) {    //ignore
+            //this.onApply();
+            return(true);
+        }
+    }
+    onRemove(){
+        if(this.target) {
+            this.target.parent.removeItem(effGrappled.name);
+            this.target=null;
+        }
+    }
+    onCombatEnd() { this.parent.removeItem(this.data.id); }
+    onTurnStart() { this.data.duration-=1; 
+        if(this.data.duration<=0) {
+            this.parent.removeItem(this.data.id); 
+        } else {
+        }
+    }
+}
+class effUngrappling extends CombatEffect {
+    constructor( targetEffect) {
+        super();
+        this.target=targetEffect;
+        this.data.id = this.data.name= effUngrappling.name, this.data.duration = 0, this.data.hidden=0;
+    }
+    toJSON() {return window.storage.Generic_toJSON("effUngrappling", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(effUngrappling, value.data);};
+    get desc() {return(this.data.name);}
+    onApply(){ 
+        this.parent.removeItem(this.target.id);
+        this.parent.removeItem(this.data.id);
+    }
+    merge(neweffect) {
+        if(neweffect.name===this.data.name) {    //ignore
+            //this.onApply();
+            return(true);
         }
     }
     onCombatEnd() { this.parent.removeItem(this.data.id); }
@@ -745,7 +893,7 @@ class effStunned extends CombatEffect {
     }
     toJSON() {return window.storage.Generic_toJSON("effStunned", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(effStunned, value.data);};
-    get desc() {return(effStunned.name);}
+    get desc() {return(this.data.name);}
     onApply(){
         this.data.duration = 2;
     }

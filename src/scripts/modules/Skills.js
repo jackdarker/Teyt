@@ -13,8 +13,9 @@ class SkillAttack extends Skill {
     targetFilter(targets){
         return(this.targetFilterEnemy(this.targetFilterAlive(targets)));
     }
+    get desc() { return("Use weapon or claws to deal damage.");}
     previewCast(targets){
-        var result = new SkillResult()
+        var result = new SkillResult();
         result.skill =this;
         result.source = this.caster;
         result.targets = targets;
@@ -65,9 +66,11 @@ class SkillBite extends SkillAttack {
     constructor() {
         super();
         this.id=this.name='Bite';
+        this.msg = '';
     }
     toJSON() {return window.storage.Generic_toJSON("SkillBite", this); };
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillBite, value.data));}
+    get desc() { return("Use your maw to bite the foe.");}
     __estimateAttack() {
         let attack =window.gm.combat.defaultAttackData();
         let mouth=this.caster.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bMouth);
@@ -92,7 +95,7 @@ class SkillTease extends Skill {
         return(this.targetFilterEnemy(this.targetFilterAlive(targets)));
     }
     previewCast(targets){
-        var result = new SkillResult()
+        var result = new SkillResult();
         result.skill =this,result.source = this.caster,result.targets = targets;
         this.msg = '';
         if(this.isValidTarget(targets)) {
@@ -127,6 +130,7 @@ class SkillStun extends Skill {
         if(multi.length>1) possibletarget.push(multi);  //if there is only [[mole]] we dont want [[mole],[mole]]
         return(possibletarget);//[[mole1],[mole2],[mole1,mole2]]
     }
+    get desc() { return("A successful stun lowers the foes chance to evade and might disable his attack for some time.");}
     previewCast(targets){
         var result = new SkillResult()
         result.skill =this;
@@ -179,6 +183,7 @@ class SkillHeal extends Skill {
     targetFilter(targets){
         return(this.targetFilterAlly(this.targetFilterAlive(targets)));
     }
+    get desc() { return("Restore some health.");}
     previewCast(targets){
         var result = new SkillResult()
         result.skill =this;
@@ -242,28 +247,164 @@ class SkillSubmit extends Skill {
         return result
     }
 }
-class SkillGuard extends Skill {
+class SkillGrapple extends Skill {
+    constructor() { 
+        super("Grapple");
+        this.msg = ''; }
+    toJSON() {return window.storage.Generic_toJSON("SkillGrapple", this); };
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillGrapple, value.data));}
+    targetFilter(targets){
+        return(this.targetFilterEnemy(this.targetFilterAlive(targets)));
+    }
+    get desc() { return("Grapple the opponent to restrict his movement.");}
+    previewCast(targets){
+        var result = new SkillResult();
+        this.msg = '';
+        result.skill =this;
+        result.source = this.caster;
+        result.targets = targets;
+        if(this.isValidTarget(targets)) {
+            result.OK = true;
+            var target=targets[0];
+            var rnd = _.random(0,100);
+            if(rnd>30) { //todo chance to grapple depends on?
+                let x = effGrappled.factory();
+                //let grappled = new effGrappled(2), grappling= new effGrappling();
+                //let x = new effCombined([grappled,grappling ]);
+                result.effects.push( {target:this.caster,eff:[x.sourceEff]});//,heal,leeching]
+                result.effects.push( {target:target,eff:[x.targetEff]});
+            } 
+        }
+        this.msg = result.msg;
+        return result
+    }
+    getCastDescription(result) {
+        return(this.msg);
+    }
+}
+//char attaches itself to target and sucks health
+class SkillLeechHealth extends Skill {
+    constructor() { 
+        super("Leech");
+        this.msg = ''; }
+    toJSON() {return window.storage.Generic_toJSON("SkillLeechHealth", this); };
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillLeechHealth, value.data));}
+    targetFilter(targets){
+        return(this.targetFilterEnemy(this.targetFilterAlive(targets)));
+    }
+    get desc() { return("Grapple the opponent and suck the life from him.");}
+    previewCast(targets){
+        var result = new SkillResult();
+        this.msg = '';
+        result.skill =this;
+        result.source = this.caster;
+        result.targets = targets;
+        if(this.isValidTarget(targets)) {
+            result.OK = true;
+            var target=targets[0];
+            var rnd = _.random(0,100);
+            if(rnd>30) { //todo chance to grapple depends on?
+                let x = effGrappled.factory();
+                this.__combineGrabAndLeech(x.targetEff,x.sourceEff);
+                result.effects.push( {target:this.caster,eff:[x.sourceEff]});//,heal,leeching]
+                result.effects.push( {target:target,eff:[x.targetEff]}); //im
+            } 
+        }
+        this.msg = result.msg;
+        return result
+    }
+    __combineGrabAndLeech(grabEff,grapplingEff) {
+        grapplingEff.onTurnStart = (function(me){
+            let eff = grapplingEff;
+            let _old = eff.onTurnStart.bind(eff); 
+            let foo = function() {
+                _old(); //override  but call orignial fct
+                eff.parent.parent.Stats.increment('health',5);  //todo scale by ??
+            }
+            return(foo);
+        } (this));
+        grabEff.onTurnStart = (function(me){
+            let eff = grabEff;
+            let _old = eff.onTurnStart.bind(eff); 
+            let foo = function() {
+                _old(); //override  but call orignial fct
+                eff.parent.parent.Stats.increment('health',-5);
+            }
+            return(foo);
+        } (this));
+    }
+    getCastDescription(result) {
+        return(this.msg);
+    }
+}
+//try to ungrapple
+class SkillStruggle extends Skill {
     //todo improves defense
+    constructor() { 
+        super("Struggle");
+        this.msg = '';}
+    toJSON() {return window.storage.Generic_toJSON("SkillStruggle", this); };
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillStruggle, value.data));}
+    targetFilter(targets){
+        return(this.targetFilterSelf(targets));
+    }
+    get desc() { return("Try to escape a grapple.");}
+    isDisabled() {
+        let x = (this.parent.parent.Effects.countItem(effGrappled.name)<=0);
+        return({OK:x,msg:''});
+    }
+    previewCast(targets){
+        var result = new SkillResult();
+        this.msg = '';
+        result.skill =this;
+        result.source = this.caster;
+        result.targets = targets;
+        if(this.isValidTarget(targets)) {
+            result.OK = true;
+            for(var target of targets) {
+                if(target.Effects.countItem(effGrappled.name)>0) {
+                var rnd = _.random(0,100);
+                var eff = target.Effects.get(effGrappled.name);
+                result.msg = "Attempts to escape the grapple failed.";
+                if(rnd>30) { //todo chance to ungrapple increase over time
+                    result.effects.push( {target:target,
+                      eff:[new effUngrappling(eff)]});
+                    result.msg = this.caster.name+" was able to escape from "+eff.source.parent.parent.name+".";
+                }
+                }
+                
+            }
+        }
+        this.msg = result.msg;
+        return result
+    }
+    getCastDescription(result) {
+        return(this.msg);
+    }
+}
+class SkillGuard extends Skill {
+    //todo improves defense; 
     constructor() { super("Guard");}
     toJSON() {return window.storage.Generic_toJSON("SkillGuard", this); };
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillGuard, value.data));}
     targetFilter(targets){
         return(this.targetFilterSelf(targets));
     }
-      previewCast(targets){
-          var result = new SkillResult()
-          result.skill =this;
-          result.source = this.caster;
-          result.targets = targets;
-          if(this.isValidTarget(targets)) {
-              result.OK = true;
-              for(var target of targets) {
-                  /*result.effects.push( {target:target,
-                      eff:[new effHeal(10)]})*/
-                  }
-          }
-          return result
-      }
+    get desc() { return("Boosts your defense.");}  
+    previewCast(targets){
+        var result = new SkillResult()
+        result.skill =this;
+        result.source = this.caster;
+        result.targets = targets;
+        if(this.isValidTarget(targets)) {
+            result.OK = true;
+            for(var target of targets) {
+                /*result.effects.push( {target:target,
+                    eff:[new effHeal(10)]})*/
+                }
+        }
+        return result
+    }
 }
 class SkillUseItem extends Skill {
     constructor() {super("UseItem");
@@ -310,6 +451,7 @@ class SkillCallHelp extends Skill {
         super("CallHelp");
         this.item='';
     }
+    get desc() { return("Summon "+this.item);}
     toJSON() {return window.storage.Generic_toJSON("SkillCallHelp", this); };
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillCallHelp, value.data));}
     targetFilter(targets){
@@ -339,12 +481,14 @@ window.gm.SkillsLib = (function (Lib) {
     window.storage.registerConstructor(SkillAttack);
     window.storage.registerConstructor(SkillBite);
     window.storage.registerConstructor(SkillCallHelp);
+    window.storage.registerConstructor(SkillGrapple);
     window.storage.registerConstructor(SkillFlee);
     window.storage.registerConstructor(SkillGuard);
     window.storage.registerConstructor(SkillHeal);
     window.storage.registerConstructor(SkillPoisonCloud);
     window.storage.registerConstructor(SkillStun);
     window.storage.registerConstructor(SkillSubmit);
+    window.storage.registerConstructor(SkillStruggle);
     window.storage.registerConstructor(SkillTease);
     window.storage.registerConstructor(SkillUseItem);
     //.. and Wardrobe
