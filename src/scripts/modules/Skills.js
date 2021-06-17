@@ -1,14 +1,40 @@
 "use strict";
+
+class SkillInspect extends Skill {
+    constructor() {
+        super("Inspect");
+        this.msg = '';
+    }
+    toJSON() {return window.storage.Generic_toJSON("SkillInspect", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillInspect, value.data));}
+    targetFilter(targets){
+        return(this.targetFilterEnemy(this.targetFilterAlive(targets)));
+    }
+    get desc() { return("Check out your foe.");}
+    previewCast(targets){
+        var result = new SkillResult();
+        result.skill =this;
+        result.source = this.caster;
+        result.targets = targets;
+        this.msg = '';
+        if(this.isValidTarget(targets)) {
+            result.OK = true;
+            result.msg = this.msg = window.gm.printBodyDescription(targets[0],true);
+            //todo display stats dependign on skill
+        }
+        return result
+    }
+    getCastDescription(result) {
+        return(this.msg);
+    }
+}
 //execute simple attack with active weapon or claws
-
-//todo class SkillInspect extends Skill
-
 class SkillAttack extends Skill {
     constructor() {
         super("Attack");
         this.msg = '';
     }
-    toJSON() {return window.storage.Generic_toJSON("SkillAttack", this); };
+    toJSON() {return window.storage.Generic_toJSON("SkillAttack", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillAttack, value.data));}
     targetFilter(targets){
         return(this.targetFilterEnemy(this.targetFilterAlive(targets)));
@@ -68,7 +94,7 @@ class SkillBite extends SkillAttack {
         this.id=this.name='Bite';
         this.msg = '';
     }
-    toJSON() {return window.storage.Generic_toJSON("SkillBite", this); };
+    toJSON() {return window.storage.Generic_toJSON("SkillBite", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillBite, value.data));}
     get desc() { return("Use your maw to bite the foe.");}
     __estimateAttack() {
@@ -89,14 +115,16 @@ class SkillTease extends Skill {
         super("Tease");
         this.msg = '';
     }
-    toJSON() {return window.storage.Generic_toJSON("SkillTease", this); };
+    toJSON() {return window.storage.Generic_toJSON("SkillTease", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillTease, value.data));}
     targetFilter(targets){
         return(this.targetFilterEnemy(this.targetFilterAlive(targets)));
     }
     previewCast(targets){
         var result = new SkillResult();
-        result.skill =this,result.source = this.caster,result.targets = targets;
+        result.skill =this;
+        result.source = this.caster;
+        result.targets = targets;
         this.msg = '';
         if(this.isValidTarget(targets)) {
             result.OK = true;
@@ -116,7 +144,7 @@ class SkillTease extends Skill {
 class SkillStun extends Skill {
     //execute stun attack
     constructor() {  super("Stun");  }
-    toJSON() {return window.storage.Generic_toJSON("SkillStun", this); };
+    toJSON() {return window.storage.Generic_toJSON("SkillStun", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillStun, value.data));}
     targetFilter(targets){
         var possibletarget = this.targetFilterFighting(this.targetFilterEnemy(targets));
@@ -152,7 +180,7 @@ class SkillStun extends Skill {
 }
 class SkillPoisonCloud extends Skill {
     constructor() {  super("PoisonCloud");  }
-    toJSON() {return window.storage.Generic_toJSON("SkillPoisonCloud", this); };
+    toJSON() {return window.storage.Generic_toJSON("SkillPoisonCloud", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillPoisonCloud, value.data));}
     targetFilter(targets){
         return(this.targetFilterFighting(this.targetFilterEnemy(targets)));
@@ -178,7 +206,7 @@ class SkillPoisonCloud extends Skill {
 }
 class SkillHeal extends Skill {
     constructor() { super("Heal");    }
-    toJSON() {return window.storage.Generic_toJSON("SkillHeal", this); };
+    toJSON() {return window.storage.Generic_toJSON("SkillHeal", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillHeal, value.data));}
     targetFilter(targets){
         return(this.targetFilterAlly(this.targetFilterAlive(targets)));
@@ -189,7 +217,7 @@ class SkillHeal extends Skill {
         result.skill =this;
         result.source = this.caster;
         result.targets = targets;
-        if(this.isValidTarget(targets)) {
+        if(this.isValidTarget(targets)) {   //todo  consume energy
             result.OK = true;
             for(var target of targets) {
                 result.effects.push( {target:target,
@@ -201,7 +229,7 @@ class SkillHeal extends Skill {
 }
 class SkillFlee extends Skill {
     constructor() { super("Flee");    }
-    toJSON() {return window.storage.Generic_toJSON("SkillFlee", this); };
+    toJSON() {return window.storage.Generic_toJSON("SkillFlee", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillFlee, value.data));}
     targetFilter(targets){
         return(this.targetFilterSelf(targets));
@@ -225,7 +253,7 @@ class SkillFlee extends Skill {
 }
 class SkillSubmit extends Skill {
     constructor() { super("Submit");    }
-    toJSON() {return window.storage.Generic_toJSON("SkillSubmit", this); };
+    toJSON() {return window.storage.Generic_toJSON("SkillSubmit", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillSubmit, value.data));}
     targetFilter(targets){
         return(this.targetFilterSelf(targets));
@@ -251,7 +279,7 @@ class SkillGrapple extends Skill {
     constructor() { 
         super("Grapple");
         this.msg = ''; }
-    toJSON() {return window.storage.Generic_toJSON("SkillGrapple", this); };
+    toJSON() {return window.storage.Generic_toJSON("SkillGrapple", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillGrapple, value.data));}
     targetFilter(targets){
         return(this.targetFilterEnemy(this.targetFilterAlive(targets)));
@@ -287,7 +315,7 @@ class SkillLeechHealth extends Skill {
     constructor() { 
         super("Leech");
         this.msg = ''; }
-    toJSON() {return window.storage.Generic_toJSON("SkillLeechHealth", this); };
+    toJSON() {return window.storage.Generic_toJSON("SkillLeechHealth", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillLeechHealth, value.data));}
     targetFilter(targets){
         return(this.targetFilterEnemy(this.targetFilterAlive(targets)));
@@ -343,7 +371,7 @@ class SkillStruggle extends Skill {
     constructor() { 
         super("Struggle");
         this.msg = '';}
-    toJSON() {return window.storage.Generic_toJSON("SkillStruggle", this); };
+    toJSON() {return window.storage.Generic_toJSON("SkillStruggle", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillStruggle, value.data));}
     targetFilter(targets){
         return(this.targetFilterSelf(targets));
@@ -385,7 +413,7 @@ class SkillStruggle extends Skill {
 class SkillGuard extends Skill {
     //todo improves defense; 
     constructor() { super("Guard");}
-    toJSON() {return window.storage.Generic_toJSON("SkillGuard", this); };
+    toJSON() {return window.storage.Generic_toJSON("SkillGuard", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillGuard, value.data));}
     targetFilter(targets){
         return(this.targetFilterSelf(targets));
@@ -411,7 +439,7 @@ class SkillUseItem extends Skill {
         this.item='';
         this.msg = '';
     }
-    toJSON() {return window.storage.Generic_toJSON("SkillUseItem", this); };
+    toJSON() {return window.storage.Generic_toJSON("SkillUseItem", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillUseItem, value.data));}
 // first item has to be set
 // then when targetFilter is called, forward the filterrequest to the item
@@ -452,7 +480,7 @@ class SkillCallHelp extends Skill {
         this.item='';
     }
     get desc() { return("Summon "+this.item);}
-    toJSON() {return window.storage.Generic_toJSON("SkillCallHelp", this); };
+    toJSON() {return window.storage.Generic_toJSON("SkillCallHelp", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillCallHelp, value.data));}
     targetFilter(targets){
         return(this.targetFilterSelf(targets));
@@ -485,13 +513,13 @@ window.gm.SkillsLib = (function (Lib) {
     window.storage.registerConstructor(SkillFlee);
     window.storage.registerConstructor(SkillGuard);
     window.storage.registerConstructor(SkillHeal);
+    window.storage.registerConstructor(SkillInspect);
     window.storage.registerConstructor(SkillPoisonCloud);
     window.storage.registerConstructor(SkillStun);
     window.storage.registerConstructor(SkillSubmit);
     window.storage.registerConstructor(SkillStruggle);
     window.storage.registerConstructor(SkillTease);
     window.storage.registerConstructor(SkillUseItem);
-    //.. and Wardrobe
-    Lib['SkillAttack'] = function () { return new SkillAttack();};
+    //    Lib['SkillAttack'] = function () { return new SkillAttack();};
     return Lib; 
 }(window.gm.SkillsLib || {}));

@@ -6,7 +6,7 @@ class Leggings extends Equipment {
         this.slotUse = ['Legs','Hips'];
     }
     get desc() { return 'Spandex-leggings for sport. (agility+)';}
-    toJSON() {return window.storage.Generic_toJSON("Leggings", this); };
+    toJSON() {return window.storage.Generic_toJSON("Leggings", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(Leggings, value.data));}
     canEquip() {return({OK:true, msg:'equipable'});}
     canUnequip() {return({OK:true, msg:'unequipable'});}
@@ -24,7 +24,7 @@ class Jeans extends Equipment {
         this.slotUse = ['Legs','Hips'];
     }
     get desc() { return 'plain old blue jeans';    }
-    toJSON() {return window.storage.Generic_toJSON("Jeans", this); };
+    toJSON() {return window.storage.Generic_toJSON("Jeans", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(Jeans, value.data));}
     canEquip() {return({OK:true, msg:'equipable'});}
     canUnequip() {return({OK:true, msg:'unequipable'});}
@@ -36,7 +36,7 @@ class Sneakers extends Equipment {
         this.slotUse = ['Feet'];
     }
     get desc() { return 'Sneakers for sport and recreational activities.';    }
-    toJSON() {return window.storage.Generic_toJSON("Sneakers", this); };
+    toJSON() {return window.storage.Generic_toJSON("Sneakers", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(Sneakers, value.data));}
     canEquip() {return({OK:true, msg:'equipable'});}
     canUnequip() {return({OK:true, msg:'unequipable'});}
@@ -48,7 +48,7 @@ class TankShirt extends Equipment {
         this.slotUse = ['Breast','Stomach'];
     }
     get desc() { return 'light blue tank-top';}
-    toJSON() {return window.storage.Generic_toJSON("TankShirt", this); };
+    toJSON() {return window.storage.Generic_toJSON("TankShirt", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(TankShirt, value.data));}
     canEquip() {return({OK:true, msg:'equipable'});}
     canUnequip() {return({OK:true, msg:'unequipable'});}
@@ -66,7 +66,7 @@ class Pullover extends Equipment {
         return(fconv(msg));
     }
     get desc() { return 'warm pullover';}
-    toJSON() {return window.storage.Generic_toJSON("Pullover", this); };
+    toJSON() {return window.storage.Generic_toJSON("Pullover", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(Pullover, value.data));}
     canEquip() {return({OK:true, msg:'equipable'});}
     canUnequip() {return({OK:true, msg:'unequipable'});}
@@ -78,7 +78,7 @@ class HandCuffs extends Equipment {
         this.slotUse = ['RHand','LHand','Wrists'];
     }
     get desc() { return 'handcuffs';  }
-    toJSON() {return window.storage.Generic_toJSON("HandCuffs", this); };
+    toJSON() {return window.storage.Generic_toJSON("HandCuffs", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(HandCuffs, value.data));}
     usable(context) {return(this.canEquip());}
     use(context) { //context here is inventory not outfit
@@ -104,7 +104,7 @@ class WristCuffs extends Equipment {
         this.lossOnRespawn = false;
     }
     get desc() { return 'handcuffs';  }
-    toJSON() {return window.storage.Generic_toJSON("WristCuffs", this); };
+    toJSON() {return window.storage.Generic_toJSON("WristCuffs", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(WristCuffs, value.data));}
     usable(context) {return(this.canEquip());}
     use(context) { //context here is inventory not outfit
@@ -130,7 +130,7 @@ class CollarQuest extends Equipment {
         this.lossOnRespawn = false;
     }
     get desc() { return 'a collar';  }
-    toJSON() {return window.storage.Generic_toJSON("CollarQuest", this); };
+    toJSON() {return window.storage.Generic_toJSON("CollarQuest", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(CollarQuest, value.data));}
     usable(context) {return(this.canEquip());}
     use(context) { //context here is inventory not outfit
@@ -165,7 +165,7 @@ class ClitPiercing extends Equipment {
         if(this.style===100) return('cursed piercing');
         return('small clitoris-piercing');
     }
-    toJSON() {return window.storage.Generic_toJSON("ClitPiercing", this); };
+    toJSON() {return window.storage.Generic_toJSON("ClitPiercing", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(ClitPiercing, value.data));}
     canEquip() {return({OK:true, msg:'equipable'});}
     canUnequip() {return({OK:true, msg:'unequipable'});}
@@ -185,7 +185,7 @@ class Crowbar extends Equipment {
     }
     descLong(fconv) {return(fconv('A warm pullover adorns $[me]$.'));}
     get desc() { return 'durable crowbar.';}
-    toJSON() {return window.storage.Generic_toJSON("Crowbar", this); };
+    toJSON() {return window.storage.Generic_toJSON("Crowbar", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(Crowbar, value.data));}
     usable(context) {return(this.canEquip());}
     use(context) { //context here is inventory not outfit
@@ -217,8 +217,8 @@ class Shovel extends Equipment {
         this.slotUse = ['RHand','LHand'];
         this.lossOnRespawn = true;
     }
-    get desc() { 'A rusty,old shovel.';}
-    toJSON() {return window.storage.Generic_toJSON("Shovel", this); };
+    get desc() { return('A rusty,old shovel.');}
+    toJSON() {return window.storage.Generic_toJSON("Shovel", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(Shovel, value.data));}
     usable(context) {return(this.canEquip());}
     use(context) { //context here is inventory not outfit
@@ -250,7 +250,7 @@ class RobesZealot extends Equipment {
         this.lossOnRespawn = true;
     }
     get desc() { return 'light blue tank-top';}
-    toJSON() {return window.storage.Generic_toJSON("RobesZealot", this); };
+    toJSON() {return window.storage.Generic_toJSON("RobesZealot", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(RobesZealot, value.data));}
     canEquip() {return({OK:true, msg:'equipable'});}
     canUnequip() {return({OK:true, msg:'unequipable'});}
@@ -264,8 +264,8 @@ class StaffWodden extends Equipment {
         this.lossOnRespawn = true;
         this.pDamage = 5;
     }
-    get desc() { 'A staff ade from wood.';}
-    toJSON() {return window.storage.Generic_toJSON("StaffWodden", this); };
+    get desc() { return('A staff made from wood.');}
+    toJSON() {return window.storage.Generic_toJSON("StaffWodden", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(StaffWodden, value.data));}
     usable(context) {return(this.canEquip());}
     use(context) { //context here is inventory not outfit

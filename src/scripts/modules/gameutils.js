@@ -1,6 +1,8 @@
 "use strict";
-/* bundles some utility operations*/
 
+
+
+/* bundles some utility operations*/
 window.gm.getSaveVersion= function(){   return([0,1,0]); };
 // reimplement to setup the game
 let _origInitGame = window.gm.initGame;
@@ -54,7 +56,7 @@ window.gm.initGame= function(forceReset,NGP=null) {
         foodMaxStore : 4
       };
     }
-    if (!s.Cyril||forceReset) {  //alternative player character
+    if (!s.Cyril||forceReset) {  //
       let ch = new Character()
       ch.name=ch.id="Cyril";
       ch.faction="Player";
@@ -69,31 +71,17 @@ window.gm.initGame= function(forceReset,NGP=null) {
       ch.Stats.increment('strength',3);
       s.Cyril =window.gm.Cyril= ch;
     }
+    if (!s.Carlia||forceReset) {  //the cat/dog-woman
+      let ch = new Carlia()
+      s.Carlia =window.gm.Carlia= ch;
+    }
     if (!s.Ruff||forceReset) {  //Ruff the wolf
-      let ch = new Character()
-      ch.name=ch.id="Ruff";
-      ch.faction="Enemy";
-      //add some basic inventory
-      ch.Outfit.addItem(new BaseQuadruped());
-      ch.Outfit.addItem(new SkinFur());
-      ch.Outfit.addItem(new FaceWolf());
-      ch.Outfit.addItem(new PenisHuman());
-      ch.Stats.increment('strength',3);
+      let ch = new Ruff()
       s.Ruff = window.gm.Ruff=ch;
     }
     if (!s.Trent||forceReset) {  //the horse-bully from the bridge
-      let ch = new Character()
+      let ch = new Trent()
       ch.name=ch.id="Trent";
-      ch.faction="Enemy";
-      //add some basic inventory
-      ch.Outfit.addItem(new BaseHumanoid());
-      ch.Outfit.addItem(new SkinFur());
-      ch.Outfit.addItem(new FaceHorse());
-      ch.Outfit.addItem(new PenisHuman());
-      ch.Stats.increment('strength',3);
-      ch.levelUp(3);
-      ch.autoLeveling();
-      ch.calcCombatMove=Mob.calcCombatMove; //ennable AI todo how to toggle later
       s.Trent = window.gm.Trent = ch;
     }
     if (!s.PlayerVR||forceReset) {  
@@ -101,12 +89,12 @@ window.gm.initGame= function(forceReset,NGP=null) {
       ch.id="PlayerVR";
       ch.name="Zeph";
       ch.faction="Player";
-      ch.Effects.addItem(skCooking.name,new skCooking());
       //body
       ch.Outfit.addItem(new BaseHumanoid());
       ch.Outfit.addItem(new SkinHuman());
       ch.Outfit.addItem(new FaceHuman());
       ch.Outfit.addItem(new PenisHuman());
+      ch.Skills.addItem(new SkillInspect());
       s.PlayerVR=window.gm.PlayerVR= ch;
     }
     if (!s.PlayerRL||forceReset) {  
@@ -172,6 +160,7 @@ window.gm.enterVR=function() {
 }
 window.gm.leaveVR=function() {
   //todo update effects in VR but stop RL effects
+  let s= window.story.state;
   s.vars.playerPartyVR = s._gm.playerParty;
   s._gm.playerParty = s.vars.playerPartyRL;
   window.gm.switchPlayer("PlayerRL");
@@ -351,23 +340,8 @@ window.gm.printBodyDescription= function(whom,onlyvisible=false) {
   let worn =whom.Outfit.getAllIds(); //todo this returns wearables & bodyparts
   // todo filter by visibility and sort the order: plae Breast & Nipple-Piercing together 
   for(el of worn) {
-    msg+= whom.Outfit.getItem(el).descLong(conv)+"</br>";
+    msg+= whom.Outfit.getItem(el).descLong(conv);
   }
-  /*let base = whom.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bBase);
-  let skin = whom.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bSkin);
-  let face = whom.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bFace);
-  msg+= base.descLong(conv)+"</br>";
-  msg+= skin.descLong(conv)+"</br>";
-  msg+= face.descLong(conv)+"</br>";
-  let breast = whom.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bBreast);
-  if(breast) msg+= breast.descLong(conv)+"</br>";
-  let penis = whom.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bPenis);
-  if(penis) penis.descLong(conv)+"</br>";
-  let vulva = whom.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bVulva);
-	if(vulva) { 
-    let pierc = whom.Outfit.getItemForSlot(window.gm.OutfitSlotLib.pClit);
-    msg +=vulva.descLong(conv) + ((pierc)?("A "+pierc.desc+" decorates your clit."):"")+"</br>";
-  }*/
 	return msg+"</br>";
 };
 // returns singular pronoun for the char depending on gender

@@ -37,7 +37,7 @@ class Character {
         this.Skills = new Inventory(this._data.skills);
         this.Skills._parent = window.gm.util.refToParent(this);
         //create basic stats
-        stHealth.setup(this.Stats,30,40),stEnergy.setup(this.Stats,30,100),stPAttack.setup(this.Stats,6,100),stPDefense.setup(this.Stats,4,100),
+        stHealth.setup(this.Stats,10,10),stEnergy.setup(this.Stats,30,100),stPAttack.setup(this.Stats,6,100),stPDefense.setup(this.Stats,4,100),
         stAgility.setup(this.Stats,10,100),stIntelligence.setup(this.Stats,10,100),stLuck.setup(this.Stats,10,100);
         stCharisma.setup(this.Stats,10,100),stPerception.setup(this.Stats,10,100),stStrength.setup(this.Stats,10,100),stEndurance.setup(this.Stats,10,100);
         stCorruption.setup(this.Stats,0,50),stArousal.setup(this.Stats,1,100),stLAttack.setup(this.Stats,6,100),stLDefense.setup(this.Stats,2,100);
@@ -50,7 +50,7 @@ class Character {
 
         window.storage.registerConstructor(Character);
     }
-    toJSON() {return window.storage.Generic_toJSON("Character", this); };
+    toJSON() {return window.storage.Generic_toJSON("Character", this); }
     static fromJSON(value) { 
         var _x = window.storage.Generic_fromJSON(Character, value.data);
         //need to recreate parent links

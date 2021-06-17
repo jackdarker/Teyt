@@ -111,7 +111,7 @@ There is a large bed for sleeping with a nightstand aside. </br>
 <%}%>
 <div <%=((window.gm.quests.getMilestoneState("qDLCMain").id<600)?"hidden":"") %> >That bulky VR-scaffold is taking up a lot of space.  
 	<%if(window.gm.getTimeStruct().hour>13){%>
-	You could [[try to start it up|<%=((window.gm.quests.getMilestoneState("qDLCMain").id<700)?"VRSuiteUp":"ForestSpawn") %>]].</br> 
+	You could <a0 onclick='if(window.gm.quests.getMilestoneState("qDLCMain").id<700) window.show.story("VRSuiteUp"); else {window.gm.enterVR();window.show.story("ForestSpawn")}'>Try to enter the VR</a></br> 
 	<%} else {%>
 	You have other things to do then play with it.</br>
 	<%}%>

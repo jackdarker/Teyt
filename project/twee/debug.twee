@@ -86,9 +86,21 @@ Theme:
 <statup>Statup</statup>  <statdown>Statdown</statdown> <span class='red'>RED</span><span class='green'>GREEN</span>
 <p class='div_alarm'>ALARM</p>
 <hr>
-<div class="popup" onclick='(function(){var popup = document.getElementById("myPopup2"); popup.classList.toggle("show");}())'>hover here
+<label>[hint]<input type="checkbox"  style="display: none;" >
+  <span role='tooltip'>hkljj  fdggfdsf gf   dfsd afsdafgdae sgfegf</span>
+</label>       <label> <input type="checkbox" >
+  <span role='tooltip'>hkljj  fdggfdsf gf   dfsd afsdafgdae sgfegf</span>
+</label>
+<div class="popup">[hover here]
   <span class="popuptext" id="myPopup2">A Simple window.gm.printPickupAndClear('Crowbar','A crowbar is lying other there.'</span>
 </div>
+<div class="popup">[hover here]
+  <span class="popuptext" id="myPopup2">A Simple window.gm.printPickupAndClear('Crowbar','A crowbar is lying other there.'</span>
+</div>
+<label> <input type="checkbox" >
+  <span role='tooltip'>hkljj  fdggfdsf gf   dfsd afsdafgdae sgfegf</span>
+</label>
+
 </article><article id="LogPanel"></article></section>
 
 

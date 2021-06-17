@@ -1,7 +1,7 @@
 :: Harcon_Logistic_Ad [_back_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<!--todo--> Auf dem maschinen-geschriebenen Zettel ist eine Teilzeit-Stelle in der Logistik-Abteilung ausgeschrieben.</br>
-'Logistic doesnt sound that interesting and I doubt that position is targeted to an engineer. Maybe I should show up there in person and check if that would be an option.'</br>
+The typewritten note advertises a part-time position in the logistics department.</br>
+<p class="tPC">'Logistic doesnt sound that interesting and I doubt that position is targeted to an engineer. But maybe I should show up there in person and see what it is about.'</p></br>
 The adress points to be somehwere around downtonw.</br>
 <a0 onclick='window.gm.quests.forceQuestMilestone("qFindAJob",100,1); window.story.show("ITD Office");'>Note down the adress</a></br>
 <div></br>
@@ -13,15 +13,19 @@ The adress points to be somehwere around downtonw.</br>
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
 <%if(window.gm.quests.hasActiveQuest("qFindAJob",100)){  %>
-    Harcon Health Inc. scheint eine Fabrik oder so zu sein die wie so üblich eingezäunt ist. Du läufst also drumherum bis du ein (geschlossenes) Eingangstor findest.</br>
+    Harcon Health Inc. scheint eine Fabrik oder Lagerhalle zu sein die wie so üblich eingezäunt ist. Du läufst also drumherum bis du ein (geschlossenes) Eingangstor findest.</br>
     Gleich daneben befindet sich ein Gebäude in Form eines kleinen Glaswürfels das wohl den Torwächter beherbergt.</br>
     "Hallo?.. uhm Ich bin wegen der Stellenazeige hier."</br>
     "Stellenanzeige?...gehts etwas genauer...haben Sie einen Termin?"</br>
+    Harcon Health Inc. seems to be a factory or warehouse that is fenced in as usual. So you walk around it until you find a (closed) entrance gate.</br>
+    Right next to it is a building in the form of a small glass cube that probably houses the gatekeeper.</br>
+    <p class="tPC">"Hello? ... I am here because of the job offer."</p></br>
+    "Job offer? Well, can you give some more details? Do you have an appointment?"</br>
     <div id='select1' >
     <a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1a")'>"Unfortunatly not"</a>
     </div>
     <div id='choice1a' hidden></br>
-         "Nein,naja ich hab die Anzeige in der Uni gesehen für eine Stelle in der Logistic-Abteilung und da dachte ich ich komm gleich mal vorbei bevor sie weg ist..."</br>
+    <p class="tPC">No. I just saw that ad on the universitys blackboard about a position in your logistics department. So I wanted to show up as soon as possible to see what it is about... </p>
     The guard frowns as he hears your rumblings. Clearly he doesnt understand how anyone would bother him WITHOUT having setup an appointment.</br>
     Then he grunt's because another huge load seems to be put onto his shoulders. He thoughtfully picks up the phone and calls someone.</br>
     "Yes, hello Elfred this is Frank from the gate. Here is a young man that asks about a position in your department do you know that.."</br>
@@ -30,10 +34,10 @@ The adress points to be somehwere around downtonw.</br>
     You cringe internally when he says 'bothered'. Somehow you know it was lazzy to just come here without announcing yourself before.</br>
     The guard places the phone back on its holder and looks at you.</br>
     "So listen, Mr.Erichson , a groupleader from logistics will speak to you. I will let you in. But just that you know there are cameras all over the place and I will see if you try anything stupid."</br>
-    "Thank you..of course I will behave myself. So where do I need to go."</br>
+    <p class="tPC">"Thank you..of course I will behave myself. So where do I need to go."</p>
     "That door other there" he point at a metal door next to a loading ramp "and just right through. There are some office-doors, one of them has his name on it - Erichson."</br>
-    After a moment where you try to memorize the name he asks "You can read."</br>
-    'Of course I an read you asshole, I'm from university' - well thats what came into your mind but you just say "Sure"</br>
+    After a moment where you try to memorize the name he asks mockingly "You can read?"</br>
+    <span class="tPC">'Of course I an read you asshole, I'm from university'</span> - well thats what came into your mind but you just say <span class="tPC">"Sure"</span></br>
     He buzzes you through the revolving door adjoining the car gate and you walk to Mr. Erichsons office.</br>
     <div></br>[[Go to logistics|Harcon_Logistic_Intro]]</br></div>
     </div> 
@@ -47,7 +51,7 @@ The adress points to be somehwere around downtonw.</br>
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
-...<!--todo-->
+...!--todo--
 
 "Actually Carl needs only some help here and there, so this is only a parttime-job."</br>
 "If you work at least 2 shifts a week here, you will get 25$ the shift every week."</br>
@@ -72,9 +76,9 @@ The adress points to be somehwere around downtonw.</br>
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
 <%if(window.gm.quests.hasActiveQuest("qFindAJob",200)){  %>
-    <!--todo-->  You work your first shift and get stuff explained.</br>
+    --todo--  You work your first shift and get stuff explained.</br>
 <% } else {%>
-    <!--todo-->Work a shift.</br>
+    --todo--Work a shift.</br>
 <%}%>
 <a0 onclick='work()'>Finish the shift</a></br>
 </article><article id="LogPanel"></article></section>

@@ -97,7 +97,6 @@ dialog::backdrop, #backdrop {
   -ms-user-select: none;
   user-select: none;
 }
-
 /* The actual popup */
 .popup .popuptext {
   visibility: hidden;
@@ -113,7 +112,6 @@ dialog::backdrop, #backdrop {
   left: 0%;
   /*margin-left: -80px;*/
 }
-
 /* Popup arrow 
 .popup .popuptext::after {
   content: "";
@@ -151,7 +149,70 @@ dialog::backdrop, #backdrop {
 .popup:hover .popuptext {
   visibility: visible;
 }
+.popup2:active{
+  color:green;
+}
+.popup2:active .popuptext {
+  visibility: visible;
+}
+.toggle-label {
+  font-size: 16px;
+  background: #fff;
+  padding: 1em;
+  cursor: pointer;
+  display: block;
+  margin: 0 auto 1em;
+  box-shadow: 0 1px 2px 0 rgba(153, 153, 153, 0.35);
+  border-radius: 4px;
+}
 
+//Style content
+.toggle-content {
+  color: #B0B3C2;
+  font-family: monospace;
+  font-size: 16px;
+  margin-bottom: 1.5em;
+  padding: 1em;
+}
+
+.toggle-input {
+  display: block;
+}
+.toggle-input:not(checked) {
+    background:red;
+}
+.toggle-input:checked {
+    background:blue;
+}
+.toggle-input:not(checked) .toggle-content {
+    display: none;
+background:blue;
+  }
+
+//Display content when checkbox is "checked"
+.toggle-input:checked .toggle-content {
+    display: block;
+background:red;
+}
+
+input:not(checked) ~ span[role=tooltip] {
+  display:none;
+  visibility:hidden;
+}
+input:checked ~ span[role=tooltip] {
+	display: inline-block;
+	position: relative;
+	bottom: 1em;
+	left: 0em;
+	width: 15em;
+	padding: 0.5em;
+	z-index: 100;
+	color: #000;
+	background-color: #ffebe6;
+	border: solid 1px #c32e04;
+	border-radius: 0.2em;
+  visibility:visible;
+}
 [type=checkbox], [type=radio] {
   width:1em;
   height: 1em;
@@ -181,12 +242,12 @@ statdown {
   color: #7bedf3;
   background-color:#11114a;
 }
-.dev::before {content: 'dev-note:';}
+.dev::before {content: 'dev-note: ';}
 .author {
   color: lightyellow;
   background-color: darkred;
 }
-.author::before {content: 'authors-note:';}
+.author::before {content: 'authors-note: ';}
 @keyframes alarm {
         0% {
           background-color: initial;

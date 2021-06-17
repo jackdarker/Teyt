@@ -1,8 +1,8 @@
 :: ForestSpawn
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
-<!--todo--> "You magically appear near the top of a hill. </br>
-You can see some kind of house at the foot ogf the hill. You just need to follow the trail down the hill."</br>
+After the VR connects to the server, your avatar appears near the top of a hill in a magic puff. </br>
+A small trail makes it way down the hill to some wooden shed."</br>
 <div></br>
 [[Settlement|ForestBorder]]</br></div>
 </article><article id="LogPanel"></article></section>
@@ -11,7 +11,7 @@ You can see some kind of house at the foot ogf the hill. You just need to follow
 :: ForestRespawnPodExit
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
-<!--todo--> You are in the sanctum of spawn. Its located on top of the hill above the settlement.</br> 
+You are in the sanctum of spawn. Its located on top of the hill above the settlement.</br> 
 </br> There is a path leading downwards to the settlement.</br>
 <div></br>
 [[Settlement|ForestBorder]] </br></div>
@@ -22,8 +22,7 @@ You can see some kind of house at the foot ogf the hill. You just need to follow
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.moveHere();%>
 <!--todo--> There is a dirt road here crossing the lush grassland that is bordered by the trees of an forest.</br> 
-One direction leads to the hut close by. The other direction follows the border of the forest but gets out of view quickly.</br> 
-</br> 
+One direction leads east, past a hut. The other direction follows the border of the forest but gets out of view quickly.</br> 
 <div></br>
 [[Enter Hut|ForestAlchemistHut]] [[Into the forest|ForestEntrance]] [[follow Road|ForestBridge]] </br></div>
 </article><article id="LogPanel"></article></section>
@@ -40,8 +39,7 @@ You found some pretty flowers with blue and yellow blossoms.</br>
 <%} else {%>
 Unfortunatly you didnt find anything useful.</br>
 <%}%>
-<div></br>
-[[Next|_back_]]</br></div>
+<div></br>[[Next|_back_]]</br></div>
 </article><article id="LogPanel"></article></section>
 
 
@@ -50,7 +48,7 @@ Unfortunatly you didnt find anything useful.</br>
 <% window.gm.quests.addQuest("qWolfMate",1); if(window.gm.quests.getMilestoneState("qWolfMate").id<=1) {%>
 Distracted by rummaging around in the bushes, you just caught by surprise as you turn around.</br>
 A dog is staring into your face. Its looks very close to a wolf you think. But wolfs would stay away from humans.
-'Oh wait, I'm in the game. In games wolves are nether to shy to attack.'
+'Oh wait, I'm in a game. In games wolves are nether to shy to attack.'
 The wolf doesnt do a thing, just stands there and looks at you.
 <div id='select1' >
 <a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1a")'>First strike</a>
@@ -93,6 +91,8 @@ Maybe you can <a0 onclick='explore(); '>explore</a> the surrounding woods and se
         window.story.show('ForestMeetCarlia1');
     } else if(window.gm.quests.getMilestoneState("qCarlia").id===100 && window.gm.player.Inv.countItem('PurpleBerry')>=4) {
         window.story.show('ForestMeetCarlia2');
+    } else if(window.gm.quests.getMilestoneState("qCarlia").id===500 && window.gm.player.Inv.countItem('SquishedLeech')>=1) {
+        window.story.show('ForestMeetCarlia3');
     } else if(rnd > 70 ) {
          window.story.show('ForestWolfEncounter');
     } else if(rnd > 65 ) {
@@ -141,6 +141,36 @@ The figure was running into the direction of the cliff. But that might also be a
 </div>
 </article><article id="LogPanel"></article></section>
 
+
+:: ForestMeetCarlia3 [_nosave_ _back_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+While scrutinizing a bush for further treasues, you hear something plop down on the grassy floor some distance behind you.</br>
+You swirl around to see whats going on and find yourself confronted with that hooded figure that you already tried to catch.</br>
+Now it is leering at you in a half crouching stand.</br>
+<p class="tPC">"Hey you, why are you pursuing me ! Do you want trouble"</p>
+"Thief ! You are thief !" the figure shouts and adds a long growl. </br>
+<p class="tPC">'Did he just growl at me like a dog? What is this?'</p>
+"Give back what stolen !"</br>
+<p class="tPC">'I didnt steal anything !'</p>
+"Liar! You took necklace! Give back!"</br>
+<p class="tPC">"That damned collar? I didnt mean to take it! It just got alive and wrapped itself around my neck. What the heck is this?"</p>
+"Its present! Give back!"</br>
+<p class="tPC">"I would gladly do so if you an tell me how to get rid of it! Do you have a key?"</p>
+"No key. Just unlatch."</br>
+<p class="tPC">"I already tried but its not giving. The guy from the hut said it might be cursed!"</p>
+"Not unlatch? ...Maybe need magic perfom." you can here it muttering.</br>
+<p class="tPC">"Huh? Is it cursed? With what?"</p>
+"Depends"</br>
+<p class="tPC">"Depends? Depends on what? Do you know how to get it off or not?"</p>
+"Wear some time and you will see. Might unlatch if curse finished."</br>
+<p class="tPC">"Aahrg! Listen. You want it back and I want to get rid of it. So why dont we help each other? "</p>
+"No help no. You thief!"</br>
+With that the figure jumps up and runs away diving through the undergrowth with a good amount of speed.
+You hurry after it but its of no use, at some point your target vanishs behind some close standing trees.</br> 
+<div> <a0 onclick='window.gm.quests.forceQuestMilestone("qCarlia",600,500);window.story.show("_back_");'>Next</a></div>
+</article><article id="LogPanel"></article></section>
+
+
 :: ForestMudGlade
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
@@ -152,7 +182,7 @@ This area of the forest seems to be more watery and sludgy. Your feet sink into 
     let rnd = _.random(0,100);
     window.gm.pushLog("rolled "+rnd);
     window.story.state.tmp.args = [];
-    if(rnd > 40 ) {
+    if(rnd > 0 ) {
          window.story.show('ForestLeechEncounter');
     } else {
         window.story.show('ForestSearchAround'); //nothing
@@ -334,9 +364,9 @@ As you stumble into the hut, the alchemists greets you: "Ah, nice to see you aga
 He shakes his head "Not that I know. Cant you sneak around them or trick them somehow to let you pass?"
 <p class="tPC">"Well, thats what I wanted to ask you. You dont have an elixier or something that makes me hardier and stronger?"</p> 
 "Huff, no. I'm still out of stock. I can give you those berry-potions if you bring me enough berries. It wouldnt take much to improve it though..."
-"If you can get me 4 purple berries, 2 apoca flowers and 2 bloated mushroom I can mix up some potion to boost your strength."
+"If you can get me 4 purple berries, 2 apoca flowers and 2 leeches I can mix up some potion to boost your strength."
 <p class="tPC">"Thats exactly what I need ! But where can I find them?"</p>
-"The flowers grow in the forest too. They have colorful blue and yellow blossoms. But those mushrooms...they grow in dark,humid places, caves and such."
+"The flowers grow in the forest too. They have colorful blue and yellow blossoms. But those leeches...they lurk in dark,humid places, swamps and such."
 <p class="tPC">"I will see to get some."</p>
 <a0 onclick='window.gm.quests.forceQuestMilestone("qPurpleBerry",200,1);window.story.show("ForestBorder");'>Leave</a></br>
 <%} else {%> He seems busy right now. [[Back|ForestAlchemistHut]] <%}%>

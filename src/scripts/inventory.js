@@ -23,11 +23,11 @@ class Inventory {
       window.storage.registerConstructor(Inventory);
     }
     get parent() {return this._parent();}
-    toJSON() {return window.storage.Generic_toJSON("Inventory", this); };
+    toJSON() {return window.storage.Generic_toJSON("Inventory", this); }
     static fromJSON(value) { 
         var _x = window.storage.Generic_fromJSON(Inventory, value.data);
         return(_x);
-    };
+    }
     _relinkItems() {  //call this after loading save data the reparent
         for(var i=0; i<this.list.length; i++) {
             if(this.list[i].item) this.list[i].item._parent=window.gm.util.refToParent(this);

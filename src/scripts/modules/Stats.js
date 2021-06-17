@@ -975,6 +975,11 @@ window.gm.StatsLib = (function (StatsLib) {
     //...effects
     window.storage.registerConstructor(effCallHelp);
     window.storage.registerConstructor(effDamage);
+    window.storage.registerConstructor(effBleed);
+    window.storage.registerConstructor(effCombined);
+    window.storage.registerConstructor(effGrappled);
+    window.storage.registerConstructor(effGrappling);
+    window.storage.registerConstructor(effUngrappling);
     window.storage.registerConstructor(effEnergized);    
     window.storage.registerConstructor(effNotTired);
     window.storage.registerConstructor(effTeaseDamage);

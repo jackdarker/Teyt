@@ -14,11 +14,8 @@ class Mob extends Character {
     //query _canAct to check if stunned or otherwise incapaciated, then run execCombatCmd(moveNOP) 
     calcCombatMove(enemys,friends){
         let rnd = _.random(1,100);
-        let result = this._canAct();
+        let result = {OK:true,msg:''};
         result.action =result.target= null;
-        if(result.OK===false) {
-            return(result);
-        }
         if(rnd>20) {  
             rnd = _.random(0,enemys.length-1);
             result.action = "Attack";
@@ -30,7 +27,8 @@ class Mob extends Character {
         }
         return(result);
     }
-
+    //return false if skill should be manually selected
+    get isAIenabled() { return(true);}
     //override to adjust the mobs attributes to player level
     scaleLevel(lvl) { 
         let x = Math.max(this.level_min,_.random(lvl-3,lvl+3));

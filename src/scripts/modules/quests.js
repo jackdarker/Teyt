@@ -12,7 +12,8 @@ window.gm.questDef = window.gm.questDef || {};
         });
     let mile2 = new QuestMilestone(100,"Found the garden","Congratulation. You found the garden.",
         function(){ return(-1)});
-    quest.addMileStone(mile1),quest.addMileStone(mile2);
+    quest.addMileStone(mile1);
+    quest.addMileStone(mile2);
     window.gm.questDef[quest.id]= quest;
 }{
     let NOP = (function(){  return (0)});

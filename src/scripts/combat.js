@@ -17,6 +17,13 @@ class CombatSetup {
     this.onVictory = (function(){return('You defeated the foe.</br>'+ window.gm.printPassageLink('Next',window.gm.player.location));});
     this.onFlee = (function(){return('You retreat hastily.</br>'+ window.gm.printPassageLink('Next',window.gm.player.location));});
     this.onSubmit = (function(){return('You submit to the foe.</br>'+ window.gm.printPassageLink('GameOver','GameOver'));});
+    //if you override this (like the others), you can jump out of battle, show some scene and return to battle
+    //- do not modify window.gm.player.location
+    //- disable save
+    //- jump back to EncounterStartTurn
+    //- the function is called before every move and will jump back there; you need to make sure that the scene doesnt trigger again 
+    //- if for some reason you want to leave battle, call window.gm.Encounter.endCombat() to cleanup
+    this.onMoveSelect = null;
   }
   //setup encounter; this calls the Encounter-passage !
 initCombat() {
@@ -55,7 +62,7 @@ spawnChar(item,party,amount){
   }
   mob.name = mob.name+"#"+uid.toString(); //TODO need unique name !!
   if(party === 'Player') {
-    mob.calcCombatMove=null; //hack to disable AI
+    mob.calcCombatMove=null; //hack to disable AI  todo
     s.combat.playerParty.push(mob);
   } else {
     s.combat.enemyParty.push(mob);
@@ -363,6 +370,10 @@ selectChar() {
 selectMove() {
   let s = window.story.state;
   let result = {OK:false, msg:''};
+  if(this.onMoveSelect != null) {
+    result = this.onMoveSelect();
+    if(result.OK) return(result);
+  }
   if(s.combat.actor.isDead())  { //skip char if already dead
     this.next=this.selectChar;
     return(result);
@@ -375,7 +386,7 @@ selectMove() {
     this.printNextLink(this.checkDefeat);
     return(result);
   } else {
-    if(s.combat.actor.calcCombatMove) { //selected by AI
+    if(s.combat.actor.isAIenabled && s.combat.actor.calcCombatMove) { //selected by AI
       result = s.combat.actor.calcCombatMove(window.story.state.combat.playerParty,window.story.state.combat.enemyParty);
       window.story.state.combat.action=result.action;
       window.story.state.combat.target=result.target;
@@ -420,7 +431,7 @@ postBattle() {
   this.next = null;  //terminate SM
   var s=window.story.state;
   var result = {OK:false, msg:''};
-  //check if battle done...
+  //check if battle end reason...
   if(s.combat.playerFleeing===true) { 
     result.OK=true,result.msg = this.onFlee();
   } else if(s.combat.playerSubmitting===true) {  

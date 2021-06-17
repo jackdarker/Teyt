@@ -68,6 +68,12 @@ You need some hard wolfcock right now.
 [[Straddle him]] [[On all 4]]
 ---
 
+:: WolffightIntermezzo
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<!--<%window.gm.player.location=window.passage.name;%>-->
+Wolf snarls at you.
+<div> [[Next|EncounterStartTurn]]</br></div> 
+</article><article id="LogPanel"></article></section>
 
 
 <div></br>

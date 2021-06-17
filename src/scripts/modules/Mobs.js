@@ -6,14 +6,18 @@
 - naga
 - stagboy
 - werwolf
-
+- vile vine
 - Giant-Snake
 - Giant wasp
 - raptor
 - gryphon
+- felkin
 - drider
 
  */
+
+////////////////////////////////////////////////////////
+// normal foes
 class Mole extends Mob {
     constructor() {
         super();
@@ -21,7 +25,6 @@ class Mole extends Mob {
         this.pic= 'assets/mole.jpg';
         this.Stats.increment('healthMax',-1*(this.health().max-20));
     }
-    
 };
 
 class Wolf extends Mob {
@@ -31,19 +34,21 @@ class Wolf extends Mob {
         this.pic= 'assets/bw_wolf1.png';
         this.level_min =3;
         this.Outfit.addItem(HandsPaw.factory('dog'));
+        this.Outfit.addItem(new BaseQuadruped());
+        this.Outfit.addItem(new SkinFur());
         this.Outfit.addItem(new FaceWolf());
-        this.fconv = window.gm.util.descFixer(this);
+        this.fconv = null; //lazy init because descfixer depends on gm.player
     }
     calcCombatMove(enemys,friends){
-        let result = this._canAct();
-        if(result.OK===false) return(result);
+        let result = {OK:true,msg:''};//this._canAct();
         let rnd = _.random(1,100);
+        //if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
         result.action =result.target= null;
         if(window.story.state.combat.turnCount%2===0) {
             rnd = _.random(0,enemys.length-1);
             result.action = "Bite";
             result.target = [enemys[rnd]];
-            result.msg =this.fconv("$[I]$ $[snap]$ at "+result.target[0].name+".</br>")+result.msg;
+            result.msg =this.name+" snaps at "+result.target[0].name+".</br>"+result.msg;
             return(result);
         }
         return(super.calcCombatMove(enemys,friends));
@@ -60,8 +65,7 @@ class Leech extends Mob {
         this.tmp = {grappleCoolDown:1};
     }
     calcCombatMove(enemys,friends){
-        let result = this._canAct();
-        if(result.OK===false) return(result);
+        let result = {OK:true,msg:''};
         let rnd = _.random(1,100);
         result.action =result.target= null;
         if(this.Effects.countItem(effGrappling.name)>0) {
@@ -88,8 +92,7 @@ class Mechanic extends Mob {
         this.pic= 'assets/mechanic.jpg';
     }
     calcCombatMove(enemys,friends){
-        let result = this._canAct();
-        if(result.OK===false) return(result);
+        let result = {OK:true,msg:''};
         let rnd = _.random(1,100);
         result.action =result.target= null;
         if(window.story.state.combat.turnCount<3) {
@@ -102,9 +105,48 @@ class Mechanic extends Mob {
         return(super.calcCombatMove(enemys,friends));
     }
 };
-//this looks weird but works; use this as template how to add more mobs
+/////////////////////////////////////////////////////////
+// special NPC
+class Carlia extends Mob {
+  constructor() {
+      super();
+      this.name = this.id = 'Carlia';
+      this.pic= 'assets/mole.jpg';
+      this.Outfit.addItem(new BaseHumanoid());
+      this.Outfit.addItem(new SkinHuman());
+      this.Outfit.addItem(new FaceHuman());
+      this.Outfit.addItem(new VulvaHuman());
+      this.levelUp(3);
+      this.autoLeveling();
+  }
+}
+class Ruff extends Wolf {
+    constructor() {
+        super();
+        this.name = this.id = 'Ruff';
+        this.pic= 'assets/bw_wolf1.png';
+        this.Outfit.addItem(new PenisHuman());
+        this.levelUp(3);
+        this.autoLeveling();
+    }
+}
+class Trent extends Mob {
+    constructor() {
+        super();
+        this.name = this.id = 'Trent';
+        this.pic= 'assets/mole.jpg';
+        this.Outfit.addItem(new BaseHumanoid());
+        this.Outfit.addItem(new SkinFur());
+        this.Outfit.addItem(new FaceHorse());
+        this.Outfit.addItem(new PenisHuman());
+        this.Stats.increment('strength',3);
+        this.levelUp(3);
+        this.autoLeveling();
+    }
+}
+//collection of mob-constructors
 window.gm.Mobs = (function (Mobs) {
-    Mobs.Mole = function () { return new Mole();  };    //add Mole-constructor to Mob-ollection
+    Mobs.Mole = function () { return new Mole();  };
     Mobs.Wolf = function () { return new Wolf();  };    
     Mobs.Leech = function () { return new Leech();  };   
     Mobs.Mechanic = function () {return new Mechanic();};

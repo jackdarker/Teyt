@@ -28,8 +28,7 @@ But you keep your stats and skills (*1).
 </br>*1): It might occur that the questline has to be started from the beginning. We are doing our best to solve the problem in the next updates. 
 </p> 
 <p class='tPC'>"Start the questline from the beginning? I really hope they get that fixed soon."</p>
-<div></br>
-[[Next|ForestRespawnPodExit]]</br></div>
+<div><a0 onclick='window.story.show("ServerDisconnected");'>Next</a></br></div>
 </article><article id="LogPanel"></article></section>
 
 <div id='select1' >
@@ -40,11 +39,15 @@ But you keep your stats and skills (*1).
 <div id='choice1a' hidden>
 </div>
 
-:: CursedCollar
+:: ServerDisconnected [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-
+<%window.gm.leaveVR();%>
+<p class='div_alarm'>Server connection error</p>
+</br><p class="tPC">"Great, I lost connection to the game server. Maybe it does reconnect..." </p>
+You wait for some time but nothing happens,
+<p class="tPC">"I'm tired anyway. I will check tomorrow if I can reconnect." </p>
 <div></br>
-[[Next|NOP]]</br></div>
+[[Next|Your Bedroom]]</br></div>
 </article><article id="LogPanel"></article></section>
 
 
@@ -93,7 +96,6 @@ I got kicked out again.
 "Be careful, though. This can also lead to the fact that you have to endure unpleasant experiences longer."
 "I will keep that in mind." 
 <p class='author'>Scenes might gradually unlock depending how often you see them and how you react (also to other situations). </p>
-
 </article><article id="LogPanel"></article></section>
 
 
