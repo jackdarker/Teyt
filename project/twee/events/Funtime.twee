@@ -22,12 +22,20 @@ Releasing the pressure on your nubs, they just feel numb right now.
 <script>
 function fondlebreast(elmnt) {
     elmnt.replaceWith("You nipple stiffens under this attention.");
-    window.gm.player.addEffect("effGrowBreast",window.gm.StatsLib.effGrowBreast());
+    window.gm.player.addEffect("effGrowBreast",window.storage.constructors['effGrowBreast']());
     window.gm.quests.forceQuestMilestone("qMyPleasure",100,1);
 }
 </script>
 
 :: WolfSubmit
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+The wolf raises a hind leg and gives your prone form a good amount of watering.
+After a final sniff it runs of into the woods.
+<div></br><a0 onclick='window.gm.player.addEffect("effMutateWolf",new window.storage.constructors["effMutateWolf"]());window.gm.respawn();'>Black out</a></br></div>
+</article><article id="LogPanel"></article></section>
+
+
+:: WolfSubmitLewd
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 The wolf isn't aroused enough and leaves you alone.
 ---
@@ -48,8 +56,7 @@ Again she growls baring her teeth as you get behind her. But she also raises her
 That hot pussy of her is squeezing down on you. 
 You cant hold any longer and shoot your jizzm inside her.
 ---
-<div></br>
-<a0 onclick='window.gm.respawn();'>Black out</a></br></div>
+<div></br><a0 onclick='window.gm.respawn();'>Black out</a></br></div>
 </article><article id="LogPanel"></article></section>
 
 

@@ -7,75 +7,32 @@ if rating increases just above 0 "You "
 
 
 :: MutateCat [_isdeffered_]
-<section> 
-<aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 <div id='output'></div></br>   <!--message is rendered here-->
 <a0 onclick= 'window.story.state.msg="";window.story.show("")'>Next</a></br>
 </article></section>
-<script>
-function mutate() {
-    if(window.gm.player.Outfit.countItem("TailCat")>0) {
-        var growth = window.gm.player.Outfit.getItem("TailCat").growth+0.25;
-        var maxGrowth = 2;//window.gm.player.Outfit.getItem("TailCat").maxGrowth;
-        if(growth >= 1) {
-            window.gm.printOutput("You already changed to a cat as far as possible.</br>");
-        } else {
-            window.gm.player.Outfit.getItem("TailCat").growth=growth;
-            window.gm.printOutput("Your tail must have grown and is now "+growth*maxGrowth+" meter long.</br>");
-        }
-    } else {
-        window.gm.player.Outfit.addItem(new window.storage.constructors['TailCat']());
-        window.gm.printOutput("You have grown a cat tail !</br>");
-    }
-}
-mutate();
+<script> window.gm.MutationsLib['mutateCat']();
 </script>
 
 
 :: MutateWolf [_isdeffered_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 <div id='output'></div></br>   <!--message is rendered here-->
+<!--set window.story.state.tmp.args=[1] before calling! -->
 <a0 onclick='window.story.state.msg="";window.story.show("")'>Next</a></br>
 </article></section>
-<script>
-function mutate() {
-    if(window.story.state.tmp.args===null) {
-        window.gm.printOutput(window.story.state.msg);
-        return;
-    }
-    let _rnd =_.random(1,100);
-    let msg='';
-    if(window.gm.player.Outfit.countItem("TailCat")>0) {
-        let tail = window.gm.player.Outfit.getItem("TailCat");
-        let growth = tail.growth+0.25;
-        let maxGrowth = tail.maxGrowth;
-        if(growth >= 1) {
-            msg+="That tail didnt grow any further.</br>";
-        } else {
-            tail.growth=growth;
-            msg+="Your bushy tail must have grown and is now "+window.gm.formatNumber(growth*maxGrowth,1)+" meter long.</br>";
-        }
-    } else {
-        window.gm.player.Outfit.addItem(new window.storage.constructors['TailCat']());
-        msg+="You have grown a short tail !</br>";
-    }
-    let face = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bFace);
-    let skin = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bSkin);
-    if(face ===null || face.id !="FaceWolf") {
-        window.gm.player.Outfit.addItem(new window.storage.constructors['FaceWolf']());
-        msg+= "Your face got transformed into a dog-like muzzle.</br>"; 
-    } else if(skin ===null || skin.id !="SkinFur") {
-        window.gm.player.Outfit.addItem(new window.storage.constructors['SkinFur']());
-        msg+= "A dense coat of fur spreads over your body.</br>";
-    }
-    if(msg==='') msg= "Your anxiety goes by as you didnt get any more wolflike."
-    window.gm.printOutput(msg);
-    window.story.state.msg = msg;
-    window.story.state.tmp.args=null; //
-}
-mutate();
+<script> window.gm.MutationsLib['mutateWolf']();
 </script>
 
+
+:: MutateHorse [_isdeffered_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+<div id='output'></div></br>   <!--message is rendered here-->
+<!--set window.story.state.tmp.args=[1] before calling! -->
+<a0 onclick='window.story.state.msg="";window.story.show("")'>Next</a></br>
+</article></section>
+<script> window.gm.MutationsLib['mutateHorse']();
+</script>
 
 
 :: CatHabit [_isdeffered_]
@@ -93,7 +50,7 @@ You feel the urge to sit down and give yourself a good licking...</br>
 function mutate() {
     if(window.gm.player.Outfit.countItem("BreastHuman")>0) {
         var growth = window.gm.player.Outfit.getItem("BreastHuman").growth+=0.1;
-        var maxGrowth = 0.3;//window.gm.player.Outfit.getItem("TailCat").maxGrowth;
+        var maxGrowth = 0.3;//window.gm.player.Outfit.getItem("TailWolf").maxGrowth;
         if(growth >= 1) {
             window.gm.printOutput("Your teats are as big as they can get.</br>");
         } else {

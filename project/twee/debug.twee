@@ -56,17 +56,14 @@ Crash if you enter wrong things below !</br>
 <section> <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <div></br>[[Back|_back_]]</br>
 Test transformation events. Because they are deffered-events you need to return to story and move between rooms.</br>
+Anthros:</br>
 <a0 onclick='window.gm.pushDeferredEvent("MutateCat",[1])'>Cat</a>
 <a0 onclick='window.gm.pushDeferredEvent("MutateWolf",[1])'>Wolf</a></br>
+<a0 onclick='window.gm.pushDeferredEvent("MutateHorse",[1])'>Horse</a></br>
+<hr>
+Ferals:</br>
 </article><article id="LogPanel"></article></section>
-<script>
-/*window.gm.initGame();window.gm.player.location=window.passage.name;
-let conv = window.gm.descFixer(window.gm.player);
-let text = conv('$[I]$ $[have]$ [some] rough [[hair]].$[I]$ $[buy]$ those pants.dense fur covers $[my]$ body."');
-conv = window.gm.descFixer(window.gm.Ruff);
-let text2 = conv('$[I]$ $[have]$ [some] rough [[hair]].$[I]$ $[buy]$ those pants.dense fur covers $[my]$ body."');
-window.gm.printOutput(text2,where="div#output");*/
-</script>
+
 
 :: Styletest [_back_]
 <section> <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>

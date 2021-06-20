@@ -33,10 +33,11 @@ class Wolf extends Mob {
         this.name = this.id = 'Wolf';
         this.pic= 'assets/bw_wolf1.png';
         this.level_min =3;
-        this.Outfit.addItem(HandsPaw.factory('dog'));
         this.Outfit.addItem(new BaseQuadruped());
-        this.Outfit.addItem(new SkinFur());
-        this.Outfit.addItem(new FaceWolf());
+        this.Outfit.addItem(SkinFur.factory('wolf','black'));
+        this.Outfit.addItem(HandsPaw.factory('wolf'));
+        this.Outfit.addItem(TailWolf.factory('wolf'));
+        this.Outfit.addItem(FaceWolf.factory('wolf'));
         this.fconv = null; //lazy init because descfixer depends on gm.player
     }
     calcCombatMove(enemys,friends){
@@ -60,13 +61,15 @@ class Leech extends Mob {
         this.name = this.id = 'Leech';
         this.pic= 'assets/Leech.png';    //todo
         this.level_min =1;
-        this.fconv = window.gm.util.descFixer(this);
+        this.Outfit.addItem(new BaseQuadruped());
         this.Skills.addItem(new SkillLeechHealth());
         this.tmp = {grappleCoolDown:1};
+        this.fconv = null; //lazy init because descfixer depends on gm.player
     }
     calcCombatMove(enemys,friends){
         let result = {OK:true,msg:''};
         let rnd = _.random(1,100);
+        if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
         result.action =result.target= null;
         if(this.Effects.countItem(effGrappling.name)>0) {
             this.tmp.grappleCoolDown=2;
@@ -114,7 +117,8 @@ class Carlia extends Mob {
       this.pic= 'assets/mole.jpg';
       this.Outfit.addItem(new BaseHumanoid());
       this.Outfit.addItem(new SkinHuman());
-      this.Outfit.addItem(new FaceHuman());
+      this.Outfit.addItem(HandsHuman.factory('cat'));
+      this.Outfit.addItem(FaceWolf.factory('cat'));
       this.Outfit.addItem(new VulvaHuman());
       this.levelUp(3);
       this.autoLeveling();
@@ -125,7 +129,7 @@ class Ruff extends Wolf {
         super();
         this.name = this.id = 'Ruff';
         this.pic= 'assets/bw_wolf1.png';
-        this.Outfit.addItem(new PenisHuman());
+        this.Outfit.addItem(PenisHuman.factory('wolf'));
         this.levelUp(3);
         this.autoLeveling();
     }
@@ -136,11 +140,13 @@ class Trent extends Mob {
         this.name = this.id = 'Trent';
         this.pic= 'assets/mole.jpg';
         this.Outfit.addItem(new BaseHumanoid());
-        this.Outfit.addItem(new SkinFur());
-        this.Outfit.addItem(new FaceHorse());
-        this.Outfit.addItem(new PenisHuman());
+        this.Outfit.addItem(SkinFur.factory('horse', 'brown'));
+        this.Outfit.addItem(HandsHuman.factory('horse'));
+        this.Outfit.addItem(TailWolf.factory('horse'));
+        this.Outfit.addItem(FaceWolf.factory('horse'));
+        this.Outfit.addItem(PenisHuman.factory('horse'));
         this.Stats.increment('strength',3);
-        this.levelUp(3);
+        this.levelUp(6);
         this.autoLeveling();
     }
 }

@@ -233,7 +233,7 @@ class Outfit { //extends Inventory{
         let _idx = this.findItemSlot(item.id);
         if(_idx.length>0) return; //already equipped
         let _item = item;
-        _idx = _item.slotUse;//.map((function(cv, ix, arr) { return (window.gm.OutfitSlotLib[cv]);  }));
+        _idx = _item.slotUse;
         let _oldIDs = [];
         let _oldSlots = [];
         let result = {OK: true, msg:''};
@@ -245,7 +245,7 @@ class Outfit { //extends Inventory{
                 if(oldId==='') continue;
                 if(_oldIDs.indexOf(oldId)<0) {
                     _oldIDs.push(oldId);
-                    _oldSlots=_oldSlots.concat(this.getItem(oldId).slotUse);//.map((function(cv, ix, arr) { return (window.gm.OutfitSlotLib[cv]);})));
+                    _oldSlots=_oldSlots.concat(this.getItem(oldId).slotUse);
                 }
                 let _tmp = this.canUnequipItem(oldId);
                 if(!_tmp.OK) result.msg += _tmp.msg; //todo duplicated msg if item uses multiple slots

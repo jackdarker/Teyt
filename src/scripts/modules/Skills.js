@@ -71,7 +71,7 @@ class SkillAttack extends Skill {
         if(!lHand && ! rHand) { //if has no weapon get body damage
             rHand=this.caster.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bHands);
             if(rHand) {
-                rHDmg = rHand.data.pDamage || 0;
+                rHDmg = (rHand.data!=='undefined')?rHand.data.pDamage || 0:0;
             }
         }
         if(lHand===rHand) {
@@ -228,7 +228,9 @@ class SkillHeal extends Skill {
     }
 }
 class SkillFlee extends Skill {
-    constructor() { super("Flee");    }
+    constructor() { 
+        super("Flee"); 
+        this.msg = '';   }
     toJSON() {return window.storage.Generic_toJSON("SkillFlee", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillFlee, value.data));}
     targetFilter(targets){
@@ -236,6 +238,7 @@ class SkillFlee extends Skill {
     }
     previewCast(targets){
         var result = new SkillResult()
+        this.msg = '';
         result.skill =this,result.source = this.caster, result.targets = targets;
         if(this.isValidTarget(targets)) {
             result.OK = true;
@@ -247,12 +250,18 @@ class SkillFlee extends Skill {
               result.msg += "Your attempts to escape failed.";
               //result.OK=false;
             }
+            this.msg = result.msg;
         }
         return result
     }
+    getCastDescription(result) {
+        return(this.msg);
+    }
 }
 class SkillSubmit extends Skill {
-    constructor() { super("Submit");    }
+    constructor() { 
+        super("Submit"); 
+        this.msg = '';   }
     toJSON() {return window.storage.Generic_toJSON("SkillSubmit", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillSubmit, value.data));}
     targetFilter(targets){
@@ -260,6 +269,7 @@ class SkillSubmit extends Skill {
     }
     previewCast(targets){
         var result = new SkillResult()
+        this.msg = '';
         result.skill =this,result.source = this.caster, result.targets = targets;
         if(this.isValidTarget(targets)) {
             result.OK = true;
@@ -271,8 +281,12 @@ class SkillSubmit extends Skill {
                 result.msg += "Your attempts to submit failed.";
                 //result.OK=false;
             }
+            this.msg = result.msg;
         }
         return result
+    }
+    getCastDescription(result) {
+        return(this.msg);
     }
 }
 class SkillGrapple extends Skill {

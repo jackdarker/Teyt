@@ -63,6 +63,7 @@ window.gm.initGame= function(forceReset,NGP=null) {
       //add some basic inventory
       ch.Outfit.addItem(new BaseHumanoid());
       ch.Outfit.addItem(new SkinHuman());
+      ch.Outfit.addItem(HandsHuman.factory('human'));
       ch.Outfit.addItem(new FaceHuman());
       ch.Wardrobe.addItem(new Jeans());
       ch.Wardrobe.addItem(new TankShirt());
@@ -93,7 +94,8 @@ window.gm.initGame= function(forceReset,NGP=null) {
       ch.Outfit.addItem(new BaseHumanoid());
       ch.Outfit.addItem(new SkinHuman());
       ch.Outfit.addItem(new FaceHuman());
-      ch.Outfit.addItem(new PenisHuman());
+      ch.Outfit.addItem(HandsHuman.factory('human'));
+      ch.Outfit.addItem(PenisHuman.factory('human'));
       ch.Skills.addItem(new SkillInspect());
       s.PlayerVR=window.gm.PlayerVR= ch;
     }
@@ -117,6 +119,7 @@ window.gm.initGame= function(forceReset,NGP=null) {
         ch.Wardrobe.addItem(new TailRibbon());
         ch.Outfit.addItem(new BaseHumanoid());
         ch.Outfit.addItem(new FaceHuman());
+        ch.Outfit.addItem(HandsHuman.factory('human'));
         ch.Outfit.addItem(new SkinHuman());
         ch.Outfit.addItem(new VulvaHuman());
         ch.Outfit.addItem(new Jeans());
@@ -148,6 +151,7 @@ window.gm.getScenePic = function(id){
 window.gm.enterVR=function() {
   //todo update effects in VR but stop RL effects
   let s= window.story.state;
+  if(s.vars.inVR) return;
   s.vars.playerPartyRL = s._gm.playerParty;
   s._gm.playerParty = s.vars.playerPartyVR;
   window.gm.switchPlayer("PlayerVR");
@@ -161,6 +165,7 @@ window.gm.enterVR=function() {
 window.gm.leaveVR=function() {
   //todo update effects in VR but stop RL effects
   let s= window.story.state;
+  if(!s.vars.inVR) return;
   s.vars.playerPartyVR = s._gm.playerParty;
   s._gm.playerParty = s.vars.playerPartyRL;
   window.gm.switchPlayer("PlayerRL");
@@ -337,11 +342,31 @@ window.gm.printUnlockPerk= function(id, descr) {
 window.gm.printBodyDescription= function(whom,onlyvisible=false) {
   let msg = "";
   let conv = window.gm.util.descFixer(whom);
-  let worn =whom.Outfit.getAllIds(); //todo this returns wearables & bodyparts
-  // todo filter by visibility and sort the order: plae Breast & Nipple-Piercing together 
-  for(el of worn) {
-    msg+= whom.Outfit.getItem(el).descLong(conv);
+  let wornIds =whom.Outfit.getAllIds(); //todo this returns wearables & bodyparts
+  let base = [] , head = [], torso =[], arms =[],legs =[], groin=[], other=[],breast=[],ignore=[];
+  // todo filter by visibility and sort the order: place Breast & Nipple-Piercing together 
+  let fbase = ['bBase','bSkin'] , fhead = ['bFace','bMouth','Head','Mouth'], 
+  ftorso =['bTorso','bTailBase','bWings','Chest','Stomach'], 
+  farms =['bArms','bHands'],flegs =['bLegs'], 
+  fbreast =['bBreast','pNipples'],
+  fgroin=['bulva','bPenis','pClit'], fignore = [];
+
+  for(el of wornIds) {
+    let item=whom.Outfit.getItem(el);
+    if(item.slotUse.some(name => fignore.includes(name))) ignore.push(item);
+    else if(item.slotUse.some(name => fbase.includes(name))) base.push(item);
+    else if(item.slotUse.some(name => fhead.includes(name))) head.push(item);
+    else if(item.slotUse.some(name => ftorso.includes(name))) torso.push(item);
+    else if(item.slotUse.some(name => fbreast.includes(name))) breast.push(item);
+    else if(item.slotUse.some(name => farms.includes(name))) arms.push(item);
+    else if(item.slotUse.some(name => flegs.includes(name))) legs.push(item);
+    else if(item.slotUse.some(name => fgroin.includes(name))) groin.push(item);
+    else other.push(item);
   }
+  //null is used to mark linebreaks
+  let all = base.concat([null]).concat(head).concat([null]).concat(torso).concat([null]).concat(arms).concat([null]);
+  all = all.concat(legs).concat([null]).concat(groin).concat([null]).concat(breast).concat([null]).concat(other);
+  for(el of all){ msg+= (el!==null)?el.descLong(conv)+' ':'</br>';}
 	return msg+"</br>";
 };
 // returns singular pronoun for the char depending on gender

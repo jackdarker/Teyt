@@ -41,6 +41,7 @@ class Job {
 
     job = new Job("Dogsit_NewCall","Dog-sitting","You could call the dogsit agency if they have a new job.");
     job.reqEnergy = 20, job.reqTime=120,job.startTimeMin=900,job.startTimeMax=1300,job.DoW =[2,3,4];
+    job.isHidden = function (){ return(true);};
     window.gm.jobs[job.id] = job;
 
     job = new Job("Home_Study","Studying","Do some studying for your graduation.");

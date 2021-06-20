@@ -495,12 +495,13 @@ class effMutateCat extends Effect {
         this.data.duration-= window.gm.getDeltaTime(time,this.data.time);
         this.data.time = time;
         if(this.data.duration<=0) {
+            this.data.duration = 60;
             return(function(me){
                 return (function(Effects){ 
                     if(me.data.cycles<=0) { 
                         Effects.removeItem(me.data.id);
                     }
-                    window.gm.pushDeferredEvent("MutateCat",[me.data.cycles]);
+                    window.gm.pushDeferredEvent("MutateCat",[me.data.magnitude]);
                     //window.gm.pushDeferredEvent("CatHabit");
                     Effects.removeItem(me.data.id);});
                 }(this));
@@ -525,20 +526,58 @@ class effMutateWolf extends Effect {
     }
     toJSON() {return window.storage.Generic_toJSON("effMutateWolf", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(effMutateWolf, value.data);};
-    get desc() {return("cat-tastic");}
+    get desc() {return("wolf-tastic");}
 
     onTimeChange(time) {
         //after some time you mutate a bit
         this.data.duration-= window.gm.getDeltaTime(time,this.data.time);
         this.data.time = time;
         if(this.data.duration<=0) {
+            this.data.duration = 60;
             return(function(me){
                 return (function(Effects){ 
                     if(me.data.cycles<=0) { 
                         Effects.removeItem(me.data.id);
                     }
-                    window.gm.pushDeferredEvent("MutateWolf",[me.data.cycles]);
+                    window.gm.pushDeferredEvent("MutateWolf",[me.data.magnitude]);
                     //window.gm.pushDeferredEvent("CatHabit");
+                    Effects.removeItem(me.data.id);});
+                }(this));
+            }
+        return(null);
+    }
+    onApply(){
+        this.data.duration = 60,this.data.cycles = 3;
+        this.data.time = window.gm.getTime();
+    }
+    merge(neweffect) {
+        if(neweffect.name===this.data.name) {//dont refresh
+            return(true);
+        }
+    }
+}
+class effMutateHorse extends Effect {
+    constructor() {
+        super();
+        this.data.id = this.data.name= effMutateHorse.name, this.data.hidden=0;
+        this.data.duration = 60,this.data.cycles = 3, this.data.magnitude = 3;
+    }
+    toJSON() {return window.storage.Generic_toJSON("effMutateHorse", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(effMutateHorse, value.data);};
+    get desc() {return("horse-tastic");}
+
+    onTimeChange(time) {
+        //after some time you mutate a bit
+        this.data.duration-= window.gm.getDeltaTime(time,this.data.time);
+        this.data.time = time;
+        if(this.data.duration<=0) {
+            this.data.duration = 60;
+            return(function(me){
+                return (function(Effects){ 
+                    if(me.data.cycles<=0) { 
+                        Effects.removeItem(me.data.id);
+                    }
+                    window.gm.pushDeferredEvent("MutateHorse",[me.data.magnitude]);
                     Effects.removeItem(me.data.id);});
                 }(this));
             }
@@ -988,13 +1027,11 @@ window.gm.StatsLib = (function (StatsLib) {
     window.storage.registerConstructor(effGuard);
     window.storage.registerConstructor(effHeal);
     
-
-    window.storage.registerConstructor(effMutateCat);
-    StatsLib.effMutateCat = function () { return new effMutateCat();  };  
+    window.storage.registerConstructor(effMutateHorse);
+    window.storage.registerConstructor(effMutateWolf);
+    window.storage.registerConstructor(effMutateCat); 
     window.storage.registerConstructor(effGrowBreast);
-    StatsLib.effGrowBreast = function () { return new effGrowBreast();  };
     window.storage.registerConstructor(effGrowVulva);
-    StatsLib.effGrowVulva = function () { return new effGrowVulva();  };
     //
     window.storage.registerConstructor(skCooking);
 

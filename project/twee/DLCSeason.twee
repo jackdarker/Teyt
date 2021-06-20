@@ -31,13 +31,6 @@ But you keep your stats and skills (*1).
 <div><a0 onclick='window.story.show("ServerDisconnected");'>Next</a></br></div>
 </article><article id="LogPanel"></article></section>
 
-<div id='select1' >
-<a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1a")'>click a</a>
-<a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1b")'>click b</a>
-</div><div id='choice1a' hidden>
-</div>
-<div id='choice1a' hidden>
-</div>
 
 :: ServerDisconnected [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
@@ -46,8 +39,7 @@ But you keep your stats and skills (*1).
 </br><p class="tPC">"Great, I lost connection to the game server. Maybe it does reconnect..." </p>
 You wait for some time but nothing happens,
 <p class="tPC">"I'm tired anyway. I will check tomorrow if I can reconnect." </p>
-<div></br>
-[[Next|Your Bedroom]]</br></div>
+<div></br>[[Next|Your Bedroom]]</br></div>
 </article><article id="LogPanel"></article></section>
 
 
@@ -64,7 +56,7 @@ But that damned thing is still there!</br>
 </article><article id="LogPanel"></article></section>
 <script> function foo(select) {
     window.gm.quests.forceQuestMilestone("qDiedAgain",200,100);
-    window.story.show("ForestRespawnPodExit");
+    window.story.show("ServerDisconnected");
 }
 </script>
 
@@ -136,7 +128,7 @@ upgraded version can change color and taste
 
 
 :: HowWillKnow
-Its not like you do hand out blowjobs in real. This is virtual, right? No one will know beause this dude isnt just a mob.
+Its not like you do hand out blowjobs in real. This is virtual, right? No one will know beause this dude is just a mob.
 
 
 :: PostDefeatCombat

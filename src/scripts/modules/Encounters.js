@@ -54,6 +54,11 @@ window.gm.encounters.wolf = function(location) {
     window.gm.Encounter = new CombatSetup();
     window.gm.Encounter.EnemyFunc = (function() { 
         let x = new window.gm.Mobs.Wolf();
+        if(_.random(1,100)>50) {
+            x.Outfit.addItem(new VulvaHuman());
+        } else {
+            x.Outfit.addItem(new PenisHuman());
+        }
         x.scaleLevel(window.gm.player.level);
         x.Stats.increment("health",9999); x.Stats.increment("energy",9999);
         return([x]);});
@@ -65,13 +70,41 @@ window.gm.encounters.wolf = function(location) {
     window.gm.Encounter.onVictory = function() {
         return('Intimitated, the wolf rolls on its back, whimpering submissively and exposing its throat.</br>'+ window.gm.printPassageLink('Next','WolfVictory'));
     }
-    window.gm.Encounter.sceneDone=false;
+    window.gm.Encounter.sceneDone=false; //attach flag to combatsetup-Instance;
     window.gm.Encounter.onMoveSelect = function() {
         let s=window.story.state;
         let result = {OK:false, msg:''};
-        if(this.sceneDone===false && s.combat.turnCount===3) {
-            result.OK=this.sceneDone=true;
+        if(window.gm.Encounter.sceneDone===false && s.combat.turnCount===3) {
+            result.OK=window.gm.Encounter.sceneDone=true;
             result.msg = 'Wolf growls at you.</br>'+ window.gm.printPassageLink('Next','WolffightIntermezzo');
+        } 
+        return(result);
+    }
+
+    window.gm.Encounter.initCombat();
+}
+window.gm.encounters.Carlia = function(location) {
+    window.gm.Encounter = new CombatSetup();
+    window.gm.Encounter.EnemyFunc = (function() { 
+        let x = window.story.state.Carlia;
+        x.Stats.increment("health",9999); x.Stats.increment("energy",9999);
+        return([x]);});
+    window.gm.Encounter.Location = location;
+    window.gm.Encounter.scenePic = window.gm.getScenePic(location);
+    window.gm.Encounter.onSubmit =window.gm.Encounter.onDefeat = function() {
+        return('You surrender to the monster-girl.</br>'+ window.gm.printPassageLink('Next','CarliaSubmit'));
+    }
+    window.gm.Encounter.onVictory = function() {
+        return('Carlia doesnt want to fight anymore.</br>'+ window.gm.printPassageLink('Next','CarliaVictory'));
+    }
+    window.gm.Encounter.sceneDone=0; //attach flag to combatsetup-Instance;
+    window.gm.Encounter.onMoveSelect = function() {
+        let s=window.story.state;
+        let result = {OK:false, msg:''};
+        if(window.gm.Encounter.sceneDone===0 && s.combat.turnCount>=4) {
+            result.OK=window.gm.Encounter.sceneDone=100;
+            window.gm.Encounter.endCombat();
+            result.msg = window.gm.printPassageLink('Next','CarliaMakeDeal');
         } 
         return(result);
     }
@@ -82,23 +115,6 @@ window.gm.encounters.Trent = function(location) {
     window.gm.Encounter = new CombatSetup();
     window.gm.Encounter.EnemyFunc = (function() { 
         let x = window.story.state.Trent; 
-        //no leveadaption? x.scaleLevel(window.gm.player.level);
-        x.Stats.increment("health",9999); 
-        return([x]);});
-    window.gm.Encounter.Location = location;
-    window.gm.Encounter.scenePic = window.gm.getScenePic(location);
-    window.gm.Encounter.onSubmit =window.gm.Encounter.onDefeat = function() {
-        return('You cannot fight anymore and surrender to the beast-man.</br>'+ window.gm.printPassageLink('Next','TrentSubmit'));
-    }
-    window.gm.Encounter.onVictory = function() {
-        return('It was barely an even fight but you showed this horsy its place.</br>'+ window.gm.printPassageLink('Next','TrentVictory'));
-    }
-    window.gm.Encounter.initCombat();
-}
-window.gm.encounters.Carlia = function(location) {
-    window.gm.Encounter = new CombatSetup();
-    window.gm.Encounter.EnemyFunc = (function() { 
-        let x = window.story.state.Carlia; 
         //no leveadaption? x.scaleLevel(window.gm.player.level);
         x.Stats.increment("health",9999); 
         return([x]);});

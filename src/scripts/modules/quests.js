@@ -83,7 +83,7 @@ window.gm.questDef = window.gm.questDef || {};
 }{
     let NOP = (function(){  return (0)});
     let hidden = (function(){return(window.gm.quests.getMilestoneState("qCarlia").id<100);});
-    let quest = new Quest("qCarlia","qCarlia","qCarlia",hidden );
+    let quest = new Quest("qCarlia","Carlia","Carlia",hidden );
     quest.addMileStone(new QuestMilestone(1,"","",        NOP,hidden));
     quest.addMileStone(new QuestMilestone(100,"","A strange individual is stalking you.",        NOP,hidden));
     quest.addMileStone(new QuestMilestone(200,"","That stalker was eying you again. He was disappearing into the cliffs direction.",        NOP,hidden));
@@ -91,6 +91,9 @@ window.gm.questDef = window.gm.questDef || {};
     quest.addMileStone(new QuestMilestone(400,"","Someone setup a camp in a cave entrance. Maybe you an find some clues there.",  NOP));
     quest.addMileStone(new QuestMilestone(500,"","Pooking around in other peoples stuff got you a \"present\".",  NOP));
     quest.addMileStone(new QuestMilestone(600,"","The stalker didnt care to hide any longer and accused you of thievery.",  NOP));
+    quest.addMileStone(new QuestMilestone(700,"","Try to convince her that she can trust you by finding her a home.",  NOP));
+    quest.addMileStone(new QuestMilestone(800,"","Tell Carlia that the Alchemist aggreed to let Carlia sleep in his hut.",  NOP));
+    quest.addMileStone(new QuestMilestone(900,"","For your help Carlia showed you a new \'skill\'.",  NOP));
     window.gm.questDef[quest.id]= quest;
 }{
     let NOP = (function(){  return (0)});

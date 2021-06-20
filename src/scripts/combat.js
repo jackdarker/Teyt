@@ -12,7 +12,7 @@ class CombatSetup {
     this.scenePic = ''  //bg-image to use
     //the following function should get reassigned; 
     //they should return a message what will happen next and provide a link to passage to follow f.e. return to window.gm.player.location
-    this.onStart = (function(){return('A '+window.story.state.combat.enemyParty[0].name+' appears !'+ window.gm.printPassageLink('GameOver','GameOver'));});
+    this.onStart = (function(){return('A '+window.story.state.combat.enemyParty[0].name+' appears !'+ window.gm.printPassageLink('Engage','EncounterStartTurn'));});
     this.onDefeat = (function(){return('You are defeated.</br>'+ window.gm.printPassageLink('GameOver','GameOver'));});
     this.onVictory = (function(){return('You defeated the foe.</br>'+ window.gm.printPassageLink('Next',window.gm.player.location));});
     this.onFlee = (function(){return('You retreat hastily.</br>'+ window.gm.printPassageLink('Next',window.gm.player.location));});
@@ -44,7 +44,7 @@ initCombat() {
   s.combat.turnCount=0;
   this.next=this.battleInit;
   this.msg='';
-  window.story.show("Encounter");
+  window.story.show("EncounterStartTurn");
 }
 //spawns additional enemys or friends
 //called by effCallHelp at begin of turn

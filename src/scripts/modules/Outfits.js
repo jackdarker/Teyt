@@ -170,7 +170,7 @@ class ClitPiercing extends Equipment {
     canEquip() {return({OK:true, msg:'equipable'});}
     canUnequip() {return({OK:true, msg:'unequipable'});}
     onEquip() {
-        if(this.style===100) window.gm.player.addEffect("effGrowVulva",window.gm.StatsLib.effGrowVulva());
+        if(this.style===100) window.gm.player.addEffect("effGrowVulva",window.storage.constructors['effGrowVulva']());
         return({OK:true, msg:'equipped'});}
 }
 
@@ -301,7 +301,7 @@ class TailRibbon extends Equipment {
     canEquip() { 
         if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) return({OK:true, msg:'unequip'});    //todo check for key
         else {
-            if(this.parent.parent.Outfit.countItem("TailCat")>0) {
+            if(this.parent.parent.Outfit.countItem("TailWolf")>0) {
                 return({OK:true, msg:'equip'}); 
             } else {
                 return({OK:false, msg:'This requires a propper tail to attach to!'}); 
