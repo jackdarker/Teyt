@@ -63,7 +63,7 @@ window.gm.OutfitSlotLib = {
     Wrists  :   "Wrists",
     LHand   :   "LHand",
     RHand   :   "RHand",
-    //U  = under wear    P = piercing  T = tattoo
+    //U  = under wear    P = piercing  T = tattoo  A = Above
     uFeet    : "uFeet",   //socks,stockings
     uAnkles  : "uAnkles",    //stockings, cuffs
     uLegs    : "uLegs",     //stockings
@@ -105,7 +105,8 @@ class Equipment extends Item {
     constructor(name) {
         super(name);
         this.tags = [];
-        this.slotUse = [];
+        this.slotUse = []; //which slot is used by the equip
+        this.slotCover = []; //which other slots are invisible by this "uses Breast, covers bBreast,bNipples"
     }
     // Attention !!
     //_parent will be added dynamical
@@ -116,8 +117,14 @@ class Equipment extends Item {
     //more detailed description that should reflet if the item is worn or not; 
     descLong(fconv) { 
         let msg='';
-        if(this.isEquipped()) msg='$[I]$ $[wear]$ '+this.name+".";
-        else msg='$[I]$ $[have]$ '+this.name+".";
+        let rnd = _.random(0,100);
+        if(this.isEquipped()) {
+            if(rnd>50) msg='$[I]$ $[wear]$ '+this.name+'.';
+            else msg='A '+this.name+' adorns $[me]$.';
+        } else {
+            if(rnd>50) msg='$[I]$ $[own]$ '+this.name+".";
+            else msg='$[I]$ $[have]$ '+this.name+".";
+        }
         return(fconv(msg));
     }
     isEquipped() { return(this.parent.parent.Outfit && this.parent.parent.Outfit.findItemSlot(this.id).length>0);}
@@ -155,7 +162,7 @@ class Outfit { //extends Inventory{
     toJSON() {return window.storage.Generic_toJSON("Outfit", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(Outfit, value.data);};
     postItemChange(id,operation,msg) {
-        window.gm.pushLog('Outfit: '+operation+' '+id+' '+msg+'</br>');
+        window.gm.pushLog('Outfit: '+operation+' '+id+' '+msg);
     }
 
     _relinkItems() {  //call this after loading save data to reparent
@@ -164,7 +171,7 @@ class Outfit { //extends Inventory{
         }
     }
     postItemChange(id,operation,msg) {
-        window.gm.pushLog('Outfit: '+operation+' '+id+' '+msg+'</br>');
+        window.gm.pushLog('Outfit: '+operation+' '+id+' '+msg);
     }
     count() {return( Object.keys(this.list).length);}
     //count how many slots are used by an item

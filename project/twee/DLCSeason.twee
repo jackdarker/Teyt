@@ -28,7 +28,7 @@ But you keep your stats and skills (*1).
 </br>*1): It might occur that the questline has to be started from the beginning. We are doing our best to solve the problem in the next updates. 
 </p> 
 <p class='tPC'>"Start the questline from the beginning? I really hope they get that fixed soon."</p>
-<div><a0 onclick='window.story.show("ServerDisconnected");'>Next</a></br></div>
+<div><a0 onclick='window.story.show("ServerDisconnected");'>Next</a></br></div>  <!--todo forward time to evenning-->
 </article><article id="LogPanel"></article></section>
 
 

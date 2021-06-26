@@ -173,8 +173,6 @@ class ClitPiercing extends Equipment {
         if(this.style===100) window.gm.player.addEffect("effGrowVulva",window.storage.constructors['effGrowVulva']());
         return({OK:true, msg:'equipped'});}
 }
-
-
 //this is an Inventory-item, not wardrobe
 class Crowbar extends Equipment {
     constructor() {
@@ -246,12 +244,55 @@ class RobesZealot extends Equipment {
     constructor() {
         super('RobesZealot');
         this.tags = ['cloth'];
-        this.slotUse = ['Breast','Stomach','Hips','Legs'];    
+        this.slotUse = ['Breast','Stomach','Hips','Legs'];
+        this.slotCover = ['bBreast','uBreast','pNipples'];    
         this.lossOnRespawn = true;
     }
     get desc() { return 'light blue tank-top';}
     toJSON() {return window.storage.Generic_toJSON("RobesZealot", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(RobesZealot, value.data));}
+    canEquip() {return({OK:true, msg:'equipable'});}
+    canUnequip() {return({OK:true, msg:'unequipable'});}
+}
+class Briefs extends Equipment {
+    constructor() {
+        super('Briefs');
+        this.tags = ['cloth'];
+        this.slotUse = ['uHips'];
+        this.slotCover = ['bPenis','bVulva','bBalls','bClit','bAnus','pPenis','pClit'];    
+        this.lossOnRespawn = true;
+    }
+    get desc() { return 'plain briefs';}
+    toJSON() {return window.storage.Generic_toJSON("Briefs", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(Briefs, value.data));}
+    canEquip() {return({OK:true, msg:'equipable'});}
+    canUnequip() {return({OK:true, msg:'unequipable'});}
+}
+class BikiniBottomLeather extends Equipment {
+    constructor() {
+        super('BikiniBottomLeather');
+        this.tags = ['cloth'];
+        this.slotUse = ['uHips'];
+        this.slotCover = ['bPenis','bVulva','bBalls','bClit','bAnus','pPenis','pClit'];    
+        this.lossOnRespawn = true;
+    }
+    get desc() { return 'leather triangle-bikini';}
+    toJSON() {return window.storage.Generic_toJSON("BikiniBottomLeather", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(BikiniBottomLeather, value.data));}
+    canEquip() {return({OK:true, msg:'equipable'});}
+    canUnequip() {return({OK:true, msg:'unequipable'});}
+}
+class ShortsLeather extends Equipment {
+    constructor() {
+        super('ShortsLeather');
+        this.tags = ['cloth'];
+        this.slotUse = ['Hips','Legs'];
+        this.slotCover = ['bPenis','bVulva','bBalls','bClit','bAnus','pPenis','pClit'];    
+        this.lossOnRespawn = true;
+    }
+    get desc() { return 'leather shorts';}
+    toJSON() {return window.storage.Generic_toJSON("ShortsLeather", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(ShortsLeather, value.data));}
     canEquip() {return({OK:true, msg:'equipable'});}
     canUnequip() {return({OK:true, msg:'unequipable'});}
 }
@@ -289,6 +330,35 @@ class StaffWodden extends Equipment {
         //this.parent.parent.Stats.removeModifier('pAttack',{id:'pAttack:StaffWodden'});
         return({OK:true, msg:'unequipped'});}
 }
+class MaceSteel extends Equipment {
+    constructor() {
+        super('MaceSteel');
+        this.tags = [ 'weapon'];
+        this.slotUse = ['RHand'];
+        this.lossOnRespawn = true;
+        this.pDamage = 10;
+    }
+    get desc() { return('A heavy steel mace.');}
+    toJSON() {return window.storage.Generic_toJSON("MaceSteel", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(MaceSteel, value.data));}
+    usable(context) {return(this.canEquip());}
+    use(context) { //context here is inventory not outfit
+        if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) {  
+            this.parent.parent.Outfit.removeItem(this.id); 
+            return( {OK:true, msg:'unequipped '+ this.name}); //todo
+        } else {
+            this.parent.parent.Outfit.addItem(this); 
+            return( {OK:true, msg:'equipped '+ this.name}); //todo
+        }
+    }
+    canEquip() {
+        if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) return({OK:true, msg:'unequip'});
+        else return({OK:true, msg:'equip'});
+    }
+    canUnequip() {return({OK:true, msg:'unequipable'});}
+    onEquip() {        return({OK:true, msg:'equipped'});}
+    onUnequip() {        return({OK:true, msg:'unequipped'});}
+}
 class TailRibbon extends Equipment {
     constructor() {
         super('TailRibbon');
@@ -310,10 +380,13 @@ class TailRibbon extends Equipment {
     }
     canUnequip() {return({OK:true, msg:'unequipable'});}
 }
-
+//todo vest,chaps,bikini top,  
 window.gm.ItemsLib = (function (ItemsLib) {
+    window.storage.registerConstructor(BikiniBottomLeather);
+    window.storage.registerConstructor(Briefs);
     window.storage.registerConstructor(CollarQuest);
     window.storage.registerConstructor(Leggings);
+    window.storage.registerConstructor(MaceSteel);
     window.storage.registerConstructor(TankShirt);
     window.storage.registerConstructor(Jeans);
     window.storage.registerConstructor(Sneakers);
@@ -323,6 +396,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(TailRibbon);
     window.storage.registerConstructor(ClitPiercing);
     window.storage.registerConstructor(RobesZealot);
+    window.storage.registerConstructor(ShortsLeather);
     window.storage.registerConstructor(StaffWodden);
     window.storage.registerConstructor(WristCuffs);
     

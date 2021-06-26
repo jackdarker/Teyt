@@ -102,7 +102,7 @@ window.gm.initGame= function(forceReset,NGP=null) {
     if (!s.PlayerRL||forceReset) {  
         let ch = new Character();
         ch.id="PlayerRL";
-        ch.name="Ratchel";
+        ch.name="Andrew";
         ch.faction="Player";
         //window.gm.PlayerVR.gainRelation('Mom',10);
         ch.Effects.addItem(skCooking.name,new skCooking());
@@ -112,22 +112,22 @@ window.gm.initGame= function(forceReset,NGP=null) {
         ch.Inv.addItem(new FlashBang(),2);
         ch.Inv.addItem(new CanOfCoffee(),2);
         ch.Wardrobe.addItem(new Jeans());
+        ch.Wardrobe.addItem(new Briefs());
         ch.Wardrobe.addItem(new Sneakers());
-        ch.Wardrobe.addItem(new Leggings());
         ch.Wardrobe.addItem(new TankShirt());
         ch.Wardrobe.addItem(new Pullover());
-        ch.Wardrobe.addItem(new TailRibbon());
         ch.Outfit.addItem(new BaseHumanoid());
         ch.Outfit.addItem(new FaceHuman());
         ch.Outfit.addItem(HandsHuman.factory('human'));
         ch.Outfit.addItem(new SkinHuman());
-        ch.Outfit.addItem(new VulvaHuman());
+        ch.Outfit.addItem(PenisHuman.factory('human'));
+        ch.Wardrobe.addItem(new Briefs());
         ch.Outfit.addItem(new Jeans());
         ch.Outfit.addItem(new Sneakers());
         ch.Outfit.addItem(new Pullover());
         //special skills
         ch.Effects.addItem(effNotTired.name, new effNotTired()); //depending on sleep Tired will be set to NotTired or Tired
-        ch.Skills.addItem(SkillCallHelp.setup('Mole'));
+        //ch.Skills.addItem(SkillCallHelp.setup('Mole'));
         s.PlayerRL=window.gm.PlayerRL=ch;
     }      
     window.gm.switchPlayer("PlayerRL");
@@ -198,12 +198,16 @@ window.gm.respawn=function(conf={keepInventory:false}) {
   } else if([100,200,300].includes(window.gm.quests.getMilestoneState("qBondageKink").id)){
       window.story.show('YouDiedWithCursedGear');
   } else {
-      window.gm.player.Wardrobe.addItem(new window.storage.constructors['RobesZealot']());
-      window.gm.player.Outfit.addItem(new window.storage.constructors['RobesZealot']());
-      let staff = new window.storage.constructors['StaffWodden']();
-      window.gm.player.Inv.addItem(staff);
-      window.gm.player.Outfit.addItem(staff);
-      window.story.show('ForestRespawnPodExit'); //todo what location
+    let robes = new window.storage.constructors['RobesZealot']();
+    window.gm.player.Wardrobe.addItem(robes);
+    window.gm.player.Outfit.addItem(robes);
+    robes = new window.storage.constructors['Briefs']();
+    window.gm.player.Wardrobe.addItem(robes);
+    window.gm.player.Outfit.addItem(robes);
+    let staff = new window.storage.constructors['StaffWodden']();
+    window.gm.player.Inv.addItem(staff);
+    window.gm.player.Outfit.addItem(staff);
+    window.story.show('ForestRespawnPodExit'); //todo what location
   }
 }
 //sets current player location and advances time
@@ -266,31 +270,6 @@ window.gm.printSchedule = function(){
   }
   return(elmt);
 };
-
-//prints a list of todo quest
-window.gm.printTodoList= function() {
-    var elmt='<form><ul style=\"list-style-type: none\" >';
-    var s= window.story.state;
-    var list=['qDogSit'];
-    elmt +="<li><label><input type=\"checkbox\" name=\"y\" value=\"x\" readonly disabled>always: keep the fridge filled</label></li>";
-    for(var i=0; i<list.length; i++) {
-        var val = s.vars[list[i]];
-        var msg ='';
-        if(list[i]==='qDogSit') {       //todo we could use <%=> instead
-        if(val<=0) {  
-        } else if(val<=0x100) {
-            msg = 'There was this dogsit-ad in the park. Maybe you should call there to earn some money.';
-        } else if(val<=0x200) {
-            msg = 'You called dogsit but didnt get a response...';
-        }else if(val<=0x300) {
-            msg = 'Get a task from dogsit!';
-        }
-        }
-        if(msg!='') elmt +="<li><label><input type=\"checkbox\" name=\"y\" value=\"x\" readonly disabled>"+msg+"</label></li>";
-    }
-        elmt +="</ul></form></br>";
-        return(elmt);
-};
 //prints a list of quest
 window.gm.printQuestList= function() {
   let elmt='<hr><form><ul style=\"list-style-type: none; padding-inline-start: 0px;\" ><legend>In progress</legend>';
@@ -324,36 +303,34 @@ window.gm.printQuestList= function() {
   elmt +="</ul></form></br>";
   return(elmt);
 };
-//prints a list of perks for unlock
-window.gm.printUnlockPerk= function(id, descr) {
-    var elmt='';
-    var s= window.story.state;
-        if(window.gm.player[id]==0 && window.gm.player.skillPoints>0) {
-            elmt +=''.concat("<a0 id='"+id+"' onclick='(function ( $event ) { unlockPerk($event.id); })(this);'>"+descr+"</a>");
-        elmt +=''.concat("    [[Info|"+id+"]]");
-        } else if(window.gm.player[id]>0) {
-            elmt +=id+": "+descr;
-        }
-        elmt +=''.concat("</br>");
-        return(elmt);
-};
-
 //prints a description of the chars-body
 window.gm.printBodyDescription= function(whom,onlyvisible=false) {
   let msg = "";
   let conv = window.gm.util.descFixer(whom);
   let wornIds =whom.Outfit.getAllIds(); //todo this returns wearables & bodyparts
   let base = [] , head = [], torso =[], arms =[],legs =[], groin=[], other=[],breast=[],ignore=[];
-  // todo filter by visibility and sort the order: place Breast & Nipple-Piercing together 
-  let fbase = ['bBase','bSkin'] , fhead = ['bFace','bMouth','Head','Mouth'], 
-  ftorso =['bTorso','bTailBase','bWings','Chest','Stomach'], 
-  farms =['bArms','bHands'],flegs =['bLegs'], 
+  
+  //sort the order: place Breast & Nipple-Piercing together 
+  let fbase = ['bBase','bSkin'] , fhead = ['bHeadHair','bFace','bEars','bEyes','bMouth','bTongue','Head','Mouth','Neck'], 
+  ftorso =['bTorso','bTailBase','bWings','Breast','Stomach','Hips'], 
+  farms =['bArms','bHands','Arms','Wrists','RHand','LHand'],flegs =['bLegs','bFeet','Feet','Thighs'], 
   fbreast =['bBreast','pNipples'],
-  fgroin=['bulva','bPenis','pClit'], fignore = [];
-
-  for(el of wornIds) {
+  fgroin=['bVulva','bPenis','pClit','bPubicHair','bHips','bAnus','Vulva','Clit','Anus','Penis','Balls'], fignore = [],
+  fcovered=[];
+  if(onlyvisible) {// filter by visibility 
+    let covered=[];
+    for(el of wornIds) { //notice that an item is only pushed once even if has multiple slots
+      let item=whom.Outfit.getItem(el);
+      covered = covered.concat(item.slotCover);
+    }
+    for(el of covered) {
+      if(!fcovered.includes(el)) fcovered.push(el);
+    }
+  }
+  for(el of wornIds) { //notice that an item is only pushed once even if has multiple slots
     let item=whom.Outfit.getItem(el);
-    if(item.slotUse.some(name => fignore.includes(name))) ignore.push(item);
+    if(item.slotUse.every(name => fcovered.includes(name))) ignore.push(item); //ignore those that are overed completely
+    else if(item.slotUse.some(name => fignore.includes(name))) ignore.push(item);
     else if(item.slotUse.some(name => fbase.includes(name))) base.push(item);
     else if(item.slotUse.some(name => fhead.includes(name))) head.push(item);
     else if(item.slotUse.some(name => ftorso.includes(name))) torso.push(item);
@@ -363,6 +340,7 @@ window.gm.printBodyDescription= function(whom,onlyvisible=false) {
     else if(item.slotUse.some(name => fgroin.includes(name))) groin.push(item);
     else other.push(item);
   }
+  
   //null is used to mark linebreaks
   let all = base.concat([null]).concat(head).concat([null]).concat(torso).concat([null]).concat(arms).concat([null]);
   all = all.concat(legs).concat([null]).concat(groin).concat([null]).concat(breast).concat([null]).concat(other);

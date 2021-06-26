@@ -120,6 +120,7 @@ class Carlia extends Mob {
       this.Outfit.addItem(HandsHuman.factory('cat'));
       this.Outfit.addItem(FaceWolf.factory('cat'));
       this.Outfit.addItem(new VulvaHuman());
+      this.Outfit.addItem(new BikiniBottomLeather());
       this.levelUp(3);
       this.autoLeveling();
   }
@@ -145,6 +146,8 @@ class Trent extends Mob {
         this.Outfit.addItem(TailWolf.factory('horse'));
         this.Outfit.addItem(FaceWolf.factory('horse'));
         this.Outfit.addItem(PenisHuman.factory('horse'));
+        this.Outfit.addItem(new ShortsLeather());
+        this.Outfit.addItem(new MaceSteel());
         this.Stats.increment('strength',3);
         this.levelUp(6);
         this.autoLeveling();

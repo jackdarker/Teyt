@@ -34,7 +34,7 @@ class Inventory {
         }
     }
     postItemChange(id,operation,msg) {
-        window.gm.pushLog('Inventory: '+operation+' '+id+' '+msg+'</br>');
+        window.gm.pushLog('Inventory: '+operation+' '+id+' '+msg);
     }
     count() {return(this.list.length);}
     countItem(id) {

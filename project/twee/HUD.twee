@@ -48,7 +48,7 @@ document.querySelector('#settings').addEventListener('click', function(){window.
 :: LogPanel
 <!--<button type="button" id="toggleview" onclick=toggleview()><i class="fa fa-compress"></i></button>
 <button type="button" id="clearview" onclick=clearview()><i class="fa fa-trash-alt"></i></button>-->
-<a0 onclick=toggleview()>toggle view</a><a0 onclick=clearview()>clear log</a>
+<div><a0 onclick=toggleview()>toggle view</a><a0 onclick=clearview()>clear log</a></div>
 <div class="scroll" style="font-size: smaller;"><%=window.gm.getLog()%></br></div>
 <script>
 function toggleview(){

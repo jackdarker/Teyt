@@ -6,7 +6,7 @@ Depending if you played the game already you might skip to a certain point:
 :: GameInvite
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
-As you check your email, you notice a letter from a Gaming-service where you have your Online-Roleplaying-Account for Dominion-of-SLayers registered.</br>
+As you skim through your email, you notice a letter from a Gaming-service where you have your Online-Roleplaying-Account for Dominion-of-Slayers registered.</br>
 <p class='tNPC2'>"Dear sir or madam, we are happy to announce that your starter subscription will end soon and you will be automatically upgraded to an experienced-member account for free*. 
 If you are no longer interested in our service, click the link below to cancel your membership. However, canceling your membership now would lead to unrecoverable loss of your avatars game-progress, stats and inventory.
 Note*: the upgrade from starter to experienced-member is free of cost; monthly subscription cost will be only 30$ instead of 2$ for your actual starter-membership."</p>
@@ -19,7 +19,7 @@ Note*: the upgrade from starter to experienced-member is free of cost; monthly s
 <p class='tPC'>"Hey Brad, did you also receive that mail from GameWorld with account-change?"</p>
 "Yeah, I just wanted to talk about it with you too. What do you think?"
 <p class='tPC'>"We put so much work into this, I wouldnt like to get all of this to waste. But 30$ is really a lot of money for someone studying."</p>
-"Even for someone who is working regulary this is alot of oney dude. If you leave the game I will leave too."
+"Even for someone who is working regulary this is alot of money dude. If you leave the game I will leave too."
 <p class='tPC'>"To tell you the truth, it wasnt that fun to play recently. Somehow they messed up the games balancing with those updates."</p>
 "Thats on purpose. They just want you to buy those boosters for real money!"
 <p class='tPC'>"Yep. So its set. Lets pull them a finger and quit."</p>
@@ -33,7 +33,7 @@ Just in that moment you got mail too: </br>
 :: GameInvite1b
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
-<p class='tNPC2'>Dear [insert name here],
+<p class='tNPC2'>Dear <%=window.gm.player.name%>,</br>
 you got selected by ServiceAsGame to receive an invite as beta-tester for our new, MOBDSMRP-Game MiracoulusMultiplayerAlwaysOnlineVirtualReallityMassiveServiceRougue-Game.
 Be part of a growing gaming community and get involved in exciting quests and rakish adventures. 
 Please note that the content rating of the game is pending and is therefore restricted to adult audience only.
@@ -44,22 +44,22 @@ Because of the high demands on this new generation service-game, only thoose tha
 <p class='tPC'>"I got an invite too. For something called Season-Quest. Never heard of that."</p>
 "Thats the same I got! If thats just a coincidence ?! But its from a different company."
 <p class='tPC'>"Should we try this? Its adult only, so no annoying kiddos fucking up our game."</p>
-"Yeah lets sign in together. I always wanted to see what beta-testing means about!"
+"Yeah lets sign in together. I always wanted to see what beta-testing is about!"</br>
 Clicking the link you got forwared to a registration page where you have to enter personal information.
 <p class='tPC'>"Uhm, they want the passportnumber"</p>
-"Of course, because age-checking"
-Entering the required information you press Next and are presented a window with densly scribbled text that is barely readable and even less understandable: the user-agreement.
-'I should check this...' you start reading but soon just scroll trhough the text.
-'Looks standard for me' you click next and are presented another window with similiar advocat scribbling.
-You groan 'Come on now' Just scrolling down and hitting next.
+"Of course, because age-checking"</br>
+Entering the required information you press Next and are presented a window with densly scribbled text that is barely readable and even less understandable: the user-agreement.</br>
+<span class="tPC">'I should check this...'</span> you start reading but soon just scroll trhough the text.</br>
+<span class="tPC">'Looks standard for me'</span> you click next and are presented another window with similiar advocat scribbling.</br>
+<span class="tPC">'Come on now'</span> you groan, just scrolling down endless text and hitting next.</br>
 "Congratulations. You are now registered in our beta-test-program and will receive login-credentials and gaming equipment."
-'What gaming equipment?'
+<span class="tPC">'What gaming equipment?'</span>
 <p class='tPC'>"Hey Brad did you finish registration? I got a confirmation about receiving gaming equipment."</p>
-"Uhm yes, I think I saw something about that there is some new generation MoCap-equipment required to play."
+"Oh yes, I think I saw something about that there is some new generation MoCap-equipment required to play."
 <p class='tPC'>"MoCap?"</p>
 "Motion-Capturing dude. Sees you need something more that just your ordinary VR-googles to play this."
 <p class='tPC'>"Do we have to pay."</p>
-"They just stated they lent it for the test....oh .I forgot I have to leave. see ya later."
+"They just stated they lent it for the test....uhm .I forgot I have to leave. see ya later."
 <p class='tPC'>"Sure."</p>
 'Im really tired now. Lets see when the equipment shows up.'</p>
 <a0 onclick='start()'>Close Browser</a>

@@ -166,7 +166,6 @@ dialog::backdrop, #backdrop {
   border-radius: 4px;
 }
 
-//Style content
 .toggle-content {
   color: #B0B3C2;
   font-family: monospace;
@@ -189,7 +188,7 @@ dialog::backdrop, #backdrop {
 background:blue;
   }
 
-//Display content when checkbox is "checked"
+/*Display content when checkbox is "checked"*/
 .toggle-input:checked .toggle-content {
     display: block;
 background:red;
@@ -282,7 +281,7 @@ statdown {
     border-color: coral;
 } 
 div.scroll {
-  height: 100%;
+  /*height: 100%; doesnt fit with buttons*/
   overflow-x: hidden;
   overflow-y: auto;
 }

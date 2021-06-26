@@ -405,7 +405,7 @@ window.gm.refreshSidePanel = function(){
 window.gm.pushLog=function(msg,Cond=true) {
   if(!Cond) return;
   var log = window.story.state._gm.log;
-  log.unshift(msg);
+  log.unshift(msg+'</br>');
   if(log.length>10) {
       log.splice(log.length-1,1);
   }

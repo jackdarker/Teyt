@@ -47,7 +47,7 @@
     }
     //override
     postItemChange(id,operation,msg) {
-        window.gm.pushLog('Stats: '+operation+' '+id+' '+msg+'</br>');
+        window.gm.pushLog('Stats: '+operation+' '+id+' '+msg);
     }
     //override; only use to create new stats !
     addItem(stat) {
@@ -223,7 +223,7 @@ class Effects extends Inventory {  //Todo a collection of Stats is similiar to I
     }
     //override
     postItemChange(id,operation,msg) {
-        window.gm.pushLog('Effects: '+operation+' '+id+' '+msg+'</br>',
+        window.gm.pushLog('Effects: '+operation+' '+id+' '+msg,
             window.story.state._gm.debug || 
             window.gm.player.name===window.story.state.playerVR.name ||
             window.gm.player.name===window.story.state.playerRL.name);  //todo only show logs for player?

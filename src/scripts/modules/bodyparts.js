@@ -326,10 +326,10 @@ class HandsHuman extends Equipment {
     canEquip() {return({OK:true, msg:'equipable'});}
     canUnequip() {return({OK:true, msg:'unequipable'});}
     descLong(fconv) { 
-        return(fconv('$[My]$ hands consist of a palm and fingers.' + 
-        (['dog','wolf','cat'].includes(this.data.style))?this.data.style+'-claws adorn the fingertips':''+
-        (['lizard'].includes(this.data.style))?'Large talons grow from their fingertips.':''
-        ));
+        let msg = '$[My]$ hands consist of a palm and fingers.';
+        msg += ['dog','wolf','cat'].includes(this.data.style)?(this.data.style+'-claws adorn the fingertips'):'';
+        msg += ['lizard'].includes(this.data.style)?('Large talons grow from their fingertips.'):'';
+        return(fconv(msg));
     }
 }
 class BreastHuman extends Equipment {
@@ -447,14 +447,6 @@ window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(BreastHuman);
     window.storage.registerConstructor(PenisHuman);
     window.storage.registerConstructor(VulvaHuman);
-    
-    /*ItemsLib['PenisHuman'] = function () { return new PenisHuman();};
-    ItemsLib['SkinFur'] = function () { return new SkinFur();};
-    ItemsLib['SkinHuman'] = function () { return new SkinHuman();};
-    ItemsLib['TailWolf'] = function () { return new TailWolf();};
-    ItemsLib['BreastHuman'] = function () { return new BreastHuman();};
-    ItemsLib['VulvaHuman'] = function () { return new VulvaHuman();};
-    ItemsLib['PenisHuman'] = function () { return new PenisHuman();};*/
     return ItemsLib; 
 }(window.gm.ItemsLib || {}));
 
