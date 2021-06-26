@@ -46,9 +46,10 @@ document.querySelector('#settings').addEventListener('click', function(){window.
 
 
 :: LogPanel
-<div class="scroll" style="font-size: smaller;"><%=window.gm.getLog()%></br></br></div>
-<button type="button" id="toggleview" onclick=toggleview()>toggle View</button>
-<button type="button" id="clearview" onclick=clearview()>clear View</button>
+<!--<button type="button" id="toggleview" onclick=toggleview()><i class="fa fa-compress"></i></button>
+<button type="button" id="clearview" onclick=clearview()><i class="fa fa-trash-alt"></i></button>-->
+<a0 onclick=toggleview()>toggle view</a><a0 onclick=clearview()>clear log</a>
+<div class="scroll" style="font-size: smaller;"><%=window.gm.getLog()%></br></div>
 <script>
 function toggleview(){
   document.querySelector("section").classList.toggle("section_swap");
@@ -209,6 +210,7 @@ for(var i=0;i<maxSlots;i++){
 :: Settings [_back_]
 <section> <!--<aside id="sidebar"></aside>--><article><%=window.story.render("CenterDialogs") %>
 [[Back|_back_]]</br>
+<p class="author">settings are stored in save-game until I find a way to store them in cookies.</p>
 Theme:
 <a href="javascript:window.styleSwitcher.setStyle('default');window.gm.refreshAllPanel();">default</a>
 <a href="javascript:window.styleSwitcher.setStyle('dark');window.gm.refreshAllPanel();">dark</a></br>

@@ -69,6 +69,7 @@ window.gm.initGame= function(forceReset,NGP=null) {
     if (!s._gm||forceReset) {
       s._gm = {
         version : window.gm.getSaveVersion(),
+        style: 'default', //ss profile to use
         log : [],
         passageStack : [], //used for passage [back] functionality
         defferedStack : [], //used for deffered events
@@ -123,6 +124,7 @@ window.gm.newGamePlus = function() {
 //reimplement this to handle version upgrades on load !
 window.gm.rebuildObjects= function(){ 
   var s = window.story.state;
+  window.styleSwitcher.loadStyle(); //since style is loaded from savegame
   window.gm.quests.setQuestData(s.quests); //necessary for load support
   window.gm.switchPlayer(s._gm.activePlayer);
 }

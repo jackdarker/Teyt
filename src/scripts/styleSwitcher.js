@@ -2,7 +2,6 @@
 "use strict";
 
 // Style Switcher from https://www.stichpunkt.de/css/styleswitch.html
-// todo cookies dont work with files that are not served by server!?
 class StyleSwitcher {
     constructor(){
         this.style = "default";
@@ -34,7 +33,7 @@ setStyle(s) {
   }
 }
 // Cookie-Funktionen
-setCookie(name, value, expdays) {   // g�ltig expdays Days
+setCookie(name, value, expdays) {
   var now = new Date();
   var exp = new Date(now.getTime() + (1000*60*60*24*expdays));
   var val =name + "=" + escape(value) + "," + "expires=" + exp.toGMTString() + "," +  "path=/";
@@ -61,9 +60,19 @@ getCookie(name) {
   }
   return null;
 }
-setStyleCookie() {  this.setCookie(this.cookie, this.style, this.days);}
-getStyleCookie() {  return this.getCookie(this.cookie);}
-delStyleCookie() {  this.delCookie(this.cookie);}
+// todo cookies dont work with files that are not served by server!?
+setStyleCookie() {  //this.setCookie(this.cookie, this.style, this.days);
+  if(!window.story.state._gm) return; // window.story.state._gm might not yet exist
+  window.story.state._gm.style=this.style;
+}
+getStyleCookie() {  //return this.getCookie(this.cookie);
+  if(!window.story.state._gm) return('default');
+  return( window.story.state._gm.style);
+}
+delStyleCookie() {  //this.delCookie(this.cookie);
+  if(!window.story.state._gm) return;
+  window.story.state._gm.style='default';
+}
 }
 window.styleSwitcher = new StyleSwitcher(); 
 window.styleSwitcher.loadStyle();

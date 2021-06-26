@@ -421,7 +421,7 @@ As you stumble into the hut, the alchemists greets you: "Ah, nice to see you aga
 He shakes his head "Not that I know. Cant you sneak around them or trick them somehow to let you pass?"
 <p class="tPC">"Well, thats what I wanted to ask you. You dont have an elixier or something that makes me hardier and stronger?"</p> 
 "Huff, no. I'm still out of stock. I can give you those berry-potions if you bring me enough berries. It wouldnt take much to improve it though..."
-"If you can get me 4 purple berries, 2 apoca flowers and 2 leeches I can mix up some potion to boost your strength."
+"If you can get me 2 purple berries, 2 apoca flowers and 2 leeches I can mix up some potion to boost your strength."
 <p class="tPC">"Thats exactly what I need ! But where can I find them?"</p>
 "The flowers grow in the forest too. They have colorful blue and yellow blossoms. But those leeches...they lurk in dark,humid places, swamps and such."
 <p class="tPC">"I will see to get some."</p>
@@ -437,7 +437,8 @@ He shakes his head "Not that I know. Cant you sneak around them or trick them so
 "About that cake we talked earlier - what kind of cake are we speaking about."
 <p class='tPC'>NOO CAKE !</p>
 <% if(window.gm.quests.getMilestoneState("qPurpleBerry").id>=100) {%>
-<a0 onclick='window.gm.player.Inv.removeItem("PurpleBerry",5);window.gm.player.Inv.addItem(new window.gm.ItemsLib.["HealthPotion(small)"](),1);window.gm.refreshAllPanel();' <%=(window.gm.player.Inv.countItem("PurpleBerry")>=5)?(""):("hidden")%>>Trade 5 purple berries for 1 potion</a>
+<a0 onclick='window.gm.player.Inv.removeItem("PurpleBerry",5);window.gm.player.Inv.addItem(new window.gm.ItemsLib["HealthPotion(small)"](),1);window.gm.refreshAllPanel();' <%=(window.gm.player.Inv.countItem("PurpleBerry")>=5)?(""):("hidden")%>>Trade 5 purple berries for 1 health-potion</a></br>
+<a0 onclick='window.gm.player.Inv.removeItem("PurpleBerry",5);window.gm.player.Inv.addItem(new window.gm.ItemsLib["HorsePowerPotion"](),1);window.gm.refreshAllPanel();' <%=(true)?(""):("hidden")%>>Trade xxx for 1 HorsePower-Draft</a>
 <%}%>
 <div></br>[[Outside|ForestBorder]]  [[Alchemist|ForestAlchemistTalk]] [[Clair]]</br></div>
 </article><article id="LogPanel"></article></section>
@@ -451,7 +452,7 @@ He shakes his head "Not that I know. Cant you sneak around them or trick them so
 Somehow you cant go into this direction. Maybe this route unlocks later.
 [[Leave|ForestBorder]]
 <% } else if(window.gm.quests.getMilestoneState("qBondageKink").id<=200) { %>
-'I guess this road leads to that town the alchemist mentioned.'</br>
+<p class="tPC">'I guess this road leads to that town the alchemist mentioned.'</p>
 You follow the path until after a curve a wooden bridge comes into view.
 The bridge spans about the canyon,a deep chasm between the forest and the eastern area thereof.</br>
 You carefully set a foot on it, so far it looks stable enough to carry ones weight.
@@ -472,12 +473,12 @@ Squinching your eyes and slowing down your steps, you try to get a better view o
 <p class='tPC'>"I cant pay you, I have nothing of value."</p>
 <p class="tNPC1">"Then, just turn around and walk back before I force you to do so."</p>
 <p class="tPC">'I could tackle him. I bet he wouldnt take the risk of a fight if he is alone and cant expect some loot from me.'</p>
-<p class="tNPC1">"Nice collar. So you are a slave? Maybe you have fled from your master huh? I should just take you into custody for some reward?"</p>
+<p class="tNPC1">"Nice collar. So you are a slave? Maybe you have fled from your master huh? I should just take you into custody for some reward - SLAVE."</p>
 <div id='select3' >
 <a0 onclick='window.gm.printTalkLink($("div#select3")[0],"div#choice3a");'>"I'm not a slave!"</a>
 </div>
 <div id='choice3a' hidden>
-While screaming at your offender, he bolts forward trying to knock you over.</br>
+While you scream at your offender, he bolts forward trying to knock you over.</br>
 You are in a <a0 onclick='window.gm.quests.forceQuestMilestone("qBondageKink",300,200);window.gm.encounters.Trent(window.gm.player.location)'>fight!</a></br>
 </div></div></div></div>
 <% } else if(window.gm.quests.getMilestoneState("qBondageKink").id<=300) { %>

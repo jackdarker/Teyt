@@ -577,7 +577,7 @@ class effMutateHorse extends Effect {
                     if(me.data.cycles<=0) { 
                         Effects.removeItem(me.data.id);
                     }
-                    window.gm.pushDeferredEvent("MutateHorse",[me.data.magnitude]);
+                    window.gm.pushDeferredEvent("MutateHorse",[me.data.magnitude]); //todo non-PC can be mutated (if receives timechange !) but the scene will assume its player?!
                     Effects.removeItem(me.data.id);});
                 }(this));
             }
@@ -589,6 +589,52 @@ class effMutateHorse extends Effect {
     }
     merge(neweffect) {
         if(neweffect.name===this.data.name) {//dont refresh
+            return(true);
+        }
+    }
+}
+class effHorsePower extends Effect {
+    constructor() {
+        super();
+        this.data.id = this.data.name= effHorsePower.name, this.data.hidden=0;
+        this.data.duration = 120,this.data.cycles = 3, this.data.magnitude = 1;
+    }
+    toJSON() {return window.storage.Generic_toJSON("effHorsePower", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(effHorsePower, value.data);};
+     get desc() {return(effHorsePower.name);}
+
+    onTimeChange(time) {
+        //+ 10Energy per hour
+        var delta = window.gm.getDeltaTime(time,this.data.time);
+        this.data.time = time;
+        this.data.duration-= delta;
+        if(this.data.duration<0) {
+            delta = delta+this.data.duration; // if delta is 20 but remaining duration is only 5, delta should be capped to 5
+            this.data.duration =0;
+        }
+        this.parent.parent.Stats.increment('energy',10*delta/60);
+        if(this.data.magnitude>2) {
+            let _i = this.parent.findItemSlot(this.data.id);
+            if(_i<0) { //todo extend if exist?
+                this.parent.parent.addEffect(effMutateHorse.id, new effMutateHorse());
+            }
+        }
+        if(this.data.duration<=0) { //remove yourself
+            return(function(me){
+                return function(Effects){ Effects.removeItem(me.data.id);}}(this));
+        }
+        return(null);
+    }
+    onApply(){
+        this.data.duration = 120;
+        this.data.duration = 3;
+        this.data.time = window.gm.getTime();
+    }
+    merge(neweffect) {
+        if(neweffect.id===this.data.id) {
+            this.onApply(); //refresh 
+            this.data.magnitude +=1; //bonus effect triggers only if added multiple times
+            window.gm.pushDeferredEvent("HorsePowerNotice",[this.data.magnitude]);
             return(true);
         }
     }
@@ -1027,6 +1073,7 @@ window.gm.StatsLib = (function (StatsLib) {
     window.storage.registerConstructor(effGuard);
     window.storage.registerConstructor(effHeal);
     
+    window.storage.registerConstructor(effHorsePower);
     window.storage.registerConstructor(effMutateHorse);
     window.storage.registerConstructor(effMutateWolf);
     window.storage.registerConstructor(effMutateCat); 

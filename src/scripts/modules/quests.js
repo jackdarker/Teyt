@@ -109,7 +109,7 @@ window.gm.questDef = window.gm.questDef || {};
     let quest = new Quest("qBondageKink","qBondageKink","qBondageKink",hidden );
     quest.addMileStone(new QuestMilestone(1,"","qBondageKink",        NOP,hidden));
     quest.addMileStone(new QuestMilestone(100,"","You got some collar on your neck. Find someone that can check on that.",        NOP,hidden));
-    quest.addMileStone(new QuestMilestone(200,"","The alchemist suggested to search for help in the next town.",      NOP,hidden));
+    quest.addMileStone(new QuestMilestone(200,"","The alchemist suggested to search for help in the next town. The road along the bridge should lead there.",      NOP,hidden));
     quest.addMileStone(new QuestMilestone(300,"","You found the bridge on your route blocked by a bully. Get rid of him.",      NOP,hidden));
     quest.addMileStone(new QuestMilestone(400,"","Find your way past the bridge to the town.",      NOP,hidden));
     quest.addMileStone(new QuestMilestone(500,"","...",      NOP,hidden));

@@ -182,6 +182,42 @@ class HealthPotion extends Item {
     } //instead of creating full class for every useless junk I use this and just add variable that will be restored after load
     get desc() { return HealthPotion.lookupId(this.id).desc;   }
 }
+class HorsePotion extends Item {
+    static lookupId(id) {
+        let info ={desc:'',amount:10};
+        switch(id){
+            case "HorsePotion": 
+                info.amount = 10,info.desc= "horse power potion";
+                break;
+            default:
+        }
+        return(info);
+    }
+    constructor() { super('HorsePotion'); this.changeId('HorsePotion'); }
+    toJSON() {return window.storage.Generic_toJSON("HorsePotion", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(HorsePotion, value.data);};
+    usable(context,on=null) {return({OK:true, msg:'drink'});}
+    use(context,on=null) { 
+        var _gaveAway=false;
+        if(context instanceof Inventory) {
+            if(on===null) on=context.parent;
+            else _gaveAway=true;
+            context.removeItem(this.id);
+            if(on instanceof Character){ 
+                if(on instanceof Character){
+                    on.addEffect('HorsePower',new effHorsePower());
+                    on.Stats.increment("health",100);
+                }
+                return({OK:true, msg:on.name+' drank a potion.'});
+            }
+        } else throw new Error('context is invalid');
+    }
+    changeId(id) {
+        this.id = id;
+        this.amount = HorsePotion.lookupId(id).amount;
+    } 
+    get desc() { return HorsePotion.lookupId(this.id).desc;   }
+}
 
 window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(LighterDad);
@@ -193,9 +229,11 @@ window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(CanOfCoffee);
     window.storage.registerConstructor(SimpleFood);
     window.storage.registerConstructor(HealthPotion);
+    window.storage.registerConstructor(HorsePotion);
     window.storage.registerConstructor(Ingredient);
     window.storage.registerConstructor(FlashBang);
     
+    //todo do I need this extra ollection?
     ItemsLib['Money'] = function () { return new Money();};
     ItemsLib['LighterDad'] = function () { return new LighterDad();};
     ItemsLib['LaptopPS'] = function () { return new LaptopPS();};

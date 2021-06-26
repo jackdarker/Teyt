@@ -21,6 +21,11 @@ This game is powered by twine/tweego and snowman.</br>
 :: Intro
 <article><%window.gm.initGame();window.gm.player.location=window.passage.name;%>
 <div id='output'></div>
+<button class="btn"><i class="fa fa-home"></i></button>
+<button class="btn"><i class="fa fa-bars"></i></button>
+<button class="btn"><i class="fa fa-trash"></i></button>
+<button class="btn"><i class="fa fa-close"></i></button>
+<button class="btn"><i class="fa fa-folder"></i></button>
 <p>Welcome to Meason, a town somewhere in these days. </br>
 You are a student in the local university and live in a shared house with some other fellows. </br></p>
 <p class='author'>You might see a lot of links that are formated red-strikethrough. Those are currently broken and you shouldnt use them.</p>
