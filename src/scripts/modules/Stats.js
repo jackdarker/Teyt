@@ -30,6 +30,21 @@ class stRelation extends Stat {
         }
     };
 }
+//generic class for resistance to damage like blunt, fire, poison,...
+// Resistance is modified by effects (applied by equipment/perks/items) and stats
+// 0 = no bonus resistance; -20 = 20% weaker ; capped at +-100% ?
+class stResistance extends Stat {
+    static setup(context, base,kind) {   
+        let _stat = new stResistance();
+        let _n = _stat.data;
+        _n.id="rst"+kind,_n.base=base, _n.value=base,_n.limits=[{max:100,min:-100}];
+        context.addItem(_stat);
+        _stat.Calc();
+    }
+    constructor() {   super();  }
+    toJSON() {return window.storage.Generic_toJSON("stResistance", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(stResistance, value.data);};
+}
 class stHealthMax extends Stat {
     static setup(context, max) {
         var _stat = new stHealthMax();
@@ -807,13 +822,25 @@ class effCombined extends CombatEffect {
     static fromJSON(value) { return window.storage.Generic_fromJSON(effCombined, value.data);};
 }
 class effDamage extends CombatEffect {
+    static setup(amount,type,onHitCB=null) {
+        let eff = new effDamage();
+        eff.amount = amount;
+        eff.type=type;
+        eff.onHit=onHitCB;
+        return(eff);
+    }
     constructor(amount) {
         super();
-        this.amount = amount;
+        this.amount = 8;
         this.data.id = this.data.name= effDamage.name, this.data.duration = 0, this.data.hidden=0;
     }
     toJSON() {return window.storage.Generic_toJSON("effDamage", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(effDamage, value.data);};
+    onCast(targets,caster) {
+        let result={OK:false,msg:''};
+        targets[0].
+        if(this.onHitCB) onHitCB(targets,caster);
+    }
     onApply(){
         this.data.duration = 0;
         this.parent.parent.Stats.increment('health',-1*this.amount);
@@ -1048,6 +1075,7 @@ window.gm.StatsLib = (function (StatsLib) {
     window.storage.registerConstructor(stLuck);
     window.storage.registerConstructor(stCharisma);
     window.storage.registerConstructor(stPerception);
+    window.storage.registerConstructor(stResistance);
     window.storage.registerConstructor(stEnergyMax);
     window.storage.registerConstructor(stEnergy);
     window.storage.registerConstructor(stArousalMax);

@@ -734,7 +734,7 @@ window.gm.printAchievements= function() {
   return(result);
 };
 //prints a string listing stats and effects
-window.gm.printEffectSummary= function(who='player',showstats=true,showfetish=false) {
+window.gm.printEffectSummary= function(who='player',showstats=true,showfetish=false,showresistane=false) {
   var elmt='';
   var s= window.story.state;
   var result ='';
@@ -746,6 +746,7 @@ window.gm.printEffectSummary= function(who='player',showstats=true,showfetish=fa
   for(var k=0;k<ids.length;k++){
       var data = window.gm[who].Stats.get(ids[k])
       let isFetish = (data.id.slice(0,2)==='ft'); //Fetish starts with ft
+      let isResistance = (data.id.slice(0,3)==='rst'); //
       if(data.hidden!==4) {
         if(isFetish && showfetish && !(data.id.slice(-4,-2)==='_M') ) {
           //expects names of fetish like ftXXX and limits ftXXX_Min ftXXX_Max
@@ -754,7 +755,7 @@ window.gm.printEffectSummary= function(who='player',showstats=true,showfetish=fa
           result+='<tr><td>'+((data.hidden & 0x1)?'???':data.id)+':</td><td>'+((data.hidden & 0x2)?'???':data.value)+'</td>';
           result+='<td>'+((data.hidden & 0x2)?'???':'('+(min.value+' to '+max.value))+')</td></tr>';
         }
-        if(!isFetish && showstats) {
+        if((!isFetish && !isResistance && showstats) || (!isFetish && isResistance && showresistane)) {
           result+='<tr><td>'+((data.hidden & 0x1)?'???':data.id)+':</td><td>'+((data.hidden & 0x2)?'???':data.value)+'</td></tr>';
         }
       }

@@ -55,18 +55,18 @@ class SkillAttack extends Skill {
                 result.effects = result.effects.concat(attack.effects); 
             }
         }
-        return result
+        return result;
     }
     __estimateAttack() {
         let attack =window.gm.combat.defaultAttackData();
         let lHand=this.caster.Outfit.getItemForSlot(window.gm.OutfitSlotLib.LHand);
         let rHand=this.caster.Outfit.getItemForSlot(window.gm.OutfitSlotLib.RHand);
         let lHDmg=0,rHDmg=0;
-        if(lHand) { //get weapon damage info
-            lHDmg = lHand.pDamage || 0;
-        }
-        if(rHand) {
+        if(rHand) { //get weapon damage info
             rHDmg = rHand.pDamage || 0;
+        }
+        if(lHand) { 
+            lHDmg = lHand.pDamage || 0;
         }
         if(!lHand && ! rHand) { //if has no weapon get body damage
             rHand=this.caster.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bHands);
@@ -87,11 +87,34 @@ class SkillAttack extends Skill {
         return(this.msg);
     }
 }
+
+/*    __estimateAttack() {
+        let attack =window.gm.combat.defaultAttackData();
+        let lHand=this.caster.Outfit.getItemForSlot(window.gm.OutfitSlotLib.LHand);
+        let rHand=this.caster.Outfit.getItemForSlot(window.gm.OutfitSlotLib.RHand);
+        let rHDmg;
+        if(rHand) { //get weapon damage info
+            rHDmg = rHand.attack;
+        } else if(lHand) { 
+            rHDmg = lHand.attack;
+        }
+        if(!lHand && ! rHand) { //if has no weapon get body damage
+            rHand=this.caster.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bHands);
+            if(rHand) {
+                rHDmg = (rHand.data!=='undefined')?rHand.data.attack || 0:0;
+            }
+        }
+        attack.input=rHDmg;
+        return(attack);
+    }
+    getCastDescription(result) {
+        return(this.msg);
+    }
+*/
 //execute attack with Face
 class SkillBite extends SkillAttack {
     constructor() {
-        super();
-        this.id=this.name='Bite';
+        super('Bite');
         this.msg = '';
     }
     toJSON() {return window.storage.Generic_toJSON("SkillBite", this); }
@@ -107,6 +130,53 @@ class SkillBite extends SkillAttack {
         attack.value+= mouthDmg+ this.caster.Stats.get('pAttack').value;
         attack.total = attack.value;
         return(attack);
+    }
+}
+class SkillChainLightning  extends Skill {
+    constructor() {
+        super('ChainLightning');
+        this.msg = '';
+    }
+    toJSON() {return window.storage.Generic_toJSON("SkillChainLightning", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillChainLightning, value.data));}
+    get desc() { return("Throw some sparks at your foes.");}
+    targetFilter(targets){
+        return(this.targetFilterEnemy(this.targetFilterAlive(targets)));
+    }
+    previewCast(targets){
+        var result = new SkillResult();
+        result.skill =this;
+        result.source = this.caster;
+        result.targets = targets;
+        this.msg = '';
+        if(this.isValidTarget(targets)) {
+            result.OK = true;
+            let target = targets[0];
+            let attack =window.gm.combat.defaultAttackData();
+            // attack.effects.push(effDamage.setup(15,'spark'))
+            //calc hit-chance
+            //cause spark-dmg
+            //chance to hit secondary target
+            let secTarget = window.story.state.combat.playerParty.concat(window.story.state.combat.enemyParty);
+            secTarget = this.targetFilterEnemy(this.targetFilterAlive(secTarget));
+            let secTarget2=[];
+
+            while(secTarget.length>_i) {
+                let target2 = secTarget.pop()[0]; //[[mob1]]
+                if(target2!==target) {
+                    secTarget2.push(target2);
+                }
+                if(secTarget2.length>=2) break;
+            }
+            //spark-dmg to secondary target
+            let result2 = window.gm.combat.calcTeaseAttack(this.caster,target,attack);
+            this.msg+=result2.msg;
+            result.effects = result.effects.concat(attack.effects); 
+        }
+        return result;
+    }
+    getCastDescription(result) {
+        return(this.msg);
     }
 }
 class SkillTease extends Skill {

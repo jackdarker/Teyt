@@ -90,8 +90,7 @@ targetFilterSelf(targets){
             for(var targ of target) {
                 if(this.caster != targ) valid=false;
             }
-            if(valid)
-                possibleTarget.push(target);           
+            if(valid) possibleTarget.push(target);           
         }
         return possibleTarget;
 }
@@ -102,8 +101,7 @@ targetFilterAlly(targets){
             for(var targ of target) {
                 if(this.caster.faction != targ.faction) valid=false;
             }
-            if(valid)
-                possibleTarget.push(target);     
+            if(valid) possibleTarget.push(target);     
         }
         return possibleTarget;
 }
@@ -115,26 +113,22 @@ targetFilterEnemy(targets){
                 if(this.caster.faction == targ.faction) valid=false;
                 if(targ.isDead()) valid=false;
             }
-            if(valid)
-                possibleTarget.push(target);
+            if(valid) possibleTarget.push(target);
         }
         return possibleTarget;
 }
-targetFilterFighting(targets){
-        //chars that are not inhibited
+targetFilterFighting(targets){   //chars that are not inhibited
         var possibleTarget = [];
         for(var target of targets){
             var valid = true;
             for(var targ of target) {
                 if(!targ._canAct().OK) valid=false;
             }
-            if(valid)
-                possibleTarget.push(target); 
+            if(valid) possibleTarget.push(target); 
         }
         return possibleTarget
 }
-targetFilterAlive(targets){
-    //chars that are not dead
+targetFilterAlive(targets){    //chars that are not dead
         var possibleTarget = [];
         for(var target of targets){
             var valid = true;
@@ -146,8 +140,7 @@ targetFilterAlive(targets){
         }
         return possibleTarget;
 }
-targetFilterDead(targets){
-    //chars that are dead
+targetFilterDead(targets){    //chars that are dead
         var possibleTarget = [];
         for(var target of targets){
             var valid = true;

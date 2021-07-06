@@ -128,9 +128,9 @@ class Equipment extends Item {
         return(fconv(msg));
     }
     isEquipped() { return(this.parent.parent.Outfit && this.parent.parent.Outfit.findItemSlot(this.id).length>0);}
-    canEquip() {return({OK:false, msg:'unusable'});}
+    canEquip(context) {return({OK:false, msg:'unusable'});}
     canUnequip() {return({OK:false, msg:'unusable'});}
-    onEquip() {return({OK:true, msg:'equipped'});}
+    onEquip(context) {return({OK:true, msg:'equipped'});}
     onUnequip() {return({OK:true, msg:'unequipped'});}
 }
 //a kind of special inventory for worn equipment
@@ -245,7 +245,7 @@ class Outfit { //extends Inventory{
         let _oldSlots = [];
         let result = {OK: true, msg:''};
         //check if equipment is equipable
-        result = item.canEquip();
+        result = item.canEquip(this);
         if(result.OK) {
             for(let l=0; l< _idx.length;l++) {  //check if the current equip can be unequipped
                 let oldId = this.getItemId(_idx[l]);
@@ -279,7 +279,7 @@ class Outfit { //extends Inventory{
             this.list[_idx[k]].item = _item;
         }  
         _item._parent = window.gm.util.refToParent(this);       //Todo currently we have 2 copies of equipment - 1 for wardrobe 1 for outfit otherwise this will not work
-        result=_item.onEquip();
+        result=_item.onEquip(this);
         this.postItemChange(_item.name,"equipped",result.msg);
     }
     //assumme that it was checked before that unequip is allowed

@@ -250,8 +250,9 @@ img.src = imgsrc;//'https://twinery.org/homepage/img/logo.svg';   //todo the loa
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 <%let char=window.gm.player;%>
 Status of <%=char.name%>:   [[Back|_back_]]</br>
-<a0 onclick='window.gm.printOutput(window.gm.printEffectSummary("<%=char.id%>",true,false));'>Stats</a>
-<a0 onclick='window.gm.printOutput(window.gm.printEffectSummary("<%=char.id%>",false,true));'>Fetish</a>
+<a0 onclick='window.gm.printOutput(window.gm.printEffectSummary("<%=char.id%>",true,false,false));'>Stats</a>
+<a0 onclick='window.gm.printOutput(window.gm.printEffectSummary("<%=char.id%>",false,false,true));'>Resistance</a>
+<a0 onclick='window.gm.printOutput(window.gm.printEffectSummary("<%=char.id%>",false,true,false));'>Fetish</a>
 </br><div id='output'></div></br>   <!--message is rendered here-->
 [[Back|_back_]]</br>
 </article><article id="LogPanel"></article></section>

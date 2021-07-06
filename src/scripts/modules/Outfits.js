@@ -8,10 +8,10 @@ class Leggings extends Equipment {
     get desc() { return 'Spandex-leggings for sport. (agility+)';}
     toJSON() {return window.storage.Generic_toJSON("Leggings", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(Leggings, value.data));}
-    canEquip() {return({OK:true, msg:'equipable'});}
+    canEquip(context) {return({OK:true, msg:'equipable'});}
     canUnequip() {return({OK:true, msg:'unequipable'});}
-    onEquip() {
-        this.parent.parent.Stats.addModifier('agility',{id:'agility:Leggings', bonus:5});
+    onEquip(context) {
+        context.parent.Stats.addModifier('agility',{id:'agility:Leggings', bonus:5});
         return({OK:true, msg:'equipped'});}
     onUnequip() {
         this.parent.parent.Stats.removeModifier('agility',{id:'agility:Leggings'});
@@ -26,7 +26,7 @@ class Jeans extends Equipment {
     get desc() { return 'plain old blue jeans';    }
     toJSON() {return window.storage.Generic_toJSON("Jeans", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(Jeans, value.data));}
-    canEquip() {return({OK:true, msg:'equipable'});}
+    canEquip(context) {return({OK:true, msg:'equipable'});}
     canUnequip() {return({OK:true, msg:'unequipable'});}
 }
 class Sneakers extends Equipment {
@@ -38,7 +38,7 @@ class Sneakers extends Equipment {
     get desc() { return 'Sneakers for sport and recreational activities.';    }
     toJSON() {return window.storage.Generic_toJSON("Sneakers", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(Sneakers, value.data));}
-    canEquip() {return({OK:true, msg:'equipable'});}
+    canEquip(context) {return({OK:true, msg:'equipable'});}
     canUnequip() {return({OK:true, msg:'unequipable'});}
 }
 class TankShirt extends Equipment {
@@ -50,7 +50,7 @@ class TankShirt extends Equipment {
     get desc() { return 'light blue tank-top';}
     toJSON() {return window.storage.Generic_toJSON("TankShirt", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(TankShirt, value.data));}
-    canEquip() {return({OK:true, msg:'equipable'});}
+    canEquip(context) {return({OK:true, msg:'equipable'});}
     canUnequip() {return({OK:true, msg:'unequipable'});}
 }
 class Pullover extends Equipment {
@@ -68,7 +68,7 @@ class Pullover extends Equipment {
     get desc() { return 'warm pullover';}
     toJSON() {return window.storage.Generic_toJSON("Pullover", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(Pullover, value.data));}
-    canEquip() {return({OK:true, msg:'equipable'});}
+    canEquip(context) {return({OK:true, msg:'equipable'});}
     canUnequip() {return({OK:true, msg:'unequipable'});}
 }
 class HandCuffs extends Equipment {
@@ -80,7 +80,7 @@ class HandCuffs extends Equipment {
     get desc() { return 'handcuffs';  }
     toJSON() {return window.storage.Generic_toJSON("HandCuffs", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(HandCuffs, value.data));}
-    usable(context) {return(this.canEquip());}
+    usable(context) {return(this.canEquip(context));}
     use(context) { //context here is inventory not outfit
         if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) {  
             this.parent.parent.Outfit.removeItem(this.id); 
@@ -90,7 +90,7 @@ class HandCuffs extends Equipment {
             return( {OK:true, msg:'equipped '+ this.name}); //todo
         }
     }
-    canEquip() { 
+    canEquip(context) { 
         if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) return({OK:true, msg:'unequip'});    //todo check for key
         else return({OK:true, msg:'equip'});
     }
@@ -106,7 +106,7 @@ class WristCuffs extends Equipment {
     get desc() { return 'handcuffs';  }
     toJSON() {return window.storage.Generic_toJSON("WristCuffs", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(WristCuffs, value.data));}
-    usable(context) {return(this.canEquip());}
+    usable(context) {return(this.canEquip(context));}
     use(context) { //context here is inventory not outfit
         if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) {  
             this.parent.parent.Outfit.removeItem(this.id); 
@@ -116,7 +116,7 @@ class WristCuffs extends Equipment {
             return( {OK:true, msg:'equipped '+ this.name}); //todo
         }
     }
-    canEquip() { 
+    canEquip(context) { 
         if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) return({OK:true, msg:'unequip'});
         else return({OK:true, msg:'equip'});
     }
@@ -132,7 +132,7 @@ class CollarQuest extends Equipment {
     get desc() { return 'a collar';  }
     toJSON() {return window.storage.Generic_toJSON("CollarQuest", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(CollarQuest, value.data));}
-    usable(context) {return(this.canEquip());}
+    usable(context) {return(this.canEquip(context));}
     use(context) { //context here is inventory not outfit
         if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) {  
             this.parent.parent.Outfit.removeItem(this.id); 
@@ -142,7 +142,7 @@ class CollarQuest extends Equipment {
             return( {OK:true, msg:'equipped '+ this.name}); //todo
         }
     }
-    canEquip() { 
+    canEquip(context) { 
         if(this.parent && this.parent.parent.Outfit.findItemSlot(this.id).length>0) return({OK:true, msg:'unequip'});
         else return({OK:true, msg:'equip'});
     }
@@ -167,10 +167,12 @@ class ClitPiercing extends Equipment {
     }
     toJSON() {return window.storage.Generic_toJSON("ClitPiercing", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(ClitPiercing, value.data));}
-    canEquip() {return({OK:true, msg:'equipable'});}
+    canEquip(context) {return({OK:true, msg:'equipable'});}
     canUnequip() {return({OK:true, msg:'unequipable'});}
-    onEquip() {
-        if(this.style===100) window.gm.player.addEffect("effGrowVulva",window.storage.constructors['effGrowVulva']());
+    onEquip(context) {
+        if(this.style===100) {
+            context.parent.addEffect("effGrowVulva",window.storage.constructors['effGrowVulva']()); //only works for player since effects of NPC dont receive ticks!
+        } 
         return({OK:true, msg:'equipped'});}
 }
 //this is an Inventory-item, not wardrobe
@@ -185,7 +187,7 @@ class Crowbar extends Equipment {
     get desc() { return 'durable crowbar.';}
     toJSON() {return window.storage.Generic_toJSON("Crowbar", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(Crowbar, value.data));}
-    usable(context) {return(this.canEquip());}
+    usable(context) {return(this.canEquip(context));}
     use(context) { //context here is inventory not outfit
         if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) {  
             this.parent.parent.Outfit.removeItem(this.id); 
@@ -195,13 +197,13 @@ class Crowbar extends Equipment {
             return( {OK:true, msg:'equipped '+ this.name}); //todo
         }
     }
-    canEquip() { 
-        if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) return({OK:true, msg:'unequip'});
+    canEquip(context) { 
+        if(context.parent.Outfit.findItemSlot(this.id).length>0) return({OK:true, msg:'unequip'});
         else return({OK:true, msg:'equip'});
     }
     canUnequip() {return({OK:true, msg:'unequipable'});}
-    onEquip() {
-        this.parent.parent.Stats.addModifier('pAttack',{id:'pAttack:Crowbar', bonus:2});
+    onEquip(context) {
+        context.parent.Stats.addModifier('pAttack',{id:'pAttack:Crowbar', bonus:2});
         return({OK:true, msg:'equipped'});}
     onUnequip() {
         this.parent.parent.Stats.removeModifier('pAttack',{id:'pAttack:Crowbar'});
@@ -218,7 +220,7 @@ class Shovel extends Equipment {
     get desc() { return('A rusty,old shovel.');}
     toJSON() {return window.storage.Generic_toJSON("Shovel", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(Shovel, value.data));}
-    usable(context) {return(this.canEquip());}
+    usable(context) {return(this.canEquip(context));}
     use(context) { //context here is inventory not outfit
         if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) {  
             this.parent.parent.Outfit.removeItem(this.id); 
@@ -228,13 +230,13 @@ class Shovel extends Equipment {
             return( {OK:true, msg:'equipped '+ this.name}); //todo
         }
     }
-    canEquip() {
-        if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) return({OK:true, msg:'unequip'});
+    canEquip(context) {
+        if(context.parent.Outfit.findItemSlot(this.id).length>0) return({OK:true, msg:'unequip'});
         else return({OK:true, msg:'equip'});
     }
     canUnequip() {return({OK:true, msg:'unequipable'});}
-    onEquip() {
-        this.parent.parent.Stats.addModifier('pAttack',{id:'pAttack:Shovel', bonus:2});
+    onEquip(context) {
+        context.parent.Stats.addModifier('pAttack',{id:'pAttack:Shovel', bonus:2});
         return({OK:true, msg:'equipped'});}
     onUnequip() {
         this.parent.parent.Stats.removeModifier('pAttack',{id:'pAttack:Shovel'});
@@ -251,7 +253,7 @@ class RobesZealot extends Equipment {
     get desc() { return 'light blue tank-top';}
     toJSON() {return window.storage.Generic_toJSON("RobesZealot", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(RobesZealot, value.data));}
-    canEquip() {return({OK:true, msg:'equipable'});}
+    canEquip(context) {return({OK:true, msg:'equipable'});}
     canUnequip() {return({OK:true, msg:'unequipable'});}
 }
 class Briefs extends Equipment {
@@ -265,7 +267,7 @@ class Briefs extends Equipment {
     get desc() { return 'plain briefs';}
     toJSON() {return window.storage.Generic_toJSON("Briefs", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(Briefs, value.data));}
-    canEquip() {return({OK:true, msg:'equipable'});}
+    canEquip(context) {return({OK:true, msg:'equipable'});}
     canUnequip() {return({OK:true, msg:'unequipable'});}
 }
 class BikiniBottomLeather extends Equipment {
@@ -279,7 +281,7 @@ class BikiniBottomLeather extends Equipment {
     get desc() { return 'leather triangle-bikini';}
     toJSON() {return window.storage.Generic_toJSON("BikiniBottomLeather", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(BikiniBottomLeather, value.data));}
-    canEquip() {return({OK:true, msg:'equipable'});}
+    canEquip(context) {return({OK:true, msg:'equipable'});}
     canUnequip() {return({OK:true, msg:'unequipable'});}
 }
 class ShortsLeather extends Equipment {
@@ -293,7 +295,7 @@ class ShortsLeather extends Equipment {
     get desc() { return 'leather shorts';}
     toJSON() {return window.storage.Generic_toJSON("ShortsLeather", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(ShortsLeather, value.data));}
-    canEquip() {return({OK:true, msg:'equipable'});}
+    canEquip(context) {return({OK:true, msg:'equipable'});}
     canUnequip() {return({OK:true, msg:'unequipable'});}
 }
 //
@@ -308,7 +310,7 @@ class StaffWodden extends Equipment {
     get desc() { return('A staff made from wood.');}
     toJSON() {return window.storage.Generic_toJSON("StaffWodden", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(StaffWodden, value.data));}
-    usable(context) {return(this.canEquip());}
+    usable(context) {return(this.canEquip(context));}
     use(context) { //context here is inventory not outfit
         if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) {  
             this.parent.parent.Outfit.removeItem(this.id); 
@@ -318,12 +320,12 @@ class StaffWodden extends Equipment {
             return( {OK:true, msg:'equipped '+ this.name}); //todo
         }
     }
-    canEquip() {
+    canEquip(context) {
         if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) return({OK:true, msg:'unequip'});
         else return({OK:true, msg:'equip'});
     }
     canUnequip() {return({OK:true, msg:'unequipable'});}
-    onEquip() {
+    onEquip(context) {
         //this.parent.parent.Stats.addModifier('pAttack',{id:'pAttack:StaffWodden', bonus:2});
         return({OK:true, msg:'equipped'});}
     onUnequip() {
@@ -336,12 +338,16 @@ class MaceSteel extends Equipment {
         this.tags = [ 'weapon'];
         this.slotUse = ['RHand'];
         this.lossOnRespawn = true;
-        this.pDamage = 10;
+        this.pDamage = 15;
+        /*this.attack = window.gm.combat.AttackSetup();
+        let dmg = {target:"defender", effect:"effDamage", value: 10};
+        let stun = {target:"defender", effect:"effStun", value: 10};
+        this.attack.apply = [{cond:100, apply:dmg},{cond:50,apply:stun}]; */
     }
     get desc() { return('A heavy steel mace.');}
     toJSON() {return window.storage.Generic_toJSON("MaceSteel", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(MaceSteel, value.data));}
-    usable(context) {return(this.canEquip());}
+    usable(context) {return(this.canEquip(context));}
     use(context) { //context here is inventory not outfit
         if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) {  
             this.parent.parent.Outfit.removeItem(this.id); 
@@ -351,12 +357,14 @@ class MaceSteel extends Equipment {
             return( {OK:true, msg:'equipped '+ this.name}); //todo
         }
     }
-    canEquip() {
-        if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) return({OK:true, msg:'unequip'});
+    canEquip(context) {
+        if(context.parent.Outfit.findItemSlot(this.id).length>0) return({OK:true, msg:'unequip'});
         else return({OK:true, msg:'equip'});
     }
     canUnequip() {return({OK:true, msg:'unequipable'});}
-    onEquip() {        return({OK:true, msg:'equipped'});}
+    onEquip(context) {        
+        return({OK:true, msg:'equipped'});
+    }
     onUnequip() {        return({OK:true, msg:'unequipped'});}
 }
 class TailRibbon extends Equipment {
@@ -368,7 +376,7 @@ class TailRibbon extends Equipment {
     get desc() { 'a fancy color band that can be wrapped around someones tailtip';}
     toJSON() {return window.storage.Generic_toJSON("TailRibbon", this); };
     static fromJSON(value) {return(window.storage.Generic_fromJSON(TailRibbon, value.data));}
-    canEquip() { 
+    canEquip(context) { 
         if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) return({OK:true, msg:'unequip'});    //todo check for key
         else {
             if(this.parent.parent.Outfit.countItem("TailWolf")>0) {

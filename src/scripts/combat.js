@@ -475,7 +475,7 @@ window.gm.combat.calcEvasion=function(attacker,target, attack) {
   var result = {OK:true,msg:''}
   var rnd = window.gm.roll(1,100);
 
-  if(target.Effects.findItemSlot(effStunned.name)>=0) {
+  if(target.Effects.findItemSlot(effStunned.name)>=0) { //todo chance to miss 
     result.OK = true; 
     result.msg = target.name+' is stunned and cannot evade. '
     attack.crit = true; //when stunned always critical hit
@@ -485,7 +485,7 @@ window.gm.combat.calcEvasion=function(attacker,target, attack) {
   var lvlDiff = target.level-attacker.level;
   var chance = target.Stats.get("agility").value + target.Stats.get("perception").value;
   chance += lvlDiff*4;
-  window.gm.pushLog(`evasion roll:${chance} vs ${rnd} `,window.story.state._gm.dbgShowCombatRoll);
+  window.gm.pushLog(`evasion roll: ${chance} vs ${rnd} `,window.story.state._gm.dbgShowCombatRoll);
   if(chance>rnd) {
     result.OK = false;
     result.msg += 'Using agility, '+ target.name +' was able to dodge the attack. '
@@ -518,7 +518,7 @@ window.gm.combat.calcParry=function(attacker,target, attack) {
   var lvlDiff = target.level-attacker.level;
   var chance = target.Stats.get("agility").value + target.Stats.get("endurance").value;
   chance += lvlDiff*4;
-  window.gm.pushLog(`parry roll:${chance} vs ${rnd} `,window.story.state._gm.dbgShowCombatRoll);
+  window.gm.pushLog(`parry roll: ${chance} vs ${rnd} `,window.story.state._gm.dbgShowCombatRoll);
   if(chance>rnd && rnd<10) {
     result.OK = false;
     if(rnd<10) {
@@ -548,13 +548,30 @@ window.gm.combat.calcAbsorb=function(attacker,defender, attack) {
   let def = defender.Stats.get('pDefense').value;
   //todo weakness bonus
   var dmg = Math.max(1,attack.value* (attack.crit?4:1)-def);
-  window.gm.pushLog(`absorb roll:${dmg} vs ${def} `,window.story.state._gm.dbgShowCombatRoll);
+  window.gm.pushLog(`absorb roll: ${dmg} vs ${def} `,window.story.state._gm.dbgShowCombatRoll);
   result.msg = defender.name +' got hit by '+attacker.name+' and suffered '+dmg+ (attack.crit?' critical ':'')+'damage. '
   attack.total = dmg;
-  //foo should add fraction of attack to defender-health
   attack.effects.push( {target:defender,eff:[(new effDamage(attack.total))]});
-  //result.foo = function(defender,attack){ return(function(){ defender.Stats.increment('health',-1*attack.total);});}(defender,attack);
   return(result);
+}
+window.gm.combat.TypesDamage = [
+  {id: 'blunt'},
+  {id: 'slash'},
+  {id: 'tease'},
+  {id: 'spark'},
+  {id: 'ice'},
+  {id: 'poison'}
+]
+//object to store 
+window.gm.combat.AttackSetup = function() {
+    /*
+  entry = {cond:number|function ,apply:[outcome]|[entry] }
+  outcome = {target:"defender", effect:"effDamage", value: 10}
+
+  attack = { cond: function(attacker,targets){ if(targets[0].hasEffect("flying")) return(0); return(70)}, 
+            apply: [{target:"defender", effect:"effDamage", value: 10}] }
+*/
+  return({cond: 100, apply:[{target:"defender", effect:"effDamage", value: 10}]})
 }
 //object to store attack-data
 window.gm.combat.defaultAttackData = function() {
@@ -563,21 +580,16 @@ window.gm.combat.defaultAttackData = function() {
 // calculates the damage of an physical attack
 window.gm.combat.calcAttack=function(attacker,defender,attack) {
   let result = {OK:false,msg:''};
-  //var def = defender.Stats.get('pDefense').value;
-  //let att = attacker.Stats.get('pAttack').value;
-  //attack.value=attack.total=att; 
-  //check if target an evade
+  //check if target can evade
   result = window.gm.combat.calcEvasion(attacker,defender,attack);
   if(result.OK===false) { return(result);  }
   var _tmp = result.msg;
   //check if target can block or parry
   result = window.gm.combat.calcParry(attacker,defender,attack);
-  //if(result.foo!==null) result.foo(attacker,attack);
   if(result.OK===false) {    return(result);  }
   _tmp += result.msg;
   //deal damage
   result = window.gm.combat.calcAbsorb(attacker,defender,attack);
-  //if(result.foo!==null) result.foo(defender,attack);
   _tmp += result.msg;
   result.msg = _tmp;
   return(result);

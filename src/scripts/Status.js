@@ -76,7 +76,7 @@ class Stat {
     static dataPrototype() {    
         return({id: '', base: 0,value: 0, limits: [],modifier:[], modifys:[], hidden:0});
         //limit = {min: max:}   limit to apply to value and base; either statid or number
-        //modifier {id: calc:}      Stat that modifys value, calc is function(context,data)=> newvalue
+        //modifier {id: bonus:}      Stat that modifys value, bonus is value to add             todo: multiplier but then we have to sort modifiers somehow
         //modifys {id:}         point to the Stats that have modifiers from this stat or is used as limit
         //hidden 0 = visible, 1= name unreadable, 2= value unreadable, 4= hidden
     }
@@ -99,8 +99,8 @@ class Stat {
     //this is called to update value of the stat and will trigger calculation of dependend stats 
     Calc( ) {
         let attr = this.data;
-        let min = -99999;
-        let max = 99999;
+        let min = -999999;
+        let max = 999999;
         let msg = '';
         //get limits
         for(let k=0;k<attr.limits.length;k++) {//this might behave odly if any min>max
