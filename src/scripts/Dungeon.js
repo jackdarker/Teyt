@@ -485,7 +485,7 @@ class DngMapper {
         this.allInfo=[];
         this.maxX=this.maxY=this.minX=this.minY=0;
     }
-    //todo only show parts of the map the player already visited or knows off - but this would bloat save
+    //todo only show parts of the map the player already visited or knows off - but this would bloat save 
     createMap(Floor) {
         this.floor = Floor;
         var allrooms = Floor.allRooms();
