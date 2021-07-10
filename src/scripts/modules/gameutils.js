@@ -129,7 +129,13 @@ window.gm.initGame= function(forceReset,NGP=null) {
         ch.Effects.addItem(effNotTired.name, new effNotTired()); //depending on sleep Tired will be set to NotTired or Tired
         //ch.Skills.addItem(SkillCallHelp.setup('Mole'));
         s.PlayerRL=window.gm.PlayerRL=ch;
-    }      
+    }
+    let dngs = [BeeHive,ShatteredCity]; //add your dngs here !
+    for(el of dngs) {
+      if (!s[el.name]||forceReset) { 
+        s[el.name] = el.persistentDngDataTemplate();
+      }
+    }    
     window.gm.switchPlayer("PlayerRL");
     //take over flags for newgameplus
     if(NGP) { window.story.state.vars.crowBarLeft = NGP.crowBarLeft; }

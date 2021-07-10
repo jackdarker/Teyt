@@ -65,10 +65,13 @@ You can see some hut from here. You just need to follow the trail down the hill.
 </article><article id="LogPanel"></article></section>
 
 
-:: Dungeon [_nosave_]
+:: Dungeon
 <!--dont "show" this! setup the dungeon and call enterDungeon-->
+<!--if not explicitly allowed, save is disabled in dungeon-->
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%= window.gm.dng.name%> <%= window.gm.dng.actualRoom.descr%></br>
+<%= window.gm.dng.name%>-<%= window.gm.dng.actualRoom.floor.name%>-<%= window.gm.dng.actualRoom.name%></br> 
+<%= window.gm.dng.actualRoom.descr()%><%= (window.gm.dng.actualRoom.allowSave?" <b>You can save here !</b>":"")%></br>
+<%= window.gm.dng.Mapper.printMap( window.gm.dng.actualRoom,true)%></br>
 </br> 
 <div id="panel"></div></br></br>    <!--display button list-->
 </article><article id="LogPanel"></article></section>
@@ -80,9 +83,7 @@ window.gm.dng.printButtons()
 :: DungeonMap [_nosave_]
 <!--dont "show" this! setup the dungeon and call displayMap-->
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<!--pre-formatted or messup allignment of ascii-rows-->
-<pre><%= window.gm.dng.Mapper.printMap( window.gm.dng.actualRoom)%></pre></br>
-<pre>Legend: P=Player, S=Stair, E=Entry/Exit<pre></br>
+<%= window.gm.dng.Mapper.printMap( window.gm.dng.actualRoom,false)%></br>
 </br> 
 [[Back|Dungeon]]
 </article><article id="LogPanel"></article></section>
@@ -91,17 +92,22 @@ window.gm.dng.printButtons()
 :: DungeonFoundNothing [_nosave_]
 <!--example-scene for onenter/onexit event-->
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%= window.gm.dng.actualRoom.descr%></br>
+<%= window.gm.dng.actualRoom.descr()%></br>
 There are some buckets here, but there is nothing useful inside.</br>
 </br>
 <a0 onclick='window.gm.dng.resumeRoom();'>Go on</a></br>
 </article><article id="LogPanel"></article></section>
 
+:: DungeonGenericEvent [_nosave_]
+<!--example-scene for operation-->
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%= window.gm.dng.renderEvent(window.gm.dng.evtData)%></br>
+</article><article id="LogPanel"></article></section>
 
 :: DungeonCrashedThroughFloor [_nosave_]
 <!--example-scene for onenter/onexit event-->
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%= window.gm.dng.actualRoom.descr%></br>
+<%= window.gm.dng.actualRoom.descr()%></br>
 You crash down through the floor and find yourself back on the lowest level of the area.</br>
 </br>
 <a0 onclick='crashThrough();'>Go on</a></br>

@@ -87,30 +87,56 @@ printCombatEffects(char) {
   }
   return(list.reduce((sum, current) => sum + current +', ', ''));
 }
+bargraph(value,max,color) {
+  let msg ='';
+  let rel = value/max*100;
+  msg ='<div class="progress-bar-striped"><div style="background-color:'+color+'; width: '+rel.toString()+'%;"><p>'+value.toString()+'/'+max.toString()+'</p></div></div>';
+  return(msg); //todo bargraph animation doesnt work because the whole page is reloaded instead of just width change
+}
+statsline(whom,mark) {
+  let msg='';
+  if(mark) msg = "<td style=\"border-style:dotted;\">";
+  else msg = "<td>";
+  msg+=whom.name+" Lv"+whom.level+"</td><td>"+this.bargraph(whom.health().value,whom.health().max,"red")+"</td><td>"+this.bargraph(whom.Stats.get("arousal").value,whom.Stats.get("arousalMax").value,"pink")+"</td><td>"+this.bargraph(whom.energy().value,whom.energy().max,"yellow")+"</td>";
+  return(msg);
+}
 //prints a table with all player/enemy data
 printStats() {
   let s=window.story.state;
   let players = (s.combat.playerParty);
   let enemys = (s.combat.enemyParty);
   /*
-              Health  Arousal Effects         Health  Arousal Effects
-      player1 10/20   10/20 Stunned     Ork1  10/10   10/10
-      player2 50/100  10/20             Ork2  20/20   10/100
+              Health  Arousal          Health  Arousal 
+      player1 10/20   10/20      Ork1  10/10   10/10
+              Stunned
+      player2 50/100  10/20      Ork2  20/20   10/100
   */
  let elmt = '<table id=\"combatstats\"><tbody>';
-  elmt += "<tr><th>   </th><th>Player</th><th>Health</th><th>Arousal</th><th>Effects</th><th>   </th><th>Enemys</th><th>Health</th><th>Arousal</th><th>Effects</th>";
+  elmt += "<tr><th>   </th><th>Player</th><th>Health</th><th>Arousal</th><th>Energy</th><th>   </th><th>Enemys</th><th>Health</th><th>Arousal</th><th>Energy</th></tr>";
   for(let i=0;(i<players.length || i<enemys.length);i++) {
     elmt += "<tr>";
     if(i<players.length) {
-      elmt += "<td>" + (s.combat.actor && s.combat.actor.name==players[i].name?">>": "")+ "</td><td>"+players[i].name+" Lv"+players[i].level+"</td><td>"+players[i].health().value.toString()+'/'+players[i].health().max.toString()+"</td><td>"+players[i].Stats.get("arousal").value.toString()+'/'+players[i].Stats.get("arousalMax").value.toString()+"</td><td style=\"font-size:smaller\">"+window.gm.Encounter.printCombatEffects(players[i])+"</td>";
+      elmt += "<td></td>"+this.statsline(players[i],s.combat.actor && s.combat.actor.name==players[i].name);
     } else {
-      elmt += "<tr><td></td><td></td><td></td><td></td><td></td>";
+      elmt += "<td></td><td></td><td></td><td></td><td></td><td></td>";
     }
     if(i<enemys.length) {
-      elmt += "<td>" + (s.combat.actor==enemys[i]?">>>": "")+ "</td><td>"+enemys[i].name+" Lv"+enemys[i].level+"</td><td>"+enemys[i].health().value.toString()+'/'+enemys[i].health().max.toString()+"</td><td>"+enemys[i].Stats.get("arousal").value.toString()+'/'+enemys[i].Stats.get("arousalMax").value.toString()+"</td><td style=\"font-size:smaller\">"+window.gm.Encounter.printCombatEffects(enemys[i])+"</td>";
+      elmt += "<td></td>"+this.statsline(enemys[i],s.combat.actor==enemys[i]);
     } else {
-      elmt += "<tr><td></td><td></td><td></td><td></td><td></td>";
+      elmt += "<tr><td></td><td></td><td></td><td></td><td></td><td></td>";
     }
+    elmt += "</tr><tr>";
+    if(i<players.length) { //effects as additional row
+      elmt += "<td></td><td></td><td colspan='3' style=\"font-size:smaller\">"+window.gm.Encounter.printCombatEffects(players[i])+"</td>";
+    } else {
+      elmt += "<td></td><td></td><td></td><td></td><td></td><td></td>";
+    }
+    if(i<enemys.length) {
+      elmt += "<td></td><td></td><td colspan='3' style=\"font-size:smaller\">"+window.gm.Encounter.printCombatEffects(enemys[i])+"</td>";
+    } else {
+      elmt += "<td></td><td></td><td></td><td></td><td></td><td></td>";
+    }
+    elmt += "</tr>";
   }
   elmt +='</tbody></table>'
   return(elmt);

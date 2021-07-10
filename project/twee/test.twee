@@ -1,19 +1,71 @@
-<div id="ui-dialog" tabindex="0" role="dialog" aria-labelledby="ui-dialog-title" class="open" style="left: 494px; right: 494px; top: 50px;">
-<div id="ui-dialog-titlebar"><h1 id="ui-dialog-title">Saves</h1>
-<button id="ui-dialog-close" class="ui-close" tabindex="0" aria-label="Close"></button></div>
-<div id="ui-dialog-body" class="saves">
-<table id="saves-list"><tbody>
-<tr><td>1</td><td><button id="saves-save-0" class="save ui-close" type="button" tabindex="0" aria-label="Save Slot 1" title="Save Slot 1">Save</button></td><td class="empty"><em>— slot empty —</em></td><td><button id="saves-delete-0" class="delete" disabled="">Delete</button></td></tr>
-<tr><td>2</td><td><button id="saves-save-1" class="save ui-close" type="button" tabindex="0" aria-label="Save Slot 2" title="Save Slot 2">Save</button></td><td class="empty"><em>— slot empty —</em></td><td><button id="saves-delete-1" class="delete" disabled="">Delete</button></td></tr>
-<tr><td>3</td><td><button id="saves-save-2" class="save ui-close" type="button" tabindex="0" aria-label="Save Slot 3" title="Save Slot 3">Save</button></td><td class="empty"><em>— slot empty —</em></td><td><button id="saves-delete-2" class="delete" disabled="">Delete</button></td></tr>
-<tr><td>4</td><td><button id="saves-save-3" class="save ui-close" type="button" tabindex="0" aria-label="Save Slot 4" title="Save Slot 4">Save</button></td><td class="empty"><em>— slot empty —</em></td><td><button id="saves-delete-3" class="delete" disabled="">Delete</button></td></tr>
-<tr><td>5</td><td><button id="saves-save-4" class="save ui-close" type="button" tabindex="0" aria-label="Save Slot 5" title="Save Slot 5">Save</button></td><td class="empty"><em>— slot empty —</em></td><td><button id="saves-delete-4" class="delete" disabled="">Delete</button></td></tr>
-<tr><td>6</td><td><button id="saves-save-5" class="save ui-close" type="button" tabindex="0" aria-label="Save Slot 6" title="Save Slot 6">Save</button></td><td class="empty"><em>— slot empty —</em></td><td><button id="saves-delete-5" class="delete" disabled="">Delete</button></td></tr>
-<tr><td>7</td><td><button id="saves-save-6" class="save ui-close" type="button" tabindex="0" aria-label="Save Slot 7" title="Save Slot 7">Save</button></td><td class="empty"><em>— slot empty —</em></td><td><button id="saves-delete-6" class="delete" disabled="">Delete</button></td></tr>
-<tr><td>8</td><td><button id="saves-save-7" class="save ui-close" type="button" tabindex="0" aria-label="Save Slot 8" title="Save Slot 8">Save</button></td><td class="empty"><em>— slot empty —</em></td><td><button id="saves-delete-7" class="delete" disabled="">Delete</button></td></tr>
-</tbody></table>
-<ul class="buttons">
-<li><button id="saves-export" class="ui-close" type="button" tabindex="0">Save to Disk…</button></li>
-<li><button id="saves-import" type="button" tabindex="0">Load from Disk…</button></li>
-<li><button id="saves-clear" disabled="">Delete All</button></li></ul>
-<input type="file" id="saves-import-file" tabindex="-1" aria-hidden="true" style="display: block; visibility: hidden; position: fixed; left: -9999px; top: -9999px; width: 1px; height: 1px;"></div></div>
+:: TowerOfKinks
+ClitPiercing of Stamina
+
+resistance to   poisoned air, slime, cold
+
+reduce energy drain of 2 items by 1
+reduce hunger by 2 but increases thirst by 1
+
+amplifies all items with cold resistance by 33%
+
+reduces mallus-effects from items on legs by 25% 
+
+improves charisma by 2
+
+improves energy-regeneration by 2/h
+
+for each piercing, add 2 to energy-regeneration
+
+improves appearane to bondage-inclined foes but induces bondage-fetish
+
+slowly increaes milk-fetish when worn visible
+
+increases relation to lupines by 1
+
+increases chance to sneak around an enemy 
+
+increases chance of valuables in loot
+
+increases chance of items with stronger effects (good or bad)
+
+requires masochism-fetish of 10
+
+requires 1 energy/h to work
+
+trader to buy tools, items and food
+librarian to identify hidden item-enchantments or remove curse
+artesan to unlock items, improve items, repair items
+medic to remove parasites and addiction, create potions
+campfire to rest, fasttravel, storage-chest
+
+every third dungeon is handdrawn and has boss
+other dungeons are randomized with same theme like boss-level
+
+you can revisit boss-levels; foe-respawn after 48h
+
+castle:
+    archer, knight, nun
+    boss: gryphon
+
+desert: hot, dry, quicksand, sandstorm
+    naga, cheetah, lizardman
+    boss: 
+
+forest: 
+    dryad, hunter, wolf
+    boss: witch
+
+caves: cold, wet, slippery, dark
+    slime, imp, gnoll
+
+jungle: hot, humid, poisonous
+    panther, giant-snake, raptor
+
+laboratory: chemicals
+    tentacle, golem, alchemmist
+
+pyramids: chaste
+    priest, acolythe, anubis, scarab
+
+underworld:
+    succubus, hellhound, 

@@ -32,7 +32,7 @@ window.gm.util.PubSub = function(){
     }
   }); 
 };
-//create pretty namme for passage; requires a tag (replace space with _ !) [name:"My_Room"]
+//create pretty name for passage; requires a tag (replace space with _ !) [name:"My_Room"]
 window.gm.util.printLocationName=function(passage) {
   let tags = window.story.passage(passage).tags;
   for(el of tags) {
@@ -474,6 +474,9 @@ window.gm.printTalkLink =function(elmt,unhideThis,cb=null) {
 //prints the same kind of link like [[Next]] but can be called from code
 window.gm.printPassageLink= function(label,target) {
   return("<a href=\"javascript:void(0)\" data-passage=\""+target+"\">"+label+"</a></br>");
+};
+window.gm.printLink= function(label,target) {
+  return('<a href="javascript:void(0)" onclick="'+target+'">'+label+'</a></br>');
 };
 //dynamically build a link representing a buy option including display of cost and restriction
 //count specifys how any items you get for cost

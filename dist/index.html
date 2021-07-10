@@ -182,11 +182,11 @@ main .word {
 /* a class to provide methods to work with PC & NPC
 */
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
 
 function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
@@ -639,19 +639,6 @@ var Character = /*#__PURE__*/function () {
 
 window.gm = window.gm || {};
 window.gm.combat = window.gm.combat || {};
-window.gm.combat.TypesDamage = [{
-  id: 'blunt'
-}, {
-  id: 'slash'
-}, {
-  id: 'tease'
-}, {
-  id: 'spark'
-}, {
-  id: 'ice'
-}, {
-  id: 'poison'
-}];
 
 var CombatSetup = /*#__PURE__*/function () {
   function CombatSetup() {
@@ -800,6 +787,22 @@ var CombatSetup = /*#__PURE__*/function () {
       return list.reduce(function (sum, current) {
         return sum + current + ', ';
       }, '');
+    }
+  }, {
+    key: "bargraph",
+    value: function bargraph(value, max, color) {
+      var msg = '';
+      var rel = value / max * 100;
+      msg = '<div class="progress-bar-striped"><div style="background-color:' + color + '; width: ' + rel.toString() + '%;"><p>' + value.toString() + '/' + max.toString() + '</p></div></div>';
+      return msg; //todo bargraph animation doesnt work because the whole page is reloaded instead of just width change
+    }
+  }, {
+    key: "statsline",
+    value: function statsline(whom, mark) {
+      var msg = '';
+      if (mark) msg = "<td style=\"border-style:dotted;\">";else msg = "<td>";
+      msg += whom.name + " Lv" + whom.level + "</td><td>" + this.bargraph(whom.health().value, whom.health().max, "red") + "</td><td>" + this.bargraph(whom.Stats.get("arousal").value, whom.Stats.get("arousalMax").value, "pink") + "</td><td>" + this.bargraph(whom.energy().value, whom.energy().max, "yellow") + "</td>";
+      return msg;
     } //prints a table with all player/enemy data
 
   }, {
@@ -809,28 +812,46 @@ var CombatSetup = /*#__PURE__*/function () {
       var players = s.combat.playerParty;
       var enemys = s.combat.enemyParty;
       /*
-                  Health  Arousal Effects         Health  Arousal Effects
-          player1 10/20   10/20 Stunned     Ork1  10/10   10/10
-          player2 50/100  10/20             Ork2  20/20   10/100
+                  Health  Arousal          Health  Arousal 
+          player1 10/20   10/20      Ork1  10/10   10/10
+                  Stunned
+          player2 50/100  10/20      Ork2  20/20   10/100
       */
 
       var elmt = '<table id=\"combatstats\"><tbody>';
-      elmt += "<tr><th>   </th><th>Player</th><th>Health</th><th>Arousal</th><th>Effects</th><th>   </th><th>Enemys</th><th>Health</th><th>Arousal</th><th>Effects</th>";
+      elmt += "<tr><th>   </th><th>Player</th><th>Health</th><th>Arousal</th><th>Energy</th><th>   </th><th>Enemys</th><th>Health</th><th>Arousal</th><th>Energy</th></tr>";
 
       for (var i = 0; i < players.length || i < enemys.length; i++) {
         elmt += "<tr>";
 
         if (i < players.length) {
-          elmt += "<td>" + (s.combat.actor && s.combat.actor.name == players[i].name ? ">>" : "") + "</td><td>" + players[i].name + " Lv" + players[i].level + "</td><td>" + players[i].health().value.toString() + '/' + players[i].health().max.toString() + "</td><td>" + players[i].Stats.get("arousal").value.toString() + '/' + players[i].Stats.get("arousalMax").value.toString() + "</td><td style=\"font-size:smaller\">" + window.gm.Encounter.printCombatEffects(players[i]) + "</td>";
+          elmt += "<td></td>" + this.statsline(players[i], s.combat.actor && s.combat.actor.name == players[i].name);
         } else {
-          elmt += "<tr><td></td><td></td><td></td><td></td><td></td>";
+          elmt += "<td></td><td></td><td></td><td></td><td></td><td></td>";
         }
 
         if (i < enemys.length) {
-          elmt += "<td>" + (s.combat.actor == enemys[i] ? ">>>" : "") + "</td><td>" + enemys[i].name + " Lv" + enemys[i].level + "</td><td>" + enemys[i].health().value.toString() + '/' + enemys[i].health().max.toString() + "</td><td>" + enemys[i].Stats.get("arousal").value.toString() + '/' + enemys[i].Stats.get("arousalMax").value.toString() + "</td><td style=\"font-size:smaller\">" + window.gm.Encounter.printCombatEffects(enemys[i]) + "</td>";
+          elmt += "<td></td>" + this.statsline(enemys[i], s.combat.actor == enemys[i]);
         } else {
-          elmt += "<tr><td></td><td></td><td></td><td></td><td></td>";
+          elmt += "<tr><td></td><td></td><td></td><td></td><td></td><td></td>";
         }
+
+        elmt += "</tr><tr>";
+
+        if (i < players.length) {
+          //effects as additional row
+          elmt += "<td></td><td></td><td colspan='3' style=\"font-size:smaller\">" + window.gm.Encounter.printCombatEffects(players[i]) + "</td>";
+        } else {
+          elmt += "<td></td><td></td><td></td><td></td><td></td><td></td>";
+        }
+
+        if (i < enemys.length) {
+          elmt += "<td></td><td></td><td colspan='3' style=\"font-size:smaller\">" + window.gm.Encounter.printCombatEffects(enemys[i]) + "</td>";
+        } else {
+          elmt += "<td></td><td></td><td></td><td></td><td></td><td></td>";
+        }
+
+        elmt += "</tr>";
       }
 
       elmt += '</tbody></table>';
@@ -1355,6 +1376,7 @@ window.gm.combat.calcEvasion = function (attacker, target, attack) {
   var rnd = window.gm.roll(1, 100);
 
   if (target.Effects.findItemSlot(effStunned.name) >= 0) {
+    //todo chance to miss 
     result.OK = true;
     result.msg = target.name + ' is stunned and cannot evade. ';
     attack.crit = true; //when stunned always critical hit
@@ -1365,7 +1387,7 @@ window.gm.combat.calcEvasion = function (attacker, target, attack) {
   var lvlDiff = target.level - attacker.level;
   var chance = target.Stats.get("agility").value + target.Stats.get("perception").value;
   chance += lvlDiff * 4;
-  window.gm.pushLog("evasion roll:".concat(chance, " vs ").concat(rnd, " "), window.story.state._gm.dbgShowCombatRoll);
+  window.gm.pushLog("evasion roll: ".concat(chance, " vs ").concat(rnd, " "), window.story.state._gm.dbgShowCombatRoll);
 
   if (chance > rnd) {
     result.OK = false;
@@ -1409,7 +1431,7 @@ window.gm.combat.calcParry = function (attacker, target, attack) {
   var lvlDiff = target.level - attacker.level;
   var chance = target.Stats.get("agility").value + target.Stats.get("endurance").value;
   chance += lvlDiff * 4;
-  window.gm.pushLog("parry roll:".concat(chance, " vs ").concat(rnd, " "), window.story.state._gm.dbgShowCombatRoll);
+  window.gm.pushLog("parry roll: ".concat(chance, " vs ").concat(rnd, " "), window.story.state._gm.dbgShowCombatRoll);
 
   if (chance > rnd && rnd < 10) {
     result.OK = false;
@@ -1454,7 +1476,7 @@ window.gm.combat.calcAbsorb = function (attacker, defender, attack) {
   var def = defender.Stats.get('pDefense').value; //todo weakness bonus
 
   var dmg = Math.max(1, attack.value * (attack.crit ? 4 : 1) - def);
-  window.gm.pushLog("absorb roll:".concat(dmg, " vs ").concat(def, " "), window.story.state._gm.dbgShowCombatRoll);
+  window.gm.pushLog("absorb roll: ".concat(dmg, " vs ").concat(def, " "), window.story.state._gm.dbgShowCombatRoll);
   result.msg = defender.name + ' got hit by ' + attacker.name + ' and suffered ' + dmg + (attack.crit ? ' critical ' : '') + 'damage. ';
   attack.total = dmg;
   attack.effects.push({
@@ -1462,8 +1484,21 @@ window.gm.combat.calcAbsorb = function (attacker, defender, attack) {
     eff: [new effDamage(attack.total)]
   });
   return result;
-}; //object to store 
+};
 
+window.gm.combat.TypesDamage = [{
+  id: 'blunt'
+}, {
+  id: 'slash'
+}, {
+  id: 'tease'
+}, {
+  id: 'spark'
+}, {
+  id: 'ice'
+}, {
+  id: 'poison'
+}]; //object to store 
 
 window.gm.combat.AttackSetup = function () {
   /*
@@ -1497,10 +1532,7 @@ window.gm.combat.calcAttack = function (attacker, defender, attack) {
   var result = {
     OK: false,
     msg: ''
-  }; //var def = defender.Stats.get('pDefense').value;
-  //let att = attacker.Stats.get('pAttack').value;
-  //attack.value=attack.total=att; 
-  //check if target an evade
+  }; //check if target can evade
 
   result = window.gm.combat.calcEvasion(attacker, defender, attack);
 
@@ -1510,7 +1542,7 @@ window.gm.combat.calcAttack = function (attacker, defender, attack) {
 
   var _tmp = result.msg; //check if target can block or parry
 
-  result = window.gm.combat.calcParry(attacker, defender, attack); //if(result.foo!==null) result.foo(attacker,attack);
+  result = window.gm.combat.calcParry(attacker, defender, attack);
 
   if (result.OK === false) {
     return result;
@@ -1518,8 +1550,7 @@ window.gm.combat.calcAttack = function (attacker, defender, attack) {
 
   _tmp += result.msg; //deal damage
 
-  result = window.gm.combat.calcAbsorb(attacker, defender, attack); //if(result.foo!==null) result.foo(defender,attack);
-
+  result = window.gm.combat.calcAbsorb(attacker, defender, attack);
   _tmp += result.msg;
   result.msg = _tmp;
   return result;
@@ -1706,7 +1737,9 @@ var DngDirection = /*#__PURE__*/function () {
   function DngDirection(dirEnum, name, descr) {
     _classCallCheck(this, DngDirection);
 
-    this.name = name, this.descr = descr === "" ? name : descr;
+    this.name = name, this.descr = descr === null ? function () {
+      return name;
+    } : descr;
     this.direction = dirEnum;
     this.oneWay = false;
     this.onExitFct = this.onEnterFct = this.canExitFct = null;
@@ -1762,7 +1795,9 @@ var DngRoom = /*#__PURE__*/function () {
   function DngRoom(name, descr, hidden) {
     _classCallCheck(this, DngRoom);
 
-    this.name = name, this.descr = descr === null || descr === "" ? name : descr;
+    this.name = name, this.descr = descr === null ? function () {
+      return name;
+    } : descr;
     this.isDungeonExit = false; // player can leave to camp with Leave-button
 
     this.isDungeonEntry = false; //when entering the dungeon player will be coming from here; there should only be one of this 
@@ -1775,7 +1810,8 @@ var DngRoom = /*#__PURE__*/function () {
     /*DngOperations*/
     = []; //list of additional operations (= buttons you can press)
 
-    this.isHidden = false; //this.floor/*DngFloor*/ = null;	//the floor where the room is assigned to
+    this.isHidden = hidden;
+    this.allowSave = false; //this.floor/*DngFloor*/ = null;	//the floor where the room is assigned to
 
     this.onEnterFct = null;
     this.origResumeFct = null;
@@ -1897,7 +1933,9 @@ var DngFloor = /*#__PURE__*/function () {
 
     this.rooms = []; //list of rooms
 
-    this.descr = descr;
+    this.descr = descr === null ? function () {
+      return name;
+    } : descr;
     this.name = name; //label of the floor 
   }
   /*addRoom(room) { 
@@ -1958,10 +1996,8 @@ var DngFloor = /*#__PURE__*/function () {
 
 
 var DngOperation = /*#__PURE__*/function () {
-  function DngOperation(name, destination) {
+  function DngOperation(name) {
     _classCallCheck(this, DngOperation);
-
-    this.destination = destination; //description to be displayed when entering room
 
     this.name = name; //label of the button
   }
@@ -1971,7 +2007,13 @@ var DngOperation = /*#__PURE__*/function () {
     //function to check if player can use this button
     value: function canTrigger() {
       return false;
-    }
+    } //override this to do something;
+
+    /* f.e set window.gm.dng.renderEvent to a function that creates a html-string (including links)
+    then call window.story.show("DungeonGenericEvent") to render that event
+    add a link that calls window.gm.dng.resumeRoom() to continue in dungeon
+     */
+
   }, {
     key: "onTrigger",
     value: function onTrigger() {}
@@ -1981,13 +2023,14 @@ var DngOperation = /*#__PURE__*/function () {
 }();
 
 var DngDungeon = /*#__PURE__*/function () {
-  function DngDungeon(name, descr) {
+  function DngDungeon(name, descr, persistData) {
     _classCallCheck(this, DngDungeon);
 
     this.name = name; //name of the dungeon
 
     this.descr = descr; //text diplayed when entering the dungeon
 
+    this.data = persistData;
     this.floors = []; //list of Dngfloors
 
     this.actualRoom = null;
@@ -1995,7 +2038,8 @@ var DngDungeon = /*#__PURE__*/function () {
 
     this.buttons = [];
     this.inRoomedDungeonResume = this.inRoomedDungeonDefeat = null;
-  }
+  } //override this to return a data-object that will be used to store persistent data
+
 
   _createClass(DngDungeon, [{
     key: "setFloors",
@@ -2010,6 +2054,24 @@ var DngDungeon = /*#__PURE__*/function () {
     key: "allFloors",
     value: function allFloors() {
       return this.floors;
+    }
+  }, {
+    key: "getFloor",
+    value: function getFloor(Name) {
+      var found = null;
+
+      for (var i = 0; i < this.floors.length; i++) {
+        found = this.floors[i];
+        if (found == null) continue;
+
+        if (found.name == Name) {
+          break;
+        }
+
+        found = null;
+      }
+
+      return found;
     } //enters the dungeon; also does some checks to verify that dungeon was properly setup
 
   }, {
@@ -2048,7 +2110,8 @@ var DngDungeon = /*#__PURE__*/function () {
   }, {
     key: "exitDungeon",
     value: function exitDungeon() {
-      throw new Error('Error: exitDungeon not overridden');
+      window.gm.dng = null;
+      window.story.state.dng.id = ""; //clear or load would send you into dng again
     } //similiar to moveTo except no onenter/onexit processing
 
   }, {
@@ -2183,6 +2246,25 @@ var DngDungeon = /*#__PURE__*/function () {
 
       this.addButton(14, "Map", this.displayMap); //.hint("View the map of this dungeon.");
 
+      bt = 0;
+
+      var _iterator9 = _createForOfIteratorHelper(this.actualRoom.operations),
+          _step9;
+
+      try {
+        for (_iterator9.s(); !(_step9 = _iterator9.n()).done;) {
+          el = _step9.value;
+          if (bt > 4) break;
+          if (el === null) continue;
+          if (el.canTrigger()) this.addButton(bt, el.name, el.onTrigger);else this.addButton(bt, el.name, "");
+          bt += 1;
+        }
+      } catch (err) {
+        _iterator9.e(err);
+      } finally {
+        _iterator9.f();
+      }
+
       if (this.actualRoom.isDungeonExit) {
         for (var i = 5; i < 15; i++) {
           //find an empty navigation button for leave
@@ -2191,16 +2273,37 @@ var DngDungeon = /*#__PURE__*/function () {
         }
 
         this.addButton(bt, "Leave", this.exitDungeon, false);
+      } //add _nosave_ tag except allowed
+
+
+      var tags = window.story.passage("Dungeon").tags;
+
+      for (var i = tags.length - 1; i >= 0; i--) {
+        if (tags[i] === '_nosave_') tags.splice(i, 1);
       }
 
+      if (!window.gm.dng.actualRoom.allowSave) {
+        tags.push('_nosave_');
+      }
+
+      var _state = window.story.state.dng;
+      _state.roomId = this.actualRoom.name; //Todo how to load dungeon ?
+
+      _state.id = this.name;
+      _state.floorId = this.actualRoom.floor.name;
       window.story.show("Dungeon"); //call the scene
     } //shows a map-screen
 
   }, {
     key: "displayMap",
     value: function displayMap() {
-      this.Mapper.createMap(this.actualRoom.floor);
+      //this.Mapper.createMap(this.actualRoom.floor);
       window.story.show("DungeonMap");
+    }
+  }], [{
+    key: "persistentDngDataTemplate",
+    value: function persistentDngDataTemplate() {
+      return null;
     }
   }]);
 
@@ -2217,7 +2320,6 @@ var DngMapperInfo = function DngMapperInfo() {
   this.Connect = 0; //bitwise encoding of directions
 }; // builds the map from the dungeons info and actualRoom
 // it is expected that all rooms in a floor are somehow connected with each other - no isolated rooms !
-//todo Not completed !
 
 
 var DngMapper = /*#__PURE__*/function () {
@@ -2278,6 +2380,8 @@ var DngMapper = /*#__PURE__*/function () {
             //create new roominfo and set coordinate
             roomInfo2 = new DngMapperInfo();
             roomInfo2.Hidden = dir.hidden();
+            roomInfo.Entry = room.isDungeonEntry || room.isDungeonExit;
+            roomInfo.Save = room.allowSave;
 
             switch (dir.direction) {
               case DngDirection.DirN:
@@ -2335,12 +2439,16 @@ var DngMapper = /*#__PURE__*/function () {
 
   }, {
     key: "printMap",
-    value: function printMap(playerRoom) {
-      //Todo update player location
+    value: function printMap(playerRoom, minimap) {
+      //Todo use images or special font instead ascii?
       var _line = "";
       var map = [];
       var roomInfo;
-      var i, j; //create 2d-array to store textual representation of room and connection between them
+      var i, j;
+      var playerX = 0,
+          playerY = 0;
+      this.createMap(playerRoom.floor); //todo only recreate if necessary
+      //create 2d-array to store textual representation of room and connection between them
 
       map = new Array(2 * (this.maxX - this.minX) + 1);
 
@@ -2361,11 +2469,20 @@ var DngMapper = /*#__PURE__*/function () {
         _line = " ";
 
         if (roomInfo.Connect & 1 << DngDirection.StairDown || roomInfo.Connect & 1 << DngDirection.StairUp) {
-          _line = "S";
+          _line = "&ang;";
         }
 
         if (playerRoom != null && playerRoom.name == roomInfo.Name) {
           _line = "P";
+          playerX = roomInfo.X, playerY = roomInfo.Y;
+        }
+
+        if (roomInfo.Save && playerRoom.name != roomInfo.Name) {
+          _line = "S";
+        }
+
+        if (roomInfo.Entry && playerRoom.name != roomInfo.Name) {
+          _line = "E";
         } //each room/connection has to be 3 chars long or it will messup formatting !
         //todo format as table?
 
@@ -2397,16 +2514,41 @@ var DngMapper = /*#__PURE__*/function () {
       } //print
 
 
-      _line = this.floor.dungeon.name + " " + this.floor.name + "\n";
+      _line = "<pre>"; //pre-formatted or messup allignment of ascii-rows
 
-      for (j = 0; j < 2 * (this.maxY - this.minY) + 1; j++) {
-        for (i = 0; i < 2 * (this.maxX - this.minX) + 1; i++) {
-          _line += map[i][j];
+      if (minimap) {
+        //only print rooms 1 step around player
+        _line += this.floor.name + "</br>";
+        var x, y;
+
+        for (j = -3; j <= 3; j++) {
+          for (i = -3; i <= 3; i++) {
+            x = i + (playerX - this.minX) * 2, y = j + (playerY - this.minY) * 2; //coord can be negative !
+            //if(x>this.maxX || y>this.maxY || x<this.minX || y< this.minY) continue;    
+
+            if (map.length - 1 < x || 0 > x) continue;
+            if (map[x].length - 1 < y || 0 > y) continue;
+            _line += (i == -3 ? "&nbsp;" : "") + map[x][y]; //todo hack:if line starts with -, snowman-markdown interprets this as <ul> ?!
+          }
+
+          _line += "\n";
+        }
+      } else {
+        //full map of floor
+        _line += this.floor.dungeon.name + " " + this.floor.name + "</br>";
+
+        for (j = 0; j < 2 * (this.maxY - this.minY) + 1; j++) {
+          for (i = 0; i < 2 * (this.maxX - this.minX) + 1; i++) {
+            _line += map[i][j];
+          }
+
+          _line += "\n";
         }
 
-        _line += "\n";
+        _line += "<pre>Legend: P=Player, &ang;=Stair, E=Entry/Exit S=Save</pre></br>";
       }
 
+      _line += "</pre>";
       return _line;
     }
   }]);
@@ -2453,18 +2595,18 @@ window.gm.util.PubSub = function () {
       ;
     }
   };
-}; //create pretty namme for passage; requires a tag (replace space with _ !) [name:"My_Room"]
+}; //create pretty name for passage; requires a tag (replace space with _ !) [name:"My_Room"]
 
 
 window.gm.util.printLocationName = function (passage) {
   var tags = window.story.passage(passage).tags;
 
-  var _iterator9 = _createForOfIteratorHelper(tags),
-      _step9;
+  var _iterator10 = _createForOfIteratorHelper(tags),
+      _step10;
 
   try {
-    for (_iterator9.s(); !(_step9 = _iterator9.n()).done;) {
-      el = _step9.value;
+    for (_iterator10.s(); !(_step10 = _iterator10.n()).done;) {
+      el = _step10.value;
       var ar = el.split(":");
 
       if (ar.length > 1 && ar[0] === 'name') {
@@ -2472,9 +2614,9 @@ window.gm.util.printLocationName = function (passage) {
       }
     }
   } catch (err) {
-    _iterator9.e(err);
+    _iterator10.e(err);
   } finally {
-    _iterator9.f();
+    _iterator10.f();
   }
 
   return passage;
@@ -3049,6 +3191,10 @@ window.gm.printTalkLink = function (elmt, unhideThis) {
 
 window.gm.printPassageLink = function (label, target) {
   return "<a href=\"javascript:void(0)\" data-passage=\"" + target + "\">" + label + "</a></br>";
+};
+
+window.gm.printLink = function (label, target) {
+  return '<a href="javascript:void(0)" onclick="' + target + '">' + label + '</a></br>';
 }; //dynamically build a link representing a buy option including display of cost and restriction
 //count specifys how any items you get for cost
 //cbCanBuy points to a function fn(itemid) that returns if can buy {OK:false,msg:'too expensive'} 
@@ -3408,6 +3554,7 @@ window.gm.printEffectSummary = function () {
   var who = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'player';
   var showstats = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
   var showfetish = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+  var showresistane = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
   var elmt = '';
   var s = window.story.state;
   var result = '';
@@ -3420,6 +3567,8 @@ window.gm.printEffectSummary = function () {
     var data = window.gm[who].Stats.get(ids[k]);
     var isFetish = data.id.slice(0, 2) === 'ft'; //Fetish starts with ft
 
+    var isResistance = data.id.slice(0, 3) === 'rst'; //
+
     if (data.hidden !== 4) {
       if (isFetish && showfetish && !(data.id.slice(-4, -2) === '_M')) {
         //expects names of fetish like ftXXX and limits ftXXX_Min ftXXX_Max
@@ -3429,7 +3578,7 @@ window.gm.printEffectSummary = function () {
         result += '<td>' + (data.hidden & 0x2 ? '???' : '(' + (min.value + ' to ' + max.value)) + ')</td></tr>';
       }
 
-      if (!isFetish && showstats) {
+      if (!isFetish && !isResistance && showstats || !isFetish && isResistance && showresistane) {
         result += '<tr><td>' + (data.hidden & 0x1 ? '???' : data.id) + ':</td><td>' + (data.hidden & 0x2 ? '???' : data.value) + '</td></tr>';
       }
     }
@@ -4025,19 +4174,19 @@ var Outfit = /*#__PURE__*/function () {
     key: "_relinkItems",
     value: function _relinkItems() {
       //call this after loading save data to reparent
-      var _iterator10 = _createForOfIteratorHelper(this.list),
-          _step10;
+      var _iterator11 = _createForOfIteratorHelper(this.list),
+          _step11;
 
       try {
-        for (_iterator10.s(); !(_step10 = _iterator10.n()).done;) {
-          el = _step10.value;
+        for (_iterator11.s(); !(_step11 = _iterator11.n()).done;) {
+          el = _step11.value;
           if (el.value.item) el.value.item._parent = window.gm.util.refToParent(this);
           ;
         }
       } catch (err) {
-        _iterator10.e(err);
+        _iterator11.e(err);
       } finally {
-        _iterator10.f();
+        _iterator11.f();
       }
     }
   }, {
@@ -4064,12 +4213,12 @@ var Outfit = /*#__PURE__*/function () {
     value: function findItemSlot(id) {
       var _idx = [];
 
-      var _iterator11 = _createForOfIteratorHelper(this.list),
-          _step11;
+      var _iterator12 = _createForOfIteratorHelper(this.list),
+          _step12;
 
       try {
-        for (_iterator11.s(); !(_step11 = _iterator11.n()).done;) {
-          el = _step11.value;
+        for (_iterator12.s(); !(_step12 = _iterator12.n()).done;) {
+          el = _step12.value;
           if (el.value.id === id) _idx.push(el.index);
         }
         /*let items = Object.keys(this.list);
@@ -4078,9 +4227,9 @@ var Outfit = /*#__PURE__*/function () {
         }*/
 
       } catch (err) {
-        _iterator11.e(err);
+        _iterator12.e(err);
       } finally {
-        _iterator11.f();
+        _iterator12.f();
       }
 
       return _idx;
@@ -4106,12 +4255,12 @@ var Outfit = /*#__PURE__*/function () {
     value: function getAllIds() {
       var ids = [];
 
-      var _iterator12 = _createForOfIteratorHelper(this.list),
-          _step12;
+      var _iterator13 = _createForOfIteratorHelper(this.list),
+          _step13;
 
       try {
-        for (_iterator12.s(); !(_step12 = _iterator12.n()).done;) {
-          el = _step12.value;
+        for (_iterator13.s(); !(_step13 = _iterator13.n()).done;) {
+          el = _step13.value;
 
           if (el.value.item && ids.indexOf(el.value.item.id) < 0) {
             //only unique items  
@@ -4123,9 +4272,9 @@ var Outfit = /*#__PURE__*/function () {
         }*/
 
       } catch (err) {
-        _iterator12.e(err);
+        _iterator13.e(err);
       } finally {
-        _iterator12.f();
+        _iterator13.f();
       }
 
       return ids;
@@ -4900,7 +5049,16 @@ window.storage = {
     window.story.checkpointName = save.checkpointName;
     window.gm.rebuildObjects(); // this is for handling version-upgrades
 
-    window.story.show(window.gm.player.location); //history disabled ! window.story.history[window.story.history.length - 1], true);      
+    if (window.story.state.dng.id !== "") {
+      window.gm.dng = window.gm.dngs[window.story.state.dng.id]();
+      var floor = window.gm.dng.getFloor(window.story.state.dng.floorId);
+      var room = floor.getRoom(window.story.state.dng.roomId);
+      window.gm.dng.enterDungeon(); //first call enterdungeon to setup everything !
+
+      window.gm.dng.teleport(floor, room);
+    } else {
+      window.story.show(window.gm.player.location); //history disabled ! window.story.history[window.story.history.length - 1], true);   
+    }
   },
   getAchievements: function getAchievements() {
     var ahash = JSON.stringify({
@@ -5059,21 +5217,21 @@ var Skill = /*#__PURE__*/function () {
       //target is [dragon] or [mole1,mole2]
       var filtered = this.targetFilter([target]); //[[]] !
 
-      var _iterator13 = _createForOfIteratorHelper(target),
-          _step13;
+      var _iterator14 = _createForOfIteratorHelper(target),
+          _step14;
 
       try {
-        for (_iterator13.s(); !(_step13 = _iterator13.n()).done;) {
-          var targ = _step13.value;
+        for (_iterator14.s(); !(_step14 = _iterator14.n()).done;) {
+          var targ = _step14.value;
 
           var _i = filtered.indexOf(target);
 
           if (_i < 0) return false;
         }
       } catch (err) {
-        _iterator13.e(err);
+        _iterator14.e(err);
       } finally {
-        _iterator13.f();
+        _iterator14.f();
       }
 
       return true;
@@ -5113,33 +5271,33 @@ var Skill = /*#__PURE__*/function () {
       if (result.OK) {
         result.msg = "";
 
-        var _iterator14 = _createForOfIteratorHelper(result.effects),
-            _step14;
+        var _iterator15 = _createForOfIteratorHelper(result.effects),
+            _step15;
 
         try {
-          for (_iterator14.s(); !(_step14 = _iterator14.n()).done;) {
-            var X = _step14.value;
+          for (_iterator15.s(); !(_step15 = _iterator15.n()).done;) {
+            var X = _step15.value;
 
             // for each target
-            var _iterator15 = _createForOfIteratorHelper(X.eff),
-                _step15;
+            var _iterator16 = _createForOfIteratorHelper(X.eff),
+                _step16;
 
             try {
-              for (_iterator15.s(); !(_step15 = _iterator15.n()).done;) {
-                var Y = _step15.value;
+              for (_iterator16.s(); !(_step16 = _iterator16.n()).done;) {
+                var Y = _step16.value;
                 //...multiple effects
                 X.target.addEffect(Y.id, Y);
               }
             } catch (err) {
-              _iterator15.e(err);
+              _iterator16.e(err);
             } finally {
-              _iterator15.f();
+              _iterator16.f();
             }
           }
         } catch (err) {
-          _iterator14.e(err);
+          _iterator15.e(err);
         } finally {
-          _iterator14.f();
+          _iterator15.f();
         }
 
         result.msg += this.getCastDescription(result);
@@ -5153,34 +5311,34 @@ var Skill = /*#__PURE__*/function () {
     value: function targetFilterSelf(targets) {
       var possibleTarget = [];
 
-      var _iterator16 = _createForOfIteratorHelper(targets),
-          _step16;
+      var _iterator17 = _createForOfIteratorHelper(targets),
+          _step17;
 
       try {
-        for (_iterator16.s(); !(_step16 = _iterator16.n()).done;) {
-          var target = _step16.value;
+        for (_iterator17.s(); !(_step17 = _iterator17.n()).done;) {
+          var target = _step17.value;
           var valid = true;
 
-          var _iterator17 = _createForOfIteratorHelper(target),
-              _step17;
+          var _iterator18 = _createForOfIteratorHelper(target),
+              _step18;
 
           try {
-            for (_iterator17.s(); !(_step17 = _iterator17.n()).done;) {
-              var targ = _step17.value;
+            for (_iterator18.s(); !(_step18 = _iterator18.n()).done;) {
+              var targ = _step18.value;
               if (this.caster != targ) valid = false;
             }
           } catch (err) {
-            _iterator17.e(err);
+            _iterator18.e(err);
           } finally {
-            _iterator17.f();
+            _iterator18.f();
           }
 
           if (valid) possibleTarget.push(target);
         }
       } catch (err) {
-        _iterator16.e(err);
+        _iterator17.e(err);
       } finally {
-        _iterator16.f();
+        _iterator17.f();
       }
 
       return possibleTarget;
@@ -5190,34 +5348,34 @@ var Skill = /*#__PURE__*/function () {
     value: function targetFilterAlly(targets) {
       var possibleTarget = [];
 
-      var _iterator18 = _createForOfIteratorHelper(targets),
-          _step18;
+      var _iterator19 = _createForOfIteratorHelper(targets),
+          _step19;
 
       try {
-        for (_iterator18.s(); !(_step18 = _iterator18.n()).done;) {
-          var target = _step18.value;
+        for (_iterator19.s(); !(_step19 = _iterator19.n()).done;) {
+          var target = _step19.value;
           var valid = true;
 
-          var _iterator19 = _createForOfIteratorHelper(target),
-              _step19;
+          var _iterator20 = _createForOfIteratorHelper(target),
+              _step20;
 
           try {
-            for (_iterator19.s(); !(_step19 = _iterator19.n()).done;) {
-              var targ = _step19.value;
+            for (_iterator20.s(); !(_step20 = _iterator20.n()).done;) {
+              var targ = _step20.value;
               if (this.caster.faction != targ.faction) valid = false;
             }
           } catch (err) {
-            _iterator19.e(err);
+            _iterator20.e(err);
           } finally {
-            _iterator19.f();
+            _iterator20.f();
           }
 
           if (valid) possibleTarget.push(target);
         }
       } catch (err) {
-        _iterator18.e(err);
+        _iterator19.e(err);
       } finally {
-        _iterator18.f();
+        _iterator19.f();
       }
 
       return possibleTarget;
@@ -5227,35 +5385,35 @@ var Skill = /*#__PURE__*/function () {
     value: function targetFilterEnemy(targets) {
       var possibleTarget = [];
 
-      var _iterator20 = _createForOfIteratorHelper(targets),
-          _step20;
+      var _iterator21 = _createForOfIteratorHelper(targets),
+          _step21;
 
       try {
-        for (_iterator20.s(); !(_step20 = _iterator20.n()).done;) {
-          var target = _step20.value;
+        for (_iterator21.s(); !(_step21 = _iterator21.n()).done;) {
+          var target = _step21.value;
           var valid = true;
 
-          var _iterator21 = _createForOfIteratorHelper(target),
-              _step21;
+          var _iterator22 = _createForOfIteratorHelper(target),
+              _step22;
 
           try {
-            for (_iterator21.s(); !(_step21 = _iterator21.n()).done;) {
-              var targ = _step21.value;
+            for (_iterator22.s(); !(_step22 = _iterator22.n()).done;) {
+              var targ = _step22.value;
               if (this.caster.faction == targ.faction) valid = false;
               if (targ.isDead()) valid = false;
             }
           } catch (err) {
-            _iterator21.e(err);
+            _iterator22.e(err);
           } finally {
-            _iterator21.f();
+            _iterator22.f();
           }
 
           if (valid) possibleTarget.push(target);
         }
       } catch (err) {
-        _iterator20.e(err);
+        _iterator21.e(err);
       } finally {
-        _iterator20.f();
+        _iterator21.f();
       }
 
       return possibleTarget;
@@ -5266,34 +5424,34 @@ var Skill = /*#__PURE__*/function () {
       //chars that are not inhibited
       var possibleTarget = [];
 
-      var _iterator22 = _createForOfIteratorHelper(targets),
-          _step22;
+      var _iterator23 = _createForOfIteratorHelper(targets),
+          _step23;
 
       try {
-        for (_iterator22.s(); !(_step22 = _iterator22.n()).done;) {
-          var target = _step22.value;
+        for (_iterator23.s(); !(_step23 = _iterator23.n()).done;) {
+          var target = _step23.value;
           var valid = true;
 
-          var _iterator23 = _createForOfIteratorHelper(target),
-              _step23;
+          var _iterator24 = _createForOfIteratorHelper(target),
+              _step24;
 
           try {
-            for (_iterator23.s(); !(_step23 = _iterator23.n()).done;) {
-              var targ = _step23.value;
+            for (_iterator24.s(); !(_step24 = _iterator24.n()).done;) {
+              var targ = _step24.value;
               if (!targ._canAct().OK) valid = false;
             }
           } catch (err) {
-            _iterator23.e(err);
+            _iterator24.e(err);
           } finally {
-            _iterator23.f();
+            _iterator24.f();
           }
 
           if (valid) possibleTarget.push(target);
         }
       } catch (err) {
-        _iterator22.e(err);
+        _iterator23.e(err);
       } finally {
-        _iterator22.f();
+        _iterator23.f();
       }
 
       return possibleTarget;
@@ -5304,34 +5462,34 @@ var Skill = /*#__PURE__*/function () {
       //chars that are not dead
       var possibleTarget = [];
 
-      var _iterator24 = _createForOfIteratorHelper(targets),
-          _step24;
+      var _iterator25 = _createForOfIteratorHelper(targets),
+          _step25;
 
       try {
-        for (_iterator24.s(); !(_step24 = _iterator24.n()).done;) {
-          var target = _step24.value;
+        for (_iterator25.s(); !(_step25 = _iterator25.n()).done;) {
+          var target = _step25.value;
           var valid = true;
 
-          var _iterator25 = _createForOfIteratorHelper(target),
-              _step25;
+          var _iterator26 = _createForOfIteratorHelper(target),
+              _step26;
 
           try {
-            for (_iterator25.s(); !(_step25 = _iterator25.n()).done;) {
-              var targ = _step25.value;
+            for (_iterator26.s(); !(_step26 = _iterator26.n()).done;) {
+              var targ = _step26.value;
               if (targ.isDead()) valid = false;
             }
           } catch (err) {
-            _iterator25.e(err);
+            _iterator26.e(err);
           } finally {
-            _iterator25.f();
+            _iterator26.f();
           }
 
           if (valid) possibleTarget.push(target);
         }
       } catch (err) {
-        _iterator24.e(err);
+        _iterator25.e(err);
       } finally {
-        _iterator24.f();
+        _iterator25.f();
       }
 
       return possibleTarget;
@@ -5342,34 +5500,34 @@ var Skill = /*#__PURE__*/function () {
       //chars that are dead
       var possibleTarget = [];
 
-      var _iterator26 = _createForOfIteratorHelper(targets),
-          _step26;
+      var _iterator27 = _createForOfIteratorHelper(targets),
+          _step27;
 
       try {
-        for (_iterator26.s(); !(_step26 = _iterator26.n()).done;) {
-          var target = _step26.value;
+        for (_iterator27.s(); !(_step27 = _iterator27.n()).done;) {
+          var target = _step27.value;
           var valid = true;
 
-          var _iterator27 = _createForOfIteratorHelper(target),
-              _step27;
+          var _iterator28 = _createForOfIteratorHelper(target),
+              _step28;
 
           try {
-            for (_iterator27.s(); !(_step27 = _iterator27.n()).done;) {
-              var targ = _step27.value;
+            for (_iterator28.s(); !(_step28 = _iterator28.n()).done;) {
+              var targ = _step28.value;
               if (!targ.isDead()) valid = false;
             }
           } catch (err) {
-            _iterator27.e(err);
+            _iterator28.e(err);
           } finally {
-            _iterator27.f();
+            _iterator28.f();
           }
 
           if (valid) possibleTarget.push(target);
         }
       } catch (err) {
-        _iterator26.e(err);
+        _iterator27.e(err);
       } finally {
-        _iterator26.f();
+        _iterator27.f();
       }
 
       return possibleTarget;
@@ -5382,19 +5540,19 @@ var Skill = /*#__PURE__*/function () {
       var multi = [];
       multi.name = "all"; //there has to be a name for display
 
-      var _iterator28 = _createForOfIteratorHelper(possibletarget),
-          _step28;
+      var _iterator29 = _createForOfIteratorHelper(possibletarget),
+          _step29;
 
       try {
-        for (_iterator28.s(); !(_step28 = _iterator28.n()).done;) {
-          var el = _step28.value;
+        for (_iterator29.s(); !(_step29 = _iterator29.n()).done;) {
+          var el = _step29.value;
           if (el.length === 1) //dont stack multi-targets
             multi.push(el[0]);
         }
       } catch (err) {
-        _iterator28.e(err);
+        _iterator29.e(err);
       } finally {
-        _iterator28.f();
+        _iterator29.f();
       }
 
       if (multi.length > 0) possibletarget.push(multi); //[[mole1],[mole2],[mole1,mole2]]
@@ -8218,7 +8376,9 @@ var BeeHive = /*#__PURE__*/function (_DngDungeon) {
 
     _classCallCheck(this, BeeHive);
 
-    _this19 = _super20.call(this, "BeeHive", "There seem to live alot of giant bees here.");
+    _this19 = _super20.call(this, "BeeHive", function () {
+      return "There seem to live alot of giant bees here.";
+    }, window.story.state[BeeHive.name]);
 
     _this19.buildFloors();
 
@@ -8235,9 +8395,9 @@ var BeeHive = /*#__PURE__*/function (_DngDungeon) {
 
       var stairDown; //:DngRoom;
 
-      firstFloor = new DngFloor();
-      firstFloor.description = "This is the lowest floor of the beehive.";
-      firstFloor.name = "1.Floor";
+      firstFloor = new DngFloor("1.Floor", function () {
+        return "This is the lowest floor of the beehive.";
+      });
       var room; //:DngRoom;
       //var rooms:LookupTable = new LookupTable(); 
 
@@ -8250,19 +8410,19 @@ var BeeHive = /*#__PURE__*/function (_DngDungeon) {
       *  E    C2   C3   S
       * */
 
-      rooms.set("Entrance", new DngRoom("Entrance", "", false));
-      rooms.set("B1", new DngRoom("B1", "", false));
-      rooms.set("A1", new DngRoom("A1", "", true)); //hidden
+      rooms.set("Entrance", new DngRoom("Entrance", null, false));
+      rooms.set("B1", new DngRoom("B1", null, false));
+      rooms.set("A1", new DngRoom("A1", null, true)); //hidden
 
-      rooms.set("B2", new DngRoom("B2", "", false));
-      rooms.set("C2", new DngRoom("C2", "", false));
-      rooms.set("A2", new DngRoom("A2", "", false));
-      rooms.set("B3", new DngRoom("B3", "", false));
-      rooms.set("C3", new DngRoom("C3", "", false));
-      rooms.set("A3", new DngRoom("A3", "", false));
-      rooms.set("B4", new DngRoom("B4", "", false));
-      rooms.set("A4", new DngRoom("A4", "", false));
-      rooms.set("Stairs", new DngRoom("Stairs", "", false));
+      rooms.set("B2", new DngRoom("B2", null, false));
+      rooms.set("C2", new DngRoom("C2", null, false));
+      rooms.set("A2", new DngRoom("A2", null, false));
+      rooms.set("B3", new DngRoom("B3", null, false));
+      rooms.set("C3", new DngRoom("C3", null, false));
+      rooms.set("A3", new DngRoom("A3", null, false));
+      rooms.set("B4", new DngRoom("B4", null, false));
+      rooms.set("A4", new DngRoom("A4", null, false));
+      rooms.set("Stairs", new DngRoom("Stairs", null, false));
       DngDirection.createDirection(DngDirection.DirN, rooms.get("Entrance"), rooms.get("B1"));
       DngDirection.createDirection(DngDirection.DirE, rooms.get("B1"), rooms.get("B2"));
       DngDirection.createDirection(DngDirection.DirN, rooms.get("B2"), rooms.get("A2"));
@@ -8292,9 +8452,9 @@ var BeeHive = /*#__PURE__*/function (_DngDungeon) {
       _floors.push(firstFloor);
 
       var secondFloor;
-      secondFloor = new DngFloor();
-      secondFloor.description = "This is the second floor of the beehive.";
-      secondFloor.name = "2.Floor";
+      secondFloor = new DngFloor("2.Floor", function () {
+        return "This is the second floor of the beehive.";
+      });
       rooms = new Map();
       /* second floor
       * 	A1# - A2 - A3# - A4
@@ -8304,18 +8464,18 @@ var BeeHive = /*#__PURE__*/function (_DngDungeon) {
       *  C1 - C2# - C3# - S
       * */
 
-      rooms.set("C1", new DngRoom("C1", "", false));
-      rooms.set("B1", new DngRoom("B1", "", false));
-      rooms.set("A1", new DngRoom("A1", "", false));
-      rooms.set("C2", new DngRoom("C2", "", false));
-      rooms.set("B2", new DngRoom("B2", "", false));
-      rooms.set("A2", new DngRoom("A2", "", false));
-      rooms.set("C3", new DngRoom("C3", "", false));
-      rooms.set("B3", new DngRoom("B3", "", false));
-      rooms.set("A3", new DngRoom("A3", "", false));
-      rooms.set("StairsDown", new DngRoom("StairsDown", "", false));
-      rooms.set("B4", new DngRoom("B4", "", false));
-      rooms.set("A4", new DngRoom("A4", "", false));
+      rooms.set("C1", new DngRoom("C1", null, false));
+      rooms.set("B1", new DngRoom("B1", null, false));
+      rooms.set("A1", new DngRoom("A1", null, false));
+      rooms.set("C2", new DngRoom("C2", null, false));
+      rooms.set("B2", new DngRoom("B2", null, false));
+      rooms.set("A2", new DngRoom("A2", null, false));
+      rooms.set("C3", new DngRoom("C3", null, false));
+      rooms.set("B3", new DngRoom("B3", null, false));
+      rooms.set("A3", new DngRoom("A3", null, false));
+      rooms.set("StairsDown", new DngRoom("StairsDown", null, false));
+      rooms.set("B4", new DngRoom("B4", null, false));
+      rooms.set("A4", new DngRoom("A4", null, false));
       DngDirection.createDirection(DngDirection.DirE, rooms.get("C3"), rooms.get("StairsDown"));
       DngDirection.createDirection(DngDirection.DirE, rooms.get("C2"), rooms.get("C3"));
       DngDirection.createDirection(DngDirection.DirE, rooms.get("C1"), rooms.get("C2"));
@@ -8361,12 +8521,13 @@ var BeeHive = /*#__PURE__*/function (_DngDungeon) {
 
 
       DngDirection.createDirection(DngDirection.StairUp, stairUp, stairDown);
-      this.setFloors(_floors);
+      this.setFloors(_floors); //assign floors to dng
     }
   }, {
     key: "exitDungeon",
     value: function exitDungeon() {
-      window.gm.dng = null;
+      _get(_getPrototypeOf(BeeHive.prototype), "exitDungeon", this).call(this);
+
       window.story.show("ForestEntrance");
     }
   }, {
@@ -8412,9 +8573,193 @@ var BeeHive = /*#__PURE__*/function (_DngDungeon) {
   return BeeHive;
 }(DngDungeon);
 
+var ShatteredCity = /*#__PURE__*/function (_DngDungeon2) {
+  _inherits(ShatteredCity, _DngDungeon2);
+
+  var _super21 = _createSuper(ShatteredCity);
+
+  _createClass(ShatteredCity, null, [{
+    key: "persistentDngDataTemplate",
+    value: function persistentDngDataTemplate() {
+      var _data = {
+        A1Chest: ["TailRibbon", "HorsePotion"],
+        A2defeated: 0
+      };
+      return _data;
+    }
+  }]);
+
+  function ShatteredCity() {
+    var _this20;
+
+    _classCallCheck(this, ShatteredCity);
+
+    _this20 = _super21.call(this, "ShatteredCity", function () {
+      return "A once thriving city now lies in ruins.";
+    }, window.story.state[ShatteredCity.name]);
+
+    _this20.buildFloors();
+
+    return _this20;
+  }
+
+  _createClass(ShatteredCity, [{
+    key: "buildFloors",
+    value: function buildFloors() {
+      var _floors = [];
+      var firstFloor; //:DngFloor;
+
+      var stairUp; //:DngRoom;
+
+      var stairDown; //:DngRoom;
+
+      firstFloor = new DngFloor("main street");
+      var room; //:DngRoom;
+
+      var rooms = new Map();
+      /* main street
+      *  A1 - A2 - A3 - A4
+      *  	    |	  |    |	
+      *  B1 - B2   B3   B4
+      *  |    |    |    |
+      *  C1   C2   C3  C4
+      * B1 = Entrance
+      * */
+
+      rooms.set("C1", new DngRoom("C1", null, false));
+      rooms.set("B1", new DngRoom("B1", null, false));
+      rooms.set("A1", new DngRoom("A1", null, false));
+      rooms.set("B2", new DngRoom("B2", function () {
+        return 'Campfire';
+      }, false));
+      rooms.set("C2", new DngRoom("C2", null, false));
+      rooms.set("A2", new DngRoom("A2", null, false));
+      rooms.set("B3", new DngRoom("B3", null, false));
+      rooms.set("C3", new DngRoom("C3", null, false));
+      rooms.set("A3", new DngRoom("A3", null, false));
+      rooms.set("B4", new DngRoom("B4", null, false));
+      rooms.set("A4", new DngRoom("A4", null, false));
+      rooms.set("C4", new DngRoom("C4", null, false));
+      DngDirection.createDirection(DngDirection.DirN, rooms.get("C1"), rooms.get("B1"));
+      DngDirection.createDirection(DngDirection.DirE, rooms.get("B1"), rooms.get("B2"));
+      DngDirection.createDirection(DngDirection.DirN, rooms.get("B2"), rooms.get("A2"));
+      DngDirection.createDirection(DngDirection.DirN, rooms.get("C2"), rooms.get("B2"));
+      DngDirection.createDirection(DngDirection.DirW, rooms.get("A2"), rooms.get("A1"));
+      DngDirection.createDirection(DngDirection.DirE, rooms.get("A2"), rooms.get("A3"));
+      DngDirection.createDirection(DngDirection.DirE, rooms.get("A3"), rooms.get("A4"));
+      DngDirection.createDirection(DngDirection.DirN, rooms.get("B3"), rooms.get("A3"));
+      DngDirection.createDirection(DngDirection.DirN, rooms.get("C3"), rooms.get("B3"));
+      DngDirection.createDirection(DngDirection.DirS, rooms.get("A4"), rooms.get("B4"));
+      DngDirection.createDirection(DngDirection.DirS, rooms.get("B4"), rooms.get("C4"));
+      room = rooms.get("B1");
+      room.isDungeonEntry = room.isDungeonExit = true;
+      room = rooms.get("A1");
+
+      var _lootChestA1 = new DngOperation("Chest");
+
+      _lootChestA1.canTrigger = function () {
+        return true;
+      };
+
+      _lootChestA1.onTrigger = function () {
+        this.renderEvent = this.renderChestA1;
+        this.evtData = {};
+        this.renderNext(1);
+      };
+
+      room.operations = [_lootChestA1]; //adds an loot-chest in this room
+
+      room = rooms.get("B2");
+      room.allowSave = true;
+      room = rooms.get("A4");
+      room.onEnterFct = this.encounterBee2;
+      room = rooms.get("A3");
+      room.onEnterFct = this.encounterBee2;
+      room = rooms.get("B4");
+      room.getDirection(DngDirection.DirS).canExitFct = this.hasItem;
+      stairUp = rooms.get("C4");
+      firstFloor.setRooms(Array.from(rooms.values()));
+
+      _floors.push(firstFloor);
+
+      this.setFloors(_floors);
+    }
+  }, {
+    key: "exitDungeon",
+    value: function exitDungeon() {
+      _get(_getPrototypeOf(ShatteredCity.prototype), "exitDungeon", this).call(this);
+
+      window.story.show("ForestEntrance");
+    }
+  }, {
+    key: "renderNext",
+    value: function renderNext(id) {
+      //helper function because for fucks sake i cant insert " in strings ?! 
+      window.gm.dng.evtData.id = id;
+      window.story.show("DungeonGenericEvent");
+    }
+  }, {
+    key: "renderChestA1",
+    value: function renderChestA1(evt) {
+      //this is some statemachine to render the screen for lootchest
+      var msg = '';
+
+      if (evt.id === 1) {
+        msg = 'There is a chest. Do you dare to open it?</br>';
+        msg += window.gm.printLink("open chest", "window.gm.dng.renderNext(2)");
+        msg += window.gm.printLink("Leave", "window.gm.dng.resumeRoom()");
+      } else if (evt.id === 2 && this.data.A1Chest.length > 0) {
+        msg = 'You find:' + this.data.A1Chest.join(",") + '</br>';
+        msg += window.gm.printLink("Take all", "window.gm.dng.renderNext(3)");
+      } else if (evt.id === 3) {
+        var _iterator30 = _createForOfIteratorHelper(this.data.A1Chest),
+            _step30;
+
+        try {
+          for (_iterator30.s(); !(_step30 = _iterator30.n()).done;) {
+            el = _step30.value;
+
+            this._addItemToPlayer(el);
+          }
+        } catch (err) {
+          _iterator30.e(err);
+        } finally {
+          _iterator30.f();
+        }
+
+        this.data.A1Chest = [];
+        msg = 'You take everything from the chest.</br>';
+        msg += window.gm.printLink("Leave", "window.gm.dng.resumeRoom()");
+      } else {
+        msg = 'There is nothing useful.</br>';
+        msg += window.gm.printLink("Leave", "window.gm.dng.resumeRoom()");
+      }
+
+      return msg;
+    }
+  }, {
+    key: "_addItemToPlayer",
+    value: function _addItemToPlayer(id) {
+      var item = new window.storage.constructors[id]();
+
+      if (item.canEquip) {
+        window.gm.player.Wardrobe.addItem(item);
+      } else {
+        window.gm.player.Inv.addItem(item);
+      }
+    }
+  }]);
+
+  return ShatteredCity;
+}(DngDungeon);
+
 window.gm.dngs = function (dngs) {
   dngs.BeeHive = function () {
     return new BeeHive();
+  };
+
+  dngs.ShatteredCity = function () {
+    return new ShatteredCity();
   };
 
   return dngs;
@@ -8816,6 +9161,16 @@ window.gm.initGame = function (forceReset) {
     s.PlayerRL = window.gm.PlayerRL = _ch5;
   }
 
+  var dngs = [BeeHive, ShatteredCity]; //add your dngs here !
+
+  for (var _i2 = 0, _dngs = dngs; _i2 < _dngs.length; _i2++) {
+    el = _dngs[_i2];
+
+    if (!s[el.name] || forceReset) {
+      s[el.name] = el.persistentDngDataTemplate();
+    }
+  }
+
   window.gm.switchPlayer("PlayerRL"); //take over flags for newgameplus
 
   if (NGP) {
@@ -8888,13 +9243,13 @@ window.gm.respawn = function () {
       if (_el3.item && _el3.item.lossOnRespawn) window.gm.player.Outfit.removeItem(_el3.id, true);
     }
 
-    for (var _i2 = window.gm.player.Wardrobe.list.length - 1; _i2 >= 0; _i2 -= 1) {
+    for (var _i3 = window.gm.player.Wardrobe.list.length - 1; _i3 >= 0; _i3 -= 1) {
       var _el4 = window.gm.player.Wardrobe.list[0];
       if (_el4.item.lossOnRespawn) window.gm.player.Wardrobe.removeItem(_el4.id, _el4.count);
     }
 
-    for (var _i3 = window.gm.player.Inv.list.length - 1; _i3 >= 0; _i3 -= 1) {
-      var _el5 = window.gm.player.Inv.list[_i3];
+    for (var _i4 = window.gm.player.Inv.list.length - 1; _i4 >= 0; _i4 -= 1) {
+      var _el5 = window.gm.player.Inv.list[_i4];
       if (_el5.item.lossOnRespawn) window.gm.player.Inv.removeItem(_el5.id, _el5.count);
     }
   }
@@ -9014,10 +9369,10 @@ window.gm.printQuestList = function () {
   elmt += "</ul></form></br>";
   elmt += '<hr><form><ul style=\"list-style-type: none\" ><legend>Completed</legend>';
 
-  for (var _i4 = 0; _i4 < s.quests.finishedQuests.length; _i4++) {
-    var _qId = s.quests.finishedQuests[_i4].id;
-    var _flags = s.quests.activeQuests[_i4].flags;
-    var _msId = s.quests.finishedQuestsMS[_i4].id;
+  for (var _i5 = 0; _i5 < s.quests.finishedQuests.length; _i5++) {
+    var _qId = s.quests.finishedQuests[_i5].id;
+    var _flags = s.quests.activeQuests[_i5].flags;
+    var _msId = s.quests.finishedQuestsMS[_i5].id;
     var _quest = window.gm.questDef[_qId];
 
     var _mile = _quest.getMileById(_msId);
@@ -9062,43 +9417,43 @@ window.gm.printBodyDescription = function (whom) {
     // filter by visibility 
     var covered = [];
 
-    var _iterator29 = _createForOfIteratorHelper(wornIds),
-        _step29;
+    var _iterator31 = _createForOfIteratorHelper(wornIds),
+        _step31;
 
     try {
-      for (_iterator29.s(); !(_step29 = _iterator29.n()).done;) {
-        el = _step29.value;
+      for (_iterator31.s(); !(_step31 = _iterator31.n()).done;) {
+        el = _step31.value;
         //notice that an item is only pushed once even if has multiple slots
         var item = whom.Outfit.getItem(el);
         covered = covered.concat(item.slotCover);
       }
     } catch (err) {
-      _iterator29.e(err);
+      _iterator31.e(err);
     } finally {
-      _iterator29.f();
+      _iterator31.f();
     }
 
-    var _iterator30 = _createForOfIteratorHelper(covered),
-        _step30;
+    var _iterator32 = _createForOfIteratorHelper(covered),
+        _step32;
 
     try {
-      for (_iterator30.s(); !(_step30 = _iterator30.n()).done;) {
-        el = _step30.value;
+      for (_iterator32.s(); !(_step32 = _iterator32.n()).done;) {
+        el = _step32.value;
         if (!fcovered.includes(el)) fcovered.push(el);
       }
     } catch (err) {
-      _iterator30.e(err);
+      _iterator32.e(err);
     } finally {
-      _iterator30.f();
+      _iterator32.f();
     }
   }
 
-  var _iterator31 = _createForOfIteratorHelper(wornIds),
-      _step31;
+  var _iterator33 = _createForOfIteratorHelper(wornIds),
+      _step33;
 
   try {
-    for (_iterator31.s(); !(_step31 = _iterator31.n()).done;) {
-      el = _step31.value;
+    for (_iterator33.s(); !(_step33 = _iterator33.n()).done;) {
+      el = _step33.value;
 
       //notice that an item is only pushed once even if has multiple slots
       var _item2 = whom.Outfit.getItem(el);
@@ -9126,26 +9481,26 @@ window.gm.printBodyDescription = function (whom) {
     } //null is used to mark linebreaks
 
   } catch (err) {
-    _iterator31.e(err);
+    _iterator33.e(err);
   } finally {
-    _iterator31.f();
+    _iterator33.f();
   }
 
   var all = base.concat([null]).concat(head).concat([null]).concat(torso).concat([null]).concat(arms).concat([null]);
   all = all.concat(legs).concat([null]).concat(groin).concat([null]).concat(breast).concat([null]).concat(other);
 
-  var _iterator32 = _createForOfIteratorHelper(all),
-      _step32;
+  var _iterator34 = _createForOfIteratorHelper(all),
+      _step34;
 
   try {
-    for (_iterator32.s(); !(_step32 = _iterator32.n()).done;) {
-      el = _step32.value;
+    for (_iterator34.s(); !(_step34 = _iterator34.n()).done;) {
+      el = _step34.value;
       msg += el !== null ? el.descLong(conv) + ' ' : '</br>';
     }
   } catch (err) {
-    _iterator32.e(err);
+    _iterator34.e(err);
   } finally {
-    _iterator32.f();
+    _iterator34.f();
   }
 
   return msg + "</br>";
@@ -9221,8 +9576,8 @@ window.gm.util.descFixer = function (whom) {
         }
       }
 
-      for (var _i5 = 0, _repl = repl; _i5 < _repl.length; _i5++) {
-        el = _repl[_i5];
+      for (var _i6 = 0, _repl = repl; _i6 < _repl.length; _i6++) {
+        el = _repl[_i6];
         //replace bracket+bracketcontent,
         el.new = window.gm.util.lookupWord(el.text, pron);
 
@@ -9328,12 +9683,12 @@ window.gm.util.lookupWord = function (word, pron) {
 var LighterDad = /*#__PURE__*/function (_Item2) {
   _inherits(LighterDad, _Item2);
 
-  var _super21 = _createSuper(LighterDad);
+  var _super22 = _createSuper(LighterDad);
 
   function LighterDad() {
     _classCallCheck(this, LighterDad);
 
-    return _super21.call(this, 'LighterDad');
+    return _super22.call(this, 'LighterDad');
   }
 
   _createClass(LighterDad, [{
@@ -9361,12 +9716,12 @@ var LighterDad = /*#__PURE__*/function (_Item2) {
 var Money = /*#__PURE__*/function (_Item3) {
   _inherits(Money, _Item3);
 
-  var _super22 = _createSuper(Money);
+  var _super23 = _createSuper(Money);
 
   function Money() {
     _classCallCheck(this, Money);
 
-    return _super22.call(this, 'Money');
+    return _super23.call(this, 'Money');
   }
 
   _createClass(Money, [{
@@ -9394,12 +9749,12 @@ var Money = /*#__PURE__*/function (_Item3) {
 var LaptopPS = /*#__PURE__*/function (_Item4) {
   _inherits(LaptopPS, _Item4);
 
-  var _super23 = _createSuper(LaptopPS);
+  var _super24 = _createSuper(LaptopPS);
 
   function LaptopPS() {
     _classCallCheck(this, LaptopPS);
 
-    return _super23.call(this, 'LaptopPS');
+    return _super24.call(this, 'LaptopPS');
   }
 
   _createClass(LaptopPS, [{
@@ -9427,12 +9782,12 @@ var LaptopPS = /*#__PURE__*/function (_Item4) {
 var Dildo_small = /*#__PURE__*/function (_Item5) {
   _inherits(Dildo_small, _Item5);
 
-  var _super24 = _createSuper(Dildo_small);
+  var _super25 = _createSuper(Dildo_small);
 
   function Dildo_small() {
     _classCallCheck(this, Dildo_small);
 
-    return _super24.call(this, 'Dildo_small');
+    return _super25.call(this, 'Dildo_small');
   }
 
   _createClass(Dildo_small, [{
@@ -9458,12 +9813,12 @@ var Dildo_small = /*#__PURE__*/function (_Item5) {
 var Lube = /*#__PURE__*/function (_Item6) {
   _inherits(Lube, _Item6);
 
-  var _super25 = _createSuper(Lube);
+  var _super26 = _createSuper(Lube);
 
   function Lube() {
     _classCallCheck(this, Lube);
 
-    return _super25.call(this, 'Lube');
+    return _super26.call(this, 'Lube');
   }
 
   _createClass(Lube, [{
@@ -9489,12 +9844,12 @@ var Lube = /*#__PURE__*/function (_Item6) {
 var Battery = /*#__PURE__*/function (_Item7) {
   _inherits(Battery, _Item7);
 
-  var _super26 = _createSuper(Battery);
+  var _super27 = _createSuper(Battery);
 
   function Battery() {
     _classCallCheck(this, Battery);
 
-    return _super26.call(this, 'Battery');
+    return _super27.call(this, 'Battery');
   }
 
   _createClass(Battery, [{
@@ -9520,16 +9875,16 @@ var Battery = /*#__PURE__*/function (_Item7) {
 var Ingredient = /*#__PURE__*/function (_Item8) {
   _inherits(Ingredient, _Item8);
 
-  var _super27 = _createSuper(Ingredient);
+  var _super28 = _createSuper(Ingredient);
 
   function Ingredient() {
-    var _this20;
+    var _this21;
 
     _classCallCheck(this, Ingredient);
 
-    _this20 = _super27.call(this, 'Ingredient');
-    _this20.lossOnRespawn = true;
-    return _this20;
+    _this21 = _super28.call(this, 'Ingredient');
+    _this21.lossOnRespawn = true;
+    return _this21;
   }
 
   _createClass(Ingredient, [{
@@ -9590,12 +9945,12 @@ var Ingredient = /*#__PURE__*/function (_Item8) {
 var FlashBang = /*#__PURE__*/function (_Item9) {
   _inherits(FlashBang, _Item9);
 
-  var _super28 = _createSuper(FlashBang);
+  var _super29 = _createSuper(FlashBang);
 
   function FlashBang() {
     _classCallCheck(this, FlashBang);
 
-    return _super28.call(this, 'FlashBang');
+    return _super29.call(this, 'FlashBang');
   }
 
   _createClass(FlashBang, [{
@@ -9652,12 +10007,12 @@ var FlashBang = /*#__PURE__*/function (_Item9) {
 
           result.msg = context.parent.name + ' uses ' + this.name + '.';
 
-          var _iterator33 = _createForOfIteratorHelper(on),
-              _step33;
+          var _iterator35 = _createForOfIteratorHelper(on),
+              _step35;
 
           try {
-            for (_iterator33.s(); !(_step33 = _iterator33.n()).done;) {
-              var _targ = _step33.value;
+            for (_iterator35.s(); !(_step35 = _iterator35.n()).done;) {
+              var _targ = _step35.value;
 
               _targ.addEffect(effStunned.id, new effStunned()); //todo should 'FlashBang:Stunned' merge with other stunned? 
 
@@ -9665,9 +10020,9 @@ var FlashBang = /*#__PURE__*/function (_Item9) {
               result.msg += _targ.name + ' got stunned. ';
             }
           } catch (err) {
-            _iterator33.e(err);
+            _iterator35.e(err);
           } finally {
-            _iterator33.f();
+            _iterator35.f();
           }
 
           result.OK = true;
@@ -9695,12 +10050,12 @@ var FlashBang = /*#__PURE__*/function (_Item9) {
 var CanOfCoffee = /*#__PURE__*/function (_Item10) {
   _inherits(CanOfCoffee, _Item10);
 
-  var _super29 = _createSuper(CanOfCoffee);
+  var _super30 = _createSuper(CanOfCoffee);
 
   function CanOfCoffee() {
     _classCallCheck(this, CanOfCoffee);
 
-    return _super29.call(this, 'CanOfCoffee');
+    return _super30.call(this, 'CanOfCoffee');
   }
 
   _createClass(CanOfCoffee, [{
@@ -9752,12 +10107,12 @@ var CanOfCoffee = /*#__PURE__*/function (_Item10) {
 var SimpleFood = /*#__PURE__*/function (_Item11) {
   _inherits(SimpleFood, _Item11);
 
-  var _super30 = _createSuper(SimpleFood);
+  var _super31 = _createSuper(SimpleFood);
 
   function SimpleFood() {
     _classCallCheck(this, SimpleFood);
 
-    return _super30.call(this, 'SimpleFood');
+    return _super31.call(this, 'SimpleFood');
   }
 
   _createClass(SimpleFood, [{
@@ -9811,7 +10166,7 @@ var SimpleFood = /*#__PURE__*/function (_Item11) {
 var HealthPotion = /*#__PURE__*/function (_Item12) {
   _inherits(HealthPotion, _Item12);
 
-  var _super31 = _createSuper(HealthPotion);
+  var _super32 = _createSuper(HealthPotion);
 
   _createClass(HealthPotion, null, [{
     key: "lookupId",
@@ -9838,15 +10193,15 @@ var HealthPotion = /*#__PURE__*/function (_Item12) {
   }]);
 
   function HealthPotion() {
-    var _this21;
+    var _this22;
 
     _classCallCheck(this, HealthPotion);
 
-    _this21 = _super31.call(this, 'HealthPotion');
+    _this22 = _super32.call(this, 'HealthPotion');
 
-    _this21.changeId('HealthPotion');
+    _this22.changeId('HealthPotion');
 
-    return _this21;
+    return _this22;
   }
 
   _createClass(HealthPotion, [{
@@ -9907,7 +10262,7 @@ var HealthPotion = /*#__PURE__*/function (_Item12) {
 var HorsePotion = /*#__PURE__*/function (_Item13) {
   _inherits(HorsePotion, _Item13);
 
-  var _super32 = _createSuper(HorsePotion);
+  var _super33 = _createSuper(HorsePotion);
 
   _createClass(HorsePotion, null, [{
     key: "lookupId",
@@ -9930,15 +10285,15 @@ var HorsePotion = /*#__PURE__*/function (_Item13) {
   }]);
 
   function HorsePotion() {
-    var _this22;
+    var _this23;
 
     _classCallCheck(this, HorsePotion);
 
-    _this22 = _super32.call(this, 'HorsePotion');
+    _this23 = _super33.call(this, 'HorsePotion');
 
-    _this22.changeId('HorsePotion');
+    _this23.changeId('HorsePotion');
 
-    return _this22;
+    return _this23;
   }
 
   _createClass(HorsePotion, [{
@@ -10111,20 +10466,20 @@ window.gm.ItemsLib = function (ItemsLib) {
 var Mole = /*#__PURE__*/function (_Mob) {
   _inherits(Mole, _Mob);
 
-  var _super33 = _createSuper(Mole);
+  var _super34 = _createSuper(Mole);
 
   function Mole() {
-    var _this23;
+    var _this24;
 
     _classCallCheck(this, Mole);
 
-    _this23 = _super33.call(this);
-    _this23.name = _this23.id = 'Mole';
-    _this23.pic = 'assets/mole.jpg';
+    _this24 = _super34.call(this);
+    _this24.name = _this24.id = 'Mole';
+    _this24.pic = 'assets/mole.jpg';
 
-    _this23.Stats.increment('healthMax', -1 * (_this23.health().max - 20));
+    _this24.Stats.increment('healthMax', -1 * (_this24.health().max - 20));
 
-    return _this23;
+    return _this24;
   }
 
   return Mole;
@@ -10135,31 +10490,31 @@ var Mole = /*#__PURE__*/function (_Mob) {
 var Wolf = /*#__PURE__*/function (_Mob2) {
   _inherits(Wolf, _Mob2);
 
-  var _super34 = _createSuper(Wolf);
+  var _super35 = _createSuper(Wolf);
 
   function Wolf() {
-    var _this24;
+    var _this25;
 
     _classCallCheck(this, Wolf);
 
-    _this24 = _super34.call(this);
-    _this24.name = _this24.id = 'Wolf';
-    _this24.pic = 'assets/bw_wolf1.png';
-    _this24.level_min = 3;
+    _this25 = _super35.call(this);
+    _this25.name = _this25.id = 'Wolf';
+    _this25.pic = 'assets/bw_wolf1.png';
+    _this25.level_min = 3;
 
-    _this24.Outfit.addItem(new BaseQuadruped());
+    _this25.Outfit.addItem(new BaseQuadruped());
 
-    _this24.Outfit.addItem(SkinFur.factory('wolf', 'black'));
+    _this25.Outfit.addItem(SkinFur.factory('wolf', 'black'));
 
-    _this24.Outfit.addItem(HandsPaw.factory('wolf'));
+    _this25.Outfit.addItem(HandsPaw.factory('wolf'));
 
-    _this24.Outfit.addItem(TailWolf.factory('wolf'));
+    _this25.Outfit.addItem(TailWolf.factory('wolf'));
 
-    _this24.Outfit.addItem(FaceWolf.factory('wolf'));
+    _this25.Outfit.addItem(FaceWolf.factory('wolf'));
 
-    _this24.fconv = null; //lazy init because descfixer depends on gm.player
+    _this25.fconv = null; //lazy init because descfixer depends on gm.player
 
-    return _this24;
+    return _this25;
   }
 
   _createClass(Wolf, [{
@@ -10195,29 +10550,29 @@ var Wolf = /*#__PURE__*/function (_Mob2) {
 var Leech = /*#__PURE__*/function (_Mob3) {
   _inherits(Leech, _Mob3);
 
-  var _super35 = _createSuper(Leech);
+  var _super36 = _createSuper(Leech);
 
   function Leech() {
-    var _this25;
+    var _this26;
 
     _classCallCheck(this, Leech);
 
-    _this25 = _super35.call(this);
-    _this25.name = _this25.id = 'Leech';
-    _this25.pic = 'assets/Leech.png'; //todo
+    _this26 = _super36.call(this);
+    _this26.name = _this26.id = 'Leech';
+    _this26.pic = 'assets/Leech.png'; //todo
 
-    _this25.level_min = 1;
+    _this26.level_min = 1;
 
-    _this25.Outfit.addItem(new BaseQuadruped());
+    _this26.Outfit.addItem(new BaseQuadruped());
 
-    _this25.Skills.addItem(new SkillLeechHealth());
+    _this26.Skills.addItem(new SkillLeechHealth());
 
-    _this25.tmp = {
+    _this26.tmp = {
       grappleCoolDown: 1
     };
-    _this25.fconv = null; //lazy init because descfixer depends on gm.player
+    _this26.fconv = null; //lazy init because descfixer depends on gm.player
 
-    return _this25;
+    return _this26;
   }
 
   _createClass(Leech, [{
@@ -10260,17 +10615,17 @@ var Leech = /*#__PURE__*/function (_Mob3) {
 var Mechanic = /*#__PURE__*/function (_Mob4) {
   _inherits(Mechanic, _Mob4);
 
-  var _super36 = _createSuper(Mechanic);
+  var _super37 = _createSuper(Mechanic);
 
   function Mechanic() {
-    var _this26;
+    var _this27;
 
     _classCallCheck(this, Mechanic);
 
-    _this26 = _super36.call(this);
-    _this26.name = _this26.id = 'Mechanic-Guy';
-    _this26.pic = 'assets/mechanic.jpg';
-    return _this26;
+    _this27 = _super37.call(this);
+    _this27.name = _this27.id = 'Mechanic-Guy';
+    _this27.pic = 'assets/mechanic.jpg';
+    return _this27;
   }
 
   _createClass(Mechanic, [{
@@ -10306,54 +10661,28 @@ var Mechanic = /*#__PURE__*/function (_Mob4) {
 var Carlia = /*#__PURE__*/function (_Mob5) {
   _inherits(Carlia, _Mob5);
 
-  var _super37 = _createSuper(Carlia);
+  var _super38 = _createSuper(Carlia);
 
   function Carlia() {
-    var _this27;
+    var _this28;
 
     _classCallCheck(this, Carlia);
 
-    _this27 = _super37.call(this);
-    _this27.name = _this27.id = 'Carlia';
-    _this27.pic = 'assets/mole.jpg';
-
-    _this27.Outfit.addItem(new BaseHumanoid());
-
-    _this27.Outfit.addItem(new SkinHuman());
-
-    _this27.Outfit.addItem(HandsHuman.factory('cat'));
-
-    _this27.Outfit.addItem(FaceWolf.factory('cat'));
-
-    _this27.Outfit.addItem(new VulvaHuman());
-
-    _this27.Outfit.addItem(new BikiniBottomLeather());
-
-    _this27.levelUp(3);
-
-    _this27.autoLeveling();
-
-    return _this27;
-  }
-
-  return Carlia;
-}(Mob);
-
-var Ruff = /*#__PURE__*/function (_Wolf) {
-  _inherits(Ruff, _Wolf);
-
-  var _super38 = _createSuper(Ruff);
-
-  function Ruff() {
-    var _this28;
-
-    _classCallCheck(this, Ruff);
-
     _this28 = _super38.call(this);
-    _this28.name = _this28.id = 'Ruff';
-    _this28.pic = 'assets/bw_wolf1.png';
+    _this28.name = _this28.id = 'Carlia';
+    _this28.pic = 'assets/mole.jpg';
 
-    _this28.Outfit.addItem(PenisHuman.factory('wolf'));
+    _this28.Outfit.addItem(new BaseHumanoid());
+
+    _this28.Outfit.addItem(new SkinHuman());
+
+    _this28.Outfit.addItem(HandsHuman.factory('cat'));
+
+    _this28.Outfit.addItem(FaceWolf.factory('cat'));
+
+    _this28.Outfit.addItem(new VulvaHuman());
+
+    _this28.Outfit.addItem(new BikiniBottomLeather());
 
     _this28.levelUp(3);
 
@@ -10362,46 +10691,72 @@ var Ruff = /*#__PURE__*/function (_Wolf) {
     return _this28;
   }
 
+  return Carlia;
+}(Mob);
+
+var Ruff = /*#__PURE__*/function (_Wolf) {
+  _inherits(Ruff, _Wolf);
+
+  var _super39 = _createSuper(Ruff);
+
+  function Ruff() {
+    var _this29;
+
+    _classCallCheck(this, Ruff);
+
+    _this29 = _super39.call(this);
+    _this29.name = _this29.id = 'Ruff';
+    _this29.pic = 'assets/bw_wolf1.png';
+
+    _this29.Outfit.addItem(PenisHuman.factory('wolf'));
+
+    _this29.levelUp(3);
+
+    _this29.autoLeveling();
+
+    return _this29;
+  }
+
   return Ruff;
 }(Wolf);
 
 var Trent = /*#__PURE__*/function (_Mob6) {
   _inherits(Trent, _Mob6);
 
-  var _super39 = _createSuper(Trent);
+  var _super40 = _createSuper(Trent);
 
   function Trent() {
-    var _this29;
+    var _this30;
 
     _classCallCheck(this, Trent);
 
-    _this29 = _super39.call(this);
-    _this29.name = _this29.id = 'Trent';
-    _this29.pic = 'assets/mole.jpg';
+    _this30 = _super40.call(this);
+    _this30.name = _this30.id = 'Trent';
+    _this30.pic = 'assets/mole.jpg';
 
-    _this29.Outfit.addItem(new BaseHumanoid());
+    _this30.Outfit.addItem(new BaseHumanoid());
 
-    _this29.Outfit.addItem(SkinFur.factory('horse', 'brown'));
+    _this30.Outfit.addItem(SkinFur.factory('horse', 'brown'));
 
-    _this29.Outfit.addItem(HandsHuman.factory('horse'));
+    _this30.Outfit.addItem(HandsHuman.factory('horse'));
 
-    _this29.Outfit.addItem(TailWolf.factory('horse'));
+    _this30.Outfit.addItem(TailWolf.factory('horse'));
 
-    _this29.Outfit.addItem(FaceWolf.factory('horse'));
+    _this30.Outfit.addItem(FaceWolf.factory('horse'));
 
-    _this29.Outfit.addItem(PenisHuman.factory('horse'));
+    _this30.Outfit.addItem(PenisHuman.factory('horse'));
 
-    _this29.Outfit.addItem(new ShortsLeather());
+    _this30.Outfit.addItem(new ShortsLeather());
 
-    _this29.Outfit.addItem(new MaceSteel());
+    _this30.Outfit.addItem(new MaceSteel());
 
-    _this29.Stats.increment('strength', 3);
+    _this30.Stats.increment('strength', 3);
 
-    _this29.levelUp(6);
+    _this30.levelUp(6);
 
-    _this29.autoLeveling();
+    _this30.autoLeveling();
 
-    return _this29;
+    return _this30;
   }
 
   return Trent;
@@ -10433,17 +10788,17 @@ window.gm.Mobs = function (Mobs) {
 var Leggings = /*#__PURE__*/function (_Equipment15) {
   _inherits(Leggings, _Equipment15);
 
-  var _super40 = _createSuper(Leggings);
+  var _super41 = _createSuper(Leggings);
 
   function Leggings() {
-    var _this30;
+    var _this31;
 
     _classCallCheck(this, Leggings);
 
-    _this30 = _super40.call(this, 'Leggings');
-    _this30.tags = ['cloth'];
-    _this30.slotUse = ['Legs', 'Hips'];
-    return _this30;
+    _this31 = _super41.call(this, 'Leggings');
+    _this31.tags = ['cloth'];
+    _this31.slotUse = ['Legs', 'Hips'];
+    return _this31;
   }
 
   _createClass(Leggings, [{
@@ -10508,17 +10863,17 @@ var Leggings = /*#__PURE__*/function (_Equipment15) {
 var Jeans = /*#__PURE__*/function (_Equipment16) {
   _inherits(Jeans, _Equipment16);
 
-  var _super41 = _createSuper(Jeans);
+  var _super42 = _createSuper(Jeans);
 
   function Jeans() {
-    var _this31;
+    var _this32;
 
     _classCallCheck(this, Jeans);
 
-    _this31 = _super41.call(this, 'Jeans');
-    _this31.tags = ['cloth'];
-    _this31.slotUse = ['Legs', 'Hips'];
-    return _this31;
+    _this32 = _super42.call(this, 'Jeans');
+    _this32.tags = ['cloth'];
+    _this32.slotUse = ['Legs', 'Hips'];
+    return _this32;
   }
 
   _createClass(Jeans, [{
@@ -10560,17 +10915,17 @@ var Jeans = /*#__PURE__*/function (_Equipment16) {
 var Sneakers = /*#__PURE__*/function (_Equipment17) {
   _inherits(Sneakers, _Equipment17);
 
-  var _super42 = _createSuper(Sneakers);
+  var _super43 = _createSuper(Sneakers);
 
   function Sneakers() {
-    var _this32;
+    var _this33;
 
     _classCallCheck(this, Sneakers);
 
-    _this32 = _super42.call(this, 'Sneakers');
-    _this32.tags = ['cloth'];
-    _this32.slotUse = ['Feet'];
-    return _this32;
+    _this33 = _super43.call(this, 'Sneakers');
+    _this33.tags = ['cloth'];
+    _this33.slotUse = ['Feet'];
+    return _this33;
   }
 
   _createClass(Sneakers, [{
@@ -10612,17 +10967,17 @@ var Sneakers = /*#__PURE__*/function (_Equipment17) {
 var TankShirt = /*#__PURE__*/function (_Equipment18) {
   _inherits(TankShirt, _Equipment18);
 
-  var _super43 = _createSuper(TankShirt);
+  var _super44 = _createSuper(TankShirt);
 
   function TankShirt() {
-    var _this33;
+    var _this34;
 
     _classCallCheck(this, TankShirt);
 
-    _this33 = _super43.call(this, 'TankShirt');
-    _this33.tags = ['cloth'];
-    _this33.slotUse = ['Breast', 'Stomach'];
-    return _this33;
+    _this34 = _super44.call(this, 'TankShirt');
+    _this34.tags = ['cloth'];
+    _this34.slotUse = ['Breast', 'Stomach'];
+    return _this34;
   }
 
   _createClass(TankShirt, [{
@@ -10664,17 +11019,17 @@ var TankShirt = /*#__PURE__*/function (_Equipment18) {
 var Pullover = /*#__PURE__*/function (_Equipment19) {
   _inherits(Pullover, _Equipment19);
 
-  var _super44 = _createSuper(Pullover);
+  var _super45 = _createSuper(Pullover);
 
   function Pullover() {
-    var _this34;
+    var _this35;
 
     _classCallCheck(this, Pullover);
 
-    _this34 = _super44.call(this, 'Pullover');
-    _this34.tags = ['cloth'];
-    _this34.slotUse = ['Breast', 'Stomach', 'Arms'];
-    return _this34;
+    _this35 = _super45.call(this, 'Pullover');
+    _this35.tags = ['cloth'];
+    _this35.slotUse = ['Breast', 'Stomach', 'Arms'];
+    return _this35;
   }
 
   _createClass(Pullover, [{
@@ -10723,17 +11078,17 @@ var Pullover = /*#__PURE__*/function (_Equipment19) {
 var HandCuffs = /*#__PURE__*/function (_Equipment20) {
   _inherits(HandCuffs, _Equipment20);
 
-  var _super45 = _createSuper(HandCuffs);
+  var _super46 = _createSuper(HandCuffs);
 
   function HandCuffs() {
-    var _this35;
+    var _this36;
 
     _classCallCheck(this, HandCuffs);
 
-    _this35 = _super45.call(this, 'HandCuffs');
-    _this35.tags = ['restrain'];
-    _this35.slotUse = ['RHand', 'LHand', 'Wrists'];
-    return _this35;
+    _this36 = _super46.call(this, 'HandCuffs');
+    _this36.tags = ['restrain'];
+    _this36.slotUse = ['RHand', 'LHand', 'Wrists'];
+    return _this36;
   }
 
   _createClass(HandCuffs, [{
@@ -10802,18 +11157,18 @@ var HandCuffs = /*#__PURE__*/function (_Equipment20) {
 var WristCuffs = /*#__PURE__*/function (_Equipment21) {
   _inherits(WristCuffs, _Equipment21);
 
-  var _super46 = _createSuper(WristCuffs);
+  var _super47 = _createSuper(WristCuffs);
 
   function WristCuffs() {
-    var _this36;
+    var _this37;
 
     _classCallCheck(this, WristCuffs);
 
-    _this36 = _super46.call(this, 'WristCuffs');
-    _this36.tags = [];
-    _this36.slotUse = ['Wrists'];
-    _this36.lossOnRespawn = false;
-    return _this36;
+    _this37 = _super47.call(this, 'WristCuffs');
+    _this37.tags = [];
+    _this37.slotUse = ['Wrists'];
+    _this37.lossOnRespawn = false;
+    return _this37;
   }
 
   _createClass(WristCuffs, [{
@@ -10881,18 +11236,18 @@ var WristCuffs = /*#__PURE__*/function (_Equipment21) {
 var CollarQuest = /*#__PURE__*/function (_Equipment22) {
   _inherits(CollarQuest, _Equipment22);
 
-  var _super47 = _createSuper(CollarQuest);
+  var _super48 = _createSuper(CollarQuest);
 
   function CollarQuest() {
-    var _this37;
+    var _this38;
 
     _classCallCheck(this, CollarQuest);
 
-    _this37 = _super47.call(this, 'CollarQuest');
-    _this37.tags = [];
-    _this37.slotUse = ['Neck'];
-    _this37.lossOnRespawn = false;
-    return _this37;
+    _this38 = _super48.call(this, 'CollarQuest');
+    _this38.tags = [];
+    _this38.slotUse = ['Neck'];
+    _this38.lossOnRespawn = false;
+    return _this38;
   }
 
   _createClass(CollarQuest, [{
@@ -10960,19 +11315,19 @@ var CollarQuest = /*#__PURE__*/function (_Equipment22) {
 var ClitPiercing = /*#__PURE__*/function (_Equipment23) {
   _inherits(ClitPiercing, _Equipment23);
 
-  var _super48 = _createSuper(ClitPiercing);
+  var _super49 = _createSuper(ClitPiercing);
 
   function ClitPiercing() {
-    var _this38;
+    var _this39;
 
     _classCallCheck(this, ClitPiercing);
 
-    _this38 = _super48.call(this, 'ClitPiercing');
-    _this38.tags = ['piercing'];
-    _this38.slotUse = ['pClit'];
-    _this38.style = 0;
-    _this38.lossOnRespawn = true;
-    return _this38;
+    _this39 = _super49.call(this, 'ClitPiercing');
+    _this39.tags = ['piercing'];
+    _this39.slotUse = ['pClit'];
+    _this39.style = 0;
+    _this39.lossOnRespawn = true;
+    return _this39;
   }
 
   _createClass(ClitPiercing, [{
@@ -11037,18 +11392,18 @@ var ClitPiercing = /*#__PURE__*/function (_Equipment23) {
 var Crowbar = /*#__PURE__*/function (_Equipment24) {
   _inherits(Crowbar, _Equipment24);
 
-  var _super49 = _createSuper(Crowbar);
+  var _super50 = _createSuper(Crowbar);
 
   function Crowbar() {
-    var _this39;
+    var _this40;
 
     _classCallCheck(this, Crowbar);
 
-    _this39 = _super49.call(this, 'Crowbar');
-    _this39.tags = ['tool', 'weapon'];
-    _this39.slotUse = ['RHand'];
-    _this39.lossOnRespawn = true;
-    return _this39;
+    _this40 = _super50.call(this, 'Crowbar');
+    _this40.tags = ['tool', 'weapon'];
+    _this40.slotUse = ['RHand'];
+    _this40.lossOnRespawn = true;
+    return _this40;
   }
 
   _createClass(Crowbar, [{
@@ -11145,18 +11500,18 @@ var Crowbar = /*#__PURE__*/function (_Equipment24) {
 var Shovel = /*#__PURE__*/function (_Equipment25) {
   _inherits(Shovel, _Equipment25);
 
-  var _super50 = _createSuper(Shovel);
+  var _super51 = _createSuper(Shovel);
 
   function Shovel() {
-    var _this40;
+    var _this41;
 
     _classCallCheck(this, Shovel);
 
-    _this40 = _super50.call(this, 'Shovel');
-    _this40.tags = ['tool', 'weapon'];
-    _this40.slotUse = ['RHand', 'LHand'];
-    _this40.lossOnRespawn = true;
-    return _this40;
+    _this41 = _super51.call(this, 'Shovel');
+    _this41.tags = ['tool', 'weapon'];
+    _this41.slotUse = ['RHand', 'LHand'];
+    _this41.lossOnRespawn = true;
+    return _this41;
   }
 
   _createClass(Shovel, [{
@@ -11247,19 +11602,19 @@ var Shovel = /*#__PURE__*/function (_Equipment25) {
 var RobesZealot = /*#__PURE__*/function (_Equipment26) {
   _inherits(RobesZealot, _Equipment26);
 
-  var _super51 = _createSuper(RobesZealot);
+  var _super52 = _createSuper(RobesZealot);
 
   function RobesZealot() {
-    var _this41;
+    var _this42;
 
     _classCallCheck(this, RobesZealot);
 
-    _this41 = _super51.call(this, 'RobesZealot');
-    _this41.tags = ['cloth'];
-    _this41.slotUse = ['Breast', 'Stomach', 'Hips', 'Legs'];
-    _this41.slotCover = ['bBreast', 'uBreast', 'pNipples'];
-    _this41.lossOnRespawn = true;
-    return _this41;
+    _this42 = _super52.call(this, 'RobesZealot');
+    _this42.tags = ['cloth'];
+    _this42.slotUse = ['Breast', 'Stomach', 'Hips', 'Legs'];
+    _this42.slotCover = ['bBreast', 'uBreast', 'pNipples'];
+    _this42.lossOnRespawn = true;
+    return _this42;
   }
 
   _createClass(RobesZealot, [{
@@ -11301,19 +11656,19 @@ var RobesZealot = /*#__PURE__*/function (_Equipment26) {
 var Briefs = /*#__PURE__*/function (_Equipment27) {
   _inherits(Briefs, _Equipment27);
 
-  var _super52 = _createSuper(Briefs);
+  var _super53 = _createSuper(Briefs);
 
   function Briefs() {
-    var _this42;
+    var _this43;
 
     _classCallCheck(this, Briefs);
 
-    _this42 = _super52.call(this, 'Briefs');
-    _this42.tags = ['cloth'];
-    _this42.slotUse = ['uHips'];
-    _this42.slotCover = ['bPenis', 'bVulva', 'bBalls', 'bClit', 'bAnus', 'pPenis', 'pClit'];
-    _this42.lossOnRespawn = true;
-    return _this42;
+    _this43 = _super53.call(this, 'Briefs');
+    _this43.tags = ['cloth'];
+    _this43.slotUse = ['uHips'];
+    _this43.slotCover = ['bPenis', 'bVulva', 'bBalls', 'bClit', 'bAnus', 'pPenis', 'pClit'];
+    _this43.lossOnRespawn = true;
+    return _this43;
   }
 
   _createClass(Briefs, [{
@@ -11355,19 +11710,19 @@ var Briefs = /*#__PURE__*/function (_Equipment27) {
 var BikiniBottomLeather = /*#__PURE__*/function (_Equipment28) {
   _inherits(BikiniBottomLeather, _Equipment28);
 
-  var _super53 = _createSuper(BikiniBottomLeather);
+  var _super54 = _createSuper(BikiniBottomLeather);
 
   function BikiniBottomLeather() {
-    var _this43;
+    var _this44;
 
     _classCallCheck(this, BikiniBottomLeather);
 
-    _this43 = _super53.call(this, 'BikiniBottomLeather');
-    _this43.tags = ['cloth'];
-    _this43.slotUse = ['uHips'];
-    _this43.slotCover = ['bPenis', 'bVulva', 'bBalls', 'bClit', 'bAnus', 'pPenis', 'pClit'];
-    _this43.lossOnRespawn = true;
-    return _this43;
+    _this44 = _super54.call(this, 'BikiniBottomLeather');
+    _this44.tags = ['cloth'];
+    _this44.slotUse = ['uHips'];
+    _this44.slotCover = ['bPenis', 'bVulva', 'bBalls', 'bClit', 'bAnus', 'pPenis', 'pClit'];
+    _this44.lossOnRespawn = true;
+    return _this44;
   }
 
   _createClass(BikiniBottomLeather, [{
@@ -11409,19 +11764,19 @@ var BikiniBottomLeather = /*#__PURE__*/function (_Equipment28) {
 var ShortsLeather = /*#__PURE__*/function (_Equipment29) {
   _inherits(ShortsLeather, _Equipment29);
 
-  var _super54 = _createSuper(ShortsLeather);
+  var _super55 = _createSuper(ShortsLeather);
 
   function ShortsLeather() {
-    var _this44;
+    var _this45;
 
     _classCallCheck(this, ShortsLeather);
 
-    _this44 = _super54.call(this, 'ShortsLeather');
-    _this44.tags = ['cloth'];
-    _this44.slotUse = ['Hips', 'Legs'];
-    _this44.slotCover = ['bPenis', 'bVulva', 'bBalls', 'bClit', 'bAnus', 'pPenis', 'pClit'];
-    _this44.lossOnRespawn = true;
-    return _this44;
+    _this45 = _super55.call(this, 'ShortsLeather');
+    _this45.tags = ['cloth'];
+    _this45.slotUse = ['Hips', 'Legs'];
+    _this45.slotCover = ['bPenis', 'bVulva', 'bBalls', 'bClit', 'bAnus', 'pPenis', 'pClit'];
+    _this45.lossOnRespawn = true;
+    return _this45;
   }
 
   _createClass(ShortsLeather, [{
@@ -11464,19 +11819,19 @@ var ShortsLeather = /*#__PURE__*/function (_Equipment29) {
 var StaffWodden = /*#__PURE__*/function (_Equipment30) {
   _inherits(StaffWodden, _Equipment30);
 
-  var _super55 = _createSuper(StaffWodden);
+  var _super56 = _createSuper(StaffWodden);
 
   function StaffWodden() {
-    var _this45;
+    var _this46;
 
     _classCallCheck(this, StaffWodden);
 
-    _this45 = _super55.call(this, 'StaffWodden');
-    _this45.tags = ['weapon'];
-    _this45.slotUse = ['RHand', 'LHand'];
-    _this45.lossOnRespawn = true;
-    _this45.pDamage = 5;
-    return _this45;
+    _this46 = _super56.call(this, 'StaffWodden');
+    _this46.tags = ['weapon'];
+    _this46.slotUse = ['RHand', 'LHand'];
+    _this46.lossOnRespawn = true;
+    _this46.pDamage = 5;
+    return _this46;
   }
 
   _createClass(StaffWodden, [{
@@ -11562,24 +11917,24 @@ var StaffWodden = /*#__PURE__*/function (_Equipment30) {
 var MaceSteel = /*#__PURE__*/function (_Equipment31) {
   _inherits(MaceSteel, _Equipment31);
 
-  var _super56 = _createSuper(MaceSteel);
+  var _super57 = _createSuper(MaceSteel);
 
   function MaceSteel() {
-    var _this46;
+    var _this47;
 
     _classCallCheck(this, MaceSteel);
 
-    _this46 = _super56.call(this, 'MaceSteel');
-    _this46.tags = ['weapon'];
-    _this46.slotUse = ['RHand'];
-    _this46.lossOnRespawn = true;
-    _this46.pDamage = 15;
+    _this47 = _super57.call(this, 'MaceSteel');
+    _this47.tags = ['weapon'];
+    _this47.slotUse = ['RHand'];
+    _this47.lossOnRespawn = true;
+    _this47.pDamage = 15;
     /*this.attack = window.gm.combat.AttackSetup();
     let dmg = {target:"defender", effect:"effDamage", value: 10};
     let stun = {target:"defender", effect:"effStun", value: 10};
     this.attack.apply = [{cond:100, apply:dmg},{cond:50,apply:stun}]; */
 
-    return _this46;
+    return _this47;
   }
 
   _createClass(MaceSteel, [{
@@ -11632,7 +11987,6 @@ var MaceSteel = /*#__PURE__*/function (_Equipment31) {
   }, {
     key: "onEquip",
     value: function onEquip(context) {
-      MaceSteel;
       return {
         OK: true,
         msg: 'equipped'
@@ -11664,17 +12018,17 @@ var MaceSteel = /*#__PURE__*/function (_Equipment31) {
 var TailRibbon = /*#__PURE__*/function (_Equipment32) {
   _inherits(TailRibbon, _Equipment32);
 
-  var _super57 = _createSuper(TailRibbon);
+  var _super58 = _createSuper(TailRibbon);
 
   function TailRibbon() {
-    var _this47;
+    var _this48;
 
     _classCallCheck(this, TailRibbon);
 
-    _this47 = _super57.call(this, 'TailRibbon');
-    _this47.tags = ['cloth'];
-    _this47.slotUse = ['TailTip'];
-    return _this47;
+    _this48 = _super58.call(this, 'TailRibbon');
+    _this48.tags = ['cloth'];
+    _this48.slotUse = ['TailTip'];
+    return _this48;
   }
 
   _createClass(TailRibbon, [{
@@ -12148,16 +12502,16 @@ var Job = /*#__PURE__*/function () {
 var SkillInspect = /*#__PURE__*/function (_Skill) {
   _inherits(SkillInspect, _Skill);
 
-  var _super58 = _createSuper(SkillInspect);
+  var _super59 = _createSuper(SkillInspect);
 
   function SkillInspect() {
-    var _this48;
+    var _this49;
 
     _classCallCheck(this, SkillInspect);
 
-    _this48 = _super58.call(this, "Inspect");
-    _this48.msg = '';
-    return _this48;
+    _this49 = _super59.call(this, "Inspect");
+    _this49.msg = '';
+    return _this49;
   }
 
   _createClass(SkillInspect, [{
@@ -12210,16 +12564,16 @@ var SkillInspect = /*#__PURE__*/function (_Skill) {
 var SkillAttack = /*#__PURE__*/function (_Skill2) {
   _inherits(SkillAttack, _Skill2);
 
-  var _super59 = _createSuper(SkillAttack);
+  var _super60 = _createSuper(SkillAttack);
 
   function SkillAttack() {
-    var _this49;
+    var _this50;
 
     _classCallCheck(this, SkillAttack);
 
-    _this49 = _super59.call(this, "Attack");
-    _this49.msg = '';
-    return _this49;
+    _this50 = _super60.call(this, "Attack");
+    _this50.msg = '';
+    return _this50;
   }
 
   _createClass(SkillAttack, [{
@@ -12244,12 +12598,12 @@ var SkillAttack = /*#__PURE__*/function (_Skill2) {
       if (this.isValidTarget(targets)) {
         result.OK = true;
 
-        var _iterator34 = _createForOfIteratorHelper(targets),
-            _step34;
+        var _iterator36 = _createForOfIteratorHelper(targets),
+            _step36;
 
         try {
-          for (_iterator34.s(); !(_step34 = _iterator34.n()).done;) {
-            var target = _step34.value;
+          for (_iterator36.s(); !(_step36 = _iterator36.n()).done;) {
+            var target = _step36.value;
 
             var attack = this.__estimateAttack();
 
@@ -12258,9 +12612,9 @@ var SkillAttack = /*#__PURE__*/function (_Skill2) {
             result.effects = result.effects.concat(attack.effects);
           }
         } catch (err) {
-          _iterator34.e(err);
+          _iterator36.e(err);
         } finally {
-          _iterator34.f();
+          _iterator36.f();
         }
       }
 
@@ -12351,16 +12705,16 @@ var SkillAttack = /*#__PURE__*/function (_Skill2) {
 var SkillBite = /*#__PURE__*/function (_SkillAttack) {
   _inherits(SkillBite, _SkillAttack);
 
-  var _super60 = _createSuper(SkillBite);
+  var _super61 = _createSuper(SkillBite);
 
   function SkillBite() {
-    var _this50;
+    var _this51;
 
     _classCallCheck(this, SkillBite);
 
-    _this50 = _super60.call(this, 'Bite');
-    _this50.msg = '';
-    return _this50;
+    _this51 = _super61.call(this, 'Bite');
+    _this51.msg = '';
+    return _this51;
   }
 
   _createClass(SkillBite, [{
@@ -12402,16 +12756,16 @@ var SkillBite = /*#__PURE__*/function (_SkillAttack) {
 var SkillChainLightning = /*#__PURE__*/function (_Skill3) {
   _inherits(SkillChainLightning, _Skill3);
 
-  var _super61 = _createSuper(SkillChainLightning);
+  var _super62 = _createSuper(SkillChainLightning);
 
   function SkillChainLightning() {
-    var _this51;
+    var _this52;
 
     _classCallCheck(this, SkillChainLightning);
 
-    _this51 = _super61.call(this, 'ChainLightning');
-    _this51.msg = '';
-    return _this51;
+    _this52 = _super62.call(this, 'ChainLightning');
+    _this52.msg = '';
+    return _this52;
   }
 
   _createClass(SkillChainLightning, [{
@@ -12435,23 +12789,30 @@ var SkillChainLightning = /*#__PURE__*/function (_Skill3) {
 
       if (this.isValidTarget(targets)) {
         result.OK = true;
+        var target = targets[0];
+        var attack = window.gm.combat.defaultAttackData(); // attack.effects.push(effDamage.setup(15,'spark'))
+        //calc hit-chance
+        //cause spark-dmg
+        //chance to hit secondary target
 
-        var _iterator35 = _createForOfIteratorHelper(targets),
-            _step35;
+        var secTarget = window.story.state.combat.playerParty.concat(window.story.state.combat.enemyParty);
+        secTarget = this.targetFilterEnemy(this.targetFilterAlive(secTarget));
+        var secTarget2 = [];
 
-        try {
-          for (_iterator35.s(); !(_step35 = _iterator35.n()).done;) {
-            var target = _step35.value;
-            var attack = window.gm.combat.defaultAttackData();
-            var result2 = window.gm.combat.calcTeaseAttack(this.caster, target, attack);
-            this.msg += result2.msg;
-            result.effects = result.effects.concat(attack.effects);
+        while (secTarget.length > _i) {
+          var target2 = secTarget.pop()[0]; //[[mob1]]
+
+          if (target2 !== target) {
+            secTarget2.push(target2);
           }
-        } catch (err) {
-          _iterator35.e(err);
-        } finally {
-          _iterator35.f();
-        }
+
+          if (secTarget2.length >= 2) break;
+        } //spark-dmg to secondary target
+
+
+        var result2 = window.gm.combat.calcTeaseAttack(this.caster, target, attack);
+        this.msg += result2.msg;
+        result.effects = result.effects.concat(attack.effects);
       }
 
       return result;
@@ -12479,17 +12840,17 @@ var SkillChainLightning = /*#__PURE__*/function (_Skill3) {
 var SkillTease = /*#__PURE__*/function (_Skill4) {
   _inherits(SkillTease, _Skill4);
 
-  var _super62 = _createSuper(SkillTease);
+  var _super63 = _createSuper(SkillTease);
 
   //execute simple attack with active weapon
   function SkillTease() {
-    var _this52;
+    var _this53;
 
     _classCallCheck(this, SkillTease);
 
-    _this52 = _super62.call(this, "Tease");
-    _this52.msg = '';
-    return _this52;
+    _this53 = _super63.call(this, "Tease");
+    _this53.msg = '';
+    return _this53;
   }
 
   _createClass(SkillTease, [{
@@ -12514,21 +12875,21 @@ var SkillTease = /*#__PURE__*/function (_Skill4) {
       if (this.isValidTarget(targets)) {
         result.OK = true;
 
-        var _iterator36 = _createForOfIteratorHelper(targets),
-            _step36;
+        var _iterator37 = _createForOfIteratorHelper(targets),
+            _step37;
 
         try {
-          for (_iterator36.s(); !(_step36 = _iterator36.n()).done;) {
-            var target = _step36.value;
+          for (_iterator37.s(); !(_step37 = _iterator37.n()).done;) {
+            var target = _step37.value;
             var attack = window.gm.combat.defaultAttackData();
             var result2 = window.gm.combat.calcTeaseAttack(this.caster, target, attack);
             this.msg += result2.msg;
             result.effects = result.effects.concat(attack.effects);
           }
         } catch (err) {
-          _iterator36.e(err);
+          _iterator37.e(err);
         } finally {
-          _iterator36.f();
+          _iterator37.f();
         }
       }
 
@@ -12552,13 +12913,13 @@ var SkillTease = /*#__PURE__*/function (_Skill4) {
 var SkillStun = /*#__PURE__*/function (_Skill5) {
   _inherits(SkillStun, _Skill5);
 
-  var _super63 = _createSuper(SkillStun);
+  var _super64 = _createSuper(SkillStun);
 
   //execute stun attack
   function SkillStun() {
     _classCallCheck(this, SkillStun);
 
-    return _super63.call(this, "Stun");
+    return _super64.call(this, "Stun");
   }
 
   _createClass(SkillStun, [{
@@ -12574,19 +12935,19 @@ var SkillStun = /*#__PURE__*/function (_Skill5) {
       var multi = [];
       multi.name = "all";
 
-      var _iterator37 = _createForOfIteratorHelper(possibletarget),
-          _step37;
+      var _iterator38 = _createForOfIteratorHelper(possibletarget),
+          _step38;
 
       try {
-        for (_iterator37.s(); !(_step37 = _iterator37.n()).done;) {
-          var el = _step37.value;
+        for (_iterator38.s(); !(_step38 = _iterator38.n()).done;) {
+          var el = _step38.value;
           if (el.length === 1) //dont stack multi-targets
             multi.push(el[0]);
         }
       } catch (err) {
-        _iterator37.e(err);
+        _iterator38.e(err);
       } finally {
-        _iterator37.f();
+        _iterator38.f();
       }
 
       if (multi.length > 1) possibletarget.push(multi); //if there is only [[mole]] we dont want [[mole],[mole]]
@@ -12604,21 +12965,21 @@ var SkillStun = /*#__PURE__*/function (_Skill5) {
       if (this.isValidTarget(targets)) {
         result.OK = true;
 
-        var _iterator38 = _createForOfIteratorHelper(targets),
-            _step38;
+        var _iterator39 = _createForOfIteratorHelper(targets),
+            _step39;
 
         try {
-          for (_iterator38.s(); !(_step38 = _iterator38.n()).done;) {
-            var target = _step38.value;
+          for (_iterator39.s(); !(_step39 = _iterator39.n()).done;) {
+            var target = _step39.value;
             result.effects.push({
               target: target,
               eff: [new effStunned()]
             });
           }
         } catch (err) {
-          _iterator38.e(err);
+          _iterator39.e(err);
         } finally {
-          _iterator38.f();
+          _iterator39.f();
         }
       }
 
@@ -12648,12 +13009,12 @@ var SkillStun = /*#__PURE__*/function (_Skill5) {
 var SkillPoisonCloud = /*#__PURE__*/function (_Skill6) {
   _inherits(SkillPoisonCloud, _Skill6);
 
-  var _super64 = _createSuper(SkillPoisonCloud);
+  var _super65 = _createSuper(SkillPoisonCloud);
 
   function SkillPoisonCloud() {
     _classCallCheck(this, SkillPoisonCloud);
 
-    return _super64.call(this, "PoisonCloud");
+    return _super65.call(this, "PoisonCloud");
   }
 
   _createClass(SkillPoisonCloud, [{
@@ -12677,21 +13038,21 @@ var SkillPoisonCloud = /*#__PURE__*/function (_Skill6) {
       if (this.isValidTarget(targets)) {
         result.OK = true;
 
-        var _iterator39 = _createForOfIteratorHelper(targets),
-            _step39;
+        var _iterator40 = _createForOfIteratorHelper(targets),
+            _step40;
 
         try {
-          for (_iterator39.s(); !(_step39 = _iterator39.n()).done;) {
-            var target = _step39.value;
+          for (_iterator40.s(); !(_step40 = _iterator40.n()).done;) {
+            var target = _step40.value;
             result.effects.push({
               target: target,
               eff: [new effPoisoned()]
             });
           }
         } catch (err) {
-          _iterator39.e(err);
+          _iterator40.e(err);
         } finally {
-          _iterator39.f();
+          _iterator40.f();
         }
       }
 
@@ -12716,12 +13077,12 @@ var SkillPoisonCloud = /*#__PURE__*/function (_Skill6) {
 var SkillHeal = /*#__PURE__*/function (_Skill7) {
   _inherits(SkillHeal, _Skill7);
 
-  var _super65 = _createSuper(SkillHeal);
+  var _super66 = _createSuper(SkillHeal);
 
   function SkillHeal() {
     _classCallCheck(this, SkillHeal);
 
-    return _super65.call(this, "Heal");
+    return _super66.call(this, "Heal");
   }
 
   _createClass(SkillHeal, [{
@@ -12746,21 +13107,21 @@ var SkillHeal = /*#__PURE__*/function (_Skill7) {
         //todo  consume energy
         result.OK = true;
 
-        var _iterator40 = _createForOfIteratorHelper(targets),
-            _step40;
+        var _iterator41 = _createForOfIteratorHelper(targets),
+            _step41;
 
         try {
-          for (_iterator40.s(); !(_step40 = _iterator40.n()).done;) {
-            var target = _step40.value;
+          for (_iterator41.s(); !(_step41 = _iterator41.n()).done;) {
+            var target = _step41.value;
             result.effects.push({
               target: target,
               eff: [new effHeal(10)]
             });
           }
         } catch (err) {
-          _iterator40.e(err);
+          _iterator41.e(err);
         } finally {
-          _iterator40.f();
+          _iterator41.f();
         }
       }
 
@@ -12784,16 +13145,16 @@ var SkillHeal = /*#__PURE__*/function (_Skill7) {
 var SkillFlee = /*#__PURE__*/function (_Skill8) {
   _inherits(SkillFlee, _Skill8);
 
-  var _super66 = _createSuper(SkillFlee);
+  var _super67 = _createSuper(SkillFlee);
 
   function SkillFlee() {
-    var _this53;
+    var _this54;
 
     _classCallCheck(this, SkillFlee);
 
-    _this53 = _super66.call(this, "Flee");
-    _this53.msg = '';
-    return _this53;
+    _this54 = _super67.call(this, "Flee");
+    _this54.msg = '';
+    return _this54;
   }
 
   _createClass(SkillFlee, [{
@@ -12849,16 +13210,16 @@ var SkillFlee = /*#__PURE__*/function (_Skill8) {
 var SkillSubmit = /*#__PURE__*/function (_Skill9) {
   _inherits(SkillSubmit, _Skill9);
 
-  var _super67 = _createSuper(SkillSubmit);
+  var _super68 = _createSuper(SkillSubmit);
 
   function SkillSubmit() {
-    var _this54;
+    var _this55;
 
     _classCallCheck(this, SkillSubmit);
 
-    _this54 = _super67.call(this, "Submit");
-    _this54.msg = '';
-    return _this54;
+    _this55 = _super68.call(this, "Submit");
+    _this55.msg = '';
+    return _this55;
   }
 
   _createClass(SkillSubmit, [{
@@ -12914,16 +13275,16 @@ var SkillSubmit = /*#__PURE__*/function (_Skill9) {
 var SkillGrapple = /*#__PURE__*/function (_Skill10) {
   _inherits(SkillGrapple, _Skill10);
 
-  var _super68 = _createSuper(SkillGrapple);
+  var _super69 = _createSuper(SkillGrapple);
 
   function SkillGrapple() {
-    var _this55;
+    var _this56;
 
     _classCallCheck(this, SkillGrapple);
 
-    _this55 = _super68.call(this, "Grapple");
-    _this55.msg = '';
-    return _this55;
+    _this56 = _super69.call(this, "Grapple");
+    _this56.msg = '';
+    return _this56;
   }
 
   _createClass(SkillGrapple, [{
@@ -12995,16 +13356,16 @@ var SkillGrapple = /*#__PURE__*/function (_Skill10) {
 var SkillLeechHealth = /*#__PURE__*/function (_Skill11) {
   _inherits(SkillLeechHealth, _Skill11);
 
-  var _super69 = _createSuper(SkillLeechHealth);
+  var _super70 = _createSuper(SkillLeechHealth);
 
   function SkillLeechHealth() {
-    var _this56;
+    var _this57;
 
     _classCallCheck(this, SkillLeechHealth);
 
-    _this56 = _super69.call(this, "Leech");
-    _this56.msg = '';
-    return _this56;
+    _this57 = _super70.call(this, "Leech");
+    _this57.msg = '';
+    return _this57;
   }
 
   _createClass(SkillLeechHealth, [{
@@ -13110,17 +13471,17 @@ var SkillLeechHealth = /*#__PURE__*/function (_Skill11) {
 var SkillStruggle = /*#__PURE__*/function (_Skill12) {
   _inherits(SkillStruggle, _Skill12);
 
-  var _super70 = _createSuper(SkillStruggle);
+  var _super71 = _createSuper(SkillStruggle);
 
   //todo improves defense
   function SkillStruggle() {
-    var _this57;
+    var _this58;
 
     _classCallCheck(this, SkillStruggle);
 
-    _this57 = _super70.call(this, "Struggle");
-    _this57.msg = '';
-    return _this57;
+    _this58 = _super71.call(this, "Struggle");
+    _this58.msg = '';
+    return _this58;
   }
 
   _createClass(SkillStruggle, [{
@@ -13154,12 +13515,12 @@ var SkillStruggle = /*#__PURE__*/function (_Skill12) {
       if (this.isValidTarget(targets)) {
         result.OK = true;
 
-        var _iterator41 = _createForOfIteratorHelper(targets),
-            _step41;
+        var _iterator42 = _createForOfIteratorHelper(targets),
+            _step42;
 
         try {
-          for (_iterator41.s(); !(_step41 = _iterator41.n()).done;) {
-            var target = _step41.value;
+          for (_iterator42.s(); !(_step42 = _iterator42.n()).done;) {
+            var target = _step42.value;
 
             if (target.Effects.countItem(effGrappled.name) > 0) {
               var rnd = _.random(0, 100);
@@ -13178,9 +13539,9 @@ var SkillStruggle = /*#__PURE__*/function (_Skill12) {
             }
           }
         } catch (err) {
-          _iterator41.e(err);
+          _iterator42.e(err);
         } finally {
-          _iterator41.f();
+          _iterator42.f();
         }
       }
 
@@ -13210,13 +13571,13 @@ var SkillStruggle = /*#__PURE__*/function (_Skill12) {
 var SkillGuard = /*#__PURE__*/function (_Skill13) {
   _inherits(SkillGuard, _Skill13);
 
-  var _super71 = _createSuper(SkillGuard);
+  var _super72 = _createSuper(SkillGuard);
 
   //todo improves defense; 
   function SkillGuard() {
     _classCallCheck(this, SkillGuard);
 
-    return _super71.call(this, "Guard");
+    return _super72.call(this, "Guard");
   }
 
   _createClass(SkillGuard, [{
@@ -13240,20 +13601,20 @@ var SkillGuard = /*#__PURE__*/function (_Skill13) {
       if (this.isValidTarget(targets)) {
         result.OK = true;
 
-        var _iterator42 = _createForOfIteratorHelper(targets),
-            _step42;
+        var _iterator43 = _createForOfIteratorHelper(targets),
+            _step43;
 
         try {
-          for (_iterator42.s(); !(_step42 = _iterator42.n()).done;) {
+          for (_iterator43.s(); !(_step43 = _iterator43.n()).done;) {
             /*result.effects.push( {target:target,
                 eff:[new effHeal(10)]})*/
 
-            var target = _step42.value;
+            var target = _step43.value;
           }
         } catch (err) {
-          _iterator42.e(err);
+          _iterator43.e(err);
         } finally {
-          _iterator42.f();
+          _iterator43.f();
         }
       }
 
@@ -13277,17 +13638,17 @@ var SkillGuard = /*#__PURE__*/function (_Skill13) {
 var SkillUseItem = /*#__PURE__*/function (_Skill14) {
   _inherits(SkillUseItem, _Skill14);
 
-  var _super72 = _createSuper(SkillUseItem);
+  var _super73 = _createSuper(SkillUseItem);
 
   function SkillUseItem() {
-    var _this58;
+    var _this59;
 
     _classCallCheck(this, SkillUseItem);
 
-    _this58 = _super72.call(this, "UseItem");
-    _this58.item = '';
-    _this58.msg = '';
-    return _this58;
+    _this59 = _super73.call(this, "UseItem");
+    _this59.item = '';
+    _this59.msg = '';
+    return _this59;
   }
 
   _createClass(SkillUseItem, [{
@@ -13346,7 +13707,7 @@ var SkillUseItem = /*#__PURE__*/function (_Skill14) {
 var SkillCallHelp = /*#__PURE__*/function (_Skill15) {
   _inherits(SkillCallHelp, _Skill15);
 
-  var _super73 = _createSuper(SkillCallHelp);
+  var _super74 = _createSuper(SkillCallHelp);
 
   _createClass(SkillCallHelp, null, [{
     key: "setup",
@@ -13359,13 +13720,13 @@ var SkillCallHelp = /*#__PURE__*/function (_Skill15) {
   }]);
 
   function SkillCallHelp() {
-    var _this59;
+    var _this60;
 
     _classCallCheck(this, SkillCallHelp);
 
-    _this59 = _super73.call(this, "CallHelp");
-    _this59.item = '';
-    return _this59;
+    _this60 = _super74.call(this, "CallHelp");
+    _this60.item = '';
+    return _this60;
   }
 
   _createClass(SkillCallHelp, [{
@@ -13387,12 +13748,12 @@ var SkillCallHelp = /*#__PURE__*/function (_Skill15) {
       if (this.isValidTarget(targets)) {
         result.OK = true;
 
-        var _iterator43 = _createForOfIteratorHelper(targets),
-            _step43;
+        var _iterator44 = _createForOfIteratorHelper(targets),
+            _step44;
 
         try {
-          for (_iterator43.s(); !(_step43 = _iterator43.n()).done;) {
-            var target = _step43.value;
+          for (_iterator44.s(); !(_step44 = _iterator44.n()).done;) {
+            var target = _step44.value;
             var eff = new effCallHelp();
             eff.configureSpawn(this.item, this.caster.faction);
             result.effects.push({
@@ -13401,9 +13762,9 @@ var SkillCallHelp = /*#__PURE__*/function (_Skill15) {
             });
           }
         } catch (err) {
-          _iterator43.e(err);
+          _iterator44.e(err);
         } finally {
-          _iterator43.f();
+          _iterator44.f();
         }
       }
 
@@ -13456,6 +13817,22 @@ window.gm.SkillsLib = function (Lib) {
 
   return Lib;
 }(window.gm.SkillsLib || {});
+/*todo 
+Slash: (weapontype) causes slash-damage; chance to cause bleed on critical (on non-constructs/conjuration)
+
+Stoneskin: (passive) if a slash-attack would cause bleed; attackers weapon gets blunted for rest of fight
+
+GolemCrusher: increased blunt-damage against golems
+
+LifeDrain: soul-damage; restores health equal to fraction of damage caused on living
+
+Supraconductor: incoming ice-damage has chance to increase spark-damage output for some turns; but fire-damage has the oposite effect
+
+BladeMace: deals slash or blunt-damage depending which would cause more damage
+
+PoisonCloud: small damage over time to lifing  
+ */
+
 
 "use strict"; //this is special stat used together with Relation-collection
 //person is used as id instead of stat-name
@@ -13464,7 +13841,7 @@ window.gm.SkillsLib = function (Lib) {
 var stRelation = /*#__PURE__*/function (_Stat) {
   _inherits(stRelation, _Stat);
 
-  var _super74 = _createSuper(stRelation);
+  var _super75 = _createSuper(stRelation);
 
   _createClass(stRelation, null, [{
     key: "setup",
@@ -13500,7 +13877,7 @@ var stRelation = /*#__PURE__*/function (_Stat) {
   function stRelation() {
     _classCallCheck(this, stRelation);
 
-    return _super74.call(this);
+    return _super75.call(this);
   }
 
   _createClass(stRelation, [{
@@ -13529,13 +13906,13 @@ var stRelation = /*#__PURE__*/function (_Stat) {
   return stRelation;
 }(Stat); //generic class for resistance to damage like blunt, fire, poison,...
 // Resistance is modified by effects (applied by equipment/perks/items) and stats
-// 0 = no bonus resistance; -20 = 20% 
+// 0 = no bonus resistance; -20 = 20% weaker ; capped at +-100% ?
 
 
 var stResistance = /*#__PURE__*/function (_Stat2) {
   _inherits(stResistance, _Stat2);
 
-  var _super75 = _createSuper(stResistance);
+  var _super76 = _createSuper(stResistance);
 
   _createClass(stResistance, null, [{
     key: "setup",
@@ -13543,7 +13920,7 @@ var stResistance = /*#__PURE__*/function (_Stat2) {
       var _stat = new stResistance();
 
       var _n = _stat.data;
-      _n.id = "Resistance " + kind, _n.base = base, _n.value = base, _n.limits = [{
+      _n.id = "rst" + kind, _n.base = base, _n.value = base, _n.limits = [{
         max: 100,
         min: -100
       }];
@@ -13556,7 +13933,7 @@ var stResistance = /*#__PURE__*/function (_Stat2) {
   function stResistance() {
     _classCallCheck(this, stResistance);
 
-    return _super75.call(this);
+    return _super76.call(this);
   }
 
   _createClass(stResistance, [{
@@ -13577,7 +13954,7 @@ var stResistance = /*#__PURE__*/function (_Stat2) {
 var stHealthMax = /*#__PURE__*/function (_Stat3) {
   _inherits(stHealthMax, _Stat3);
 
-  var _super76 = _createSuper(stHealthMax);
+  var _super77 = _createSuper(stHealthMax);
 
   _createClass(stHealthMax, null, [{
     key: "setup",
@@ -13598,7 +13975,7 @@ var stHealthMax = /*#__PURE__*/function (_Stat3) {
   function stHealthMax() {
     _classCallCheck(this, stHealthMax);
 
-    return _super76.call(this);
+    return _super77.call(this);
   }
 
   _createClass(stHealthMax, [{
@@ -13619,7 +13996,7 @@ var stHealthMax = /*#__PURE__*/function (_Stat3) {
 var stHealth = /*#__PURE__*/function (_Stat4) {
   _inherits(stHealth, _Stat4);
 
-  var _super77 = _createSuper(stHealth);
+  var _super78 = _createSuper(stHealth);
 
   _createClass(stHealth, null, [{
     key: "setup",
@@ -13642,7 +14019,7 @@ var stHealth = /*#__PURE__*/function (_Stat4) {
   function stHealth() {
     _classCallCheck(this, stHealth);
 
-    return _super77.call(this);
+    return _super78.call(this);
   }
 
   _createClass(stHealth, [{
@@ -13663,7 +14040,7 @@ var stHealth = /*#__PURE__*/function (_Stat4) {
 var stEnergyMax = /*#__PURE__*/function (_Stat5) {
   _inherits(stEnergyMax, _Stat5);
 
-  var _super78 = _createSuper(stEnergyMax);
+  var _super79 = _createSuper(stEnergyMax);
 
   _createClass(stEnergyMax, null, [{
     key: "setup",
@@ -13684,7 +14061,7 @@ var stEnergyMax = /*#__PURE__*/function (_Stat5) {
   function stEnergyMax() {
     _classCallCheck(this, stEnergyMax);
 
-    return _super78.call(this);
+    return _super79.call(this);
   }
 
   _createClass(stEnergyMax, [{
@@ -13705,7 +14082,7 @@ var stEnergyMax = /*#__PURE__*/function (_Stat5) {
 var stEnergy = /*#__PURE__*/function (_Stat6) {
   _inherits(stEnergy, _Stat6);
 
-  var _super79 = _createSuper(stEnergy);
+  var _super80 = _createSuper(stEnergy);
 
   _createClass(stEnergy, null, [{
     key: "setup",
@@ -13728,7 +14105,7 @@ var stEnergy = /*#__PURE__*/function (_Stat6) {
   function stEnergy() {
     _classCallCheck(this, stEnergy);
 
-    return _super79.call(this);
+    return _super80.call(this);
   }
 
   _createClass(stEnergy, [{
@@ -13749,7 +14126,7 @@ var stEnergy = /*#__PURE__*/function (_Stat6) {
 var stArousalMax = /*#__PURE__*/function (_Stat7) {
   _inherits(stArousalMax, _Stat7);
 
-  var _super80 = _createSuper(stArousalMax);
+  var _super81 = _createSuper(stArousalMax);
 
   _createClass(stArousalMax, null, [{
     key: "setup",
@@ -13770,7 +14147,7 @@ var stArousalMax = /*#__PURE__*/function (_Stat7) {
   function stArousalMax() {
     _classCallCheck(this, stArousalMax);
 
-    return _super80.call(this);
+    return _super81.call(this);
   }
 
   _createClass(stArousalMax, [{
@@ -13791,7 +14168,7 @@ var stArousalMax = /*#__PURE__*/function (_Stat7) {
 var stArousalMin = /*#__PURE__*/function (_Stat8) {
   _inherits(stArousalMin, _Stat8);
 
-  var _super81 = _createSuper(stArousalMin);
+  var _super82 = _createSuper(stArousalMin);
 
   _createClass(stArousalMin, null, [{
     key: "setup",
@@ -13812,7 +14189,7 @@ var stArousalMin = /*#__PURE__*/function (_Stat8) {
   function stArousalMin() {
     _classCallCheck(this, stArousalMin);
 
-    return _super81.call(this);
+    return _super82.call(this);
   }
 
   _createClass(stArousalMin, [{
@@ -13833,7 +14210,7 @@ var stArousalMin = /*#__PURE__*/function (_Stat8) {
 var stArousal = /*#__PURE__*/function (_Stat9) {
   _inherits(stArousal, _Stat9);
 
-  var _super82 = _createSuper(stArousal);
+  var _super83 = _createSuper(stArousal);
 
   _createClass(stArousal, null, [{
     key: "setup",
@@ -13857,7 +14234,7 @@ var stArousal = /*#__PURE__*/function (_Stat9) {
   function stArousal() {
     _classCallCheck(this, stArousal);
 
-    return _super82.call(this);
+    return _super83.call(this);
   }
 
   _createClass(stArousal, [{
@@ -13878,7 +14255,7 @@ var stArousal = /*#__PURE__*/function (_Stat9) {
 var stAgility = /*#__PURE__*/function (_Stat10) {
   _inherits(stAgility, _Stat10);
 
-  var _super83 = _createSuper(stAgility);
+  var _super84 = _createSuper(stAgility);
 
   _createClass(stAgility, null, [{
     key: "setup",
@@ -13902,7 +14279,7 @@ var stAgility = /*#__PURE__*/function (_Stat10) {
   function stAgility() {
     _classCallCheck(this, stAgility);
 
-    return _super83.call(this);
+    return _super84.call(this);
   }
 
   _createClass(stAgility, [{
@@ -13931,7 +14308,7 @@ var stAgility = /*#__PURE__*/function (_Stat10) {
 var stPerception = /*#__PURE__*/function (_Stat11) {
   _inherits(stPerception, _Stat11);
 
-  var _super84 = _createSuper(stPerception);
+  var _super85 = _createSuper(stPerception);
 
   _createClass(stPerception, null, [{
     key: "setup",
@@ -13953,7 +14330,7 @@ var stPerception = /*#__PURE__*/function (_Stat11) {
   function stPerception() {
     _classCallCheck(this, stPerception);
 
-    return _super84.call(this);
+    return _super85.call(this);
   }
 
   _createClass(stPerception, [{
@@ -13977,7 +14354,7 @@ var stPerception = /*#__PURE__*/function (_Stat11) {
 var stLuck = /*#__PURE__*/function (_Stat12) {
   _inherits(stLuck, _Stat12);
 
-  var _super85 = _createSuper(stLuck);
+  var _super86 = _createSuper(stLuck);
 
   _createClass(stLuck, null, [{
     key: "setup",
@@ -13999,7 +14376,7 @@ var stLuck = /*#__PURE__*/function (_Stat12) {
   function stLuck() {
     _classCallCheck(this, stLuck);
 
-    return _super85.call(this);
+    return _super86.call(this);
   }
 
   _createClass(stLuck, [{
@@ -14023,7 +14400,7 @@ var stLuck = /*#__PURE__*/function (_Stat12) {
 var stCharisma = /*#__PURE__*/function (_Stat13) {
   _inherits(stCharisma, _Stat13);
 
-  var _super86 = _createSuper(stCharisma);
+  var _super87 = _createSuper(stCharisma);
 
   _createClass(stCharisma, null, [{
     key: "setup",
@@ -14045,7 +14422,7 @@ var stCharisma = /*#__PURE__*/function (_Stat13) {
   function stCharisma() {
     _classCallCheck(this, stCharisma);
 
-    return _super86.call(this);
+    return _super87.call(this);
   }
 
   _createClass(stCharisma, [{
@@ -14069,7 +14446,7 @@ var stCharisma = /*#__PURE__*/function (_Stat13) {
 var stIntelligence = /*#__PURE__*/function (_Stat14) {
   _inherits(stIntelligence, _Stat14);
 
-  var _super87 = _createSuper(stIntelligence);
+  var _super88 = _createSuper(stIntelligence);
 
   _createClass(stIntelligence, null, [{
     key: "setup",
@@ -14091,7 +14468,7 @@ var stIntelligence = /*#__PURE__*/function (_Stat14) {
   function stIntelligence() {
     _classCallCheck(this, stIntelligence);
 
-    return _super87.call(this);
+    return _super88.call(this);
   }
 
   _createClass(stIntelligence, [{
@@ -14115,7 +14492,7 @@ var stIntelligence = /*#__PURE__*/function (_Stat14) {
 var stStrength = /*#__PURE__*/function (_Stat15) {
   _inherits(stStrength, _Stat15);
 
-  var _super88 = _createSuper(stStrength);
+  var _super89 = _createSuper(stStrength);
 
   _createClass(stStrength, null, [{
     key: "setup",
@@ -14138,7 +14515,7 @@ var stStrength = /*#__PURE__*/function (_Stat15) {
   function stStrength() {
     _classCallCheck(this, stStrength);
 
-    return _super88.call(this);
+    return _super89.call(this);
   }
 
   _createClass(stStrength, [{
@@ -14171,7 +14548,7 @@ var stStrength = /*#__PURE__*/function (_Stat15) {
 var stEndurance = /*#__PURE__*/function (_Stat16) {
   _inherits(stEndurance, _Stat16);
 
-  var _super89 = _createSuper(stEndurance);
+  var _super90 = _createSuper(stEndurance);
 
   _createClass(stEndurance, null, [{
     key: "setup",
@@ -14194,7 +14571,7 @@ var stEndurance = /*#__PURE__*/function (_Stat16) {
   function stEndurance() {
     _classCallCheck(this, stEndurance);
 
-    return _super89.call(this);
+    return _super90.call(this);
   }
 
   _createClass(stEndurance, [{
@@ -14227,7 +14604,7 @@ var stEndurance = /*#__PURE__*/function (_Stat16) {
 var stPAttack = /*#__PURE__*/function (_Stat17) {
   _inherits(stPAttack, _Stat17);
 
-  var _super90 = _createSuper(stPAttack);
+  var _super91 = _createSuper(stPAttack);
 
   _createClass(stPAttack, null, [{
     key: "setup",
@@ -14249,7 +14626,7 @@ var stPAttack = /*#__PURE__*/function (_Stat17) {
   function stPAttack() {
     _classCallCheck(this, stPAttack);
 
-    return _super90.call(this);
+    return _super91.call(this);
   }
 
   _createClass(stPAttack, [{
@@ -14270,7 +14647,7 @@ var stPAttack = /*#__PURE__*/function (_Stat17) {
 var stPDefense = /*#__PURE__*/function (_Stat18) {
   _inherits(stPDefense, _Stat18);
 
-  var _super91 = _createSuper(stPDefense);
+  var _super92 = _createSuper(stPDefense);
 
   _createClass(stPDefense, null, [{
     key: "setup",
@@ -14292,7 +14669,7 @@ var stPDefense = /*#__PURE__*/function (_Stat18) {
   function stPDefense() {
     _classCallCheck(this, stPDefense);
 
-    return _super91.call(this);
+    return _super92.call(this);
   }
 
   _createClass(stPDefense, [{
@@ -14313,7 +14690,7 @@ var stPDefense = /*#__PURE__*/function (_Stat18) {
 var stLAttack = /*#__PURE__*/function (_Stat19) {
   _inherits(stLAttack, _Stat19);
 
-  var _super92 = _createSuper(stLAttack);
+  var _super93 = _createSuper(stLAttack);
 
   _createClass(stLAttack, null, [{
     key: "setup",
@@ -14335,7 +14712,7 @@ var stLAttack = /*#__PURE__*/function (_Stat19) {
   function stLAttack() {
     _classCallCheck(this, stLAttack);
 
-    return _super92.call(this);
+    return _super93.call(this);
   }
 
   _createClass(stLAttack, [{
@@ -14356,7 +14733,7 @@ var stLAttack = /*#__PURE__*/function (_Stat19) {
 var stLDefense = /*#__PURE__*/function (_Stat20) {
   _inherits(stLDefense, _Stat20);
 
-  var _super93 = _createSuper(stLDefense);
+  var _super94 = _createSuper(stLDefense);
 
   _createClass(stLDefense, null, [{
     key: "setup",
@@ -14378,7 +14755,7 @@ var stLDefense = /*#__PURE__*/function (_Stat20) {
   function stLDefense() {
     _classCallCheck(this, stLDefense);
 
-    return _super93.call(this);
+    return _super94.call(this);
   }
 
   _createClass(stLDefense, [{
@@ -14399,7 +14776,7 @@ var stLDefense = /*#__PURE__*/function (_Stat20) {
 var stCorruptionMax = /*#__PURE__*/function (_Stat21) {
   _inherits(stCorruptionMax, _Stat21);
 
-  var _super94 = _createSuper(stCorruptionMax);
+  var _super95 = _createSuper(stCorruptionMax);
 
   _createClass(stCorruptionMax, null, [{
     key: "setup",
@@ -14420,7 +14797,7 @@ var stCorruptionMax = /*#__PURE__*/function (_Stat21) {
   function stCorruptionMax() {
     _classCallCheck(this, stCorruptionMax);
 
-    return _super94.call(this);
+    return _super95.call(this);
   }
 
   _createClass(stCorruptionMax, [{
@@ -14441,7 +14818,7 @@ var stCorruptionMax = /*#__PURE__*/function (_Stat21) {
 var stCorruption = /*#__PURE__*/function (_Stat22) {
   _inherits(stCorruption, _Stat22);
 
-  var _super95 = _createSuper(stCorruption);
+  var _super96 = _createSuper(stCorruption);
 
   _createClass(stCorruption, null, [{
     key: "setup",
@@ -14464,7 +14841,7 @@ var stCorruption = /*#__PURE__*/function (_Stat22) {
   function stCorruption() {
     _classCallCheck(this, stCorruption);
 
-    return _super95.call(this);
+    return _super96.call(this);
   }
 
   _createClass(stCorruption, [{
@@ -14487,7 +14864,7 @@ var stCorruption = /*#__PURE__*/function (_Stat22) {
 var stFetish = /*#__PURE__*/function (_Stat23) {
   _inherits(stFetish, _Stat23);
 
-  var _super96 = _createSuper(stFetish);
+  var _super97 = _createSuper(stFetish);
 
   _createClass(stFetish, null, [{
     key: "setup",
@@ -14528,7 +14905,7 @@ var stFetish = /*#__PURE__*/function (_Stat23) {
   function stFetish() {
     _classCallCheck(this, stFetish);
 
-    return _super96.call(this);
+    return _super97.call(this);
   }
 
   return stFetish;
@@ -14538,16 +14915,16 @@ var stFetish = /*#__PURE__*/function (_Stat23) {
 var effEnergized = /*#__PURE__*/function (_Effect2) {
   _inherits(effEnergized, _Effect2);
 
-  var _super97 = _createSuper(effEnergized);
+  var _super98 = _createSuper(effEnergized);
 
   function effEnergized() {
-    var _this60;
+    var _this61;
 
     _classCallCheck(this, effEnergized);
 
-    _this60 = _super97.call(this);
-    _this60.data.id = _this60.data.name = effEnergized.name, _this60.data.duration = 120;
-    return _this60;
+    _this61 = _super98.call(this);
+    _this61.data.id = _this61.data.name = effEnergized.name, _this61.data.duration = 120;
+    return _this61;
   }
 
   _createClass(effEnergized, [{
@@ -14618,16 +14995,16 @@ var effEnergized = /*#__PURE__*/function (_Effect2) {
 var effNotTired = /*#__PURE__*/function (_Effect3) {
   _inherits(effNotTired, _Effect3);
 
-  var _super98 = _createSuper(effNotTired);
+  var _super99 = _createSuper(effNotTired);
 
   function effNotTired() {
-    var _this61;
+    var _this62;
 
     _classCallCheck(this, effNotTired);
 
-    _this61 = _super98.call(this);
-    _this61.data.id = effNotTired.name, _this61.data.name = "not tired", _this61.data.duration = 120, _this61.data.hidden = 4;
-    return _this61;
+    _this62 = _super99.call(this);
+    _this62.data.id = effNotTired.name, _this62.data.name = "not tired", _this62.data.duration = 120, _this62.data.hidden = 4;
+    return _this62;
   }
 
   _createClass(effNotTired, [{
@@ -14687,16 +15064,16 @@ var effNotTired = /*#__PURE__*/function (_Effect3) {
 var effTired = /*#__PURE__*/function (_Effect4) {
   _inherits(effTired, _Effect4);
 
-  var _super99 = _createSuper(effTired);
+  var _super100 = _createSuper(effTired);
 
   function effTired() {
-    var _this62;
+    var _this63;
 
     _classCallCheck(this, effTired);
 
-    _this62 = _super99.call(this);
-    _this62.data.id = effTired.name, _this62.data.name = "tired", _this62.data.duration = 120, _this62.data.hidden = 0;
-    return _this62;
+    _this63 = _super100.call(this);
+    _this63.data.id = effTired.name, _this63.data.name = "tired", _this63.data.duration = 120, _this63.data.hidden = 0;
+    return _this63;
   }
 
   _createClass(effTired, [{
@@ -14762,17 +15139,17 @@ var effTired = /*#__PURE__*/function (_Effect4) {
 var effMutateCat = /*#__PURE__*/function (_Effect5) {
   _inherits(effMutateCat, _Effect5);
 
-  var _super100 = _createSuper(effMutateCat);
+  var _super101 = _createSuper(effMutateCat);
 
   function effMutateCat() {
-    var _this63;
+    var _this64;
 
     _classCallCheck(this, effMutateCat);
 
-    _this63 = _super100.call(this);
-    _this63.data.id = _this63.data.name = effMutateCat.name, _this63.data.hidden = 0;
-    _this63.data.duration = 60, _this63.data.cycles = 3, _this63.data.magnitude = 3;
-    return _this63;
+    _this64 = _super101.call(this);
+    _this64.data.id = _this64.data.name = effMutateCat.name, _this64.data.hidden = 0;
+    _this64.data.duration = 60, _this64.data.cycles = 3, _this64.data.magnitude = 3;
+    return _this64;
   }
 
   _createClass(effMutateCat, [{
@@ -14836,17 +15213,17 @@ var effMutateCat = /*#__PURE__*/function (_Effect5) {
 var effMutateWolf = /*#__PURE__*/function (_Effect6) {
   _inherits(effMutateWolf, _Effect6);
 
-  var _super101 = _createSuper(effMutateWolf);
+  var _super102 = _createSuper(effMutateWolf);
 
   function effMutateWolf() {
-    var _this64;
+    var _this65;
 
     _classCallCheck(this, effMutateWolf);
 
-    _this64 = _super101.call(this);
-    _this64.data.id = _this64.data.name = effMutateWolf.name, _this64.data.hidden = 0;
-    _this64.data.duration = 60, _this64.data.cycles = 3, _this64.data.magnitude = 3;
-    return _this64;
+    _this65 = _super102.call(this);
+    _this65.data.id = _this65.data.name = effMutateWolf.name, _this65.data.hidden = 0;
+    _this65.data.duration = 60, _this65.data.cycles = 3, _this65.data.magnitude = 3;
+    return _this65;
   }
 
   _createClass(effMutateWolf, [{
@@ -14910,17 +15287,17 @@ var effMutateWolf = /*#__PURE__*/function (_Effect6) {
 var effMutateHorse = /*#__PURE__*/function (_Effect7) {
   _inherits(effMutateHorse, _Effect7);
 
-  var _super102 = _createSuper(effMutateHorse);
+  var _super103 = _createSuper(effMutateHorse);
 
   function effMutateHorse() {
-    var _this65;
+    var _this66;
 
     _classCallCheck(this, effMutateHorse);
 
-    _this65 = _super102.call(this);
-    _this65.data.id = _this65.data.name = effMutateHorse.name, _this65.data.hidden = 0;
-    _this65.data.duration = 60, _this65.data.cycles = 3, _this65.data.magnitude = 3;
-    return _this65;
+    _this66 = _super103.call(this);
+    _this66.data.id = _this66.data.name = effMutateHorse.name, _this66.data.hidden = 0;
+    _this66.data.duration = 60, _this66.data.cycles = 3, _this66.data.magnitude = 3;
+    return _this66;
   }
 
   _createClass(effMutateHorse, [{
@@ -14984,17 +15361,17 @@ var effMutateHorse = /*#__PURE__*/function (_Effect7) {
 var effHorsePower = /*#__PURE__*/function (_Effect8) {
   _inherits(effHorsePower, _Effect8);
 
-  var _super103 = _createSuper(effHorsePower);
+  var _super104 = _createSuper(effHorsePower);
 
   function effHorsePower() {
-    var _this66;
+    var _this67;
 
     _classCallCheck(this, effHorsePower);
 
-    _this66 = _super103.call(this);
-    _this66.data.id = _this66.data.name = effHorsePower.name, _this66.data.hidden = 0;
-    _this66.data.duration = 120, _this66.data.cycles = 3, _this66.data.magnitude = 1;
-    return _this66;
+    _this67 = _super104.call(this);
+    _this67.data.id = _this67.data.name = effHorsePower.name, _this67.data.hidden = 0;
+    _this67.data.duration = 120, _this67.data.cycles = 3, _this67.data.magnitude = 1;
+    return _this67;
   }
 
   _createClass(effHorsePower, [{
@@ -15019,9 +15396,9 @@ var effHorsePower = /*#__PURE__*/function (_Effect8) {
       this.parent.parent.Stats.increment('energy', 10 * delta / 60);
 
       if (this.data.magnitude > 2) {
-        var _i = this.parent.findItemSlot(this.data.id);
+        var _i7 = this.parent.findItemSlot(this.data.id);
 
-        if (_i < 0) {
+        if (_i7 < 0) {
           //todo extend if exist?
           this.parent.parent.addEffect(effMutateHorse.id, new effMutateHorse());
         }
@@ -15075,17 +15452,17 @@ var effHorsePower = /*#__PURE__*/function (_Effect8) {
 var effGrowBreast = /*#__PURE__*/function (_Effect9) {
   _inherits(effGrowBreast, _Effect9);
 
-  var _super104 = _createSuper(effGrowBreast);
+  var _super105 = _createSuper(effGrowBreast);
 
   function effGrowBreast() {
-    var _this67;
+    var _this68;
 
     _classCallCheck(this, effGrowBreast);
 
-    _this67 = _super104.call(this);
-    _this67.data.id = _this67.data.name = effGrowBreast.name, _this67.data.duration = 60, _this67.data.hidden = 0;
-    _this67.data.cycles = 3, _this67.data.magnitude = 3;
-    return _this67;
+    _this68 = _super105.call(this);
+    _this68.data.id = _this68.data.name = effGrowBreast.name, _this68.data.duration = 60, _this68.data.hidden = 0;
+    _this68.data.cycles = 3, _this68.data.magnitude = 3;
+    return _this68;
   }
 
   _createClass(effGrowBreast, [{
@@ -15147,17 +15524,17 @@ var effGrowBreast = /*#__PURE__*/function (_Effect9) {
 var effGrowVulva = /*#__PURE__*/function (_Effect10) {
   _inherits(effGrowVulva, _Effect10);
 
-  var _super105 = _createSuper(effGrowVulva);
+  var _super106 = _createSuper(effGrowVulva);
 
   function effGrowVulva() {
-    var _this68;
+    var _this69;
 
     _classCallCheck(this, effGrowVulva);
 
-    _this68 = _super105.call(this);
-    _this68.data.id = _this68.data.name = effGrowVulva.name, _this68.data.duration = 60, _this68.data.hidden = 0;
-    _this68.data.cycles = 3, _this68.data.magnitude = 3;
-    return _this68;
+    _this69 = _super106.call(this);
+    _this69.data.id = _this69.data.name = effGrowVulva.name, _this69.data.duration = 60, _this69.data.hidden = 0;
+    _this69.data.cycles = 3, _this69.data.magnitude = 3;
+    return _this69;
   }
 
   _createClass(effGrowVulva, [{
@@ -15220,19 +15597,19 @@ var effGrowVulva = /*#__PURE__*/function (_Effect10) {
 var effHeal = /*#__PURE__*/function (_CombatEffect) {
   _inherits(effHeal, _CombatEffect);
 
-  var _super106 = _createSuper(effHeal);
+  var _super107 = _createSuper(effHeal);
 
   function effHeal(amount) {
-    var _this69;
+    var _this70;
 
     var duration = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
 
     _classCallCheck(this, effHeal);
 
-    _this69 = _super106.call(this);
-    _this69.amount = amount;
-    _this69.data.id = _this69.data.name = effHeal.name, _this69.data.startduration = duration, _this69.data.hidden = 0;
-    return _this69;
+    _this70 = _super107.call(this);
+    _this70.amount = amount;
+    _this70.data.id = _this70.data.name = effHeal.name, _this70.data.startduration = duration, _this70.data.hidden = 0;
+    return _this70;
   }
 
   _createClass(effHeal, [{
@@ -15286,17 +15663,17 @@ var effHeal = /*#__PURE__*/function (_CombatEffect) {
 var effGuard = /*#__PURE__*/function (_CombatEffect2) {
   _inherits(effGuard, _CombatEffect2);
 
-  var _super107 = _createSuper(effGuard);
+  var _super108 = _createSuper(effGuard);
 
   function effGuard(amount) {
-    var _this70;
+    var _this71;
 
     _classCallCheck(this, effGuard);
 
-    _this70 = _super107.call(this);
-    _this70.amount = amount;
-    _this70.data.id = _this70.data.name = effGuard.name, _this70.data.duration = 0, _this70.data.hidden = 0;
-    return _this70;
+    _this71 = _super108.call(this);
+    _this71.amount = amount;
+    _this71.data.id = _this71.data.name = effGuard.name, _this71.data.duration = 0, _this71.data.hidden = 0;
+    return _this71;
   }
 
   _createClass(effGuard, [{
@@ -15359,23 +15736,23 @@ var effGuard = /*#__PURE__*/function (_CombatEffect2) {
 var effCombined = /*#__PURE__*/function (_CombatEffect3) {
   _inherits(effCombined, _CombatEffect3);
 
-  var _super108 = _createSuper(effCombined);
+  var _super109 = _createSuper(effCombined);
 
   function effCombined(EffectsA, EffectsB) {
-    var _this71;
+    var _this72;
 
     _classCallCheck(this, effCombined);
 
-    _this71 = _super108.call(this);
-    _this71.effects = EffectsA.concat(EffectsB);
-    _this71.data.id = _this71.data.name = effCombined.name, _this71.data.duration = 0, _this71.data.hidden = 0;
+    _this72 = _super109.call(this);
+    _this72.effects = EffectsA.concat(EffectsB);
+    _this72.data.id = _this72.data.name = effCombined.name, _this72.data.duration = 0, _this72.data.hidden = 0;
 
-    var _iterator44 = _createForOfIteratorHelper(EffectsA),
-        _step44;
+    var _iterator45 = _createForOfIteratorHelper(EffectsA),
+        _step45;
 
     try {
-      for (_iterator44.s(); !(_step44 = _iterator44.n()).done;) {
-        el = _step44.value;
+      for (_iterator45.s(); !(_step45 = _iterator45.n()).done;) {
+        el = _step45.value;
 
         el.onRemove = function (me) {
           var _old = el.onRemove.bind(el);
@@ -15390,32 +15767,32 @@ var effCombined = /*#__PURE__*/function (_CombatEffect3) {
           };
 
           return foo;
-        }(_assertThisInitialized(_this71));
+        }(_assertThisInitialized(_this72));
       }
     } catch (err) {
-      _iterator44.e(err);
+      _iterator45.e(err);
     } finally {
-      _iterator44.f();
+      _iterator45.f();
     }
 
-    return _this71;
+    return _this72;
   }
 
   _createClass(effCombined, [{
     key: "removeAll",
     value: function removeAll() {
-      var _iterator45 = _createForOfIteratorHelper(this.effects),
-          _step45;
+      var _iterator46 = _createForOfIteratorHelper(this.effects),
+          _step46;
 
       try {
-        for (_iterator45.s(); !(_step45 = _iterator45.n()).done;) {
-          el = _step45.value;
+        for (_iterator46.s(); !(_step46 = _iterator46.n()).done;) {
+          el = _step46.value;
           if (el) el.parent.removeItem(el.id);
         }
       } catch (err) {
-        _iterator45.e(err);
+        _iterator46.e(err);
       } finally {
-        _iterator45.f();
+        _iterator46.f();
       }
 
       this.parent.removeItem(this.id);
@@ -15438,17 +15815,29 @@ var effCombined = /*#__PURE__*/function (_CombatEffect3) {
 var effDamage = /*#__PURE__*/function (_CombatEffect4) {
   _inherits(effDamage, _CombatEffect4);
 
-  var _super109 = _createSuper(effDamage);
+  var _super110 = _createSuper(effDamage);
+
+  _createClass(effDamage, null, [{
+    key: "setup",
+    value: function setup(amount, type) {
+      var onHitCB = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+      var eff = new effDamage();
+      eff.amount = amount;
+      eff.type = type;
+      eff.onHit = onHitCB;
+      return eff;
+    }
+  }]);
 
   function effDamage(amount) {
-    var _this72;
+    var _this73;
 
     _classCallCheck(this, effDamage);
 
-    _this72 = _super109.call(this);
-    _this72.amount = amount;
-    _this72.data.id = _this72.data.name = effDamage.name, _this72.data.duration = 0, _this72.data.hidden = 0;
-    return _this72;
+    _this73 = _super110.call(this);
+    _this73.amount = 8;
+    _this73.data.id = _this73.data.name = effDamage.name, _this73.data.duration = 0, _this73.data.hidden = 0;
+    return _this73;
   }
 
   _createClass(effDamage, [{
@@ -15458,6 +15847,12 @@ var effDamage = /*#__PURE__*/function (_CombatEffect4) {
     }
   }, {
     key: "onApply",
+
+    /*??onCast(targets,caster) {
+        let result={OK:false,msg:''};
+        targets[0].
+        if(this.onHitCB) onHitCB(targets,caster);
+    }*/
     value: function onApply() {
       this.data.duration = 0;
       this.parent.parent.Stats.increment('health', -1 * this.amount);
@@ -15495,17 +15890,17 @@ var effDamage = /*#__PURE__*/function (_CombatEffect4) {
 var effBleed = /*#__PURE__*/function (_CombatEffect5) {
   _inherits(effBleed, _CombatEffect5);
 
-  var _super110 = _createSuper(effBleed);
+  var _super111 = _createSuper(effBleed);
 
   function effBleed(amount) {
-    var _this73;
+    var _this74;
 
     _classCallCheck(this, effBleed);
 
-    _this73 = _super110.call(this);
-    _this73.amount = amount;
-    _this73.data.id = _this73.data.name = effBleed.name, _this73.data.duration = 0, _this73.data.hidden = 0;
-    return _this73;
+    _this74 = _super111.call(this);
+    _this74.amount = amount;
+    _this74.data.id = _this74.data.name = effBleed.name, _this74.data.duration = 0, _this74.data.hidden = 0;
+    return _this74;
   }
 
   _createClass(effBleed, [{
@@ -15558,7 +15953,7 @@ var effBleed = /*#__PURE__*/function (_CombatEffect5) {
 var effGrappled = /*#__PURE__*/function (_CombatEffect6) {
   _inherits(effGrappled, _CombatEffect6);
 
-  var _super111 = _createSuper(effGrappled);
+  var _super112 = _createSuper(effGrappled);
 
   _createClass(effGrappled, null, [{
     key: "factory",
@@ -15574,14 +15969,14 @@ var effGrappled = /*#__PURE__*/function (_CombatEffect6) {
   }]);
 
   function effGrappled(amount) {
-    var _this74;
+    var _this75;
 
     _classCallCheck(this, effGrappled);
 
-    _this74 = _super111.call(this);
-    _this74.source = null;
-    _this74.data.id = _this74.data.name = effGrappled.name, _this74.data.duration = 0, _this74.data.hidden = 0;
-    return _this74;
+    _this75 = _super112.call(this);
+    _this75.source = null;
+    _this75.data.id = _this75.data.name = effGrappled.name, _this75.data.duration = 0, _this75.data.hidden = 0;
+    return _this75;
   }
 
   _createClass(effGrappled, [{
@@ -15641,17 +16036,17 @@ var effGrappled = /*#__PURE__*/function (_CombatEffect6) {
 var effGrappling = /*#__PURE__*/function (_CombatEffect7) {
   _inherits(effGrappling, _CombatEffect7);
 
-  var _super112 = _createSuper(effGrappling);
+  var _super113 = _createSuper(effGrappling);
 
   function effGrappling(targetEffect) {
-    var _this75;
+    var _this76;
 
     _classCallCheck(this, effGrappling);
 
-    _this75 = _super112.call(this);
-    _this75.target = targetEffect;
-    _this75.data.id = _this75.data.name = effGrappling.name, _this75.data.duration = 0, _this75.data.hidden = 0;
-    return _this75;
+    _this76 = _super113.call(this);
+    _this76.target = targetEffect;
+    _this76.data.id = _this76.data.name = effGrappling.name, _this76.data.duration = 0, _this76.data.hidden = 0;
+    return _this76;
   }
 
   _createClass(effGrappling, [{
@@ -15713,17 +16108,17 @@ var effGrappling = /*#__PURE__*/function (_CombatEffect7) {
 var effUngrappling = /*#__PURE__*/function (_CombatEffect8) {
   _inherits(effUngrappling, _CombatEffect8);
 
-  var _super113 = _createSuper(effUngrappling);
+  var _super114 = _createSuper(effUngrappling);
 
   function effUngrappling(targetEffect) {
-    var _this76;
+    var _this77;
 
     _classCallCheck(this, effUngrappling);
 
-    _this76 = _super113.call(this);
-    _this76.target = targetEffect;
-    _this76.data.id = _this76.data.name = effUngrappling.name, _this76.data.duration = 0, _this76.data.hidden = 0;
-    return _this76;
+    _this77 = _super114.call(this);
+    _this77.target = targetEffect;
+    _this77.data.id = _this77.data.name = effUngrappling.name, _this77.data.duration = 0, _this77.data.hidden = 0;
+    return _this77;
   }
 
   _createClass(effUngrappling, [{
@@ -15775,17 +16170,17 @@ var effUngrappling = /*#__PURE__*/function (_CombatEffect8) {
 var effTeaseDamage = /*#__PURE__*/function (_CombatEffect9) {
   _inherits(effTeaseDamage, _CombatEffect9);
 
-  var _super114 = _createSuper(effTeaseDamage);
+  var _super115 = _createSuper(effTeaseDamage);
 
   function effTeaseDamage(amount) {
-    var _this77;
+    var _this78;
 
     _classCallCheck(this, effTeaseDamage);
 
-    _this77 = _super114.call(this);
-    _this77.amount = amount;
-    _this77.data.id = _this77.data.name = effTeaseDamage.name, _this77.data.duration = 0, _this77.data.hidden = 0;
-    return _this77;
+    _this78 = _super115.call(this);
+    _this78.amount = amount;
+    _this78.data.id = _this78.data.name = effTeaseDamage.name, _this78.data.duration = 0, _this78.data.hidden = 0;
+    return _this78;
   }
 
   _createClass(effTeaseDamage, [{
@@ -15838,16 +16233,16 @@ var effTeaseDamage = /*#__PURE__*/function (_CombatEffect9) {
 var effStunned = /*#__PURE__*/function (_CombatEffect10) {
   _inherits(effStunned, _CombatEffect10);
 
-  var _super115 = _createSuper(effStunned);
+  var _super116 = _createSuper(effStunned);
 
   function effStunned() {
-    var _this78;
+    var _this79;
 
     _classCallCheck(this, effStunned);
 
-    _this78 = _super115.call(this);
-    _this78.data.id = _this78.data.name = effStunned.name, _this78.data.duration = 2;
-    return _this78;
+    _this79 = _super116.call(this);
+    _this79.data.id = _this79.data.name = effStunned.name, _this79.data.duration = 2;
+    return _this79;
   }
 
   _createClass(effStunned, [{
@@ -15898,16 +16293,16 @@ var effStunned = /*#__PURE__*/function (_CombatEffect10) {
 var effCallHelp = /*#__PURE__*/function (_CombatEffect11) {
   _inherits(effCallHelp, _CombatEffect11);
 
-  var _super116 = _createSuper(effCallHelp);
+  var _super117 = _createSuper(effCallHelp);
 
   function effCallHelp() {
-    var _this79;
+    var _this80;
 
     _classCallCheck(this, effCallHelp);
 
-    _this79 = _super116.call(this);
-    _this79.data.id = _this79.data.name = effCallHelp.name, _this79.data.duration = 2;
-    return _this79;
+    _this80 = _super117.call(this);
+    _this80.data.id = _this80.data.name = effCallHelp.name, _this80.data.duration = 2;
+    return _this80;
   }
 
   _createClass(effCallHelp, [{
@@ -15968,16 +16363,16 @@ var effCallHelp = /*#__PURE__*/function (_CombatEffect11) {
 var skCooking = /*#__PURE__*/function (_Effect11) {
   _inherits(skCooking, _Effect11);
 
-  var _super117 = _createSuper(skCooking);
+  var _super118 = _createSuper(skCooking);
 
   function skCooking() {
-    var _this80;
+    var _this81;
 
     _classCallCheck(this, skCooking);
 
-    _this80 = _super117.call(this);
-    _this80.data.id = _this80.data.name = skCooking.name;
-    return _this80;
+    _this81 = _super118.call(this);
+    _this81.data.id = _this81.data.name = skCooking.name;
+    return _this81;
   }
 
   _createClass(skCooking, [{
@@ -16047,7 +16442,7 @@ window.gm.StatsLib = function (StatsLib) {
   return StatsLib;
 }(window.gm.StatsLib || {});
 /* twine-user-script #2: "Story JavaScript" */
-</script><tw-tag name="template" color="orange"></tw-tag><tw-tag name="_back_" color="gray"></tw-tag><tw-tag name="_nosave_" color="yellow"></tw-tag><tw-tag name="_nodeffered_" color="yellow"></tw-tag><tw-tag name="_isdeffered_" color="brown"></tw-tag><tw-passagedata pid="1" name="Info_Jake" tags="_back_" position="100,100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
+</script><tw-tag name="_nodeffered_" color="yellow"></tw-tag><tw-tag name="_isdeffered_" color="brown"></tw-tag><tw-tag name="template" color="orange"></tw-tag><tw-tag name="_back_" color="gray"></tw-tag><tw-tag name="_nosave_" color="yellow"></tw-tag><tw-passagedata pid="1" name="Info_Jake" tags="_back_" position="100,100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 Jake is here.&lt;/br&gt;
 You barely know anything about him.&lt;/br&gt;
 [[Back|_back_]]&lt;/br&gt;&lt;/br&gt;
@@ -16693,7 +17088,7 @@ Of course that werent the case and even then it wouldnt automatically implicate 
 Getting your butt ravaged is [[a No-No]] [[an odd idea ]].
 ...   
 ...Your butt feels kinda empty. Like it needs to be filled with some...some... ugh you dont know.
-Are you really going to stick something up your hole. [[Yeah]] [[No way]] [[not sure]]</tw-passagedata><tw-passagedata pid="44" name="DLCShopWelcome" tags="_back_" position="475,600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+Would you really try to stick something up your hole? [[Yeah]] [[No way]] [[not sure]]</tw-passagedata><tw-passagedata pid="44" name="DLCShopWelcome" tags="_back_" position="475,600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 Welcome to the games Shop where you can buy Quality-of-life-service and equipment for your travel in our game.&lt;/br&gt;
 Please note that you need Tokens to buy something. Token can be bougth for real money or they can be earned in the game or granted by the content managers. 
 
@@ -16936,8 +17331,9 @@ img.src = imgsrc;//&#39;https://twinery.org/homepage/img/logo.svg&#39;;   //todo
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="63" name="Status" tags="_back_" position="350,850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%let char=window.gm.player;%&gt;
 Status of &lt;%=char.name%&gt;:   [[Back|_back_]]&lt;/br&gt;
-&lt;a0 onclick=&#39;window.gm.printOutput(window.gm.printEffectSummary(&quot;&lt;%=char.id%&gt;&quot;,true,false));&#39;&gt;Stats&lt;/a&gt;
-&lt;a0 onclick=&#39;window.gm.printOutput(window.gm.printEffectSummary(&quot;&lt;%=char.id%&gt;&quot;,false,true));&#39;&gt;Fetish&lt;/a&gt;
+&lt;a0 onclick=&#39;window.gm.printOutput(window.gm.printEffectSummary(&quot;&lt;%=char.id%&gt;&quot;,true,false,false));&#39;&gt;Stats&lt;/a&gt;
+&lt;a0 onclick=&#39;window.gm.printOutput(window.gm.printEffectSummary(&quot;&lt;%=char.id%&gt;&quot;,false,false,true));&#39;&gt;Resistance&lt;/a&gt;
+&lt;a0 onclick=&#39;window.gm.printOutput(window.gm.printEffectSummary(&quot;&lt;%=char.id%&gt;&quot;,false,true,false));&#39;&gt;Fetish&lt;/a&gt;
 &lt;/br&gt;&lt;div id=&#39;output&#39;&gt;&lt;/div&gt;&lt;/br&gt;   &lt;!--message is rendered here--&gt;
 [[Back|_back_]]&lt;/br&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
@@ -17756,7 +18152,7 @@ Some things for debugging:&lt;/br&gt;
 [[Cheats|debug]]&lt;/br&gt;
 [[Back|_back_]]&lt;/br&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="79" name="debug" tags="_back_" position="1100,975" size="100,100">&lt;section&gt; &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
-[[Back|_back_]] [[DebugTransform]] [[Styletest]]&lt;/br&gt;
+[[Back|_back_]] [[DebugTransform]] [[Styletest]] [[Emergency-Wardrobe|Wardrobe]]&lt;/br&gt;
 Cheat buttons: those are meant for debugging and might break your game&lt;/br&gt;
 &lt;a0  onclick=&#39;window.gm.player.Inv.addItem(new window.storage.constructors[&quot;Money&quot;](),200);window.gm.refreshAllPanel();&#39;&gt;Get 200$&lt;/a&gt;&lt;/br&gt;
 &lt;/br&gt;
@@ -17819,6 +18215,14 @@ Theme:
 &lt;statup&gt;Statup&lt;/statup&gt;  &lt;statdown&gt;Statdown&lt;/statdown&gt; &lt;span class=&#39;red&#39;&gt;RED&lt;/span&gt;&lt;span class=&#39;green&#39;&gt;GREEN&lt;/span&gt;
 &lt;p class=&#39;div_alarm&#39;&gt;ALARM&lt;/p&gt;
 &lt;hr&gt;
+&lt;div class=&quot;progress-bar-striped&quot;&gt;
+			&lt;div style=&quot;width: 100%;&quot;&gt;&lt;b&gt;&lt;p&gt;100%&lt;/p&gt;&lt;/b&gt;&lt;/div&gt;
+		&lt;/div&gt;
+		&lt;div&gt;
+			&lt;input id=&quot;progress-value&quot; type=&quot;number&quot; placeholder=&quot;Enter desired percentage&quot; min=&quot;0&quot; max=&quot;100&quot; value=&quot;7&quot; /&gt;
+			&lt;input type=&quot;button&quot; value=&quot;Change&quot; onclick=&quot;change()&quot;/&gt;
+		&lt;/div&gt;
+&lt;hr&gt;
 &lt;label&gt;[hint]&lt;input type=&quot;checkbox&quot;  style=&quot;display: none;&quot; &gt;
   &lt;span role=&#39;tooltip&#39;&gt;hkljj  fdggfdsf gf   dfsd afsdafgdae sgfegf&lt;/span&gt;
 &lt;/label&gt;       &lt;label&gt; &lt;input type=&quot;checkbox&quot; &gt;
@@ -17833,8 +18237,14 @@ Theme:
 &lt;label&gt; &lt;input type=&quot;checkbox&quot; &gt;
   &lt;span role=&#39;tooltip&#39;&gt;hkljj  fdggfdsf gf   dfsd afsdafgdae sgfegf&lt;/span&gt;
 &lt;/label&gt;
-
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="82" name="NOP" tags="_back_" position="225,1100" size="100,100">&lt;section&gt; &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
+&lt;script&gt;
+function change(){
+				var selectedValue = document.querySelector(&quot;#progress-value&quot;).value;
+				document.querySelector(&quot;.progress-bar-striped &gt; div&quot;).textContent = selectedValue + &quot;%&quot;;
+				document.querySelector(&quot;.progress-bar-striped &gt; div&quot;).style.width = selectedValue + &quot;%&quot;;
+			}
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="82" name="NOP" tags="_back_" position="225,1100" size="100,100">&lt;section&gt; &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;p class=&#39;author&#39;&gt;Sorry, this loation is curently not implemented.&lt;/p&gt; &lt;!--todo  implement passages pointing to this--&gt;
 &lt;div&gt; &lt;/br&gt;
 [[Back|_back_]]&lt;/br&gt;&lt;/div&gt;
@@ -18763,9 +19173,19 @@ You are in the sanctum of spawn. Its located on top of the hill above the settle
 &lt;%window.gm.moveHere();%&gt;
 &lt;!--todo--&gt; There is a dirt road here crossing the lush grassland that is bordered by the trees of an forest.&lt;/br&gt; 
 One direction leads east, past a hut. The other direction follows the border of the forest but gets out of view quickly.&lt;/br&gt; 
-&lt;div&gt;&lt;/br&gt;
-[[Enter Hut|ForestAlchemistHut]] [[Into the forest|ForestEntrance]] [[follow Road|ForestBridge]] &lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="142" name="ForestSearchAround" tags="_back_" position="225,1850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;div&gt;
+[[Enter Hut|ForestAlchemistHut]] [[Into the forest|ForestEntrance]] [[follow Road|ForestBridge]] &lt;/br&gt;
+&lt;a0 onclick=&#39;enterBeehive(); &#39;&gt;Enter Beehive&lt;/a&gt; &lt;a0 onclick=&#39;enterShatteredCity(); &#39;&gt;Enter Shattered City&lt;/a&gt;&lt;/div&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
+&lt;script&gt; function enterBeehive() {
+    window.gm.dng = window.gm.dngs.BeeHive();
+    window.gm.dng.enterDungeon();
+}
+function enterShatteredCity() {
+    window.gm.dng = window.gm.dngs.ShatteredCity();
+    window.gm.dng.enterDungeon();
+}
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="142" name="ForestSearchAround" tags="_back_" position="225,1850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;% let args = window.story.state.tmp.args; if(args[0]===&#39;PurpleBerry&#39; &amp;&amp; args[1]&gt;0){ window.gm.player.Inv.addItem(window.gm.ItemsLib[args[0]](),args[1]); %&gt;
 On a secluded spot you found a batch of berry bushes. Most of them dont have any more berrys but you are able to collect a handful.&lt;/br&gt;
 &lt;%} else if(args[0]===&#39;PurpleBerry&#39;){%&gt;
@@ -19187,9 +19607,13 @@ You can see some hut from here. You just need to follow the trail down the hill.
 &lt;devnote&gt;&quot;I wish you good luck in exploring this world. May the gods be with you.&quot;&lt;/devnote&gt;&lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Continue|ForestBorder]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="168" name="Dungeon" tags="_nosave_" position="975,2100" size="100,100">&lt;!--dont &quot;show&quot; this! setup the dungeon and call enterDungeon--&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="168" name="Dungeon" tags="" position="975,2100" size="100,100">&lt;!--dont &quot;show&quot; this! setup the dungeon and call enterDungeon--&gt;
+&lt;!--if not explicitly allowed, save is disabled in dungeon--&gt;
 &lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
-&lt;%= window.gm.dng.name%&gt; &lt;%= window.gm.dng.actualRoom.descr%&gt;&lt;/br&gt;
+&lt;%= window.gm.dng.name%&gt;-&lt;%= window.gm.dng.actualRoom.floor.name%&gt;-&lt;%= window.gm.dng.actualRoom.name%&gt;&lt;/br&gt; 
+&lt;%= window.gm.dng.actualRoom.descr()%&gt;&lt;/br&gt;
+&lt;%= (window.gm.dng.actualRoom.allowSave?&quot;You can save here ! &lt;/br&gt;&quot;:&quot;&quot;)%&gt;
+&lt;%= window.gm.dng.Mapper.printMap( window.gm.dng.actualRoom,true)%&gt;&lt;/br&gt;
 &lt;/br&gt; 
 &lt;div id=&quot;panel&quot;&gt;&lt;/div&gt;&lt;/br&gt;&lt;/br&gt;    &lt;!--display button list--&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
@@ -19197,20 +19621,21 @@ You can see some hut from here. You just need to follow the trail down the hill.
 window.gm.dng.printButtons()
 &lt;/script&gt;</tw-passagedata><tw-passagedata pid="169" name="DungeonMap" tags="_nosave_" position="1100,2100" size="100,100">&lt;!--dont &quot;show&quot; this! setup the dungeon and call displayMap--&gt;
 &lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
-&lt;!--pre-formatted or messup allignment of ascii-rows--&gt;
-&lt;pre&gt;&lt;%= window.gm.dng.Mapper.printMap( window.gm.dng.actualRoom)%&gt;&lt;/pre&gt;&lt;/br&gt;
-&lt;pre&gt;Legend: P=Player, S=Stair, E=Entry/Exit&lt;pre&gt;&lt;/br&gt;
+&lt;%= window.gm.dng.Mapper.printMap( window.gm.dng.actualRoom,false)%&gt;&lt;/br&gt;
 &lt;/br&gt; 
 [[Back|Dungeon]]
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="170" name="DungeonFoundNothing" tags="_nosave_" position="1225,2100" size="100,100">&lt;!--example-scene for onenter/onexit event--&gt;
 &lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
-&lt;%= window.gm.dng.actualRoom.descr%&gt;&lt;/br&gt;
+&lt;%= window.gm.dng.actualRoom.descr()%&gt;&lt;/br&gt;
 There are some buckets here, but there is nothing useful inside.&lt;/br&gt;
 &lt;/br&gt;
 &lt;a0 onclick=&#39;window.gm.dng.resumeRoom();&#39;&gt;Go on&lt;/a&gt;&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="171" name="DungeonCrashedThroughFloor" tags="_nosave_" position="100,2225" size="100,100">&lt;!--example-scene for onenter/onexit event--&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="171" name="DungeonGenericEvent" tags="_nosave_" position="100,2225" size="100,100">&lt;!--example-scene for operation--&gt;
 &lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
-&lt;%= window.gm.dng.actualRoom.descr%&gt;&lt;/br&gt;
+&lt;%= window.gm.dng.renderEvent(window.gm.dng.evtData)%&gt;&lt;/br&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="172" name="DungeonCrashedThroughFloor" tags="_nosave_" position="225,2225" size="100,100">&lt;!--example-scene for onenter/onexit event--&gt;
+&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;%= window.gm.dng.actualRoom.descr()%&gt;&lt;/br&gt;
 You crash down through the floor and find yourself back on the lowest level of the area.&lt;/br&gt;
 &lt;/br&gt;
 &lt;a0 onclick=&#39;crashThrough();&#39;&gt;Go on&lt;/a&gt;&lt;/br&gt;
@@ -19221,12 +19646,12 @@ function crashThrough() {
     var Room = floor1.getRoom(window.gm.dng.actualRoom.name);  //room names are the same at same position of floor
     window.gm.dng.teleport(floor1, Room);
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="172" name="NOP_VR" tags="_nosave_,_back_" position="225,2225" size="100,100">&lt;!--example-scene for onenter/onexit event--&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="173" name="NOP_VR" tags="_nosave_,_back_" position="350,2225" size="100,100">&lt;!--example-scene for onenter/onexit event--&gt;
 &lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;p class=&#39;dev&#39;&gt; You cant go that way. Either because its WIP or you need to solve a quest first. &lt;/p&gt;
 &lt;/br&gt;
 [[Back|_back_]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="173" name="Home" tags="name:your_dorms_hallway" position="350,2225" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="174" name="Home" tags="name:your_dorms_hallway" position="475,2225" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;%window.gm.quests.addQuest(&quot;qFindGarden&quot;,1);window.gm.quests.addQuest(&quot;qStudy&quot;,1); %&gt;
@@ -19244,7 +19669,7 @@ function checkQuest(){
 	}
 }
 checkQuest();
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="174" name="Kitchen" tags="" position="1231,613" size="100,100">&lt;section&gt; 
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="175" name="Kitchen" tags="" position="1231,613" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 You are in the kitchen. &lt;/br&gt;
@@ -19261,7 +19686,7 @@ Mom will take care to resupply the fridge. But she might be disappointed if you 
 &lt;%}%&gt;
 Where would you like to go?&lt;/br&gt;
 [[Living_Room]]   [[Hallway|Home]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="175" name="Melanies Bedroom" tags="" position="600,2225" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="176" name="Melanies Bedroom" tags="" position="725,2225" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 This is the bedroom of Melanie.
@@ -19292,7 +19717,7 @@ function inviteChar(elmnt) {
 		elmnt.outerHTML=(&quot;&lt;div class=&#39;red&#39;&gt;Cyril added to your team. &lt;/div&gt;&quot;);
 	}
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="176" name="moms_treasure" tags="_back_" position="725,2225" size="100,100">&lt;section&gt; 
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="177" name="moms_treasure" tags="_back_" position="850,2225" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 In one of the nightstand you find some handcuffs.They look thorough but you think they just might be used for some bedplay.&lt;/br&gt;
 &lt;a0 onclick=&#39;useHandcuff(this)&#39;&gt;Play with them&lt;/a&gt;&lt;/br&gt;
@@ -19304,7 +19729,7 @@ function useHandcuff(elmnt) {
 	window.gm.player.Outfit.addItem(new Handcuffs());
 	elmnt.replaceWith(&quot;&lt;div class=&#39;red&#39;&gt;Playing around with the cuffs you suddenly find yourself locked up with them. You panick as you find the locking-mechanic quite tight. You need a key and maybe some help to unlock them!&lt;/div&gt;&quot;);
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="177" name="Your Bedroom" tags="" position="1033,470" size="100,100">&lt;section&gt; 
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="178" name="Your Bedroom" tags="" position="1033,470" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%window.gm.player.location=window.passage.name; 
 window.gm.quests.addQuest(&quot;qMyPleasure&quot;,1);%&gt;
@@ -19333,7 +19758,7 @@ There is a large bed for sleeping with a nightstand aside. &lt;/br&gt;
 &lt;% } else { %&gt;
 Where do you want to go ? &lt;/br&gt;
 [[Hallway|Home]]&lt;/br&gt; &lt;%}%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="178" name="Sleep" tags="" position="975,2225" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="179" name="Sleep" tags="" position="1100,2225" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 You fall into your bedsheets and sleep until your smartphone buzzes you out of your dreams.&lt;/br&gt;
 &lt;/br&gt;&lt;div id=&#39;output&#39;&gt;&lt;/div&gt;
@@ -19354,7 +19779,7 @@ function checkJob() {
 	return(text);
 }
 window.gm.printOutput(checkJob());
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="179" name="Living_Room" tags="" position="1100,2225" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="180" name="Living_Room" tags="" position="1225,2225" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 The living room that you share with your mom is sparsely decorated (until now).&lt;/br&gt;
 An old wooden table with 4 chairs rests on a wornout green carpet.&lt;/br&gt;
 Some money is laying on the table. Maybe mom forgot it there.&lt;/br&gt;
@@ -19392,11 +19817,11 @@ function touchCatIdol(elmnt) {
 	elmnt.replaceWith(&quot;Its just a simple statue.&quot;); //elmnt.replaceWith(&quot;There is a tickling feeling in your hand.&quot;);
 	//window.gm.player.addEffect(&quot;effMutateCat&quot;,window.storage.constructors[&#39;effMutateCat&#39;]());
 }
-&lt;/script&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="180" name="Cabinet" tags="" position="1225,2225" size="100,100">&lt;section&gt; 
+&lt;/script&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="181" name="Cabinet" tags="" position="100,2350" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 There is nothing here
 [[Living_Room]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="181" name="Garden" tags="" position="100,2350" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="182" name="Garden" tags="" position="225,2350" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;window.gm.quests.tick();%&gt;
 The garden behind the house is not very large. &lt;/br&gt;
@@ -19414,18 +19839,18 @@ You remeber that you took the shovel from here.&lt;/br&gt;
 &lt;%}%&gt;
 Where would you like to go?&lt;/br&gt;
 [[Hallway|Home]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="182" name="Cellar" tags="" position="225,2350" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="183" name="Cellar" tags="" position="350,2350" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 The portal is still active. Do you dare to [[enter|Cellar_Portal]] it? &lt;/br&gt;&lt;/br&gt;
 Where would you like to go?&lt;/br&gt;
 [[Hallway|Home]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="183" name="Cellar_PortalReverse" tags="" position="350,2350" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="184" name="Cellar_PortalReverse" tags="" position="475,2350" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;!--&lt;%window.gm.player.location=window.passage.name;%&gt;--&gt;
 The portal spits you out in the dim light of your cellar.&lt;/br&gt;&lt;/br&gt;
 [[Next|Cellar]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="184" name="Cellar_Portal" tags="" position="475,2350" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="185" name="Cellar_Portal" tags="" position="600,2350" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;!--&lt;%window.gm.player.location=window.passage.name;%&gt;--&gt;
 A blinding light engulfs you just for a second and then a deafening darkness.  &lt;/br&gt;&lt;/br&gt;
@@ -19434,7 +19859,7 @@ As you come back to your senses you find yourself cowering on the floor, still c
 Time to move on.&lt;/br&gt;&lt;/br&gt;&lt;/br&gt;
 Where would you like to go?&lt;/br&gt;
 [[Home|Cellar_PortalReverse]] [[Mall|Mall Floor 0 (postapocalypse)]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="185" name="HairGrow" tags="deferred" position="600,2350" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="186" name="HairGrow" tags="deferred" position="725,2350" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 A blinding light engulfs you just for a second and then a deafening darkness.  &lt;/br&gt;&lt;/br&gt;
 Its impossible to tell what else happens or how long the process takes.&lt;/br&gt;&lt;/br&gt;
@@ -19442,12 +19867,12 @@ As you come back to your senses you find yourself cowering on the floor, still c
 Time to move on.&lt;/br&gt;&lt;/br&gt;&lt;/br&gt;
 Where would you like to go?&lt;/br&gt;
 [[Next|&lt;%=window.gm.player.location%&gt;]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="186" name="Home_Study" tags="" position="725,2350" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="187" name="Home_Study" tags="" position="850,2350" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;% window.gm.player.Stats.increment(&#39;energy&#39;,-20);window.gm.addTime(120);window.gm.quests.forceQuestMilestone(&quot;qStudy&quot;,100,1);%&gt;
 You sit down with your books and scriblings and try to get some sense out of it.&lt;/br&gt;
 [[Give up|&lt;%=window.gm.player.location%&gt;]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="187" name="Campus" tags="" position="825,825" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="188" name="Campus" tags="" position="825,825" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;%if(!window.gm.quests.hasActiveQuest(&quot;qFindAJob&quot;)){  %&gt;
@@ -19465,21 +19890,21 @@ You sit down with your books and scriblings and try to get some sense out of it.
     [[Electrical &amp; Mechanical Engineering|NOP]]  [Chemistry &amp; Process Engineering] [Micro-Power &amp; Nano-Engineering] [[Dining Hall]]  [[ITD Office]]  Library &lt;/br&gt;
     [[Into the city]]&lt;/br&gt;&lt;/div&gt; 
 &lt;%}%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="188" name="ITD Office" tags="" position="975,2350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="189" name="ITD Office" tags="" position="1100,2350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 This is the office-building of the Institute.&lt;/br&gt;
 The [[counsellor|NOP]] might be available to give you some guidance about institutional affairs.&lt;/br&gt;
 Here in the lobby of the building is also a [[blackboard]]. Maybe you can find some job offers there or informations about upcoming events. &lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Campus]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="189" name="Dining Hall" tags="" position="1100,2350" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="190" name="Dining Hall" tags="" position="1225,2350" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 Die Mensa ist wahrscheinlich das beliebteste Gebäude des Campus bei den Studenten; es gibt was zu essen und an kann miteinander quatschen.&lt;/br&gt;
 Das Essen ist vielleicht nicht gerade das beste auf der Welt aber dafür ist es recht günstig. Hast du Hunger?&lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Campus]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="190" name="blackboard" tags="_back_" position="1225,2350" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="191" name="blackboard" tags="_back_" position="100,2475" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &#39;Lets see if there is anything interesting.&#39;&lt;/br&gt;
@@ -19488,7 +19913,7 @@ There is an announce from Harcon Health Inc. for a [[job|Harcon_Logistic_Ad]] in
 &lt;%}%&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Back|_back_]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="191" name="attend lecture" tags="" position="100,2475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="192" name="attend lecture" tags="" position="225,2475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 todo You attend to lectures all morning.&lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
@@ -19500,14 +19925,14 @@ function work() {
     window.gm.forwardTime(1300);
     window.story.show(&quot;Campus&quot;);
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="192" name="Harcon_Logistic_Ad" tags="_back_" position="225,2475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="193" name="Harcon_Logistic_Ad" tags="_back_" position="350,2475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 The typewritten note advertises a part-time position in the logistics department.&lt;/br&gt;
 &lt;p class=&quot;tPC&quot;&gt;&#39;Logistic doesnt sound that interesting and I doubt that position is targeted to an engineer. But maybe I should show up there in person and see what it is about.&#39;&lt;/p&gt;&lt;/br&gt;
 The adress points to be somehwere around downtonw.&lt;/br&gt;
 &lt;a0 onclick=&#39;window.gm.quests.forceQuestMilestone(&quot;qFindAJob&quot;,100,1); window.story.show(&quot;ITD Office&quot;);&#39;&gt;Note down the adress&lt;/a&gt;&lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Back|_back_]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="193" name="Harcon_Health" tags="" position="350,2475" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="194" name="Harcon_Health" tags="" position="475,2475" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;%if(window.gm.quests.hasActiveQuest(&quot;qFindAJob&quot;,100)){  %&gt;
@@ -19543,7 +19968,7 @@ The adress points to be somehwere around downtonw.&lt;/br&gt;
     This seems to be some kind of factory. You have no business here.&lt;/br&gt;
     &lt;div&gt;&lt;/br&gt;[[Downtown]]&lt;/br&gt;&lt;/div&gt;
 &lt;%}%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="194" name="Harcon_Logistic_Intro" tags="" position="475,2475" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="195" name="Harcon_Logistic_Intro" tags="" position="600,2475" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 ...!--todo--
@@ -19564,7 +19989,7 @@ The adress points to be somehwere around downtonw.&lt;/br&gt;
     Mr. Erichson looks quite disappointed.  &lt;/br&gt;
     [[Next|Downtown]]&lt;/br&gt; 
 &lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="195" name="Harcon_work" tags="" position="600,2475" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="196" name="Harcon_work" tags="" position="725,2475" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;%if(window.gm.quests.hasActiveQuest(&quot;qFindAJob&quot;,200)){  %&gt;
@@ -19581,7 +20006,7 @@ function work() {
     window.gm.quests.getQuestState(&quot;qFindAJob&quot;).flags+=1;
     window.story.show(&quot;Downtown&quot;);
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="196" name="Mall Floor 0" tags="" position="1250,850" size="100,100">&lt;section&gt; 
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="197" name="Mall Floor 0" tags="" position="1250,850" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 You are actually at [[&lt;%=window.gm.player.location%&gt;]].&lt;/br&gt;
@@ -19601,7 +20026,7 @@ _Entrys.push({id:&quot;Lube&quot;,count:10,cost:4,costPerv:10});
 _Entrys.push({id:&quot;Battery&quot;,count:4,cost:4,costPerv:0});
 _Entrys.push({id:&quot;Dildo_small&quot;,count:1,cost:25,costPerv:14});
 renderToSelector(&quot;#panel&quot;, &quot;listbuy&quot;); 
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="197" name="Mall Floor 1" tags="" position="1125,850" size="100,100">&lt;section&gt; 
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="198" name="Mall Floor 1" tags="" position="1125,850" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;%window.gm.printShopBuyEntry(&quot;Lube&quot;,4,cbCanBuy=(function(itemid){return window.gm.cbCanBuyPerverse(itemid,15,10)}),cbPostBuy=(function(itemid){window.gm.defaultPostBuy(itemid,15)}))%&gt;
@@ -19616,7 +20041,7 @@ if(window.gm.player.Stats.get(&#39;corruption&#39;).value&lt;=10) {%&gt;
 &lt;%} else {%&gt; [[Adult books and tools]] &lt;/br&gt; &lt;%} %&gt;
 Where would you like to go from here?&lt;/br&gt;
 [[Mall 0F|Mall Floor 0]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="198" name="Mall Floor -1" tags="" position="1000,825" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="199" name="Mall Floor -1" tags="" position="1000,825" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 You are actually at [[&lt;%=window.gm.player.location%&gt;]].&lt;/br&gt;
@@ -19624,7 +20049,7 @@ This level of the mall seems to be reserved for the less fancy business. &lt;/br
 Most of the space is occupied by the usual [[electronics store]] and a [[food store]].
 Where would you like to go from here?&lt;/br&gt;
 [[Mall 0F|Mall Floor 0]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="199" name="Adult books and tools" tags="" position="1025,650" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="200" name="Adult books and tools" tags="" position="1025,650" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 You are actually at [[&lt;%=window.gm.player.location%&gt;]].&lt;/br&gt;
@@ -19637,11 +20062,11 @@ No way I&#39;m going in to that smut-shop. Only perverts do that. &lt;/br&gt;
 &lt;%} %&gt;
 Where would you like to go from here?&lt;/br&gt;
 [[Mall 0F|Mall Floor 0]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="200" name="Buy" tags="_back_" position="850,350" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="201" name="Buy" tags="_back_" position="850,350" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 
 [[Back|_back_]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="201" name="Mall Floor 0 (postapocalypse)" tags="" position="100,2600" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="202" name="Mall Floor 0 (postapocalypse)" tags="" position="225,2600" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 You are actually at [[&lt;%=window.gm.player.location%&gt;]].&lt;/br&gt;
@@ -19652,7 +20077,7 @@ Where would you like to go from here?&lt;/br&gt;
 [[Mall 1F|Mall Floor 1 (postapocalypse)]]
 The stairway to the lower floor is blocked by parts of the building that fell down from top. But there might be other options to get there. &lt;/br&gt; 
 [[Exit|Into the city]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="202" name="Mall Floor 1 (postapocalypse)" tags="" position="225,2600" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="203" name="Mall Floor 1 (postapocalypse)" tags="" position="350,2600" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 
@@ -19667,11 +20092,11 @@ Where would you like to go from here?&lt;/br&gt;
 You are on the hunt for useful resources as...
 &lt;a href=&quot;javascript:void(0)&quot; onclick=&#39;window.gm.encounters.mole(window.gm.player.location);&#39;&gt;Next&lt;/a&gt; &lt;/br&gt;
 
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="203" name="skCooking" tags="" position="825,625" size="100,100">You can create tasty meals from basic ingredients. No need to rely on fastfood.
-[[Back|&lt;%=window.gm.player.location%&gt;]]</tw-passagedata><tw-passagedata pid="204" name="skSporty" tags="" position="725,625" size="100,100">You like to do sports.
-[[Back|&lt;%=window.gm.player.location%&gt;]]</tw-passagedata><tw-passagedata pid="205" name="skTechy" tags="" position="825,525" size="100,100">Tinkering and repairing gadgets is your thing.
-[[Back|&lt;%=window.gm.player.location%&gt;]]</tw-passagedata><tw-passagedata pid="206" name="skMoneymaker" tags="" position="725,525" size="100,100">You often find ways to increase your profit a little bit.
-[[Back|&lt;%=window.gm.player.location%&gt;]]</tw-passagedata><tw-passagedata pid="207" name="Start" tags="" position="850,2600" size="100,100">Select a Link:
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="204" name="skCooking" tags="" position="825,625" size="100,100">You can create tasty meals from basic ingredients. No need to rely on fastfood.
+[[Back|&lt;%=window.gm.player.location%&gt;]]</tw-passagedata><tw-passagedata pid="205" name="skSporty" tags="" position="725,625" size="100,100">You like to do sports.
+[[Back|&lt;%=window.gm.player.location%&gt;]]</tw-passagedata><tw-passagedata pid="206" name="skTechy" tags="" position="825,525" size="100,100">Tinkering and repairing gadgets is your thing.
+[[Back|&lt;%=window.gm.player.location%&gt;]]</tw-passagedata><tw-passagedata pid="207" name="skMoneymaker" tags="" position="725,525" size="100,100">You often find ways to increase your profit a little bit.
+[[Back|&lt;%=window.gm.player.location%&gt;]]</tw-passagedata><tw-passagedata pid="208" name="Start" tags="" position="975,2600" size="100,100">Select a Link:
 &lt;ul&gt;
     &lt;li&gt;[[_SuperSimpleStory_]]&lt;/li&gt;
 	&lt;li&gt;[[_ImagesAndOtherMedia_]]&lt;/li&gt;
@@ -19680,9 +20105,78 @@ You are on the hunt for useful resources as...
     &lt;li&gt;[[_Inventory_]]&lt;/li&gt;
     &lt;li&gt;[[_SaveAndRestore_]]&lt;/li&gt;
     &lt;li&gt;[[StartPage]]&lt;/li&gt;
-&lt;/ul&gt;</tw-passagedata><tw-passagedata pid="208" name="NewGamePlus" tags="" position="975,2600" size="100,100">You finished the game in some way but maybe you have missed something. &lt;/br&gt;
+&lt;/ul&gt;</tw-passagedata><tw-passagedata pid="209" name="NewGamePlus" tags="" position="1100,2600" size="100,100">You finished the game in some way but maybe you have missed something. &lt;/br&gt;
 Would you like to start a new game while taking some of your equipment/skills with you?&lt;/br&gt;
-&lt;a0 onclick=&#39;window.gm.newGamePlus()&#39;&gt;Start new game plus&lt;/a&gt;&lt;/br&gt;</tw-passagedata></tw-storydata>
+&lt;a0 onclick=&#39;window.gm.newGamePlus()&#39;&gt;Start new game plus&lt;/a&gt;&lt;/br&gt;</tw-passagedata><tw-passagedata pid="210" name="TowerOfKinks" tags="" position="1225,2600" size="100,100">ClitPiercing of Stamina
+
+resistance to   poisoned air, slime, cold
+
+reduce energy drain of 2 items by 1
+reduce hunger by 2 but increases thirst by 1
+
+amplifies all items with cold resistance by 33%
+
+reduces mallus-effects from items on legs by 25% 
+
+improves charisma by 2
+
+improves energy-regeneration by 2/h
+
+for each piercing, add 2 to energy-regeneration
+
+improves appearane to bondage-inclined foes but induces bondage-fetish
+
+slowly increaes milk-fetish when worn visible
+
+increases relation to lupines by 1
+
+increases chance to sneak around an enemy 
+
+increases chance of valuables in loot
+
+increases chance of items with stronger effects (good or bad)
+
+requires masochism-fetish of 10
+
+requires 1 energy/h to work
+
+trader to buy tools, items and food
+librarian to identify hidden item-enchantments or remove curse
+artesan to unlock items, improve items, repair items
+medic to remove parasites and addiction, create potions
+campfire to rest, fasttravel, storage-chest
+
+every third dungeon is handdrawn and has boss
+other dungeons are randomized with same theme like boss-level
+
+you can revisit boss-levels; foe-respawn after 48h
+
+castle:
+    archer, knight, nun
+    boss: gryphon
+
+desert: hot, dry, quicksand, sandstorm
+    naga, cheetah, lizardman
+    boss: 
+
+forest: 
+    dryad, hunter, wolf
+    boss: witch
+
+caves: cold, wet, slippery, dark
+    slime, imp, gnoll
+
+jungle: hot, humid, poisonous
+    panther, giant-snake, raptor
+
+laboratory: chemicals
+    tentacle, golem, alchemmist
+
+pyramids: chaste
+    priest, acolythe, anubis, scarab
+
+underworld:
+    succubus, hellhound,</tw-passagedata></tw-storydata>
 		<script>
 		(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 "use strict";window.either=function(){for(var n=[],t=0;t<arguments.length;t++)if(arguments[t]instanceof Array)for(var r=0;r<arguments[t].length;r++)n.push(arguments[t][r]);else n.push(arguments[t]);return n[_.random(n.length-1)]},window.hasVisited=function(){var n=null;if(1===arguments.length)return null!=(n=window.story.passage(arguments[0]))&&window.story.history.includes(n.id);for(var t=0;t<arguments.length;t++)if(null===(n=window.story.passage(arguments[t]))||!1===window.story.history.includes(n.id))return!1;return!0},window.visited=function(){for(var n=[],t=[],r=0;r<arguments.length;r++){var e=window.story.passage(arguments[r]);null!==e&&(t=window.story.history.filter(function(n){return n===e.id})),n.push(t.length)}return Math.min.apply(Math,n)},window.renderToSelector=function(n,t){var r=window.story.passage(t);null!==r&&$(n).html(r.render())},window.getStyles=function(){return $.when.apply($,$.map(arguments,function(n){return $.get(n,function(n){$("<style>"+n+"</style>").appendTo("head")})}))};

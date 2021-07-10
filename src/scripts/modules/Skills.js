@@ -607,3 +607,19 @@ window.gm.SkillsLib = (function (Lib) {
     //    Lib['SkillAttack'] = function () { return new SkillAttack();};
     return Lib; 
 }(window.gm.SkillsLib || {}));
+
+/*todo 
+Slash: (weapontype) causes slash-damage; chance to cause bleed on critical (on non-constructs/conjuration)
+
+Stoneskin: (passive) if a slash-attack would cause bleed; attackers weapon gets blunted for rest of fight
+
+GolemCrusher: increased blunt-damage against golems
+
+LifeDrain: soul-damage; restores health equal to fraction of damage caused on living
+
+Supraconductor: incoming ice-damage has chance to increase spark-damage output for some turns; but fire-damage has the oposite effect
+
+BladeMace: deals slash or blunt-damage depending which would cause more damage
+
+PoisonCloud: small damage over time to lifing  
+ */

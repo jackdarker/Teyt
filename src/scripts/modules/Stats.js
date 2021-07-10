@@ -836,11 +836,11 @@ class effDamage extends CombatEffect {
     }
     toJSON() {return window.storage.Generic_toJSON("effDamage", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(effDamage, value.data);};
-    onCast(targets,caster) {
+    /*??onCast(targets,caster) {
         let result={OK:false,msg:''};
         targets[0].
         if(this.onHitCB) onHitCB(targets,caster);
-    }
+    }*/
     onApply(){
         this.data.duration = 0;
         this.parent.parent.Stats.increment('health',-1*this.amount);

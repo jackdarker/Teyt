@@ -12,7 +12,7 @@ Some things for debugging:</br>
 
 :: debug [_back_]
 <section> <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
-[[Back|_back_]] [[DebugTransform]] [[Styletest]]</br>
+[[Back|_back_]] [[DebugTransform]] [[Styletest]] [[Emergency-Wardrobe|Wardrobe]]</br>
 Cheat buttons: those are meant for debugging and might break your game</br>
 <a0  onclick='window.gm.player.Inv.addItem(new window.storage.constructors["Money"](),200);window.gm.refreshAllPanel();'>Get 200$</a></br>
 </br>
@@ -83,6 +83,14 @@ Theme:
 <statup>Statup</statup>  <statdown>Statdown</statdown> <span class='red'>RED</span><span class='green'>GREEN</span>
 <p class='div_alarm'>ALARM</p>
 <hr>
+<div class="progress-bar-striped">
+			<div style="width: 100%;"><b><p>100%</p></b></div>
+		</div>
+		<div>
+			<input id="progress-value" type="number" placeholder="Enter desired percentage" min="0" max="100" value="7" />
+			<input type="button" value="Change" onclick="change()"/>
+		</div>
+<hr>
 <label>[hint]<input type="checkbox"  style="display: none;" >
   <span role='tooltip'>hkljj  fdggfdsf gf   dfsd afsdafgdae sgfegf</span>
 </label>       <label> <input type="checkbox" >
@@ -97,8 +105,14 @@ Theme:
 <label> <input type="checkbox" >
   <span role='tooltip'>hkljj  fdggfdsf gf   dfsd afsdafgdae sgfegf</span>
 </label>
-
 </article><article id="LogPanel"></article></section>
+<script>
+function change(){
+				var selectedValue = document.querySelector("#progress-value").value;
+				document.querySelector(".progress-bar-striped > div").textContent = selectedValue + "%";
+				document.querySelector(".progress-bar-striped > div").style.width = selectedValue + "%";
+			}
+</script>
 
 
 :: NOP [_back_]

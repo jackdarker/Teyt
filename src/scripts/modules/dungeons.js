@@ -1,8 +1,7 @@
 "use strict";
-
 class BeeHive extends DngDungeon{
     constructor()    {
-        super("BeeHive", "There seem to live alot of giant bees here.")
+        super("BeeHive", function() { return("There seem to live alot of giant bees here.")},window.story.state[BeeHive.name])
         this.buildFloors();
     }
 
@@ -11,9 +10,7 @@ class BeeHive extends DngDungeon{
         var firstFloor//:DngFloor;
         var stairUp//:DngRoom;
         var stairDown//:DngRoom;
-        firstFloor = new DngFloor();
-        firstFloor.description = "This is the lowest floor of the beehive.";
-        firstFloor.name = "1.Floor";
+        firstFloor = new DngFloor("1.Floor", function() {return("This is the lowest floor of the beehive.")});
         var room//:DngRoom;
         //var rooms:LookupTable = new LookupTable(); 
         var rooms= new Map();
@@ -24,18 +21,18 @@ class BeeHive extends DngDungeon{
         *  |    |    |    |
         *  E    C2   C3   S
         * */
-        rooms.set("Entrance", new DngRoom("Entrance", "",false));
-        rooms.set("B1", new DngRoom("B1", "",false));
-        rooms.set("A1",new DngRoom("A1", "",true));	//hidden
-        rooms.set("B2", new DngRoom("B2", "", false));
-        rooms.set("C2",new DngRoom("C2", "",false));
-        rooms.set("A2",new DngRoom("A2", "",false));
-        rooms.set("B3", new DngRoom("B3", "", false));
-        rooms.set("C3",new DngRoom("C3", "",false));
-        rooms.set("A3",new DngRoom("A3", "",false));
-        rooms.set("B4",new DngRoom("B4", "",false));
-        rooms.set("A4",new DngRoom("A4", "",false));
-        rooms.set("Stairs",new DngRoom("Stairs", "",false));
+        rooms.set("Entrance", new DngRoom("Entrance", null,false));
+        rooms.set("B1", new DngRoom("B1", null,false));
+        rooms.set("A1",new DngRoom("A1", null,true));	//hidden
+        rooms.set("B2", new DngRoom("B2", null, false));
+        rooms.set("C2",new DngRoom("C2", null,false));
+        rooms.set("A2",new DngRoom("A2", null,false));
+        rooms.set("B3", new DngRoom("B3", null, false));
+        rooms.set("C3",new DngRoom("C3", null,false));
+        rooms.set("A3",new DngRoom("A3", null,false));
+        rooms.set("B4",new DngRoom("B4", null,false));
+        rooms.set("A4",new DngRoom("A4", null,false));
+        rooms.set("Stairs",new DngRoom("Stairs", null,false));
         DngDirection.createDirection(DngDirection.DirN, rooms.get("Entrance") , rooms.get("B1"));
         DngDirection.createDirection(DngDirection.DirE, rooms.get("B1" ), rooms.get("B2"));
         DngDirection.createDirection(DngDirection.DirN, rooms.get("B2" ), rooms.get("A2"));
@@ -66,9 +63,7 @@ class BeeHive extends DngDungeon{
         
         
         var secondFloor;
-        secondFloor = new DngFloor();
-        secondFloor.description = "This is the second floor of the beehive.";
-        secondFloor.name = "2.Floor";
+        secondFloor = new DngFloor("2.Floor",function(){return("This is the second floor of the beehive.")});
         rooms= new Map(); 
         /* second floor
         * 	A1# - A2 - A3# - A4
@@ -77,18 +72,18 @@ class BeeHive extends DngDungeon{
         *  |     |    |     |
         *  C1 - C2# - C3# - S
         * */
-        rooms.set("C1", new DngRoom("C1", "",false));
-        rooms.set("B1", new DngRoom("B1", "",false));
-        rooms.set("A1", new DngRoom("A1", "",false));
-        rooms.set("C2", new DngRoom("C2", "",false));
-        rooms.set("B2",new DngRoom("B2", "",false));
-        rooms.set("A2", new DngRoom("A2", "",false));
-        rooms.set("C3", new DngRoom("C3", "",false));
-        rooms.set("B3",new DngRoom("B3", "",false));
-        rooms.set("A3", new DngRoom("A3", "",false));
-        rooms.set("StairsDown",new DngRoom("StairsDown", "",false));
-        rooms.set("B4",new DngRoom("B4", "",false));
-        rooms.set("A4", new DngRoom("A4", "",false));
+        rooms.set("C1", new DngRoom("C1", null,false));
+        rooms.set("B1", new DngRoom("B1", null,false));
+        rooms.set("A1", new DngRoom("A1", null,false));
+        rooms.set("C2", new DngRoom("C2", null,false));
+        rooms.set("B2",new DngRoom("B2", null,false));
+        rooms.set("A2", new DngRoom("A2", null,false));
+        rooms.set("C3", new DngRoom("C3", null,false));
+        rooms.set("B3",new DngRoom("B3", null,false));
+        rooms.set("A3", new DngRoom("A3", null,false));
+        rooms.set("StairsDown",new DngRoom("StairsDown", null,false));
+        rooms.set("B4",new DngRoom("B4", null,false));
+        rooms.set("A4", new DngRoom("A4", null,false));
         DngDirection.createDirection(DngDirection.DirE, rooms.get("C3" ), rooms.get("StairsDown"));
         DngDirection.createDirection(DngDirection.DirE, rooms.get("C2" ), rooms.get("C3"));
         DngDirection.createDirection(DngDirection.DirE, rooms.get("C1" ), rooms.get("C2"));
@@ -126,10 +121,10 @@ class BeeHive extends DngDungeon{
         _floors.push(secondFloor);
         //now create floor links
         DngDirection.createDirection(DngDirection.StairUp, stairUp , stairDown);
-        this.setFloors(_floors);
+        this.setFloors(_floors);//assign floors to dng
     }
     exitDungeon() {
-        window.gm.dng=null;
+        super.exitDungeon();
         window.story.show("ForestEntrance");
     }
     encounterTentacle(Me) {
@@ -163,7 +158,123 @@ class BeeHive extends DngDungeon{
     }
 }
 
+class ShatteredCity extends DngDungeon{
+    static persistentDngDataTemplate() {
+        let _data = {
+            A1Chest:["TailRibbon","HorsePotion"],
+            A2defeated : 0
+        };
+        return(_data);
+    }
+    constructor()    {
+        super("ShatteredCity", function() { return("A once thriving city now lies in ruins.")},window.story.state[ShatteredCity.name]);
+        this.buildFloors();
+    }
+    buildFloors() {
+        var _floors= [];
+        var firstFloor//:DngFloor;
+        var stairUp//:DngRoom;
+        var stairDown//:DngRoom;
+        firstFloor = new DngFloor("main street");
+        var room//:DngRoom;
+        var rooms= new Map();
+        /* main street
+        *  A1 - A2 - A3 - A4
+        *  	    |	  |    |	
+        *  B1 - B2   B3   B4
+        *  |    |    |    |
+        *  C1   C2   C3  C4
+        * B1 = Entrance
+        * */
+        rooms.set("C1",new DngRoom("C1", null,false));
+        rooms.set("B1",new DngRoom("B1", null,false));
+        rooms.set("A1",new DngRoom("A1", null,false));
+        rooms.set("B2",new DngRoom("B2", function(){return('Campfire');},false));
+        rooms.set("C2",new DngRoom("C2", null,false));
+        rooms.set("A2",new DngRoom("A2", null,false));
+        rooms.set("B3",new DngRoom("B3", null,false));
+        rooms.set("C3",new DngRoom("C3", null,false));
+        rooms.set("A3",new DngRoom("A3", null,false));
+        rooms.set("B4",new DngRoom("B4", null,false));
+        rooms.set("A4",new DngRoom("A4", null,false));
+        rooms.set("C4",new DngRoom("C4", null,false));
+        DngDirection.createDirection(DngDirection.DirN, rooms.get("C1") , rooms.get("B1"));
+        DngDirection.createDirection(DngDirection.DirE, rooms.get("B1" ), rooms.get("B2"));
+        DngDirection.createDirection(DngDirection.DirN, rooms.get("B2" ), rooms.get("A2"));
+        DngDirection.createDirection(DngDirection.DirN, rooms.get("C2" ), rooms.get("B2"));
+        DngDirection.createDirection(DngDirection.DirW, rooms.get("A2" ), rooms.get("A1"));
+        DngDirection.createDirection(DngDirection.DirE, rooms.get("A2" ), rooms.get("A3"));
+        DngDirection.createDirection(DngDirection.DirE, rooms.get("A3" ), rooms.get("A4"));
+        DngDirection.createDirection(DngDirection.DirN, rooms.get("B3" ), rooms.get("A3"));
+        DngDirection.createDirection(DngDirection.DirN, rooms.get("C3" ), rooms.get("B3"));
+        DngDirection.createDirection(DngDirection.DirS, rooms.get("A4" ), rooms.get("B4"));
+        DngDirection.createDirection(DngDirection.DirS, rooms.get("B4" ), rooms.get("C4"));
+        room = (rooms.get("B1") );
+        room.isDungeonEntry = room.isDungeonExit = true;
+        room = (rooms.get("A1"));
+        let _lootChestA1 = new DngOperation("Chest");
+        _lootChestA1.canTrigger = function(){return(true);};
+        _lootChestA1.onTrigger = function(){
+            this.renderEvent = this.renderChestA1;
+            this.evtData = {};
+            this.renderNext(1);
+        };
+        room.operations = [_lootChestA1]; //adds an loot-chest in this room
+        room = (rooms.get("B2") );
+        room.allowSave=true;
+        room = (rooms.get("A4") );
+        room.onEnterFct = this.encounterBee2;
+        room = (rooms.get("A3") );
+        room.onEnterFct = this.encounterBee2;
+        room = (rooms.get("B4") );
+        room.getDirection(DngDirection.DirS).canExitFct = this.hasItem;
+        stairUp = (rooms.get("C4") );
+        
+        firstFloor.setRooms(Array.from(rooms.values( )));
+        _floors.push(firstFloor);
+        this.setFloors(_floors);
+    }
+    exitDungeon() {
+        super.exitDungeon();
+        window.story.show("ForestEntrance");
+    }
+    renderNext(id) { //helper function because for fucks sake i cant insert " in strings ?! 
+        window.gm.dng.evtData.id=id;
+        window.story.show("DungeonGenericEvent");
+    }
+    renderChestA1(evt) { //this is some statemachine to render the screen for lootchest
+        let msg ='';
+        if(evt.id===1) {
+            msg = 'There is a chest. Do you dare to open it?</br>';
+            msg+= window.gm.printLink("open chest","window.gm.dng.renderNext(2)");
+            msg+= window.gm.printLink("Leave","window.gm.dng.resumeRoom()");
+        } else if(evt.id===2 && this.data.A1Chest.length>0) {
+            msg = 'You find:'+this.data.A1Chest.join(",")+'</br>';
+            msg+= window.gm.printLink("Take all","window.gm.dng.renderNext(3)");
+        } else if(evt.id===3) {
+            for(el of this.data.A1Chest){
+                this._addItemToPlayer(el);
+            }
+            this.data.A1Chest = [];
+            msg = 'You take everything from the chest.</br>';
+            msg+= window.gm.printLink("Leave","window.gm.dng.resumeRoom()");
+        } else {
+            msg = 'There is nothing useful.</br>';
+            msg+= window.gm.printLink("Leave","window.gm.dng.resumeRoom()");
+        }
+        return(msg);
+    }
+    _addItemToPlayer(id) {
+        let item = new window.storage.constructors[id]();
+        if(item.canEquip) {
+            window.gm.player.Wardrobe.addItem(item);
+        } else {
+            window.gm.player.Inv.addItem(item);
+        }
+    }
+}
 window.gm.dngs = (function (dngs) {
     dngs.BeeHive = function () { return(new BeeHive());  };  
+    dngs.ShatteredCity = function () { return(new ShatteredCity());  };  
     return dngs; 
 }(window.gm.dngs || {}));

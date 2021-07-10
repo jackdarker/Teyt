@@ -83,8 +83,8 @@ class DngDirection{
     static FALSE(Me) { return false; };
     static TRUE(Me) { return true; };
     
-    constructor(dirEnum,name,descr) 		{	
-        this.name = name,this.descr = ((descr==="") ? name:descr);
+    constructor(dirEnum,name,descr){	
+        this.name = name,this.descr = (descr===null) ? function() {return(name)}:descr;
         this.direction = dirEnum;
         this.oneWay=false;
         this.onExitFct= this.onEnterFct =  this.canExitFct= null;
@@ -123,12 +123,13 @@ class DngDirection{
 // a room connected by directions
 class DngRoom {
     constructor(name,descr,hidden) {
-        this.name = name, this.descr = (descr===null||descr==="")?name:descr;
+        this.name = name, this.descr = (descr===null)?function(){ return(name)}:descr;
         this.isDungeonExit = false; // player can leave to camp with Leave-button
         this.isDungeonEntry = false; //when entering the dungeon player will be coming from here; there should only be one of this 
         this.directions/*DngDirection*/ = [null, null, null, null, null, null];	//list of directions
         this.operations/*DngOperations*/ = []; //list of additional operations (= buttons you can press)
-        this.isHidden = false;
+        this.isHidden = hidden;
+        this.allowSave=false;
         //this.floor/*DngFloor*/ = null;	//the floor where the room is assigned to
         this.onEnterFct = null;
         this.origResumeFct = null;
@@ -216,7 +217,7 @@ class DngRoom {
 class DngFloor {
     constructor(name,descr) {
         this.rooms = [];//list of rooms
-        this.descr = descr;
+        this.descr = (descr===null)?function(){ return(name)}:descr;
         this.name = name; //label of the floor 
     }
 	
@@ -254,34 +255,50 @@ class DngFloor {
 }
 // an additional operation that the player can trigger by pressing a button
 class DngOperation {
-    constructor(name,destination) {
-        this.destination = destination; //description to be displayed when entering room
+    constructor(name) {
         this.name=name; //label of the button
     };
-	
     //function to check if player can use this button
     canTrigger() { return false; }
+    //override this to do something;
+    /* f.e set window.gm.dng.renderEvent to a function that creates a html-string (including links)
+    then call window.story.show("DungeonGenericEvent") to render that event
+    add a link that calls window.gm.dng.resumeRoom() to continue in dungeon
+     */
     onTrigger() { };
 }
-
 class DngDungeon	{
-    constructor(name,descr) {
+    constructor(name,descr,persistData) {
         this.name = name;//name of the dungeon
         this.descr= descr;//text diplayed when entering the dungeon
+        this.data = persistData;
         this.floors =[];//list of Dngfloors
         this.actualRoom = null;
         this.Mapper = {};//DngMapper; 
         this.buttons=[];
         this.inRoomedDungeonResume = this.inRoomedDungeonDefeat = null;
     }
+    //override this to return a data-object that will be used to store persistent data
+    static persistentDngDataTemplate() {return(null);}
     setFloors(Floors) {  
         this.floors = Floors; 
         for(var i=0;i<this.floors.length;i++) {
             this.floors[i]._parent = window.gm.util.refToParent(this);
         }  
-    };
+    }
     allFloors() {  return this.floors;   }
-
+    getFloor(Name) {
+        var found = null;
+        for (var i=0; i<this.floors.length;i++ ) {
+            found = this.floors[i];
+            if (found == null) continue;
+            if (found.name == Name) {
+                break;
+            }
+            found = null;
+        }
+        return found;
+    }
     //enters the dungeon; also does some checks to verify that dungeon was properly setup
     enterDungeon() {
         this.Mapper = new DngMapper();
@@ -311,7 +328,8 @@ class DngDungeon	{
     //You need to override this to return to a proper passage with window.story.show
     //You should also set window.gm.dng=null to release memory
     exitDungeon() {
-        throw new Error('Error: exitDungeon not overridden');
+        window.gm.dng=null;
+        window.story.state.dng.id = ""; //clear or load would send you into dng again
     }
     //similiar to moveTo except no onenter/onexit processing
     teleport(Floor, Room) {
@@ -415,6 +433,14 @@ class DngDungeon	{
         //if (player.lust >= 30) addButton(8, "Masturbate", SceneLib.masturbation.masturbateGo);
         //addButton(13, "Inventory", inventory.inventoryMenu).hint("The inventory allows you to use an item.  Be careful as this leaves you open to a counterattack when in combat.");
         this.addButton(14, "Map", this.displayMap);//.hint("View the map of this dungeon.");
+        bt = 0;
+        for(el of this.actualRoom.operations) {
+            if(bt>4) break;
+            if(el===null) continue;
+            if(el.canTrigger()) this.addButton(bt, el.name, el.onTrigger);
+            else this.addButton(bt, el.name, "");
+            bt+=1;
+        }
         if(this.actualRoom.isDungeonExit) {
             for (var i = 5; i < 15; i++ ) {	//find an empty navigation button for leave
                 bt = i;
@@ -422,15 +448,26 @@ class DngDungeon	{
             }
             this.addButton(bt, "Leave", this.exitDungeon, false);
         }
+        //add _nosave_ tag except allowed
+        let tags = window.story.passage("Dungeon").tags;
+        for(var i=tags.length-1;i>=0;i--) {
+            if(tags[i]==='_nosave_') tags.splice(i,1);
+        }
+        if(!window.gm.dng.actualRoom.allowSave) {
+            tags.push('_nosave_');
+        } 
+        let _state = window.story.state.dng;
+        _state.roomId =  this.actualRoom.name;      //Todo how to load dungeon ?
+        _state.id = this.name;
+        _state.floorId = this.actualRoom.floor.name;
         window.story.show("Dungeon"); //call the scene
     }
     //shows a map-screen
     displayMap() {
-        this.Mapper.createMap(this.actualRoom.floor);
+        //this.Mapper.createMap(this.actualRoom.floor);
         window.story.show("DungeonMap");
     }
 }
-
 // a helper class to store info for a room
 class DngMapperInfo {
     constructor() {    
@@ -442,14 +479,13 @@ class DngMapperInfo {
 }
 // builds the map from the dungeons info and actualRoom
 // it is expected that all rooms in a floor are somehow connected with each other - no isolated rooms !
-//todo Not completed !
 class DngMapper { 
     constructor()   {
         this.dungeon = this.floor=null;
         this.allInfo=[];
         this.maxX=this.maxY=this.minX=this.minY=0;
     }
-    
+    //todo only show parts of the map the player already visited or knows off - but this would bloat save
     createMap(Floor) {
         this.floor = Floor;
         var allrooms = Floor.allRooms();
@@ -490,6 +526,8 @@ class DngMapper {
                 if (m >= 0) {	//create new roominfo and set coordinate
                     roomInfo2 = new DngMapperInfo();
                     roomInfo2.Hidden = dir.hidden();
+                    roomInfo.Entry = room.isDungeonEntry || room.isDungeonExit;
+                    roomInfo.Save = room.allowSave;
                     switch (dir.direction) {
                         case DngDirection.DirN: 
                             roomInfo2.X = roomInfo.X;
@@ -514,8 +552,6 @@ class DngMapper {
                     if (roomInfo2.X > this.maxX) this.maxX = roomInfo2.X;
                     if (roomInfo2.Y < this.minY) this.minY = roomInfo2.Y;
                     if (roomInfo2.Y > this.maxY) this.maxY = roomInfo2.Y;
-                    
-                    
                     if (roomIndexs.indexOf(m) < 0) 
                     {
                         roomIndexs.push(m);
@@ -542,12 +578,13 @@ class DngMapper {
         *   |	 |	 |   |	
         *  [ ]-[P]-[ ]-[ ]
     */
-    printMap(playerRoom) {
-        //Todo update player location
+    printMap(playerRoom, minimap) { //Todo use images or special font instead ascii?
         var _line ="";
         var map=[];
         var roomInfo;
         var i,j;
+        var playerX=0, playerY=0;
+        this.createMap(playerRoom.floor); //todo only recreate if necessary
         //create 2d-array to store textual representation of room and connection between them
         map = new Array(2*(this.maxX - this.minX)+1); 
         for (i = 0; i < map.length; i++) {  
@@ -564,10 +601,17 @@ class DngMapper {
             _line = " ";
             if ((roomInfo.Connect & (1 << DngDirection.StairDown)) ||
                 (roomInfo.Connect & (1 << DngDirection.StairUp)) ) {
-                _line = "S";
+                _line = "&ang;";
             }
             if (playerRoom != null && playerRoom.name == roomInfo.Name) {
                 _line = "P";
+                playerX=roomInfo.X, playerY= roomInfo.Y;
+            }
+            if (roomInfo.Save && playerRoom.name != roomInfo.Name) {
+                _line = "S";
+            }
+            if (roomInfo.Entry && playerRoom.name != roomInfo.Name) {
+                _line = "E";
             }
             //each room/connection has to be 3 chars long or it will messup formatting !
             //todo format as table?
@@ -594,13 +638,31 @@ class DngMapper {
             }
         }
         //print
-        _line = (this.floor.dungeon.name + " " + this.floor.name +"\n");
-        for (j= 0; j < (2 * (this.maxY - this.minY) + 1); j++) {   
-            for (i = 0; i < (2*(this.maxX - this.minX)+1); i++) { 
-                _line += map[i][j];
+        _line = "<pre>"; //pre-formatted or messup allignment of ascii-rows
+        if(minimap) { //only print rooms 1 step around player
+            _line += this.floor.name +"</br>";
+            let x,y;
+            for (j= -3; j <= 3; j++) {   
+                for (i = -3; i <= 3; i++) {
+                    x=i+(playerX- this.minX)*2, y=j+(playerY-this.minY)*2; //coord can be negative !
+                    //if(x>this.maxX || y>this.maxY || x<this.minX || y< this.minY) continue;    
+                    if(map.length-1<x || 0>x) continue;   
+                    if(map[x].length-1<y || 0>y) continue;           
+                    _line += ((i==-3)?"&nbsp;":"")+map[x][y]; //todo hack:if line starts with -, snowman-markdown interprets this as <ul> ?!
+                }
+                _line +="\n";
             }
-            _line += "\n";
+        } else { //full map of floor
+            _line += (this.floor.dungeon.name + " " + this.floor.name +"</br>");
+            for (j= 0; j < (2 * (this.maxY - this.minY) + 1); j++) {   
+                for (i = 0; i < (2*(this.maxX - this.minX)+1); i++) { 
+                    _line += map[i][j];
+                }
+                _line += "\n";
+            }
+            _line += "<pre>Legend: P=Player, &ang;=Stair, E=Entry/Exit S=Save</pre></br>";
         }
+        _line += "</pre>";
         return _line;
     }
 }
