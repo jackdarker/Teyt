@@ -111,10 +111,26 @@ class SkillAttack extends Skill {
         return(this.msg);
     }
 */
+class SkillUltraKill extends SkillAttack {
+    constructor() {
+        super();
+        this.id=this.name='UltraKill'
+        this.msg = '';
+    }
+    toJSON() {return window.storage.Generic_toJSON("SkillUltraKill", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillUltraKill, value.data));}
+    __estimateAttack() {
+        let attack =window.gm.combat.defaultAttackData();
+        attack.value= 99999;
+        attack.total = attack.value;
+        return(attack);
+    }
+}
 //execute attack with Face
 class SkillBite extends SkillAttack {
     constructor() {
-        super('Bite');
+        super();
+        this.id=this.name='Bite'
         this.msg = '';
     }
     toJSON() {return window.storage.Generic_toJSON("SkillBite", this); }
@@ -603,6 +619,7 @@ window.gm.SkillsLib = (function (Lib) {
     window.storage.registerConstructor(SkillSubmit);
     window.storage.registerConstructor(SkillStruggle);
     window.storage.registerConstructor(SkillTease);
+    window.storage.registerConstructor(SkillUltraKill);
     window.storage.registerConstructor(SkillUseItem);
     //    Lib['SkillAttack'] = function () { return new SkillAttack();};
     return Lib; 

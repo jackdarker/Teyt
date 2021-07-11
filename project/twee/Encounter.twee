@@ -39,6 +39,6 @@ Game Over. Better luck next time.</br>
 <article><%=window.story.render("CenterDialogs") %>
 The mole took you down into his cave. </br>
 Which was very difficult since you are far to large - you know?</br>
-[[Return Home|Home]]
+<a0 onclick='window.gm.postDefeat();'>Black out</a>
 </article><article id="LogPanel"></article>
 </section>

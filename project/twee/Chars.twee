@@ -57,7 +57,7 @@ But they just snicker and mock your opponent.</br>
 [[The winner takes it all]]
 <p class="tPC">"So horsie how about we go for a ride?"</p> 
 Trent looks up to you, he already knows what that means. | Trent looks up to you with lust in his eyes. You should be careful not to end under his muscular body. | The recent acitivties got him quite pent up. But not that much that he will get involved with you. Maybe if you know each other better...  
-[[Walk away|ForestBridge]]
+<a0 onclick='window.gm.postVictory();'>Walk away</a>
 <%}%>
 </br></br>
 </article><article id="LogPanel"></article></section>
@@ -71,5 +71,5 @@ Trent looks up to you, he already knows what that means. | Trent looks up to you
 <%}%>
 That didnt went as planned. That bully delivered a though blow and knocked you out. It didnt felt that lethal but the game has decided that you earned your death. </br>
 <p class="tPC">'I need to do some leveling and get stronger or find another way to give myself a head start. Maybe the alchemist could help.'</p>
-<a0 onclick='window.gm.respawn();'>Black out</a>
+<a0 onclick='window.gm.postDefeat();'>Black out</a>
 </article><article id="LogPanel"></article></section>

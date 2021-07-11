@@ -97,6 +97,7 @@ window.gm.initGame= function(forceReset,NGP=null) {
       ch.Outfit.addItem(HandsHuman.factory('human'));
       ch.Outfit.addItem(PenisHuman.factory('human'));
       ch.Skills.addItem(new SkillInspect());
+      ch.Skills.addItem(new SkillUltraKill());
       s.PlayerVR=window.gm.PlayerVR= ch;
     }
     if (!s.PlayerRL||forceReset) {  
@@ -181,7 +182,27 @@ window.gm.leaveVR=function() {
   s._gm.time = s._gm.timeRL,s._gm.day = s._gm.dayRL;
   window.gm.addTime(60);
 }
-//heal player and remove inventory {keepInventory=false,location=''}
+//call this after onVictory/onFlee-scene to continue in dng or other location
+//this function is also used to restore after loading save !
+window.gm.postVictory=function() {
+  let reloadDng = (window.gm.dng===null);
+  if(window.story.state.dng.id!=="") {
+    if(reloadDng) window.gm.dng = window.gm.dngs[window.story.state.dng.id]();
+    var floor = window.gm.dng.getFloor(window.story.state.dng.floorId);
+    var room = floor.getRoom(window.story.state.dng.roomId);
+    if(reloadDng) window.gm.dng.enterDungeon();//first call enterdungeon to setup everything !
+    window.gm.dng.teleport(floor,room);
+  } else {
+    window.story.show(window.gm.player.location);//history disabled ! window.story.history[window.story.history.length - 1], true);   
+  }
+}
+//call this after your onDefeat/onSubmit-scene to respawn at respawn-point; cleansup dng-variables
+window.gm.postDefeat=function() { 
+  window.story.state.dng.id="";
+  window.gm.dng = null;
+  window.gm.respawn();
+}
+//after passing out: heal player and remove inventory {keepInventory=false,location=''}
 window.gm.respawn=function(conf={keepInventory:false}) {
   window.gm.player.Stats.increment("energy",9999);
   window.gm.player.Stats.increment("health",9999);

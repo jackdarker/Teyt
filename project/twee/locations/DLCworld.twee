@@ -101,6 +101,7 @@ There are some buckets here, but there is nothing useful inside.</br>
 :: DungeonGenericEvent [_nosave_]
 <!--example-scene for operation-->
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<div id='panel'></div><!--event is rendered here-->
 <%= window.gm.dng.renderEvent(window.gm.dng.evtData)%></br>
 </article><article id="LogPanel"></article></section>
 

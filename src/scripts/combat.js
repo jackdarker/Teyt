@@ -14,8 +14,8 @@ class CombatSetup {
     //they should return a message what will happen next and provide a link to passage to follow f.e. return to window.gm.player.location
     this.onStart = (function(){return('A '+window.story.state.combat.enemyParty[0].name+' appears !'+ window.gm.printPassageLink('Engage','EncounterStartTurn'));});
     this.onDefeat = (function(){return('You are defeated.</br>'+ window.gm.printPassageLink('GameOver','GameOver'));});
-    this.onVictory = (function(){return('You defeated the foe.</br>'+ window.gm.printPassageLink('Next',window.gm.player.location));});
-    this.onFlee = (function(){return('You retreat hastily.</br>'+ window.gm.printPassageLink('Next',window.gm.player.location));});
+    this.onVictory = (function(){return('You defeated the foe.</br> '+ window.gm.printLink('Next','window.gm.postVictory()'));});
+    this.onFlee = (function(){return('You retreat hastily.</br>'+ window.gm.printLink('Next','window.gm.postVictory()'));});
     this.onSubmit = (function(){return('You submit to the foe.</br>'+ window.gm.printPassageLink('GameOver','GameOver'));});
     //if you override this (like the others), you can jump out of battle, show some scene and return to battle
     //- do not modify window.gm.player.location
@@ -25,6 +25,7 @@ class CombatSetup {
     //- if for some reason you want to leave battle, call window.gm.Encounter.endCombat() to cleanup
     this.onMoveSelect = null;
   }
+
   //setup encounter; this calls the Encounter-passage !
 initCombat() {
   let s=window.story.state;
@@ -550,7 +551,7 @@ window.gm.combat.calcParry=function(attacker,target, attack) {
     if(rnd<10) {
       result.msg = target.name +' parried the attack and was even able to land a hit.'  //todo how to add textual variation based on used weapon and skill?
       // foo should reflect fraction of attack back to attacker
-      attack.effects.push( {target:attacker,eff:([new effDamage(0.5*attack.value)])});
+      attack.effects.push( {target:attacker,eff:([effDamage.setup(0.5*attack.value,"blunt")])});
       //result.foo = function(attacker,attack){ return(function(attacker,attack){ attacker.Stats.increment('health',-0.5*attack.value);});}(attacker,attack);
     } else {
       result.msg = target.name +' parried the attack.'
@@ -577,7 +578,7 @@ window.gm.combat.calcAbsorb=function(attacker,defender, attack) {
   window.gm.pushLog(`absorb roll: ${dmg} vs ${def} `,window.story.state._gm.dbgShowCombatRoll);
   result.msg = defender.name +' got hit by '+attacker.name+' and suffered '+dmg+ (attack.crit?' critical ':'')+'damage. '
   attack.total = dmg;
-  attack.effects.push( {target:defender,eff:[(new effDamage(attack.total))]});
+  attack.effects.push( {target:defender,eff:[ effDamage.setup(attack.total,"blunt")]});
   return(result);
 }
 window.gm.combat.TypesDamage = [

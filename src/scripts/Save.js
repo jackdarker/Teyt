@@ -199,15 +199,7 @@ window.storage = {
       window.story.history = save.history;
       window.story.checkpointName = save.checkpointName;
       window.gm.rebuildObjects();  // this is for handling version-upgrades
-      if(window.story.state.dng.id!=="") {
-        window.gm.dng = window.gm.dngs[window.story.state.dng.id]();
-        var floor = window.gm.dng.getFloor(window.story.state.dng.floorId);
-        var room = floor.getRoom(window.story.state.dng.roomId);
-        window.gm.dng.enterDungeon();//first call enterdungeon to setup everything !
-        window.gm.dng.teleport(floor,room);
-      } else {
-        window.story.show(window.gm.player.location);//history disabled ! window.story.history[window.story.history.length - 1], true);   
-      }   
+      window.gm.postVictory();//teleport into dng or other location   
   },
   getAchievements: function() {
     var ahash = JSON.stringify({achievements : window.gm.achievements});

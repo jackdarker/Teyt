@@ -157,7 +157,7 @@ window.gm.addTime= function(min) {
   window.gm.timeEvent.publish("change",min);
   window.gm.player.Effects.updateTime(); //todo not happy with that; see PubSub-comment
   // updating all existing chars might not be wise (some could be dead)
-  // but what if I have to update other chars too
+  // but what if I have to update other chars too?
   //
   
 };
@@ -476,7 +476,7 @@ window.gm.printPassageLink= function(label,target) {
   return("<a href=\"javascript:void(0)\" data-passage=\""+target+"\">"+label+"</a></br>");
 };
 window.gm.printLink= function(label,target) {
-  return('<a href="javascript:void(0)" onclick="'+target+'">'+label+'</a></br>');
+  return("<a href=\"javascript:void(0)\" onclick=\""+target+"\">"+label+"</a></br>");
 };
 //dynamically build a link representing a buy option including display of cost and restriction
 //count specifys how any items you get for cost

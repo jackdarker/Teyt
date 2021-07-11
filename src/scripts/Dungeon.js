@@ -1,7 +1,7 @@
 "use strict";
 /* bundles some operations related to dungeon navigation */
 window.gm = window.gm || {};
-window.gm.dng = window.gm.dng || {};
+window.gm.dng = window.gm.dng || null; //{};
 
 //represents a button the player can press for directions N,E,S,W; this will also be used to generate the map
 //if you have to connect 2 rooms, you have to define direction in both of them
@@ -87,24 +87,19 @@ class DngDirection{
         this.name = name,this.descr = (descr===null) ? function() {return(name)}:descr;
         this.direction = dirEnum;
         this.oneWay=false;
-        this.onExitFct= this.onEnterFct =  this.canExitFct= null;
+        this.onExitFct= this.onEnterFct = null; //should return true if something is happening
+        this.canExitFct= null;
         
         this.roomA //DngRoom;	//source room
         this.roomB//:DngRoom;	//target room
         this.tooltip="";//:String = "";	//tooltip of the button
     }
     //gets called when player enters from this direction
-    /*public function onEnterAtoB():void { 
-        onEnterAtoBFct();
-    }*/
     onEnter() { 
         if (this.onEnterFct == null) return false;
         return (onEnterFct(this));
     }
     //gets called when player  exits into this direction
-    /*public function onExitBtoA():void { 
-        onExitBtoAFct();
-    };*/
     onExit() { 
         if (this.onExitFct == null) return false;
         return this.onExitFct(this);
@@ -123,15 +118,16 @@ class DngDirection{
 // a room connected by directions
 class DngRoom {
     constructor(name,descr,hidden) {
-        this.name = name, this.descr = (descr===null)?function(){ return(name)}:descr;
-        this.isDungeonExit = false; // player can leave to camp with Leave-button
-        this.isDungeonEntry = false; //when entering the dungeon player will be coming from here; there should only be one of this 
+        this.name = name, this.descr = (descr===null)?function(){ return(name)}:descr; 
         this.directions/*DngDirection*/ = [null, null, null, null, null, null];	//list of directions
-        this.operations/*DngOperations*/ = []; //list of additional operations (= buttons you can press)
         this.isHidden = hidden;
+        //those you can adjust
+        this.isDungeonExit = false; // player can leave to camp with Leave-button
+        this.isDungeonEntry = false; //when entering the dungeon player will be coming from here; there should only be one of this
+        this.operations/*DngOperations*/ = []; //list of additional operations (= buttons you can press)
         this.allowSave=false;
-        //this.floor/*DngFloor*/ = null;	//the floor where the room is assigned to
-        this.onEnterFct = null;
+        this.onEnterFct = null; //should return true if something is happening, see also DngDirection.onEnterFct/onExitFct
+        //internal
         this.origResumeFct = null;
         this.it;
         this.fromRoom;

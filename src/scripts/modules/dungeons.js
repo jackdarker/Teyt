@@ -180,11 +180,11 @@ class ShatteredCity extends DngDungeon{
         var rooms= new Map();
         /* main street
         *  A1 - A2 - A3 - A4
-        *  	    |	  |    |	
+        *      |      |    |	
         *  B1 - B2   B3   B4
         *  |    |    |    |
-        *  C1   C2   C3  C4
-        * B1 = Entrance
+        *  C1   C2   C3   C4
+        * B1 = Entrance; B2 Camp; A1 Chest
         * */
         rooms.set("C1",new DngRoom("C1", null,false));
         rooms.set("B1",new DngRoom("B1", null,false));
@@ -212,21 +212,29 @@ class ShatteredCity extends DngDungeon{
         room = (rooms.get("B1") );
         room.isDungeonEntry = room.isDungeonExit = true;
         room = (rooms.get("A1"));
-        let _lootChestA1 = new DngOperation("Chest");
-        _lootChestA1.canTrigger = function(){return(true);};
-        _lootChestA1.onTrigger = function(){
+        let _evt = new DngOperation("Chest");
+        _evt.canTrigger = function(){return(true);};
+        _evt.onTrigger = function(){
             this.renderEvent = this.renderChestA1;
             this.evtData = {};
             this.renderNext(1);
         };
-        room.operations = [_lootChestA1]; //adds an loot-chest in this room
+        room.operations = [_evt]; //adds an loot-chest in this room
         room = (rooms.get("B2") );
         room.allowSave=true;
-        room = (rooms.get("A4") );
-        room.onEnterFct = this.encounterBee2;
+        room = (rooms.get("C1") );
+        _evt = new DngOperation("Scavenge");
+        _evt.canTrigger = function(){return(true);};
+        _evt.onTrigger = function(){
+            this.renderEvent = this.renderScavengeA3;
+            this.evtData = {};
+            this.renderNext(1);
+        };
+        room.operations = [_evt];
         room = (rooms.get("A3") );
-        room.onEnterFct = this.encounterBee2;
-        room = (rooms.get("B4") );
+        room.onEnterFct = this.sneekAround();
+        room = (rooms.get("A4") );
+        //room.onEnterFct = this.sneekAround();
         room.getDirection(DngDirection.DirS).canExitFct = this.hasItem;
         stairUp = (rooms.get("C4") );
         
@@ -242,9 +250,43 @@ class ShatteredCity extends DngDungeon{
         window.gm.dng.evtData.id=id;
         window.story.show("DungeonGenericEvent");
     }
+    sneekAround() {
+        let cb = function(that){ 
+            return(function(me){
+                that.renderEvent = that.renderSneekAround;
+                that.evtData = {};
+                that.renderNext(1);
+                return true;
+        });}(this);
+        return(cb);        
+    }
+    renderSneekAround(evt) {
+        let msg ='';
+        let _rnd = _.random(0,100);
+        if(evt.id===1) {
+            window.gm.addTime(30);
+            msg = 'There is a gang of barbarians. You could try to sneek around them, talk your way through it or start a surprise attack.</br>';
+            msg+= window.gm.printLink("sneak around","window.gm.dng.renderNext(2)");
+            msg+= window.gm.printPassageLink("approach","SC_BarbarianMeetup");
+            msg+= window.gm.printLink("attack","window.gm.dng._fight(1)");
+        } else if(evt.id===2) {
+            if(_rnd>70) {
+                msg+='Someone spotted you !</br>';
+                msg+= window.gm.printLink("Next",'window.gm.dng._fight()');
+            } else  {
+                msg = 'You succesfully bypassed the threat.</br>';
+                msg+= window.gm.printLink("Leave","window.gm.dng.resumeRoom()");
+            }
+        }else if(evt.id===3) {
+                msg+='Someone spotted you !</br>';
+                msg+= window.gm.printLink("Next",'window.gm.dng._fight()');
+        }
+        return(msg);
+    }
     renderChestA1(evt) { //this is some statemachine to render the screen for lootchest
         let msg ='';
         if(evt.id===1) {
+            window.gm.addTime(30);
             msg = 'There is a chest. Do you dare to open it?</br>';
             msg+= window.gm.printLink("open chest","window.gm.dng.renderNext(2)");
             msg+= window.gm.printLink("Leave","window.gm.dng.resumeRoom()");
@@ -263,6 +305,26 @@ class ShatteredCity extends DngDungeon{
             msg+= window.gm.printLink("Leave","window.gm.dng.resumeRoom()");
         }
         return(msg);
+    }
+    renderScavengeA3(evt) { //
+        let msg ='';
+        let _rnd = _.random(0,100);
+        if(evt.id===1) {
+            window.gm.addTime(30);//todo would be better to update time after battle
+            msg = 'You search the area for something useful...</br>';
+            if(_rnd>30) {
+                msg+='... and found some trouble !</br>';
+                msg+= window.gm.printLink("Next",'window.gm.dng._fight()');
+            } else  {
+                msg = '...but you didnt find anything.</br>';
+                msg+= window.gm.printLink("Leave","window.gm.dng.resumeRoom()");
+            }
+        } 
+        return(msg);
+    }
+    _fight(evt) {
+        if(evt===1) window.gm.encounters.wolf(window.gm.player.location);
+        else window.gm.encounters.wolf(window.gm.player.location);
     }
     _addItemToPlayer(id) {
         let item = new window.storage.constructors[id]();

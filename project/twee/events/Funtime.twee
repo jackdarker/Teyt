@@ -31,7 +31,7 @@ function fondlebreast(elmnt) {
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 The wolf raises a hind leg and gives your prone form a good amount of watering.
 After a final sniff it runs of into the woods.
-<div></br><a0 onclick='window.gm.player.addEffect("effMutateWolf",new window.storage.constructors["effMutateWolf"]());window.gm.respawn();'>Black out</a></br></div>
+<div></br><a0 onclick='window.gm.player.addEffect("effMutateWolf",new window.storage.constructors["effMutateWolf"]());window.gm.postDefeat()');'>Black out</a></br></div>
 </article><article id="LogPanel"></article></section>
 
 
@@ -69,11 +69,10 @@ The beast isn't in the mood to have sex with you.
 ---
 The beast is quite in the mood to fool around.  
 ---
-
----
 You need some hard wolfcock right now.
 [[Straddle him]] [[On all 4]]
 ---
+<a0 onclick='window.gm.postVictory();'>Walk away</a>
 
 :: WolffightIntermezzo
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
@@ -81,8 +80,6 @@ You need some hard wolfcock right now.
 Wolf snarls at you.
 <div> [[Next|EncounterStartTurn]]</br></div> 
 </article><article id="LogPanel"></article></section>
-
-
 <div></br>
 [[Next|<%=window.gm.player.location%>]]</br></div>
 </article><article id="LogPanel"></article></section>
