@@ -172,7 +172,7 @@ function getMoney(elmnt,val) {
 	let pierc = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib.pClit);
 	if(vulva && vulva instanceof (window.storage.constructors['VulvaHuman'])) {
 		if(pierc===null ) {
-			pierc= new window.gm.ItemsLib['ClitPiercing']();
+			pierc= new window.gm.ItemsLib['PiercingClit']();
 			pierc.style =100; 
 			window.gm.player.Outfit.addItem(pierc,true);
 			msg += 'You feel a short pain in your most private area. Maybe you should check up yourself.';

@@ -98,7 +98,7 @@ statsline(whom,mark) {
   let msg='';
   if(mark) msg = "<td style=\"border-style:dotted;\">";
   else msg = "<td>";
-  msg+=whom.name+" Lv"+whom.level+"</td><td>"+this.bargraph(whom.health().value,whom.health().max,"red")+"</td><td>"+this.bargraph(whom.Stats.get("arousal").value,whom.Stats.get("arousalMax").value,"pink")+"</td><td>"+this.bargraph(whom.energy().value,whom.energy().max,"yellow")+"</td>";
+  msg+=whom.name+" Lv"+whom.level+"</td><td>"+this.bargraph(whom.health().value,whom.health().max,"lightcoral")+"</td><td>"+this.bargraph(whom.Stats.get("arousal").value,whom.Stats.get("arousalMax").value,"lightpink")+"</td><td>"+this.bargraph(whom.energy().value,whom.energy().max,"lightyellow")+"</td><td>"+this.bargraph(whom.Stats.get("arcana").value,whom.Stats.get("arcanaMax").value,"lightblue")+"</td>";
   return(msg);
 }
 //prints a table with all player/enemy data
@@ -113,7 +113,7 @@ printStats() {
       player2 50/100  10/20      Ork2  20/20   10/100
   */
  let elmt = '<table id=\"combatstats\"><tbody>';
-  elmt += "<tr><th>   </th><th>Player</th><th>Health</th><th>Arousal</th><th>Energy</th><th>   </th><th>Enemys</th><th>Health</th><th>Arousal</th><th>Energy</th></tr>";
+  elmt += "<tr><th>   </th><th>Player</th><th>Health</th><th>Arousal</th><th>Energy</th><th>Arcana</th><th>   </th><th>Enemys</th><th>Health</th><th>Arousal</th><th>Energy</th><th>Arcana</th></tr>";
   for(let i=0;(i<players.length || i<enemys.length);i++) {
     elmt += "<tr>";
     if(i<players.length) {
@@ -151,11 +151,13 @@ printSkillList() {
     //todo how to sort the list in a useful manner?
     for(var i=0; i<skillIds.length;i++) {
       var entry = document.createElement('button');
+      var res;
       //entry.href='javascript:void(0)';
       entry.addEventListener("click",(function(me,target){ 
         return(window.gm.Encounter._postSkillSelect.bind(me,target));}(this,skillIds[i])));
       entry.textContent=s.combat.actor.Skills.getItem(skillIds[i]).name;
-      entry.disabled=s.combat.actor.Skills.getItem(skillIds[i]).isDisabled().OK;
+      res = s.combat.actor.Skills.getItem(skillIds[i]).isEnabled();
+      entry.disabled=!res.OK; entry.Title=res.msg;  //Todo use pointevent+toasty?
       $("div#choice")[0].appendChild(entry);      // <- requires this node in html
     }
   } else {  //cannot do a thing

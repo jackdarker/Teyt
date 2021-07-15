@@ -8,12 +8,47 @@ class SkillResult{
           this.msg = "",
           this.effects = [];
     }
-  }
-
+}
+class SkillCost{
+    constructor(){
+          this.arcana = 0,
+          this.energy = 0,
+          this.health = 0,
+          this.items =[]    //Todo
+    }
+    asText() {
+        let msg='';
+        if(this.arcana>0) msg+=this.arcana.toString()+' arcana';
+        if(this.energy>0) msg+=this.energy.toString()+' energy';
+        if(this.health>0) msg+=this.health.toString()+' health';
+        if(msg==='') msg = 'without cost';
+        else msg = 'requires ' +msg;
+        return(msg);
+    }
+    canPay(Char) {
+        let res = {OK:true,msg:''};
+        if(this.arcana> Char.Stats.get('arcana').value) {
+            res.OK=false; res.msg +='not enough arcana';
+        }
+        if(this.health+1> Char.Stats.get('health').value) { //+1 to not selfkill
+            res.OK=false; res.msg +='not enough health';
+        }
+        if(this.energy> Char.Stats.get('energy').value) {
+            res.OK=false; res.msg +='not enough energy';
+        }
+        return(res);
+    }
+    pay(Char) {
+        Char.Stats.increment('health',this.health*-1);
+        Char.Stats.increment('arcana',this.arcana*-1);
+        Char.Stats.increment('energy',this.energy*-1);
+    }
+}
 
 class Skill {
 constructor(id) {
     this.id=this.name = id;
+    this.cost = new SkillCost();
 }
 //_parent will be added dynamical
 get parent() {return this._parent();}
@@ -26,11 +61,14 @@ isValidPhase() {
         //returns True if the skill can be used in tha actual game-phase (combatPhase,explorePhase)
         return true;
 }
-
-isDisabled() {
-    //returns True and text if the skill cannot be used because its temporary disabled (silenced mage, blinded)
-    //the text should indicate why and how long it is disabled
-    return ({OK:false,msg:''});
+/**
+ * returns false and text if the skill cannot be used because its temporary disabled (silenced mage, blinded)
+ * the text should indicate why and how long it is disabled
+ * call super to check cost !
+ */
+isEnabled() {
+    let res=this.getCost().canPay(this.parent.parent);
+    return (res);
 }
 //this is used to filter possible targets for a skill
 //the function returns a array of arrays containing the targets  
@@ -49,10 +87,11 @@ isValidTarget(target) {
     }
     return true;
 }
-
+/**
+ * returns information about the cost to execute the skill
+ */
 getCost(){ //Todo
-    //returns information about the cost to execute the skill
-    return {}
+    return (this.cost);
 }
 getName(){
     //returns name of the skill for listboxes/labels"""
@@ -70,6 +109,7 @@ previewCast(target){
 cast(target){
     //execute the skill on the targets
     var result = this.previewCast(target);
+    var cost = this.getCost();
     if(result.OK) {
         result.msg = "";
         for(var X of result.effects) {// for each target
@@ -77,6 +117,7 @@ cast(target){
                     X.target.addEffect(Y.id,Y);
             }
         }
+        cost.pay(this.parent.parent);
         result.msg += this.getCastDescription(result); 
     }
     return(result)

@@ -36,7 +36,7 @@ window.gm.OutfitSlotLib = {
     Legs    :   "Legs",
     Thighs  :   "Thighs",     //
     Hips    :   "Hips",    //belt
-    Torso   :   "Torso",    //not used !
+    Torso   :   "Torso",    //dont use !
     Breast  :   "Breast",
     Nipples :   "Nipples",
     Penis :     "Penis",
@@ -72,6 +72,7 @@ window.gm.OutfitSlotLib = {
     uTorso   : "uTorso",    //not used !
     uBreast  : "uBreast",   //bra
     pNipples : "pNipples",
+    tStomach : "tStomach",
     uPenis   : "uPenis",
     pPenis  :   "pPenis",
     uBalls  :   "uBalls",

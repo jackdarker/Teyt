@@ -1,5 +1,6 @@
 "use strict";
-/* a class to provide methods to work with PC & NPC
+/**
+* a class to provide methods to work with PC & NPC
 */
 class Character {
     static defaultData() {
@@ -37,7 +38,8 @@ class Character {
         this.Skills = new Inventory(this._data.skills);
         this.Skills._parent = window.gm.util.refToParent(this);
         //create basic stats
-        stHealth.setup(this.Stats,10,10),stEnergy.setup(this.Stats,30,100),stPAttack.setup(this.Stats,6,100),stPDefense.setup(this.Stats,4,100),
+        stHealth.setup(this.Stats,10,10),stEnergy.setup(this.Stats,30,30),stArcana.setup(this.Stats,0,30),
+        stPAttack.setup(this.Stats,6,100),stPDefense.setup(this.Stats,4,100),
         stAgility.setup(this.Stats,10,100),stIntelligence.setup(this.Stats,10,100),stLuck.setup(this.Stats,10,100);
         stCharisma.setup(this.Stats,10,100),stPerception.setup(this.Stats,10,100),stStrength.setup(this.Stats,10,100),stEndurance.setup(this.Stats,10,100);
         for(el of window.gm.combat.TypesDamage) {
@@ -66,6 +68,11 @@ class Character {
         _x.Skills._relinkItems();
         return(_x);
     };
+    /**
+    * calculates how many levels you can upgrade
+    * @param {int} XP available
+    * @returns {inz} level from
+    */
     static calcXPToLevel(XP,fromLvl=1) {
         let XP2 = Character.calcLevelToXP(fromLvl);
         return(Math.floor((-1+Math.sqrt(1+(XP+XP2)*4/50))/2));
@@ -73,6 +80,9 @@ class Character {
     static calcLevelToXP(lvl) {
         return(100*lvl*(lvl+1)/2); //Gauss-Sum
     }
+    /**
+     * id of char
+     */
     get id() { return(this._data.id);  }
     set id(id) {this._data.id=id;}
     get name() { return(this._data.name);  }
@@ -97,7 +107,7 @@ class Character {
         this._data.XP-=reqXP; //calculate requires XP and subtract from already gained
         if(this._data.XP<0) this._data.XP=0;
         this._data.level+=add;
-        this._data.unspentStat+=add*5;  //todo 5pt per Level?
+        this._data.unspentStat+=add*5;  //todo 5pt Stat per Level?
     }
     //overwrite this to define the wheighting for autoLeveling
     //returns an array of objects with "id" matching the statname and "wgt" as a number that defines the relativ wheight (f.e. if 1 stat should be 50% more then other set this to 20 and all other to 10)
@@ -155,6 +165,9 @@ class Character {
     }
     energy() {
         return({value:this.Stats.get('energy').value, max:this.Stats.get('energyMax').value, min:0});
+    }
+    arcana() {
+        return({value:this.Stats.get('arcana').value, max:this.Stats.get('arcanaMax').value, min:0});
     }
     sleep(until=700) {
         let {msg,delta}=window.gm.forwardTime(until);

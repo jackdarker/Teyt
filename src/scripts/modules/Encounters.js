@@ -50,6 +50,13 @@ window.gm.encounters.mechanicguy = function(location) {
     window.gm.Encounter.scenePic = window.gm.getScenePic(location);
     window.gm.Encounter.initCombat();
 }
+window.gm.encounters.huntress = function(location) {
+    window.gm.Encounter = new CombatSetup();
+    window.gm.Encounter.EnemyFunc = window.gm.Mobs.Huntress;
+    window.gm.Encounter.Location = location;
+    window.gm.Encounter.scenePic = window.gm.getScenePic(location);
+    window.gm.Encounter.initCombat();
+}
 window.gm.encounters.wolf = function(location) {
     window.gm.Encounter = new CombatSetup();
     window.gm.Encounter.EnemyFunc = (function() { 

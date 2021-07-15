@@ -229,7 +229,9 @@ class SkillTease extends Skill {
 }
 class SkillStun extends Skill {
     //execute stun attack
-    constructor() {  super("Stun");  }
+    constructor() {  super("Stun");  
+    this.cost.energy =20;
+    }
     toJSON() {return window.storage.Generic_toJSON("SkillStun", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillStun, value.data));}
     targetFilter(targets){
@@ -244,7 +246,7 @@ class SkillStun extends Skill {
         if(multi.length>1) possibletarget.push(multi);  //if there is only [[mole]] we dont want [[mole],[mole]]
         return(possibletarget);//[[mole1],[mole2],[mole1,mole2]]
     }
-    get desc() { return("A successful stun lowers the foes chance to evade and might disable his attack for some time.");}
+    get desc() { return("A successful stun lowers the foes chance to evade and might disable his attack for some time. "+this.getCost().asText());}
     previewCast(targets){
         var result = new SkillResult()
         result.skill =this;
@@ -291,13 +293,15 @@ class SkillPoisonCloud extends Skill {
     }
 }
 class SkillHeal extends Skill {
-    constructor() { super("Heal");    }
+    constructor() { super("Heal");   
+    this.cost.arcana =20; 
+    }
     toJSON() {return window.storage.Generic_toJSON("SkillHeal", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillHeal, value.data));}
     targetFilter(targets){
         return(this.targetFilterAlly(this.targetFilterAlive(targets)));
     }
-    get desc() { return("Restore some health.");}
+    get desc() { return("Restore some health. "+this.getCost().asText());}
     previewCast(targets){
         var result = new SkillResult()
         result.skill =this;
@@ -477,8 +481,10 @@ class SkillStruggle extends Skill {
         return(this.targetFilterSelf(targets));
     }
     get desc() { return("Try to escape a grapple.");}
-    isDisabled() {
-        let x = (this.parent.parent.Effects.countItem(effGrappled.name)<=0);
+    isEnabled() {
+        let res= super.isEnabled();
+        if(res.OK===false) return(res);
+        let x = !(this.parent.parent.Effects.countItem(effGrappled.name)<=0);
         return({OK:x,msg:''});
     }
     previewCast(targets){
@@ -597,9 +603,6 @@ class SkillCallHelp extends Skill {
             }
         }
         return result
-    }
-    isDisabled() { //Todo cooldown
-        return({OK:false,msg:''});
     }
     getCastDescription(result) {
         return("Calls some "+this.item+" as reinforcement.");

@@ -8,7 +8,7 @@ A <%=window.story.state.combat.enemyParty[0].name%> appears ! </br>
 
 :: EncounterStartTurn {"position":"650,25"}
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
-<div id='combatCanvas' style='background: url(<%=s.combat.enemyParty[0].pic%>) no-repeat center,url(<%=s.combat.scenePic%>) no-repeat center;color:black;'></div></br>
+<div id='combatCanvas' style='background: url(<%=s.combat.enemyParty[0].pic%>) no-repeat center/contain,url(<%=s.combat.scenePic%>) no-repeat center;color:black;'></div></br>
 <div id="panel"></div></br></br> <!--filled by statspanel-->
 <div id="choice"></div></br></br> <!--filled by combat-statemachine-->
 </br><div id='output'></div></br>   <!--message is rendered here-->

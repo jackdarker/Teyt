@@ -88,6 +88,28 @@ class Leech extends Mob {
         return(super.calcCombatMove(enemys,friends));
     }
 };
+class Huntress extends Mob {
+    constructor() {
+        super();
+        this.name = this.id = 'Huntress';
+        this.pic= 'assets/icons/icon_question.svg';
+        this.Outfit.addItem(new BaseHumanoid());
+        this.Outfit.addItem(new SkinHuman());
+        this.Outfit.addItem(HandsHuman.factory('cat'));
+        this.Outfit.addItem(FaceWolf.factory('cat'));
+        this.Outfit.addItem(new VulvaHuman());
+        this.Outfit.addItem(new BikiniBottomLeather());
+        this.levelUp(3);
+        this.autoLeveling();
+    }
+    calcCombatMove(enemys,friends){
+        let result = {OK:true,msg:''};
+        let rnd = _.random(1,100);
+        result.action =result.target= null;
+        //todo shoot arrow, pounce, throw net
+        return(super.calcCombatMove(enemys,friends));
+    }
+};
 class Mechanic extends Mob {
     constructor() {
         super();
@@ -114,7 +136,7 @@ class Carlia extends Mob {
   constructor() {
       super();
       this.name = this.id = 'Carlia';
-      this.pic= 'assets/mole.jpg';
+      this.pic= 'assets/icons/icon_question.svg';
       this.Outfit.addItem(new BaseHumanoid());
       this.Outfit.addItem(new SkinHuman());
       this.Outfit.addItem(HandsHuman.factory('cat'));
@@ -139,7 +161,7 @@ class Trent extends Mob {
     constructor() {
         super();
         this.name = this.id = 'Trent';
-        this.pic= 'assets/mole.jpg';
+        this.pic= 'assets/icons/icon_question.svg';
         this.Outfit.addItem(new BaseHumanoid());
         this.Outfit.addItem(SkinFur.factory('horse', 'brown'));
         this.Outfit.addItem(HandsHuman.factory('horse'));

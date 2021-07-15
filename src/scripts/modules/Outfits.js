@@ -77,7 +77,7 @@ class HandCuffs extends Equipment {
         this.tags = ['restrain'];
         this.slotUse = ['RHand','LHand','Wrists'];
     }
-    get desc() { return 'handcuffs';  }
+    get desc() { return 'handcuffs like the police use them';  }
     toJSON() {return window.storage.Generic_toJSON("HandCuffs", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(HandCuffs, value.data));}
     usable(context) {return(this.canEquip(context));}
@@ -103,7 +103,7 @@ class WristCuffs extends Equipment {
         this.slotUse = ['Wrists'];
         this.lossOnRespawn = false;
     }
-    get desc() { return 'handcuffs';  }
+    get desc() { return 'some leather cuffs for wrists';  }
     toJSON() {return window.storage.Generic_toJSON("WristCuffs", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(WristCuffs, value.data));}
     usable(context) {return(this.canEquip(context));}
@@ -148,9 +148,9 @@ class CollarQuest extends Equipment {
     }
     canUnequip() {return({OK:false, msg:'This can only be removed by a magican!'});}
 }
-class ClitPiercing extends Equipment {
+class PiercingClit extends Equipment {
     constructor() {
-        super('ClitPiercing');
+        super('PiercingClit');
         this.tags = ['piercing'];
         this.slotUse = ['pClit'];    
         this.style = 0;   
@@ -165,8 +165,8 @@ class ClitPiercing extends Equipment {
         if(this.style===100) return('cursed piercing');
         return('small clitoris-piercing');
     }
-    toJSON() {return window.storage.Generic_toJSON("ClitPiercing", this); }
-    static fromJSON(value) {return(window.storage.Generic_fromJSON(ClitPiercing, value.data));}
+    toJSON() {return window.storage.Generic_toJSON("PiercingClit", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(PiercingClit, value.data));}
     canEquip(context) {return({OK:true, msg:'equipable'});}
     canUnequip() {return({OK:true, msg:'unequipable'});}
     onEquip(context) {
@@ -174,6 +174,33 @@ class ClitPiercing extends Equipment {
             context.parent.addEffect("effGrowVulva",window.storage.constructors['effGrowVulva']()); //only works for player since effects of NPC dont receive ticks!
         } 
         return({OK:true, msg:'equipped'});}
+}
+class TattooGroin extends Equipment {
+    constructor() {
+        super('TattooGroin');
+        this.tags = ['tattoo'];
+        this.slotUse = ['tStomach'];    
+        this.style = 0;   
+        this.lossOnRespawn = false;
+    }
+    set style(style) { 
+        this._style = style; 
+        if(style===100) this.lossOnRespawn=false;
+    }
+    get style() {return this._style;}
+    get desc() { 
+        if(this.style===100) return('a kind of lewd mark');
+        return('a tribal tatto on the lower belly');
+    }
+    toJSON() {return window.storage.Generic_toJSON("TattooGroin", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(TattooGroin, value.data));}
+    canEquip(context) {return({OK:false, msg:'unequipable'});}
+    canUnequip() {return({OK:false, msg:'not so easy to get rid off'});}
+    onEquip(context) {
+        if(this.style===100) {
+            context.parent.addEffect("effLewdMark",window.storage.constructors['effLewdMark']()); //only works for player since effects of NPC dont receive ticks!
+        } 
+        return({OK:true, msg:'tattoed'});}
 }
 //this is an Inventory-item, not wardrobe
 class Crowbar extends Equipment {
@@ -278,9 +305,23 @@ class BikiniBottomLeather extends Equipment {
         this.slotCover = ['bPenis','bVulva','bBalls','bClit','bAnus','pPenis','pClit'];    
         this.lossOnRespawn = true;
     }
-    get desc() { return 'leather triangle-bikini';}
+    get desc() { return 'leather triangle-bikini bottom';}
     toJSON() {return window.storage.Generic_toJSON("BikiniBottomLeather", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(BikiniBottomLeather, value.data));}
+    canEquip(context) {return({OK:true, msg:'equipable'});}
+    canUnequip() {return({OK:true, msg:'unequipable'});}
+}
+class BikiniTopLeather extends Equipment {
+    constructor() {
+        super('BikiniTopLeather');
+        this.tags = ['cloth'];
+        this.slotUse = ['uBreast'];
+        this.slotCover = ['pNipples'];    
+        this.lossOnRespawn = true;
+    }
+    get desc() { return 'leather triangle-bikini top';}
+    toJSON() {return window.storage.Generic_toJSON("BikiniTopLeather", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(BikiniTopLeather, value.data));}
     canEquip(context) {return({OK:true, msg:'equipable'});}
     canUnequip() {return({OK:true, msg:'unequipable'});}
 }
@@ -298,7 +339,7 @@ class ShortsLeather extends Equipment {
     canEquip(context) {return({OK:true, msg:'equipable'});}
     canUnequip() {return({OK:true, msg:'unequipable'});}
 }
-//
+
 class StaffWodden extends Equipment {
     constructor() {
         super('StaffWodden');
@@ -388,9 +429,11 @@ class TailRibbon extends Equipment {
     }
     canUnequip() {return({OK:true, msg:'unequipable'});}
 }
-//todo vest,chaps,bikini top,  
+//todo bow,whip,blowpipe
+//todo vest,chaps,bikini top, greaves , jacket
 window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(BikiniBottomLeather);
+    window.storage.registerConstructor(BikiniTopLeather);
     window.storage.registerConstructor(Briefs);
     window.storage.registerConstructor(CollarQuest);
     window.storage.registerConstructor(Leggings);
@@ -402,7 +445,8 @@ window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(Crowbar);
     window.storage.registerConstructor(Shovel);
     window.storage.registerConstructor(TailRibbon);
-    window.storage.registerConstructor(ClitPiercing);
+    window.storage.registerConstructor(PiercingClit);
+    window.storage.registerConstructor(TattooGroin);
     window.storage.registerConstructor(RobesZealot);
     window.storage.registerConstructor(ShortsLeather);
     window.storage.registerConstructor(StaffWodden);
@@ -416,7 +460,8 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['Sneakers'] = function () { return new Sneakers();};
     ItemsLib['Pullover'] = function () { return new Pullover();};
     ItemsLib['TailRibbon'] = function () { return new TailRibbon();};
-    ItemsLib['ClitPiercing'] = function () { return new ClitPiercing();};
+    ItemsLib['PiercingClit'] = function () { return new PiercingClit();};
+    ItemsLib['TattooGroin'] = function () { return new TattooGroin();};
     ItemsLib['RobesZealot'] = function () { return new RobesZealot();};
     ItemsLib['WristCuffs'] = function () { return new WristCuffs();};
     //special wardrobe-item combination

@@ -62,17 +62,30 @@ You cant hold any longer and shoot your jizzm inside her.
 
 :: WolfVictory
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-You arent horny enough.
----
-The beast isn't in the mood to have sex with you.
-[[Force]] [[Leave]]
----
-The beast is quite in the mood to fool around.  
----
-You need some hard wolfcock right now.
-[[Straddle him]] [[On all 4]]
----
-<a0 onclick='window.gm.postVictory();'>Walk away</a>
+<div id='panel'></div><!--description is rendered here-->
+<div id='choice'> <!--choice is rendered here-->
+</div>
+</article><article id="LogPanel"></article></section>
+<script>
+function builtStartOptions() {
+  function foo(label, func) {
+    let link;
+    link = document.createElement('a');
+    link.addEventListener("click", func);
+    link.textContent=label;
+    link.href='javascript:void(0)';
+    $("div#choice")[0].appendChild(link);
+  }
+  let entry;
+  entry = document.createElement('p');
+  entry.textContent="You arent horny enough. | The beast is quite in the mood to fool around. | You need some hard wolfcock right now. ";
+  $("div#panel")[0].appendChild(entry);
+  foo('Straddle him',function(){window.gm.sex.wolfOnPlayerDoggystyle(1);});
+  foo('On all 4',function(){window.gm.sex.wolfOnPlayerDoggystyle(1);});
+  foo('Walk away',function(){window.gm.postVictory();});
+}
+builtStartOptions();
+</script>
 
 :: WolffightIntermezzo
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
@@ -83,6 +96,41 @@ Wolf snarls at you.
 <div></br>
 [[Next|<%=window.gm.player.location%>]]</br></div>
 </article><article id="LogPanel"></article></section>
+
+:: HuntressSubmit
+"You are a worthy opponent. Lets see if you have some stamina left."
+She is stradeling your prone form. Gyrating her hips around, she guides your hard pecker between her wet folds. After she grows tired on teasing you and herself, she plunges dowm, engulfing your rigid member in one smooth stroke.
+Riding you like a pro, you have considerable difficulty to not just shoot your load into her.    
+
+:: HuntressVictory
+"Lets sate that appetite of yours."
+...
+Take it all in slut. I hope you bear some big soulgems for me when I met you again.
+
+
+:: Arousalchange
+<!--deffered event-->
+You are so horny ! If you ran into a virile stud right now, you wouldnt be able to resist his advances. 
+
+
+:: SoulCrystalGrowth
+<!--deffered event-->
+As you get comfortable to rest for a while, you get some warm, blissful feeling from your stomach.
+...
+Something is growing in you.
+...
+You guess a soul crystal absorbs fertile sperm slushing around in your uterus, converting it to arcane essence.
+...
+For sure that hungry soul crystal is busy absorbing seed and your own life preserving fluids to grow its power. Its essence concetration, you guess, is tiny/small/medium/large/massive/grand.
+...
+You gain the impression that the soul crystal has reached the maximum size that your body is able to sustain. Time to get it out form the oven.
+
+:: SoulcrystalKnowledge
+"Soul crystals are arcane essence contained in a crystalin sphere. They are commonly used as a source of power for crafts of the arcana."
+"Soul crystal, also called soul gems by some, can be sometimes found at locations with a strong etheral crossroads."
+"It was stated that soul gems can also form in-uteri of special aligned individuals. The process of forming the crystal seems to be bound to sexual interaction. Various studies have led to the view that the crystal feds on the live-force of the received sperm and also the hosts ovary.
+"A developing soul gem interferes and supresses normal pregnancys. There are different cases known where host used this effect as alternative to other birth control measures." 
+Several religious directions state that this is against natures law and has to be prohibited. However, the high demand for crystals encourages unofficial experimentation."
 
 
 :: HangmanGame

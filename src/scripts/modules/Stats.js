@@ -96,6 +96,31 @@ class stEnergy extends Stat {
     toJSON() {return window.storage.Generic_toJSON("stEnergy", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stEnergy, value.data);};
 }
+class stArcanaMax extends Stat {
+    static setup(context, max) {
+        var _stat = new stArcanaMax();
+        var _n = _stat.data;
+        _n.id='arcanaMax',_n.base=max, _n.value=max,_n.modifys=[{id:'arcana'}],_n.limits=[{max:99999,min:0}];
+        context.addItem(_stat);
+    }
+    constructor() {  super();    }
+    toJSON() {return window.storage.Generic_toJSON("stArcanaMax", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(stArcanaMax, value.data);};
+}
+class stArcana extends Stat {
+    static setup(context, base,max) {
+        stArcanaMax.setup(context,max);
+
+        var _stat = new stArcana();
+        var _n = _stat.data;
+        _n.id='arcana',_n.base=base, _n.value=base,_n.limits=[{max:'arcanaMax',min:0}];
+        context.addItem(_stat);
+        _stat.Calc();
+    }
+    constructor() { super();   }
+    toJSON() {return window.storage.Generic_toJSON("stArcana", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(stArcana, value.data);};
+}
 class stArousalMax extends Stat {
     static setup(context, max) {
         var _stat = new stArousalMax();
@@ -143,6 +168,7 @@ class stArousal extends Stat{
     toJSON() {return window.storage.Generic_toJSON("stArousal", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stArousal, value.data);};
 }
+////    Base-Stats ///////////////////////////////////////////////
 class stAgility extends Stat { // core attribute
     static setup(context, base,max) { 
         var _stat = new stAgility();
@@ -176,6 +202,7 @@ class stPerception extends Stat { // core attribute
     toJSON() {return window.storage.Generic_toJSON("stPerception", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stPerception, value.data);};
     updateModifier() {
+        this.parent.addModifier('arcanaMax',{id:'perception', bonus:this.parent.get('perception').value*4});
     };
 }
 class stLuck extends Stat { // core attribute
@@ -210,6 +237,7 @@ class stCharisma extends Stat { // core attribute
     toJSON() {return window.storage.Generic_toJSON("stCharisma", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stCharisma, value.data);};
     updateModifier() {
+        this.parent.addModifier('energyMax',{id:'charisma', bonus:this.parent.get('charisma').value});
     };
 }
 class stIntelligence extends Stat { // core attribute
@@ -220,13 +248,11 @@ class stIntelligence extends Stat { // core attribute
         context.addItem(_stat);
         _stat.Calc();
     }
-    constructor() {
-        super();
-        
-    }
+    constructor() {        super(); }
     toJSON() {return window.storage.Generic_toJSON("stIntelligence", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stIntelligence, value.data);};
     updateModifier() {
+        this.parent.addModifier('arcanaMax',{id:'intelligence', bonus:this.parent.get('intelligence').value*4});
     };
 }
 class stStrength extends Stat { // core attribute
@@ -237,10 +263,7 @@ class stStrength extends Stat { // core attribute
         context.addItem(_stat);
         _stat.Calc();
     }
-    constructor() {
-        super();
-        
-    }
+    constructor() {        super();}
     toJSON() {return window.storage.Generic_toJSON("stStrength", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stStrength, value.data);};
     updateModifier() {
@@ -256,10 +279,7 @@ class stEndurance extends Stat { // core attribute
         context.addItem(_stat);
         _stat.Calc();
     }
-    constructor() {
-        super();
-       
-    }
+    constructor() {        super();}
     toJSON() {return window.storage.Generic_toJSON("stEndurance", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stEndurance, value.data);};
     updateModifier() {
@@ -267,6 +287,7 @@ class stEndurance extends Stat { // core attribute
         this.parent.addModifier('pDefense',{id:'strength', bonus:this.parent.get('endurance').value%4});
     };
 }
+////////////////////////////////////////////////////////////////////////////////
 class stPAttack extends Stat {   //physical attack
     static setup(context, base,max) {
         var _stat = new stPAttack();
@@ -732,6 +753,72 @@ class effGrowVulva extends Effect {
         }
     }
 }
+class effLewdMark extends Effect {
+    constructor() {
+        super();
+        this.data.id = this.data.name= effLewdMark.name, this.data.duration = 60, this.data.hidden=0;
+        this.data.cycles = 3, this.data.magnitude = 1;
+    }
+    toJSON() {return window.storage.Generic_toJSON("effLewdMark", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(effLewdMark, value.data);};
+    get desc() {return(effLewdMark.name);}
+    onTimeChange(time) {
+        //todo the mark indicates that you can bear soulgems; the stronger the mark, the better the gem
+        //with each birth, the mark grows stronger;
+        //while you are pampering the gem, it sucks up your arcana if you dont have sex
+        //chance to go into heat if you dont pamper gem
+        this.data.duration = Math.max(this.data.duration-window.gm.getDeltaTime(time,this.data.time),0);
+        this.data.time = time;
+        if(this.data.duration<=0 && this.data.cycles>0) {
+            this.data.cycles-=1;
+            return(function(me){
+                return (function(Effects){ 
+                    if(me.data.cycles<=0) { 
+                        Effects.removeItem(me.data.id);
+                        window.gm.pushDeferredEvent("MutateVulvaEnd");
+                    }
+                    else window.gm.pushDeferredEvent("MutateVulva");
+                });
+            }(this));
+        }
+        return(null);
+    }
+    onApply(){
+        this.data.duration = 60;
+        this.data.time = window.gm.getTime();
+    }
+    merge(neweffect) {
+        if(neweffect.name===this.data.name) {
+            return(true);
+        }
+    }
+}
+class effInHeat extends Effect {
+    constructor() {
+        super();
+        this.data.id = this.data.name= effInHeat.name, this.data.duration = 60, this.data.hidden=0;
+        this.data.cycles = 3, this.data.magnitude = 1;
+    }
+    toJSON() {return window.storage.Generic_toJSON("effInHeat", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(effInHeat, value.data);};
+    get desc() {return(effInHeat.name);}
+    //todo if female, you might go into heat (only when not carrying child/soulgem ?) 
+    //more arousal damage by studs
+    //succesful impregation or time might end heat
+}
+class effInRut extends Effect {
+    constructor() {
+        super();
+        this.data.id = this.data.name= effInRut.name, this.data.duration = 60, this.data.hidden=0;
+        this.data.cycles = 3, this.data.magnitude = 1;
+    }
+    toJSON() {return window.storage.Generic_toJSON("effInRut", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(effInRut, value.data);};
+    get desc() {return(effInRut.name);}
+    //todo if male, you might go into rut  
+    //more arousal damage by sluts
+    //multiple succesful impregations/balldrain or time might end rut
+}
 /////////////// combateffects /////////////////////////
 class effHeal extends CombatEffect {
     constructor(amount,duration=0) {
@@ -1078,6 +1165,8 @@ window.gm.StatsLib = (function (StatsLib) {
     window.storage.registerConstructor(stResistance);
     window.storage.registerConstructor(stEnergyMax);
     window.storage.registerConstructor(stEnergy);
+    window.storage.registerConstructor(stArcanaMax);
+    window.storage.registerConstructor(stArcana);
     window.storage.registerConstructor(stArousalMax);
     window.storage.registerConstructor(stArousalMin);
     window.storage.registerConstructor(stArousal);
@@ -1107,6 +1196,9 @@ window.gm.StatsLib = (function (StatsLib) {
     window.storage.registerConstructor(effMutateCat); 
     window.storage.registerConstructor(effGrowBreast);
     window.storage.registerConstructor(effGrowVulva);
+    window.storage.registerConstructor(effLewdMark);
+    window.storage.registerConstructor(effInHeat);
+    window.storage.registerConstructor(effInRut);
     //
     window.storage.registerConstructor(skCooking);
 

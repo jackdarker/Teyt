@@ -31,11 +31,20 @@ Here is a task-list for you: </br>
 :: Help_Basics [_back_]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+Real Life</br><hr></br>
 For many activities you have to spend energy and time. F.e. walking into the city takes some time and effort.</br>
 Energy can be recovered by sleeping. Also some activities, food or drugs can restore energy.</br>
 Use the sleep-option in your own bedroom to rest.</br>
-Leaving the VR is only possible at the spawn-points, and only if in freeplay. If there is some storyrelevant stage running, you cant leave.
-Entering VR is also only possible if the story-stage is at a certain points and requires it or freeplay is on.
+</br>Virtual Reallity</br><hr></br>
+Leaving the VR is only possible at the spawn-points, and only if in freeplay. If there is some storyrelevant stage running, you cant leave.</br>
+Entering VR is also only possible if the story-stage is at a certain points and requires it or freeplay is on.</br>
+</br>
+</br>Combat</br><hr></br>
+You defeat enemys by dammaging their health. If you have the skill, you can tease them until they are to aroused to bother fighting.
+Postbattle scenes might differ if the victor is excited !
+For some actions you need energy, f.e. a heavy strike or blocking with shield. Energy is recovered slowly on each turn.
+Arcana can be used to cast magic.
+Be aware that running out of energy/arcana might get you in a weakened condition.
 </br>
 [[Back|_back_]]</br>
 </article><article id="LogPanel"></article></section>
@@ -45,10 +54,8 @@ Entering VR is also only possible if the story-stage is at a certain points and 
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 For the beginning:
-- you should receive game equipment and get thrown into the game after 2 days
-- try to explore the city.</br>
-
-TODO: There isnt much more content right now!</br>
+- you should receive game equipment after 2 days
+- try to explore the college i the meantime.</br>
 [[Back|_back_]]</br>
 </article><article id="LogPanel"></article></section>
 
@@ -66,7 +73,10 @@ Then I might be abel to backtrack the error.</br>
 
 :: Credits [_back_]
 <section> <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
-Credits go to:</br>
+Credits:</br>
+
+Icons & Images:</br>
+https://www.svgrepo.com/ </br>
 
 [[Back|_back_]]</br>
 </article><article id="LogPanel"></article></section>
