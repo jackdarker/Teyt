@@ -3,7 +3,7 @@
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 Some things for debugging:</br>
-</br>[[MemoryGame]] [[HangmanGame]]</br> <!--todo-->
+</br>[[MemoryGame]] [[HangmanGame]] [[MinesweeperAscii]] [[Evade]]</br> <!--todo-->
 </br>[[NewGamePlus]]</br> <!--todo-->
 [[Cheats|debug]]</br>
 [[Back|_back_]]</br>
@@ -12,7 +12,7 @@ Some things for debugging:</br>
 
 :: debug [_back_]
 <section> <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
-[[Back|_back_]] [[DebugTransform]] [[Styletest]] [[Emergency-Wardrobe|Wardrobe]]</br>
+[[Back|_back_]] [[DebugTransform]] [[Styletest]] [[Emergency-Wardrobe|Wardrobe]] [[dont use!|debug_cheat]]</br>
 Cheat buttons: those are meant for debugging and might break your game</br>
 <a0  onclick='window.gm.player.Inv.addItem(new window.storage.constructors["Money"](),200);window.gm.refreshAllPanel();'>Get 200$</a></br>
 </br>

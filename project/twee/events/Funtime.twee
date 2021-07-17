@@ -66,25 +66,7 @@ You cant hold any longer and shoot your jizzm inside her.
 <div id='choice'> <!--choice is rendered here-->
 </div>
 </article><article id="LogPanel"></article></section>
-<script>
-function builtStartOptions() {
-  function foo(label, func) {
-    let link;
-    link = document.createElement('a');
-    link.addEventListener("click", func);
-    link.textContent=label;
-    link.href='javascript:void(0)';
-    $("div#choice")[0].appendChild(link);
-  }
-  let entry;
-  entry = document.createElement('p');
-  entry.textContent="You arent horny enough. | The beast is quite in the mood to fool around. | You need some hard wolfcock right now. ";
-  $("div#panel")[0].appendChild(entry);
-  foo('Straddle him',function(){window.gm.sex.wolfOnPlayerDoggystyle(1);});
-  foo('On all 4',function(){window.gm.sex.wolfOnPlayerDoggystyle(1);});
-  foo('Walk away',function(){window.gm.postVictory();});
-}
-builtStartOptions();
+<script>window.gm.sex.wolfOnPlayerDoggystyle({state:0});
 </script>
 
 :: WolffightIntermezzo
@@ -131,6 +113,200 @@ You gain the impression that the soul crystal has reached the maximum size that 
 "It was stated that soul gems can also form in-uteri of special aligned individuals. The process of forming the crystal seems to be bound to sexual interaction. Various studies have led to the view that the crystal feds on the live-force of the received sperm and also the hosts ovary.
 "A developing soul gem interferes and supresses normal pregnancys. There are different cases known where host used this effect as alternative to other birth control measures." 
 Several religious directions state that this is against natures law and has to be prohibited. However, the high demand for crystals encourages unofficial experimentation."
+
+:: ReactionTest
+<p>Click Start and then click somewhere on the bar to stop the green rectangle in the yellow hit-area.</p>
+<div class="progress-bar" id='clickHere' style='height:1em; width: 100%;'><div id='bar' style="position:relative; width:5%; height:100%; background-color:green;"></div></div>
+<a0 id='btStart'>Start</a><p id='result'></p>
+<script>
+function onStop(value) {
+document.getElementById('result').innerHTML='scored '+value;
+}
+var _game = window.gm.startReactTest('bar',2000,onStop,null,[{a:40,b:60,color:'orange'},{a:90,b:100,color:'yellow'}]);
+document.getElementById('btStart').addEventListener("click", _game.start);
+document.getElementById('clickHere').addEventListener("click", _game.click);
+</script>
+
+:: Evade
+<!-- präsentiert von kostenlose-javascripts.de (c) Copyright By N00b1000-->
+<script type='text/javascript'>
+//<!--
+//alert("Versuche den herunterfallenden Objekten so lange wie möglich auszuweichen.nSteuere die Figur mit den Pfeiltasten.nDrücke 'N' für ein neues Spiel.")
+var bilderpfad = "http://www.eurehomepage.tld/bilder";
+var up=0;
+var down=0;
+var left=0;
+var right=0;
+var a=0;
+var b=0;
+var d=0;
+var z=0;
+var life=1;
+var c=Math.round(Math.random()*5);
+var starttime = new Date();
+
+
+document.write('<div id="feld" style="position:relative; left:0px; top:0px; background-color: black; width: 300px; height: 350px;"></div>');
+document.write('<div id="spieler" style="position:absolute; left:0px; top:0px">');
+document.write('	<img width="50" id="imgplayer" height="50" src="'+bilderpfad+'/spieler0.gif" alt="" />');
+document.write('</div>');
+document.write('<div id="auto" style="position:absolute; left:0px; top:0px">');
+document.write('	<img width="50" id="imgkristall" height="50" src="'+bilderpfad+'/kristall0.gif" alt="" />');
+document.write('</div>');
+
+
+function move() {
+
+	spieler0 = new Image();
+	spieler0.src = bilderpfad+"/spieler0.gif";
+	spieler1 = new Image();
+	spieler1.src = bilderpfad+"/spieler1.gif";
+
+	if (life==1) {
+	zaehler();
+	if (a>5) a=5;
+	document.getElementById('spieler').style.left = (a*50)+"px";
+	document.getElementById('spieler').style.top = "300px";
+	d++;
+	document.getElementById('auto').style.top = (d*z/200)+"px";
+	document.getElementById('auto').style.left = (c*50)+"px";
+	hit();
+
+	if (d*z/200>300) {d=0; c=Math.round(Math.random()*5);} }
+	window.setTimeout ('move()', 10);
+}
+
+function keyleft(y) {
+	if (y==37) { left++; a-- }
+}
+
+function keyright(y) {
+	if (y==39) { right++; a++ }
+}
+
+function hit() {
+	if (a==c && d*z/200>250 && life==1) {
+		wechsel('imgplayer',spieler1);
+		alert("Getroffen!!!nDu hast " + (new Date()-starttime)/1000 + " Sekunden überlebt.");
+		life=0;
+	}
+}
+
+function zaehler() {
+	z=z+1
+}
+
+function keycheck(e) {
+	y = (e) ? e.which : window.event.keyCode;
+	if ( y == 78 ) {
+		restart();
+	}
+
+	keyleft(y);
+	keyright(y);
+	if (a<0) a=0;
+	if (b<0) b=0;
+}
+
+function restart() {
+	a=0; b=0; c=Math.round(Math.random()*5);
+	d=0; z=0; life=1; starttime=new Date();
+	wechsel('imgplayer',spieler0);
+}
+
+function wechsel(Bildnr,Bildobjekt) {
+	document.getElementById(Bildnr).src = Bildobjekt.src;
+}
+document.onkeydown = keycheck;
+move();
+//-->
+</script>
+
+
+
+:: MinesweeperAscii
+<!-- präsentiert von kostenlose-javascripts.de -->
+<script type='text/javascript'>
+//<!--
+function neu(){
+minen=3;
+minen1=0;
+verloren=false;
+verdeckt=new Array();
+aufgedeckt=new Array();
+for (i=0;i<16;i++)
+{
+a = 1 + 6*(Math.random());
+a = Math.round(a);
+if(a==6 && minen!=0||a==2 && minen!=0){
+verdeckt[i]="mine";
+aufgedeckt[i]="mine";
+minen1+=1;
+}
+else{
+verdeckt[i]="leer";
+aufgedeckt[i]="leer";
+}
+aktuell="feld"+i;
+document.getElementById(aktuell).innerHTML = "( )";
+}
+document.getElementById('smiley').innerHTML='<font color="lime" onclick="neu();">:)</font>';
+}
+neu();
+function klick(feld){
+ausgabe="<b>( )</b>"
+if(verloren==false){
+
+checken="feld"+feld;
+if(verdeckt[feld]=="mine"){
+verloren=true;
+document.getElementById(checken).innerHTML="(<font color='red'>*</font>)";
+document.getElementById('smiley').innerHTML='<font color="red" onclick="neu();">:(</font>';
+}
+else{
+ausgabe=0;
+aufgedeckt[feld]="";
+if(verdeckt[feld+1]=="mine" && feld!=3 || verdeckt[feld-1]=="mine" && feld!=7 ||verdeckt[feld-1]=="mine" && feld!=11 ||verdeckt[feld-1]=="mine" && feld!=15){
+ausgabe+=1
+}
+if(verdeckt[feld-1]=="mine" && feld!=0 || verdeckt[feld-1]=="mine" && feld!=4 || verdeckt[feld-1]=="mine" && feld!=8 ||verdeckt[feld-1]=="mine" && feld!=12){
+ausgabe+=1
+}
+if(verdeckt[feld-4]=="mine"){
+ausgabe+=1
+}
+if(verdeckt[feld+4]=="mine"){
+ausgabe+=1
+}
+if(ausgabe==0){
+ausgabe="( )";
+}
+test=0;
+for (i=0;i<16;i++)
+{
+if(aufgedeckt[i]==""){
+test+=1;
+
+}
+if(test==16-minen1){
+alert("Sie haben gewonnen.");
+}
+
+}
+ausgaben="<font color='green'> "+ausgabe+"</font>";
+document.getElementById(checken).innerHTML=ausgaben;
+}}}
+neu();
+//-->
+</script>
+<div style="font-size: 30px;" align="center"><span id="smiley" style="background-color:yellow;"><font color="lime" onclick="neu();">:)</font></span><span style="background-color:yellow;"><font color="lime">
+</font></span></div>
+<p align="center"><span id="feld0" onclick="klick(0)">()</span> <span id="feld1"  onclick="klick(1)">()</span> <span id="feld2" onclick="klick(2)">()</span> <span id="feld3" onclick="klick(3)">()</span> </p>
+<p align="center"><span id="feld4" onclick="klick(4)">()</span> <span id="feld5" onclick="klick(5)">()</span> <span id="feld6" onclick="klick(6)">()</span> <span id="feld7" onclick="klick(7)">()</span> </p>
+
+<p align="center"><span id="feld8" onclick="klick(8)">()</span> <span id="feld9" onclick="klick(9)">()</span> <span id="feld10" onclick="klick(10)">()</span> <span id="feld11" onclick="klick(11)">()</span> </p>
+<p align="center"><span id="feld12" onclick="klick(12)">()</span> <span id="feld13" onclick="klick(13)">()</span> <span id="feld14" onclick="klick(14)">()</span> <span id="feld15"  onclick="klick(15)">()</span> </p>
+<br />
 
 
 :: HangmanGame

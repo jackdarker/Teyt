@@ -269,6 +269,87 @@ window.gm.giveCyrilFood= function(){
         window.gm.printOutput("you have no food to spare");
     }
 };
+/*
+* ReactTest = a box is moing repeatedly left-right-left and the user has to click on it to 
+* stop it inside a hit area (success if center of moving box is inside one hit-area)
+*
+* call this setup-function once and use the returned start & click function for game input
+* bar is the id of the moving element-node; example:
+* <div style='height:1em; width: 100%;'><div id='bar' style="position:relative; width:5%; height:100%; background-color:green;"></div></div>
+* 
+* you might provide callbacks for start & stop, stop will get area-index on success or -1 on fail
+* speed is ms for one movement of the box from left to right 
+* area is a list of non-overlapping hit-areas like [{a:5,b:10, color:'orange'}]; 
+*/
+window.gm.startReactTest=function(bar, speed, stopCB, startCB,areas) {
+  /**
+   * starts the game
+   */
+  function start() { //todo instead left-right also up-down should be possible
+    data.stop();
+    data.value=0,data.run=true;
+    data.bargraph.style.left = data.value+'%'; //dont start in between; speed would be slowed down to maintain transition time
+    var width =window.getComputedStyle(data.bargraph).getPropertyValue('width');
+    var total = window.getComputedStyle(data.bargraph.parentNode).getPropertyValue('width');
+    //calculate barsize relative to total width (necessary if windowsize changed in between )
+    data.barsize=100*parseFloat(width.split('px'))/parseFloat(total.split('px')); 
+    data.bargraph.style.transition = "left "+data.speed+"ms linear"; //configure transition for animation
+    if(data.startCB) data.startCB(); //called before transition-start!
+    data.bargraph.ontransitionend(); //start transition
+  }
+  /**
+   * this stops the game and returns the index of hit area; use click() instead !
+   */
+  function stop() {
+    var computedStyle = window.getComputedStyle(data.bargraph);
+    var left = computedStyle.getPropertyValue('left');
+    data.bargraph.style.left=left;
+    data.bargraph.style.transition = null; // disable transition AFTER fetching computed value !
+    var total = window.getComputedStyle(data.bargraph.parentNode).getPropertyValue('width');
+    left =parseFloat(left.split('px')),total=parseFloat(total.split('px'));
+    left = 100*left/total+data.barsize/2;
+    var res =-1; //detect if area was hit or not
+    for(var i=data.areas.length-1; i>=0;i--) {
+      if(data.areas[i].a<=left && left<=data.areas[i].b) res=i; 
+    }
+    data.run=false;
+    return(res);
+  }
+  /**
+   * this can be bound to eventhandler for user input detection to trigger stop and will call stop-CB
+   */
+  function click() {
+    var run = data.run;
+    var res = data.stop();
+    if(run && data.stopCB) data.stopCB(res);
+  }
+  let data ={ //internal state of game
+    bargraph : document.getElementById(bar),
+    run:false, //game started?
+    value: 0, //actual setpoint in%
+    barsize: 5, //width of hitbox relative to total width in %
+    areas:areas,  //list of areas to hit in %;
+    speed:speed, //transition time in ms
+    stopCB: stopCB, //callback after user trigger 
+    startCB: startCB, //callback after start
+    start: start, //ref to start-function
+    stop: stop, //ref to stop-func
+    click: click //ref to click-func
+  }
+  let gradient=''; 
+  for(el of data.areas) { //todo need to sort from left to right
+    gradient += '#80808000 0 '+el.a+'%, '+el.color+' '+el.a+'%,'+el.color+' '+el.b+'%,#80808000 '+el.b+'%,';
+  }
+  data.bargraph.parentNode.style.backgroundImage='linear-gradient(to right,'+gradient.slice(0,-1)+')';
+  /**
+   * instead of using timers rely on css-transition handling and events
+   */
+  data.bargraph.ontransitionend = () => {
+    data.value = (data.value===0)?100-data.barsize:0;
+    data.bargraph.style.left=data.value+'%'; //this should trigger css-transition
+  };
+  return(data);
+}
 //print list of actions for actual day and hour
 window.gm.printSchedule = function(){
   var elmt='';

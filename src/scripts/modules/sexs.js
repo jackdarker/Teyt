@@ -40,30 +40,64 @@
     
 }*/
 window.gm.sex = window.gm.sex||{};
-window.gm.sex.wolfOnPlayerDoggystyle=function(state=1) {
+window.gm.sex.createButton=function(label,foo) {
+    let link;
+    link = document.createElement('a');
+    link.href='javascript:void(0)';
+    link.addEventListener("click", function(){foo();});
+    link.textContent=label;
+    $("div#choice")[0].appendChild(link);
+};
+//cleans up choice-list
+window.gm.sex.beginScene=function(){
     for(var i=$("div#choice")[0].childNodes.length-1;i>=0;i-- ) {
         $("div#choice")[0].removeChild($("div#choice")[0].childNodes[i]);
     }
-    let entry,link;
-    link = document.createElement('a');
-    link.href='javascript:void(0)';
-    entry = document.createElement('p');
-    if(state===1) {
+};
+//add scenedescription to panel
+window.gm.sex.updateScene=function(entry){
+    $("div#panel")[0].appendChild(entry); 
+};
+window.gm.sex.wolfOnPlayerDoggystyle=function(data) {
+    window.gm.sex.beginScene();
+    let entry = document.createElement('p');
+    let createButton=window.gm.sex.createButton;
+    let newdata = {};
+    if(data.state<0) { //quit if scene is done
+        window.gm.postVictory();
+        return;
+    } else if(data.state===0) { //start-menu
+        entry.textContent ="You arent horny enough. | The beast is quite in the mood to fool around. | You need some hard wolfcock right now. ";
+        //todo detect available holes and let select
+        data.state=1;
+        Object.assign(newdata,data);
+        createButton('Straddle Him',window.gm.sex.wolfOnPlayerDoggystyle.bind(null,newdata));
+        newdata = {},Object.assign(newdata,data);
+        createButton('On all 4',window.gm.sex.wolfOnPlayerDoggystyle.bind(null,newdata));
+        newdata = {},Object.assign(newdata,data);
+        newdata.state=-1;
+        createButton('Walk away',window.gm.sex.wolfOnPlayerDoggystyle.bind(null,newdata));
+    } else if(data.state===1) { //each button-click will call this sm again and switch state
         entry.textContent ="You strip of your gear and drop down on knees and hands.";
         //todo detect available holes and let select
-        link.addEventListener("click", function(){window.gm.sex.wolfOnPlayerDoggystyle(2)});
-        link.textContent="Next";
-    } else if(state===2) {
-        entry.textContent ="The wolf mounts you and fills you with his sperm.";
+        data.state=2;
+        Object.assign(newdata,data); //need a copy to create different data-values
+        newdata.hole = "anal";
+        createButton(newdata.hole,window.gm.sex.wolfOnPlayerDoggystyle.bind(null,newdata));
+        newdata = {},Object.assign(newdata,data);
+        newdata.hole = "vaginal";
+        createButton(newdata.hole,window.gm.sex.wolfOnPlayerDoggystyle.bind(null,newdata));
+    } else if(data.state===2) {
+        entry.textContent ="The wolf mounts you and drills into your "+data.hole+" hole.";
+        data.state=3;
+        Object.assign(newdata,data);
+        createButton("Take it",window.gm.sex.wolfOnPlayerDoggystyle.bind(null,newdata));
+    } else if(data.state===3) {
+        entry.textContent ="Wolf-jizzm is painting your inside white.";
         //todo insert sperm in hole
-        link.addEventListener("click", function(){window.gm.sex.wolfOnPlayerDoggystyle(-1)});
-        link.textContent="Pass out";
-    }  
-    
-    if(state<0){
-        window.gm.postVictory();
-    } else {
-        $("div#panel")[0].appendChild(entry);
-        $("div#choice")[0].appendChild(link);
+        data.state=-1;
+        Object.assign(newdata,data);
+        createButton("Pass out",window.gm.sex.wolfOnPlayerDoggystyle.bind(null,newdata));
     }
+    window.gm.sex.updateScene(entry); 
 }
