@@ -81,7 +81,8 @@ window.gm.initGame= function(forceReset,NGP=null) {
         playerParty: [],  //names of NPC in playerParty 
         debug : false,    //globally enables debug
         dbgShowCombatRoll : false,  //log combat calculation details
-        dbgShowQuestInfo : false  //show internal quest state
+        dbgShowQuestInfo : false,  //show internal quest state
+        dbgShowMoreInfo : false
       }
     }
     if (!s.dng||forceReset) { //stores the state of the current dungeon

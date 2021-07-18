@@ -521,12 +521,12 @@ window.gm.ItemsLib = (function (ItemsLib) {
 //todo randomize what is mutated
 //number of mutations depends on magnitude?
 //temporary mutate to feral?
+/*
+* those mutations are usually triggered by effects, calculate some changes and 
+* if related to player pushDeffered Event for displaying message  
+*/
 window.gm.MutationsLib = window.gm.MutationsLib || {};
 window.gm.MutationsLib['vaginaSpermDissolve'] = function (char) {
-    if(window.story.state.tmp.args===null) { //needs to be set before scene !
-        window.gm.printOutput(window.story.state.msg);
-        return;
-    }
     let vulva = char.getVagina();
     vulva.removeSperm(2); //todo decay depends on looseness, soulgem absorption??
     let msg='';
@@ -554,16 +554,11 @@ window.gm.MutationsLib['vaginaSpermDissolve'] = function (char) {
     if(vulva.data.sperm>0) {
         msg+="There might still be "+window.gm.formatNumber(vulva.data.sperm,0)+"ml sperm left.</br>"
     } else msg+="This was possibly the last remains of sperm.</br>";
-    window.gm.printOutput(msg);
-    window.story.state.msg = msg;
-    window.story.state.tmp.args=null; //
+    if(char===window.gm.player) {
+        window.gm.pushDeferredEvent("GenericDeffered",[msg]);
+    }
 }
 window.gm.MutationsLib['vaginaPregnancy'] = function (char) {
-    if(window.story.state.tmp.args===null) { //needs to be set before scene !
-        window.gm.printOutput(window.story.state.msg);
-        return;
-    }
-    let vulva = char.getVagina();
     let msg='';
     let lewdMark=char.Effects.findEffect(effLewdMark.name)[0];
     let pregnancy=char.Effects.findEffect(effVaginalPregnant.name)[0];
@@ -582,13 +577,15 @@ window.gm.MutationsLib['vaginaPregnancy'] = function (char) {
                 msg+="Your belly is swollen with the spawn of some "+pregnancy.data.type+".</br>"; 
             }
         }
+        if(window.story.state._gm.dbgShowMoreInfo) msg+= pregnancy.data.cycles*pregnancy.data.duration+" minutes to go.";
     } 
     //todo go in heat if fertility-cycle triggers?
-    window.gm.printOutput(msg);
-    window.story.state.msg = msg;
-    window.story.state.tmp.args=null; //
+    if(char===window.gm.player) {
+        window.gm.pushDeferredEvent("GenericDeffered",[msg]);
+    }
 }
 window.gm.MutationsLib['swapGender'] = function (char,genderItem) {
+    let msg='';
     let penis = char.getPenis();
     let vulva = char.getVagina();
     let style=(penis)?penis.getStyle():((vulva)?vulva.getStyle():'human');
@@ -596,21 +593,28 @@ window.gm.MutationsLib['swapGender'] = function (char,genderItem) {
     if(newItem.slotUse.includes('bPenis')) {
         if(vulva !==null) {
             window.gm.player.Outfit.removeItem(vulva.id,true);
+            msg+= 'You lost your female privats. ';
         }
-        if(penis===null) window.gm.player.Outfit.addItem(newItem.factory(style),true);
+        if(penis===null) {
+            window.gm.player.Outfit.addItem(newItem.factory(style),true);
+            msg+= 'Instead a dick sprouts in your nethers.</br>';
+        }
     } 
     if(newItem.slotUse.includes('bVulva')) {
         if(penis!==null) {
             window.gm.player.Outfit.removeItem(penis.id,true);
+            msg+= 'Your fine penis shrinks down until it is finally completely absorbed in your body. ';
         }
-        if(vulva===null) window.gm.player.Outfit.addItem(newItem,true);
+        if(vulva===null) {
+            window.gm.player.Outfit.addItem(newItem,true);
+            msg+= 'A female opening forms itself in your groin.</br>';
+        }
     } 
+    if(char===window.gm.player) {
+        window.gm.pushDeferredEvent("GenericDeffered",[msg]);
+    }
 }
 window.gm.MutationsLib['mutateWolf'] = function () {
-    if(window.story.state.tmp.args===null) { //needs to be set before scene !
-        window.gm.printOutput(window.story.state.msg);
-        return;
-    }
     let _rnd =_.random(1,100);
     let msg='',_TF="TailWolf";
     if(window.gm.player.Outfit.countItem(_TF)>0) {
@@ -646,16 +650,12 @@ window.gm.MutationsLib['mutateWolf'] = function () {
         msg+= "A dense coat of fur spreads over your body.</br>";
     }
     if(msg==='') msg= "Your anxiety goes by as you didnt get any more wolflike."
-    window.gm.printOutput(msg);
-    window.story.state.msg = msg;
-    window.story.state.tmp.args=null; //
+    if(char===window.gm.player) {
+        window.gm.pushDeferredEvent("GenericDeffered",[msg]);
+    }
 };
 
 window.gm.MutationsLib['mutateCat'] = function() {
-    if(window.story.state.tmp.args===null) {//needs to be set before scene !
-        window.gm.printOutput(window.story.state.msg);
-        return;
-    }
     let msg='', _TF="TailWolf";
     if(window.gm.player.Outfit.countItem(_TF)>0) {
         let item = window.gm.player.Outfit.getItem(_TF);
@@ -676,7 +676,7 @@ window.gm.MutationsLib['mutateCat'] = function() {
         window.gm.player.Outfit.addItem(window.storage.constructors['TailWolf'].factory('cat'));
         msg=("You have grown a cat tail !</br>");
     }
-    window.gm.printOutput(msg);
-    window.story.state.msg = msg;
-    window.story.state.tmp.args=null; //
+    if(char===window.gm.player) {
+        window.gm.pushDeferredEvent("GenericDeffered",[msg]);
+    }
 }

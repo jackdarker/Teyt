@@ -38,7 +38,7 @@ class Character {
         this.Skills = new Inventory(this._data.skills);
         this.Skills._parent = window.gm.util.refToParent(this);
         //create basic stats
-        stHealth.setup(this.Stats,10,10),stEnergy.setup(this.Stats,30,30),stArcana.setup(this.Stats,0,30),
+        stHealth.setup(this.Stats,10,10),stEnergy.setup(this.Stats,30,30),stArcana.setup(this.Stats,0,0),
         stPAttack.setup(this.Stats,6,100),stPDefense.setup(this.Stats,4,100),
         stAgility.setup(this.Stats,10,100),stIntelligence.setup(this.Stats,10,100),stLuck.setup(this.Stats,10,100);
         stCharisma.setup(this.Stats,10,100),stPerception.setup(this.Stats,10,100),stStrength.setup(this.Stats,10,100),stEndurance.setup(this.Stats,10,100);

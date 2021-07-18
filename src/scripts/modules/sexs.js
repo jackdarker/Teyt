@@ -126,7 +126,7 @@ window.gm.sex.wolfOnPlayer=function(data) {
         Object.assign(newdata,data);
         createButton("Take it",window.gm.sex.wolfOnPlayer.bind(null,newdata));
     } else if(data.state==='plDomOrgasm') {
-        entry.textContent ="Wolf-jizzm is painting your inside white.";  //Unfortunatly, the stud came before you did -- 
+        entry.textContent ="Wolf-jizzm is painting your insides white.";  //Unfortunatly, the stud came before you did -- 
         if(data.hole==='vaginal') {
             window.gm.player.getVagina().addSperm('wolf',3);
         } else if(data.hole==='anal') {

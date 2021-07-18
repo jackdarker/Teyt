@@ -16,6 +16,7 @@ window.gm.initGame= function(forceReset,NGP=null) {
     s._gm.debug = 1,   
     s._gm.dbgShowCombatRoll= true,
     s._gm.dbgShowQuestInfo= true;
+    s._gm.dbgShowMoreInfo=true;
     if (!s.vars||forceReset) { // storage of variables that doesnt fit player
         s.vars = {
         debugInv: new Inventory(),

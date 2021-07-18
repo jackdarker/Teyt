@@ -184,7 +184,7 @@ class stAgility extends Stat { // core attribute
     toJSON() {return window.storage.Generic_toJSON("stAgility", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stAgility, value.data);};
     updateModifier() {
-        this.parent.addModifier('energyMax',{id:'agility', bonus:this.parent.get('agility').value});
+        this.parent.addModifier('energyMax',{id:'agility', bonus:this.parent.get('agility').value*2});
     };
 }
 class stPerception extends Stat { // core attribute
@@ -202,7 +202,7 @@ class stPerception extends Stat { // core attribute
     toJSON() {return window.storage.Generic_toJSON("stPerception", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stPerception, value.data);};
     updateModifier() {
-        this.parent.addModifier('arcanaMax',{id:'perception', bonus:this.parent.get('perception').value*4});
+        this.parent.addModifier('arcanaMax',{id:'perception', bonus:this.parent.get('perception').value*2});
     };
 }
 class stLuck extends Stat { // core attribute
@@ -237,7 +237,7 @@ class stCharisma extends Stat { // core attribute
     toJSON() {return window.storage.Generic_toJSON("stCharisma", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stCharisma, value.data);};
     updateModifier() {
-        this.parent.addModifier('energyMax',{id:'charisma', bonus:this.parent.get('charisma').value});
+        this.parent.addModifier('energyMax',{id:'charisma', bonus:this.parent.get('charisma').value*2});
     };
 }
 class stIntelligence extends Stat { // core attribute
@@ -252,7 +252,7 @@ class stIntelligence extends Stat { // core attribute
     toJSON() {return window.storage.Generic_toJSON("stIntelligence", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stIntelligence, value.data);};
     updateModifier() {
-        this.parent.addModifier('arcanaMax',{id:'intelligence', bonus:this.parent.get('intelligence').value*4});
+        this.parent.addModifier('arcanaMax',{id:'intelligence', bonus:this.parent.get('intelligence').value*2});
     };
 }
 class stStrength extends Stat { // core attribute
@@ -267,7 +267,7 @@ class stStrength extends Stat { // core attribute
     toJSON() {return window.storage.Generic_toJSON("stStrength", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stStrength, value.data);};
     updateModifier() {
-        this.parent.addModifier('healthMax',{id:'strength', bonus:this.parent.get('strength').value*4});
+        this.parent.addModifier('healthMax',{id:'strength', bonus:this.parent.get('strength').value*2});
         this.parent.addModifier('pAttack',{id:'strength', bonus:Math.floor(this.parent.get('strength').value/4)});
     };
 }
@@ -283,7 +283,7 @@ class stEndurance extends Stat { // core attribute
     toJSON() {return window.storage.Generic_toJSON("stEndurance", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stEndurance, value.data);};
     updateModifier() {
-        this.parent.addModifier('healthMax',{id:'endurance', bonus:this.parent.get('endurance').value*4});
+        this.parent.addModifier('healthMax',{id:'endurance', bonus:this.parent.get('endurance').value*2});
         this.parent.addModifier('pDefense',{id:'strength', bonus:this.parent.get('endurance').value%4});
     };
 }
@@ -847,9 +847,8 @@ class effVaginalPregnant extends Effect {
         this.data.duration = Math.max(this.data.duration-window.gm.getDeltaTime(time,this.data.time),0);
         this.data.time = time;
         if(this.data.duration<=0 && this.data.cycles>0) {
-            this.data.cycles-=1;
-            window.gm.pushDeferredEvent("VaginaPregnancy"); //pregnancy-end is handled in event
-            this.data.duration = 60;
+            this.data.cycles-=1,this.data.duration = 60;
+            window.gm.MutationsLib.vaginaPregnancy(this.parent.parent)
         }
         return(null);
     }
@@ -879,13 +878,12 @@ class effSpermInWomb extends Effect {   //if you have womb filled with sperm, th
         this.data.duration = Math.max(this.data.duration-window.gm.getDeltaTime(time,this.data.time),0);
         this.data.time = time;
         if(this.data.duration<=0 && this.data.cycles>0) {
-            //this.data.cycles-=1;
+            this.data.duration = 60;
             let vagina=this.parent.parent.getVagina();
             if(vagina && vagina.data.sperm>0) {  
                 //todo add option to show only big changes/sometime
-                window.gm.pushDeferredEvent("VaginaSpermDissolve",[this.data.magnitude]);
+                window.gm.MutationsLib.vaginaSpermDissolve(this.parent.parent);
             }
-            this.data.duration = 60;
         }
         return(null);
     }
