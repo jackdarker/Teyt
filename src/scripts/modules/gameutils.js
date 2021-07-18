@@ -181,6 +181,7 @@ window.gm.leaveVR=function() {
   s._gm.timeVR = s._gm.time,s._gm.dayVR = s._gm.day;
   s._gm.time = s._gm.timeRL,s._gm.day = s._gm.dayRL;
   window.gm.addTime(60);
+  //todo copy fetish-stats back to RLPlayer ?
 }
 //call this after onVictory/onFlee-scene to continue in dng or other location
 //this function is also used to restore after loading save !

@@ -156,11 +156,13 @@ class Effects extends Inventory {  //Todo a collection of Stats is similiar to I
     get(id){
         return(this.getItem(id));
     }
-    //findItemslot uses id, this one finds all effects(-slot) with a name
+    /*
+    * findItemslot uses id, this one finds all effects with a name
+    */
     findEffect(name) {
         let _items = [] ;
         for (let i = 0; i < this.count(); i++) {
-            if(this.list[i].item.name===name) _items.push(i);
+            if(this.list[i].item.name===name) _items.push(this.list[i].item);
         }
         return(_items);
     }

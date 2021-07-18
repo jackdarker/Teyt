@@ -214,4 +214,12 @@ class Character {
         result.msg = window.gm.util.descFixer(this)(result.msg);
         return(result);
     }
+    getPenis() {
+        let penis = this.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bPenis);
+        return(penis);
+    }
+    getVagina() {
+        let vulva = this.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bVulva);
+        return(vulva);
+    }
 }

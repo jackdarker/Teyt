@@ -62,9 +62,9 @@ window.gm.encounters.wolf = function(location) {
     window.gm.Encounter.EnemyFunc = (function() { 
         let x = new window.gm.Mobs.Wolf();
         if(_.random(1,100)>50) {
-            x.Outfit.addItem(new VulvaHuman());
+            x.Outfit.addItem(VulvaHuman.factory('wolf'));
         } else {
-            x.Outfit.addItem(new PenisHuman());
+            x.Outfit.addItem(PenisHuman.factory('wolf'));
         }
         x.scaleLevel(window.gm.player.level);
         x.Stats.increment("health",9999); x.Stats.increment("energy",9999);

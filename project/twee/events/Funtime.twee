@@ -59,14 +59,12 @@ You cant hold any longer and shoot your jizzm inside her.
 <div></br><a0 onclick='window.gm.respawn();'>Black out</a></br></div>
 </article><article id="LogPanel"></article></section>
 
-
 :: WolfVictory
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <div id='panel'></div><!--description is rendered here-->
-<div id='choice'> <!--choice is rendered here-->
-</div>
+<div id='choice'></div> <!--choice is rendered here-->
 </article><article id="LogPanel"></article></section>
-<script>window.gm.sex.wolfOnPlayerDoggystyle({state:0});
+<script>window.gm.sex.wolfOnPlayer({state:0, battleResult:'victory'});
 </script>
 
 :: WolffightIntermezzo

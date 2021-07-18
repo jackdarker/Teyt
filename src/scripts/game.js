@@ -769,7 +769,7 @@ window.gm.printEffectSummary= function(who='player',showstats=true,showfetish=fa
   ids.sort(); //Todo better sort
   for(var i=0;i<ids.length;i++){
       var data = window.gm[who].Effects.get(ids[i]);
-      result+='<tr><td>'+data.id+':</td><td>'+data.name+'</td></tr>';
+      result+='<tr><td>'+data.id+':</td><td>'+data.desc+'</td></tr>';
   }
   result+='</table>';
   return(result);

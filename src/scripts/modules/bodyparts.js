@@ -211,6 +211,7 @@ class TailWolf extends Equipment {
     }
     setStyle(id) {
         switch(id) {
+            case 'human':
             case 'cat':
             case 'dog':
             case 'horse':
@@ -333,13 +334,37 @@ class HandsHuman extends Equipment {
     }
 }
 class BreastHuman extends Equipment {
+    static dataPrototype() {    
+        return({size:3});
+    }
+    static factory(id) {
+        let obj =  new BreastHuman();
+        obj.setStyle(id);
+        return(obj);
+    }
     constructor() {
         super('BreastHuman');
         this.tags = ['body'];
         this.slotUse = ['bBreast'];
-        this.growth = 0.0; //in %/100 maxGrowth
-        this.maxGrowth = 0.3; //in meter, todo depends on bodysize
+        this.data = BreastHuman.dataPrototype();
     }
+    setStyle(id) {
+        this.data.style = id;
+        switch(id) {
+            case 'human':
+            case 'horse':
+                break;
+            case 'cat':
+            case 'dog':
+            case 'wolf':
+                break;
+            case 'lizard':
+                break;
+            default:
+                throw new Error("unknown breast-style "+id);
+        }
+    }
+    getStyle() { return this.data.style; }
     get descShort() { return (this.desc);}
     get desc() { return 'some human breasts.';}
     toJSON() {return window.storage.Generic_toJSON("BreastHuman", this); };
@@ -352,13 +377,13 @@ class BreastHuman extends Equipment {
 }
 class VulvaHuman extends Equipment {
     static dataPrototype() {    
-        return({labia:0, virgin:true,wetgen:1, stretch:1,depth:1,clitsize:0.5});
+        //
+        return({labia:0, virgin:true,wetgen:1, stretch:1,depth:1,clitsize:0.5, spermtype:'',sperm:0});
     }
-    static labiaStyles() {
-        let style ={};
-        style['human'] = 0;
-        style['dog'] = 1;
-        return(style);
+    static factory(id) {
+        let obj =  new VulvaHuman();
+        obj.setStyle(id);
+        return(obj);
     }
     constructor() {
         super('VulvaHuman');
@@ -366,7 +391,22 @@ class VulvaHuman extends Equipment {
         this.slotUse = ['bVulva'];
         this.data = VulvaHuman.dataPrototype();
     }
-    get descShort() { return 'human vagina';}
+    setStyle(id) {
+        this.data.style = id;
+        switch(id) {
+            case 'human':
+            case 'cat':
+            case 'dog':
+            case 'horse':
+            case 'wolf':
+            case 'lizard':
+                break;
+            default:
+                throw new Error("unknown vulva-style "+id);
+        }
+    }
+    getStyle() { return this.data.style; }
+    get descShort() { return(this.data.style+' vagina');}
     get desc() { return 'puffy cunt';}
     toJSON() {return window.storage.Generic_toJSON("VulvaHuman", this); };
     static fromJSON(value) {return(window.storage.Generic_fromJSON(VulvaHuman, value.data));}
@@ -374,8 +414,36 @@ class VulvaHuman extends Equipment {
     canUnequip() {return({OK:true, msg:'unequipable'});}
     descLong(fconv) {
         let msg= "$[My]$ vagina can snuggly fit around "+this.data.stretch+"cm in diameter and "+this.data.depth+"cm in depth.";
-        msg+= "Its clit is of a size of around "+this.data.clitsize+"cm.";   
+        msg+= "Its clit is of a size of around "+this.data.clitsize+"cm."; 
+        if(this.data.spermtype!=='') {
+            msg+= this.data.sperm+"ml of sperm from a "+this.data.spermtype+" might be deposited in $[my]$ womb.";  
+        }
         return(fconv(msg));
+    }
+    onEquip(context){
+        context.parent.addEffect('effSpermInWomb',new window.storage.constructors['effSpermInWomb']());
+        context.parent.addEffect('effVaginalFertil',new window.storage.constructors['effVaginalFertil']());
+        return({OK:true,msg:'equipped'});
+    }
+    onUnequip(context) {
+        context.parent.Effects.removeItem('effVaginalFertil');
+        context.parent.Effects.removeItem('effVaginalPregnant');
+        context.parent.Effects.removeItem('effSpermInWomb');
+        return({OK:true,msg:'unequipped'});
+    }
+    addSperm(type,amount) {
+        if(amount>this.data.sperm || this.data.spermtype) {
+            this.data.spermtype=type;
+        }
+        this.data.sperm+=amount;
+    }
+    removeSperm(amount) {
+        if(amount>0) {
+            this.data.sperm-=amount;
+        } else this.data.sperm=0;
+        if(this.data.sperm<=0) {
+            this.data.sperm=0;this.data.spermtype='';
+        }
     }
 }
 class PenisHuman extends Equipment {
@@ -454,20 +522,92 @@ window.gm.ItemsLib = (function (ItemsLib) {
 //number of mutations depends on magnitude?
 //temporary mutate to feral?
 window.gm.MutationsLib = window.gm.MutationsLib || {};
-window.gm.MutationsLib['swapGender'] = function (genderItem) {
-    let penis = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bPenis);
-    let vulva = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bVulva);
-    if(genderItem.slotUse.includes('bPenis')) {
-        if(vulva !==null) window.gm.player.Outfit.removeItem(vulva.id,true);
-        if(penis===null) window.gm.player.Outfit.addItem(genderItem,true);
+window.gm.MutationsLib['vaginaSpermDissolve'] = function (char) {
+    if(window.story.state.tmp.args===null) { //needs to be set before scene !
+        window.gm.printOutput(window.story.state.msg);
+        return;
+    }
+    let vulva = char.getVagina();
+    vulva.removeSperm(2); //todo decay depends on looseness, soulgem absorption??
+    let msg='';
+    msg+="You can feel some of the cum in your womb dribble down your leg. ";
+    let lewdMark=char.Effects.findEffect(effLewdMark.name)[0];
+    let pregnancy=char.Effects.findEffect(effVaginalPregnant.name)[0];
+    if(pregnancy) {
+        if(lewdMark) {
+            msg+="More of that precious seed is absorbed by that soulgem growing in you.</br>";
+            vulva.removeSperm(2); //todo decay depends on looseness, soulgem absorption??
+        } else msg+="But you are pregnant already anyway.</br>"; 
     } 
-    if(genderItem.slotUse.includes('bVulva')) {
-        if(penis!==null) window.gm.player.Outfit.removeItem(penis.id,true);
-        if(vulva===null) window.gm.player.Outfit.addItem(genderItem,true);
+    if(!pregnancy) {
+        pregnancy=char.Effects.findEffect(effVaginalFertil.name)[0];
+        if(pregnancy) { //todo random chance
+            if(true || _.random(0,100)>75) { //todo  fertility as stat
+                msg+="Has your last fling got you impregnated?</br>";
+                pregnancy = new effVaginalPregnant();
+                pregnancy.data.type=vulva.data.spermtype;
+                if(lewdMark) pregnancy.data.type='soulgem'; 
+                char.addEffect(effVaginalPregnant.name, pregnancy)
+            } else msg+="Hopefully there is nothing to worry about?</br>";
+        }
+    }    
+    if(vulva.data.sperm>0) {
+        msg+="There might still be "+window.gm.formatNumber(vulva.data.sperm,0)+"ml sperm left.</br>"
+    } else msg+="This was possibly the last remains of sperm.</br>";
+    window.gm.printOutput(msg);
+    window.story.state.msg = msg;
+    window.story.state.tmp.args=null; //
+}
+window.gm.MutationsLib['vaginaPregnancy'] = function (char) {
+    if(window.story.state.tmp.args===null) { //needs to be set before scene !
+        window.gm.printOutput(window.story.state.msg);
+        return;
+    }
+    let vulva = char.getVagina();
+    let msg='';
+    let lewdMark=char.Effects.findEffect(effLewdMark.name)[0];
+    let pregnancy=char.Effects.findEffect(effVaginalPregnant.name)[0];
+    if(pregnancy) {
+        if(lewdMark && pregnancy.data.type==='soulgem') {
+            if(pregnancy.data.cycles <=0) {
+                pregnancy = new effVaginalFertil();
+                char.addEffect(effVaginalFertil.name, pregnancy);
+                msg+="A homemade soulgem slips out of your nethers !</br>";
+                char.Inv.addItem(window.gm.ItemsLib['TinySoulGem']());
+            } else msg+="If you dont provide that soulgem something to feed off, it might absorb some energy from you instead!.</br>";
+        } else {
+            if(pregnancy.data.cycles <=0) {
+                msg+="Congrats, you brought some more "+pregnancy.data.type+" into this world.</br>";
+            } else {
+                msg+="Your belly is swollen with the spawn of some "+pregnancy.data.type+".</br>"; 
+            }
+        }
+    } 
+    //todo go in heat if fertility-cycle triggers?
+    window.gm.printOutput(msg);
+    window.story.state.msg = msg;
+    window.story.state.tmp.args=null; //
+}
+window.gm.MutationsLib['swapGender'] = function (char,genderItem) {
+    let penis = char.getPenis();
+    let vulva = char.getVagina();
+    let style=(penis)?penis.getStyle():((vulva)?vulva.getStyle():'human');
+    let newItem =genderItem.factory(style);
+    if(newItem.slotUse.includes('bPenis')) {
+        if(vulva !==null) {
+            window.gm.player.Outfit.removeItem(vulva.id,true);
+        }
+        if(penis===null) window.gm.player.Outfit.addItem(newItem.factory(style),true);
+    } 
+    if(newItem.slotUse.includes('bVulva')) {
+        if(penis!==null) {
+            window.gm.player.Outfit.removeItem(penis.id,true);
+        }
+        if(vulva===null) window.gm.player.Outfit.addItem(newItem,true);
     } 
 }
 window.gm.MutationsLib['mutateWolf'] = function () {
-    if(window.story.state.tmp.args===null) {
+    if(window.story.state.tmp.args===null) { //needs to be set before scene !
         window.gm.printOutput(window.story.state.msg);
         return;
     }
@@ -512,7 +652,7 @@ window.gm.MutationsLib['mutateWolf'] = function () {
 };
 
 window.gm.MutationsLib['mutateCat'] = function() {
-    if(window.story.state.tmp.args===null) {
+    if(window.story.state.tmp.args===null) {//needs to be set before scene !
         window.gm.printOutput(window.story.state.msg);
         return;
     }

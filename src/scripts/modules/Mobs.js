@@ -3,16 +3,23 @@
 - imp
 - nymph
 - kobold
+- lizard-man
 - naga
-- stagboy
+- stag-boy/-Stud
+- cougar-girl/-mistress
+- grizzly
 - werwolf
 - vile vine
+- lush orchid
+- slug
 - Giant-Snake
 - Giant wasp
+- spider/tarantula
 - raptor
 - gryphon
 - felkin
 - drider
+- dragon/wyvern
 
  */
 
@@ -25,8 +32,7 @@ class Mole extends Mob {
         this.pic= 'assets/mole.jpg';
         this.Stats.increment('healthMax',-1*(this.health().max-20));
     }
-};
-
+}
 class Wolf extends Mob {
     constructor() {
         super();
@@ -54,7 +60,7 @@ class Wolf extends Mob {
         }
         return(super.calcCombatMove(enemys,friends));
     }
-};
+}
 class Leech extends Mob {
     constructor() {
         super();
@@ -87,7 +93,7 @@ class Leech extends Mob {
         } 
         return(super.calcCombatMove(enemys,friends));
     }
-};
+}
 class Huntress extends Mob {
     constructor() {
         super();
@@ -97,7 +103,7 @@ class Huntress extends Mob {
         this.Outfit.addItem(new SkinHuman());
         this.Outfit.addItem(HandsHuman.factory('cat'));
         this.Outfit.addItem(FaceWolf.factory('cat'));
-        this.Outfit.addItem(new VulvaHuman());
+        this.Outfit.addItem(VulvaHuman.factory('cat'));
         this.Outfit.addItem(new BikiniBottomLeather());
         this.levelUp(3);
         this.autoLeveling();
@@ -109,7 +115,7 @@ class Huntress extends Mob {
         //todo shoot arrow, pounce, throw net
         return(super.calcCombatMove(enemys,friends));
     }
-};
+}
 class Mechanic extends Mob {
     constructor() {
         super();
@@ -129,7 +135,7 @@ class Mechanic extends Mob {
         }
         return(super.calcCombatMove(enemys,friends));
     }
-};
+}
 /////////////////////////////////////////////////////////
 // special NPC
 class Carlia extends Mob {
@@ -141,7 +147,8 @@ class Carlia extends Mob {
       this.Outfit.addItem(new SkinHuman());
       this.Outfit.addItem(HandsHuman.factory('cat'));
       this.Outfit.addItem(FaceWolf.factory('cat'));
-      this.Outfit.addItem(new VulvaHuman());
+      this.Outfit.addItem(BreastHuman.factory('human'));
+      this.Outfit.addItem(VulvaHuman.factory('human'));
       this.Outfit.addItem(new BikiniBottomLeather());
       this.levelUp(3);
       this.autoLeveling();

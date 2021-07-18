@@ -5,13 +5,28 @@ else increase rating
 if rating drops below 0 ??  "Something in your nethers is changing, you can feel it. Your once average sized human dong has changed its shape. At least that what you think."
 if rating increases just above 0 "You "
 
+:: VaginaSpermDissolve [_isdeffered_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+<div id='output'></div></br>   <!--message is rendered here-->
+<a0 onclick= 'window.story.state.msg="";window.story.show("")'>Next</a></br>
+</article></section>
+<script> window.gm.MutationsLib['vaginaSpermDissolve'](window.gm.player);
+</script>
+
+:: VaginaPregnancy [_isdeffered_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+<div id='output'></div></br>   <!--message is rendered here-->
+<a0 onclick= 'window.story.state.msg="";window.story.show("")'>Next</a></br>
+</article></section>
+<script> window.gm.MutationsLib['vaginaPregnancy'](window.gm.player);
+</script>
 
 :: MutateCat [_isdeffered_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 <div id='output'></div></br>   <!--message is rendered here-->
 <a0 onclick= 'window.story.state.msg="";window.story.show("")'>Next</a></br>
 </article></section>
-<script> window.gm.MutationsLib['mutateCat']();
+<script> window.gm.MutationsLib['mutateCat'](window.gm.player);
 </script>
 
 
@@ -21,7 +36,7 @@ if rating increases just above 0 "You "
 <!--set window.story.state.tmp.args=[1] before calling! -->
 <a0 onclick='window.story.state.msg="";window.story.show("")'>Next</a></br>
 </article></section>
-<script> window.gm.MutationsLib['mutateWolf']();
+<script> window.gm.MutationsLib['mutateWolf'](window.gm.player);
 </script>
 
 
@@ -31,7 +46,7 @@ if rating increases just above 0 "You "
 <!--set window.story.state.tmp.args=[1] before calling! -->
 <a0 onclick='window.story.state.msg="";window.story.show("")'>Next</a></br>
 </article></section>
-<script> window.gm.MutationsLib['mutateHorse']();
+<script> window.gm.MutationsLib['mutateHorse'](window.gm.player);
 </script>
 
 

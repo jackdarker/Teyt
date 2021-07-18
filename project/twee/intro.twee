@@ -30,6 +30,8 @@ There are also some options to make a fastforward (might behave oddly): </br>
 [[FF VR Character creation]] </br>
 [[FF before the bridge]]</br>
 [[FF Bridge passage unlocked]]</br>
+debug only! :</br>
+[[FF WolfVictory]]</br>
 </article>
 
 :: Intro2
@@ -98,5 +100,25 @@ You can now pass the bridge and leave the forest.
     window.gm.quests.addQuest("qPurpleBerry",100);
     window.gm.enterVR();
     window.gm.player.Outfit.addItem(new window.gm.ItemsLib["CollarQuest"]());
+}
+</script>
+
+
+:: FF WolfVictory
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+<div></br>
+[[Back|Intro]] <a0 onclick='start();window.story.show("WolfVictory");'>Start</a></br></div>
+</article><article id="LogPanel"></article></section>
+<script> function start() {
+    window.gm.quests.addQuest("qBeastKink",1);
+    window.gm.quests.addQuest("qBondageKink",400);
+    window.gm.quests.addQuest("qDLCMain",600);
+    window.gm.quests.addQuest("qFixLaptop",1000);
+    window.gm.quests.addQuest("qDiedAgain",300);
+    window.gm.quests.addQuest("qPurpleBerry",100);
+    window.gm.enterVR();
+    window.gm.MutationsLib['swapGender'](window.gm.player,window.storage.constructors["VulvaHuman"]);
+    window.gm.player.addEffect('effLewdMark',new window.storage.constructors['effLewdMark']());
 }
 </script>

@@ -64,7 +64,34 @@ class Ingredient extends Item {
     toJSON() {return window.storage.Generic_toJSON("Ingredient", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(Ingredient, value.data);};
 }
-
+class SoulGem extends Item {
+    constructor() { super('SoulGem');   
+        this.lossOnRespawn = true;
+    }
+    static lookupId(id) {
+        let info ={desc:''};
+        switch(id){
+            case "TinySoulGem": 
+                info.desc= "tiny soulgem";
+                break;
+            case "SmallSoulGem":
+                info.desc="small soulgem";
+                break;
+            case "SmallBlackSoulGem":
+                info.desc="small corrupted soulgem";
+                break;
+            case "TinyBlackSoulGem":
+                    info.desc="tiny corrupted soulgem";
+                    break;
+            default:
+        }
+        return(info);
+    }
+    changeId(id) {this.id = id;} //instead of creating full class for every useless junk I use this and just add variable that will be restored after load
+    get desc() { return SoulGem.lookupId(this.id).desc;   }
+    toJSON() {return window.storage.Generic_toJSON("SoulGem", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(Ingredient, value.data);};
+}
 class FlashBang extends Item {
     constructor() { super('FlashBang');  }
     get desc() { return 'Stun someone with a blinding light.';  }
@@ -232,6 +259,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(HorsePotion);
     window.storage.registerConstructor(Ingredient);
     window.storage.registerConstructor(FlashBang);
+    window.storage.registerConstructor(SoulGem);
     
     //todo do I need this extra ollection?
     ItemsLib['Money'] = function () { return new Money();};
@@ -250,5 +278,6 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['BloatedMushroom'] = function () { let x= new Ingredient();x.changeId("BloatedMushroom");return(x); };
     ItemsLib['PurpleBerry'] = function () { let x= new Ingredient();x.changeId("PurpleBerry");return(x); };
     ItemsLib['ApocaFlower'] = function () { let x= new Ingredient();x.changeId("ApocaFlower");return(x); };
+    ItemsLib['TinySoulGem'] = function () { let x= new SoulGem();x.changeId("TinySoulGem");return(x); };
     return ItemsLib; 
 }(window.gm.ItemsLib || {}));

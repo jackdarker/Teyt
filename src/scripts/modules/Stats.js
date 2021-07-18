@@ -766,21 +766,7 @@ class effLewdMark extends Effect {
         //todo the mark indicates that you can bear soulgems; the stronger the mark, the better the gem
         //with each birth, the mark grows stronger;
         //while you are pampering the gem, it sucks up your arcana if you dont have sex
-        //chance to go into heat if you dont pamper gem
-        this.data.duration = Math.max(this.data.duration-window.gm.getDeltaTime(time,this.data.time),0);
-        this.data.time = time;
-        if(this.data.duration<=0 && this.data.cycles>0) {
-            this.data.cycles-=1;
-            return(function(me){
-                return (function(Effects){ 
-                    if(me.data.cycles<=0) { 
-                        Effects.removeItem(me.data.id);
-                        window.gm.pushDeferredEvent("MutateVulvaEnd");
-                    }
-                    else window.gm.pushDeferredEvent("MutateVulva");
-                });
-            }(this));
-        }
+        //chance to go into heat if you dont have a gem
         return(null);
     }
     onApply(){
@@ -818,6 +804,100 @@ class effInRut extends Effect {
     //todo if male, you might go into rut  
     //more arousal damage by sluts
     //multiple succesful impregations/balldrain or time might end rut
+}
+class effVaginalFertil extends Effect {
+    constructor() {
+        super();
+        this.data.id = this.data.name= effVaginalFertil.name, this.data.duration = 60, this.data.hidden=0;
+        this.data.cycles = 3, this.data.magnitude = 1;
+    }
+    toJSON() {return window.storage.Generic_toJSON("effVaginalFertil", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(effVaginalFertil, value.data);};
+    get desc() {return(effVaginalFertil.name);}
+    onTimeChange(time) {
+        //todo can get pregnant with child,eggs ; natural heat might be triggered
+        // if fertility of Vagina is 0, can still bear parasites,soulgem; fertility heat might not trigger 
+        return(null);
+    }
+    onApply(){
+        //todo remove infertile,fertileEffect
+        this.parent.removeItem(effVaginalPregnant.name);
+        this.data.duration = 60;
+        this.data.time = window.gm.getTime();
+    }
+    merge(neweffect) {
+        if(neweffect.name===this.data.name) { //no merge
+            return(true);
+        }
+    }
+}
+class effVaginalPregnant extends Effect {
+    constructor() {
+        super();
+        this.data.id = this.data.name= effVaginalPregnant.name, this.data.duration = 60, this.data.hidden=0;
+        this.data.cycles = 3, this.data.magnitude = 1, this.data.type='';
+    }
+    toJSON() {return window.storage.Generic_toJSON("effVaginalPregnant", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(effVaginalPregnant, value.data);};
+    get desc() {return(effVaginalPregnant.name);}
+    onTimeChange(time) {
+        //todo be pregnant with child,eggs,parasites,soulgem
+        //normal pregnancy will grow over time, might be aborted by medicine
+        //soulgem grows over time, consumes arcana or sperm
+        this.data.duration = Math.max(this.data.duration-window.gm.getDeltaTime(time,this.data.time),0);
+        this.data.time = time;
+        if(this.data.duration<=0 && this.data.cycles>0) {
+            this.data.cycles-=1;
+            window.gm.pushDeferredEvent("VaginaPregnancy"); //pregnancy-end is handled in event
+            this.data.duration = 60;
+        }
+        return(null);
+    }
+    onApply(){
+        //todo remove infertile,fertileEffect
+        this.parent.removeItem(effVaginalFertil.name);
+        this.data.duration = 60;
+        this.data.time = window.gm.getTime();
+    }
+    merge(neweffect) {
+        if(neweffect.name===this.data.name) { //no merge
+            return(true);
+        }
+    }
+}
+//todo VaginalParasite
+class effSpermInWomb extends Effect {   //if you have womb filled with sperm, this handles impregnation and sperm-decay
+    constructor() {
+        super();
+        this.data.id = this.data.name= effSpermInWomb.name, this.data.duration = 60, this.data.hidden=0;
+        this.data.cycles = 1, this.data.magnitude = 2;
+    }
+    toJSON() {return window.storage.Generic_toJSON("effSpermInWomb", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(effSpermInWomb, value.data);};
+    get desc() {return(effSpermInWomb.name);}
+    onTimeChange(time) {
+        this.data.duration = Math.max(this.data.duration-window.gm.getDeltaTime(time,this.data.time),0);
+        this.data.time = time;
+        if(this.data.duration<=0 && this.data.cycles>0) {
+            //this.data.cycles-=1;
+            let vagina=this.parent.parent.getVagina();
+            if(vagina && vagina.data.sperm>0) {  
+                //todo add option to show only big changes/sometime
+                window.gm.pushDeferredEvent("VaginaSpermDissolve",[this.data.magnitude]);
+            }
+            this.data.duration = 60;
+        }
+        return(null);
+    }
+    onApply(){
+        this.data.duration = 60;
+        this.data.time = window.gm.getTime();
+    }
+    merge(neweffect) {
+        if(neweffect.name===this.data.name) {
+            return(true);
+        }
+    }
 }
 /////////////// combateffects /////////////////////////
 class effHeal extends CombatEffect {
@@ -1199,6 +1279,9 @@ window.gm.StatsLib = (function (StatsLib) {
     window.storage.registerConstructor(effLewdMark);
     window.storage.registerConstructor(effInHeat);
     window.storage.registerConstructor(effInRut);
+    window.storage.registerConstructor(effSpermInWomb);
+    window.storage.registerConstructor(effVaginalFertil);
+    window.storage.registerConstructor(effVaginalPregnant);
     //
     window.storage.registerConstructor(skCooking);
 
