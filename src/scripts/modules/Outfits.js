@@ -8,8 +8,6 @@ class Leggings extends Equipment {
     get desc() { return 'Spandex-leggings for sport. (agility+)';}
     toJSON() {return window.storage.Generic_toJSON("Leggings", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(Leggings, value.data));}
-    canEquip(context) {return({OK:true, msg:'equipable'});}
-    canUnequip() {return({OK:true, msg:'unequipable'});}
     onEquip(context) {
         context.parent.Stats.addModifier('agility',{id:'agility:Leggings', bonus:5});
         return({OK:true, msg:'equipped'});}
@@ -26,8 +24,6 @@ class Jeans extends Equipment {
     get desc() { return 'plain old blue jeans';    }
     toJSON() {return window.storage.Generic_toJSON("Jeans", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(Jeans, value.data));}
-    canEquip(context) {return({OK:true, msg:'equipable'});}
-    canUnequip() {return({OK:true, msg:'unequipable'});}
 }
 class Sneakers extends Equipment {
     constructor() {
@@ -38,8 +34,6 @@ class Sneakers extends Equipment {
     get desc() { return 'Sneakers for sport and recreational activities.';    }
     toJSON() {return window.storage.Generic_toJSON("Sneakers", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(Sneakers, value.data));}
-    canEquip(context) {return({OK:true, msg:'equipable'});}
-    canUnequip() {return({OK:true, msg:'unequipable'});}
 }
 class TankShirt extends Equipment {
     constructor() {
@@ -50,8 +44,6 @@ class TankShirt extends Equipment {
     get desc() { return 'light blue tank-top';}
     toJSON() {return window.storage.Generic_toJSON("TankShirt", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(TankShirt, value.data));}
-    canEquip(context) {return({OK:true, msg:'equipable'});}
-    canUnequip() {return({OK:true, msg:'unequipable'});}
 }
 class Pullover extends Equipment {
     constructor() {
@@ -68,8 +60,32 @@ class Pullover extends Equipment {
     get desc() { return 'warm pullover';}
     toJSON() {return window.storage.Generic_toJSON("Pullover", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(Pullover, value.data));}
-    canEquip(context) {return({OK:true, msg:'equipable'});}
-    canUnequip() {return({OK:true, msg:'unequipable'});}
+}
+class BracerLeather extends Equipment {
+    constructor() {
+        super('BracerLeather');
+        this.tags = ['cloth'];
+        this.slotUse = ['Wrists'];
+        this.style = 0;   
+        this.lossOnRespawn = true;
+    }
+    set style(style) { 
+        this._style = style; 
+        //if(style===100) this.lossOnRespawn=false;
+    }
+    get style() {return this._style;}
+    get desc() { 
+        if(this.style===100) return('leather bracers with steel-studs');
+        return('worn bracers made of leather');
+    }
+    descLong(fconv) {
+        let msg='';
+        if(this.isEquipped()) msg='A pair of bracers adorns $[my]$ lower arms.';
+        else msg='$[I]$ $[have]$ '+this.name+".";
+        return(fconv(msg));
+    }
+    toJSON() {return window.storage.Generic_toJSON("BracerLeather", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(BracerLeather, value.data));}
 }
 class HandCuffs extends Equipment {
     constructor() {
@@ -167,8 +183,6 @@ class PiercingClit extends Equipment {
     }
     toJSON() {return window.storage.Generic_toJSON("PiercingClit", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(PiercingClit, value.data));}
-    canEquip(context) {return({OK:true, msg:'equipable'});}
-    canUnequip() {return({OK:true, msg:'unequipable'});}
     onEquip(context) {
         if(this.style===100) {
             context.parent.addEffect("effGrowVulva",window.storage.constructors['effGrowVulva']()); //only works for player since effects of NPC dont receive ticks!
@@ -224,11 +238,6 @@ class Crowbar extends Equipment {
             return( {OK:true, msg:'equipped '+ this.name}); //todo
         }
     }
-    canEquip(context) { 
-        if(context.parent.Outfit.findItemSlot(this.id).length>0) return({OK:true, msg:'unequip'});
-        else return({OK:true, msg:'equip'});
-    }
-    canUnequip() {return({OK:true, msg:'unequipable'});}
     onEquip(context) {
         context.parent.Stats.addModifier('pAttack',{id:'pAttack:Crowbar', bonus:2});
         return({OK:true, msg:'equipped'});}
@@ -257,11 +266,7 @@ class Shovel extends Equipment {
             return( {OK:true, msg:'equipped '+ this.name}); //todo
         }
     }
-    canEquip(context) {
-        if(context.parent.Outfit.findItemSlot(this.id).length>0) return({OK:true, msg:'unequip'});
-        else return({OK:true, msg:'equip'});
-    }
-    canUnequip() {return({OK:true, msg:'unequipable'});}
+
     onEquip(context) {
         context.parent.Stats.addModifier('pAttack',{id:'pAttack:Shovel', bonus:2});
         return({OK:true, msg:'equipped'});}
@@ -280,8 +285,7 @@ class RobesZealot extends Equipment {
     get desc() { return 'light blue tank-top';}
     toJSON() {return window.storage.Generic_toJSON("RobesZealot", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(RobesZealot, value.data));}
-    canEquip(context) {return({OK:true, msg:'equipable'});}
-    canUnequip() {return({OK:true, msg:'unequipable'});}
+
 }
 class Briefs extends Equipment {
     constructor() {
@@ -294,8 +298,6 @@ class Briefs extends Equipment {
     get desc() { return 'plain briefs';}
     toJSON() {return window.storage.Generic_toJSON("Briefs", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(Briefs, value.data));}
-    canEquip(context) {return({OK:true, msg:'equipable'});}
-    canUnequip() {return({OK:true, msg:'unequipable'});}
 }
 class BikiniBottomLeather extends Equipment {
     constructor() {
@@ -308,8 +310,6 @@ class BikiniBottomLeather extends Equipment {
     get desc() { return 'leather triangle-bikini bottom';}
     toJSON() {return window.storage.Generic_toJSON("BikiniBottomLeather", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(BikiniBottomLeather, value.data));}
-    canEquip(context) {return({OK:true, msg:'equipable'});}
-    canUnequip() {return({OK:true, msg:'unequipable'});}
 }
 class BikiniTopLeather extends Equipment {
     constructor() {
@@ -322,8 +322,6 @@ class BikiniTopLeather extends Equipment {
     get desc() { return 'leather triangle-bikini top';}
     toJSON() {return window.storage.Generic_toJSON("BikiniTopLeather", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(BikiniTopLeather, value.data));}
-    canEquip(context) {return({OK:true, msg:'equipable'});}
-    canUnequip() {return({OK:true, msg:'unequipable'});}
 }
 class ShortsLeather extends Equipment {
     constructor() {
@@ -336,8 +334,6 @@ class ShortsLeather extends Equipment {
     get desc() { return 'leather shorts';}
     toJSON() {return window.storage.Generic_toJSON("ShortsLeather", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(ShortsLeather, value.data));}
-    canEquip(context) {return({OK:true, msg:'equipable'});}
-    canUnequip() {return({OK:true, msg:'unequipable'});}
 }
 
 class StaffWodden extends Equipment {
@@ -361,11 +357,6 @@ class StaffWodden extends Equipment {
             return( {OK:true, msg:'equipped '+ this.name}); //todo
         }
     }
-    canEquip(context) {
-        if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) return({OK:true, msg:'unequip'});
-        else return({OK:true, msg:'equip'});
-    }
-    canUnequip() {return({OK:true, msg:'unequipable'});}
     onEquip(context) {
         //this.parent.parent.Stats.addModifier('pAttack',{id:'pAttack:StaffWodden', bonus:2});
         return({OK:true, msg:'equipped'});}
@@ -398,11 +389,6 @@ class MaceSteel extends Equipment {
             return( {OK:true, msg:'equipped '+ this.name}); //todo
         }
     }
-    canEquip(context) {
-        if(context.parent.Outfit.findItemSlot(this.id).length>0) return({OK:true, msg:'unequip'});
-        else return({OK:true, msg:'equip'});
-    }
-    canUnequip() {return({OK:true, msg:'unequipable'});}
     onEquip(context) {        
         return({OK:true, msg:'equipped'});
     }
@@ -427,13 +413,13 @@ class TailRibbon extends Equipment {
             }
         }
     }
-    canUnequip() {return({OK:true, msg:'unequipable'});}
 }
 //todo bow,whip,blowpipe
 //todo vest,chaps,bikini top, greaves , jacket
 window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(BikiniBottomLeather);
     window.storage.registerConstructor(BikiniTopLeather);
+    window.storage.registerConstructor(BracerLeather);
     window.storage.registerConstructor(Briefs);
     window.storage.registerConstructor(CollarQuest);
     window.storage.registerConstructor(Leggings);

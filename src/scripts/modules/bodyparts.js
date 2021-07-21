@@ -11,8 +11,6 @@ class BaseHumanoid extends Equipment {
     get desc() { return '';}
     toJSON() {return window.storage.Generic_toJSON("BaseHumanoid", this); };
     static fromJSON(value) {return(window.storage.Generic_fromJSON(BaseHumanoid, value.data));}
-    canEquip(context) {return({OK:true, msg:'equipable'});}
-    canUnequip() {return({OK:true, msg:'unequipable'});}
 }
 class BaseQuadruped extends Equipment {
     constructor() {
@@ -24,8 +22,6 @@ class BaseQuadruped extends Equipment {
     get desc() { return '';}
     toJSON() {return window.storage.Generic_toJSON("BaseQuadruped", this); };
     static fromJSON(value) {return(window.storage.Generic_fromJSON(BaseQuadruped, value.data));}
-    canEquip(context) {return({OK:true, msg:'equipable'});}
-    canUnequip() {return({OK:true, msg:'unequipable'});}
     descLong(fconv) {return(fconv('$[I]$ $[am]$ walking on 4 legs like a feral mammal.'));}
 }
 class BaseWorm extends Equipment {
@@ -38,8 +34,6 @@ class BaseWorm extends Equipment {
     get desc() { return '';}
     toJSON() {return window.storage.Generic_toJSON("BaseWorm", this); };
     static fromJSON(value) {return(window.storage.Generic_fromJSON(BaseWorm, value.data));}
-    canEquip(context) {return({OK:true, msg:'equipable'});}
-    canUnequip() {return({OK:true, msg:'unequipable'});}
     descLong(fconv) {return(fconv('$[I]$ $[am]$ wriggling around like a snake.'));}
 }
 class FaceHuman extends Equipment {
@@ -57,8 +51,6 @@ class FaceHuman extends Equipment {
     get desc() { return 'hominid face';}
     toJSON() {return window.storage.Generic_toJSON("FaceHuman", this); };
     static fromJSON(value) {return(window.storage.Generic_fromJSON(FaceHuman, value.data));}
-    canEquip(context) {return({OK:true, msg:'equipable'});}
-    canUnequip() {return({OK:true, msg:'unequipable'});}
     descLong(fconv) {
         return(fconv('$[My]$ face ressembles that of a human'));
     }
@@ -99,8 +91,6 @@ class FaceWolf extends Equipment {
     get desc() { return this.data.style+'\'like face.';}
     toJSON() {return window.storage.Generic_toJSON("FaceWolf", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(FaceWolf, value.data));}
-    canEquip(context) {return({OK:true, msg:'equipable'});}
-    canUnequip() {return({OK:true, msg:'unequipable'});}
     onEquip(context) {
         let old = context.parent.Skills.countItem(SkillBite.name);
         if(old>0) context.parent.Skills.removeItem(SkillBite.name,old);
@@ -129,8 +119,6 @@ class FaceHorse extends Equipment {
     get desc() { return 'wolf muzzle';}
     toJSON() {return window.storage.Generic_toJSON("FaceHorse", this); };
     static fromJSON(value) {return(window.storage.Generic_fromJSON(FaceHorse, value.data));}
-    canEquip(context) {return({OK:true, msg:'equipable'});}
-    canUnequip() {return({OK:true, msg:'unequipable'});}
     descLong(fconv) {
         return(fconv('$[I]$ $[have]$ a muzzle like a horse'));
     }
@@ -144,8 +132,6 @@ class SkinHuman extends Equipment {
     get desc() { 'a smooth tanned skin mostly bare of noticable hair.';}
     toJSON() {return window.storage.Generic_toJSON("SkinHuman", this); };
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkinHuman, value.data));}
-    canEquip(context) {return({OK:true, msg:'equipable'});}
-    canUnequip() {return({OK:true, msg:'unequipable'});}
     descLong(fconv) {
         return(fconv('Smooth skin covers most of $[my]$ body.'));
     }
@@ -189,8 +175,6 @@ class SkinFur extends Equipment {
     get desc() { 'a dense fur covering the whole body.';}  //todo color
     toJSON() {return window.storage.Generic_toJSON("SkinFur", this); };
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkinFur, value.data));}
-    canEquip(context) {return({OK:true, msg:'equipable'});}
-    canUnequip() {return({OK:true, msg:'unequipable'});}
     descLong(fconv) {
         return(fconv('A '+this.data.pattern+', '+this.data.color+' fur covers $[my]$ body.'));
     }
@@ -240,8 +224,6 @@ class TailWolf extends Equipment {
     }
     toJSON() {return window.storage.Generic_toJSON("TailWolf", this); };
     static fromJSON(value) {return(window.storage.Generic_fromJSON(TailWolf, value.data));}
-    canEquip(context) {return({OK:true, msg:'equipable'});}
-    canUnequip() {return({OK:true, msg:'unequipable'});}
     descLong(fconv) { 
         return(fconv('Some '+this.data.style+'-tail is attached to $[my]$ spine.'));
     }
@@ -279,8 +261,6 @@ class HandsPaw extends Equipment { //paws of ferals
     get desc() { return this.data.style+'\'like paws.';}
     toJSON() {return window.storage.Generic_toJSON("HandsPaw", this); };
     static fromJSON(value) {return(window.storage.Generic_fromJSON(HandsPaw, value.data));}
-    canEquip(context) {return({OK:true, msg:'equipable'});}
-    canUnequip() {return({OK:true, msg:'unequipable'});}
     descLong(fconv) { 
         return(fconv('$[I]$ $[have]$ paws like that of a '+this.data.style+'.'));
     }
@@ -324,8 +304,6 @@ class HandsHuman extends Equipment {
     get desc() { return ('human like hands.');}
     toJSON() {return window.storage.Generic_toJSON("HandsHuman", this); };
     static fromJSON(value) {return(window.storage.Generic_fromJSON(HandsHuman, value.data));}
-    canEquip(context) {return({OK:true, msg:'equipable'});}
-    canUnequip() {return({OK:true, msg:'unequipable'});}
     descLong(fconv) { 
         let msg = '$[My]$ hands consist of a palm and fingers.';
         msg += ['dog','wolf','cat'].includes(this.data.style)?(this.data.style+'-claws adorn the fingertips'):'';
@@ -369,8 +347,6 @@ class BreastHuman extends Equipment {
     get desc() { return 'some human breasts.';}
     toJSON() {return window.storage.Generic_toJSON("BreastHuman", this); };
     static fromJSON(value) {return(window.storage.Generic_fromJSON(BreastHuman, value.data));}
-    canEquip(context) {return({OK:true, msg:'equipable'});}
-    canUnequip() {return({OK:true, msg:'unequipable'});}
     descLong(fconv) { 
         return(fconv('$[My]$ breasts are small but perky.'));
     }
@@ -409,9 +385,7 @@ class VulvaHuman extends Equipment {
     get descShort() { return(this.data.style+' vagina');}
     get desc() { return 'puffy cunt';}
     toJSON() {return window.storage.Generic_toJSON("VulvaHuman", this); };
-    static fromJSON(value) {return(window.storage.Generic_fromJSON(VulvaHuman, value.data));}
-    canEquip(context) {return({OK:true, msg:'equipable'});}
-    canUnequip() {return({OK:true, msg:'unequipable'});}
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(VulvaHuman, value.data));}}
     descLong(fconv) {
         let msg= "$[My]$ vagina can snuggly fit around "+this.data.stretch+"cm in diameter and "+this.data.depth+"cm in depth.";
         msg+= "Its clit is of a size of around "+this.data.clitsize+"cm."; 
@@ -541,8 +515,10 @@ window.gm.MutationsLib['vaginaSpermDissolve'] = function (char) {
     } 
     if(!pregnancy) {
         pregnancy=char.Effects.findEffect(effVaginalFertil.name)[0];
-        if(pregnancy) { //todo random chance
-            if(true || _.random(0,100)>75) { //todo  fertility as stat
+        if(pregnancy) { 
+            //todo random chance according to base-fertility-stat, sperm-fertility, vulva-fertility
+            //race-compatibility between father-mother
+            if(true || _.random(0,100)>75) {
                 msg+="Has your last fling got you impregnated?</br>";
                 pregnancy = new effVaginalPregnant();
                 pregnancy.data.type=vulva.data.spermtype;

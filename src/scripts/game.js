@@ -134,7 +134,9 @@ window.gm.rebuildObjects= function(){
 window.gm.getTime= function() {
   return(window.story.state._gm.time+2400*window.story.state._gm.day);
 }
-//calculates timedifference for hhmm time format
+/*
+* calculates timedifference a-b for hhmm time format
+*/
 window.gm.getDeltaTime = function(a,b){
   var m=a%100;         
   var h=((a-m)/100);
@@ -157,6 +159,7 @@ window.gm.addTime= function(min) {
   }
   window.gm.timeEvent.publish("change",min);
   window.gm.player.Effects.updateTime(); //todo not happy with that; see PubSub-comment
+  window.gm.player.Outfit.updateTime();
   // updating all existing chars might not be wise (some could be dead)
   // but what if I have to update other chars too?
   //

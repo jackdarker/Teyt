@@ -70,7 +70,7 @@ Start at the character creation screen in the VR-game.
 <%window.gm.player.location=window.passage.name;%>
 Start at forest with introductory quest done so far. Roam around and prepare to defeat bridge boss.
 <div></br>
-[[Back|Intro]] <a0 onclick='start();window.story.show("ForestEntrance");'>Start</a></br></div>
+[[Back|Intro]] <a0 onclick='start();window.story.show("ForestSpawn");'>Start</a></br></div>
 </article><article id="LogPanel"></article></section>
 <script> function start() {
     window.gm.quests.addQuest("qBeastKink",1);

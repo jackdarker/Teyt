@@ -15,6 +15,7 @@ class Item {
     //context is the owner of item (parent of inventory), on is target (character)
     usable(context,on=null) {return({OK:false, msg:'Cannot use.'});}
     use(context,on=null) {return({OK:false, msg:'Cannot use.'});}
+    onTimeChange(now) {};
 }
 //an Inventory-Component to store items
 class Inventory {

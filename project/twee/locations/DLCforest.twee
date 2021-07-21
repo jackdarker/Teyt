@@ -3,10 +3,20 @@
 <%window.gm.player.location=window.passage.name; window.gm.enterVR();%>
 After the VR connects to the server, your avatar appears near the top of a hill in a magic puff. </br>
 A small trail makes it way down the hill to some wooden shed."</br>
+</br>Some leather bracers ly on the road.
+<a0 onclick='takeBracers();'>pickup fancy bracers</a></br>
 <div></br>
 [[Settlement|ForestBorder]]</br></div>
 </article><article id="LogPanel"></article></section>
-
+<script>
+function takeBracers() {
+    let item = new window.storage.constructors['BracerLeather']();
+    item = window.gm.makeCursedItem(item,{lock:true,energydrain:2})
+    window.gm.player.Wardrobe.addItem(item);
+    window.gm.player.Outfit.addItem(item);
+    this.disabled=true;
+}
+</script>
 
 :: ForestRespawnPodExit
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
@@ -24,7 +34,7 @@ You are in the sanctum of spawn. Its located on top of the hill above the settle
 <!--todo--> There is a dirt road here crossing the lush grassland that is bordered by the trees of an forest.</br> 
 One direction leads east, past a hut. The other direction follows the border of the forest but gets out of view quickly.</br> 
 <div><a0 onclick='window.gm.addTime(25);window.story.show(window.passage.name);'>Rest</a>
-[[Enter Hut|ForestAlchemistHut]] [[Into the forest|ForestEntrance]] [[follow Road|ForestBridge]] </br>
+[[Enter Hut|ForestAlchemistHut]] [[Into the forest|ForestEntrance]] [[follow Road|ForestBridge]] [[Up the hill|ForestSpawn]]</br>
 <a0 onclick='enterBeehive(); '>Enter Beehive</a> <a0 onclick='enterShatteredCity(); '>Enter Shattered City</a></div>
 </article><article id="LogPanel"></article></section>
 <script> function enterBeehive() {

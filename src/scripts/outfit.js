@@ -4,7 +4,7 @@
 //this is a lookuptable for the equipmentslots
 //basially you could create your own slotdefinition, the string is used to lookup properties assigned to list 
 window.gm.OutfitSlotLib = { 
-    //b.. = bodyparts  (separated for mutiation-slots)
+    //b.. = bodyparts  (separated for mutation-slots)
     bBase   : "bBase", //defines overall bodyform
     bFeet   : "bFeet",
     bLegs   : "bLegs",
@@ -108,6 +108,8 @@ class Equipment extends Item {
         this.tags = [];
         this.slotUse = []; //which slot is used by the equip
         this.slotCover = []; //which other slots are invisible by this "uses Breast, covers bBreast,bNipples"
+        this.locked=false;
+        this.curse=null;
     }
     // Attention !!
     //_parent will be added dynamical
@@ -129,10 +131,18 @@ class Equipment extends Item {
         return(fconv(msg));
     }
     isEquipped() { return(this.parent.parent.Outfit && this.parent.parent.Outfit.findItemSlot(this.id).length>0);}
-    canEquip(context) {return({OK:false, msg:'unusable'});}
-    canUnequip() {return({OK:false, msg:'unusable'});}
-    onEquip(context) {return({OK:true, msg:'equipped'});}
-    onUnequip() {return({OK:true, msg:'unequipped'});}
+    canEquip(context) {
+        if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) return(this.canUnequip()); //if you try to equip the same outfit another time it should unequip 
+        else return({OK:true, msg:'equipable'});}
+    canUnequip() {return({OK:this.locked===false, msg:'unequipable'});}
+    onEquip(context) {
+        if(this.curse) this.curse.onEquip();
+        return({OK:true, msg:'equipped'});
+    }
+    onUnequip() {return({OK:this.locked===false, msg:'unequipped'});}  //todo see CrsEffLock 
+    onTimeChange(now) {
+        if(this.curse) this.curse.onTimeChange(now);
+    };
 }
 //a kind of special inventory for worn equipment
 class Outfit { //extends Inventory{
@@ -305,6 +315,13 @@ class Outfit { //extends Inventory{
         }
         this.postItemChange(id,"removed",result.msg);
         //Todo delete _item;    //un-parent
+    }
+    updateTime() {
+        let now =window.gm.getTime();
+        for(el of this.list){
+            let _eff = el.value.item;
+            if(_eff) _eff.onTimeChange(now);   
+        }
     }
 }
 

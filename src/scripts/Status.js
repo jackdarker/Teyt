@@ -216,7 +216,7 @@ class Effects extends Inventory {  //Todo a collection of Stats is similiar to I
         neweffect.onApply();
     }
     updateTime() {
-        let now =window.gm.getTime();           //todo only update RL-char in RL and VR-char in VR 
+        let now =window.gm.getTime();
         for(let i=0;i<this.list.length;i++){
             let _eff = this.list[i].item;
             let foo = _eff.onTimeChange(now);   

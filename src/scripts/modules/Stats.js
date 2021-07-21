@@ -485,7 +485,7 @@ class effNotTired extends Effect {
 class effTired extends Effect {
     constructor() {
         super();
-        this.data.id = effTired.name, this.data.name="tired", this.data.duration = 120, this.data.hidden=0;
+        this.data.id = effTired.name, this.data.name="tired", this.data.duration = 0, this.data.hidden=0;
     }
     toJSON() {return window.storage.Generic_toJSON("effTired", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(effTired, value.data);};
@@ -512,6 +512,29 @@ class effTired extends Effect {
         }
         if(neweffect.name===this.data.name) {
             //just ignore
+            return(true);
+        }
+    }
+}
+class effEnergyDrain extends Effect {
+    constructor() {
+        super();
+        this.data.id = effEnergyDrain.name, this.data.name="energy drained", this.data.duration = 0, this.data.hidden=0;
+    }
+    toJSON() {return window.storage.Generic_toJSON("effEnergyDrain", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(effEnergyDrain, value.data);};
+    get desc() {return(effEnergyDrain.name);}
+
+    onTimeChange(time) {  
+        var delta = window.gm.getDeltaTime(time,this.data.time);
+        this.data.time = time;
+        this.parent.parent.Stats.increment('energy',-3*delta/60);
+    }
+    onApply(){
+        this.data.time = window.gm.getTime();
+    }
+    merge(neweffect) {
+        if(neweffect.name===this.data.name) {
             return(true);
         }
     }
@@ -1229,6 +1252,12 @@ class skCooking extends Effect {
 
     get desc() {return(skCooking.name);}
 }
+/*skAlchemist
+ * Lv1 - can create potions from 1 ingredient
+ * Lv2 - can create potion from 2 ingredients
+ * Lv3 - can combine 2 potions into better one
+ * Lv4 - can use 3 ingredients
+ */
 window.gm.StatsLib = (function (StatsLib) {
     //...stats
     window.storage.registerConstructor(stHealthMax);
@@ -1268,6 +1297,8 @@ window.gm.StatsLib = (function (StatsLib) {
     window.storage.registerConstructor(effGuard);
     window.storage.registerConstructor(effHeal);
     
+    window.storage.registerConstructor(effEnergyDrain);
+
     window.storage.registerConstructor(effHorsePower);
     window.storage.registerConstructor(effMutateHorse);
     window.storage.registerConstructor(effMutateWolf);
