@@ -80,17 +80,13 @@ class Stat {
         //modifys {id:}         point to the Stats that have modifiers from this stat or is used as limit
         //hidden 0 = visible, 1= name unreadable, 2= value unreadable, 4= hidden
     }
-    // Attention !!
-    //_parent will be added dynamical
-    get parent() {return this._parent();}
-    //add Reviver support:
-    //window.storage.registerConstructor(???);
-    //toJSON() {return window.storage.Generic_toJSON("???", this); };
-    //static fromJSON(value) { return window.storage.Generic_fromJSON(???, value.data);};
-
     constructor() {
         this.data = Stat.dataPrototype();
     }
+    // Attention !!
+    //_parent will be added dynamical
+    get parent() {return this._parent?this._parent():null;}
+    _relinkItems(parent){this._parent=window.gm.util.refToParent(parent);}
     get name() {return(this.data.id);}
     get id() {return(this.data.id);}
     get base() {return(this.data.base);}
@@ -138,8 +134,6 @@ class Stat {
     };
     updateModifier() {};
 }
-
-
 /////////////////////////////////////////////////////////////////////////
 class Effects extends Inventory {  //Todo a collection of Stats is similiar to Inventory?
     constructor(externlist) {
@@ -244,7 +238,8 @@ class Effect {
     }
     // Attention !!
     //_parent will be added dynamical
-    get parent() {return this._parent();}
+    get parent() {return this._parent?this._parent():null;}
+    _relinkItems(parent){this._parent=window.gm.util.refToParent(parent);}
     // id = SlumberPotion:Stunned;  name = Stunned
     get id() {return(this.data.id);}
     set id(id) { this.data.id=id;}

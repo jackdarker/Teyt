@@ -3,7 +3,8 @@ class Item {
     constructor(name) {
         this.id = this.name = name;   //todo add id
     }
-    get parent() {return this._parent();}
+    get parent() {return this._parent?this._parent():null;}
+    _relinkItems(parent){this._parent=window.gm.util.refToParent(parent);}
     //called by SkillUseItem
     targetFilter(targets) {
         return([]); //default unuseable in combat
@@ -23,7 +24,7 @@ class Inventory {
         this.list = externlist ? externlist : [];
       window.storage.registerConstructor(Inventory);
     }
-    get parent() {return this._parent();}
+    get parent() {return this._parent?this._parent():null;}
     toJSON() {return window.storage.Generic_toJSON("Inventory", this); }
     static fromJSON(value) { 
         var _x = window.storage.Generic_fromJSON(Inventory, value.data);
@@ -31,7 +32,7 @@ class Inventory {
     }
     _relinkItems() {  //call this after loading save data the reparent
         for(var i=0; i<this.list.length; i++) {
-            if(this.list[i].item) this.list[i].item._parent=window.gm.util.refToParent(this);
+            if(this.list[i].item) this.list[i].item._relinkItems(this);
         }
     }
     postItemChange(id,operation,msg) {

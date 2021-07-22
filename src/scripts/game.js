@@ -676,12 +676,18 @@ window.gm.printItem2= function( id,descr,carrier,useOn=null ) {
 window.gm.printEquipment= function( id,descr) {
   var elmt='';
   var s= window.story.state;
+  var res;
   elmt +=`<a0 id='${id}' onclick='(function($event){document.querySelector(\"div#${id}\").toggleAttribute(\"hidden\");})(this);'>${id}</a>`;
   if(window.gm.player.Outfit.countItem(id)<=0) {
       //elmt +=`<a0 id='${id}' onclick='(function($event){window.gm.player.Outfit.addItem(new window.storage.constructors[\"${id}\"]()); window.gm.refreshAllPanel();}(this))'>Equip</a>`;
       elmt +=`<a0 id='${id}' onclick='(function($event){window.gm.player.Outfit.addItem(window.gm.player.Wardrobe.getItem(\"${id}\")); window.gm.refreshAllPanel();}(this))'>Equip</a>`;
   } else {
+    res = window.gm.player.Outfit.canUnequipItem(id,false);
+    if(res.OK) {
       elmt +=`<a0 id='${id}' onclick='(function($event){window.gm.player.Outfit.removeItem(\"${id}\"); window.gm.refreshAllPanel();}(this))'>Unequip</a>`;
+    } else {
+      elmt +='<div>'+res.msg+'</div>';
+    }
   }
   elmt +=`</br><div hidden id='${id}'>${descr}</div>`;
 

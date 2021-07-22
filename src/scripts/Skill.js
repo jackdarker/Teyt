@@ -51,7 +51,8 @@ constructor(id) {
     this.cost = new SkillCost();
 }
 //_parent will be added dynamical
-get parent() {return this._parent();}
+get parent() {return this._parent?this._parent():null;}
+_relinkItems(parent){this._parent=window.gm.util.refToParent(parent);}
 get caster() {return this.parent.parent;}
 //implement this for description
 get desc() { return(this.name);}

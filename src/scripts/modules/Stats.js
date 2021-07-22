@@ -173,7 +173,7 @@ class stAgility extends Stat { // core attribute
     static setup(context, base,max) { 
         var _stat = new stAgility();
         var _n = _stat.data;
-        _n.id='agility',_n.base=base, _n.value=base, _n.modifys=[{id:'energyMax'}],_n.limits=[{max:999,min:0}];
+        _n.id='agility',_n.base=base, _n.value=base,_n.limits=[{max:999,min:0}];
         context.addItem(_stat);
         _stat.Calc();
     }
@@ -409,6 +409,8 @@ class stFetish extends Stat {
         return(list);
     }
     constructor() {   super();  }
+    toJSON() {return window.storage.Generic_toJSON("stFetish", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(stFetish, value.data);};
 }
 //effects
 class effEnergized extends Effect {
@@ -1263,12 +1265,14 @@ window.gm.StatsLib = (function (StatsLib) {
     window.storage.registerConstructor(stHealthMax);
     window.storage.registerConstructor(stHealth);
     window.storage.registerConstructor(stRelation);
-    window.storage.registerConstructor(stEndurance);
-    window.storage.registerConstructor(stStrength);
+    window.storage.registerConstructor(stFetish);
     window.storage.registerConstructor(stAgility);
-    window.storage.registerConstructor(stLuck);
     window.storage.registerConstructor(stCharisma);
+    window.storage.registerConstructor(stEndurance);
+    window.storage.registerConstructor(stIntelligence);
+    window.storage.registerConstructor(stLuck);
     window.storage.registerConstructor(stPerception);
+    window.storage.registerConstructor(stStrength);
     window.storage.registerConstructor(stResistance);
     window.storage.registerConstructor(stEnergyMax);
     window.storage.registerConstructor(stEnergy);
@@ -1279,8 +1283,10 @@ window.gm.StatsLib = (function (StatsLib) {
     window.storage.registerConstructor(stArousal);
     window.storage.registerConstructor(stCorruptionMax);
     window.storage.registerConstructor(stCorruption);
+    window.storage.registerConstructor(stLAttack);
+    window.storage.registerConstructor(stLDefense);
     window.storage.registerConstructor(stPAttack);
-    window.storage.registerConstructor(stPDefense);
+    window.storage.registerConstructor(stPDefense);    
     //...effects
     window.storage.registerConstructor(effCallHelp);
     window.storage.registerConstructor(effDamage);

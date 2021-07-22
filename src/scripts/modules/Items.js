@@ -92,6 +92,28 @@ class SoulGem extends Item {
     toJSON() {return window.storage.Generic_toJSON("SoulGem", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(Ingredient, value.data);};
 }
+class KeyRestraint extends Item {
+    constructor() { super('KeyRestraint');   
+        this.lossOnRespawn = true;
+    }
+    static lookupId(id) {
+        let info ={desc:''};
+        switch(id){
+            case "KeyRestraintA": 
+                info.desc= "Key for type A restraints";
+                break;
+            case "KeyRestraintB":
+                info.desc="Key for type B restraints";
+                break;
+            default:
+        }
+        return(info);
+    }
+    changeId(id) {this.id = id;}
+    get desc() { return KeyRestraint.lookupId(this.id).desc;   }
+    toJSON() {return window.storage.Generic_toJSON("KeyRestraint", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(KeyRestraint, value.data);};
+}
 class FlashBang extends Item {
     constructor() { super('FlashBang');  }
     get desc() { return 'Stun someone with a blinding light.';  }
@@ -254,6 +276,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(Dildo_small);
     window.storage.registerConstructor(Lube);
     window.storage.registerConstructor(CanOfCoffee);
+    window.storage.registerConstructor(KeyRestraint);
     window.storage.registerConstructor(SimpleFood);
     window.storage.registerConstructor(HealthPotion);
     window.storage.registerConstructor(HorsePotion);
@@ -279,5 +302,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['PurpleBerry'] = function () { let x= new Ingredient();x.changeId("PurpleBerry");return(x); };
     ItemsLib['ApocaFlower'] = function () { let x= new Ingredient();x.changeId("ApocaFlower");return(x); };
     ItemsLib['TinySoulGem'] = function () { let x= new SoulGem();x.changeId("TinySoulGem");return(x); };
+    ItemsLib['KeyRestraintA'] = function () { let x= new KeyRestraint();x.changeId("KeyRestraintA");return(x); }; 
+    ItemsLib['KeyRestraintB'] = function () { let x= new KeyRestraint();x.changeId("KeyRestraintB");return(x); };
     return ItemsLib; 
 }(window.gm.ItemsLib || {}));

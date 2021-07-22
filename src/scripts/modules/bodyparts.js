@@ -385,7 +385,7 @@ class VulvaHuman extends Equipment {
     get descShort() { return(this.data.style+' vagina');}
     get desc() { return 'puffy cunt';}
     toJSON() {return window.storage.Generic_toJSON("VulvaHuman", this); };
-    static fromJSON(value) {return(window.storage.Generic_fromJSON(VulvaHuman, value.data));}}
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(VulvaHuman, value.data));}
     descLong(fconv) {
         let msg= "$[My]$ vagina can snuggly fit around "+this.data.stretch+"cm in diameter and "+this.data.depth+"cm in depth.";
         msg+= "Its clit is of a size of around "+this.data.clitsize+"cm."; 

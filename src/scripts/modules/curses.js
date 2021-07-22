@@ -39,12 +39,14 @@ class Curse {
     * Attention !! _parent will be added dynamical
     */
     get parent() {return(this._parent?this._parent(): null);} 
-    configureCurse(trigger,curses) {
+    configureCurse(item,trigger,curses) {
         this.trigger = trigger;
         this.list=curses;
-        this.rebuiltObj()
+        item.curse=this;
+        this._relinkItems(item);
     }
-    rebuiltObj() {
+    _relinkItems(parent) {
+        this._parent = window.gm.util.refToParent(parent);
         this.trigger._parent=window.gm.util.refToParent(this);
         for(el of this.list) {
             el._parent=window.gm.util.refToParent(this);
@@ -55,12 +57,24 @@ class Curse {
     onEquip() {
         if(this.trigger.onEquip()) this.apply();
     }
+    onUnequip() {
+        if(this.trigger.onUnequip()) return(this.apply(true));
+    }
+    canUnequip() { //ask effects if allowed to unequip/not locked
+        let res;
+        for(el of this.list) {
+            res = el.canUnequip();
+            if(res.OK==false) return(res);
+        }
+        res = {OK:true, msg:'unequipable'};
+        return(res);
+    }
     onTimeChange(time) {
         if(this.trigger.onTimeChange(time)) this.apply();
     }
-    apply(){
+    apply(unapply){
         for(el of this.list) {
-            el.apply();
+            el.apply(unapply);
         }
     }
 }
@@ -75,6 +89,7 @@ class CrsTrigger {
     */
     get parent() {return(this._parent?this._parent(): null);} 
     onEquip() {return(false);}
+    onUnequip() {return(true);} //by default trigger unapply when unequipped
     onTimeChange(time) {return(false);}
 }
 class CrsTrgOnEquip extends CrsTrigger {
@@ -83,9 +98,7 @@ class CrsTrgOnEquip extends CrsTrigger {
         this.minItems=0; //if 0 always trigger onEquip
         this.curseName=''; //todo ..otherwise min no. items with this keyword need to be equipped
     }
-    onEquip() {
-        return(true);
-    }
+    onEquip() { return(true);  }
     toJSON() {return window.storage.Generic_toJSON("CrsTrgOnEquip", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(CrsTrgOnEquip, value.data));}
 }
@@ -116,21 +129,31 @@ class CrsEffect {
     * Attention !! _parent will be added dynamical
     */
     get parent() {return(this._parent?this._parent(): null);} 
+    canUnequip() {return({OK:true,msg:'unequipable'});}
 }
 class CrsEffLock extends CrsEffect{
     constructor() {
         super();
-        this.id='CurseLock';
-        this.locked=false;
+        this.id='CrsEffLock';
+        this.key='KeyRestraintA';
     }
-    toJSON() {return window.storage.Generic_toJSON("CurseLock", this); }
-    static fromJSON(value) {return(window.storage.Generic_fromJSON(CurseLock, value.data));}
+    toJSON() {return window.storage.Generic_toJSON("CrsEffLock", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(CrsEffLock, value.data));}
     desc() {return("The item can only be unlocked with a fitting key.")}
-    apply() {
-        this.parent.parent.locked=true;
-        window.gm.pushDeferredEvent("GenericDeffered",['As soon as you equiped it, some hidden lock sealed the item on you !']);
-        //todo unequip is possible if key in items:  
-        //item.canUnequip=curse.canUnequip     need to restore functionassignment after load!
+    canUnequip() {
+        let res= {OK:true,msg:'This devices requires '+this.key+' to unlock'};
+        if(this.parent.parent.parent.parent.Inv.countItem(this.key)<=0) {
+            res.OK=false;
+        }
+        return(res);
+    }
+    apply(unapply) {
+        if(unapply) {
+            this.parent.parent.parent.parent.Inv.removeItem(this.key,1);
+            window.gm.pushDeferredEvent("GenericDeffered",['With the key, it was now possible to unlock and remove '+this.parent.parent.name+' !']);
+        } else {
+            window.gm.pushDeferredEvent("GenericDeffered",['As soon as you equiped '+this.parent.parent.name+', some hidden lock sealed the item on you !']);
+        }
     }
 }
 class CrsEffEnergyDrain extends CrsEffect{
@@ -141,11 +164,14 @@ class CrsEffEnergyDrain extends CrsEffect{
     toJSON() {return window.storage.Generic_toJSON("CrsEffEnergyDrain", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(CrsEffEnergyDrain, value.data));}
     desc() {return("Drains ones energy.")}
-    apply() {
+    apply(unapply) {
+        if(unapply) {
+            this.parent.parent.parent.parent.Effects.removeItem(this.parent.parent.id+'_EnergyDrain');
+        } else {
         //todo id should be "cursed_leather_bracer.EnergyDrain"
         //this->curse->item->outfit->char
-        this.parent.parent.parent.parent.addEffect(this.parent.id+'_EnergyDrain',new window.storage.constructors['effEnergyDrain']());
-        //todo remove effect on unequip
+            this.parent.parent.parent.parent.addEffect(this.parent.parent.id+'_EnergyDrain',new window.storage.constructors['effEnergyDrain']());
+        }
     }
 }
 /**
@@ -167,9 +193,7 @@ window.gm.makeCursedItem = function(item, extra) {
         eff = new CrsEffEnergyDrain();
         list.push(eff);
     }
-    curse.configureCurse(curse.trigger,list);
-    item.curse=curse;
-    curse._parent=window.gm.util.refToParent(item); //todo rebuilt on load
+    curse.configureCurse(item,curse.trigger,list);
     return(item);
   }
 

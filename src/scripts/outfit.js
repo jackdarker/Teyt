@@ -108,12 +108,15 @@ class Equipment extends Item {
         this.tags = [];
         this.slotUse = []; //which slot is used by the equip
         this.slotCover = []; //which other slots are invisible by this "uses Breast, covers bBreast,bNipples"
-        this.locked=false;
+        this.unlocked= {OK:true, msg:'unequipable'}; //todo see CrsEffLock 
         this.curse=null;
     }
-    // Attention !!
-    //_parent will be added dynamical
-    get parent() {return(this._parent?this._parent(): null);}   //todo parent might not be set if item is not in wardrobe
+    _relinkItems(parent) {  //call this after loading save data to reparent
+        super._relinkItems(parent);
+        if(this.curse) { 
+            this.curse._relinkItems(this);
+        }
+    }
     //for compatibility with item
     usable(context) {return({OK:false, msg:'Useable in wardrobe'});}
     use(context) {return({OK:false, msg:'Cannot use.'});}
@@ -132,14 +135,22 @@ class Equipment extends Item {
     }
     isEquipped() { return(this.parent.parent.Outfit && this.parent.parent.Outfit.findItemSlot(this.id).length>0);}
     canEquip(context) {
-        if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) return(this.canUnequip()); //if you try to equip the same outfit another time it should unequip 
+        if(this.parent && this.parent.parent.Outfit.findItemSlot(this.id).length>0) return(this.canUnequip()); //if you try to equip the same outfit another time it should unequip 
         else return({OK:true, msg:'equipable'});}
-    canUnequip() {return({OK:this.locked===false, msg:'unequipable'});}
+    canUnequip() {
+        let res = {OK:true, msg:'unequipable'};
+        if(this.curse) res=this.curse.canUnequip();
+        return(res);
+    }
     onEquip(context) {
         if(this.curse) this.curse.onEquip();
         return({OK:true, msg:'equipped'});
     }
-    onUnequip() {return({OK:this.locked===false, msg:'unequipped'});}  //todo see CrsEffLock 
+    onUnequip() {
+        let res = {OK:true, msg:''};
+        if(this.curse) this.curse.onUnequip();
+        return(res);
+    }
     onTimeChange(now) {
         if(this.curse) this.curse.onTimeChange(now);
     };
@@ -169,7 +180,7 @@ class Outfit { //extends Inventory{
          }
         window.storage.registerConstructor(Outfit);
     }
-    get parent() {return this._parent();}
+    get parent() {return this._parent?this._parent():null;}
     toJSON() {return window.storage.Generic_toJSON("Outfit", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(Outfit, value.data);};
     postItemChange(id,operation,msg) {
@@ -178,7 +189,9 @@ class Outfit { //extends Inventory{
 
     _relinkItems() {  //call this after loading save data to reparent
         for (el of this.list) {
-            if(el.value.item) el.value.item._parent=window.gm.util.refToParent(this);;
+            if(el.value.item) { 
+                el.value.item._relinkItems(this);
+            }
         }
     }
     postItemChange(id,operation,msg) {

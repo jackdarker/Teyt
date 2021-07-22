@@ -65,7 +65,7 @@ window.storage = {
     data = {};
     for (index = 0; index < keys.length; ++index) {
       key = keys[index];
-      data[key] = obj[key];                 //TODO causes infinite loop on circular ref   Character->Inventory->Character
+      data[key] = obj[key];                 //causes infinite loop on circular ref   Character->Inventory->Character
     }
     return {ctor: ctorName, data: data};
   },
@@ -89,10 +89,11 @@ window.storage = {
      // } else if(setter2 in obj){ // ..or...
      //   obj[setter2](data[name]); 
       } else { // if not, we set it directly
-        if(typeof obj[name] === "object") {
+        if(typeof obj[name] === "object" && data[name]!==null) {  //cannot assign(curse,null)
+          if(obj[name]===null) obj[name]=data[name];//obj[name]={};
           Object.assign(obj[name], data[name]);
         } else {
-          obj[name] = data[name];       //todo ??? obj[name] is constructed properly but will be overwritten with data[namme]; use assign ?!
+          obj[name] = data[name];       //todo ??? obj[name] is constructed properly but will be overwritten with data[name]; use assign ?!
         }
       }
     }
