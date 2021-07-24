@@ -334,12 +334,12 @@ window.story.__proto__.show = function(idOrName, noHistory = false) {
     next = window.gm.popBackPassage();
     tagsnext = window.story.passage(next).tags;
   } else if(inGame && window.story.state._gm.defferedStack.length>0 && //deffered event if allowed and requested
-      tagsnext.indexOf('_back_')<0 && tagsnext.indexOf('_nosave_')<0 && tagsnext.indexOf('_nodeffered_')<0 ) { 
+      /*tagsnext.indexOf('_back_')<0 &&*/ tagsnext.indexOf('_nosave_')<0 && tagsnext.indexOf('_nodeffered_')<0 ) { 
         //before entering a new passage check if there is a defferedEvent that we should do first
         //if so, push the normal-passage onto stack, show deffered passage
         //after the deffered passage(s) finish, make sure to show the original passage
         //this is a problem?how do I know the deffered passage is done? 
-    if(idOrName!=='') window.gm.pushOnHold(idOrName); //only push when not returning from other deffered or not passage with back
+    if(idOrName!=='') window.gm.pushOnHold(idOrName);
     next = window.gm.popDeferredEvent();
     nextp = window.story.passage(next);
     tagsnext =  nextp.tags;

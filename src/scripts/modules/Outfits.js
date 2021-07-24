@@ -75,8 +75,9 @@ class BracerLeather extends Equipment {
     }
     get style() {return this._style;}
     get desc() { 
-        if(this.style===100) return('leather bracers with steel-studs');
-        return('worn bracers made of leather');
+        let msg ='worn bracers made of leather';
+        if(this.style===100) msg=('leather bracers with steel-studs');
+        return(msg+this.bonusDesc());
     }
     descLong(fconv) {
         let msg='';
@@ -224,7 +225,7 @@ class Crowbar extends Equipment {
         this.slotUse = ['RHand'];
         this.lossOnRespawn = true;
     }
-    descLong(fconv) {return(fconv('A warm pullover adorns $[me]$.'));}
+    descLong(fconv) {return(fconv('$[I]$ $[hold]$ a crowbar.'));}
     get desc() { return 'durable crowbar.';}
     toJSON() {return window.storage.Generic_toJSON("Crowbar", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(Crowbar, value.data));}

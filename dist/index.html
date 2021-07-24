@@ -3049,13 +3049,14 @@ window.story.__proto__.show = function (idOrName) {
     next = window.gm.popBackPassage();
     tagsnext = window.story.passage(next).tags;
   } else if (inGame && window.story.state._gm.defferedStack.length > 0 && //deffered event if allowed and requested
-  tagsnext.indexOf('_back_') < 0 && tagsnext.indexOf('_nosave_') < 0 && tagsnext.indexOf('_nodeffered_') < 0) {
+
+  /*tagsnext.indexOf('_back_')<0 &&*/
+  tagsnext.indexOf('_nosave_') < 0 && tagsnext.indexOf('_nodeffered_') < 0) {
     //before entering a new passage check if there is a defferedEvent that we should do first
     //if so, push the normal-passage onto stack, show deffered passage
     //after the deffered passage(s) finish, make sure to show the original passage
     //this is a problem?how do I know the deffered passage is done? 
-    if (idOrName !== '') window.gm.pushOnHold(idOrName); //only push when not returning from other deffered or not passage with back
-
+    if (idOrName !== '') window.gm.pushOnHold(idOrName);
     next = window.gm.popDeferredEvent();
     nextp = window.story.passage(next);
     tagsnext = nextp.tags;
@@ -4091,12 +4092,8 @@ var Equipment = /*#__PURE__*/function (_Item) {
 
     _this2.slotCover = []; //which other slots are invisible by this "uses Breast, covers bBreast,bNipples"
 
-    _this2.unlocked = {
-      OK: true,
-      msg: 'unequipable'
-    }; //todo see CrsEffLock 
+    _this2.bonus = []; //Curse or Bonus assigned to item
 
-    _this2.curse = null;
     return _this2;
   }
 
@@ -4106,8 +4103,19 @@ var Equipment = /*#__PURE__*/function (_Item) {
       //call this after loading save data to reparent
       _get(_getPrototypeOf(Equipment.prototype), "_relinkItems", this).call(this, parent);
 
-      if (this.curse) {
-        this.curse._relinkItems(this);
+      var _iterator11 = _createForOfIteratorHelper(this.bonus),
+          _step11;
+
+      try {
+        for (_iterator11.s(); !(_step11 = _iterator11.n()).done;) {
+          el = _step11.value;
+
+          el._relinkItems(this);
+        }
+      } catch (err) {
+        _iterator11.e(err);
+      } finally {
+        _iterator11.f();
       }
     } //for compatibility with item
 
@@ -4144,6 +4152,27 @@ var Equipment = /*#__PURE__*/function (_Item) {
       return fconv(msg);
     }
   }, {
+    key: "bonusDesc",
+    value: function bonusDesc() {
+      var msg = '';
+
+      var _iterator12 = _createForOfIteratorHelper(this.bonus),
+          _step12;
+
+      try {
+        for (_iterator12.s(); !(_step12 = _iterator12.n()).done;) {
+          el = _step12.value;
+          msg += "</br>" + el.desc;
+        }
+      } catch (err) {
+        _iterator12.e(err);
+      } finally {
+        _iterator12.f();
+      }
+
+      return msg;
+    }
+  }, {
     key: "isEquipped",
     value: function isEquipped() {
       return this.parent.parent.Outfit && this.parent.parent.Outfit.findItemSlot(this.id).length > 0;
@@ -4164,13 +4193,41 @@ var Equipment = /*#__PURE__*/function (_Item) {
         OK: true,
         msg: 'unequipable'
       };
-      if (this.curse) res = this.curse.canUnequip();
+
+      var _iterator13 = _createForOfIteratorHelper(this.bonus),
+          _step13;
+
+      try {
+        for (_iterator13.s(); !(_step13 = _iterator13.n()).done;) {
+          el = _step13.value;
+          res = el.canUnequip();
+          if (res.OK === false) return res;
+        }
+      } catch (err) {
+        _iterator13.e(err);
+      } finally {
+        _iterator13.f();
+      }
+
       return res;
     }
   }, {
     key: "onEquip",
     value: function onEquip(context) {
-      if (this.curse) this.curse.onEquip();
+      var _iterator14 = _createForOfIteratorHelper(this.bonus),
+          _step14;
+
+      try {
+        for (_iterator14.s(); !(_step14 = _iterator14.n()).done;) {
+          el = _step14.value;
+          el.onEquip();
+        }
+      } catch (err) {
+        _iterator14.e(err);
+      } finally {
+        _iterator14.f();
+      }
+
       return {
         OK: true,
         msg: 'equipped'
@@ -4183,13 +4240,44 @@ var Equipment = /*#__PURE__*/function (_Item) {
         OK: true,
         msg: ''
       };
-      if (this.curse) this.curse.onUnequip();
+
+      var _iterator15 = _createForOfIteratorHelper(this.bonus),
+          _step15;
+
+      try {
+        for (_iterator15.s(); !(_step15 = _iterator15.n()).done;) {
+          el = _step15.value;
+          el.onUnequip();
+        }
+      } catch (err) {
+        _iterator15.e(err);
+      } finally {
+        _iterator15.f();
+      }
+
       return res;
     }
   }, {
     key: "onTimeChange",
     value: function onTimeChange(now) {
-      if (this.curse) this.curse.onTimeChange(now);
+      var _iterator16 = _createForOfIteratorHelper(this.bonus),
+          _step16;
+
+      try {
+        for (_iterator16.s(); !(_step16 = _iterator16.n()).done;) {
+          el = _step16.value;
+          el.onTimeChange(now);
+        }
+      } catch (err) {
+        _iterator16.e(err);
+      } finally {
+        _iterator16.f();
+      }
+    }
+  }, {
+    key: "desc",
+    get: function get() {
+      return this.descShort + this.bonusDesc();
     }
   }]);
 
@@ -4248,21 +4336,21 @@ var Outfit = /*#__PURE__*/function () {
     key: "_relinkItems",
     value: function _relinkItems() {
       //call this after loading save data to reparent
-      var _iterator11 = _createForOfIteratorHelper(this.list),
-          _step11;
+      var _iterator17 = _createForOfIteratorHelper(this.list),
+          _step17;
 
       try {
-        for (_iterator11.s(); !(_step11 = _iterator11.n()).done;) {
-          el = _step11.value;
+        for (_iterator17.s(); !(_step17 = _iterator17.n()).done;) {
+          el = _step17.value;
 
           if (el.value.item) {
             el.value.item._relinkItems(this);
           }
         }
       } catch (err) {
-        _iterator11.e(err);
+        _iterator17.e(err);
       } finally {
-        _iterator11.f();
+        _iterator17.f();
       }
     }
   }, {
@@ -4289,12 +4377,12 @@ var Outfit = /*#__PURE__*/function () {
     value: function findItemSlot(id) {
       var _idx = [];
 
-      var _iterator12 = _createForOfIteratorHelper(this.list),
-          _step12;
+      var _iterator18 = _createForOfIteratorHelper(this.list),
+          _step18;
 
       try {
-        for (_iterator12.s(); !(_step12 = _iterator12.n()).done;) {
-          el = _step12.value;
+        for (_iterator18.s(); !(_step18 = _iterator18.n()).done;) {
+          el = _step18.value;
           if (el.value.id === id) _idx.push(el.index);
         }
         /*let items = Object.keys(this.list);
@@ -4303,9 +4391,9 @@ var Outfit = /*#__PURE__*/function () {
         }*/
 
       } catch (err) {
-        _iterator12.e(err);
+        _iterator18.e(err);
       } finally {
-        _iterator12.f();
+        _iterator18.f();
       }
 
       return _idx;
@@ -4331,12 +4419,12 @@ var Outfit = /*#__PURE__*/function () {
     value: function getAllIds() {
       var ids = [];
 
-      var _iterator13 = _createForOfIteratorHelper(this.list),
-          _step13;
+      var _iterator19 = _createForOfIteratorHelper(this.list),
+          _step19;
 
       try {
-        for (_iterator13.s(); !(_step13 = _iterator13.n()).done;) {
-          el = _step13.value;
+        for (_iterator19.s(); !(_step19 = _iterator19.n()).done;) {
+          el = _step19.value;
 
           if (el.value.item && ids.indexOf(el.value.item.id) < 0) {
             //only unique items  
@@ -4348,9 +4436,9 @@ var Outfit = /*#__PURE__*/function () {
         }*/
 
       } catch (err) {
-        _iterator13.e(err);
+        _iterator19.e(err);
       } finally {
-        _iterator13.f();
+        _iterator19.f();
       }
 
       return ids;
@@ -4506,19 +4594,19 @@ var Outfit = /*#__PURE__*/function () {
     value: function updateTime() {
       var now = window.gm.getTime();
 
-      var _iterator14 = _createForOfIteratorHelper(this.list),
-          _step14;
+      var _iterator20 = _createForOfIteratorHelper(this.list),
+          _step20;
 
       try {
-        for (_iterator14.s(); !(_step14 = _iterator14.n()).done;) {
-          el = _step14.value;
+        for (_iterator20.s(); !(_step20 = _iterator20.n()).done;) {
+          el = _step20.value;
           var _eff = el.value.item;
           if (_eff) _eff.onTimeChange(now);
         }
       } catch (err) {
-        _iterator14.e(err);
+        _iterator20.e(err);
       } finally {
-        _iterator14.f();
+        _iterator20.f();
       }
     }
   }, {
@@ -5370,21 +5458,21 @@ var Skill = /*#__PURE__*/function () {
       //target is [dragon] or [mole1,mole2]
       var filtered = this.targetFilter([target]); //[[]] !
 
-      var _iterator15 = _createForOfIteratorHelper(target),
-          _step15;
+      var _iterator21 = _createForOfIteratorHelper(target),
+          _step21;
 
       try {
-        for (_iterator15.s(); !(_step15 = _iterator15.n()).done;) {
-          var targ = _step15.value;
+        for (_iterator21.s(); !(_step21 = _iterator21.n()).done;) {
+          var targ = _step21.value;
 
           var _i = filtered.indexOf(target);
 
           if (_i < 0) return false;
         }
       } catch (err) {
-        _iterator15.e(err);
+        _iterator21.e(err);
       } finally {
-        _iterator15.f();
+        _iterator21.f();
       }
 
       return true;
@@ -5428,33 +5516,33 @@ var Skill = /*#__PURE__*/function () {
       if (result.OK) {
         result.msg = "";
 
-        var _iterator16 = _createForOfIteratorHelper(result.effects),
-            _step16;
+        var _iterator22 = _createForOfIteratorHelper(result.effects),
+            _step22;
 
         try {
-          for (_iterator16.s(); !(_step16 = _iterator16.n()).done;) {
-            var X = _step16.value;
+          for (_iterator22.s(); !(_step22 = _iterator22.n()).done;) {
+            var X = _step22.value;
 
             // for each target
-            var _iterator17 = _createForOfIteratorHelper(X.eff),
-                _step17;
+            var _iterator23 = _createForOfIteratorHelper(X.eff),
+                _step23;
 
             try {
-              for (_iterator17.s(); !(_step17 = _iterator17.n()).done;) {
-                var Y = _step17.value;
+              for (_iterator23.s(); !(_step23 = _iterator23.n()).done;) {
+                var Y = _step23.value;
                 //...multiple effects
                 X.target.addEffect(Y.id, Y);
               }
             } catch (err) {
-              _iterator17.e(err);
+              _iterator23.e(err);
             } finally {
-              _iterator17.f();
+              _iterator23.f();
             }
           }
         } catch (err) {
-          _iterator16.e(err);
+          _iterator22.e(err);
         } finally {
-          _iterator16.f();
+          _iterator22.f();
         }
 
         cost.pay(this.parent.parent);
@@ -5467,119 +5555,6 @@ var Skill = /*#__PURE__*/function () {
   }, {
     key: "targetFilterSelf",
     value: function targetFilterSelf(targets) {
-      var possibleTarget = [];
-
-      var _iterator18 = _createForOfIteratorHelper(targets),
-          _step18;
-
-      try {
-        for (_iterator18.s(); !(_step18 = _iterator18.n()).done;) {
-          var target = _step18.value;
-          var valid = true;
-
-          var _iterator19 = _createForOfIteratorHelper(target),
-              _step19;
-
-          try {
-            for (_iterator19.s(); !(_step19 = _iterator19.n()).done;) {
-              var targ = _step19.value;
-              if (this.caster != targ) valid = false;
-            }
-          } catch (err) {
-            _iterator19.e(err);
-          } finally {
-            _iterator19.f();
-          }
-
-          if (valid) possibleTarget.push(target);
-        }
-      } catch (err) {
-        _iterator18.e(err);
-      } finally {
-        _iterator18.f();
-      }
-
-      return possibleTarget;
-    }
-  }, {
-    key: "targetFilterAlly",
-    value: function targetFilterAlly(targets) {
-      var possibleTarget = [];
-
-      var _iterator20 = _createForOfIteratorHelper(targets),
-          _step20;
-
-      try {
-        for (_iterator20.s(); !(_step20 = _iterator20.n()).done;) {
-          var target = _step20.value;
-          var valid = true;
-
-          var _iterator21 = _createForOfIteratorHelper(target),
-              _step21;
-
-          try {
-            for (_iterator21.s(); !(_step21 = _iterator21.n()).done;) {
-              var targ = _step21.value;
-              if (this.caster.faction != targ.faction) valid = false;
-            }
-          } catch (err) {
-            _iterator21.e(err);
-          } finally {
-            _iterator21.f();
-          }
-
-          if (valid) possibleTarget.push(target);
-        }
-      } catch (err) {
-        _iterator20.e(err);
-      } finally {
-        _iterator20.f();
-      }
-
-      return possibleTarget;
-    }
-  }, {
-    key: "targetFilterEnemy",
-    value: function targetFilterEnemy(targets) {
-      var possibleTarget = [];
-
-      var _iterator22 = _createForOfIteratorHelper(targets),
-          _step22;
-
-      try {
-        for (_iterator22.s(); !(_step22 = _iterator22.n()).done;) {
-          var target = _step22.value;
-          var valid = true;
-
-          var _iterator23 = _createForOfIteratorHelper(target),
-              _step23;
-
-          try {
-            for (_iterator23.s(); !(_step23 = _iterator23.n()).done;) {
-              var targ = _step23.value;
-              if (this.caster.faction == targ.faction) valid = false;
-              if (targ.isDead()) valid = false;
-            }
-          } catch (err) {
-            _iterator23.e(err);
-          } finally {
-            _iterator23.f();
-          }
-
-          if (valid) possibleTarget.push(target);
-        }
-      } catch (err) {
-        _iterator22.e(err);
-      } finally {
-        _iterator22.f();
-      }
-
-      return possibleTarget;
-    }
-  }, {
-    key: "targetFilterFighting",
-    value: function targetFilterFighting(targets) {
-      //chars that are not inhibited
       var possibleTarget = [];
 
       var _iterator24 = _createForOfIteratorHelper(targets),
@@ -5596,7 +5571,7 @@ var Skill = /*#__PURE__*/function () {
           try {
             for (_iterator25.s(); !(_step25 = _iterator25.n()).done;) {
               var targ = _step25.value;
-              if (!targ._canAct().OK) valid = false;
+              if (this.caster != targ) valid = false;
             }
           } catch (err) {
             _iterator25.e(err);
@@ -5615,9 +5590,8 @@ var Skill = /*#__PURE__*/function () {
       return possibleTarget;
     }
   }, {
-    key: "targetFilterAlive",
-    value: function targetFilterAlive(targets) {
-      //chars that are not dead
+    key: "targetFilterAlly",
+    value: function targetFilterAlly(targets) {
       var possibleTarget = [];
 
       var _iterator26 = _createForOfIteratorHelper(targets),
@@ -5634,7 +5608,7 @@ var Skill = /*#__PURE__*/function () {
           try {
             for (_iterator27.s(); !(_step27 = _iterator27.n()).done;) {
               var targ = _step27.value;
-              if (targ.isDead()) valid = false;
+              if (this.caster.faction != targ.faction) valid = false;
             }
           } catch (err) {
             _iterator27.e(err);
@@ -5653,9 +5627,8 @@ var Skill = /*#__PURE__*/function () {
       return possibleTarget;
     }
   }, {
-    key: "targetFilterDead",
-    value: function targetFilterDead(targets) {
-      //chars that are dead
+    key: "targetFilterEnemy",
+    value: function targetFilterEnemy(targets) {
       var possibleTarget = [];
 
       var _iterator28 = _createForOfIteratorHelper(targets),
@@ -5672,7 +5645,8 @@ var Skill = /*#__PURE__*/function () {
           try {
             for (_iterator29.s(); !(_step29 = _iterator29.n()).done;) {
               var targ = _step29.value;
-              if (!targ.isDead()) valid = false;
+              if (this.caster.faction == targ.faction) valid = false;
+              if (targ.isDead()) valid = false;
             }
           } catch (err) {
             _iterator29.e(err);
@@ -5691,6 +5665,120 @@ var Skill = /*#__PURE__*/function () {
       return possibleTarget;
     }
   }, {
+    key: "targetFilterFighting",
+    value: function targetFilterFighting(targets) {
+      //chars that are not inhibited
+      var possibleTarget = [];
+
+      var _iterator30 = _createForOfIteratorHelper(targets),
+          _step30;
+
+      try {
+        for (_iterator30.s(); !(_step30 = _iterator30.n()).done;) {
+          var target = _step30.value;
+          var valid = true;
+
+          var _iterator31 = _createForOfIteratorHelper(target),
+              _step31;
+
+          try {
+            for (_iterator31.s(); !(_step31 = _iterator31.n()).done;) {
+              var targ = _step31.value;
+              if (!targ._canAct().OK) valid = false;
+            }
+          } catch (err) {
+            _iterator31.e(err);
+          } finally {
+            _iterator31.f();
+          }
+
+          if (valid) possibleTarget.push(target);
+        }
+      } catch (err) {
+        _iterator30.e(err);
+      } finally {
+        _iterator30.f();
+      }
+
+      return possibleTarget;
+    }
+  }, {
+    key: "targetFilterAlive",
+    value: function targetFilterAlive(targets) {
+      //chars that are not dead
+      var possibleTarget = [];
+
+      var _iterator32 = _createForOfIteratorHelper(targets),
+          _step32;
+
+      try {
+        for (_iterator32.s(); !(_step32 = _iterator32.n()).done;) {
+          var target = _step32.value;
+          var valid = true;
+
+          var _iterator33 = _createForOfIteratorHelper(target),
+              _step33;
+
+          try {
+            for (_iterator33.s(); !(_step33 = _iterator33.n()).done;) {
+              var targ = _step33.value;
+              if (targ.isDead()) valid = false;
+            }
+          } catch (err) {
+            _iterator33.e(err);
+          } finally {
+            _iterator33.f();
+          }
+
+          if (valid) possibleTarget.push(target);
+        }
+      } catch (err) {
+        _iterator32.e(err);
+      } finally {
+        _iterator32.f();
+      }
+
+      return possibleTarget;
+    }
+  }, {
+    key: "targetFilterDead",
+    value: function targetFilterDead(targets) {
+      //chars that are dead
+      var possibleTarget = [];
+
+      var _iterator34 = _createForOfIteratorHelper(targets),
+          _step34;
+
+      try {
+        for (_iterator34.s(); !(_step34 = _iterator34.n()).done;) {
+          var target = _step34.value;
+          var valid = true;
+
+          var _iterator35 = _createForOfIteratorHelper(target),
+              _step35;
+
+          try {
+            for (_iterator35.s(); !(_step35 = _iterator35.n()).done;) {
+              var targ = _step35.value;
+              if (!targ.isDead()) valid = false;
+            }
+          } catch (err) {
+            _iterator35.e(err);
+          } finally {
+            _iterator35.f();
+          }
+
+          if (valid) possibleTarget.push(target);
+        }
+      } catch (err) {
+        _iterator34.e(err);
+      } finally {
+        _iterator34.f();
+      }
+
+      return possibleTarget;
+    }
+  }, {
     key: "targetMultiple",
     value: function targetMultiple(targets) {
       var possibletarget = targets.slice(0); //[[mole1],[mole2]]
@@ -5698,19 +5786,19 @@ var Skill = /*#__PURE__*/function () {
       var multi = [];
       multi.name = "all"; //there has to be a name for display
 
-      var _iterator30 = _createForOfIteratorHelper(possibletarget),
-          _step30;
+      var _iterator36 = _createForOfIteratorHelper(possibletarget),
+          _step36;
 
       try {
-        for (_iterator30.s(); !(_step30 = _iterator30.n()).done;) {
-          var el = _step30.value;
+        for (_iterator36.s(); !(_step36 = _iterator36.n()).done;) {
+          var el = _step36.value;
           if (el.length === 1) //dont stack multi-targets
             multi.push(el[0]);
         }
       } catch (err) {
-        _iterator30.e(err);
+        _iterator36.e(err);
       } finally {
-        _iterator30.f();
+        _iterator36.f();
       }
 
       if (multi.length > 0) possibletarget.push(multi); //[[mole1],[mole2],[mole1,mole2]]
@@ -8526,7 +8614,7 @@ window.gm.MutationsLib['mutateCat'] = function () {
 
 "use strict";
 /**
- * Items can have curse(s) that is applied when its condition is met 
+ * Items can have bonus/curse(s) that is applied when its condition is met 
  * condition is checked when equipped and on every timechange (no check if not equipped ? )
  * if trigger succeeds, apply-function is called  
  * the curse should be initially hidden to the player but might be revealed by a magican
@@ -8554,6 +8642,10 @@ window.gm.MutationsLib['mutateCat'] = function () {
  * - mutate body to remove bodypart (snake -> no wristcuffs) 
  */
 
+/**
+ * //hidden 0 = visible, 1= name=???, 2= , 4= hidden
+ */
+
 
 var Curse = /*#__PURE__*/function () {
   function Curse() {
@@ -8574,7 +8666,7 @@ var Curse = /*#__PURE__*/function () {
     value: function configureCurse(item, trigger, curses) {
       this.trigger = trigger;
       this.list = curses;
-      item.curse = this;
+      item.bonus.push(this);
 
       this._relinkItems(item);
     }
@@ -8584,18 +8676,18 @@ var Curse = /*#__PURE__*/function () {
       this._parent = window.gm.util.refToParent(parent);
       this.trigger._parent = window.gm.util.refToParent(this);
 
-      var _iterator31 = _createForOfIteratorHelper(this.list),
-          _step31;
+      var _iterator37 = _createForOfIteratorHelper(this.list),
+          _step37;
 
       try {
-        for (_iterator31.s(); !(_step31 = _iterator31.n()).done;) {
-          el = _step31.value;
+        for (_iterator37.s(); !(_step37 = _iterator37.n()).done;) {
+          el = _step37.value;
           el._parent = window.gm.util.refToParent(this);
         }
       } catch (err) {
-        _iterator31.e(err);
+        _iterator37.e(err);
       } finally {
-        _iterator31.f();
+        _iterator37.f();
       }
     }
   }, {
@@ -8611,7 +8703,7 @@ var Curse = /*#__PURE__*/function () {
   }, {
     key: "onUnequip",
     value: function onUnequip() {
-      if (this.trigger.onUnequip()) return this.apply(true);
+      if (this.trigger.onUnequip()) this.apply(true);
     }
   }, {
     key: "canUnequip",
@@ -8619,19 +8711,19 @@ var Curse = /*#__PURE__*/function () {
       //ask effects if allowed to unequip/not locked
       var res;
 
-      var _iterator32 = _createForOfIteratorHelper(this.list),
-          _step32;
+      var _iterator38 = _createForOfIteratorHelper(this.list),
+          _step38;
 
       try {
-        for (_iterator32.s(); !(_step32 = _iterator32.n()).done;) {
-          el = _step32.value;
+        for (_iterator38.s(); !(_step38 = _iterator38.n()).done;) {
+          el = _step38.value;
           res = el.canUnequip();
           if (res.OK == false) return res;
         }
       } catch (err) {
-        _iterator32.e(err);
+        _iterator38.e(err);
       } finally {
-        _iterator32.f();
+        _iterator38.f();
       }
 
       res = {
@@ -8648,24 +8740,54 @@ var Curse = /*#__PURE__*/function () {
   }, {
     key: "apply",
     value: function apply(unapply) {
-      var _iterator33 = _createForOfIteratorHelper(this.list),
-          _step33;
+      this.hidden = 0; //reveal
+
+      var _iterator39 = _createForOfIteratorHelper(this.list),
+          _step39;
 
       try {
-        for (_iterator33.s(); !(_step33 = _iterator33.n()).done;) {
-          el = _step33.value;
-          el.apply(unapply);
+        for (_iterator39.s(); !(_step39 = _iterator39.n()).done;) {
+          el = _step39.value;
+          el.apply(unapply); //todo 3 effects would generate 3 defferedEvents; instead combine text into single event
         }
       } catch (err) {
-        _iterator33.e(err);
+        _iterator39.e(err);
       } finally {
-        _iterator33.f();
+        _iterator39.f();
       }
     }
   }, {
     key: "parent",
     get: function get() {
       return this._parent ? this._parent() : null;
+    }
+  }, {
+    key: "desc",
+    get: function get() {
+      var msg = '';
+
+      if ((this.hidden & 0x4) > 0) {//completely hidden
+      } else if ((this.hidden & 0x1) > 0) {
+        msg = 'unknown effect';
+      } else if (this.hidden === 0) {
+        msg = this.trigger.desc;
+
+        var _iterator40 = _createForOfIteratorHelper(this.list),
+            _step40;
+
+        try {
+          for (_iterator40.s(); !(_step40 = _iterator40.n()).done;) {
+            el = _step40.value;
+            msg += "; " + el.desc;
+          }
+        } catch (err) {
+          _iterator40.e(err);
+        } finally {
+          _iterator40.f();
+        }
+      }
+
+      return msg;
     }
   }], [{
     key: "fromJSON",
@@ -8711,6 +8833,11 @@ var CrsTrigger = /*#__PURE__*/function () {
     get: function get() {
       return this._parent ? this._parent() : null;
     }
+  }, {
+    key: "desc",
+    get: function get() {
+      return '';
+    }
   }]);
 
   return CrsTrigger;
@@ -8743,6 +8870,11 @@ var CrsTrgOnEquip = /*#__PURE__*/function (_CrsTrigger) {
     key: "toJSON",
     value: function toJSON() {
       return window.storage.Generic_toJSON("CrsTrgOnEquip", this);
+    }
+  }, {
+    key: "desc",
+    get: function get() {
+      return 'when equipped';
     }
   }], [{
     key: "fromJSON",
@@ -8786,6 +8918,11 @@ var CrsTrgDelayed = /*#__PURE__*/function (_CrsTrigger2) {
     value: function toJSON() {
       return window.storage.Generic_toJSON("CrsTrgDelayed", this);
     }
+  }, {
+    key: "desc",
+    get: function get() {
+      return 'after ' + window.gm.formatNumber(this.timeToTrigger, 0) + 'min';
+    }
   }], [{
     key: "fromJSON",
     value: function fromJSON(value) {
@@ -8823,6 +8960,11 @@ var CrsEffect = /*#__PURE__*/function () {
     get: function get() {
       return this._parent ? this._parent() : null;
     }
+  }, {
+    key: "desc",
+    get: function get() {
+      return '';
+    }
   }]);
 
   return CrsEffect;
@@ -8850,11 +8992,6 @@ var CrsEffLock = /*#__PURE__*/function (_CrsEffect) {
       return window.storage.Generic_toJSON("CrsEffLock", this);
     }
   }, {
-    key: "desc",
-    value: function desc() {
-      return "The item can only be unlocked with a fitting key.";
-    }
-  }, {
     key: "canUnequip",
     value: function canUnequip() {
       var res = {
@@ -8877,6 +9014,11 @@ var CrsEffLock = /*#__PURE__*/function (_CrsEffect) {
       } else {
         window.gm.pushDeferredEvent("GenericDeffered", ['As soon as you equiped ' + this.parent.parent.name + ', some hidden lock sealed the item on you !']);
       }
+    }
+  }, {
+    key: "desc",
+    get: function get() {
+      return "The item can only be unlocked with a " + this.key + ".";
     }
   }], [{
     key: "fromJSON",
@@ -8909,11 +9051,6 @@ var CrsEffEnergyDrain = /*#__PURE__*/function (_CrsEffect2) {
       return window.storage.Generic_toJSON("CrsEffEnergyDrain", this);
     }
   }, {
-    key: "desc",
-    value: function desc() {
-      return "Drains ones energy.";
-    }
-  }, {
     key: "apply",
     value: function apply(unapply) {
       if (unapply) {
@@ -8924,6 +9061,11 @@ var CrsEffEnergyDrain = /*#__PURE__*/function (_CrsEffect2) {
         this.parent.parent.parent.parent.addEffect(this.parent.parent.id + '_EnergyDrain', new window.storage.constructors['effEnergyDrain']());
       }
     }
+  }, {
+    key: "desc",
+    get: function get() {
+      return "Drains wearers energy.";
+    }
   }], [{
     key: "fromJSON",
     value: function fromJSON(value) {
@@ -8932,6 +9074,57 @@ var CrsEffEnergyDrain = /*#__PURE__*/function (_CrsEffect2) {
   }]);
 
   return CrsEffEnergyDrain;
+}(CrsEffect);
+
+var CrsEffStatBonus = /*#__PURE__*/function (_CrsEffect3) {
+  _inherits(CrsEffStatBonus, _CrsEffect3);
+
+  var _super24 = _createSuper(CrsEffStatBonus);
+
+  function CrsEffStatBonus() {
+    var _this23;
+
+    _classCallCheck(this, CrsEffStatBonus);
+
+    _this23 = _super24.call(this);
+    _this23.id = 'CrsEffStatBonus';
+    _this23.statid = 'strength';
+    _this23.statbonus = 5;
+    return _this23;
+  }
+
+  _createClass(CrsEffStatBonus, [{
+    key: "toJSON",
+    value: function toJSON() {
+      return window.storage.Generic_toJSON("CrsEffStatBonus", this);
+    }
+  }, {
+    key: "apply",
+    value: function apply(unapply) {
+      if (unapply) {
+        this.parent.parent.parent.parent.Stats.removeModifier(this.statid, {
+          id: this.statid + ":" + this.parent.parent.id
+        });
+      } else {
+        this.parent.parent.parent.parent.Stats.addModifier(this.statid, {
+          id: this.statid + ":" + this.parent.parent.id,
+          bonus: this.statbonus
+        });
+      }
+    }
+  }, {
+    key: "desc",
+    get: function get() {
+      return this.statid + " +" + this.statbonus;
+    }
+  }], [{
+    key: "fromJSON",
+    value: function fromJSON(value) {
+      return window.storage.Generic_fromJSON(CrsEffStatBonus, value.data);
+    }
+  }]);
+
+  return CrsEffStatBonus;
 }(CrsEffect);
 /**
  * adds a curse-function to an item
@@ -8943,6 +9136,11 @@ window.gm.makeCursedItem = function (item, extra) {
   var eff = null;
   var list = [];
   curse.trigger = new CrsTrgOnEquip();
+
+  if (extra.hidden) {
+    curse.hidden = extra.hidden;
+  } else curse.hidden = 4; //by default hidden
+
 
   if (extra.delayed) {
     curse.trigger = new CrsTrgDelayed();
@@ -8962,12 +9160,34 @@ window.gm.makeCursedItem = function (item, extra) {
   return item;
 };
 
+window.gm.makeBonusItem = function (item, extra) {
+  var curse = new Curse();
+  var eff = null;
+  var list = [];
+  curse.trigger = new CrsTrgOnEquip();
+
+  if (extra.hidden) {
+    curse.hidden = extra.hidden;
+  } else curse.hidden = 0; //by default visible?
+
+
+  if (extra.statBoost && extra.statBonus) {
+    eff = new CrsEffStatBonus();
+    eff.statid = extra.statBoost, eff.statbonus = extra.statBonus;
+    list.push(eff);
+  }
+
+  curse.configureCurse(item, curse.trigger, list);
+  return item;
+};
+
 window.gm.ItemsLib = function (ItemsLib) {
   window.storage.registerConstructor(Curse);
   window.storage.registerConstructor(CrsTrgDelayed);
   window.storage.registerConstructor(CrsTrgOnEquip);
   window.storage.registerConstructor(CrsEffLock);
   window.storage.registerConstructor(CrsEffEnergyDrain);
+  window.storage.registerConstructor(CrsEffStatBonus);
 }(window.gm.ItemsLib || {});
 
 "use strict";
@@ -8975,20 +9195,20 @@ window.gm.ItemsLib = function (ItemsLib) {
 var BeeHive = /*#__PURE__*/function (_DngDungeon) {
   _inherits(BeeHive, _DngDungeon);
 
-  var _super24 = _createSuper(BeeHive);
+  var _super25 = _createSuper(BeeHive);
 
   function BeeHive() {
-    var _this23;
+    var _this24;
 
     _classCallCheck(this, BeeHive);
 
-    _this23 = _super24.call(this, "BeeHive", function () {
+    _this24 = _super25.call(this, "BeeHive", function () {
       return "There seem to live alot of giant bees here.";
     }, window.story.state[BeeHive.name]);
 
-    _this23.buildFloors();
+    _this24.buildFloors();
 
-    return _this23;
+    return _this24;
   }
 
   _createClass(BeeHive, [{
@@ -9182,7 +9402,7 @@ var BeeHive = /*#__PURE__*/function (_DngDungeon) {
 var ShatteredCity = /*#__PURE__*/function (_DngDungeon2) {
   _inherits(ShatteredCity, _DngDungeon2);
 
-  var _super25 = _createSuper(ShatteredCity);
+  var _super26 = _createSuper(ShatteredCity);
 
   _createClass(ShatteredCity, null, [{
     key: "persistentDngDataTemplate",
@@ -9196,17 +9416,17 @@ var ShatteredCity = /*#__PURE__*/function (_DngDungeon2) {
   }]);
 
   function ShatteredCity() {
-    var _this24;
+    var _this25;
 
     _classCallCheck(this, ShatteredCity);
 
-    _this24 = _super25.call(this, "ShatteredCity", function () {
+    _this25 = _super26.call(this, "ShatteredCity", function () {
       return "A once thriving city now lies in ruins.";
     }, window.story.state[ShatteredCity.name]);
 
-    _this24.buildFloors();
+    _this25.buildFloors();
 
-    return _this24;
+    return _this25;
   }
 
   _createClass(ShatteredCity, [{
@@ -9374,19 +9594,19 @@ var ShatteredCity = /*#__PURE__*/function (_DngDungeon2) {
         msg = 'You find:' + this.data.A1Chest.join(",") + '</br>';
         msg += window.gm.printLink("Take all", "window.gm.dng.renderNext(3)");
       } else if (evt.id === 3) {
-        var _iterator34 = _createForOfIteratorHelper(this.data.A1Chest),
-            _step34;
+        var _iterator41 = _createForOfIteratorHelper(this.data.A1Chest),
+            _step41;
 
         try {
-          for (_iterator34.s(); !(_step34 = _iterator34.n()).done;) {
-            el = _step34.value;
+          for (_iterator41.s(); !(_step41 = _iterator41.n()).done;) {
+            el = _step41.value;
 
             this._addItemToPlayer(el);
           }
         } catch (err) {
-          _iterator34.e(err);
+          _iterator41.e(err);
         } finally {
-          _iterator34.f();
+          _iterator41.f();
         }
 
         this.data.A1Chest = [];
@@ -10134,19 +10354,19 @@ window.gm.startReactTest = function (bar, speed, stopCB, startCB, areas) {
   };
   var gradient = '';
 
-  var _iterator35 = _createForOfIteratorHelper(data.areas),
-      _step35;
+  var _iterator42 = _createForOfIteratorHelper(data.areas),
+      _step42;
 
   try {
-    for (_iterator35.s(); !(_step35 = _iterator35.n()).done;) {
-      el = _step35.value;
+    for (_iterator42.s(); !(_step42 = _iterator42.n()).done;) {
+      el = _step42.value;
       //todo need to sort from left to right
       gradient += '#80808000 0 ' + el.a + '%, ' + el.color + ' ' + el.a + '%,' + el.color + ' ' + el.b + '%,#80808000 ' + el.b + '%,';
     }
   } catch (err) {
-    _iterator35.e(err);
+    _iterator42.e(err);
   } finally {
-    _iterator35.f();
+    _iterator42.f();
   }
 
   data.bargraph.parentNode.style.backgroundImage = 'linear-gradient(to right,' + gradient.slice(0, -1) + ')';
@@ -10264,43 +10484,43 @@ window.gm.printBodyDescription = function (whom) {
     // filter by visibility 
     var covered = [];
 
-    var _iterator36 = _createForOfIteratorHelper(wornIds),
-        _step36;
+    var _iterator43 = _createForOfIteratorHelper(wornIds),
+        _step43;
 
     try {
-      for (_iterator36.s(); !(_step36 = _iterator36.n()).done;) {
-        el = _step36.value;
+      for (_iterator43.s(); !(_step43 = _iterator43.n()).done;) {
+        el = _step43.value;
         //notice that an item is only pushed once even if has multiple slots
         var item = whom.Outfit.getItem(el);
         covered = covered.concat(item.slotCover);
       }
     } catch (err) {
-      _iterator36.e(err);
+      _iterator43.e(err);
     } finally {
-      _iterator36.f();
+      _iterator43.f();
     }
 
-    var _iterator37 = _createForOfIteratorHelper(covered),
-        _step37;
+    var _iterator44 = _createForOfIteratorHelper(covered),
+        _step44;
 
     try {
-      for (_iterator37.s(); !(_step37 = _iterator37.n()).done;) {
-        el = _step37.value;
+      for (_iterator44.s(); !(_step44 = _iterator44.n()).done;) {
+        el = _step44.value;
         if (!fcovered.includes(el)) fcovered.push(el);
       }
     } catch (err) {
-      _iterator37.e(err);
+      _iterator44.e(err);
     } finally {
-      _iterator37.f();
+      _iterator44.f();
     }
   }
 
-  var _iterator38 = _createForOfIteratorHelper(wornIds),
-      _step38;
+  var _iterator45 = _createForOfIteratorHelper(wornIds),
+      _step45;
 
   try {
-    for (_iterator38.s(); !(_step38 = _iterator38.n()).done;) {
-      el = _step38.value;
+    for (_iterator45.s(); !(_step45 = _iterator45.n()).done;) {
+      el = _step45.value;
 
       //notice that an item is only pushed once even if has multiple slots
       var _item2 = whom.Outfit.getItem(el);
@@ -10328,26 +10548,26 @@ window.gm.printBodyDescription = function (whom) {
     } //null is used to mark linebreaks
 
   } catch (err) {
-    _iterator38.e(err);
+    _iterator45.e(err);
   } finally {
-    _iterator38.f();
+    _iterator45.f();
   }
 
   var all = base.concat([null]).concat(head).concat([null]).concat(torso).concat([null]).concat(arms).concat([null]);
   all = all.concat(legs).concat([null]).concat(groin).concat([null]).concat(breast).concat([null]).concat(other);
 
-  var _iterator39 = _createForOfIteratorHelper(all),
-      _step39;
+  var _iterator46 = _createForOfIteratorHelper(all),
+      _step46;
 
   try {
-    for (_iterator39.s(); !(_step39 = _iterator39.n()).done;) {
-      el = _step39.value;
+    for (_iterator46.s(); !(_step46 = _iterator46.n()).done;) {
+      el = _step46.value;
       msg += el !== null ? el.descLong(conv) + ' ' : '</br>';
     }
   } catch (err) {
-    _iterator39.e(err);
+    _iterator46.e(err);
   } finally {
-    _iterator39.f();
+    _iterator46.f();
   }
 
   return msg + "</br>";
@@ -10530,12 +10750,12 @@ window.gm.util.lookupWord = function (word, pron) {
 var LighterDad = /*#__PURE__*/function (_Item2) {
   _inherits(LighterDad, _Item2);
 
-  var _super26 = _createSuper(LighterDad);
+  var _super27 = _createSuper(LighterDad);
 
   function LighterDad() {
     _classCallCheck(this, LighterDad);
 
-    return _super26.call(this, 'LighterDad');
+    return _super27.call(this, 'LighterDad');
   }
 
   _createClass(LighterDad, [{
@@ -10563,12 +10783,12 @@ var LighterDad = /*#__PURE__*/function (_Item2) {
 var Money = /*#__PURE__*/function (_Item3) {
   _inherits(Money, _Item3);
 
-  var _super27 = _createSuper(Money);
+  var _super28 = _createSuper(Money);
 
   function Money() {
     _classCallCheck(this, Money);
 
-    return _super27.call(this, 'Money');
+    return _super28.call(this, 'Money');
   }
 
   _createClass(Money, [{
@@ -10596,12 +10816,12 @@ var Money = /*#__PURE__*/function (_Item3) {
 var LaptopPS = /*#__PURE__*/function (_Item4) {
   _inherits(LaptopPS, _Item4);
 
-  var _super28 = _createSuper(LaptopPS);
+  var _super29 = _createSuper(LaptopPS);
 
   function LaptopPS() {
     _classCallCheck(this, LaptopPS);
 
-    return _super28.call(this, 'LaptopPS');
+    return _super29.call(this, 'LaptopPS');
   }
 
   _createClass(LaptopPS, [{
@@ -10629,12 +10849,12 @@ var LaptopPS = /*#__PURE__*/function (_Item4) {
 var Dildo_small = /*#__PURE__*/function (_Item5) {
   _inherits(Dildo_small, _Item5);
 
-  var _super29 = _createSuper(Dildo_small);
+  var _super30 = _createSuper(Dildo_small);
 
   function Dildo_small() {
     _classCallCheck(this, Dildo_small);
 
-    return _super29.call(this, 'Dildo_small');
+    return _super30.call(this, 'Dildo_small');
   }
 
   _createClass(Dildo_small, [{
@@ -10660,12 +10880,12 @@ var Dildo_small = /*#__PURE__*/function (_Item5) {
 var Lube = /*#__PURE__*/function (_Item6) {
   _inherits(Lube, _Item6);
 
-  var _super30 = _createSuper(Lube);
+  var _super31 = _createSuper(Lube);
 
   function Lube() {
     _classCallCheck(this, Lube);
 
-    return _super30.call(this, 'Lube');
+    return _super31.call(this, 'Lube');
   }
 
   _createClass(Lube, [{
@@ -10691,12 +10911,12 @@ var Lube = /*#__PURE__*/function (_Item6) {
 var Battery = /*#__PURE__*/function (_Item7) {
   _inherits(Battery, _Item7);
 
-  var _super31 = _createSuper(Battery);
+  var _super32 = _createSuper(Battery);
 
   function Battery() {
     _classCallCheck(this, Battery);
 
-    return _super31.call(this, 'Battery');
+    return _super32.call(this, 'Battery');
   }
 
   _createClass(Battery, [{
@@ -10722,16 +10942,16 @@ var Battery = /*#__PURE__*/function (_Item7) {
 var Ingredient = /*#__PURE__*/function (_Item8) {
   _inherits(Ingredient, _Item8);
 
-  var _super32 = _createSuper(Ingredient);
+  var _super33 = _createSuper(Ingredient);
 
   function Ingredient() {
-    var _this25;
+    var _this26;
 
     _classCallCheck(this, Ingredient);
 
-    _this25 = _super32.call(this, 'Ingredient');
-    _this25.lossOnRespawn = true;
-    return _this25;
+    _this26 = _super33.call(this, 'Ingredient');
+    _this26.lossOnRespawn = true;
+    return _this26;
   }
 
   _createClass(Ingredient, [{
@@ -10792,16 +11012,16 @@ var Ingredient = /*#__PURE__*/function (_Item8) {
 var SoulGem = /*#__PURE__*/function (_Item9) {
   _inherits(SoulGem, _Item9);
 
-  var _super33 = _createSuper(SoulGem);
+  var _super34 = _createSuper(SoulGem);
 
   function SoulGem() {
-    var _this26;
+    var _this27;
 
     _classCallCheck(this, SoulGem);
 
-    _this26 = _super33.call(this, 'SoulGem');
-    _this26.lossOnRespawn = true;
-    return _this26;
+    _this27 = _super34.call(this, 'SoulGem');
+    _this27.lossOnRespawn = true;
+    return _this27;
   }
 
   _createClass(SoulGem, [{
@@ -10862,16 +11082,16 @@ var SoulGem = /*#__PURE__*/function (_Item9) {
 var KeyRestraint = /*#__PURE__*/function (_Item10) {
   _inherits(KeyRestraint, _Item10);
 
-  var _super34 = _createSuper(KeyRestraint);
+  var _super35 = _createSuper(KeyRestraint);
 
   function KeyRestraint() {
-    var _this27;
+    var _this28;
 
     _classCallCheck(this, KeyRestraint);
 
-    _this27 = _super34.call(this, 'KeyRestraint');
-    _this27.lossOnRespawn = true;
-    return _this27;
+    _this28 = _super35.call(this, 'KeyRestraint');
+    _this28.lossOnRespawn = true;
+    return _this28;
   }
 
   _createClass(KeyRestraint, [{
@@ -10923,12 +11143,12 @@ var KeyRestraint = /*#__PURE__*/function (_Item10) {
 var FlashBang = /*#__PURE__*/function (_Item11) {
   _inherits(FlashBang, _Item11);
 
-  var _super35 = _createSuper(FlashBang);
+  var _super36 = _createSuper(FlashBang);
 
   function FlashBang() {
     _classCallCheck(this, FlashBang);
 
-    return _super35.call(this, 'FlashBang');
+    return _super36.call(this, 'FlashBang');
   }
 
   _createClass(FlashBang, [{
@@ -10985,12 +11205,12 @@ var FlashBang = /*#__PURE__*/function (_Item11) {
 
           result.msg = context.parent.name + ' uses ' + this.name + '.';
 
-          var _iterator40 = _createForOfIteratorHelper(on),
-              _step40;
+          var _iterator47 = _createForOfIteratorHelper(on),
+              _step47;
 
           try {
-            for (_iterator40.s(); !(_step40 = _iterator40.n()).done;) {
-              var _targ = _step40.value;
+            for (_iterator47.s(); !(_step47 = _iterator47.n()).done;) {
+              var _targ = _step47.value;
 
               _targ.addEffect(effStunned.id, new effStunned()); //todo should 'FlashBang:Stunned' merge with other stunned? 
 
@@ -10998,9 +11218,9 @@ var FlashBang = /*#__PURE__*/function (_Item11) {
               result.msg += _targ.name + ' got stunned. ';
             }
           } catch (err) {
-            _iterator40.e(err);
+            _iterator47.e(err);
           } finally {
-            _iterator40.f();
+            _iterator47.f();
           }
 
           result.OK = true;
@@ -11028,12 +11248,12 @@ var FlashBang = /*#__PURE__*/function (_Item11) {
 var CanOfCoffee = /*#__PURE__*/function (_Item12) {
   _inherits(CanOfCoffee, _Item12);
 
-  var _super36 = _createSuper(CanOfCoffee);
+  var _super37 = _createSuper(CanOfCoffee);
 
   function CanOfCoffee() {
     _classCallCheck(this, CanOfCoffee);
 
-    return _super36.call(this, 'CanOfCoffee');
+    return _super37.call(this, 'CanOfCoffee');
   }
 
   _createClass(CanOfCoffee, [{
@@ -11085,12 +11305,12 @@ var CanOfCoffee = /*#__PURE__*/function (_Item12) {
 var SimpleFood = /*#__PURE__*/function (_Item13) {
   _inherits(SimpleFood, _Item13);
 
-  var _super37 = _createSuper(SimpleFood);
+  var _super38 = _createSuper(SimpleFood);
 
   function SimpleFood() {
     _classCallCheck(this, SimpleFood);
 
-    return _super37.call(this, 'SimpleFood');
+    return _super38.call(this, 'SimpleFood');
   }
 
   _createClass(SimpleFood, [{
@@ -11144,7 +11364,7 @@ var SimpleFood = /*#__PURE__*/function (_Item13) {
 var HealthPotion = /*#__PURE__*/function (_Item14) {
   _inherits(HealthPotion, _Item14);
 
-  var _super38 = _createSuper(HealthPotion);
+  var _super39 = _createSuper(HealthPotion);
 
   _createClass(HealthPotion, null, [{
     key: "lookupId",
@@ -11171,15 +11391,15 @@ var HealthPotion = /*#__PURE__*/function (_Item14) {
   }]);
 
   function HealthPotion() {
-    var _this28;
+    var _this29;
 
     _classCallCheck(this, HealthPotion);
 
-    _this28 = _super38.call(this, 'HealthPotion');
+    _this29 = _super39.call(this, 'HealthPotion');
 
-    _this28.changeId('HealthPotion');
+    _this29.changeId('HealthPotion');
 
-    return _this28;
+    return _this29;
   }
 
   _createClass(HealthPotion, [{
@@ -11240,7 +11460,7 @@ var HealthPotion = /*#__PURE__*/function (_Item14) {
 var HorsePotion = /*#__PURE__*/function (_Item15) {
   _inherits(HorsePotion, _Item15);
 
-  var _super39 = _createSuper(HorsePotion);
+  var _super40 = _createSuper(HorsePotion);
 
   _createClass(HorsePotion, null, [{
     key: "lookupId",
@@ -11263,15 +11483,15 @@ var HorsePotion = /*#__PURE__*/function (_Item15) {
   }]);
 
   function HorsePotion() {
-    var _this29;
+    var _this30;
 
     _classCallCheck(this, HorsePotion);
 
-    _this29 = _super39.call(this, 'HorsePotion');
+    _this30 = _super40.call(this, 'HorsePotion');
 
-    _this29.changeId('HorsePotion');
+    _this30.changeId('HorsePotion');
 
-    return _this29;
+    return _this30;
   }
 
   _createClass(HorsePotion, [{
@@ -11471,20 +11691,20 @@ window.gm.ItemsLib = function (ItemsLib) {
 var Mole = /*#__PURE__*/function (_Mob) {
   _inherits(Mole, _Mob);
 
-  var _super40 = _createSuper(Mole);
+  var _super41 = _createSuper(Mole);
 
   function Mole() {
-    var _this30;
+    var _this31;
 
     _classCallCheck(this, Mole);
 
-    _this30 = _super40.call(this);
-    _this30.name = _this30.id = 'Mole';
-    _this30.pic = 'assets/mole.jpg';
+    _this31 = _super41.call(this);
+    _this31.name = _this31.id = 'Mole';
+    _this31.pic = 'assets/mole.jpg';
 
-    _this30.Stats.increment('healthMax', -1 * (_this30.health().max - 20));
+    _this31.Stats.increment('healthMax', -1 * (_this31.health().max - 20));
 
-    return _this30;
+    return _this31;
   }
 
   return Mole;
@@ -11493,31 +11713,31 @@ var Mole = /*#__PURE__*/function (_Mob) {
 var Wolf = /*#__PURE__*/function (_Mob2) {
   _inherits(Wolf, _Mob2);
 
-  var _super41 = _createSuper(Wolf);
+  var _super42 = _createSuper(Wolf);
 
   function Wolf() {
-    var _this31;
+    var _this32;
 
     _classCallCheck(this, Wolf);
 
-    _this31 = _super41.call(this);
-    _this31.name = _this31.id = 'Wolf';
-    _this31.pic = 'assets/bw_wolf1.png';
-    _this31.level_min = 3;
+    _this32 = _super42.call(this);
+    _this32.name = _this32.id = 'Wolf';
+    _this32.pic = 'assets/bw_wolf1.png';
+    _this32.level_min = 3;
 
-    _this31.Outfit.addItem(new BaseQuadruped());
+    _this32.Outfit.addItem(new BaseQuadruped());
 
-    _this31.Outfit.addItem(SkinFur.factory('wolf', 'black'));
+    _this32.Outfit.addItem(SkinFur.factory('wolf', 'black'));
 
-    _this31.Outfit.addItem(HandsPaw.factory('wolf'));
+    _this32.Outfit.addItem(HandsPaw.factory('wolf'));
 
-    _this31.Outfit.addItem(TailWolf.factory('wolf'));
+    _this32.Outfit.addItem(TailWolf.factory('wolf'));
 
-    _this31.Outfit.addItem(FaceWolf.factory('wolf'));
+    _this32.Outfit.addItem(FaceWolf.factory('wolf'));
 
-    _this31.fconv = null; //lazy init because descfixer depends on gm.player
+    _this32.fconv = null; //lazy init because descfixer depends on gm.player
 
-    return _this31;
+    return _this32;
   }
 
   _createClass(Wolf, [{
@@ -11551,29 +11771,29 @@ var Wolf = /*#__PURE__*/function (_Mob2) {
 var Leech = /*#__PURE__*/function (_Mob3) {
   _inherits(Leech, _Mob3);
 
-  var _super42 = _createSuper(Leech);
+  var _super43 = _createSuper(Leech);
 
   function Leech() {
-    var _this32;
+    var _this33;
 
     _classCallCheck(this, Leech);
 
-    _this32 = _super42.call(this);
-    _this32.name = _this32.id = 'Leech';
-    _this32.pic = 'assets/Leech.png'; //todo
+    _this33 = _super43.call(this);
+    _this33.name = _this33.id = 'Leech';
+    _this33.pic = 'assets/Leech.png'; //todo
 
-    _this32.level_min = 1;
+    _this33.level_min = 1;
 
-    _this32.Outfit.addItem(new BaseQuadruped());
+    _this33.Outfit.addItem(new BaseQuadruped());
 
-    _this32.Skills.addItem(new SkillLeechHealth());
+    _this33.Skills.addItem(new SkillLeechHealth());
 
-    _this32.tmp = {
+    _this33.tmp = {
       grappleCoolDown: 1
     };
-    _this32.fconv = null; //lazy init because descfixer depends on gm.player
+    _this33.fconv = null; //lazy init because descfixer depends on gm.player
 
-    return _this32;
+    return _this33;
   }
 
   _createClass(Leech, [{
@@ -11614,34 +11834,34 @@ var Leech = /*#__PURE__*/function (_Mob3) {
 var Huntress = /*#__PURE__*/function (_Mob4) {
   _inherits(Huntress, _Mob4);
 
-  var _super43 = _createSuper(Huntress);
+  var _super44 = _createSuper(Huntress);
 
   function Huntress() {
-    var _this33;
+    var _this34;
 
     _classCallCheck(this, Huntress);
 
-    _this33 = _super43.call(this);
-    _this33.name = _this33.id = 'Huntress';
-    _this33.pic = 'assets/icons/icon_question.svg';
+    _this34 = _super44.call(this);
+    _this34.name = _this34.id = 'Huntress';
+    _this34.pic = 'assets/icons/icon_question.svg';
 
-    _this33.Outfit.addItem(new BaseHumanoid());
+    _this34.Outfit.addItem(new BaseHumanoid());
 
-    _this33.Outfit.addItem(new SkinHuman());
+    _this34.Outfit.addItem(new SkinHuman());
 
-    _this33.Outfit.addItem(HandsHuman.factory('cat'));
+    _this34.Outfit.addItem(HandsHuman.factory('cat'));
 
-    _this33.Outfit.addItem(FaceWolf.factory('cat'));
+    _this34.Outfit.addItem(FaceWolf.factory('cat'));
 
-    _this33.Outfit.addItem(VulvaHuman.factory('cat'));
+    _this34.Outfit.addItem(VulvaHuman.factory('cat'));
 
-    _this33.Outfit.addItem(new BikiniBottomLeather());
+    _this34.Outfit.addItem(new BikiniBottomLeather());
 
-    _this33.levelUp(3);
+    _this34.levelUp(3);
 
-    _this33.autoLeveling();
+    _this34.autoLeveling();
 
-    return _this33;
+    return _this34;
   }
 
   _createClass(Huntress, [{
@@ -11666,17 +11886,17 @@ var Huntress = /*#__PURE__*/function (_Mob4) {
 var Mechanic = /*#__PURE__*/function (_Mob5) {
   _inherits(Mechanic, _Mob5);
 
-  var _super44 = _createSuper(Mechanic);
+  var _super45 = _createSuper(Mechanic);
 
   function Mechanic() {
-    var _this34;
+    var _this35;
 
     _classCallCheck(this, Mechanic);
 
-    _this34 = _super44.call(this);
-    _this34.name = _this34.id = 'Mechanic-Guy';
-    _this34.pic = 'assets/mechanic.jpg';
-    return _this34;
+    _this35 = _super45.call(this);
+    _this35.name = _this35.id = 'Mechanic-Guy';
+    _this35.pic = 'assets/mechanic.jpg';
+    return _this35;
   }
 
   _createClass(Mechanic, [{
@@ -11711,56 +11931,30 @@ var Mechanic = /*#__PURE__*/function (_Mob5) {
 var Carlia = /*#__PURE__*/function (_Mob6) {
   _inherits(Carlia, _Mob6);
 
-  var _super45 = _createSuper(Carlia);
+  var _super46 = _createSuper(Carlia);
 
   function Carlia() {
-    var _this35;
+    var _this36;
 
     _classCallCheck(this, Carlia);
 
-    _this35 = _super45.call(this);
-    _this35.name = _this35.id = 'Carlia';
-    _this35.pic = 'assets/icons/icon_question.svg';
-
-    _this35.Outfit.addItem(new BaseHumanoid());
-
-    _this35.Outfit.addItem(new SkinHuman());
-
-    _this35.Outfit.addItem(HandsHuman.factory('cat'));
-
-    _this35.Outfit.addItem(FaceWolf.factory('cat'));
-
-    _this35.Outfit.addItem(BreastHuman.factory('human'));
-
-    _this35.Outfit.addItem(VulvaHuman.factory('human'));
-
-    _this35.Outfit.addItem(new BikiniBottomLeather());
-
-    _this35.levelUp(3);
-
-    _this35.autoLeveling();
-
-    return _this35;
-  }
-
-  return Carlia;
-}(Mob);
-
-var Ruff = /*#__PURE__*/function (_Wolf) {
-  _inherits(Ruff, _Wolf);
-
-  var _super46 = _createSuper(Ruff);
-
-  function Ruff() {
-    var _this36;
-
-    _classCallCheck(this, Ruff);
-
     _this36 = _super46.call(this);
-    _this36.name = _this36.id = 'Ruff';
-    _this36.pic = 'assets/bw_wolf1.png';
+    _this36.name = _this36.id = 'Carlia';
+    _this36.pic = 'assets/icons/icon_question.svg';
 
-    _this36.Outfit.addItem(PenisHuman.factory('wolf'));
+    _this36.Outfit.addItem(new BaseHumanoid());
+
+    _this36.Outfit.addItem(new SkinHuman());
+
+    _this36.Outfit.addItem(HandsHuman.factory('cat'));
+
+    _this36.Outfit.addItem(FaceWolf.factory('cat'));
+
+    _this36.Outfit.addItem(BreastHuman.factory('human'));
+
+    _this36.Outfit.addItem(VulvaHuman.factory('human'));
+
+    _this36.Outfit.addItem(new BikiniBottomLeather());
 
     _this36.levelUp(3);
 
@@ -11769,46 +11963,72 @@ var Ruff = /*#__PURE__*/function (_Wolf) {
     return _this36;
   }
 
+  return Carlia;
+}(Mob);
+
+var Ruff = /*#__PURE__*/function (_Wolf) {
+  _inherits(Ruff, _Wolf);
+
+  var _super47 = _createSuper(Ruff);
+
+  function Ruff() {
+    var _this37;
+
+    _classCallCheck(this, Ruff);
+
+    _this37 = _super47.call(this);
+    _this37.name = _this37.id = 'Ruff';
+    _this37.pic = 'assets/bw_wolf1.png';
+
+    _this37.Outfit.addItem(PenisHuman.factory('wolf'));
+
+    _this37.levelUp(3);
+
+    _this37.autoLeveling();
+
+    return _this37;
+  }
+
   return Ruff;
 }(Wolf);
 
 var Trent = /*#__PURE__*/function (_Mob7) {
   _inherits(Trent, _Mob7);
 
-  var _super47 = _createSuper(Trent);
+  var _super48 = _createSuper(Trent);
 
   function Trent() {
-    var _this37;
+    var _this38;
 
     _classCallCheck(this, Trent);
 
-    _this37 = _super47.call(this);
-    _this37.name = _this37.id = 'Trent';
-    _this37.pic = 'assets/icons/icon_question.svg';
+    _this38 = _super48.call(this);
+    _this38.name = _this38.id = 'Trent';
+    _this38.pic = 'assets/icons/icon_question.svg';
 
-    _this37.Outfit.addItem(new BaseHumanoid());
+    _this38.Outfit.addItem(new BaseHumanoid());
 
-    _this37.Outfit.addItem(SkinFur.factory('horse', 'brown'));
+    _this38.Outfit.addItem(SkinFur.factory('horse', 'brown'));
 
-    _this37.Outfit.addItem(HandsHuman.factory('horse'));
+    _this38.Outfit.addItem(HandsHuman.factory('horse'));
 
-    _this37.Outfit.addItem(TailWolf.factory('horse'));
+    _this38.Outfit.addItem(TailWolf.factory('horse'));
 
-    _this37.Outfit.addItem(FaceWolf.factory('horse'));
+    _this38.Outfit.addItem(FaceWolf.factory('horse'));
 
-    _this37.Outfit.addItem(PenisHuman.factory('horse'));
+    _this38.Outfit.addItem(PenisHuman.factory('horse'));
 
-    _this37.Outfit.addItem(new ShortsLeather());
+    _this38.Outfit.addItem(new ShortsLeather());
 
-    _this37.Outfit.addItem(new MaceSteel());
+    _this38.Outfit.addItem(new MaceSteel());
 
-    _this37.Stats.increment('strength', 3);
+    _this38.Stats.increment('strength', 3);
 
-    _this37.levelUp(6);
+    _this38.levelUp(6);
 
-    _this37.autoLeveling();
+    _this38.autoLeveling();
 
-    return _this37;
+    return _this38;
   }
 
   return Trent;
@@ -11840,17 +12060,17 @@ window.gm.Mobs = function (Mobs) {
 var Leggings = /*#__PURE__*/function (_Equipment15) {
   _inherits(Leggings, _Equipment15);
 
-  var _super48 = _createSuper(Leggings);
+  var _super49 = _createSuper(Leggings);
 
   function Leggings() {
-    var _this38;
+    var _this39;
 
     _classCallCheck(this, Leggings);
 
-    _this38 = _super48.call(this, 'Leggings');
-    _this38.tags = ['cloth'];
-    _this38.slotUse = ['Legs', 'Hips'];
-    return _this38;
+    _this39 = _super49.call(this, 'Leggings');
+    _this39.tags = ['cloth'];
+    _this39.slotUse = ['Legs', 'Hips'];
+    return _this39;
   }
 
   _createClass(Leggings, [{
@@ -11899,17 +12119,17 @@ var Leggings = /*#__PURE__*/function (_Equipment15) {
 var Jeans = /*#__PURE__*/function (_Equipment16) {
   _inherits(Jeans, _Equipment16);
 
-  var _super49 = _createSuper(Jeans);
+  var _super50 = _createSuper(Jeans);
 
   function Jeans() {
-    var _this39;
+    var _this40;
 
     _classCallCheck(this, Jeans);
 
-    _this39 = _super49.call(this, 'Jeans');
-    _this39.tags = ['cloth'];
-    _this39.slotUse = ['Legs', 'Hips'];
-    return _this39;
+    _this40 = _super50.call(this, 'Jeans');
+    _this40.tags = ['cloth'];
+    _this40.slotUse = ['Legs', 'Hips'];
+    return _this40;
   }
 
   _createClass(Jeans, [{
@@ -11935,17 +12155,17 @@ var Jeans = /*#__PURE__*/function (_Equipment16) {
 var Sneakers = /*#__PURE__*/function (_Equipment17) {
   _inherits(Sneakers, _Equipment17);
 
-  var _super50 = _createSuper(Sneakers);
+  var _super51 = _createSuper(Sneakers);
 
   function Sneakers() {
-    var _this40;
+    var _this41;
 
     _classCallCheck(this, Sneakers);
 
-    _this40 = _super50.call(this, 'Sneakers');
-    _this40.tags = ['cloth'];
-    _this40.slotUse = ['Feet'];
-    return _this40;
+    _this41 = _super51.call(this, 'Sneakers');
+    _this41.tags = ['cloth'];
+    _this41.slotUse = ['Feet'];
+    return _this41;
   }
 
   _createClass(Sneakers, [{
@@ -11971,17 +12191,17 @@ var Sneakers = /*#__PURE__*/function (_Equipment17) {
 var TankShirt = /*#__PURE__*/function (_Equipment18) {
   _inherits(TankShirt, _Equipment18);
 
-  var _super51 = _createSuper(TankShirt);
+  var _super52 = _createSuper(TankShirt);
 
   function TankShirt() {
-    var _this41;
+    var _this42;
 
     _classCallCheck(this, TankShirt);
 
-    _this41 = _super51.call(this, 'TankShirt');
-    _this41.tags = ['cloth'];
-    _this41.slotUse = ['Breast', 'Stomach'];
-    return _this41;
+    _this42 = _super52.call(this, 'TankShirt');
+    _this42.tags = ['cloth'];
+    _this42.slotUse = ['Breast', 'Stomach'];
+    return _this42;
   }
 
   _createClass(TankShirt, [{
@@ -12007,17 +12227,17 @@ var TankShirt = /*#__PURE__*/function (_Equipment18) {
 var Pullover = /*#__PURE__*/function (_Equipment19) {
   _inherits(Pullover, _Equipment19);
 
-  var _super52 = _createSuper(Pullover);
+  var _super53 = _createSuper(Pullover);
 
   function Pullover() {
-    var _this42;
+    var _this43;
 
     _classCallCheck(this, Pullover);
 
-    _this42 = _super52.call(this, 'Pullover');
-    _this42.tags = ['cloth'];
-    _this42.slotUse = ['Breast', 'Stomach', 'Arms'];
-    return _this42;
+    _this43 = _super53.call(this, 'Pullover');
+    _this43.tags = ['cloth'];
+    _this43.slotUse = ['Breast', 'Stomach', 'Arms'];
+    return _this43;
   }
 
   _createClass(Pullover, [{
@@ -12050,19 +12270,19 @@ var Pullover = /*#__PURE__*/function (_Equipment19) {
 var BracerLeather = /*#__PURE__*/function (_Equipment20) {
   _inherits(BracerLeather, _Equipment20);
 
-  var _super53 = _createSuper(BracerLeather);
+  var _super54 = _createSuper(BracerLeather);
 
   function BracerLeather() {
-    var _this43;
+    var _this44;
 
     _classCallCheck(this, BracerLeather);
 
-    _this43 = _super53.call(this, 'BracerLeather');
-    _this43.tags = ['cloth'];
-    _this43.slotUse = ['Wrists'];
-    _this43.style = 0;
-    _this43.lossOnRespawn = true;
-    return _this43;
+    _this44 = _super54.call(this, 'BracerLeather');
+    _this44.tags = ['cloth'];
+    _this44.slotUse = ['Wrists'];
+    _this44.style = 0;
+    _this44.lossOnRespawn = true;
+    return _this44;
   }
 
   _createClass(BracerLeather, [{
@@ -12088,8 +12308,9 @@ var BracerLeather = /*#__PURE__*/function (_Equipment20) {
   }, {
     key: "desc",
     get: function get() {
-      if (this.style === 100) return 'leather bracers with steel-studs';
-      return 'worn bracers made of leather';
+      var msg = 'worn bracers made of leather';
+      if (this.style === 100) msg = 'leather bracers with steel-studs';
+      return msg + this.bonusDesc();
     }
   }], [{
     key: "fromJSON",
@@ -12104,17 +12325,17 @@ var BracerLeather = /*#__PURE__*/function (_Equipment20) {
 var HandCuffs = /*#__PURE__*/function (_Equipment21) {
   _inherits(HandCuffs, _Equipment21);
 
-  var _super54 = _createSuper(HandCuffs);
+  var _super55 = _createSuper(HandCuffs);
 
   function HandCuffs() {
-    var _this44;
+    var _this45;
 
     _classCallCheck(this, HandCuffs);
 
-    _this44 = _super54.call(this, 'HandCuffs');
-    _this44.tags = ['restrain'];
-    _this44.slotUse = ['RHand', 'LHand', 'Wrists'];
-    return _this44;
+    _this45 = _super55.call(this, 'HandCuffs');
+    _this45.tags = ['restrain'];
+    _this45.slotUse = ['RHand', 'LHand', 'Wrists'];
+    return _this45;
   }
 
   _createClass(HandCuffs, [{
@@ -12183,18 +12404,18 @@ var HandCuffs = /*#__PURE__*/function (_Equipment21) {
 var WristCuffs = /*#__PURE__*/function (_Equipment22) {
   _inherits(WristCuffs, _Equipment22);
 
-  var _super55 = _createSuper(WristCuffs);
+  var _super56 = _createSuper(WristCuffs);
 
   function WristCuffs() {
-    var _this45;
+    var _this46;
 
     _classCallCheck(this, WristCuffs);
 
-    _this45 = _super55.call(this, 'WristCuffs');
-    _this45.tags = [];
-    _this45.slotUse = ['Wrists'];
-    _this45.lossOnRespawn = false;
-    return _this45;
+    _this46 = _super56.call(this, 'WristCuffs');
+    _this46.tags = [];
+    _this46.slotUse = ['Wrists'];
+    _this46.lossOnRespawn = false;
+    return _this46;
   }
 
   _createClass(WristCuffs, [{
@@ -12262,18 +12483,18 @@ var WristCuffs = /*#__PURE__*/function (_Equipment22) {
 var CollarQuest = /*#__PURE__*/function (_Equipment23) {
   _inherits(CollarQuest, _Equipment23);
 
-  var _super56 = _createSuper(CollarQuest);
+  var _super57 = _createSuper(CollarQuest);
 
   function CollarQuest() {
-    var _this46;
+    var _this47;
 
     _classCallCheck(this, CollarQuest);
 
-    _this46 = _super56.call(this, 'CollarQuest');
-    _this46.tags = [];
-    _this46.slotUse = ['Neck'];
-    _this46.lossOnRespawn = false;
-    return _this46;
+    _this47 = _super57.call(this, 'CollarQuest');
+    _this47.tags = [];
+    _this47.slotUse = ['Neck'];
+    _this47.lossOnRespawn = false;
+    return _this47;
   }
 
   _createClass(CollarQuest, [{
@@ -12341,19 +12562,19 @@ var CollarQuest = /*#__PURE__*/function (_Equipment23) {
 var PiercingClit = /*#__PURE__*/function (_Equipment24) {
   _inherits(PiercingClit, _Equipment24);
 
-  var _super57 = _createSuper(PiercingClit);
+  var _super58 = _createSuper(PiercingClit);
 
   function PiercingClit() {
-    var _this47;
+    var _this48;
 
     _classCallCheck(this, PiercingClit);
 
-    _this47 = _super57.call(this, 'PiercingClit');
-    _this47.tags = ['piercing'];
-    _this47.slotUse = ['pClit'];
-    _this47.style = 0;
-    _this47.lossOnRespawn = true;
-    return _this47;
+    _this48 = _super58.call(this, 'PiercingClit');
+    _this48.tags = ['piercing'];
+    _this48.slotUse = ['pClit'];
+    _this48.style = 0;
+    _this48.lossOnRespawn = true;
+    return _this48;
   }
 
   _createClass(PiercingClit, [{
@@ -12401,19 +12622,19 @@ var PiercingClit = /*#__PURE__*/function (_Equipment24) {
 var TattooGroin = /*#__PURE__*/function (_Equipment25) {
   _inherits(TattooGroin, _Equipment25);
 
-  var _super58 = _createSuper(TattooGroin);
+  var _super59 = _createSuper(TattooGroin);
 
   function TattooGroin() {
-    var _this48;
+    var _this49;
 
     _classCallCheck(this, TattooGroin);
 
-    _this48 = _super58.call(this, 'TattooGroin');
-    _this48.tags = ['tattoo'];
-    _this48.slotUse = ['tStomach'];
-    _this48.style = 0;
-    _this48.lossOnRespawn = false;
-    return _this48;
+    _this49 = _super59.call(this, 'TattooGroin');
+    _this49.tags = ['tattoo'];
+    _this49.slotUse = ['tStomach'];
+    _this49.style = 0;
+    _this49.lossOnRespawn = false;
+    return _this49;
   }
 
   _createClass(TattooGroin, [{
@@ -12478,24 +12699,24 @@ var TattooGroin = /*#__PURE__*/function (_Equipment25) {
 var Crowbar = /*#__PURE__*/function (_Equipment26) {
   _inherits(Crowbar, _Equipment26);
 
-  var _super59 = _createSuper(Crowbar);
+  var _super60 = _createSuper(Crowbar);
 
   function Crowbar() {
-    var _this49;
+    var _this50;
 
     _classCallCheck(this, Crowbar);
 
-    _this49 = _super59.call(this, 'Crowbar');
-    _this49.tags = ['tool', 'weapon'];
-    _this49.slotUse = ['RHand'];
-    _this49.lossOnRespawn = true;
-    return _this49;
+    _this50 = _super60.call(this, 'Crowbar');
+    _this50.tags = ['tool', 'weapon'];
+    _this50.slotUse = ['RHand'];
+    _this50.lossOnRespawn = true;
+    return _this50;
   }
 
   _createClass(Crowbar, [{
     key: "descLong",
     value: function descLong(fconv) {
-      return fconv('A warm pullover adorns $[me]$.');
+      return fconv('$[I]$ $[hold]$ a crowbar.');
     }
   }, {
     key: "toJSON",
@@ -12567,18 +12788,18 @@ var Crowbar = /*#__PURE__*/function (_Equipment26) {
 var Shovel = /*#__PURE__*/function (_Equipment27) {
   _inherits(Shovel, _Equipment27);
 
-  var _super60 = _createSuper(Shovel);
+  var _super61 = _createSuper(Shovel);
 
   function Shovel() {
-    var _this50;
+    var _this51;
 
     _classCallCheck(this, Shovel);
 
-    _this50 = _super60.call(this, 'Shovel');
-    _this50.tags = ['tool', 'weapon'];
-    _this50.slotUse = ['RHand', 'LHand'];
-    _this50.lossOnRespawn = true;
-    return _this50;
+    _this51 = _super61.call(this, 'Shovel');
+    _this51.tags = ['tool', 'weapon'];
+    _this51.slotUse = ['RHand', 'LHand'];
+    _this51.lossOnRespawn = true;
+    return _this51;
   }
 
   _createClass(Shovel, [{
@@ -12650,19 +12871,19 @@ var Shovel = /*#__PURE__*/function (_Equipment27) {
 var RobesZealot = /*#__PURE__*/function (_Equipment28) {
   _inherits(RobesZealot, _Equipment28);
 
-  var _super61 = _createSuper(RobesZealot);
+  var _super62 = _createSuper(RobesZealot);
 
   function RobesZealot() {
-    var _this51;
+    var _this52;
 
     _classCallCheck(this, RobesZealot);
 
-    _this51 = _super61.call(this, 'RobesZealot');
-    _this51.tags = ['cloth'];
-    _this51.slotUse = ['Breast', 'Stomach', 'Hips', 'Legs'];
-    _this51.slotCover = ['bBreast', 'uBreast', 'pNipples'];
-    _this51.lossOnRespawn = true;
-    return _this51;
+    _this52 = _super62.call(this, 'RobesZealot');
+    _this52.tags = ['cloth'];
+    _this52.slotUse = ['Breast', 'Stomach', 'Hips', 'Legs'];
+    _this52.slotCover = ['bBreast', 'uBreast', 'pNipples'];
+    _this52.lossOnRespawn = true;
+    return _this52;
   }
 
   _createClass(RobesZealot, [{
@@ -12688,19 +12909,19 @@ var RobesZealot = /*#__PURE__*/function (_Equipment28) {
 var Briefs = /*#__PURE__*/function (_Equipment29) {
   _inherits(Briefs, _Equipment29);
 
-  var _super62 = _createSuper(Briefs);
+  var _super63 = _createSuper(Briefs);
 
   function Briefs() {
-    var _this52;
+    var _this53;
 
     _classCallCheck(this, Briefs);
 
-    _this52 = _super62.call(this, 'Briefs');
-    _this52.tags = ['cloth'];
-    _this52.slotUse = ['uHips'];
-    _this52.slotCover = ['bPenis', 'bVulva', 'bBalls', 'bClit', 'bAnus', 'pPenis', 'pClit'];
-    _this52.lossOnRespawn = true;
-    return _this52;
+    _this53 = _super63.call(this, 'Briefs');
+    _this53.tags = ['cloth'];
+    _this53.slotUse = ['uHips'];
+    _this53.slotCover = ['bPenis', 'bVulva', 'bBalls', 'bClit', 'bAnus', 'pPenis', 'pClit'];
+    _this53.lossOnRespawn = true;
+    return _this53;
   }
 
   _createClass(Briefs, [{
@@ -12726,19 +12947,19 @@ var Briefs = /*#__PURE__*/function (_Equipment29) {
 var BikiniBottomLeather = /*#__PURE__*/function (_Equipment30) {
   _inherits(BikiniBottomLeather, _Equipment30);
 
-  var _super63 = _createSuper(BikiniBottomLeather);
+  var _super64 = _createSuper(BikiniBottomLeather);
 
   function BikiniBottomLeather() {
-    var _this53;
+    var _this54;
 
     _classCallCheck(this, BikiniBottomLeather);
 
-    _this53 = _super63.call(this, 'BikiniBottomLeather');
-    _this53.tags = ['cloth'];
-    _this53.slotUse = ['uHips'];
-    _this53.slotCover = ['bPenis', 'bVulva', 'bBalls', 'bClit', 'bAnus', 'pPenis', 'pClit'];
-    _this53.lossOnRespawn = true;
-    return _this53;
+    _this54 = _super64.call(this, 'BikiniBottomLeather');
+    _this54.tags = ['cloth'];
+    _this54.slotUse = ['uHips'];
+    _this54.slotCover = ['bPenis', 'bVulva', 'bBalls', 'bClit', 'bAnus', 'pPenis', 'pClit'];
+    _this54.lossOnRespawn = true;
+    return _this54;
   }
 
   _createClass(BikiniBottomLeather, [{
@@ -12764,19 +12985,19 @@ var BikiniBottomLeather = /*#__PURE__*/function (_Equipment30) {
 var BikiniTopLeather = /*#__PURE__*/function (_Equipment31) {
   _inherits(BikiniTopLeather, _Equipment31);
 
-  var _super64 = _createSuper(BikiniTopLeather);
+  var _super65 = _createSuper(BikiniTopLeather);
 
   function BikiniTopLeather() {
-    var _this54;
+    var _this55;
 
     _classCallCheck(this, BikiniTopLeather);
 
-    _this54 = _super64.call(this, 'BikiniTopLeather');
-    _this54.tags = ['cloth'];
-    _this54.slotUse = ['uBreast'];
-    _this54.slotCover = ['pNipples'];
-    _this54.lossOnRespawn = true;
-    return _this54;
+    _this55 = _super65.call(this, 'BikiniTopLeather');
+    _this55.tags = ['cloth'];
+    _this55.slotUse = ['uBreast'];
+    _this55.slotCover = ['pNipples'];
+    _this55.lossOnRespawn = true;
+    return _this55;
   }
 
   _createClass(BikiniTopLeather, [{
@@ -12802,19 +13023,19 @@ var BikiniTopLeather = /*#__PURE__*/function (_Equipment31) {
 var ShortsLeather = /*#__PURE__*/function (_Equipment32) {
   _inherits(ShortsLeather, _Equipment32);
 
-  var _super65 = _createSuper(ShortsLeather);
+  var _super66 = _createSuper(ShortsLeather);
 
   function ShortsLeather() {
-    var _this55;
+    var _this56;
 
     _classCallCheck(this, ShortsLeather);
 
-    _this55 = _super65.call(this, 'ShortsLeather');
-    _this55.tags = ['cloth'];
-    _this55.slotUse = ['Hips', 'Legs'];
-    _this55.slotCover = ['bPenis', 'bVulva', 'bBalls', 'bClit', 'bAnus', 'pPenis', 'pClit'];
-    _this55.lossOnRespawn = true;
-    return _this55;
+    _this56 = _super66.call(this, 'ShortsLeather');
+    _this56.tags = ['cloth'];
+    _this56.slotUse = ['Hips', 'Legs'];
+    _this56.slotCover = ['bPenis', 'bVulva', 'bBalls', 'bClit', 'bAnus', 'pPenis', 'pClit'];
+    _this56.lossOnRespawn = true;
+    return _this56;
   }
 
   _createClass(ShortsLeather, [{
@@ -12840,19 +13061,19 @@ var ShortsLeather = /*#__PURE__*/function (_Equipment32) {
 var StaffWodden = /*#__PURE__*/function (_Equipment33) {
   _inherits(StaffWodden, _Equipment33);
 
-  var _super66 = _createSuper(StaffWodden);
+  var _super67 = _createSuper(StaffWodden);
 
   function StaffWodden() {
-    var _this56;
+    var _this57;
 
     _classCallCheck(this, StaffWodden);
 
-    _this56 = _super66.call(this, 'StaffWodden');
-    _this56.tags = ['weapon'];
-    _this56.slotUse = ['RHand', 'LHand'];
-    _this56.lossOnRespawn = true;
-    _this56.pDamage = 5;
-    return _this56;
+    _this57 = _super67.call(this, 'StaffWodden');
+    _this57.tags = ['weapon'];
+    _this57.slotUse = ['RHand', 'LHand'];
+    _this57.lossOnRespawn = true;
+    _this57.pDamage = 5;
+    return _this57;
   }
 
   _createClass(StaffWodden, [{
@@ -12919,24 +13140,24 @@ var StaffWodden = /*#__PURE__*/function (_Equipment33) {
 var MaceSteel = /*#__PURE__*/function (_Equipment34) {
   _inherits(MaceSteel, _Equipment34);
 
-  var _super67 = _createSuper(MaceSteel);
+  var _super68 = _createSuper(MaceSteel);
 
   function MaceSteel() {
-    var _this57;
+    var _this58;
 
     _classCallCheck(this, MaceSteel);
 
-    _this57 = _super67.call(this, 'MaceSteel');
-    _this57.tags = ['weapon'];
-    _this57.slotUse = ['RHand'];
-    _this57.lossOnRespawn = true;
-    _this57.pDamage = 15;
+    _this58 = _super68.call(this, 'MaceSteel');
+    _this58.tags = ['weapon'];
+    _this58.slotUse = ['RHand'];
+    _this58.lossOnRespawn = true;
+    _this58.pDamage = 15;
     /*this.attack = window.gm.combat.AttackSetup();
     let dmg = {target:"defender", effect:"effDamage", value: 10};
     let stun = {target:"defender", effect:"effStun", value: 10};
     this.attack.apply = [{cond:100, apply:dmg},{cond:50,apply:stun}]; */
 
-    return _this57;
+    return _this58;
   }
 
   _createClass(MaceSteel, [{
@@ -13001,17 +13222,17 @@ var MaceSteel = /*#__PURE__*/function (_Equipment34) {
 var TailRibbon = /*#__PURE__*/function (_Equipment35) {
   _inherits(TailRibbon, _Equipment35);
 
-  var _super68 = _createSuper(TailRibbon);
+  var _super69 = _createSuper(TailRibbon);
 
   function TailRibbon() {
-    var _this58;
+    var _this59;
 
     _classCallCheck(this, TailRibbon);
 
-    _this58 = _super68.call(this, 'TailRibbon');
-    _this58.tags = ['cloth'];
-    _this58.slotUse = ['TailTip'];
-    return _this58;
+    _this59 = _super69.call(this, 'TailRibbon');
+    _this59.tags = ['cloth'];
+    _this59.slotUse = ['TailTip'];
+    return _this59;
   }
 
   _createClass(TailRibbon, [{
@@ -13645,16 +13866,16 @@ window.gm.sex.wolfOnPlayer = function (data) {
 var SkillInspect = /*#__PURE__*/function (_Skill) {
   _inherits(SkillInspect, _Skill);
 
-  var _super69 = _createSuper(SkillInspect);
+  var _super70 = _createSuper(SkillInspect);
 
   function SkillInspect() {
-    var _this59;
+    var _this60;
 
     _classCallCheck(this, SkillInspect);
 
-    _this59 = _super69.call(this, "Inspect");
-    _this59.msg = '';
-    return _this59;
+    _this60 = _super70.call(this, "Inspect");
+    _this60.msg = '';
+    return _this60;
   }
 
   _createClass(SkillInspect, [{
@@ -13707,16 +13928,16 @@ var SkillInspect = /*#__PURE__*/function (_Skill) {
 var SkillAttack = /*#__PURE__*/function (_Skill2) {
   _inherits(SkillAttack, _Skill2);
 
-  var _super70 = _createSuper(SkillAttack);
+  var _super71 = _createSuper(SkillAttack);
 
   function SkillAttack() {
-    var _this60;
+    var _this61;
 
     _classCallCheck(this, SkillAttack);
 
-    _this60 = _super70.call(this, "Attack");
-    _this60.msg = '';
-    return _this60;
+    _this61 = _super71.call(this, "Attack");
+    _this61.msg = '';
+    return _this61;
   }
 
   _createClass(SkillAttack, [{
@@ -13741,12 +13962,12 @@ var SkillAttack = /*#__PURE__*/function (_Skill2) {
       if (this.isValidTarget(targets)) {
         result.OK = true;
 
-        var _iterator41 = _createForOfIteratorHelper(targets),
-            _step41;
+        var _iterator48 = _createForOfIteratorHelper(targets),
+            _step48;
 
         try {
-          for (_iterator41.s(); !(_step41 = _iterator41.n()).done;) {
-            var target = _step41.value;
+          for (_iterator48.s(); !(_step48 = _iterator48.n()).done;) {
+            var target = _step48.value;
 
             var attack = this.__estimateAttack();
 
@@ -13755,9 +13976,9 @@ var SkillAttack = /*#__PURE__*/function (_Skill2) {
             result.effects = result.effects.concat(attack.effects);
           }
         } catch (err) {
-          _iterator41.e(err);
+          _iterator48.e(err);
         } finally {
-          _iterator41.f();
+          _iterator48.f();
         }
       }
 
@@ -13847,17 +14068,17 @@ var SkillAttack = /*#__PURE__*/function (_Skill2) {
 var SkillUltraKill = /*#__PURE__*/function (_SkillAttack) {
   _inherits(SkillUltraKill, _SkillAttack);
 
-  var _super71 = _createSuper(SkillUltraKill);
+  var _super72 = _createSuper(SkillUltraKill);
 
   function SkillUltraKill() {
-    var _this61;
+    var _this62;
 
     _classCallCheck(this, SkillUltraKill);
 
-    _this61 = _super71.call(this);
-    _this61.id = _this61.name = 'UltraKill';
-    _this61.msg = '';
-    return _this61;
+    _this62 = _super72.call(this);
+    _this62.id = _this62.name = 'UltraKill';
+    _this62.msg = '';
+    return _this62;
   }
 
   _createClass(SkillUltraKill, [{
@@ -13887,17 +14108,17 @@ var SkillUltraKill = /*#__PURE__*/function (_SkillAttack) {
 var SkillBite = /*#__PURE__*/function (_SkillAttack2) {
   _inherits(SkillBite, _SkillAttack2);
 
-  var _super72 = _createSuper(SkillBite);
+  var _super73 = _createSuper(SkillBite);
 
   function SkillBite() {
-    var _this62;
+    var _this63;
 
     _classCallCheck(this, SkillBite);
 
-    _this62 = _super72.call(this);
-    _this62.id = _this62.name = 'Bite';
-    _this62.msg = '';
-    return _this62;
+    _this63 = _super73.call(this);
+    _this63.id = _this63.name = 'Bite';
+    _this63.msg = '';
+    return _this63;
   }
 
   _createClass(SkillBite, [{
@@ -13939,16 +14160,16 @@ var SkillBite = /*#__PURE__*/function (_SkillAttack2) {
 var SkillChainLightning = /*#__PURE__*/function (_Skill3) {
   _inherits(SkillChainLightning, _Skill3);
 
-  var _super73 = _createSuper(SkillChainLightning);
+  var _super74 = _createSuper(SkillChainLightning);
 
   function SkillChainLightning() {
-    var _this63;
+    var _this64;
 
     _classCallCheck(this, SkillChainLightning);
 
-    _this63 = _super73.call(this, 'ChainLightning');
-    _this63.msg = '';
-    return _this63;
+    _this64 = _super74.call(this, 'ChainLightning');
+    _this64.msg = '';
+    return _this64;
   }
 
   _createClass(SkillChainLightning, [{
@@ -14023,17 +14244,17 @@ var SkillChainLightning = /*#__PURE__*/function (_Skill3) {
 var SkillTease = /*#__PURE__*/function (_Skill4) {
   _inherits(SkillTease, _Skill4);
 
-  var _super74 = _createSuper(SkillTease);
+  var _super75 = _createSuper(SkillTease);
 
   //execute simple attack with active weapon
   function SkillTease() {
-    var _this64;
+    var _this65;
 
     _classCallCheck(this, SkillTease);
 
-    _this64 = _super74.call(this, "Tease");
-    _this64.msg = '';
-    return _this64;
+    _this65 = _super75.call(this, "Tease");
+    _this65.msg = '';
+    return _this65;
   }
 
   _createClass(SkillTease, [{
@@ -14058,21 +14279,21 @@ var SkillTease = /*#__PURE__*/function (_Skill4) {
       if (this.isValidTarget(targets)) {
         result.OK = true;
 
-        var _iterator42 = _createForOfIteratorHelper(targets),
-            _step42;
+        var _iterator49 = _createForOfIteratorHelper(targets),
+            _step49;
 
         try {
-          for (_iterator42.s(); !(_step42 = _iterator42.n()).done;) {
-            var target = _step42.value;
+          for (_iterator49.s(); !(_step49 = _iterator49.n()).done;) {
+            var target = _step49.value;
             var attack = window.gm.combat.defaultAttackData();
             var result2 = window.gm.combat.calcTeaseAttack(this.caster, target, attack);
             this.msg += result2.msg;
             result.effects = result.effects.concat(attack.effects);
           }
         } catch (err) {
-          _iterator42.e(err);
+          _iterator49.e(err);
         } finally {
-          _iterator42.f();
+          _iterator49.f();
         }
       }
 
@@ -14096,17 +14317,17 @@ var SkillTease = /*#__PURE__*/function (_Skill4) {
 var SkillStun = /*#__PURE__*/function (_Skill5) {
   _inherits(SkillStun, _Skill5);
 
-  var _super75 = _createSuper(SkillStun);
+  var _super76 = _createSuper(SkillStun);
 
   //execute stun attack
   function SkillStun() {
-    var _this65;
+    var _this66;
 
     _classCallCheck(this, SkillStun);
 
-    _this65 = _super75.call(this, "Stun");
-    _this65.cost.energy = 20;
-    return _this65;
+    _this66 = _super76.call(this, "Stun");
+    _this66.cost.energy = 20;
+    return _this66;
   }
 
   _createClass(SkillStun, [{
@@ -14122,19 +14343,19 @@ var SkillStun = /*#__PURE__*/function (_Skill5) {
       var multi = [];
       multi.name = "all";
 
-      var _iterator43 = _createForOfIteratorHelper(possibletarget),
-          _step43;
+      var _iterator50 = _createForOfIteratorHelper(possibletarget),
+          _step50;
 
       try {
-        for (_iterator43.s(); !(_step43 = _iterator43.n()).done;) {
-          var el = _step43.value;
+        for (_iterator50.s(); !(_step50 = _iterator50.n()).done;) {
+          var el = _step50.value;
           if (el.length === 1) //dont stack multi-targets
             multi.push(el[0]);
         }
       } catch (err) {
-        _iterator43.e(err);
+        _iterator50.e(err);
       } finally {
-        _iterator43.f();
+        _iterator50.f();
       }
 
       if (multi.length > 1) possibletarget.push(multi); //if there is only [[mole]] we dont want [[mole],[mole]]
@@ -14152,21 +14373,21 @@ var SkillStun = /*#__PURE__*/function (_Skill5) {
       if (this.isValidTarget(targets)) {
         result.OK = true;
 
-        var _iterator44 = _createForOfIteratorHelper(targets),
-            _step44;
+        var _iterator51 = _createForOfIteratorHelper(targets),
+            _step51;
 
         try {
-          for (_iterator44.s(); !(_step44 = _iterator44.n()).done;) {
-            var target = _step44.value;
+          for (_iterator51.s(); !(_step51 = _iterator51.n()).done;) {
+            var target = _step51.value;
             result.effects.push({
               target: target,
               eff: [new effStunned()]
             });
           }
         } catch (err) {
-          _iterator44.e(err);
+          _iterator51.e(err);
         } finally {
-          _iterator44.f();
+          _iterator51.f();
         }
       }
 
@@ -14196,12 +14417,12 @@ var SkillStun = /*#__PURE__*/function (_Skill5) {
 var SkillPoisonCloud = /*#__PURE__*/function (_Skill6) {
   _inherits(SkillPoisonCloud, _Skill6);
 
-  var _super76 = _createSuper(SkillPoisonCloud);
+  var _super77 = _createSuper(SkillPoisonCloud);
 
   function SkillPoisonCloud() {
     _classCallCheck(this, SkillPoisonCloud);
 
-    return _super76.call(this, "PoisonCloud");
+    return _super77.call(this, "PoisonCloud");
   }
 
   _createClass(SkillPoisonCloud, [{
@@ -14225,21 +14446,21 @@ var SkillPoisonCloud = /*#__PURE__*/function (_Skill6) {
       if (this.isValidTarget(targets)) {
         result.OK = true;
 
-        var _iterator45 = _createForOfIteratorHelper(targets),
-            _step45;
+        var _iterator52 = _createForOfIteratorHelper(targets),
+            _step52;
 
         try {
-          for (_iterator45.s(); !(_step45 = _iterator45.n()).done;) {
-            var target = _step45.value;
+          for (_iterator52.s(); !(_step52 = _iterator52.n()).done;) {
+            var target = _step52.value;
             result.effects.push({
               target: target,
               eff: [new effPoisoned()]
             });
           }
         } catch (err) {
-          _iterator45.e(err);
+          _iterator52.e(err);
         } finally {
-          _iterator45.f();
+          _iterator52.f();
         }
       }
 
@@ -14264,16 +14485,16 @@ var SkillPoisonCloud = /*#__PURE__*/function (_Skill6) {
 var SkillHeal = /*#__PURE__*/function (_Skill7) {
   _inherits(SkillHeal, _Skill7);
 
-  var _super77 = _createSuper(SkillHeal);
+  var _super78 = _createSuper(SkillHeal);
 
   function SkillHeal() {
-    var _this66;
+    var _this67;
 
     _classCallCheck(this, SkillHeal);
 
-    _this66 = _super77.call(this, "Heal");
-    _this66.cost.arcana = 20;
-    return _this66;
+    _this67 = _super78.call(this, "Heal");
+    _this67.cost.arcana = 20;
+    return _this67;
   }
 
   _createClass(SkillHeal, [{
@@ -14298,21 +14519,21 @@ var SkillHeal = /*#__PURE__*/function (_Skill7) {
         //todo  consume energy
         result.OK = true;
 
-        var _iterator46 = _createForOfIteratorHelper(targets),
-            _step46;
+        var _iterator53 = _createForOfIteratorHelper(targets),
+            _step53;
 
         try {
-          for (_iterator46.s(); !(_step46 = _iterator46.n()).done;) {
-            var target = _step46.value;
+          for (_iterator53.s(); !(_step53 = _iterator53.n()).done;) {
+            var target = _step53.value;
             result.effects.push({
               target: target,
               eff: [new effHeal(10)]
             });
           }
         } catch (err) {
-          _iterator46.e(err);
+          _iterator53.e(err);
         } finally {
-          _iterator46.f();
+          _iterator53.f();
         }
       }
 
@@ -14336,16 +14557,16 @@ var SkillHeal = /*#__PURE__*/function (_Skill7) {
 var SkillFlee = /*#__PURE__*/function (_Skill8) {
   _inherits(SkillFlee, _Skill8);
 
-  var _super78 = _createSuper(SkillFlee);
+  var _super79 = _createSuper(SkillFlee);
 
   function SkillFlee() {
-    var _this67;
+    var _this68;
 
     _classCallCheck(this, SkillFlee);
 
-    _this67 = _super78.call(this, "Flee");
-    _this67.msg = '';
-    return _this67;
+    _this68 = _super79.call(this, "Flee");
+    _this68.msg = '';
+    return _this68;
   }
 
   _createClass(SkillFlee, [{
@@ -14401,16 +14622,16 @@ var SkillFlee = /*#__PURE__*/function (_Skill8) {
 var SkillSubmit = /*#__PURE__*/function (_Skill9) {
   _inherits(SkillSubmit, _Skill9);
 
-  var _super79 = _createSuper(SkillSubmit);
+  var _super80 = _createSuper(SkillSubmit);
 
   function SkillSubmit() {
-    var _this68;
+    var _this69;
 
     _classCallCheck(this, SkillSubmit);
 
-    _this68 = _super79.call(this, "Submit");
-    _this68.msg = '';
-    return _this68;
+    _this69 = _super80.call(this, "Submit");
+    _this69.msg = '';
+    return _this69;
   }
 
   _createClass(SkillSubmit, [{
@@ -14466,16 +14687,16 @@ var SkillSubmit = /*#__PURE__*/function (_Skill9) {
 var SkillGrapple = /*#__PURE__*/function (_Skill10) {
   _inherits(SkillGrapple, _Skill10);
 
-  var _super80 = _createSuper(SkillGrapple);
+  var _super81 = _createSuper(SkillGrapple);
 
   function SkillGrapple() {
-    var _this69;
+    var _this70;
 
     _classCallCheck(this, SkillGrapple);
 
-    _this69 = _super80.call(this, "Grapple");
-    _this69.msg = '';
-    return _this69;
+    _this70 = _super81.call(this, "Grapple");
+    _this70.msg = '';
+    return _this70;
   }
 
   _createClass(SkillGrapple, [{
@@ -14547,16 +14768,16 @@ var SkillGrapple = /*#__PURE__*/function (_Skill10) {
 var SkillLeechHealth = /*#__PURE__*/function (_Skill11) {
   _inherits(SkillLeechHealth, _Skill11);
 
-  var _super81 = _createSuper(SkillLeechHealth);
+  var _super82 = _createSuper(SkillLeechHealth);
 
   function SkillLeechHealth() {
-    var _this70;
+    var _this71;
 
     _classCallCheck(this, SkillLeechHealth);
 
-    _this70 = _super81.call(this, "Leech");
-    _this70.msg = '';
-    return _this70;
+    _this71 = _super82.call(this, "Leech");
+    _this71.msg = '';
+    return _this71;
   }
 
   _createClass(SkillLeechHealth, [{
@@ -14662,17 +14883,17 @@ var SkillLeechHealth = /*#__PURE__*/function (_Skill11) {
 var SkillStruggle = /*#__PURE__*/function (_Skill12) {
   _inherits(SkillStruggle, _Skill12);
 
-  var _super82 = _createSuper(SkillStruggle);
+  var _super83 = _createSuper(SkillStruggle);
 
   //todo improves defense
   function SkillStruggle() {
-    var _this71;
+    var _this72;
 
     _classCallCheck(this, SkillStruggle);
 
-    _this71 = _super82.call(this, "Struggle");
-    _this71.msg = '';
-    return _this71;
+    _this72 = _super83.call(this, "Struggle");
+    _this72.msg = '';
+    return _this72;
   }
 
   _createClass(SkillStruggle, [{
@@ -14709,12 +14930,12 @@ var SkillStruggle = /*#__PURE__*/function (_Skill12) {
       if (this.isValidTarget(targets)) {
         result.OK = true;
 
-        var _iterator47 = _createForOfIteratorHelper(targets),
-            _step47;
+        var _iterator54 = _createForOfIteratorHelper(targets),
+            _step54;
 
         try {
-          for (_iterator47.s(); !(_step47 = _iterator47.n()).done;) {
-            var target = _step47.value;
+          for (_iterator54.s(); !(_step54 = _iterator54.n()).done;) {
+            var target = _step54.value;
 
             if (target.Effects.countItem(effGrappled.name) > 0) {
               var rnd = _.random(0, 100);
@@ -14733,9 +14954,9 @@ var SkillStruggle = /*#__PURE__*/function (_Skill12) {
             }
           }
         } catch (err) {
-          _iterator47.e(err);
+          _iterator54.e(err);
         } finally {
-          _iterator47.f();
+          _iterator54.f();
         }
       }
 
@@ -14765,13 +14986,13 @@ var SkillStruggle = /*#__PURE__*/function (_Skill12) {
 var SkillGuard = /*#__PURE__*/function (_Skill13) {
   _inherits(SkillGuard, _Skill13);
 
-  var _super83 = _createSuper(SkillGuard);
+  var _super84 = _createSuper(SkillGuard);
 
   //todo improves defense; 
   function SkillGuard() {
     _classCallCheck(this, SkillGuard);
 
-    return _super83.call(this, "Guard");
+    return _super84.call(this, "Guard");
   }
 
   _createClass(SkillGuard, [{
@@ -14795,20 +15016,20 @@ var SkillGuard = /*#__PURE__*/function (_Skill13) {
       if (this.isValidTarget(targets)) {
         result.OK = true;
 
-        var _iterator48 = _createForOfIteratorHelper(targets),
-            _step48;
+        var _iterator55 = _createForOfIteratorHelper(targets),
+            _step55;
 
         try {
-          for (_iterator48.s(); !(_step48 = _iterator48.n()).done;) {
+          for (_iterator55.s(); !(_step55 = _iterator55.n()).done;) {
             /*result.effects.push( {target:target,
                 eff:[new effHeal(10)]})*/
 
-            var target = _step48.value;
+            var target = _step55.value;
           }
         } catch (err) {
-          _iterator48.e(err);
+          _iterator55.e(err);
         } finally {
-          _iterator48.f();
+          _iterator55.f();
         }
       }
 
@@ -14832,17 +15053,17 @@ var SkillGuard = /*#__PURE__*/function (_Skill13) {
 var SkillUseItem = /*#__PURE__*/function (_Skill14) {
   _inherits(SkillUseItem, _Skill14);
 
-  var _super84 = _createSuper(SkillUseItem);
+  var _super85 = _createSuper(SkillUseItem);
 
   function SkillUseItem() {
-    var _this72;
+    var _this73;
 
     _classCallCheck(this, SkillUseItem);
 
-    _this72 = _super84.call(this, "UseItem");
-    _this72.item = '';
-    _this72.msg = '';
-    return _this72;
+    _this73 = _super85.call(this, "UseItem");
+    _this73.item = '';
+    _this73.msg = '';
+    return _this73;
   }
 
   _createClass(SkillUseItem, [{
@@ -14901,7 +15122,7 @@ var SkillUseItem = /*#__PURE__*/function (_Skill14) {
 var SkillCallHelp = /*#__PURE__*/function (_Skill15) {
   _inherits(SkillCallHelp, _Skill15);
 
-  var _super85 = _createSuper(SkillCallHelp);
+  var _super86 = _createSuper(SkillCallHelp);
 
   _createClass(SkillCallHelp, null, [{
     key: "setup",
@@ -14914,13 +15135,13 @@ var SkillCallHelp = /*#__PURE__*/function (_Skill15) {
   }]);
 
   function SkillCallHelp() {
-    var _this73;
+    var _this74;
 
     _classCallCheck(this, SkillCallHelp);
 
-    _this73 = _super85.call(this, "CallHelp");
-    _this73.item = '';
-    return _this73;
+    _this74 = _super86.call(this, "CallHelp");
+    _this74.item = '';
+    return _this74;
   }
 
   _createClass(SkillCallHelp, [{
@@ -14942,12 +15163,12 @@ var SkillCallHelp = /*#__PURE__*/function (_Skill15) {
       if (this.isValidTarget(targets)) {
         result.OK = true;
 
-        var _iterator49 = _createForOfIteratorHelper(targets),
-            _step49;
+        var _iterator56 = _createForOfIteratorHelper(targets),
+            _step56;
 
         try {
-          for (_iterator49.s(); !(_step49 = _iterator49.n()).done;) {
-            var target = _step49.value;
+          for (_iterator56.s(); !(_step56 = _iterator56.n()).done;) {
+            var target = _step56.value;
             var eff = new effCallHelp();
             eff.configureSpawn(this.item, this.caster.faction);
             result.effects.push({
@@ -14956,9 +15177,9 @@ var SkillCallHelp = /*#__PURE__*/function (_Skill15) {
             });
           }
         } catch (err) {
-          _iterator49.e(err);
+          _iterator56.e(err);
         } finally {
-          _iterator49.f();
+          _iterator56.f();
         }
       }
 
@@ -15027,7 +15248,7 @@ PoisonCloud: small damage over time to lifing
 var stRelation = /*#__PURE__*/function (_Stat) {
   _inherits(stRelation, _Stat);
 
-  var _super86 = _createSuper(stRelation);
+  var _super87 = _createSuper(stRelation);
 
   _createClass(stRelation, null, [{
     key: "setup",
@@ -15063,7 +15284,7 @@ var stRelation = /*#__PURE__*/function (_Stat) {
   function stRelation() {
     _classCallCheck(this, stRelation);
 
-    return _super86.call(this);
+    return _super87.call(this);
   }
 
   _createClass(stRelation, [{
@@ -15098,7 +15319,7 @@ var stRelation = /*#__PURE__*/function (_Stat) {
 var stResistance = /*#__PURE__*/function (_Stat2) {
   _inherits(stResistance, _Stat2);
 
-  var _super87 = _createSuper(stResistance);
+  var _super88 = _createSuper(stResistance);
 
   _createClass(stResistance, null, [{
     key: "setup",
@@ -15119,7 +15340,7 @@ var stResistance = /*#__PURE__*/function (_Stat2) {
   function stResistance() {
     _classCallCheck(this, stResistance);
 
-    return _super87.call(this);
+    return _super88.call(this);
   }
 
   _createClass(stResistance, [{
@@ -15140,7 +15361,7 @@ var stResistance = /*#__PURE__*/function (_Stat2) {
 var stHealthMax = /*#__PURE__*/function (_Stat3) {
   _inherits(stHealthMax, _Stat3);
 
-  var _super88 = _createSuper(stHealthMax);
+  var _super89 = _createSuper(stHealthMax);
 
   _createClass(stHealthMax, null, [{
     key: "setup",
@@ -15161,7 +15382,7 @@ var stHealthMax = /*#__PURE__*/function (_Stat3) {
   function stHealthMax() {
     _classCallCheck(this, stHealthMax);
 
-    return _super88.call(this);
+    return _super89.call(this);
   }
 
   _createClass(stHealthMax, [{
@@ -15182,7 +15403,7 @@ var stHealthMax = /*#__PURE__*/function (_Stat3) {
 var stHealth = /*#__PURE__*/function (_Stat4) {
   _inherits(stHealth, _Stat4);
 
-  var _super89 = _createSuper(stHealth);
+  var _super90 = _createSuper(stHealth);
 
   _createClass(stHealth, null, [{
     key: "setup",
@@ -15205,7 +15426,7 @@ var stHealth = /*#__PURE__*/function (_Stat4) {
   function stHealth() {
     _classCallCheck(this, stHealth);
 
-    return _super89.call(this);
+    return _super90.call(this);
   }
 
   _createClass(stHealth, [{
@@ -15226,7 +15447,7 @@ var stHealth = /*#__PURE__*/function (_Stat4) {
 var stEnergyMax = /*#__PURE__*/function (_Stat5) {
   _inherits(stEnergyMax, _Stat5);
 
-  var _super90 = _createSuper(stEnergyMax);
+  var _super91 = _createSuper(stEnergyMax);
 
   _createClass(stEnergyMax, null, [{
     key: "setup",
@@ -15247,7 +15468,7 @@ var stEnergyMax = /*#__PURE__*/function (_Stat5) {
   function stEnergyMax() {
     _classCallCheck(this, stEnergyMax);
 
-    return _super90.call(this);
+    return _super91.call(this);
   }
 
   _createClass(stEnergyMax, [{
@@ -15268,7 +15489,7 @@ var stEnergyMax = /*#__PURE__*/function (_Stat5) {
 var stEnergy = /*#__PURE__*/function (_Stat6) {
   _inherits(stEnergy, _Stat6);
 
-  var _super91 = _createSuper(stEnergy);
+  var _super92 = _createSuper(stEnergy);
 
   _createClass(stEnergy, null, [{
     key: "setup",
@@ -15291,7 +15512,7 @@ var stEnergy = /*#__PURE__*/function (_Stat6) {
   function stEnergy() {
     _classCallCheck(this, stEnergy);
 
-    return _super91.call(this);
+    return _super92.call(this);
   }
 
   _createClass(stEnergy, [{
@@ -15312,7 +15533,7 @@ var stEnergy = /*#__PURE__*/function (_Stat6) {
 var stArcanaMax = /*#__PURE__*/function (_Stat7) {
   _inherits(stArcanaMax, _Stat7);
 
-  var _super92 = _createSuper(stArcanaMax);
+  var _super93 = _createSuper(stArcanaMax);
 
   _createClass(stArcanaMax, null, [{
     key: "setup",
@@ -15333,7 +15554,7 @@ var stArcanaMax = /*#__PURE__*/function (_Stat7) {
   function stArcanaMax() {
     _classCallCheck(this, stArcanaMax);
 
-    return _super92.call(this);
+    return _super93.call(this);
   }
 
   _createClass(stArcanaMax, [{
@@ -15354,7 +15575,7 @@ var stArcanaMax = /*#__PURE__*/function (_Stat7) {
 var stArcana = /*#__PURE__*/function (_Stat8) {
   _inherits(stArcana, _Stat8);
 
-  var _super93 = _createSuper(stArcana);
+  var _super94 = _createSuper(stArcana);
 
   _createClass(stArcana, null, [{
     key: "setup",
@@ -15377,7 +15598,7 @@ var stArcana = /*#__PURE__*/function (_Stat8) {
   function stArcana() {
     _classCallCheck(this, stArcana);
 
-    return _super93.call(this);
+    return _super94.call(this);
   }
 
   _createClass(stArcana, [{
@@ -15398,7 +15619,7 @@ var stArcana = /*#__PURE__*/function (_Stat8) {
 var stArousalMax = /*#__PURE__*/function (_Stat9) {
   _inherits(stArousalMax, _Stat9);
 
-  var _super94 = _createSuper(stArousalMax);
+  var _super95 = _createSuper(stArousalMax);
 
   _createClass(stArousalMax, null, [{
     key: "setup",
@@ -15419,7 +15640,7 @@ var stArousalMax = /*#__PURE__*/function (_Stat9) {
   function stArousalMax() {
     _classCallCheck(this, stArousalMax);
 
-    return _super94.call(this);
+    return _super95.call(this);
   }
 
   _createClass(stArousalMax, [{
@@ -15440,7 +15661,7 @@ var stArousalMax = /*#__PURE__*/function (_Stat9) {
 var stArousalMin = /*#__PURE__*/function (_Stat10) {
   _inherits(stArousalMin, _Stat10);
 
-  var _super95 = _createSuper(stArousalMin);
+  var _super96 = _createSuper(stArousalMin);
 
   _createClass(stArousalMin, null, [{
     key: "setup",
@@ -15461,7 +15682,7 @@ var stArousalMin = /*#__PURE__*/function (_Stat10) {
   function stArousalMin() {
     _classCallCheck(this, stArousalMin);
 
-    return _super95.call(this);
+    return _super96.call(this);
   }
 
   _createClass(stArousalMin, [{
@@ -15482,7 +15703,7 @@ var stArousalMin = /*#__PURE__*/function (_Stat10) {
 var stArousal = /*#__PURE__*/function (_Stat11) {
   _inherits(stArousal, _Stat11);
 
-  var _super96 = _createSuper(stArousal);
+  var _super97 = _createSuper(stArousal);
 
   _createClass(stArousal, null, [{
     key: "setup",
@@ -15506,7 +15727,7 @@ var stArousal = /*#__PURE__*/function (_Stat11) {
   function stArousal() {
     _classCallCheck(this, stArousal);
 
-    return _super96.call(this);
+    return _super97.call(this);
   }
 
   _createClass(stArousal, [{
@@ -15528,7 +15749,7 @@ var stArousal = /*#__PURE__*/function (_Stat11) {
 var stAgility = /*#__PURE__*/function (_Stat12) {
   _inherits(stAgility, _Stat12);
 
-  var _super97 = _createSuper(stAgility);
+  var _super98 = _createSuper(stAgility);
 
   _createClass(stAgility, null, [{
     key: "setup",
@@ -15550,7 +15771,7 @@ var stAgility = /*#__PURE__*/function (_Stat12) {
   function stAgility() {
     _classCallCheck(this, stAgility);
 
-    return _super97.call(this);
+    return _super98.call(this);
   }
 
   _createClass(stAgility, [{
@@ -15579,7 +15800,7 @@ var stAgility = /*#__PURE__*/function (_Stat12) {
 var stPerception = /*#__PURE__*/function (_Stat13) {
   _inherits(stPerception, _Stat13);
 
-  var _super98 = _createSuper(stPerception);
+  var _super99 = _createSuper(stPerception);
 
   _createClass(stPerception, null, [{
     key: "setup",
@@ -15601,7 +15822,7 @@ var stPerception = /*#__PURE__*/function (_Stat13) {
   function stPerception() {
     _classCallCheck(this, stPerception);
 
-    return _super98.call(this);
+    return _super99.call(this);
   }
 
   _createClass(stPerception, [{
@@ -15630,7 +15851,7 @@ var stPerception = /*#__PURE__*/function (_Stat13) {
 var stLuck = /*#__PURE__*/function (_Stat14) {
   _inherits(stLuck, _Stat14);
 
-  var _super99 = _createSuper(stLuck);
+  var _super100 = _createSuper(stLuck);
 
   _createClass(stLuck, null, [{
     key: "setup",
@@ -15652,7 +15873,7 @@ var stLuck = /*#__PURE__*/function (_Stat14) {
   function stLuck() {
     _classCallCheck(this, stLuck);
 
-    return _super99.call(this);
+    return _super100.call(this);
   }
 
   _createClass(stLuck, [{
@@ -15676,7 +15897,7 @@ var stLuck = /*#__PURE__*/function (_Stat14) {
 var stCharisma = /*#__PURE__*/function (_Stat15) {
   _inherits(stCharisma, _Stat15);
 
-  var _super100 = _createSuper(stCharisma);
+  var _super101 = _createSuper(stCharisma);
 
   _createClass(stCharisma, null, [{
     key: "setup",
@@ -15698,7 +15919,7 @@ var stCharisma = /*#__PURE__*/function (_Stat15) {
   function stCharisma() {
     _classCallCheck(this, stCharisma);
 
-    return _super100.call(this);
+    return _super101.call(this);
   }
 
   _createClass(stCharisma, [{
@@ -15727,7 +15948,7 @@ var stCharisma = /*#__PURE__*/function (_Stat15) {
 var stIntelligence = /*#__PURE__*/function (_Stat16) {
   _inherits(stIntelligence, _Stat16);
 
-  var _super101 = _createSuper(stIntelligence);
+  var _super102 = _createSuper(stIntelligence);
 
   _createClass(stIntelligence, null, [{
     key: "setup",
@@ -15749,7 +15970,7 @@ var stIntelligence = /*#__PURE__*/function (_Stat16) {
   function stIntelligence() {
     _classCallCheck(this, stIntelligence);
 
-    return _super101.call(this);
+    return _super102.call(this);
   }
 
   _createClass(stIntelligence, [{
@@ -15778,7 +15999,7 @@ var stIntelligence = /*#__PURE__*/function (_Stat16) {
 var stStrength = /*#__PURE__*/function (_Stat17) {
   _inherits(stStrength, _Stat17);
 
-  var _super102 = _createSuper(stStrength);
+  var _super103 = _createSuper(stStrength);
 
   _createClass(stStrength, null, [{
     key: "setup",
@@ -15801,7 +16022,7 @@ var stStrength = /*#__PURE__*/function (_Stat17) {
   function stStrength() {
     _classCallCheck(this, stStrength);
 
-    return _super102.call(this);
+    return _super103.call(this);
   }
 
   _createClass(stStrength, [{
@@ -15834,7 +16055,7 @@ var stStrength = /*#__PURE__*/function (_Stat17) {
 var stEndurance = /*#__PURE__*/function (_Stat18) {
   _inherits(stEndurance, _Stat18);
 
-  var _super103 = _createSuper(stEndurance);
+  var _super104 = _createSuper(stEndurance);
 
   _createClass(stEndurance, null, [{
     key: "setup",
@@ -15857,7 +16078,7 @@ var stEndurance = /*#__PURE__*/function (_Stat18) {
   function stEndurance() {
     _classCallCheck(this, stEndurance);
 
-    return _super103.call(this);
+    return _super104.call(this);
   }
 
   _createClass(stEndurance, [{
@@ -15891,7 +16112,7 @@ var stEndurance = /*#__PURE__*/function (_Stat18) {
 var stPAttack = /*#__PURE__*/function (_Stat19) {
   _inherits(stPAttack, _Stat19);
 
-  var _super104 = _createSuper(stPAttack);
+  var _super105 = _createSuper(stPAttack);
 
   _createClass(stPAttack, null, [{
     key: "setup",
@@ -15913,7 +16134,7 @@ var stPAttack = /*#__PURE__*/function (_Stat19) {
   function stPAttack() {
     _classCallCheck(this, stPAttack);
 
-    return _super104.call(this);
+    return _super105.call(this);
   }
 
   _createClass(stPAttack, [{
@@ -15934,7 +16155,7 @@ var stPAttack = /*#__PURE__*/function (_Stat19) {
 var stPDefense = /*#__PURE__*/function (_Stat20) {
   _inherits(stPDefense, _Stat20);
 
-  var _super105 = _createSuper(stPDefense);
+  var _super106 = _createSuper(stPDefense);
 
   _createClass(stPDefense, null, [{
     key: "setup",
@@ -15956,7 +16177,7 @@ var stPDefense = /*#__PURE__*/function (_Stat20) {
   function stPDefense() {
     _classCallCheck(this, stPDefense);
 
-    return _super105.call(this);
+    return _super106.call(this);
   }
 
   _createClass(stPDefense, [{
@@ -15977,7 +16198,7 @@ var stPDefense = /*#__PURE__*/function (_Stat20) {
 var stLAttack = /*#__PURE__*/function (_Stat21) {
   _inherits(stLAttack, _Stat21);
 
-  var _super106 = _createSuper(stLAttack);
+  var _super107 = _createSuper(stLAttack);
 
   _createClass(stLAttack, null, [{
     key: "setup",
@@ -15999,7 +16220,7 @@ var stLAttack = /*#__PURE__*/function (_Stat21) {
   function stLAttack() {
     _classCallCheck(this, stLAttack);
 
-    return _super106.call(this);
+    return _super107.call(this);
   }
 
   _createClass(stLAttack, [{
@@ -16020,7 +16241,7 @@ var stLAttack = /*#__PURE__*/function (_Stat21) {
 var stLDefense = /*#__PURE__*/function (_Stat22) {
   _inherits(stLDefense, _Stat22);
 
-  var _super107 = _createSuper(stLDefense);
+  var _super108 = _createSuper(stLDefense);
 
   _createClass(stLDefense, null, [{
     key: "setup",
@@ -16042,7 +16263,7 @@ var stLDefense = /*#__PURE__*/function (_Stat22) {
   function stLDefense() {
     _classCallCheck(this, stLDefense);
 
-    return _super107.call(this);
+    return _super108.call(this);
   }
 
   _createClass(stLDefense, [{
@@ -16063,7 +16284,7 @@ var stLDefense = /*#__PURE__*/function (_Stat22) {
 var stCorruptionMax = /*#__PURE__*/function (_Stat23) {
   _inherits(stCorruptionMax, _Stat23);
 
-  var _super108 = _createSuper(stCorruptionMax);
+  var _super109 = _createSuper(stCorruptionMax);
 
   _createClass(stCorruptionMax, null, [{
     key: "setup",
@@ -16084,7 +16305,7 @@ var stCorruptionMax = /*#__PURE__*/function (_Stat23) {
   function stCorruptionMax() {
     _classCallCheck(this, stCorruptionMax);
 
-    return _super108.call(this);
+    return _super109.call(this);
   }
 
   _createClass(stCorruptionMax, [{
@@ -16105,7 +16326,7 @@ var stCorruptionMax = /*#__PURE__*/function (_Stat23) {
 var stCorruption = /*#__PURE__*/function (_Stat24) {
   _inherits(stCorruption, _Stat24);
 
-  var _super109 = _createSuper(stCorruption);
+  var _super110 = _createSuper(stCorruption);
 
   _createClass(stCorruption, null, [{
     key: "setup",
@@ -16128,7 +16349,7 @@ var stCorruption = /*#__PURE__*/function (_Stat24) {
   function stCorruption() {
     _classCallCheck(this, stCorruption);
 
-    return _super109.call(this);
+    return _super110.call(this);
   }
 
   _createClass(stCorruption, [{
@@ -16151,7 +16372,7 @@ var stCorruption = /*#__PURE__*/function (_Stat24) {
 var stFetish = /*#__PURE__*/function (_Stat25) {
   _inherits(stFetish, _Stat25);
 
-  var _super110 = _createSuper(stFetish);
+  var _super111 = _createSuper(stFetish);
 
   _createClass(stFetish, null, [{
     key: "setup",
@@ -16192,7 +16413,7 @@ var stFetish = /*#__PURE__*/function (_Stat25) {
   function stFetish() {
     _classCallCheck(this, stFetish);
 
-    return _super110.call(this);
+    return _super111.call(this);
   }
 
   _createClass(stFetish, [{
@@ -16214,16 +16435,16 @@ var stFetish = /*#__PURE__*/function (_Stat25) {
 var effEnergized = /*#__PURE__*/function (_Effect2) {
   _inherits(effEnergized, _Effect2);
 
-  var _super111 = _createSuper(effEnergized);
+  var _super112 = _createSuper(effEnergized);
 
   function effEnergized() {
-    var _this74;
+    var _this75;
 
     _classCallCheck(this, effEnergized);
 
-    _this74 = _super111.call(this);
-    _this74.data.id = _this74.data.name = effEnergized.name, _this74.data.duration = 120;
-    return _this74;
+    _this75 = _super112.call(this);
+    _this75.data.id = _this75.data.name = effEnergized.name, _this75.data.duration = 120;
+    return _this75;
   }
 
   _createClass(effEnergized, [{
@@ -16294,16 +16515,16 @@ var effEnergized = /*#__PURE__*/function (_Effect2) {
 var effNotTired = /*#__PURE__*/function (_Effect3) {
   _inherits(effNotTired, _Effect3);
 
-  var _super112 = _createSuper(effNotTired);
+  var _super113 = _createSuper(effNotTired);
 
   function effNotTired() {
-    var _this75;
+    var _this76;
 
     _classCallCheck(this, effNotTired);
 
-    _this75 = _super112.call(this);
-    _this75.data.id = effNotTired.name, _this75.data.name = "not tired", _this75.data.duration = 120, _this75.data.hidden = 4;
-    return _this75;
+    _this76 = _super113.call(this);
+    _this76.data.id = effNotTired.name, _this76.data.name = "not tired", _this76.data.duration = 120, _this76.data.hidden = 4;
+    return _this76;
   }
 
   _createClass(effNotTired, [{
@@ -16363,16 +16584,16 @@ var effNotTired = /*#__PURE__*/function (_Effect3) {
 var effTired = /*#__PURE__*/function (_Effect4) {
   _inherits(effTired, _Effect4);
 
-  var _super113 = _createSuper(effTired);
+  var _super114 = _createSuper(effTired);
 
   function effTired() {
-    var _this76;
+    var _this77;
 
     _classCallCheck(this, effTired);
 
-    _this76 = _super113.call(this);
-    _this76.data.id = effTired.name, _this76.data.name = "tired", _this76.data.duration = 0, _this76.data.hidden = 0;
-    return _this76;
+    _this77 = _super114.call(this);
+    _this77.data.id = effTired.name, _this77.data.name = "tired", _this77.data.duration = 0, _this77.data.hidden = 0;
+    return _this77;
   }
 
   _createClass(effTired, [{
@@ -16438,16 +16659,16 @@ var effTired = /*#__PURE__*/function (_Effect4) {
 var effEnergyDrain = /*#__PURE__*/function (_Effect5) {
   _inherits(effEnergyDrain, _Effect5);
 
-  var _super114 = _createSuper(effEnergyDrain);
+  var _super115 = _createSuper(effEnergyDrain);
 
   function effEnergyDrain() {
-    var _this77;
+    var _this78;
 
     _classCallCheck(this, effEnergyDrain);
 
-    _this77 = _super114.call(this);
-    _this77.data.id = effEnergyDrain.name, _this77.data.name = "energy drained", _this77.data.duration = 0, _this77.data.hidden = 0;
-    return _this77;
+    _this78 = _super115.call(this);
+    _this78.data.id = effEnergyDrain.name, _this78.data.name = "energy drained", _this78.data.duration = 0, _this78.data.hidden = 0;
+    return _this78;
   }
 
   _createClass(effEnergyDrain, [{
@@ -16492,17 +16713,17 @@ var effEnergyDrain = /*#__PURE__*/function (_Effect5) {
 var effMutateCat = /*#__PURE__*/function (_Effect6) {
   _inherits(effMutateCat, _Effect6);
 
-  var _super115 = _createSuper(effMutateCat);
+  var _super116 = _createSuper(effMutateCat);
 
   function effMutateCat() {
-    var _this78;
+    var _this79;
 
     _classCallCheck(this, effMutateCat);
 
-    _this78 = _super115.call(this);
-    _this78.data.id = _this78.data.name = effMutateCat.name, _this78.data.hidden = 0;
-    _this78.data.duration = 60, _this78.data.cycles = 3, _this78.data.magnitude = 3;
-    return _this78;
+    _this79 = _super116.call(this);
+    _this79.data.id = _this79.data.name = effMutateCat.name, _this79.data.hidden = 0;
+    _this79.data.duration = 60, _this79.data.cycles = 3, _this79.data.magnitude = 3;
+    return _this79;
   }
 
   _createClass(effMutateCat, [{
@@ -16566,17 +16787,17 @@ var effMutateCat = /*#__PURE__*/function (_Effect6) {
 var effMutateWolf = /*#__PURE__*/function (_Effect7) {
   _inherits(effMutateWolf, _Effect7);
 
-  var _super116 = _createSuper(effMutateWolf);
+  var _super117 = _createSuper(effMutateWolf);
 
   function effMutateWolf() {
-    var _this79;
+    var _this80;
 
     _classCallCheck(this, effMutateWolf);
 
-    _this79 = _super116.call(this);
-    _this79.data.id = _this79.data.name = effMutateWolf.name, _this79.data.hidden = 0;
-    _this79.data.duration = 60, _this79.data.cycles = 3, _this79.data.magnitude = 3;
-    return _this79;
+    _this80 = _super117.call(this);
+    _this80.data.id = _this80.data.name = effMutateWolf.name, _this80.data.hidden = 0;
+    _this80.data.duration = 60, _this80.data.cycles = 3, _this80.data.magnitude = 3;
+    return _this80;
   }
 
   _createClass(effMutateWolf, [{
@@ -16640,17 +16861,17 @@ var effMutateWolf = /*#__PURE__*/function (_Effect7) {
 var effMutateHorse = /*#__PURE__*/function (_Effect8) {
   _inherits(effMutateHorse, _Effect8);
 
-  var _super117 = _createSuper(effMutateHorse);
+  var _super118 = _createSuper(effMutateHorse);
 
   function effMutateHorse() {
-    var _this80;
+    var _this81;
 
     _classCallCheck(this, effMutateHorse);
 
-    _this80 = _super117.call(this);
-    _this80.data.id = _this80.data.name = effMutateHorse.name, _this80.data.hidden = 0;
-    _this80.data.duration = 60, _this80.data.cycles = 3, _this80.data.magnitude = 3;
-    return _this80;
+    _this81 = _super118.call(this);
+    _this81.data.id = _this81.data.name = effMutateHorse.name, _this81.data.hidden = 0;
+    _this81.data.duration = 60, _this81.data.cycles = 3, _this81.data.magnitude = 3;
+    return _this81;
   }
 
   _createClass(effMutateHorse, [{
@@ -16714,17 +16935,17 @@ var effMutateHorse = /*#__PURE__*/function (_Effect8) {
 var effHorsePower = /*#__PURE__*/function (_Effect9) {
   _inherits(effHorsePower, _Effect9);
 
-  var _super118 = _createSuper(effHorsePower);
+  var _super119 = _createSuper(effHorsePower);
 
   function effHorsePower() {
-    var _this81;
+    var _this82;
 
     _classCallCheck(this, effHorsePower);
 
-    _this81 = _super118.call(this);
-    _this81.data.id = _this81.data.name = effHorsePower.name, _this81.data.hidden = 0;
-    _this81.data.duration = 120, _this81.data.cycles = 3, _this81.data.magnitude = 1;
-    return _this81;
+    _this82 = _super119.call(this);
+    _this82.data.id = _this82.data.name = effHorsePower.name, _this82.data.hidden = 0;
+    _this82.data.duration = 120, _this82.data.cycles = 3, _this82.data.magnitude = 1;
+    return _this82;
   }
 
   _createClass(effHorsePower, [{
@@ -16805,17 +17026,17 @@ var effHorsePower = /*#__PURE__*/function (_Effect9) {
 var effGrowBreast = /*#__PURE__*/function (_Effect10) {
   _inherits(effGrowBreast, _Effect10);
 
-  var _super119 = _createSuper(effGrowBreast);
+  var _super120 = _createSuper(effGrowBreast);
 
   function effGrowBreast() {
-    var _this82;
+    var _this83;
 
     _classCallCheck(this, effGrowBreast);
 
-    _this82 = _super119.call(this);
-    _this82.data.id = _this82.data.name = effGrowBreast.name, _this82.data.duration = 60, _this82.data.hidden = 0;
-    _this82.data.cycles = 3, _this82.data.magnitude = 3;
-    return _this82;
+    _this83 = _super120.call(this);
+    _this83.data.id = _this83.data.name = effGrowBreast.name, _this83.data.duration = 60, _this83.data.hidden = 0;
+    _this83.data.cycles = 3, _this83.data.magnitude = 3;
+    return _this83;
   }
 
   _createClass(effGrowBreast, [{
@@ -16877,17 +17098,17 @@ var effGrowBreast = /*#__PURE__*/function (_Effect10) {
 var effGrowVulva = /*#__PURE__*/function (_Effect11) {
   _inherits(effGrowVulva, _Effect11);
 
-  var _super120 = _createSuper(effGrowVulva);
+  var _super121 = _createSuper(effGrowVulva);
 
   function effGrowVulva() {
-    var _this83;
+    var _this84;
 
     _classCallCheck(this, effGrowVulva);
 
-    _this83 = _super120.call(this);
-    _this83.data.id = _this83.data.name = effGrowVulva.name, _this83.data.duration = 60, _this83.data.hidden = 0;
-    _this83.data.cycles = 3, _this83.data.magnitude = 3;
-    return _this83;
+    _this84 = _super121.call(this);
+    _this84.data.id = _this84.data.name = effGrowVulva.name, _this84.data.duration = 60, _this84.data.hidden = 0;
+    _this84.data.cycles = 3, _this84.data.magnitude = 3;
+    return _this84;
   }
 
   _createClass(effGrowVulva, [{
@@ -16949,17 +17170,17 @@ var effGrowVulva = /*#__PURE__*/function (_Effect11) {
 var effLewdMark = /*#__PURE__*/function (_Effect12) {
   _inherits(effLewdMark, _Effect12);
 
-  var _super121 = _createSuper(effLewdMark);
+  var _super122 = _createSuper(effLewdMark);
 
   function effLewdMark() {
-    var _this84;
+    var _this85;
 
     _classCallCheck(this, effLewdMark);
 
-    _this84 = _super121.call(this);
-    _this84.data.id = _this84.data.name = effLewdMark.name, _this84.data.duration = 60, _this84.data.hidden = 0;
-    _this84.data.cycles = 3, _this84.data.magnitude = 1;
-    return _this84;
+    _this85 = _super122.call(this);
+    _this85.data.id = _this85.data.name = effLewdMark.name, _this85.data.duration = 60, _this85.data.hidden = 0;
+    _this85.data.cycles = 3, _this85.data.magnitude = 1;
+    return _this85;
   }
 
   _createClass(effLewdMark, [{
@@ -17007,17 +17228,17 @@ var effLewdMark = /*#__PURE__*/function (_Effect12) {
 var effInHeat = /*#__PURE__*/function (_Effect13) {
   _inherits(effInHeat, _Effect13);
 
-  var _super122 = _createSuper(effInHeat);
+  var _super123 = _createSuper(effInHeat);
 
   function effInHeat() {
-    var _this85;
+    var _this86;
 
     _classCallCheck(this, effInHeat);
 
-    _this85 = _super122.call(this);
-    _this85.data.id = _this85.data.name = effInHeat.name, _this85.data.duration = 60, _this85.data.hidden = 0;
-    _this85.data.cycles = 3, _this85.data.magnitude = 1;
-    return _this85;
+    _this86 = _super123.call(this);
+    _this86.data.id = _this86.data.name = effInHeat.name, _this86.data.duration = 60, _this86.data.hidden = 0;
+    _this86.data.cycles = 3, _this86.data.magnitude = 1;
+    return _this86;
   }
 
   _createClass(effInHeat, [{
@@ -17046,17 +17267,17 @@ var effInHeat = /*#__PURE__*/function (_Effect13) {
 var effInRut = /*#__PURE__*/function (_Effect14) {
   _inherits(effInRut, _Effect14);
 
-  var _super123 = _createSuper(effInRut);
+  var _super124 = _createSuper(effInRut);
 
   function effInRut() {
-    var _this86;
+    var _this87;
 
     _classCallCheck(this, effInRut);
 
-    _this86 = _super123.call(this);
-    _this86.data.id = _this86.data.name = effInRut.name, _this86.data.duration = 60, _this86.data.hidden = 0;
-    _this86.data.cycles = 3, _this86.data.magnitude = 1;
-    return _this86;
+    _this87 = _super124.call(this);
+    _this87.data.id = _this87.data.name = effInRut.name, _this87.data.duration = 60, _this87.data.hidden = 0;
+    _this87.data.cycles = 3, _this87.data.magnitude = 1;
+    return _this87;
   }
 
   _createClass(effInRut, [{
@@ -17085,17 +17306,17 @@ var effInRut = /*#__PURE__*/function (_Effect14) {
 var effVaginalFertil = /*#__PURE__*/function (_Effect15) {
   _inherits(effVaginalFertil, _Effect15);
 
-  var _super124 = _createSuper(effVaginalFertil);
+  var _super125 = _createSuper(effVaginalFertil);
 
   function effVaginalFertil() {
-    var _this87;
+    var _this88;
 
     _classCallCheck(this, effVaginalFertil);
 
-    _this87 = _super124.call(this);
-    _this87.data.id = _this87.data.name = effVaginalFertil.name, _this87.data.duration = 60, _this87.data.hidden = 0;
-    _this87.data.cycles = 3, _this87.data.magnitude = 1;
-    return _this87;
+    _this88 = _super125.call(this);
+    _this88.data.id = _this88.data.name = effVaginalFertil.name, _this88.data.duration = 60, _this88.data.hidden = 0;
+    _this88.data.cycles = 3, _this88.data.magnitude = 1;
+    return _this88;
   }
 
   _createClass(effVaginalFertil, [{
@@ -17144,17 +17365,17 @@ var effVaginalFertil = /*#__PURE__*/function (_Effect15) {
 var effVaginalPregnant = /*#__PURE__*/function (_Effect16) {
   _inherits(effVaginalPregnant, _Effect16);
 
-  var _super125 = _createSuper(effVaginalPregnant);
+  var _super126 = _createSuper(effVaginalPregnant);
 
   function effVaginalPregnant() {
-    var _this88;
+    var _this89;
 
     _classCallCheck(this, effVaginalPregnant);
 
-    _this88 = _super125.call(this);
-    _this88.data.id = _this88.data.name = effVaginalPregnant.name, _this88.data.duration = 60, _this88.data.hidden = 0;
-    _this88.data.cycles = 3, _this88.data.magnitude = 1, _this88.data.type = '';
-    return _this88;
+    _this89 = _super126.call(this);
+    _this89.data.id = _this89.data.name = effVaginalPregnant.name, _this89.data.duration = 60, _this89.data.hidden = 0;
+    _this89.data.cycles = 3, _this89.data.magnitude = 1, _this89.data.type = '';
+    return _this89;
   }
 
   _createClass(effVaginalPregnant, [{
@@ -17213,18 +17434,18 @@ var effVaginalPregnant = /*#__PURE__*/function (_Effect16) {
 var effSpermInWomb = /*#__PURE__*/function (_Effect17) {
   _inherits(effSpermInWomb, _Effect17);
 
-  var _super126 = _createSuper(effSpermInWomb);
+  var _super127 = _createSuper(effSpermInWomb);
 
   //if you have womb filled with sperm, this handles impregnation and sperm-decay
   function effSpermInWomb() {
-    var _this89;
+    var _this90;
 
     _classCallCheck(this, effSpermInWomb);
 
-    _this89 = _super126.call(this);
-    _this89.data.id = _this89.data.name = effSpermInWomb.name, _this89.data.duration = 60, _this89.data.hidden = 0;
-    _this89.data.cycles = 1, _this89.data.magnitude = 2;
-    return _this89;
+    _this90 = _super127.call(this);
+    _this90.data.id = _this90.data.name = effSpermInWomb.name, _this90.data.duration = 60, _this90.data.hidden = 0;
+    _this90.data.cycles = 1, _this90.data.magnitude = 2;
+    return _this90;
   }
 
   _createClass(effSpermInWomb, [{
@@ -17282,19 +17503,19 @@ var effSpermInWomb = /*#__PURE__*/function (_Effect17) {
 var effHeal = /*#__PURE__*/function (_CombatEffect) {
   _inherits(effHeal, _CombatEffect);
 
-  var _super127 = _createSuper(effHeal);
+  var _super128 = _createSuper(effHeal);
 
   function effHeal(amount) {
-    var _this90;
+    var _this91;
 
     var duration = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
 
     _classCallCheck(this, effHeal);
 
-    _this90 = _super127.call(this);
-    _this90.amount = amount;
-    _this90.data.id = _this90.data.name = effHeal.name, _this90.data.startduration = duration, _this90.data.hidden = 0;
-    return _this90;
+    _this91 = _super128.call(this);
+    _this91.amount = amount;
+    _this91.data.id = _this91.data.name = effHeal.name, _this91.data.startduration = duration, _this91.data.hidden = 0;
+    return _this91;
   }
 
   _createClass(effHeal, [{
@@ -17348,17 +17569,17 @@ var effHeal = /*#__PURE__*/function (_CombatEffect) {
 var effGuard = /*#__PURE__*/function (_CombatEffect2) {
   _inherits(effGuard, _CombatEffect2);
 
-  var _super128 = _createSuper(effGuard);
+  var _super129 = _createSuper(effGuard);
 
   function effGuard(amount) {
-    var _this91;
+    var _this92;
 
     _classCallCheck(this, effGuard);
 
-    _this91 = _super128.call(this);
-    _this91.amount = amount;
-    _this91.data.id = _this91.data.name = effGuard.name, _this91.data.duration = 0, _this91.data.hidden = 0;
-    return _this91;
+    _this92 = _super129.call(this);
+    _this92.amount = amount;
+    _this92.data.id = _this92.data.name = effGuard.name, _this92.data.duration = 0, _this92.data.hidden = 0;
+    return _this92;
   }
 
   _createClass(effGuard, [{
@@ -17421,23 +17642,23 @@ var effGuard = /*#__PURE__*/function (_CombatEffect2) {
 var effCombined = /*#__PURE__*/function (_CombatEffect3) {
   _inherits(effCombined, _CombatEffect3);
 
-  var _super129 = _createSuper(effCombined);
+  var _super130 = _createSuper(effCombined);
 
   function effCombined(EffectsA, EffectsB) {
-    var _this92;
+    var _this93;
 
     _classCallCheck(this, effCombined);
 
-    _this92 = _super129.call(this);
-    _this92.effects = EffectsA.concat(EffectsB);
-    _this92.data.id = _this92.data.name = effCombined.name, _this92.data.duration = 0, _this92.data.hidden = 0;
+    _this93 = _super130.call(this);
+    _this93.effects = EffectsA.concat(EffectsB);
+    _this93.data.id = _this93.data.name = effCombined.name, _this93.data.duration = 0, _this93.data.hidden = 0;
 
-    var _iterator50 = _createForOfIteratorHelper(EffectsA),
-        _step50;
+    var _iterator57 = _createForOfIteratorHelper(EffectsA),
+        _step57;
 
     try {
-      for (_iterator50.s(); !(_step50 = _iterator50.n()).done;) {
-        el = _step50.value;
+      for (_iterator57.s(); !(_step57 = _iterator57.n()).done;) {
+        el = _step57.value;
 
         el.onRemove = function (me) {
           var _old = el.onRemove.bind(el);
@@ -17452,32 +17673,32 @@ var effCombined = /*#__PURE__*/function (_CombatEffect3) {
           };
 
           return foo;
-        }(_assertThisInitialized(_this92));
+        }(_assertThisInitialized(_this93));
       }
     } catch (err) {
-      _iterator50.e(err);
+      _iterator57.e(err);
     } finally {
-      _iterator50.f();
+      _iterator57.f();
     }
 
-    return _this92;
+    return _this93;
   }
 
   _createClass(effCombined, [{
     key: "removeAll",
     value: function removeAll() {
-      var _iterator51 = _createForOfIteratorHelper(this.effects),
-          _step51;
+      var _iterator58 = _createForOfIteratorHelper(this.effects),
+          _step58;
 
       try {
-        for (_iterator51.s(); !(_step51 = _iterator51.n()).done;) {
-          el = _step51.value;
+        for (_iterator58.s(); !(_step58 = _iterator58.n()).done;) {
+          el = _step58.value;
           if (el) el.parent.removeItem(el.id);
         }
       } catch (err) {
-        _iterator51.e(err);
+        _iterator58.e(err);
       } finally {
-        _iterator51.f();
+        _iterator58.f();
       }
 
       this.parent.removeItem(this.id);
@@ -17500,7 +17721,7 @@ var effCombined = /*#__PURE__*/function (_CombatEffect3) {
 var effDamage = /*#__PURE__*/function (_CombatEffect4) {
   _inherits(effDamage, _CombatEffect4);
 
-  var _super130 = _createSuper(effDamage);
+  var _super131 = _createSuper(effDamage);
 
   _createClass(effDamage, null, [{
     key: "setup",
@@ -17515,14 +17736,14 @@ var effDamage = /*#__PURE__*/function (_CombatEffect4) {
   }]);
 
   function effDamage(amount) {
-    var _this93;
+    var _this94;
 
     _classCallCheck(this, effDamage);
 
-    _this93 = _super130.call(this);
-    _this93.amount = 8;
-    _this93.data.id = _this93.data.name = effDamage.name, _this93.data.duration = 0, _this93.data.hidden = 0;
-    return _this93;
+    _this94 = _super131.call(this);
+    _this94.amount = 8;
+    _this94.data.id = _this94.data.name = effDamage.name, _this94.data.duration = 0, _this94.data.hidden = 0;
+    return _this94;
   }
 
   _createClass(effDamage, [{
@@ -17575,17 +17796,17 @@ var effDamage = /*#__PURE__*/function (_CombatEffect4) {
 var effBleed = /*#__PURE__*/function (_CombatEffect5) {
   _inherits(effBleed, _CombatEffect5);
 
-  var _super131 = _createSuper(effBleed);
+  var _super132 = _createSuper(effBleed);
 
   function effBleed(amount) {
-    var _this94;
+    var _this95;
 
     _classCallCheck(this, effBleed);
 
-    _this94 = _super131.call(this);
-    _this94.amount = amount;
-    _this94.data.id = _this94.data.name = effBleed.name, _this94.data.duration = 0, _this94.data.hidden = 0;
-    return _this94;
+    _this95 = _super132.call(this);
+    _this95.amount = amount;
+    _this95.data.id = _this95.data.name = effBleed.name, _this95.data.duration = 0, _this95.data.hidden = 0;
+    return _this95;
   }
 
   _createClass(effBleed, [{
@@ -17638,7 +17859,7 @@ var effBleed = /*#__PURE__*/function (_CombatEffect5) {
 var effGrappled = /*#__PURE__*/function (_CombatEffect6) {
   _inherits(effGrappled, _CombatEffect6);
 
-  var _super132 = _createSuper(effGrappled);
+  var _super133 = _createSuper(effGrappled);
 
   _createClass(effGrappled, null, [{
     key: "factory",
@@ -17654,14 +17875,14 @@ var effGrappled = /*#__PURE__*/function (_CombatEffect6) {
   }]);
 
   function effGrappled(amount) {
-    var _this95;
+    var _this96;
 
     _classCallCheck(this, effGrappled);
 
-    _this95 = _super132.call(this);
-    _this95.source = null;
-    _this95.data.id = _this95.data.name = effGrappled.name, _this95.data.duration = 0, _this95.data.hidden = 0;
-    return _this95;
+    _this96 = _super133.call(this);
+    _this96.source = null;
+    _this96.data.id = _this96.data.name = effGrappled.name, _this96.data.duration = 0, _this96.data.hidden = 0;
+    return _this96;
   }
 
   _createClass(effGrappled, [{
@@ -17721,17 +17942,17 @@ var effGrappled = /*#__PURE__*/function (_CombatEffect6) {
 var effGrappling = /*#__PURE__*/function (_CombatEffect7) {
   _inherits(effGrappling, _CombatEffect7);
 
-  var _super133 = _createSuper(effGrappling);
+  var _super134 = _createSuper(effGrappling);
 
   function effGrappling(targetEffect) {
-    var _this96;
+    var _this97;
 
     _classCallCheck(this, effGrappling);
 
-    _this96 = _super133.call(this);
-    _this96.target = targetEffect;
-    _this96.data.id = _this96.data.name = effGrappling.name, _this96.data.duration = 0, _this96.data.hidden = 0;
-    return _this96;
+    _this97 = _super134.call(this);
+    _this97.target = targetEffect;
+    _this97.data.id = _this97.data.name = effGrappling.name, _this97.data.duration = 0, _this97.data.hidden = 0;
+    return _this97;
   }
 
   _createClass(effGrappling, [{
@@ -17793,17 +18014,17 @@ var effGrappling = /*#__PURE__*/function (_CombatEffect7) {
 var effUngrappling = /*#__PURE__*/function (_CombatEffect8) {
   _inherits(effUngrappling, _CombatEffect8);
 
-  var _super134 = _createSuper(effUngrappling);
+  var _super135 = _createSuper(effUngrappling);
 
   function effUngrappling(targetEffect) {
-    var _this97;
+    var _this98;
 
     _classCallCheck(this, effUngrappling);
 
-    _this97 = _super134.call(this);
-    _this97.target = targetEffect;
-    _this97.data.id = _this97.data.name = effUngrappling.name, _this97.data.duration = 0, _this97.data.hidden = 0;
-    return _this97;
+    _this98 = _super135.call(this);
+    _this98.target = targetEffect;
+    _this98.data.id = _this98.data.name = effUngrappling.name, _this98.data.duration = 0, _this98.data.hidden = 0;
+    return _this98;
   }
 
   _createClass(effUngrappling, [{
@@ -17855,17 +18076,17 @@ var effUngrappling = /*#__PURE__*/function (_CombatEffect8) {
 var effTeaseDamage = /*#__PURE__*/function (_CombatEffect9) {
   _inherits(effTeaseDamage, _CombatEffect9);
 
-  var _super135 = _createSuper(effTeaseDamage);
+  var _super136 = _createSuper(effTeaseDamage);
 
   function effTeaseDamage(amount) {
-    var _this98;
+    var _this99;
 
     _classCallCheck(this, effTeaseDamage);
 
-    _this98 = _super135.call(this);
-    _this98.amount = amount;
-    _this98.data.id = _this98.data.name = effTeaseDamage.name, _this98.data.duration = 0, _this98.data.hidden = 0;
-    return _this98;
+    _this99 = _super136.call(this);
+    _this99.amount = amount;
+    _this99.data.id = _this99.data.name = effTeaseDamage.name, _this99.data.duration = 0, _this99.data.hidden = 0;
+    return _this99;
   }
 
   _createClass(effTeaseDamage, [{
@@ -17918,16 +18139,16 @@ var effTeaseDamage = /*#__PURE__*/function (_CombatEffect9) {
 var effStunned = /*#__PURE__*/function (_CombatEffect10) {
   _inherits(effStunned, _CombatEffect10);
 
-  var _super136 = _createSuper(effStunned);
+  var _super137 = _createSuper(effStunned);
 
   function effStunned() {
-    var _this99;
+    var _this100;
 
     _classCallCheck(this, effStunned);
 
-    _this99 = _super136.call(this);
-    _this99.data.id = _this99.data.name = effStunned.name, _this99.data.duration = 2;
-    return _this99;
+    _this100 = _super137.call(this);
+    _this100.data.id = _this100.data.name = effStunned.name, _this100.data.duration = 2;
+    return _this100;
   }
 
   _createClass(effStunned, [{
@@ -17978,16 +18199,16 @@ var effStunned = /*#__PURE__*/function (_CombatEffect10) {
 var effCallHelp = /*#__PURE__*/function (_CombatEffect11) {
   _inherits(effCallHelp, _CombatEffect11);
 
-  var _super137 = _createSuper(effCallHelp);
+  var _super138 = _createSuper(effCallHelp);
 
   function effCallHelp() {
-    var _this100;
+    var _this101;
 
     _classCallCheck(this, effCallHelp);
 
-    _this100 = _super137.call(this);
-    _this100.data.id = _this100.data.name = effCallHelp.name, _this100.data.duration = 2;
-    return _this100;
+    _this101 = _super138.call(this);
+    _this101.data.id = _this101.data.name = effCallHelp.name, _this101.data.duration = 2;
+    return _this101;
   }
 
   _createClass(effCallHelp, [{
@@ -18048,16 +18269,16 @@ var effCallHelp = /*#__PURE__*/function (_CombatEffect11) {
 var skCooking = /*#__PURE__*/function (_Effect18) {
   _inherits(skCooking, _Effect18);
 
-  var _super138 = _createSuper(skCooking);
+  var _super139 = _createSuper(skCooking);
 
   function skCooking() {
-    var _this101;
+    var _this102;
 
     _classCallCheck(this, skCooking);
 
-    _this101 = _super138.call(this);
-    _this101.data.id = _this101.data.name = skCooking.name;
-    return _this101;
+    _this102 = _super139.call(this);
+    _this102.data.id = _this102.data.name = skCooking.name;
+    return _this102;
   }
 
   _createClass(skCooking, [{
@@ -18147,7 +18368,7 @@ window.gm.StatsLib = function (StatsLib) {
   return StatsLib;
 }(window.gm.StatsLib || {});
 /* twine-user-script #2: "Story JavaScript" */
-</script><tw-tag name="_isdeffered_" color="brown"></tw-tag><tw-tag name="template" color="orange"></tw-tag><tw-tag name="_back_" color="gray"></tw-tag><tw-tag name="_nosave_" color="yellow"></tw-tag><tw-tag name="_nodeffered_" color="yellow"></tw-tag><tw-passagedata pid="1" name="Info_Jake" tags="_back_" position="100,100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
+</script><tw-tag name="template" color="orange"></tw-tag><tw-tag name="_back_" color="gray"></tw-tag><tw-tag name="_nosave_" color="yellow"></tw-tag><tw-tag name="_nodeffered_" color="yellow"></tw-tag><tw-tag name="_isdeffered_" color="brown"></tw-tag><tw-passagedata pid="1" name="Info_Jake" tags="_back_" position="100,100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 Jake is here.&lt;/br&gt;
 You barely know anything about him.&lt;/br&gt;
 [[Back|_back_]]&lt;/br&gt;&lt;/br&gt;
@@ -21083,7 +21304,8 @@ A small trail makes it way down the hill to some wooden shed.&quot;&lt;/br&gt;
 &lt;script&gt;
 function takeBracers() {
     let item = new window.storage.constructors[&#39;BracerLeather&#39;]();
-    item = window.gm.makeCursedItem(item,{lock:true,energydrain:2})
+    item = window.gm.makeCursedItem(item,{lock:true,energydrain:2});
+    item = window.gm.makeBonusItem(item,{statBoost:&#39;agility&#39;, statBonus:3});
     window.gm.player.Wardrobe.addItem(item);
     window.gm.player.Outfit.addItem(item);
     this.disabled=true;

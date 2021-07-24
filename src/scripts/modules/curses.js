@@ -1,7 +1,7 @@
 
 "use strict";
 /**
- * Items can have curse(s) that is applied when its condition is met 
+ * Items can have bonus/curse(s) that is applied when its condition is met 
  * condition is checked when equipped and on every timechange (no check if not equipped ? )
  * if trigger succeeds, apply-function is called  
  * the curse should be initially hidden to the player but might be revealed by a magican
@@ -28,6 +28,9 @@
  * - use item/potion that counters the effect
  * - mutate body to remove bodypart (snake -> no wristcuffs) 
  */
+/**
+ * //hidden 0 = visible, 1= name=???, 2= , 4= hidden
+ */
 class Curse {
     constructor() {
         this.hidden=0;
@@ -42,7 +45,7 @@ class Curse {
     configureCurse(item,trigger,curses) {
         this.trigger = trigger;
         this.list=curses;
-        item.curse=this;
+        item.bonus.push(this);
         this._relinkItems(item);
     }
     _relinkItems(parent) {
@@ -58,7 +61,7 @@ class Curse {
         if(this.trigger.onEquip()) this.apply();
     }
     onUnequip() {
-        if(this.trigger.onUnequip()) return(this.apply(true));
+        if(this.trigger.onUnequip()) this.apply(true);
     }
     canUnequip() { //ask effects if allowed to unequip/not locked
         let res;
@@ -73,9 +76,24 @@ class Curse {
         if(this.trigger.onTimeChange(time)) this.apply();
     }
     apply(unapply){
+        this.hidden=0; //reveal
         for(el of this.list) {
-            el.apply(unapply);
+            el.apply(unapply); //todo 3 effects would generate 3 defferedEvents; instead combine text into single event
         }
+    }
+    get desc() {
+        let msg='';
+        if((this.hidden & 0x4)>0) {  //completely hidden
+
+        } else if((this.hidden & 0x1)>0) {
+            msg = 'unknown effect';
+        } else if(this.hidden===0 ) {
+            msg = this.trigger.desc;
+            for(el of this.list) {
+                msg += "; " + el.desc;
+            }
+        }
+        return(msg);
     }
 }
 //-------------------------------------------------------------------------
@@ -91,6 +109,7 @@ class CrsTrigger {
     onEquip() {return(false);}
     onUnequip() {return(true);} //by default trigger unapply when unequipped
     onTimeChange(time) {return(false);}
+    get desc() { return('');}
 }
 class CrsTrgOnEquip extends CrsTrigger {
     constructor() {
@@ -101,6 +120,7 @@ class CrsTrgOnEquip extends CrsTrigger {
     onEquip() { return(true);  }
     toJSON() {return window.storage.Generic_toJSON("CrsTrgOnEquip", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(CrsTrgOnEquip, value.data));}
+    get desc() { return('when equipped');}
 }
 class CrsTrgDelayed extends CrsTrigger {
     constructor() {
@@ -117,6 +137,7 @@ class CrsTrgDelayed extends CrsTrigger {
     }
     toJSON() {return window.storage.Generic_toJSON("CrsTrgDelayed", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(CrsTrgDelayed, value.data));}
+    get desc() { return('after '+window.gm.formatNumber(this.timeToTrigger,0)+'min');}
 }
 //-------------------------------------------------------------------------
 class CrsEffect {
@@ -130,6 +151,7 @@ class CrsEffect {
     */
     get parent() {return(this._parent?this._parent(): null);} 
     canUnequip() {return({OK:true,msg:'unequipable'});}
+    get desc() { return('');}
 }
 class CrsEffLock extends CrsEffect{
     constructor() {
@@ -139,7 +161,7 @@ class CrsEffLock extends CrsEffect{
     }
     toJSON() {return window.storage.Generic_toJSON("CrsEffLock", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(CrsEffLock, value.data));}
-    desc() {return("The item can only be unlocked with a fitting key.")}
+    get desc() {return("The item can only be unlocked with a "+this.key+".")}
     canUnequip() {
         let res= {OK:true,msg:'This devices requires '+this.key+' to unlock'};
         if(this.parent.parent.parent.parent.Inv.countItem(this.key)<=0) {
@@ -163,7 +185,7 @@ class CrsEffEnergyDrain extends CrsEffect{
     }
     toJSON() {return window.storage.Generic_toJSON("CrsEffEnergyDrain", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(CrsEffEnergyDrain, value.data));}
-    desc() {return("Drains ones energy.")}
+    get desc() {return("Drains wearers energy.")}
     apply(unapply) {
         if(unapply) {
             this.parent.parent.parent.parent.Effects.removeItem(this.parent.parent.id+'_EnergyDrain');
@@ -171,6 +193,24 @@ class CrsEffEnergyDrain extends CrsEffect{
         //todo id should be "cursed_leather_bracer.EnergyDrain"
         //this->curse->item->outfit->char
             this.parent.parent.parent.parent.addEffect(this.parent.parent.id+'_EnergyDrain',new window.storage.constructors['effEnergyDrain']());
+        }
+    }
+}
+class CrsEffStatBonus extends CrsEffect{
+    constructor() {
+        super();
+        this.id='CrsEffStatBonus';
+        this.statid ='strength';
+        this.statbonus = 5;
+    }
+    toJSON() {return window.storage.Generic_toJSON("CrsEffStatBonus", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(CrsEffStatBonus, value.data));}
+    get desc() {return(this.statid+" +"+this.statbonus)}
+    apply(unapply) {
+        if(unapply) {
+            this.parent.parent.parent.parent.Stats.removeModifier(this.statid,{id:this.statid+":"+this.parent.parent.id});
+        } else {
+            this.parent.parent.parent.parent.Stats.addModifier(this.statid,{id:this.statid+":"+this.parent.parent.id, bonus:this.statbonus});
         }
     }
 }
@@ -182,6 +222,9 @@ window.gm.makeCursedItem = function(item, extra) {
     let eff =null;
     let list=[];
     curse.trigger = new CrsTrgOnEquip();
+    if(extra.hidden) { 
+        curse.hidden=extra.hidden;
+    } else curse.hidden=4; //by default hidden
     if(extra.delayed) {
         curse.trigger = new CrsTrgDelayed();
     }
@@ -195,7 +238,23 @@ window.gm.makeCursedItem = function(item, extra) {
     }
     curse.configureCurse(item,curse.trigger,list);
     return(item);
-  }
+}
+window.gm.makeBonusItem = function(item, extra) {
+    let curse = new Curse();
+    let eff =null;
+    let list=[];
+    curse.trigger = new CrsTrgOnEquip();
+    if(extra.hidden) { 
+        curse.hidden=extra.hidden;
+    } else curse.hidden=0; //by default visible?
+    if(extra.statBoost && extra.statBonus) {
+        eff = new CrsEffStatBonus();
+        eff.statid=extra.statBoost, eff.statbonus=extra.statBonus;
+        list.push(eff);
+    }
+    curse.configureCurse(item,curse.trigger,list);
+    return(item);
+}
 
 window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(Curse);
@@ -203,4 +262,5 @@ window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(CrsTrgOnEquip);
     window.storage.registerConstructor(CrsEffLock);
     window.storage.registerConstructor(CrsEffEnergyDrain);
+    window.storage.registerConstructor(CrsEffStatBonus);
 }(window.gm.ItemsLib || {}));

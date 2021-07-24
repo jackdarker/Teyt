@@ -108,13 +108,12 @@ class Equipment extends Item {
         this.tags = [];
         this.slotUse = []; //which slot is used by the equip
         this.slotCover = []; //which other slots are invisible by this "uses Breast, covers bBreast,bNipples"
-        this.unlocked= {OK:true, msg:'unequipable'}; //todo see CrsEffLock 
-        this.curse=null;
+        this.bonus =[]; //Curse or Bonus assigned to item
     }
     _relinkItems(parent) {  //call this after loading save data to reparent
         super._relinkItems(parent);
-        if(this.curse) { 
-            this.curse._relinkItems(this);
+        for(el of this.bonus) { 
+            el._relinkItems(this);
         }
     }
     //for compatibility with item
@@ -133,26 +132,43 @@ class Equipment extends Item {
         }
         return(fconv(msg));
     }
+    get desc() { return(this.descShort+ this.bonusDesc());}
+    bonusDesc() {
+        let msg='';
+        for(el of this.bonus) {
+            msg+="</br>"+el.desc;
+        }
+        return(msg);
+    }
     isEquipped() { return(this.parent.parent.Outfit && this.parent.parent.Outfit.findItemSlot(this.id).length>0);}
     canEquip(context) {
         if(this.parent && this.parent.parent.Outfit.findItemSlot(this.id).length>0) return(this.canUnequip()); //if you try to equip the same outfit another time it should unequip 
         else return({OK:true, msg:'equipable'});}
     canUnequip() {
         let res = {OK:true, msg:'unequipable'};
-        if(this.curse) res=this.curse.canUnequip();
+        for (el of this.bonus) {
+            res=el.canUnequip();
+            if(res.OK===false) return(res);
+        }
         return(res);
     }
     onEquip(context) {
-        if(this.curse) this.curse.onEquip();
+        for (el of this.bonus) {
+            el.onEquip();
+        }
         return({OK:true, msg:'equipped'});
     }
     onUnequip() {
         let res = {OK:true, msg:''};
-        if(this.curse) this.curse.onUnequip();
+        for (el of this.bonus) {
+            el.onUnequip();
+        }
         return(res);
     }
     onTimeChange(now) {
-        if(this.curse) this.curse.onTimeChange(now);
+        for (el of this.bonus) {
+            el.onTimeChange(now);
+        }
     };
 }
 //a kind of special inventory for worn equipment

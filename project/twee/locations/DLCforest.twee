@@ -11,7 +11,8 @@ A small trail makes it way down the hill to some wooden shed."</br>
 <script>
 function takeBracers() {
     let item = new window.storage.constructors['BracerLeather']();
-    item = window.gm.makeCursedItem(item,{lock:true,energydrain:2})
+    item = window.gm.makeCursedItem(item,{lock:true,energydrain:2});
+    item = window.gm.makeBonusItem(item,{statBoost:'agility', statBonus:3});
     window.gm.player.Wardrobe.addItem(item);
     window.gm.player.Outfit.addItem(item);
     this.disabled=true;
