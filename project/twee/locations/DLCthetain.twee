@@ -21,10 +21,10 @@ Someone has painted 'Thetain' on the planks above the wooden gate. Most likely t
 :: VillageMarketPlace
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.moveHere();%>
-<!--todo--> There arent many people around the place right now.</br> There seems to be a shop of an alchemist, a Inn and another shop where you cant say what kind of wares - if any - they are trading.</br>
+<!--todo--> There arent many people around the place right now.</br> There seems to be a smithy, a general store, a Inn and another shop where you cant say what kind of wares - if any - they are trading.</br>
 </br> Near the entrance of the Inn is also a [[bulletin-board]]. 
 <div></br>
-[[Gate|VillageEntrance]] [[Inn|VillageInn]]  [[Alchemist]] [[Shop|VillagePawnshop]]</br></div>
+[[Gate|VillageEntrance]] [[Inn|VillageInn]] [[Smithy|VillageSmithy]] [[Shop|VillagePawnshop]]</br></div>
 </article><article id="LogPanel"></article></section>
 
 

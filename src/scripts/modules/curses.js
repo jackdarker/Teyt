@@ -137,7 +137,7 @@ class CrsTrgDelayed extends CrsTrigger {
     }
     toJSON() {return window.storage.Generic_toJSON("CrsTrgDelayed", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(CrsTrgDelayed, value.data));}
-    get desc() { return('after '+window.gm.formatNumber(this.timeToTrigger,0)+'min');}
+    get desc() { return('after '+window.gm.util.formatNumber(this.timeToTrigger,0)+'min');}
 }
 //-------------------------------------------------------------------------
 class CrsEffect {

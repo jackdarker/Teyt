@@ -1,7 +1,7 @@
 "use strict";
 class BeeHive extends DngDungeon{
     constructor()    {
-        super("BeeHive", function() { return("There seem to live alot of giant bees here.")},window.story.state[BeeHive.name])
+        super("BeeHive", function() { return("There seem to live alot of giant bees here.")},window.story.state.dng[BeeHive.name])
         this.buildFloors();
     }
 
@@ -159,7 +159,7 @@ class BeeHive extends DngDungeon{
 }
 
 class ShatteredCity extends DngDungeon{
-    static persistentDngDataTemplate() {
+    persistentDngDataTemplate() {
         let _data = {
             A1Chest:["TailRibbon","HorsePotion"],
             A2defeated : 0
@@ -167,7 +167,7 @@ class ShatteredCity extends DngDungeon{
         return(_data);
     }
     constructor()    {
-        super("ShatteredCity", function() { return("A once thriving city now lies in ruins.")},window.story.state[ShatteredCity.name]);
+        super("ShatteredCity", function() { return("A once thriving city now lies in ruins.")},window.story.state.dng[ShatteredCity.name]);
         this.buildFloors();
     }
     buildFloors() {

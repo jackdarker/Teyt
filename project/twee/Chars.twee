@@ -9,7 +9,7 @@ You barely know anything about him.</br>
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 Cyril is here.</br>
 <a0 onclick='window.gm.giveCyrilFood()'>Give him some food</a></br>
-<a0 onclick='window.gm.printOutput(window.gm.printBodyDescription(window.gm.Cyril))'>Look at</a></br>
+<a0 onclick='window.gm.printOutput(window.gm.printBodyDescription(window.story.state.Cyril))'>Look at</a></br>
 </br><div id='output'></div></br>   <!--message is rendered here-->
 [[Back|_back_]]</br></br>
 </article><article id="LogPanel"></article></section>

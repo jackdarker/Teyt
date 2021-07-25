@@ -273,17 +273,17 @@ window.gm.printOutput(window.gm.printEffectSummary(window.gm.player.id,true,fals
 <div id='output'></div>
 </article><article id="LogPanel"></article></section>
 <script>function levelUp(char) {
-  window.gm[char].levelUp(1);
+  window.story.state[char].levelUp(1);
   window.gm.refreshAllPanel();
 }
 function statUp(statid,charname) {
-  let char =window.gm[charname];
+  let char =window.story.state[charname];
   char.Stats.increment(statid,1);
   char._data.unspentStat-=1; //todo ugly
   window.gm.refreshAllPanel();
 }
 function showStats(charname) {
-  let char =window.gm[charname];
+  let char =window.story.state[charname];
   let _wheights = char.autolevelWheight();
   let msg='';
   if(char._data.unspentStat>0) {

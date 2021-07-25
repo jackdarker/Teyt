@@ -222,7 +222,7 @@ window.gm.forwardTime=function(until) {
 // use: child._parent = window.gm.util.refToParent(parent);
 window.gm.util.refToParent = function(me){ return function(){return(me);}};  //todo causes problem with replaceState??
 //since there is no builtin function to format numbers here is one: formatNumber(-1002.4353,2) -> 1,002.44  
-window.gm.formatNumber = function(n, dp){
+window.gm.util.formatNumber = function(n, dp){
   var s = ''+(Math.floor(n)), d = Math.abs(n % 1), i = s.length, r = '';
   while ( (i -= 3) > 0 ) { r = ',' + s.substr(i, 3) + r; }  //todo . & , is hardcoded
   return s.substr(0, i + 3) + r + 
@@ -753,32 +753,32 @@ window.gm.printEffectSummary= function(who='player',showstats=true,showfetish=fa
   var result ='';
   var ids = [];
   result+='<table>';
-  var ids =window.gm[who].Stats.getAllIds();
+  var ids =window.story.state[who].Stats.getAllIds();
   
   ids.sort(); //Todo better sort
   for(var k=0;k<ids.length;k++){
-      var data = window.gm[who].Stats.get(ids[k])
+      var data = window.story.state[who].Stats.get(ids[k])
       let isFetish = (data.id.slice(0,2)==='ft'); //Fetish starts with ft
       let isResistance = (data.id.slice(0,3)==='rst'); //
       if(data.hidden!==4) {
         if(isFetish && showfetish && !(data.id.slice(-4,-2)==='_M') ) {
           //expects names of fetish like ftXXX and limits ftXXX_Min ftXXX_Max
-          let min = window.gm[who].Stats.get(ids[k]+"_Min");
-          let max = window.gm[who].Stats.get(ids[k]+"_Max");
+          let min = window.story.state[who].Stats.get(ids[k]+"_Min");
+          let max = window.story.state[who].Stats.get(ids[k]+"_Max");
           result+='<tr><td>'+((data.hidden & 0x1)?'???':data.id)+':</td><td>'+((data.hidden & 0x2)?'???':data.value)+'</td>';
           result+='<td>'+((data.hidden & 0x2)?'???':'('+(min.value+' to '+max.value))+')</td></tr>';
         }
         if((!isFetish && !isResistance && showstats) || (!isFetish && isResistance && showresistane)) {
           result+='<tr><td>'+((data.hidden & 0x1)?'???':data.id)+':</td><td>'+((data.hidden & 0x2)?'???':data.value)+'</td></tr>';
-        }
+        }//todo show modifier list for each stat  agility: BracerLeather +2
       }
   }
   result+='</table>';
   result+='</br>Active Effects:<table>'
-  ids = window.gm[who].Effects.getAllIds();
+  ids = window.story.state[who].Effects.getAllIds();
   ids.sort(); //Todo better sort
   for(var i=0;i<ids.length;i++){
-      var data = window.gm[who].Effects.get(ids[i]);
+      var data = window.story.state[who].Effects.get(ids[i]);
       result+='<tr><td>'+data.id+':</td><td>'+data.desc+'</td></tr>';
   }
   result+='</table>';

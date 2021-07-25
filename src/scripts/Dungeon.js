@@ -263,10 +263,17 @@ class DngOperation {
      */
     onTrigger() { };
 }
+/**
+ * persistData should be a "pointer" to a location where to store dungeon data f.e. story.state.dng.myDungeon
+ */
 class DngDungeon	{
-    constructor(name,descr,persistData) {
+    constructor(name,descr) {
         this.name = name;//name of the dungeon
         this.descr= descr;//text diplayed when entering the dungeon
+        let persistData = window.story.state.dng[name];
+        if(persistData===undefined || persistData===null) {
+            persistData = window.story.state.dng[name]=this.persistentDngDataTemplate(); 
+        }
         this.data = persistData;
         this.floors =[];//list of Dngfloors
         this.actualRoom = null;
@@ -275,7 +282,7 @@ class DngDungeon	{
         this.inRoomedDungeonResume = this.inRoomedDungeonDefeat = null;
     }
     //override this to return a data-object that will be used to store persistent data
-    static persistentDngDataTemplate() {return(null);}
+    persistentDngDataTemplate() {return({});}
     setFloors(Floors) {  
         this.floors = Floors; 
         for(var i=0;i<this.floors.length;i++) {

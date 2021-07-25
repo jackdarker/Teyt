@@ -71,20 +71,20 @@ window.gm.initGame= function(forceReset,NGP=null) {
       ch.Outfit.addItem(new Jeans());
       ch.Outfit.addItem(new TankShirt());
       ch.Stats.increment('strength',3);
-      s.Cyril =window.gm.Cyril= ch;
+      s.Cyril = ch;
     }
     if (!s.Carlia||forceReset) {  //the cat/dog-woman
       let ch = new Carlia()
-      s.Carlia =window.gm.Carlia= ch;
+      s.Carlia = ch;
     }
     if (!s.Ruff||forceReset) {  //Ruff the wolf
       let ch = new Ruff()
-      s.Ruff = window.gm.Ruff=ch;
+      s.Ruff = ch;
     }
     if (!s.Trent||forceReset) {  //the horse-bully from the bridge
       let ch = new Trent()
       ch.name=ch.id="Trent";
-      s.Trent = window.gm.Trent = ch;
+      s.Trent = ch;
     }
     if (!s.PlayerVR||forceReset) {  
       let ch = new Character();
@@ -99,14 +99,13 @@ window.gm.initGame= function(forceReset,NGP=null) {
       ch.Outfit.addItem(PenisHuman.factory('human'));
       ch.Skills.addItem(new SkillInspect());
       ch.Skills.addItem(new SkillUltraKill());
-      s.PlayerVR=window.gm.PlayerVR= ch;
+      s.PlayerVR=ch;
     }
     if (!s.PlayerRL||forceReset) {  
         let ch = new Character();
         ch.id="PlayerRL";
         ch.name="Andrew";
         ch.faction="Player";
-        //window.gm.PlayerVR.gainRelation('Mom',10);
         ch.Effects.addItem(skCooking.name,new skCooking());
         //add some basic inventory
         ch.Inv.addItem(new Money(),20);
@@ -130,14 +129,14 @@ window.gm.initGame= function(forceReset,NGP=null) {
         //special skills
         ch.Effects.addItem(effNotTired.name, new effNotTired()); //depending on sleep Tired will be set to NotTired or Tired
         //ch.Skills.addItem(SkillCallHelp.setup('Mole'));
-        s.PlayerRL=window.gm.PlayerRL=ch;
+        s.PlayerRL=ch;
     }
-    let dngs = [BeeHive,ShatteredCity]; //add your dngs here !
+    /*let dngs = [BeeHive,ShatteredCity]; //add your dngs here !
     for(el of dngs) {
-      if (!s[el.name]||forceReset) { 
-        s[el.name] = el.persistentDngDataTemplate();
+      if (!s.dng[el.name]||forceReset) { 
+        s.dng[el.name] = el.persistentDngDataTemplate();
       }
-    }    
+    } */   
     window.gm.switchPlayer("PlayerRL");
     //take over flags for newgameplus
     if(NGP) { window.story.state.vars.crowBarLeft = NGP.crowBarLeft; }

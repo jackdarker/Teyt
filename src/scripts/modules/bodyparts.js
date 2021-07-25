@@ -528,7 +528,7 @@ window.gm.MutationsLib['vaginaSpermDissolve'] = function (char) {
         }
     }    
     if(vulva.data.sperm>0) {
-        msg+="There might still be "+window.gm.formatNumber(vulva.data.sperm,0)+"ml sperm left.</br>"
+        msg+="There might still be "+window.gm.util.formatNumber(vulva.data.sperm,0)+"ml sperm left.</br>"
     } else msg+="This was possibly the last remains of sperm.</br>";
     if(char===window.gm.player) {
         window.gm.pushDeferredEvent("GenericDeffered",[msg]);
@@ -605,7 +605,7 @@ window.gm.MutationsLib['mutateWolf'] = function () {
                 msg+="That tail didnt grow any further.</br>";
             } else {
                 item.growth=growth;
-                msg+="Your bushy tail must have grown and is now "+window.gm.formatNumber(growth*maxGrowth,1)+" meter long.</br>";
+                msg+="Your bushy tail must have grown and is now "+window.gm.util.formatNumber(growth*maxGrowth,1)+" meter long.</br>";
             }
         }
     } else {
