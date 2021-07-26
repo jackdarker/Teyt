@@ -200,7 +200,6 @@ class TattooGroin extends Equipment {
     }
     set style(style) { 
         this._style = style; 
-        if(style===100) this.lossOnRespawn=false;
     }
     get style() {return this._style;}
     get desc() { 

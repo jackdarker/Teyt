@@ -190,8 +190,7 @@ class CrsEffEnergyDrain extends CrsEffect{
         if(unapply) {
             this.parent.parent.parent.parent.Effects.removeItem(this.parent.parent.id+'_EnergyDrain');
         } else {
-        //todo id should be "cursed_leather_bracer.EnergyDrain"
-        //this->curse->item->outfit->char
+        //this->curse->item->outfit->char     id="cursed_leather_bracer.EnergyDrain"
             this.parent.parent.parent.parent.addEffect(this.parent.parent.id+'_EnergyDrain',new window.storage.constructors['effEnergyDrain']());
         }
     }

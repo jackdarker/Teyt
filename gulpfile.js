@@ -23,7 +23,11 @@ function processScripts (dir, out, name) {
             ]
         }) : noop())
         .pipe(config.javascript.minify ? 
-            uglify().on('error', (e) => {console.log(e);}) : noop())
+            uglify({
+            mangle: {
+               keep_fnames: true // keep function names
+            }
+         }).on('error', (e) => {console.log(e);}) : noop())
         .pipe(gulp.dest(out));
 }
 

@@ -22,9 +22,9 @@ class stRelation extends Stat {
     static fromJSON(value) { return window.storage.Generic_fromJSON(stRelation, value.data);};
     formatMsgStatChange(attr,_new,_old) {
         if((_new-_old)>0) {
-            return('<statup>Your relation to '+attr.id+" improved by "+(_new-_old).toFixed(1).toString()+"</statup></br>");
+            return('<statup>Your relation to '+attr.id+" improved by "+(_new-_old).toFixed(1).toString()+"</statup>");
         } else if ((_new-_old)<0) {
-            return('<statdown>Your relation to '+attr.id+" worsend by "+(_new-_old).toFixed(1).toString()+"</statdown></br>");
+            return('<statdown>Your relation to '+attr.id+" worsend by "+(_new-_old).toFixed(1).toString()+"</statdown>");
         } else {
             return('Your relation to '+attr.id+" wasnt affected at all by your behaviour.</br>");
         }

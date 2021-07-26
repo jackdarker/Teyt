@@ -36,6 +36,29 @@ class Battery extends Item {
     toJSON() {return window.storage.Generic_toJSON("Battery", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(Battery, value.data);};
 }
+class GameVoucher extends Item {
+    constructor() {
+        super('GameVoucher');
+        this.lossOnRespawn = false;
+    }
+    toJSON() {return window.storage.Generic_toJSON("GameVoucher", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(GameVoucher, value.data);};
+    static lookupId(id) {
+        let info ={desc:''};
+        switch(id){
+            case "BronzeCoupon": 
+                info.desc= "bronze-voucher for ingame-shop";
+                break;
+            case "SilverCoupon": 
+                info.desc= "silver-voucher for ingame-shop";
+                break;
+            default:
+        }
+        return(info);
+    }
+    changeId(id) {this.id = id;}
+    get desc() { return GameVoucher.lookupId(this.id).desc;   }
+};
 class Ingredient extends Item {
     constructor() { super('Ingredient');   
         this.lossOnRespawn = true;
@@ -270,6 +293,7 @@ class HorsePotion extends Item {
 
 window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(LighterDad);
+    window.storage.registerConstructor(GameVoucher);
     window.storage.registerConstructor(Money);
     window.storage.registerConstructor(LaptopPS);
     window.storage.registerConstructor(Battery);
@@ -284,7 +308,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(FlashBang);
     window.storage.registerConstructor(SoulGem);
     
-    //todo do I need this extra ollection?
+    //Some of those items are generics that need some setup; so I create a template-library here
     ItemsLib['Money'] = function () { return new Money();};
     ItemsLib['LighterDad'] = function () { return new LighterDad();};
     ItemsLib['LaptopPS'] = function () { return new LaptopPS();};
@@ -304,5 +328,6 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['TinySoulGem'] = function () { let x= new SoulGem();x.changeId("TinySoulGem");return(x); };
     ItemsLib['KeyRestraintA'] = function () { let x= new KeyRestraint();x.changeId("KeyRestraintA");return(x); }; 
     ItemsLib['KeyRestraintB'] = function () { let x= new KeyRestraint();x.changeId("KeyRestraintB");return(x); };
+    ItemsLib['GameVoucherBronze'] = function () { let x= new GameVoucher();x.changeId("BronzeCoupon");return(x); };
     return ItemsLib; 
 }(window.gm.ItemsLib || {}));
