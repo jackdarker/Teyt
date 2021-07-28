@@ -125,6 +125,20 @@ document.getElementById('btStart').addEventListener("click", _game.start);
 document.getElementById('clickHere').addEventListener("click", _game.click);
 </script>
 
+:: ReactionTest2
+<p>Click Start and then keypress A/D to fill meter.</p>
+<div class="progress-bar" id='clickHere' style='height:1em; width: 100%;'><div id='bar' style="position:relative; width:5%; height:100%; background-color:green;"></div></div>
+<a0 id='btStart'>Start</a><p id='result'></p>
+<p><output id="losgelassen"><output></output></p>
+<script>
+function onStop(value) {
+  document.getElementById('result').innerHTML='scored '+value;
+}
+var _game = window.gm.startReactTest2('bar',100,onStop,null,[{a:40,b:60,color:'orange'},{a:90,b:100,color:'yellow'}]);
+document.getElementById('btStart').addEventListener("click", _game.start);
+document.querySelector('body').addEventListener("keyup", _game.click);
+</script>
+
 :: Evade
 <!-- präsentiert von kostenlose-javascripts.de (c) Copyright By N00b1000-->
 <script type='text/javascript'>

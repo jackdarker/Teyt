@@ -78,6 +78,9 @@ class Ingredient extends Item {
             case "SquishedLeech":
                 info.desc="I dont wanna carry that around";
                 break;
+            case "WolfTooth":
+                info.desc="Some canine from a canine";
+                break;
             default:
         }
         return(info);
@@ -304,7 +307,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(SimpleFood);
     window.storage.registerConstructor(HealthPotion);
     window.storage.registerConstructor(HorsePotion);
-    window.storage.registerConstructor(Ingredient);
+    window.storage.registerConstructor(Ingredient);//only need constructor for base-ingredient
     window.storage.registerConstructor(FlashBang);
     window.storage.registerConstructor(SoulGem);
     
@@ -316,7 +319,6 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['Dildo_small'] = function () { return new Dildo_small();};
     // consumables
     ItemsLib['Lube'] = function () { return new Lube();};
-    ItemsLib['Ingredient'] = function () { return new Ingredient();};
     ItemsLib['CanOfCoffee'] = function () { return new CanOfCoffee(); };
     ItemsLib['SimpleFood'] = function () { return new SimpleFood(); };
     ItemsLib['FlashBang'] = function () { return new FlashBang(); };
@@ -324,6 +326,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['HealthPotion(small)'] = function () { let x= new HealthPotion();x.changeId("HealthPotion(small)");return(x); };
     ItemsLib['BloatedMushroom'] = function () { let x= new Ingredient();x.changeId("BloatedMushroom");return(x); };
     ItemsLib['PurpleBerry'] = function () { let x= new Ingredient();x.changeId("PurpleBerry");return(x); };
+    ItemsLib['WolfTooth'] = function () { let x= new Ingredient();x.changeId("WolfTooth");return(x); };
     ItemsLib['ApocaFlower'] = function () { let x= new Ingredient();x.changeId("ApocaFlower");return(x); };
     ItemsLib['TinySoulGem'] = function () { let x= new SoulGem();x.changeId("TinySoulGem");return(x); };
     ItemsLib['KeyRestraintA'] = function () { let x= new KeyRestraint();x.changeId("KeyRestraintA");return(x); }; 

@@ -8,7 +8,7 @@
 <%=window.gm.player.name%></br>
 Energy: <%=window.gm.player.energy().value%>/<%=window.gm.player.energy().max%></br>
 Health: <%=window.gm.player.health().value%>/<%=window.gm.player.health().max%></br>
-Arcana: <%=window.gm.player.arcana().value%>/<%=window.gm.player.arcana().max%></br>
+Will: <%=window.gm.player.will().value%>/<%=window.gm.player.will().max%></br>
 Money: <%=window.gm.player.Inv.countItem('Money') %> <div <%=window.gm.player.canLevelUp?"class=\"green\"":""%>>XP/Level: <%=window.gm.player._data.XP+"/"+window.gm.player._data.level%></div></br>
 </div>
 <hr>

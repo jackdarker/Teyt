@@ -33,7 +33,7 @@ He shakes his head "Not that I know. Cant you sneak around them or trick them so
 <p class="tPC">"Thats exactly what I need ! But where can I find them?"</p>
 "The flowers grow in the forest too. They have colorful blue and yellow blossoms. But those leeches...they lurk in dark,humid places, swamps and such."
 <p class="tPC">"I will see to get some."</p>
-<a0 onclick='window.gm.quests.forceQuestMilestone("qPurpleBerry",200,1);window.story.show("ForestBorder");'>Leave</a></br>
+<a0 onclick='window.gm.quests.forceQuestMilestone("qPurpleBerry",200,100);window.story.show("ForestBorder");'>Leave</a></br>
 
 
 :: AlchTalkFinishPurpleBerry

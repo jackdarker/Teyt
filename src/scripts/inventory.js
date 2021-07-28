@@ -1,13 +1,17 @@
 "use strict";
 class Item {
     constructor(name) {
-        this.id = this.name = name;   //todo add id
+        this.id = this.name = name;
+        this.tags = [];
     }
     get parent() {return this._parent?this._parent():null;}
     _relinkItems(parent){this._parent=window.gm.util.refToParent(parent);}
     //called by SkillUseItem
     targetFilter(targets) {
         return([]); //default unuseable in combat
+    }
+    hasTag(tag) {
+        return(this.tags.includes(tag)>=0);
     }
     //implement this for description
     get desc() { return(this.descShort);}

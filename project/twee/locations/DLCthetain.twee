@@ -1,8 +1,8 @@
 :: VillageEntranceIntro
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<!--todo--> A neat little village comes into view as you walk towards its entrance.  </br>
+<!--todo--> A neat little village comes into view as you make your way along the dirtroad.</br>
 Someone has painted 'Thetain' on the planks above the wooden gate. Most likely thats the name of this commune.
-'Thats really looks awesome. I wonder if I can really visit those houses or if they are just scenery.'</br>
+'I wonder if I can really visit those houses or if they are just scenery of the game.'</br>
 <div></br>
 [[Continue|VillageMarketPlace]]</br></div>
 </article><article id="LogPanel"></article></section>
@@ -11,7 +11,7 @@ Someone has painted 'Thetain' on the planks above the wooden gate. Most likely t
 :: VillageEntrance
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.moveHere();%>
-<!--todo--> You are at the crossroads in front of the entrance to the town Thetain.
+<!--todo--> You are at the entrance to the town Thetain.
 </br></br>
 <div></br>
 [[Enter village|VillageMarketPlace]]  [[go to forest|ForestBridge]]</br></div>
@@ -22,9 +22,17 @@ Someone has painted 'Thetain' on the planks above the wooden gate. Most likely t
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.moveHere();%>
 <!--todo--> There arent many people around the place right now.</br> There seems to be a smithy, a general store, a Inn and another shop where you cant say what kind of wares - if any - they are trading.</br>
-</br> Near the entrance of the Inn is also a [[bulletin-board]]. 
+</br> Near the entrance of the Inn is also a [[bulletin-board|VillageBlackboard]]. 
 <div></br>
 [[Gate|VillageEntrance]] [[Inn|VillageInn]] [[Smithy|VillageSmithy]] [[Shop|VillagePawnshop]]</br></div>
+</article><article id="LogPanel"></article></section>
+
+:: VillageBlackboard [_back_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+Some tattered notes are pinned to the board: </br>
+<hr> Farmhand needed </br> Someone is searching for help with their farm work.</br> "I'm here for adventure,not boring work !"</br>
+<div></br>
+[[Leave|_back_]]</br></div>
 </article><article id="LogPanel"></article></section>
 
 
@@ -33,12 +41,23 @@ Someone has painted 'Thetain' on the planks above the wooden gate. Most likely t
 <%window.gm.moveHere();%>
 <!--todo--> 'This really looks like they scavenged that place from a typical fantasy story book.'</br> 
 <div></br>
-[[Square|VillageMarketPlace]] </br></div>
+[[Square|VillageMarketPlace]] [[Innkeeper]] </br></div>
 </article><article id="LogPanel"></article></section>
 <script> </script>
 
 
 :: VillagePawnshop
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.moveHere();%>
+<!--todo--> If this is a shop, then they sell everything: Shoes, cooking pans, assault ballista and chicken.</br> 
+<!--todo-->On the other side of the room is a large [[Wardrobe]] with a [[Mirror]] where you can take a look at yourself.
+</br> 
+<div></br>
+[[Square|VillageMarketPlace]]  [[Shopkeeper]]</br></div>
+</article><article id="LogPanel"></article></section>
+
+
+:: VillageSmithy
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.moveHere();%>
 <!--todo--> If this is a shop, then they sell everything: Shoes, cooking pans, assault ballista and chicken.</br> 

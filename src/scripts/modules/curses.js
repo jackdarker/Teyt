@@ -213,6 +213,7 @@ class CrsEffStatBonus extends CrsEffect{
         }
     }
 }
+//todo wrap you in rubber; pony gear,
 /**
  * adds a curse-function to an item
  */

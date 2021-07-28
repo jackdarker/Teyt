@@ -206,6 +206,7 @@ window.gm.postDefeat=function() {
 //after passing out: heal player and remove inventory {keepInventory=false,location=''}
 window.gm.respawn=function(conf={keepInventory:false}) {
   window.gm.player.Stats.increment("energy",9999);
+  window.gm.player.Stats.increment("will",9999);
   window.gm.player.Stats.increment("health",9999);
   if(!conf.keepInventory) { //remove inentory and outfit that is not questitem, cursed or permanent
     for(let i =window.gm.player.Outfit.list.length-1;i>=0;i-=1) {
@@ -349,6 +350,101 @@ window.gm.startReactTest=function(bar, speed, stopCB, startCB,areas) {
     data.value = (data.value===0)?100-data.barsize:0;
     data.bargraph.style.left=data.value+'%'; //this should trigger css-transition
   };
+  return(data);
+}
+/**
+ * by pressing left/right alternatively you move a box along a bar until you reach its end or run out of time
+ * the bar will slowly slide back to origin without proper input (you have to press quickly to finish); each time you pass an area, this movement increases 
+ * 
+ * @param {*} bar : the element to move
+ * @param {*} speed : recovery rate in ms 
+ * @param {*} stopCB 
+ * @param {*} startCB 
+ * @param {*} areas 
+ */
+window.gm.startReactTest2=function(bar, speed, stopCB, startCB,areas) {   //todo timeout starts after first click
+  /**
+   * starts the game
+   */
+  function start() { //todo instead left-right also up-down should be possible
+    data.stop();
+    data.run=true;
+    data.bargraph.style.left = data.value+'%'; //dont start in between; speed would be slowed down to maintain transition time
+    var width =window.getComputedStyle(data.bargraph).getPropertyValue('width');
+    var total = window.getComputedStyle(data.bargraph.parentNode).getPropertyValue('width');
+    //calculate barsize relative to total width (necessary if windowsize changed in between )
+    data.barsize=100*parseFloat(width.split('px'))/parseFloat(total.split('px')); 
+    //data.bargraph.style.transition = "left "+data.speed+"ms linear"; //configure transition for animation
+    if(data.startCB) data.startCB(); //called before transition-start!
+    //data.bargraph.ontransitionend(); //start transition
+    data.value=20, data.speed2 =1;
+    tick();
+    data.intervalID = window.setInterval( tick,data.speed);
+  }
+  /**
+   * this stops the game and returns the index of hit area; use click() instead !
+   */
+  function stop() {
+    if(data.intervalID) window.clearInterval(data.intervalID);
+    var computedStyle = window.getComputedStyle(data.bargraph);
+    var left = computedStyle.getPropertyValue('left');
+    data.bargraph.style.left=left;
+    data.bargraph.style.transition = null; // disable transition AFTER fetching computed value !
+    data.run=false;
+  }
+  function tick() {
+      data.value= Math.max(0,data.value-data.speed2);
+      data.bargraph.style.left=data.value+'%';
+    }
+  /**
+   * this can be bound to eventhandler for user input detection to trigger stop and will call stop-CB
+   */
+  function click(evt) {
+    if(!data.run) return;
+    let prevKey = data.lastKey;
+    if((prevKey !==evt.key && (evt.key==='a' || evt.key==='ArrowLeft' || evt.key==='d'|| evt.key==='ArrowRight'))) {
+      data.lastKey=evt.key,data.value+=5;
+      data.bargraph.style.left=data.value+'%';
+    } 
+    var left = data.value+data.barsize/2;
+    var res =-1; //detect if area was hit or not
+    for(var i=data.areas.length-1; i>=0;i--) {
+      if(data.areas[i].a<=left && left<=data.areas[i].b) {
+        res=i; data.speed2=(i+1)*2; } 
+    }
+    if(res===data.areas.length-1) {
+      stop();
+      if(data.stopCB) data.stopCB(res); 
+    }
+  }
+  let data ={ //internal state of game
+    bargraph : document.getElementById(bar),
+    run:false, //game started?
+    value: 0, //actual setpoint in%
+    barsize: 5, //width of hitbox relative to total width in %
+    areas:areas,  //list of areas to hit in %;
+    speed:speed, //transition time in ms
+    speed2 : 1,  //recovery speed in % of barwidth
+    stopCB: stopCB, //callback after user trigger 
+    startCB: startCB, //callback after start
+    start: start, //ref to start-function
+    stop: stop, //ref to stop-func
+    click: click, //ref to click-func
+    intervalID: null,
+    lastKey: ''
+  }
+  let gradient=''; 
+  for(el of data.areas) { //todo need to sort from left to right
+    gradient += '#80808000 0 '+el.a+'%, '+el.color+' '+el.a+'%,'+el.color+' '+el.b+'%,#80808000 '+el.b+'%,';
+  }
+  data.bargraph.parentNode.style.backgroundImage='linear-gradient(to right,'+gradient.slice(0,-1)+')';
+  /**
+   * instead of using timers rely on css-transition handling and events
+   */
+  /*data.bargraph.ontransitionend = () => {
+    data.value = (data.value===0)?100-data.barsize:0;
+    data.bargraph.style.left=data.value+'%'; //this should trigger css-transition
+  };*/
   return(data);
 }
 //print list of actions for actual day and hour

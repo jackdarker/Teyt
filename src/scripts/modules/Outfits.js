@@ -335,7 +335,58 @@ class ShortsLeather extends Equipment {
     toJSON() {return window.storage.Generic_toJSON("ShortsLeather", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(ShortsLeather, value.data));}
 }
-
+class BowWodden extends Equipment {
+    constructor() {
+        super('BowWodden');
+        this.tags = [ 'weapon'];
+        this.slotUse = ['RHand','LHand'];
+        this.lossOnRespawn = true;
+        this.pDamage = 11;
+    }
+    get desc() { return('A simple bow');}
+    toJSON() {return window.storage.Generic_toJSON("BowWodden", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(BowWodden, value.data));}
+    usable(context) {return(this.canEquip(context));}
+    use(context) { //context here is inventory not outfit
+        if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) {  
+            this.parent.parent.Outfit.removeItem(this.id); 
+            return( {OK:true, msg:'unequipped '+ this.name});
+        } else {
+            this.parent.parent.Outfit.addItem(this); 
+            return( {OK:true, msg:'equipped '+ this.name}); 
+        }
+    }
+    onEquip(context) {        
+        return({OK:true, msg:'equipped'});
+    }
+    onUnequip() {return({OK:true, msg:'unequipped'});}
+}
+class DaggerSteel extends Equipment {
+    constructor() {
+        super('DaggerSteel');
+        this.tags = [ 'weapon'];
+        this.slotUse = ['RHand'];
+        this.lossOnRespawn = true;
+        this.pDamage = 6;
+    }
+    get desc() { return('A steel dagger.');}
+    toJSON() {return window.storage.Generic_toJSON("DaggerSteel", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(DaggerSteel, value.data));}
+    usable(context) {return(this.canEquip(context));}
+    use(context) { //context here is inventory not outfit
+        if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) {  
+            this.parent.parent.Outfit.removeItem(this.id); 
+            return( {OK:true, msg:'unequipped '+ this.name});
+        } else {
+            this.parent.parent.Outfit.addItem(this); 
+            return( {OK:true, msg:'equipped '+ this.name}); 
+        }
+    }
+    onEquip(context) {        
+        return({OK:true, msg:'equipped'});
+    }
+    onUnequip() {return({OK:true, msg:'unequipped'});}
+}
 class StaffWodden extends Equipment {
     constructor() {
         super('StaffWodden');
@@ -422,6 +473,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(BracerLeather);
     window.storage.registerConstructor(Briefs);
     window.storage.registerConstructor(CollarQuest);
+    window.storage.registerConstructor(DaggerSteel);
     window.storage.registerConstructor(Leggings);
     window.storage.registerConstructor(MaceSteel);
     window.storage.registerConstructor(TankShirt);
@@ -455,5 +507,6 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['Shovel']  = function () { return new Shovel();};
     ItemsLib['StaffWodden']  = function () { return new StaffWodden();};
     ItemsLib['Handcuffs'] = function () { return new HandCuffs();};
+    ItemsLib['DaggerSteel'] = function () { return new DaggerSteel();};
     return ItemsLib; 
 }(window.gm.ItemsLib || {}));

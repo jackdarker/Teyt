@@ -4,6 +4,8 @@ class Mob extends Character {
     constructor() {
         super();
         this.level_min = 1;     
+        this.baseXPReward=0;
+        this.loot =[];   //[{id:'healthpotion', amount:1}]
         this.levelUp(1);
         this.autoLeveling();
     }
@@ -38,7 +40,10 @@ class Mob extends Character {
             this.autoLeveling();
         }
     };
-
+    levelUp(add) {
+        super.levelUp(add);
+        this.baseXPReward = this.level*20; //todo baseXP = sum of statpoints + skills ?
+    }
 }
 
 

@@ -57,7 +57,7 @@ Entering the required information you press Next and are presented a window with
 <p class='tPC'>"Hey Brad did you finish registration? I got a confirmation about receiving gaming equipment."</p>
 "Oh yes, I think I saw something about that there is some new generation MoCap-equipment required to play."
 <p class='tPC'>"MoCap?"</p>
-"Motion-Capturing dude. Sees you need something more that just your ordinary VR-googles to play this."
+"Motion-Capturing dude. Seems you need something more than just your ordinary VR-googles to play this."
 <p class='tPC'>"Do we have to pay."</p>
 "They just stated they lent it for the test....uhm .I forgot I have to leave. see ya later."
 <p class='tPC'>"Sure."</p>
@@ -144,7 +144,7 @@ You put your phone away. A shower and some sleep would be nice.</br>
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 The email reads:
 "Dear tester, we just noticed that a part of the game equipment was not delivered to you. We will make another attempt to send it to you within short time."
-'But I have equipment received. I didnt notie anything missing.'
+'But I have equipment received. I didnt notice anything missing.'
 [[Next]]</div></div>
 </article><article id="LogPanel"></article></section>
 
@@ -187,7 +187,7 @@ But where else could you place it?
 There is this room in the basement that was planned to be changed over into a party cellar.</br>
 But that plan was never finished and the room is unused right now.
 [[Move everything into the cellar]]
-[[Assemble the cage]]
+[[Assemble the rack]]
 [[Connect VR-Headset]]
 That VR-Headset seems a lot better than your old one. Its not as heavy as your old one and can be better adapt to your skull-shape. There are also several cameras that have to be assembled to the rig. You guess they are used to detect the position of the mocap-suite. 
 You connect the cables harness to your PC. There is a message from operating system: "installing drivers...'

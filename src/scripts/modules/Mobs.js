@@ -39,6 +39,7 @@ class Wolf extends Mob {
         this.name = this.id = 'Wolf';
         this.pic= 'assets/bw_wolf1.png';
         this.level_min =3;
+        this.loot= [{id:'WolfTooth',amount:1}];
         this.Outfit.addItem(new BaseQuadruped());
         this.Outfit.addItem(SkinFur.factory('wolf','black'));
         this.Outfit.addItem(HandsPaw.factory('wolf'));
@@ -102,6 +103,30 @@ class Huntress extends Mob {
         this.Outfit.addItem(new BaseHumanoid());
         this.Outfit.addItem(new SkinHuman());
         this.Outfit.addItem(HandsHuman.factory('cat'));
+        this.Outfit.addItem(BreastHuman.factory('cat'));
+        this.Outfit.addItem(FaceWolf.factory('cat'));
+        this.Outfit.addItem(VulvaHuman.factory('cat'));
+        this.Outfit.addItem(new BikiniBottomLeather());
+        this.levelUp(3);
+        this.autoLeveling();
+    }
+    calcCombatMove(enemys,friends){
+        let result = {OK:true,msg:''};
+        let rnd = _.random(1,100);
+        result.action =result.target= null;
+        //todo shoot arrow, pounce, throw net
+        return(super.calcCombatMove(enemys,friends));
+    }
+}
+class Dryad extends Mob {
+    constructor() {
+        super();
+        this.name = this.id = 'Huntress';
+        this.pic= 'assets/icons/icon_question.svg';
+        this.Outfit.addItem(new BaseHumanoid());
+        this.Outfit.addItem(new SkinHuman());
+        this.Outfit.addItem(HandsHuman.factory('cat'));
+        this.Outfit.addItem(BreastHuman.factory('cat'));
         this.Outfit.addItem(FaceWolf.factory('cat'));
         this.Outfit.addItem(VulvaHuman.factory('cat'));
         this.Outfit.addItem(new BikiniBottomLeather());

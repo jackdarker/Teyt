@@ -38,7 +38,7 @@ class Character {
         this.Skills = new Inventory(this._data.skills);
         this.Skills._parent = window.gm.util.refToParent(this);
         //create basic stats
-        stHealth.setup(this.Stats,10,10),stEnergy.setup(this.Stats,30,30),stArcana.setup(this.Stats,0,0),
+        stHealth.setup(this.Stats,10,10),stEnergy.setup(this.Stats,30,30),stWill.setup(this.Stats,0,0),
         stPAttack.setup(this.Stats,6,100),stPDefense.setup(this.Stats,4,100),
         stAgility.setup(this.Stats,10,100),stIntelligence.setup(this.Stats,10,100),stLuck.setup(this.Stats,10,100);
         stCharisma.setup(this.Stats,10,100),stPerception.setup(this.Stats,10,100),stStrength.setup(this.Stats,10,100),stEndurance.setup(this.Stats,10,100);
@@ -100,8 +100,10 @@ class Character {
     }
     get level(){return(this._data.level);}
     addXP(XP) { this._data.XP+=XP; }
-    //upgrade level by 1;this will increase level even if not enough XP !
-    levelUp(add=1) { 
+    /*
+     * upgrade level by 1;this will increase level even if not enough XP !
+    */
+     levelUp(add=1) { 
         if(add<1) return;
         let reqXP=Character.calcLevelToXP(this._data.level+add)-Character.calcLevelToXP(this._data.level);
         this._data.XP-=reqXP; //calculate requires XP and subtract from already gained
@@ -166,14 +168,15 @@ class Character {
     energy() {
         return({value:this.Stats.get('energy').value, max:this.Stats.get('energyMax').value, min:0});
     }
-    arcana() {
-        return({value:this.Stats.get('arcana').value, max:this.Stats.get('arcanaMax').value, min:0});
+    will() {
+        return({value:this.Stats.get('will').value, max:this.Stats.get('willMax').value, min:0});
     }
     sleep(until=700) {
         let {msg,delta}=window.gm.forwardTime(until);
         let regen = delta>=360 ? 9999 : parseInt(delta/60*15);  //todo scaling of regeneration
         this.Stats.increment('health',regen);
         this.Stats.increment('energy',regen);
+        this.Stats.increment('will',regen);
         if(delta>360) {
             this.Effects.addItem(effNotTired.name, new effNotTired());
         } 
@@ -190,6 +193,19 @@ class Character {
             this.Rel.increment(char,val);
         }
     }
+    /**
+     * helper function to handle wardrobe (not outfit!)/inventory properly; 
+     * if amount<0 remove itme, else add
+     */
+    changeInventory(item,amount) {
+        if(item.slotUse && !item.hasTag('weapon')) { //equipment goes into wardrobe except weapons
+            if(amount<0) this.Wardrobe.removeItem(item,true); //todo force?
+            else this.Wardrobe.addItem(item.id,amount);
+        } else {
+            if(amount<0) this.Inv.addItem(item,amount); 
+            else this.Inv.removeItem(item.id,-1*amount); 
+        }
+      }
     //combat related
     _canAct() { //todo even if stunned we should be able to struggle
         var result = {OK:true,msg:''};

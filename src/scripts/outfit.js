@@ -105,7 +105,6 @@ window.gm.OutfitSlotLib = {
 class Equipment extends Item {
     constructor(name) {
         super(name);
-        this.tags = [];
         this.slotUse = []; //which slot is used by the equip
         this.slotCover = []; //which other slots are invisible by this "uses Breast, covers bBreast,bNipples"
         this.bonus =[]; //Curse or Bonus assigned to item

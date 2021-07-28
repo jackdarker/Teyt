@@ -75,7 +75,7 @@ window.gm.encounters.wolf = function(location) {
         return('You cannot fight anymore and surrender to the beast.</br>'+ window.gm.printPassageLink('Next','WolfSubmit'));
     }
     window.gm.Encounter.onVictory = function() {
-        return('Intimitated, the wolf rolls on its back, whimpering submissively and exposing its throat.</br>'+ window.gm.printPassageLink('Next','WolfVictory'));
+        return('Intimitated, the wolf rolls on its back, whimpering submissively and exposing its throat.</br>'+this.fetchLoot()+'</br>'+ window.gm.printPassageLink('Next','WolfVictory'));
     }
     window.gm.Encounter.sceneDone=false; //attach flag to combatsetup-Instance;
     window.gm.Encounter.onMoveSelect = function() {
@@ -87,7 +87,6 @@ window.gm.encounters.wolf = function(location) {
         } 
         return(result);
     }
-
     window.gm.Encounter.initCombat();
 }
 window.gm.encounters.Carlia = function(location) {

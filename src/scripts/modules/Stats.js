@@ -96,30 +96,30 @@ class stEnergy extends Stat {
     toJSON() {return window.storage.Generic_toJSON("stEnergy", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stEnergy, value.data);};
 }
-class stArcanaMax extends Stat {
+class stWillMax extends Stat {
     static setup(context, max) {
-        var _stat = new stArcanaMax();
+        var _stat = new stWillMax();
         var _n = _stat.data;
-        _n.id='arcanaMax',_n.base=max, _n.value=max,_n.modifys=[{id:'arcana'}],_n.limits=[{max:99999,min:0}];
+        _n.id='willMax',_n.base=max, _n.value=max,_n.modifys=[{id:'will'}],_n.limits=[{max:99999,min:0}];
         context.addItem(_stat);
     }
     constructor() {  super();    }
-    toJSON() {return window.storage.Generic_toJSON("stArcanaMax", this); };
-    static fromJSON(value) { return window.storage.Generic_fromJSON(stArcanaMax, value.data);};
+    toJSON() {return window.storage.Generic_toJSON("stWillMax", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(stWillMax, value.data);};
 }
-class stArcana extends Stat {
+class stWill extends Stat {
     static setup(context, base,max) {
-        stArcanaMax.setup(context,max);
+        stWillMax.setup(context,max);
 
-        var _stat = new stArcana();
+        var _stat = new stWill();
         var _n = _stat.data;
-        _n.id='arcana',_n.base=base, _n.value=base,_n.limits=[{max:'arcanaMax',min:0}];
+        _n.id='will',_n.base=base, _n.value=base,_n.limits=[{max:'willMax',min:0}];
         context.addItem(_stat);
         _stat.Calc();
     }
     constructor() { super();   }
-    toJSON() {return window.storage.Generic_toJSON("stArcana", this); };
-    static fromJSON(value) { return window.storage.Generic_fromJSON(stArcana, value.data);};
+    toJSON() {return window.storage.Generic_toJSON("stWill", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(stWill, value.data);};
 }
 class stArousalMax extends Stat {
     static setup(context, max) {
@@ -202,7 +202,7 @@ class stPerception extends Stat { // core attribute
     toJSON() {return window.storage.Generic_toJSON("stPerception", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stPerception, value.data);};
     updateModifier() {
-        this.parent.addModifier('arcanaMax',{id:'perception', bonus:this.parent.get('perception').value*2});
+        this.parent.addModifier('willMax',{id:'perception', bonus:this.parent.get('perception').value*2});
     };
 }
 class stLuck extends Stat { // core attribute
@@ -252,7 +252,7 @@ class stIntelligence extends Stat { // core attribute
     toJSON() {return window.storage.Generic_toJSON("stIntelligence", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stIntelligence, value.data);};
     updateModifier() {
-        this.parent.addModifier('arcanaMax',{id:'intelligence', bonus:this.parent.get('intelligence').value*2});
+        this.parent.addModifier('willMax',{id:'intelligence', bonus:this.parent.get('intelligence').value*2});
     };
 }
 class stStrength extends Stat { // core attribute
@@ -1276,8 +1276,8 @@ window.gm.StatsLib = (function (StatsLib) {
     window.storage.registerConstructor(stResistance);
     window.storage.registerConstructor(stEnergyMax);
     window.storage.registerConstructor(stEnergy);
-    window.storage.registerConstructor(stArcanaMax);
-    window.storage.registerConstructor(stArcana);
+    window.storage.registerConstructor(stWillMax);
+    window.storage.registerConstructor(stWill);
     window.storage.registerConstructor(stArousalMax);
     window.storage.registerConstructor(stArousalMin);
     window.storage.registerConstructor(stArousal);

@@ -1,9 +1,40 @@
 "use strict";
+/**
+ * extends Function with the possibility to execute it multiple times with delay
+ * var foo = function test(startTime, count) { alert(startTime + count);};
+ * new foo.Timer(2000,3,null);
+ * see https://wiki.selfhtml.org/wiki/JavaScript/Tutorials/komfortable_Timer-Funktion
+ * @param {int} interval: in ms 
+ * @param {*} calls : how many times or use Infinity
+ * @param {*} onend : optional CB fired after #calls or if function returns false
+ */
+Function.prototype.Timer = function (interval, calls, onend) {
+  var count = 0;
+  var payloadFunction = this;
+  //payloadFunction.abortTimer = false;
+  var startTime = new Date();
+  var callbackFunction = function () {
+    return payloadFunction(startTime, count);
+  };
+  var endFunction = function () {
+    if (onend) {
+      onend(startTime, count, calls);
+    }
+  };
+  var timerFunction = function () {
+    count++;
+    if(payloadFunction.abortTimer) return;
+    if (count < calls && callbackFunction() != false) {
+      window.setTimeout(timerFunction, interval);
+    } else {
+      endFunction();
+    }
+  };
+  timerFunction();
+};
 /*
 core functionality
 */
-
-
 window.gm = window.gm || {}; //game related operations
 window.gm.util = window.gm.util || {};  //utility functions
 // helper for publisher/subscriber-pattern; myObject.ps =PubSub(); myObject.ps.subscribe(...

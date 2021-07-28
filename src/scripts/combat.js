@@ -13,11 +13,12 @@ class CombatSetup {
     //the following function should get reassigned; 
     //they should return a message what will happen next and provide a link to passage to follow f.e. return to window.gm.player.location
     this.onStart = (function(){return('A '+window.story.state.combat.enemyParty[0].name+' appears !'+ window.gm.printPassageLink('Engage','EncounterStartTurn'));});
-    this.onDefeat = (function(){return('You are defeated.</br>'+ window.gm.printPassageLink('GameOver','GameOver'));});
-    this.onVictory = (function(){return('You defeated the foe.</br> '+ window.gm.printLink('Next','window.gm.postVictory()'));});
+    this.onDefeat = (function(){return('You are defeated.</br>'+ window.gm.printLink('Next','window.gm.postDefeat()'));});
+    //...dont forget to fetchLoot
+    this.onVictory = (function(){return('You defeated the foe.</br> '+this.fetchLoot()+'</br>'+ window.gm.printLink('Next','window.gm.postVictory()'));});
     this.onFlee = (function(){return('You retreat hastily.</br>'+ window.gm.printLink('Next','window.gm.postVictory()'));});
-    this.onSubmit = (function(){return('You submit to the foe.</br>'+ window.gm.printPassageLink('GameOver','GameOver'));});
-    //if you override this (like the others), you can jump out of battle, show some scene and return to battle
+    this.onSubmit = (function(){return('You submit to the foe.</br>'+ window.gm.printLink('Next','window.gm.postDefeat()'));});
+    //if you override onMoveSelect (like the others), you can jump out of battle, show some scene and return to battle
     //- do not modify window.gm.player.location
     //- disable save
     //- jump back to EncounterStartTurn
@@ -98,7 +99,7 @@ statsline(whom,mark) {
   let msg='';
   if(mark) msg = "<td style=\"border-style:dotted;\">";
   else msg = "<td>";
-  msg+=whom.name+" Lv"+whom.level+"</td><td>"+this.bargraph(whom.health().value,whom.health().max,"lightcoral")+"</td><td>"+this.bargraph(whom.Stats.get("arousal").value,whom.Stats.get("arousalMax").value,"lightpink")+"</td><td>"+this.bargraph(whom.energy().value,whom.energy().max,"lightyellow")+"</td><td>"+this.bargraph(whom.Stats.get("arcana").value,whom.Stats.get("arcanaMax").value,"lightblue")+"</td>";
+  msg+=whom.name+" Lv"+whom.level+"</td><td>"+this.bargraph(whom.health().value,whom.health().max,"lightcoral")+"</td><td>"+this.bargraph(whom.Stats.get("arousal").value,whom.Stats.get("arousalMax").value,"lightpink")+"</td><td>"+this.bargraph(whom.energy().value,whom.energy().max,"lightyellow")+"</td><td>"+this.bargraph(whom.Stats.get("will").value,whom.Stats.get("willMax").value,"lightblue")+"</td>";
   return(msg);
 }
 //prints a table with all player/enemy data
@@ -113,7 +114,7 @@ printStats() {
       player2 50/100  10/20      Ork2  20/20   10/100
   */
  let elmt = '<table id=\"combatstats\"><tbody>';
-  elmt += "<tr><th>   </th><th>Player</th><th>Health</th><th>Arousal</th><th>Energy</th><th>Arcana</th><th>   </th><th>Enemys</th><th>Health</th><th>Arousal</th><th>Energy</th><th>Arcana</th></tr>";
+  elmt += "<tr><th>   </th><th>Player</th><th>Health</th><th>Arousal</th><th>Energy</th><th>Will</th><th>   </th><th>Enemys</th><th>Health</th><th>Arousal</th><th>Energy</th><th>Will</th></tr>";
   for(let i=0;(i<players.length || i<enemys.length);i++) {
     elmt += "<tr>";
     if(i<players.length) {
@@ -310,6 +311,30 @@ endCombat(){
       }
     }
   }
+}
+/**
+ * call this onVictory to grab loot & XP from Mobs
+ */
+fetchLoot(){ //if you are victorious: grant XP & transfer Loot to player 
+  let s=window.story.state;
+  let msg='';
+  let XP=0;
+  let maxLevel = 0;
+  for (el of s.combat.playerParty) {
+    maxLevel = Math.max(maxLevel,el.level);
+  }
+  for(el of s.combat.enemyParty) {
+    for(var i = el.loot.length-1;i>=0;i--) {
+      msg+= el.loot[i].amount+'x '+el.loot[i].id+' ';
+      window.gm.player.changeInventory(el.loot[i].id,el.loot[i].amount);
+    }
+    XP+=Math.floor(el.baseXPReward* Math.min(3,Math.max(0,1+(el.level-maxLevel)*0.25)));
+  }
+  msg = '</br>You got some loot: '+window.gm.util.formatNumber(XP,0) +'XP '+msg+'</br>';
+  for (el of s.combat.playerParty) {
+    el.addXP(XP);  //all get the same?
+  }
+  return(msg);
 }
 isAllDefeated(party) {
   for(var i=0;i<party.length;i++) {
@@ -510,9 +535,9 @@ window.gm.combat.calcEvasion=function(attacker,target, attack) {
     attack.crit = true; //when stunned always critical hit
     return(result);
   }
-
+ //todo chance depends on ?
   var lvlDiff = target.level-attacker.level;
-  var chance = target.Stats.get("agility").value + target.Stats.get("perception").value;
+  var chance = target.Stats.get("agility").value + target.Stats.get("perception").value;  
   chance += lvlDiff*4;
   window.gm.pushLog(`evasion roll: ${chance} vs ${rnd} `,window.story.state._gm.dbgShowCombatRoll);
   if(chance>rnd) {

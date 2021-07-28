@@ -11,14 +11,14 @@ class SkillResult{
 }
 class SkillCost{
     constructor(){
-          this.arcana = 0,
+          this.will = 0,
           this.energy = 0,
           this.health = 0,
           this.items =[]    //Todo
     }
     asText() {
         let msg='';
-        if(this.arcana>0) msg+=this.arcana.toString()+' arcana';
+        if(this.will>0) msg+=this.will.toString()+' will';
         if(this.energy>0) msg+=this.energy.toString()+' energy';
         if(this.health>0) msg+=this.health.toString()+' health';
         if(msg==='') msg = 'without cost';
@@ -27,8 +27,8 @@ class SkillCost{
     }
     canPay(Char) {
         let res = {OK:true,msg:''};
-        if(this.arcana> Char.Stats.get('arcana').value) {
-            res.OK=false; res.msg +='not enough arcana';
+        if(this.will> Char.Stats.get('will').value) {
+            res.OK=false; res.msg +='not enough will';
         }
         if(this.health+1> Char.Stats.get('health').value) { //+1 to not selfkill
             res.OK=false; res.msg +='not enough health';
@@ -40,7 +40,7 @@ class SkillCost{
     }
     pay(Char) {
         Char.Stats.increment('health',this.health*-1);
-        Char.Stats.increment('arcana',this.arcana*-1);
+        Char.Stats.increment('will',this.will*-1);
         Char.Stats.increment('energy',this.energy*-1);
     }
 }

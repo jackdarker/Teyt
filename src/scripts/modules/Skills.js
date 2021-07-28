@@ -246,7 +246,7 @@ class SkillStun extends Skill {
         if(multi.length>1) possibletarget.push(multi);  //if there is only [[mole]] we dont want [[mole],[mole]]
         return(possibletarget);//[[mole1],[mole2],[mole1,mole2]]
     }
-    get desc() { return("A successful stun lowers the foes chance to evade and might disable his attack for some time. "+this.getCost().asText());}
+    get desc() { return("A successful stun lowers the foes chance to evade and might disable them for some time. "+this.getCost().asText());}
     previewCast(targets){
         var result = new SkillResult()
         result.skill =this;
@@ -294,7 +294,7 @@ class SkillPoisonCloud extends Skill {
 }
 class SkillHeal extends Skill {
     constructor() { super("Heal");   
-    this.cost.arcana =20; 
+    this.cost.will =20; 
     }
     toJSON() {return window.storage.Generic_toJSON("SkillHeal", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillHeal, value.data));}

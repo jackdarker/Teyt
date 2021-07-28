@@ -52,24 +52,26 @@ window.gm.questDef = window.gm.questDef || {};
     let NOP = (function(){  return (0)});
     let hidden = (function(){return(window.gm.quests.getMilestoneState("qDLCMain").id<100);});
     let quest = new Quest("qDLCMain","qDLCMain","qDLCMain",hidden );
-    quest.addMileStone(new QuestMilestone(1,"","Sign betatestcontract.",        NOP,hidden));
+    quest.addMileStone(new QuestMilestone(1,"","Sign betatestcontract.",NOP,hidden));
     quest.addMileStone(new QuestMilestone(100,"","It will take some days until the game-equipment arrives. Spent some time studying or working.",        NOP,hidden));
-    quest.addMileStone(new QuestMilestone(500,"","Setup VR-equipment.",        NOP,hidden));
-    quest.addMileStone(new QuestMilestone(600,"","Enter the game.",        NOP,hidden));
-    quest.addMileStone(new QuestMilestone(700,"","Get to the settlement.",        NOP,hidden));
-    quest.addMileStone(new QuestMilestone(800,"","Ask around for a quest.",        NOP,hidden));
-    quest.addMileStone(new QuestMilestone(900,"","Finish the PurpleBerryQuest.",  NOP));
-    quest.addMileStone(new QuestMilestone(1000,"",".",  NOP));
+    quest.addMileStone(new QuestMilestone(500,"","Setup VR-equipment.",NOP,hidden));
+    quest.addMileStone(new QuestMilestone(600,"","Enter the game.",NOP,hidden));
+    quest.addMileStone(new QuestMilestone(700,"","Get to the settlement.",NOP,hidden));
+    quest.addMileStone(new QuestMilestone(800,"","Ask around for a quest.",NOP,hidden));
+    quest.addMileStone(new QuestMilestone(900,"","Finish the PurpleBerryQuest.",NOP));
+    quest.addMileStone(new QuestMilestone(1000,"","Get past that bridge and find your way to the village",  NOP)); //<--
+    quest.addMileStone(new QuestMilestone(1100,"","Ask around in the village for help with that collar.",  NOP));
+    quest.addMileStone(new QuestMilestone(1000,"","Someone called \"Librarian\" might be found in \"Shattered City\"",  NOP));
     window.gm.questDef[quest.id]= quest;
 }{   // the quest tracks death for tutorial
     let NOP = (function(){  return (0)});
     let hidden = (function(){return(window.gm.quests.getMilestoneState("qDiedAgain").id<0);});
     let quest = new Quest("qDiedAgain","qDiedAgain","qDiedAgain",hidden );
-    quest.addMileStone(new QuestMilestone(1,"","Life is a game.",        NOP,hidden));
-    quest.addMileStone(new QuestMilestone(2,"","Find your first death.",        NOP,hidden));
-    quest.addMileStone(new QuestMilestone(100,"","Die with some bonded equipment.",        NOP,hidden));
-    quest.addMileStone(new QuestMilestone(200,"","Die by pleasure.",        NOP,hidden));   //todo what if this is before previous?
-    quest.addMileStone(new QuestMilestone(300,"",".",        NOP,hidden));
+    quest.addMileStone(new QuestMilestone(1,"","Life is a game.",NOP,hidden));
+    quest.addMileStone(new QuestMilestone(2,"","Find your first death.",NOP,hidden));
+    quest.addMileStone(new QuestMilestone(100,"","Die with some bonded equipment.",NOP,hidden));
+    quest.addMileStone(new QuestMilestone(200,"","Die by pleasure.",NOP,hidden));   //todo what if this is before previous?
+    quest.addMileStone(new QuestMilestone(300,"",".",NOP,hidden));
     window.gm.questDef[quest.id]= quest;
 }{   //
     let NOP = (function(){  return (0)});
@@ -77,8 +79,8 @@ window.gm.questDef = window.gm.questDef || {};
     let quest = new Quest("qPurpleBerry","qPurpleBerry","qPurpleBerry",hidden );
     quest.addMileStone(new QuestMilestone(1,"","Search the forest for 5 handful of purple berrys and deliver them to the alchemist.",        NOP,hidden));
     quest.addMileStone(new QuestMilestone(100,"","You delivered the berries to the alchemist.",        NOP,hidden));
-    quest.addMileStone(new QuestMilestone(200,"","Find 4 purple berrys, 2 apoca-blossoms, 2 bloated mushrooms.",        NOP,hidden));
-    quest.addMileStone(new QuestMilestone(300,"","....",        NOP,hidden));
+    quest.addMileStone(new QuestMilestone(200,"","Find 4 purple berrys, 2 apoca-blossoms, 2 leeches.",        NOP,hidden));
+    quest.addMileStone(new QuestMilestone(300,"","Fetch the potion from the alchemist.",        NOP,hidden));
     window.gm.questDef[quest.id]= quest;
 }{
     let NOP = (function(){  return (0)});

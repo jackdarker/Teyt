@@ -87,7 +87,7 @@ class DngDirection{
         this.name = name,this.descr = (descr===null) ? function() {return(name)}:descr;
         this.direction = dirEnum;
         this.oneWay=false;
-        this.onExitFct= this.onEnterFct = null; //should return true if something is happening
+        this.onExitFct= this.onEnterFct = null; //should return true if something is happening (aborts other fct-evaluation! )
         this.canExitFct= null;
         
         this.roomA //DngRoom;	//source room
@@ -114,7 +114,6 @@ class DngDirection{
         return (this.roomA.isHidden || this.roomB.isHidden);
     }
 }
-
 // a room connected by directions
 class DngRoom {
     constructor(name,descr,hidden) {
@@ -398,14 +397,6 @@ class DngDungeon	{
 
     }
     resumeRoom() {
-        /*clearOutput();
-        EngineCore.statScreenRefresh(true);
-        //setTopButtons();
-        spriteSelect(-1);
-        menu();
-        actualRoom.updateRoom();
-        outputText(actualRoom.getDescription());
-        */
         /*		Menu Layout
             * 		[ Op1 ]	[ Op2 ]	[ Op3 ]	[ Op4 ]	[More ]
             * 		[ Up  ]	[  N  ]	[Down ]	[Mast ]	[     ]
