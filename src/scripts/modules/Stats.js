@@ -45,6 +45,19 @@ class stResistance extends Stat {
     toJSON() {return window.storage.Generic_toJSON("stResistance", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stResistance, value.data);};
 }
+//generic class for armor
+class stArmor extends Stat {
+    static setup(context, base,name) {   
+        let _stat = new stArmor();
+        let _n = _stat.data;
+        _n.id="arm"+name,_n.base=base, _n.value=base,_n.limits=[{max:999999,min:0}];
+        context.addItem(_stat);
+        _stat.Calc();
+    }
+    constructor() {   super();  }
+    toJSON() {return window.storage.Generic_toJSON("stArmor", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(stArmor, value.data);};
+}
 class stHealthMax extends Stat {
     static setup(context, max) {
         var _stat = new stHealthMax();
@@ -259,7 +272,7 @@ class stStrength extends Stat { // core attribute
     static setup(context, base,max) { 
         var _stat = new stStrength();
         var _n = _stat.data;
-        _n.id='strength',_n.base=base, _n.value=base, _n.modifys=[{id:'healthMax'},{id:'pAttack'}];
+        _n.id='strength',_n.base=base, _n.value=base, _n.modifys=[{id:'healthMax'}];
         context.addItem(_stat);
         _stat.Calc();
     }
@@ -268,14 +281,14 @@ class stStrength extends Stat { // core attribute
     static fromJSON(value) { return window.storage.Generic_fromJSON(stStrength, value.data);};
     updateModifier() {
         this.parent.addModifier('healthMax',{id:'strength', bonus:this.parent.get('strength').value*2});
-        this.parent.addModifier('pAttack',{id:'strength', bonus:Math.floor(this.parent.get('strength').value/4)});
+        //this.parent.addModifier('pAttack',{id:'strength', bonus:Math.floor(this.parent.get('strength').value/4)});
     };
 }
 class stEndurance extends Stat { // core attribute
     static setup(context, base,max) { 
         var _stat = new stEndurance();
         var _n = _stat.data;
-        _n.id='endurance',_n.base=base, _n.value=base, _n.modifys=[{id:'healthMax'},{id:'pDefense'}];
+        _n.id='endurance',_n.base=base, _n.value=base, _n.modifys=[{id:'healthMax'}];
         context.addItem(_stat);
         _stat.Calc();
     }
@@ -284,70 +297,10 @@ class stEndurance extends Stat { // core attribute
     static fromJSON(value) { return window.storage.Generic_fromJSON(stEndurance, value.data);};
     updateModifier() {
         this.parent.addModifier('healthMax',{id:'endurance', bonus:this.parent.get('endurance').value*2});
-        this.parent.addModifier('pDefense',{id:'strength', bonus:this.parent.get('endurance').value%4});
+        //this.parent.addModifier('pDefense',{id:'strength', bonus:this.parent.get('endurance').value%4});
     };
 }
 ////////////////////////////////////////////////////////////////////////////////
-class stPAttack extends Stat {   //physical attack
-    static setup(context, base,max) {
-        var _stat = new stPAttack();
-        var _n = _stat.data;
-        _n.id='pAttack',_n.base=base, _n.value=base,_n.limits=[{max:99999,min:0}];
-        context.addItem(_stat);
-        _stat.Calc();
-    }
-    constructor() {
-        super();
-
-    }
-    toJSON() {return window.storage.Generic_toJSON("stPAttack", this); };
-    static fromJSON(value) { return window.storage.Generic_fromJSON(stPAttack, value.data);};
-}
-class stPDefense extends Stat {   //physical defense
-    static setup(context, base,max) {
-        var _stat = new stPDefense();
-        var _n = _stat.data;
-        _n.id='pDefense',_n.base=base, _n.value=base,_n.limits=[{max:99999,min:0}];
-        context.addItem(_stat);
-        _stat.Calc();
-    }
-    constructor() {
-        super();
-
-    }
-    toJSON() {return window.storage.Generic_toJSON("stPDefense", this); };
-    static fromJSON(value) { return window.storage.Generic_fromJSON(stPDefense, value.data);};
-}
-class stLAttack extends Stat {   //tease attack
-    static setup(context, base,max) {
-        var _stat = new stLAttack();
-        var _n = _stat.data;
-        _n.id='lAttack',_n.base=base, _n.value=base,_n.limits=[{max:99999,min:0}];
-        context.addItem(_stat);
-        _stat.Calc();
-    }
-    constructor() {
-        super();
-
-    }
-    toJSON() {return window.storage.Generic_toJSON("stLAttack", this); };
-    static fromJSON(value) { return window.storage.Generic_fromJSON(stLAttack, value.data);};
-}
-class stLDefense extends Stat {   //tease defense
-    static setup(context, base,max) {
-        var _stat = new stLAttack();
-        var _n = _stat.data;
-        _n.id='lDefense',_n.base=base, _n.value=base,_n.limits=[{max:99999,min:0}];
-        context.addItem(_stat);
-        _stat.Calc();
-    }
-    constructor() {
-        super();
-
-    }
-    toJSON() {return window.storage.Generic_toJSON("stLAttack", this); };
-    static fromJSON(value) { return window.storage.Generic_fromJSON(stLAttack, value.data);};
-}
 class stCorruptionMax extends Stat {
     static setup(context, base,max) {
         var _stat = new stCorruptionMax();
@@ -964,7 +917,7 @@ class effGuard extends CombatEffect {
     get desc() {return(effGuard.name);}
     onApply(){
         this.data.duration = 2;
-        this.parent.parent.Stats.addModifier('pDefense',{id:'pDefense:Guard', bonus:5}); //Todo percentage
+        //this.parent.parent.Stats.addModifier('pDefense',{id:'pDefense:Guard', bonus:5}); //Todo percentage
     }
     merge(neweffect) {
         if(neweffect.name===this.data.name) {    //extends
@@ -980,7 +933,7 @@ class effGuard extends CombatEffect {
         if(this.data.duration<=0) this.parent.removeItem(this.data.id);
     }
     onRemove(){
-        this.parent.parent.Stats.removeModifier('pDefense',{id:'pDefense:Guard'});
+        //this.parent.parent.Stats.removeModifier('pDefense',{id:'pDefense:Guard'});
     }
 }
 //to combine multiple effects that get dispelled together 
@@ -1019,7 +972,7 @@ class effDamage extends CombatEffect {
         eff.onHit=onHitCB;
         return(eff);
     }
-    constructor(amount) {
+    constructor() {
         super();
         this.amount = 8;
         this.data.id = this.data.name= effDamage.name, this.data.duration = 0, this.data.hidden=0;
@@ -1034,6 +987,7 @@ class effDamage extends CombatEffect {
     onApply(){
         this.data.duration = 0;
         this.parent.parent.Stats.increment('health',-1*this.amount);
+        if(this.data.duration<1) this.parent.removeItem(this.data.id);  
     }
     merge(neweffect) {
         if(neweffect.name===this.data.name) {    //ignore
@@ -1166,6 +1120,11 @@ class effUngrappling extends CombatEffect {
     onTurnStart() { this.data.duration-=1; if(this.data.duration<=0) this.parent.removeItem(this.data.id);    }
 }
 class effTeaseDamage extends CombatEffect {
+    static setup(amount) {
+        let eff = new effTeaseDamage();
+        eff.amount = amount;
+        return(eff);
+    }
     constructor(amount) {
         super();
         this.amount = amount;
@@ -1283,10 +1242,7 @@ window.gm.StatsLib = (function (StatsLib) {
     window.storage.registerConstructor(stArousal);
     window.storage.registerConstructor(stCorruptionMax);
     window.storage.registerConstructor(stCorruption);
-    window.storage.registerConstructor(stLAttack);
-    window.storage.registerConstructor(stLDefense);
-    window.storage.registerConstructor(stPAttack);
-    window.storage.registerConstructor(stPDefense);    
+    window.storage.registerConstructor(stArmor);   
     //...effects
     window.storage.registerConstructor(effCallHelp);
     window.storage.registerConstructor(effDamage);

@@ -38,19 +38,19 @@ class Character {
         this.Skills = new Inventory(this._data.skills);
         this.Skills._parent = window.gm.util.refToParent(this);
         //create basic stats
-        stHealth.setup(this.Stats,10,10),stEnergy.setup(this.Stats,30,30),stWill.setup(this.Stats,0,0),
-        stPAttack.setup(this.Stats,6,100),stPDefense.setup(this.Stats,4,100),
+        stHealth.setup(this.Stats,10,10),stEnergy.setup(this.Stats,30,30),stWill.setup(this.Stats,0,0);
+        for(el of window.gm.combat.TypesDamage) {
+            stResistance.setup(this.Stats,0,el.id);
+            stArmor.setup(this.Stats,0,el.id); 
+        }
         stAgility.setup(this.Stats,10,100),stIntelligence.setup(this.Stats,10,100),stLuck.setup(this.Stats,10,100);
         stCharisma.setup(this.Stats,10,100),stPerception.setup(this.Stats,10,100),stStrength.setup(this.Stats,10,100),stEndurance.setup(this.Stats,10,100);
-        for(el of window.gm.combat.TypesDamage) {
-            stResistance.setup(this.Stats,0,el.id); 
-        }
-        stCorruption.setup(this.Stats,0,50),stArousal.setup(this.Stats,1,100),stLAttack.setup(this.Stats,6,100),stLDefense.setup(this.Stats,2,100);
+        stCorruption.setup(this.Stats,0,50),stArousal.setup(this.Stats,1,100);
         for(let name of stFetish.listFetish()) {
             stFetish.setup(this.Stats,0,10,name);
-        }        
-        this.Skills.addItem(new SkillUseItem());this.Skills.addItem(new SkillStruggle());
-        this.Skills.addItem(new SkillAttack());this.Skills.addItem(new SkillStun());this.Skills.addItem(new SkillHeal());
+        }         
+        this.Skills.addItem(new SkillUseItem());this.Skills.addItem(new SkillStruggle());this.Skills.addItem(new SkillAttack());
+        this.Skills.addItem(new SkillStun());this.Skills.addItem(new SkillHeal());this.Skills.addItem(new SkillTease());
         this.Skills.addItem(new SkillFlee()),this.Skills.addItem(new SkillSubmit());    
 
         window.storage.registerConstructor(Character);

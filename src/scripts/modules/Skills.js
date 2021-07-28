@@ -33,6 +33,7 @@ class SkillAttack extends Skill {
     constructor() {
         super("Attack");
         this.msg = '';
+        this.weapon='';
     }
     toJSON() {return window.storage.Generic_toJSON("SkillAttack", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillAttack, value.data));}
@@ -49,7 +50,7 @@ class SkillAttack extends Skill {
         if(this.isValidTarget(targets)) {
             result.OK = true;
             for(var target of targets) {
-                let attack = this.__estimateAttack()
+                let attack = this.__estimateAttack(target)
                 let result2 = window.gm.combat.calcAttack(this.caster,target,attack);
                 this.msg+=result2.msg;
                 result.effects = result.effects.concat(attack.effects); 
@@ -57,30 +58,23 @@ class SkillAttack extends Skill {
         }
         return result;
     }
-    __estimateAttack() {
+    __estimateAttack(target) {
         let attack =window.gm.combat.defaultAttackData();
         let lHand=this.caster.Outfit.getItemForSlot(window.gm.OutfitSlotLib.LHand);
         let rHand=this.caster.Outfit.getItemForSlot(window.gm.OutfitSlotLib.RHand);
+        attack.mod=new SkillMod();
         let lHDmg=0,rHDmg=0;
         if(rHand) { //get weapon damage info
-            rHDmg = rHand.pDamage || 0;
-        }
-        if(lHand) { 
-            lHDmg = lHand.pDamage || 0;
+            attack.mod=rHand.attackMod(target);
+        } else if(lHand) { //todo dual wield?
+            attack.mod=lHand.attackMod(target);
         }
         if(!lHand && ! rHand) { //if has no weapon get body damage
             rHand=this.caster.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bHands);
-            if(rHand) {
-                rHDmg = (rHand.data!=='undefined')?rHand.data.pDamage || 0:0;
+            if(rHand && rHand.attackMod) {
+                    attack.mod=rHand.attackMod(target);
             }
         }
-        if(lHand===rHand) {
-            attack.value=lHDmg;
-        } else {
-            attack.value=lHDmg+rHDmg;
-        }
-        attack.value+=this.caster.Stats.get('pAttack').value;
-        attack.total = attack.value;
         return(attack);
     }
     getCastDescription(result) {
@@ -107,10 +101,39 @@ class SkillAttack extends Skill {
         attack.input=rHDmg;
         return(attack);
     }
-    getCastDescription(result) {
-        return(this.msg);
-    }
 */
+class SkillSmash extends SkillAttack {
+    constructor() {
+        super();
+        this.id=this.name='Smash'
+        this.msg = '';
+        this.weapon='';
+    }
+    toJSON() {return window.storage.Generic_toJSON("SkillSmash", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillSmash, value.data));}
+    get desc() { return("Use "+this.weapon);}
+    previewCast(targets){
+        var result = new SkillResult();
+        result.skill =this;
+        result.source = this.caster;
+        result.targets = targets;
+        this.msg = '';
+        if(this.isValidTarget(targets)) {
+            result.OK = true;
+            for(var target of targets) {
+                let attack =window.gm.combat.defaultAttackData();
+                //get data from weapon
+                let _mod = this.parent.parent.Outfit.getItem(this.weapon).attackMod(target);
+                //modify chance& values depending on stats??
+                attack.mod=_mod;
+                let result2 = window.gm.combat.calcAttack(this.caster,target,attack);
+                this.msg+=result2.msg;
+                result.effects = result.effects.concat(attack.effects); 
+            }
+        }
+        return result;
+    }
+}
 class SkillUltraKill extends SkillAttack {
     constructor() {
         super();
@@ -119,10 +142,10 @@ class SkillUltraKill extends SkillAttack {
     }
     toJSON() {return window.storage.Generic_toJSON("SkillUltraKill", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillUltraKill, value.data));}
-    __estimateAttack() {
+    __estimateAttack(target) {
         let attack =window.gm.combat.defaultAttackData();
-        attack.value= 99999;
-        attack.total = attack.value;
+        let mod = new SkillMod();
+        attack.mod.onHit = [{ target:target, eff: [effDamage.setup(99999,'blunt')]}];
         return(attack);
     }
 }
@@ -136,15 +159,13 @@ class SkillBite extends SkillAttack {
     toJSON() {return window.storage.Generic_toJSON("SkillBite", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillBite, value.data));}
     get desc() { return("Use your maw to bite the foe.");}
-    __estimateAttack() {
+    __estimateAttack(target) {
         let attack =window.gm.combat.defaultAttackData();
         let mouth=this.caster.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bMouth);
-        let mouthDmg =0;
-        if(mouth) { //get teeth damage info
-            mouthDmg = mouth.data.pDamage || 0;
+        attack.mod= new SkillMod();
+        if(mouth && mouth.attackMod) { //get teeth damage info
+            attack.mod=mouth.attackMod(target);
         }
-        attack.value+= mouthDmg+ this.caster.Stats.get('pAttack').value;
-        attack.total = attack.value;
         return(attack);
     }
 }
@@ -196,7 +217,6 @@ class SkillChainLightning  extends Skill {
     }
 }
 class SkillTease extends Skill {
-    //execute simple attack with active weapon
     constructor() {
         super("Tease");
         this.msg = '';
@@ -214,14 +234,21 @@ class SkillTease extends Skill {
         this.msg = '';
         if(this.isValidTarget(targets)) {
             result.OK = true;
+            this.msg = 'Shaking his hips, xxx trys to arouse the audiensce.'; //todo
             for(var target of targets) {
-                let attack =window.gm.combat.defaultAttackData();
+                let attack =this.__estimateAttack(target);
                 let result2 = window.gm.combat.calcTeaseAttack(this.caster,target,attack);
                 this.msg+=result2.msg;
                 result.effects = result.effects.concat(attack.effects); 
             }
         }
         return result
+    }
+    __estimateAttack(target) {
+        let attack =window.gm.combat.defaultAttackData();
+        attack.mod= new SkillMod(); //todo tease depends on slutiness & preferences
+        attack.mod.onHit=[{target:target, eff:[effTeaseDamage.setup(10)]}]
+        return(attack);
     }
     getCastDescription(result) {
         return(this.msg);
@@ -618,6 +645,7 @@ window.gm.SkillsLib = (function (Lib) {
     window.storage.registerConstructor(SkillHeal);
     window.storage.registerConstructor(SkillInspect);
     window.storage.registerConstructor(SkillPoisonCloud);
+    window.storage.registerConstructor(SkillSmash);
     window.storage.registerConstructor(SkillStun);
     window.storage.registerConstructor(SkillSubmit);
     window.storage.registerConstructor(SkillStruggle);

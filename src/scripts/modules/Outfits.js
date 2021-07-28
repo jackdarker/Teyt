@@ -239,10 +239,10 @@ class Crowbar extends Equipment {
         }
     }
     onEquip(context) {
-        context.parent.Stats.addModifier('pAttack',{id:'pAttack:Crowbar', bonus:2});
+        //context.parent.Stats.addModifier('pAttack',{id:'pAttack:Crowbar', bonus:2});
         return({OK:true, msg:'equipped'});}
     onUnequip() {
-        this.parent.parent.Stats.removeModifier('pAttack',{id:'pAttack:Crowbar'});
+        //this.parent.parent.Stats.removeModifier('pAttack',{id:'pAttack:Crowbar'});
         return({OK:true, msg:'unequipped'});}
 }
 //this is an Inventory-item, not wardrobe
@@ -268,10 +268,10 @@ class Shovel extends Equipment {
     }
 
     onEquip(context) {
-        context.parent.Stats.addModifier('pAttack',{id:'pAttack:Shovel', bonus:2});
+        //context.parent.Stats.addModifier('pAttack',{id:'pAttack:Shovel', bonus:2});
         return({OK:true, msg:'equipped'});}
     onUnequip() {
-        this.parent.parent.Stats.removeModifier('pAttack',{id:'pAttack:Shovel'});
+        //this.parent.parent.Stats.removeModifier('pAttack',{id:'pAttack:Shovel'});
         return({OK:true, msg:'unequipped'});}
 }
 class RobesZealot extends Equipment {
@@ -409,11 +409,20 @@ class StaffWodden extends Equipment {
         }
     }
     onEquip(context) {
-        //this.parent.parent.Stats.addModifier('pAttack',{id:'pAttack:StaffWodden', bonus:2});
+        let sk = new SkillSmash();
+        sk.weapon = this.id;
+        this.parent.parent.Skills.addItem(sk);
         return({OK:true, msg:'equipped'});}
     onUnequip() {
-        //this.parent.parent.Stats.removeModifier('pAttack',{id:'pAttack:StaffWodden'});
+        this.parent.parent.Skills.removeItem('Smash');
         return({OK:true, msg:'unequipped'});}
+    attackMod(target){
+        let mod = new SkillMod();
+        mod.onHit = [{ target:target, eff: [effDamage.setup(11,'blunt')]}];
+        mod.critChance=50;
+        mod.onCrit = [{ target:target, eff: [effDamage.setup(11,'blunt'), new effStunned()]}];
+        return(mod);
+    }
 }
 class MaceSteel extends Equipment {
     constructor() {
@@ -443,7 +452,7 @@ class MaceSteel extends Equipment {
     onEquip(context) {        
         return({OK:true, msg:'equipped'});
     }
-    onUnequip() {        return({OK:true, msg:'unequipped'});}
+    onUnequip() {return({OK:true, msg:'unequipped'});}
 }
 class TailRibbon extends Equipment {
     constructor() {

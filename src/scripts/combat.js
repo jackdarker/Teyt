@@ -573,21 +573,16 @@ window.gm.combat.calcParry=function(attacker,target, attack) {
   var chance = target.Stats.get("agility").value + target.Stats.get("endurance").value;
   chance += lvlDiff*4;
   window.gm.pushLog(`parry roll: ${chance} vs ${rnd} `,window.story.state._gm.dbgShowCombatRoll);
-  if(chance>rnd && rnd<10) {
+  if(chance>rnd && rnd<10) { 
     result.OK = false;
     if(rnd<10) {
       result.msg = target.name +' parried the attack and was even able to land a hit.'  //todo how to add textual variation based on used weapon and skill?
-      // foo should reflect fraction of attack back to attacker
-      attack.effects.push( {target:attacker,eff:([effDamage.setup(0.5*attack.value,"blunt")])});
-      //result.foo = function(attacker,attack){ return(function(attacker,attack){ attacker.Stats.increment('health',-0.5*attack.value);});}(attacker,attack);
+      attack.effects.push( {target:attacker,eff:([effDamage.setup(5,"blunt")])}); //todo how much damage? 
     } else {
       result.msg = target.name +' parried the attack.'
     }
   } else {
     result.OK = true;
-    if(rnd>90) {
-      attack.crit = true;
-    }
   }
   return(result);
 }
@@ -596,7 +591,7 @@ DR = sum of armor (with individual skill-bonus) + magic armor
 attack = weapon damage formula + weakness-bonus
 attack increases on critical
 hp-dmg = attack -DR but min.1 */
-window.gm.combat.calcAbsorb=function(attacker,defender, attack) {
+window.gm.combat.calcAbsorbOld=function(attacker,defender, attack) {
   let result = {OK:true,msg:'',foo:null}
   let rnd = _.random(1,100);
   let def = defender.Stats.get('pDefense').value;
@@ -606,6 +601,22 @@ window.gm.combat.calcAbsorb=function(attacker,defender, attack) {
   result.msg = defender.name +' got hit by '+attacker.name+' and suffered '+dmg+ (attack.crit?' critical ':'')+'damage. '
   attack.total = dmg;
   attack.effects.push( {target:defender,eff:[ effDamage.setup(attack.total,"blunt")]});
+  return(result);
+}
+window.gm.combat.calcAbsorb=function(attacker,defender, attack) {
+  let result = {OK:true,msg:''}
+  let rnd = _.random(1,100);
+  if(attack.mod.onCrit.length>0 && rnd<attack.mod.critChance) {  //is critical
+    result.msg = defender.name +' got critical hit by '+attacker.name;
+    for(el of attack.mod.onCrit) {
+        attack.effects.push( {target:el.target, eff:el.eff}); //el.eff is []
+    }
+  } else {
+    result.msg = defender.name +' got hit by '+attacker.name;
+    for(el of attack.mod.onHit) {
+        attack.effects.push( {target:el.target, eff:el.eff});
+    }
+  }
   return(result);
 }
 window.gm.combat.TypesDamage = [
@@ -634,6 +645,7 @@ window.gm.combat.defaultAttackData = function() {
 // calculates the damage of an physical attack
 window.gm.combat.calcAttack=function(attacker,defender,attack) {
   let result = {OK:false,msg:''};
+  window.gm.combat.scaleEffect(attack);
   //check if target can evade
   result = window.gm.combat.calcEvasion(attacker,defender,attack);
   if(result.OK===false) { return(result);  }
@@ -647,6 +659,29 @@ window.gm.combat.calcAttack=function(attacker,defender,attack) {
   _tmp += result.msg;
   result.msg = _tmp;
   return(result);
+}
+/**
+ * helper function to scale effective damage according to armor & resistance
+ * @param {*} attack 
+ */
+window.gm.combat.scaleEffect = function(attack) {
+  for(var i=0; i<attack.mod.onHit.length;i++){
+    let target = attack.mod.onHit[i].target;
+    let dmg,arm=0;
+    for(el of attack.mod.onHit[i].eff) {
+      if(el.name===effDamage.name) {
+        arm = target.Stats.getItem('arm'+el.type).value; //todo dmg = (attack-armor)*(100%-resistance)
+        dmg = Math.max(1,(el.amount-arm));
+        el.amount=dmg;
+      }
+      if(el.name===effTeaseDamage.name) {
+        arm = target.Stats.getItem('armtease').value
+        dmg = Math.max(1,(el.amount-arm));
+        el.amount=dmg;
+      }
+    }
+  }
+  //todo onCrit
 }
 // calculates the damage of an tease attack
 // - calculate sluttiness of attacker: 
@@ -662,19 +697,10 @@ window.gm.combat.calcAttack=function(attacker,defender,attack) {
 // self-dmg if exhibitionist/stripper
 window.gm.combat.calcTeaseAttack=function(attacker,defender,attack) {
   let result = {OK:true,msg:''};
-
-  let rnd = _.random(1,100);
-  let att = attacker.Stats.get('lAttack').value;
-  attack.value=att,attack.total=att;
-  let def = defender.Stats.get('lDefense').value;
-  //todo weakness bonus
-  let dmg = Math.max(1,attack.value* (attack.crit?4:1)-def);
-  window.gm.pushLog(`absorb roll:${dmg} vs ${def} `,window.story.state._gm.dbgShowCombatRoll);
-  result.msg = defender.name +' got teased by '+attacker.name+' and suffered '+dmg+ (attack.crit?' critical ':'')+'lustdamage. '
-  attack.total = dmg;
-
-  attack.effects.push( {target:defender,eff:[(new effTeaseDamage(attack.total))]});
-  /*_tmp += result.msg;
-  result.msg = _tmp;*/
+  window.gm.combat.scaleEffect(attack);
+  //deal damage
+  result = window.gm.combat.calcAbsorb(attacker,defender,attack);
+  var _tmp = result.msg;
+  result.msg = _tmp;
   return(result);
 }

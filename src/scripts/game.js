@@ -438,7 +438,7 @@ window.gm.refreshSidePanel = function(){
 };
 ///////////////////////////////////////////////////////////////////////
 window.gm.pushLog=function(msg,Cond=true) {
-  if(!Cond) return;
+  if(!Cond || msg==='') return;
   var log = window.story.state._gm.log;
   log.unshift(msg+'</br>');
   if(log.length>10) {
@@ -664,7 +664,6 @@ window.gm.printPickupAndClear= function(itemid, desc,itemleft,cbAfterPickup=null
 };
 window.gm.pickupAndClear=function(itemid, desc,itemleft,cbAfterPickup=null) {
   window.gm.player.Inv.addItem(new window.storage.constructors[itemid]());
-  //window.gm.pushLog("added "+itemid+" to inventory.</br>");
   if(cbAfterPickup) cbAfterPickup();
   window.gm.refreshAllPanel();
 };

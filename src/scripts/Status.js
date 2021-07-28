@@ -250,11 +250,7 @@ class Effect {
     get hidden() {return(this.data.hidden);}
     get desc() {return(this.name);}
     get shortDesc() {return(this.name);}
-        //add Reviver support:
-    //window.storage.registerConstructor(???);
-    //toJSON() {return window.storage.Generic_toJSON("???", this); };
-    //static fromJSON(value) { return window.storage.Generic_fromJSON(???, value.data);};
-    
+        
     //is called when a effect is applied to check if the new effect can be combined with an exisitng one
     //return null if no merge occured
     //return true if the neweffect was merged into existing one; no other effects are then checked for mergeability
@@ -276,11 +272,11 @@ class CombatEffect extends Effect {
     }
     get shortDesc() {return(this.desc+" for " + this.data.duration+" turns");}
     //duration in turns !
-    static onCombatEnd(context,data) {}
+    onCombatEnd() {}
     //called before targets turn
-    static onTurnStart(context,data) {}
+    onTurnStart() {}
     //at end of targets turn
-    static onTurnEnd(context,data) {}
+    onTurnEnd() {}
 }
 
 

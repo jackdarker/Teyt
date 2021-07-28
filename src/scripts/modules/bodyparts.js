@@ -105,6 +105,11 @@ class FaceWolf extends Equipment {
     descLong(fconv) {
         return(fconv('$[I]$ $[have]$ a muzzle like a '+this.data.style+'.'));
     }
+    attackMod(target){
+        let mod = new SkillMod();
+        mod.onHit = [{ target:target, eff: [effDamage.setup(11,'slash')]}];
+        return(mod);
+    }
 }
 class FaceHorse extends Equipment {
     static dataPrototype() {    
@@ -263,6 +268,11 @@ class HandsPaw extends Equipment { //paws of ferals
     static fromJSON(value) {return(window.storage.Generic_fromJSON(HandsPaw, value.data));}
     descLong(fconv) { 
         return(fconv('$[I]$ $[have]$ paws like that of a '+this.data.style+'.'));
+    }
+    attackMod(target){
+        let mod = new SkillMod();
+        mod.onHit = [{ target:target, eff: [effDamage.setup(10,'slash')]}];
+        return(mod);
     }
 }
 class HandsHuman extends Equipment {

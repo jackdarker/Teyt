@@ -45,6 +45,7 @@ class Wolf extends Mob {
         this.Outfit.addItem(HandsPaw.factory('wolf'));
         this.Outfit.addItem(TailWolf.factory('wolf'));
         this.Outfit.addItem(FaceWolf.factory('wolf'));
+        this.Stats.increment('armblunt',5);
         this.fconv = null; //lazy init because descfixer depends on gm.player
     }
     calcCombatMove(enemys,friends){

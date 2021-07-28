@@ -36,8 +36,7 @@ Game Over. Better luck next time.</br>
 
 :: Mole Submit {"position":"500,175"}
 <section> 
-<!--hide this, we are not in a state ready to save <aside id="sidebar"></aside>-->
-<article><%=window.story.render("CenterDialogs") %>
+<aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 The mole took you down into his cave. </br>
 Which was very difficult since you are far to large - you know?</br>
 <a0 onclick='window.gm.postDefeat();'>Black out</a>

@@ -45,6 +45,17 @@ class SkillCost{
     }
 }
 
+class SkillMod {
+    constructor() {
+        this.hitChance =100;
+        this.critChance =4;
+        this.onHit = [];    // [{ target: 'target', eff: 'damage_pierce', damage: '11'}]
+        this.onCrit = [];
+        this.onUse = [];
+        this.onMiss = [];
+    }
+}
+
 class Skill {
 constructor(id) {
     this.id=this.name = id;
@@ -103,9 +114,9 @@ getCastDescription(result) {
     return(this.caster.name +" uses "+ this.name +" on " + result.targets[0].name+".");
 }
 previewCast(target){
-        var result = new SkillResult();
-        result.msg = this.caster.name +" will use "+ this.name +" on " + targets.name;
-        return(result);
+    var result = new SkillResult();
+    result.msg = this.caster.name +" will use "+ this.name +" on " + targets.name;
+    return(result);
 }
 cast(target){
     //execute the skill on the targets

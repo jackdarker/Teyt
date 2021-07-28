@@ -230,7 +230,6 @@ Where would you like to go?</br>
 :: Cellar_PortalReverse
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<!--<%window.gm.player.location=window.passage.name;%>-->
 The portal spits you out in the dim light of your cellar.</br></br>
 [[Next|Cellar]]</br>
 </article><article id="LogPanel"></article></section>
@@ -239,7 +238,6 @@ The portal spits you out in the dim light of your cellar.</br></br>
 :: Cellar_Portal
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<!--<%window.gm.player.location=window.passage.name;%>-->
 A blinding light engulfs you just for a second and then a deafening darkness.  </br></br>
 Its impossible to tell what else happens or how long the process takes.</br></br>
 As you come back to your senses you find yourself cowering on the floor, still croggy from the experience.</br>
