@@ -144,7 +144,7 @@ class SkillUltraKill extends SkillAttack {
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillUltraKill, value.data));}
     __estimateAttack(target) {
         let attack =window.gm.combat.defaultAttackData();
-        let mod = new SkillMod();
+        attack.mod = new SkillMod();
         attack.mod.onHit = [{ target:target, eff: [effDamage.setup(99999,'blunt')]}];
         return(attack);
     }
@@ -220,6 +220,7 @@ class SkillTease extends Skill {
     constructor() {
         super("Tease");
         this.msg = '';
+        this.magnitude=0.5;
     }
     toJSON() {return window.storage.Generic_toJSON("SkillTease", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillTease, value.data));}
@@ -234,9 +235,15 @@ class SkillTease extends Skill {
         this.msg = '';
         if(this.isValidTarget(targets)) {
             result.OK = true;
-            this.msg = 'Shaking his hips, xxx trys to arouse the audiensce.'; //todo
+            let dmg =5;
+            //tease depends on teaseproficiency, clothing slutiness/nudeness,own arousal
+            if(this.parent.parent.Stats.getItem('arousal').value>40) dmg +=5
+            dmg*=Math.max(0,this.magnitude*this.__slutDetector(this.caster));
+            this.msg = 'Shaking his hips, xxx trys to arouse the audience.'; //todo
             for(var target of targets) {
-                let attack =this.__estimateAttack(target);
+                let attack =window.gm.combat.defaultAttackData();
+                attack.mod= new SkillMod();
+                attack.mod.onHit=[{target:target, eff:[effTeaseDamage.setup(dmg)]}]
                 let result2 = window.gm.combat.calcTeaseAttack(this.caster,target,attack);
                 this.msg+=result2.msg;
                 result.effects = result.effects.concat(attack.effects); 
@@ -244,11 +251,12 @@ class SkillTease extends Skill {
         }
         return result
     }
-    __estimateAttack(target) {
-        let attack =window.gm.combat.defaultAttackData();
-        attack.mod= new SkillMod(); //todo tease depends on slutiness & preferences
-        attack.mod.onHit=[{target:target, eff:[effTeaseDamage.setup(10)]}]
-        return(attack);
+    __slutDetector(target) {
+        let x=1; 
+        let lewd=this.caster.Outfit.getLewdness();
+        if(lewd.slut>3) x+=0.1; //todo bondage 
+        if(lewd.slut>6) x+=0.1;
+        return(x);
     }
     getCastDescription(result) {
         return(this.msg);
@@ -294,7 +302,10 @@ class SkillStun extends Skill {
     }
 }
 class SkillPoisonCloud extends Skill {
-    constructor() {  super("PoisonCloud");  }
+    constructor() {  super("PoisonCloud");
+        this.cost.energy =20;
+        this.amount=4;
+    }
     toJSON() {return window.storage.Generic_toJSON("SkillPoisonCloud", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillPoisonCloud, value.data));}
     targetFilter(targets){
@@ -308,20 +319,23 @@ class SkillPoisonCloud extends Skill {
         if(this.isValidTarget(targets)) {
             result.OK = true;
             for(var target of targets) {
-                result.effects.push( {target:target,
-                    eff:[new effPoisoned()]})
-                }
+                let attack =window.gm.combat.defaultAttackData();
+                attack.mod= new SkillMod();
+                attack.mod.onHit = [{ target:target, eff: [effDamage.setup(this.amount,'poison')]}];
+                let result2 = window.gm.combat.calcAttack(this.caster,target,attack);
+                this.msg+=result2.msg;
+                result.effects = result.effects.concat(attack.effects); 
+            }
         }
         return result
     }
     getCastDescription(result) {
-        //update msg after sucessful cast
         return(this.caster.name +" poisons " + result.targets.name+".");
     }
 }
 class SkillHeal extends Skill {
     constructor() { super("Heal");   
-    this.cost.will =20; 
+    this.cost.will =25; 
     }
     toJSON() {return window.storage.Generic_toJSON("SkillHeal", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillHeal, value.data));}
@@ -334,7 +348,7 @@ class SkillHeal extends Skill {
         result.skill =this;
         result.source = this.caster;
         result.targets = targets;
-        if(this.isValidTarget(targets)) {   //todo  consume energy
+        if(this.isValidTarget(targets)) {
             result.OK = true;
             for(var target of targets) {
                 result.effects.push( {target:target,
@@ -427,10 +441,8 @@ class SkillGrapple extends Skill {
             var target=targets[0];
             var rnd = _.random(0,100);
             if(rnd>30) { //todo chance to grapple depends on?
-                let x = effGrappled.factory();
-                //let grappled = new effGrappled(2), grappling= new effGrappling();
-                //let x = new effCombined([grappled,grappling ]);
-                result.effects.push( {target:this.caster,eff:[x.sourceEff]});//,heal,leeching]
+                let x = effGrappled.factory(); //target get grappled effect and caster grappling until the grapple is undone
+                result.effects.push( {target:this.caster,eff:[x.sourceEff]});
                 result.effects.push( {target:target,eff:[x.targetEff]});
             } 
         }
@@ -544,7 +556,6 @@ class SkillStruggle extends Skill {
     }
 }
 class SkillGuard extends Skill {
-    //todo improves defense; 
     constructor() { super("Guard");}
     toJSON() {return window.storage.Generic_toJSON("SkillGuard", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillGuard, value.data));}

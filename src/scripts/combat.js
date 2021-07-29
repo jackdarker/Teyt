@@ -619,25 +619,20 @@ window.gm.combat.calcAbsorb=function(attacker,defender, attack) {
   }
   return(result);
 }
+/**
+ * damage types
+ */
 window.gm.combat.TypesDamage = [
   {id: 'blunt'},
   {id: 'slash'},
+  {id: 'pierce'},
   {id: 'tease'},
   {id: 'spark'},
   {id: 'ice'},
+  {id: 'fire'},
   {id: 'poison'}
 ]
-//object to store 
-window.gm.combat.AttackSetup = function() {
-    /*
-  entry = {cond:number|function ,apply:[outcome]|[entry] }
-  outcome = {target:"defender", effect:"effDamage", value: 10}
 
-  attack = { cond: function(attacker,targets){ if(targets[0].hasEffect("flying")) return(0); return(70)}, 
-            apply: [{target:"defender", effect:"effDamage", value: 10}] }
-*/
-  return({cond: 100, apply:[{target:"defender", effect:"effDamage", value: 10}]})
-}
 //object to store attack-data
 window.gm.combat.defaultAttackData = function() {
   return({value:0,total:0,crit:false,effects:[]}); 
@@ -665,35 +660,35 @@ window.gm.combat.calcAttack=function(attacker,defender,attack) {
  * @param {*} attack 
  */
 window.gm.combat.scaleEffect = function(attack) {
-  for(var i=0; i<attack.mod.onHit.length;i++){
-    let target = attack.mod.onHit[i].target;
-    let dmg,arm=0;
-    for(el of attack.mod.onHit[i].eff) {
-      if(el.name===effDamage.name) {
-        arm = target.Stats.getItem('arm'+el.type).value; //todo dmg = (attack-armor)*(100%-resistance)
-        dmg = Math.max(1,(el.amount-arm));
-        el.amount=dmg;
+  function _adapt(op){
+    let target,dmg,rst,arm=0;
+    for(var i=0; i<op.length;i++){
+      target = op[i].target;
+      for(el of op[i].eff) {
+        if(el.name===effDamage.name) {  //dmg = (attack-armor)*(100%-resistance) but min. 1pt
+          arm = target.Stats.getItem('arm'+el.type).value;
+          rst = target.Stats.getItem('rst'+el.type).value;
+          dmg = Math.max(1,(el.amount-arm)*(100-rst)/100);
+          el.amount=dmg;
+        }
+        if(el.name===effTeaseDamage.name) {
+          arm = target.Stats.getItem('armtease').value;
+          rst = target.Stats.getItem('rsttease').value;
+          dmg = Math.max(1,(el.amount-arm)*(100-rst)/100);
+          el.amount=dmg;
+        }
       }
-      if(el.name===effTeaseDamage.name) {
-        arm = target.Stats.getItem('armtease').value
-        dmg = Math.max(1,(el.amount-arm));
-        el.amount=dmg;
-      }
-    }
-  }
-  //todo onCrit
+    }}
+    _adapt(attack.mod.onHit);
+    _adapt(attack.mod.onCrit);
 }
-// calculates the damage of an tease attack
-// - calculate sluttiness of attacker: 
-//      teaseproficiency
-//      clothing slutiness
-//      nudeness
-//      own arousal
-// - calculate vulnerability of defender
+
+// todo calculate vulnerability of defender
 //      sexcrafing
 //      like/dislike of attacker
 //      fetish
 // dmg = vulnerability*sluttiness
+// no dmg if blinded, stunned,
 // self-dmg if exhibitionist/stripper
 window.gm.combat.calcTeaseAttack=function(attacker,defender,attack) {
   let result = {OK:true,msg:''};

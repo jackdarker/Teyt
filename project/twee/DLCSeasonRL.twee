@@ -103,19 +103,18 @@ You read some more:</br>
 * damage or misuse of the provided equipment
 * obstruction of beta-test-program or the game itself
 * disclosure of game-related information"
-</br>'Ok, no problem yet. I think thats just reasonable for something like a beta-test.'</br>
+</br></br>'Ok, no problem yet. I think thats just reasonable for something like a beta-test.'</br>
 "Please note that you are responsible to regulary check your test-schedule for your assigned pending task.
 Tasks noted as required have to be fullfilled within the given time window. Continous failing to do so might count as obstruction of the test-program... "</br>
 'Damit, what did I get mmyself into. Lets check online about this schedule.'</br>
 You login with your credentials on the PC and are greeted by a welcome screen:</br>
 "Welcome <%=window.gm.player.name%>, this is your actual profile:" </br> 
 * no avatar
-Tasks:</br>
+</br>Tasks:</br>
 * Setup equipment to game
 * Create avatar
 * Finish Game introduction
-</br>
-Adorning the gloves and the VR-googles, you first have to run introductory tutorial. </br>
+</br></br>Adorning the gloves and the VR-googles, you first have to run introductory tutorial. </br>
 You get some info how to use your hands movement for navigationg the screen and you even can use speech-control to do so.</br>
 You are eager to create your avatar and get a look at the game. On the other side, you would like to talk about your current experience with Brad first and see if he has gotten as far as you.</br>
 Besides its already gotten late.</br>
@@ -130,12 +129,12 @@ You chuckle to yourself 'So Mr.IKnowEverything failed on the mechanical part alr
 [[Offer your help]]
 <p class='tPC'>"I can help you tomorrow to get it setup if you want."</p>
 "I will just give it a try tommorow morning on my own. I'm just to tired from work, you know."
-<p class='tPC'>"So you have a day off tomorrow? Just wait for me before doing quests. Its not fair if you get a head start just because I'm busy all day."
+<p class='tPC'>"So you have a day off tomorrow? Just wait for me before doing quests. Its not fair if you get a head start just because I'm busy all day."</p>
 "Dont worry. As usual I will help your lazy ass leveling up to catch up with me."
-<p class='tPC'>"For sure"</p> 'I should have already started the game to get a head start.'
+<p class='tPC'>"For sure"</p>
 You can hear him yawning "I'm going to sleep now."
 <p class='tPC'>"Me too. See you tomorrow then, bro."</p>
-"Yup. See ya."
+"Yup. See ya."</br>
 You put your phone away. A shower and some sleep would be nice.</br>
 [[Next|Your Bedroom]]
 </article><article id="LogPanel"></article></section>

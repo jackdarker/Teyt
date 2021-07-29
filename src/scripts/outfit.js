@@ -43,7 +43,7 @@ window.gm.OutfitSlotLib = {
     Balls  :    "Balls",
     Vulva  :    "Vulva",
     Clit    :   "Clit",
-    Womb   :    "Womb",
+    Womb   :    "Womb", //??
     Anus   :    "Anus",
     TailBase   :"TailBase",
     TailTip :   "TailTip",
@@ -108,6 +108,7 @@ class Equipment extends Item {
         this.slotUse = []; //which slot is used by the equip
         this.slotCover = []; //which other slots are invisible by this "uses Breast, covers bBreast,bNipples"
         this.bonus =[]; //Curse or Bonus assigned to item
+        this.lewd ={slut:0, bondage:0, sm:0}; //slutiness-rating 
     }
     _relinkItems(parent) {  //call this after loading save data to reparent
         super._relinkItems(parent);
@@ -172,8 +173,7 @@ class Equipment extends Item {
 }
 //a kind of special inventory for worn equipment
 class Outfit { //extends Inventory{
-    constructor(externlist) {
-        //super(externlist);
+    constructor() {
         this.list = {};  //this.list.Legs = {id:'Leggings' item:x}
         this.list[Symbol.iterator] = function() { //need iterator for for..of
             let index = -1;
@@ -201,7 +201,6 @@ class Outfit { //extends Inventory{
     postItemChange(id,operation,msg) {
         window.gm.pushLog('Outfit: '+operation+' '+id+' '+msg);
     }
-
     _relinkItems() {  //call this after loading save data to reparent
         for (el of this.list) {
             if(el.value.item) { 
@@ -224,10 +223,6 @@ class Outfit { //extends Inventory{
         for (el of this.list) {
             if(el.value.id===id) _idx.push(el.index);
         }
-        /*let items = Object.keys(this.list);
-        for (let i = 0; i < items.length; i++) {
-            if(items[i].id===id) _idx.push(id);
-        }*/
         return(_idx);
     }
     getItemId(slot) {
@@ -248,9 +243,6 @@ class Outfit { //extends Inventory{
                 ids.push(el.value.item.id);
             }
         }
-        /*for (let i =ids.length-1;i>=0;i-=1) {
-            ids[i]=ids[i].id;
-        }*/
         return(ids);
     }
     getItemForSlot(slot) {
@@ -350,6 +342,43 @@ class Outfit { //extends Inventory{
             let _eff = el.value.item;
             if(_eff) _eff.onTimeChange(now);   
         }
+    }
+    /**
+     * returns all items that can be seen (Breast-armor hides breast-underwear hides breast)
+     */
+    getVisibleSlots() {
+        let covered=[], seen=[];   
+        let lstIds = this.getAllIds();
+        for(var i=lstIds.length-1;i>=0;i--) {
+            let item =this.getItem(lstIds[i]);
+            covered=covered.concat(item.slotCover);
+            seen =seen.concat(item.slotUse);
+        }
+        function remCovered(elm){
+            return(!covered.includes(elm));
+        }
+        seen=seen.filter(remCovered);
+        return(seen);
+    }
+    getLewdness() {
+        let total={},lewd={};
+        let item,slots = this.getVisibleSlots();
+        for(var i=0; i<slots.length-1;i++) {
+            item = this.getItemForSlot(slots[i]);
+            if(item && !lewd[item.id]) { //no double count items  
+                lewd[item.id] = item.lewd;
+            }
+        }
+        var _keys = Object.keys(lewd); // {slut:0,sm:2}
+        for(var i=0;i<_keys.length;i++) {
+            item = lewd[_keys[i]];
+            var _keys2 = Object.keys(item);
+            for(el of _keys2) {
+                if(total.hasOwnProperty(el)) total[el] += item[el];
+                else total[el] = item[el];
+            }
+        }
+        return(total);
     }
 }
 

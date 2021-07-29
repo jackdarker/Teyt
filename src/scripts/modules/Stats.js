@@ -906,10 +906,10 @@ class effHeal extends CombatEffect {
         }
     }
 }
+
 class effGuard extends CombatEffect {
-    constructor(amount) {
+    constructor() {
         super();
-        this.amount = amount;
         this.data.id = this.data.name= effGuard.name, this.data.duration = 0, this.data.hidden=0;
     }
     toJSON() {return window.storage.Generic_toJSON("effGuard", this); };
@@ -917,7 +917,9 @@ class effGuard extends CombatEffect {
     get desc() {return(effGuard.name);}
     onApply(){
         this.data.duration = 2;
-        //this.parent.parent.Stats.addModifier('pDefense',{id:'pDefense:Guard', bonus:5}); //Todo percentage
+        this.parent.parent.Stats.addModifier('rstblunt',{id:'rstblunt:Guard', bonus:5});
+        this.parent.parent.Stats.addModifier('rstslash',{id:'rstblunt:Guard', bonus:5});
+        this.parent.parent.Stats.addModifier('rstpierce',{id:'rstpierce:Guard', bonus:5});
     }
     merge(neweffect) {
         if(neweffect.name===this.data.name) {    //extends
@@ -933,7 +935,9 @@ class effGuard extends CombatEffect {
         if(this.data.duration<=0) this.parent.removeItem(this.data.id);
     }
     onRemove(){
-        //this.parent.parent.Stats.removeModifier('pDefense',{id:'pDefense:Guard'});
+        this.parent.parent.Stats.removeModifier('rstblunt',{id:'rstblunt:Guard'});
+        this.parent.parent.Stats.removeModifier('rstblunt',{id:'rstblunt:Guard'});
+        this.parent.parent.Stats.removeModifier('rstpierce',{id:'rstpierce:Guard'});
     }
 }
 //to combine multiple effects that get dispelled together 
@@ -1120,9 +1124,10 @@ class effUngrappling extends CombatEffect {
     onTurnStart() { this.data.duration-=1; if(this.data.duration<=0) this.parent.removeItem(this.data.id);    }
 }
 class effTeaseDamage extends CombatEffect {
-    static setup(amount) {
+    static setup(amount,type) {
         let eff = new effTeaseDamage();
         eff.amount = amount;
+        eff.type = type;
         return(eff);
     }
     constructor(amount) {

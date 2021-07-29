@@ -20,7 +20,6 @@ You try to change race, but find that you are stuck to some kind of elf-boy.
 You can toggle between male and female though the difference between the androgyne male and the female seem just to be some perky but small titts.</br>
 The description of the class is sparse. The picture you see indicates that this class uses a 2-handed staff and light armor. You expect also some magic abilities - its an elf, isn't it?.</br>
 <p class="tPC">'I will choose male. Brad would make fun of me all time if I would choose any other option. On the other hand, it is roleplay right?'</p></br>
-<!--todo-->[[male elf]] [[female elf]] 
 <div id='select1' >
 <a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1a");window.gm.MutationsLib["swapGender"](window.gm.player,window.storage.constructors["PenisHuman"]);'>male</a>
 <a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1b");window.gm.MutationsLib["swapGender"](window.gm.player,window.storage.constructors["VulvaHuman"]);window.gm.player.Outfit.addItem(window.storage.constructors["BreastHuman"].factory("human"));'>female</a>

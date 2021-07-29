@@ -294,6 +294,7 @@ class Briefs extends Equipment {
         this.slotUse = ['uHips'];
         this.slotCover = ['bPenis','bVulva','bBalls','bClit','bAnus','pPenis','pClit'];    
         this.lossOnRespawn = true;
+        this.lewd.slut = 1;
     }
     get desc() { return 'plain briefs';}
     toJSON() {return window.storage.Generic_toJSON("Briefs", this); }

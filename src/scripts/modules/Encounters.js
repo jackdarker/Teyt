@@ -89,6 +89,17 @@ window.gm.encounters.wolf = function(location) {
     }
     window.gm.Encounter.initCombat();
 }
+window.gm.encounters.dryad = function(location) {
+    window.gm.Encounter = new CombatSetup();
+    window.gm.Encounter.EnemyFunc = (function() { 
+        let x = new window.gm.Mobs.Dryad();
+        x.scaleLevel(window.gm.player.level);
+        x.Stats.increment("health",9999); x.Stats.increment("energy",9999);
+        return([x]);});
+    window.gm.Encounter.Location = location;
+    window.gm.Encounter.scenePic = window.gm.getScenePic(location);
+    window.gm.Encounter.initCombat();
+}
 window.gm.encounters.Carlia = function(location) {
     window.gm.Encounter = new CombatSetup();
     window.gm.Encounter.EnemyFunc = (function() { 

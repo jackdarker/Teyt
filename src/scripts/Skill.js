@@ -60,6 +60,7 @@ class Skill {
 constructor(id) {
     this.id=this.name = id;
     this.cost = new SkillCost();
+    this.level=1;
 }
 //_parent will be added dynamical
 get parent() {return this._parent?this._parent():null;}

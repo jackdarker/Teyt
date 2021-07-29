@@ -550,6 +550,8 @@ window.gm.printBodyDescription= function(whom,onlyvisible=false) {
   let all = base.concat([null]).concat(head).concat([null]).concat(torso).concat([null]).concat(arms).concat([null]);
   all = all.concat(legs).concat([null]).concat(groin).concat([null]).concat(breast).concat([null]).concat(other);
   for(el of all){ msg+= (el!==null)?el.descLong(conv)+' ':'</br>';}
+  let lewd = whom.Outfit.getLewdness();
+  msg +='</br>Total lewdness sluty:'+lewd.slut+' bondage:'+lewd.bondage+' sm:'+lewd.sm;
 	return msg+"</br>";
 };
 // returns singular pronoun for the char depending on gender

@@ -143,11 +143,12 @@ class Character {
         }
     }
     isDead() {return(this.Stats.get('health').value<=0);}
-    //naked returns: 
-    //"naked" - naked
-    //"primal" - cover genitals 
-    //"civil" - wears some trousers,footwear and torsocovers
-    //"formal" - ...wears underwear too
+    /** 
+    * "naked" - naked
+    * "primal" - cover genitals 
+    * "civil" - wears some trousers,footwear and torsocovers
+    * "formal" - ...wears underwear too
+    */
     clothLevel() { //TODO
         let uwOK = false,civOK =false;
         if(this.Outfit.getItemId(window.gm.OutfitSlotLib.uHips)!=='' && this.Outfit.getItemId(window.gm.OutfitSlotLib.uBreast)!=='')  {
