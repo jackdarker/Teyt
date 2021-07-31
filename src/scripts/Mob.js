@@ -5,7 +5,7 @@ class Mob extends Character {
         super();
         this.level_min = 1;     
         this.baseXPReward=0;
-        this.loot =[];   //[{id:'healthpotion', amount:1}]
+        this.loot =[];   //[{id:'healthpotion',chance:5, amount:1}]
         this.levelUp(1);
         this.autoLeveling();
     }
@@ -39,6 +39,8 @@ class Mob extends Character {
             this.levelUp(1);
             this.autoLeveling();
         }
+        //refill gained stats 
+        this.Stats.increment("health",99999); this.Stats.increment("energy",99999);this.Stats.increment("will",99999);
     };
     levelUp(add) {
         super.levelUp(add);

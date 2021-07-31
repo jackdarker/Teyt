@@ -4,20 +4,22 @@ window.gm = window.gm || {};
 window.gm.combat = window.gm.combat || {};
 
 
-class CombatSetup {
+class Encounter {
   constructor() {
     this.EnemyFirst=false;
     this.EnemyFunc = null;  //a ctor of Mob
     this.Location = ''  //your actual location-name
     this.scenePic = ''  //bg-image to use
-    //the following function should get reassigned; 
-    //they should return a message what will happen next and provide a link to passage to follow f.e. return to window.gm.player.location
+    //the following function should get reassigned;they should return a message what will happen next and provide a link to passage to follow f.e. return to window.gm.player.location
     this.onStart = (function(){return('A '+window.story.state.combat.enemyParty[0].name+' appears !'+ window.gm.printPassageLink('Engage','EncounterStartTurn'));});
+    //...endCombat is called after this and if you need to check on effects, you have to do this here !
     this.onDefeat = (function(){return('You are defeated.</br>'+ window.gm.printLink('Next','window.gm.postDefeat()'));});
-    //...dont forget to fetchLoot
-    this.onVictory = (function(){return('You defeated the foe.</br> '+this.fetchLoot()+'</br>'+ window.gm.printLink('Next','window.gm.postVictory()'));});
-    this.onFlee = (function(){return('You retreat hastily.</br>'+ window.gm.printLink('Next','window.gm.postVictory()'));});
     this.onSubmit = (function(){return('You submit to the foe.</br>'+ window.gm.printLink('Next','window.gm.postDefeat()'));});
+    this.onFlee = (function(){return('You retreat hastily.</br>'+ window.gm.printLink('Next','window.gm.postVictory()'));});
+
+    //...dont forget to fetchLoot on victory
+    this.onVictory = (function(){return('You defeated the foe.</br> '+this.fetchLoot()+'</br>'+ window.gm.printLink('Next','window.gm.postVictory()'));});
+
     //if you override onMoveSelect (like the others), you can jump out of battle, show some scene and return to battle
     //- do not modify window.gm.player.location
     //- disable save
@@ -318,16 +320,18 @@ endCombat(){
 fetchLoot(){ //if you are victorious: grant XP & transfer Loot to player 
   let s=window.story.state;
   let msg='';
-  let XP=0;
-  let maxLevel = 0;
+  let XP=0, maxLevel = 0, _rnd=_.random(0,100);
   for (el of s.combat.playerParty) {
     maxLevel = Math.max(maxLevel,el.level);
   }
   for(el of s.combat.enemyParty) {
     for(var i = el.loot.length-1;i>=0;i--) {
-      msg+= el.loot[i].amount+'x '+el.loot[i].id+' ';
-      window.gm.player.changeInventory(el.loot[i].id,el.loot[i].amount);
+      if(_rnd<=el.loot[i].chance) {
+        msg+= el.loot[i].amount+'x '+el.loot[i].id+' ';
+        window.gm.player.changeInventory(el.loot[i].id,el.loot[i].amount);
+      }
     }
+    //XP reduced/increased if your level is bigger/smaller then foes by 25% per level
     XP+=Math.floor(el.baseXPReward* Math.min(3,Math.max(0,1+(el.level-maxLevel)*0.25)));
   }
   msg = '</br>You got some loot: '+window.gm.util.formatNumber(XP,0) +'XP '+msg+'</br>';
@@ -660,7 +664,9 @@ window.gm.combat.calcAttack=function(attacker,defender,attack) {
  * @param {*} attack 
  */
 window.gm.combat.scaleEffect = function(attack) {
+  let res = {OK:true,msg:''};
   function _adapt(op){
+    let res = {OK:true,msg:''};
     let target,dmg,rst,arm=0;
     for(var i=0; i<op.length;i++){
       target = op[i].target;
@@ -672,29 +678,29 @@ window.gm.combat.scaleEffect = function(attack) {
           el.amount=dmg;
         }
         if(el.name===effTeaseDamage.name) {
+          //todo no dmg if blinded, stunned,
+          //todo vulnerable if inHeat, like/dislike attacker
+          //bondage-fetish -> bonus for bond-gear
+          el.amount *= 1+Math.sqrt(el.lewds.slut)/10; //bonus for slutty wear
           arm = target.Stats.getItem('armtease').value;
           rst = target.Stats.getItem('rsttease').value;
-          dmg = Math.max(1,(el.amount-arm)*(100-rst)/100);
+          dmg = Math.max(0,(el.amount-arm)*(100-rst)/100); //might cause 0 dmg
           el.amount=dmg;
         }
       }
-    }}
-    _adapt(attack.mod.onHit);
-    _adapt(attack.mod.onCrit);
+    }
+    return(res);
+  }
+  _adapt(attack.mod.onHit);
+  _adapt(attack.mod.onCrit);
+  return(res);
 }
-
-// todo calculate vulnerability of defender
-//      sexcrafing
-//      like/dislike of attacker
-//      fetish
-// dmg = vulnerability*sluttiness
-// no dmg if blinded, stunned,
-// self-dmg if exhibitionist/stripper
 window.gm.combat.calcTeaseAttack=function(attacker,defender,attack) {
   let result = {OK:true,msg:''};
   window.gm.combat.scaleEffect(attack);
-  //deal damage
-  result = window.gm.combat.calcAbsorb(attacker,defender,attack);
+  //todo chance to fail?
+  //todo self-dmg if exhibitionist/stripper
+  result = window.gm.combat.calcAbsorb(attacker,defender,attack);  //deal damage
   var _tmp = result.msg;
   result.msg = _tmp;
   return(result);

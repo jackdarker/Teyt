@@ -312,6 +312,7 @@ class Outfit { //extends Inventory{
         _item._parent = window.gm.util.refToParent(this);       //Todo currently we have 2 copies of equipment - 1 for wardrobe 1 for outfit otherwise this will not work
         result=_item.onEquip(this);
         this.postItemChange(_item.name,"equipped",result.msg);
+        return(result);
     }
     //assumme that it was checked before that unequip is allowed
     __clearSlot(slot, force) {
@@ -335,6 +336,7 @@ class Outfit { //extends Inventory{
         }
         this.postItemChange(id,"removed",result.msg);
         //Todo delete _item;    //un-parent
+        return(result)
     }
     updateTime() {
         let now =window.gm.getTime();

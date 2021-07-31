@@ -67,6 +67,15 @@ You cant hold any longer and shoot your jizzm inside her.
 <script>window.gm.sex.wolfOnPlayer({state:0, battleResult:'victory'});
 </script>
 
+:: DryadVictory
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<div id='panel'></div><!--description is rendered here-->
+<div id='choice'></div> <!--choice is rendered here-->
+</article><article id="LogPanel"></article></section>
+<script>window.gm.sex.dryadOnPlayer({state:0, battleResult:'victory'});
+</script>
+
+
 :: WolffightIntermezzo
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 Wolf snarls at you.
@@ -111,8 +120,16 @@ You gain the impression that the soul crystal has reached the maximum size that 
 "A developing soul gem interferes and supresses normal pregnancys. There are different cases known where host used this effect as alternative to other birth control measures." 
 Several religious directions state that this is against natures law and has to be prohibited. However, the high demand for crystals encourages unofficial experimentation."
 
+
+
+:: Pong
+<div id="pong"></div>
+<a0 id='btStart'>Start</a><p id='result'></p>
+<script>window.gm.startPong();</script>
+
 :: ReactionTest
 <p>Click Start and then click somewhere on the bar to stop the green rectangle in the yellow hit-area.</p>
+<div id='canvas'></div>
 <div class="progress-bar" id='clickHere' style='height:1em; width: 100%;'><div id='bar' style="position:relative; width:5%; height:100%; background-color:green;"></div></div>
 <a0 id='btStart'>Start</a><p id='result'></p>
 <script>
@@ -138,6 +155,63 @@ document.getElementById('btStart').addEventListener("click", _game.start);
 document.querySelector('body').addEventListener("keyup", _game.click);
 </script>
 
+
+:: Reactiontest3
+<p>example on how to create reactive graphics from svg parts</p>
+* Define g-object with id in defs.
+* use-xlink to create instances of those objects
+* use var(--) to define variables that you can set in css 
+* 
+<svg class="pink-cube" viewBox="0 0 300 230" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<defs>
+  <g id="Leg" class="cube-unit">
+    <rect width="21" height="24" fill="var(--lightColor)" stroke="var(--strokeColor)"/>
+  </g>
+  </defs>
+  <use xlink:href="#Leg" x="121" y="112"/>
+</svg>
+<svg class="pink-cube" viewBox="0 0 300 230" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+  <g id="cube" class="cube-unit">
+    <rect width="21" height="24" fill="var(--lightColor)" stroke="var(--strokeColor)" transform="skewY(30)"/>
+    <rect width="21" height="24" fill="var(--darkColor)" stroke="var(--strokeColor)" transform="skewY(-30) translate(21 24.3)"/>
+    <rect width="21" height="21" fill="var(--mainColor)" stroke="var(--strokeColor)" transform="scale(1.41,.81) rotate(45) translate(0 -21)"/>
+  </g>
+  </defs>
+  <line opacity=".5" x1="80" x2="100" y1="150" y2="150" fill="none" stroke-width="1" stroke-linecap="round" stroke="var(--lightColor)" stroke-dasharray="2.5" />
+   <line opacity=".5" x1="186" x2="204" y1="90" y2="90" fill="none" stroke-width="1" stroke-linecap="round" stroke="var(--lightColor)" stroke-dasharray="2.5" />
+   <line opacity=".5" x1="115" x2="115" y1="75" y2="85" fill="none" stroke-width="1" stroke-linecap="round" stroke="var(--lightColor)" stroke-dasharray="2.5" />
+    <use xlink:href="#cube" x="121" y="112"/>
+    <use xlink:href="#cube" x="100" y="124"/>
+    <use xlink:href="#cube" x="142" y="124"/>
+    <use xlink:href="#cube" x="121" y="136"/>
+    <use class="m-left" xlink:href="#cube" x="79" y="136"/>
+    <use xlink:href="#cube" x="163" y="136"/>
+    <use xlink:href="#cube" x="142" y="148"/>
+    <use xlink:href="#cube" x="100" y="148"/>
+    <use xlink:href="#cube" x="121" y="160"/>
+    <use xlink:href="#cube" x="121" y="88"/>
+    <use xlink:href="#cube" x="100" y="100"/>
+    <use xlink:href="#cube" x="142" y="100"/>
+    <use xlink:href="#cube" x="121" y="112"/>
+    <use xlink:href="#cube" x="79" y="112"/>
+    <use xlink:href="#cube" x="163" y="112"/>
+    <line opacity=".5" x1="165" x2="185" y1="155" y2="155" fill="none" stroke-width="1" stroke-linecap="round" stroke="var(--lightColor)" stroke-dasharray="2.5" />
+    <use class="m-right" xlink:href="#cube" x="142" y="124"/>
+    <use xlink:href="#cube" x="100" y="124"/>
+    <use xlink:href="#cube" x="121" y="136"/>
+    <use xlink:href="#cube" x="121" y="64"/>
+    <use class="m-up" xlink:href="#cube" x="100" y="76"/>
+    <use xlink:href="#cube" x="142" y="76"/>
+    <use xlink:href="#cube" x="121" y="88"/>
+    <use xlink:href="#cube" x="79" y="88"/>
+    <use class="m-right" xlink:href="#cube" x="163" y="88"/>
+    <use xlink:href="#cube" x="142" y="100"/>
+    <use xlink:href="#cube" x="100" y="100"/>
+    <use xlink:href="#cube" x="121" y="112"/>
+  </svg>
+  <p>hover over me</p>
+
 :: Evade
 <!-- präsentiert von kostenlose-javascripts.de (c) Copyright By N00b1000-->
 <script type='text/javascript'>
@@ -155,8 +229,6 @@ var z=0;
 var life=1;
 var c=Math.round(Math.random()*5);
 var starttime = new Date();
-
-
 document.write('<div id="feld" style="position:relative; left:0px; top:0px; background-color: black; width: 300px; height: 350px;"></div>');
 document.write('<div id="spieler" style="position:absolute; left:0px; top:0px">');
 document.write('	<img width="50" id="imgplayer" height="50" src="'+bilderpfad+'/spieler0.gif" alt="" />');
@@ -164,10 +236,7 @@ document.write('</div>');
 document.write('<div id="auto" style="position:absolute; left:0px; top:0px">');
 document.write('	<img width="50" id="imgkristall" height="50" src="'+bilderpfad+'/kristall0.gif" alt="" />');
 document.write('</div>');
-
-
 function move() {
-
 	spieler0 = new Image();
 	spieler0.src = bilderpfad+"/spieler0.gif";
 	spieler1 = new Image();

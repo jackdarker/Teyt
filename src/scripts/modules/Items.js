@@ -1,4 +1,6 @@
 "use strict";
+///////////////////////////////////////////////////////////////
+//RL-Items
 class LighterDad extends Item {
     constructor() {        super('LighterDad');    }
     get desc() { return('I got this lighter from my real dad.');}
@@ -18,11 +20,22 @@ class LaptopPS extends Item {
     toJSON() {return window.storage.Generic_toJSON("LaptopPS", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(LaptopPS, value.data);};
 };
-class Dildo_small extends Item {
-    constructor() {        super('Dildo_small');    }
-    get desc() { return 'A dildo, smaller than an average dong, made from rubbery plastic.';    }
-    toJSON() {return window.storage.Generic_toJSON("Dildo_small", this); };
-    static fromJSON(value) { return window.storage.Generic_fromJSON(Dildo_small, value.data);};
+class Dildo extends Item {
+    constructor() {super('Dildo');}
+    static lookupId(id) {
+        let info ={desc:''};
+        switch(id){
+            case "Dildo_small": 
+                info.desc= 'A dildo made from rubbery plastic, smaller than an average dong.';
+                break;
+            default:
+        }
+        return(info);
+    }
+    changeId(id){this.id = id;} //instead of creating full class for every useless junk I use this and just add variable that will be restored after load
+    get desc(){return Ingredient.lookupId(this.id).desc;}
+    toJSON() {return window.storage.Generic_toJSON("Dildo", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(Dildo, value.data);};
 }
 class Lube extends Item {
     constructor() {     super('Lube');    }
@@ -36,6 +49,8 @@ class Battery extends Item {
     toJSON() {return window.storage.Generic_toJSON("Battery", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(Battery, value.data);};
 }
+/////////////////////////////////////////////////////////////////
+//VR-Items
 class GameVoucher extends Item {
     constructor() {
         super('GameVoucher');
@@ -79,14 +94,17 @@ class Ingredient extends Item {
                 info.desc="I dont wanna carry that around";
                 break;
             case "WolfTooth":
-                info.desc="Some canine from a canine";
+                info.desc="Some canines from a canine";
+                break;
+            case "DryadVine":
+                info.desc="fibers of a sturdy plant";
                 break;
             default:
         }
         return(info);
     }
-    changeId(id) {this.id = id;} //instead of creating full class for every useless junk I use this and just add variable that will be restored after load
-    get desc() { return Ingredient.lookupId(this.id).desc;   }
+    changeId(id){this.id = id;} //instead of creating full class for every useless junk I use this and just add variable that will be restored after load
+    get desc(){return Ingredient.lookupId(this.id).desc;}
     toJSON() {return window.storage.Generic_toJSON("Ingredient", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(Ingredient, value.data);};
 }
@@ -300,7 +318,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(Money);
     window.storage.registerConstructor(LaptopPS);
     window.storage.registerConstructor(Battery);
-    window.storage.registerConstructor(Dildo_small);
+    window.storage.registerConstructor(Dildo);
     window.storage.registerConstructor(Lube);
     window.storage.registerConstructor(CanOfCoffee);
     window.storage.registerConstructor(KeyRestraint);
@@ -316,21 +334,27 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['LighterDad'] = function () { return new LighterDad();};
     ItemsLib['LaptopPS'] = function () { return new LaptopPS();};
     ItemsLib['Battery'] = function () { return new Battery();};
-    ItemsLib['Dildo_small'] = function () { return new Dildo_small();};
+    ItemsLib['Dildo_small'] =function(){let x=new Dildo();x.changeId("Dildo_small");return(x);};
     // consumables
     ItemsLib['Lube'] = function () { return new Lube();};
     ItemsLib['CanOfCoffee'] = function () { return new CanOfCoffee(); };
     ItemsLib['SimpleFood'] = function () { return new SimpleFood(); };
     ItemsLib['FlashBang'] = function () { return new FlashBang(); };
+    //healthpotion
     ItemsLib['HealthPotion'] = function () { let x= new HealthPotion();x.changeId("HealthPotion");return(x); };
     ItemsLib['HealthPotion(small)'] = function () { let x= new HealthPotion();x.changeId("HealthPotion(small)");return(x); };
-    ItemsLib['BloatedMushroom'] = function () { let x= new Ingredient();x.changeId("BloatedMushroom");return(x); };
-    ItemsLib['PurpleBerry'] = function () { let x= new Ingredient();x.changeId("PurpleBerry");return(x); };
-    ItemsLib['WolfTooth'] = function () { let x= new Ingredient();x.changeId("WolfTooth");return(x); };
-    ItemsLib['ApocaFlower'] = function () { let x= new Ingredient();x.changeId("ApocaFlower");return(x); };
+    //Ingredient
+    ItemsLib['BloatedMushroom'] = function(){ let x=new Ingredient();x.changeId("BloatedMushroom");return(x);};
+    ItemsLib['PurpleBerry'] = function(){ let x=new Ingredient();x.changeId("PurpleBerry");return(x);};
+    ItemsLib['WolfTooth'] = function(){ let x=new Ingredient();x.changeId("WolfTooth");return(x);};
+    ItemsLib['ApocaFlower'] = function(){ let x=new Ingredient();x.changeId("ApocaFlower");return(x);};
+    ItemsLib['DryadVine'] = function(){ let x=new Ingredient();x.changeId("DryadVine");return(x);};
+    //soulgem
     ItemsLib['TinySoulGem'] = function () { let x= new SoulGem();x.changeId("TinySoulGem");return(x); };
+    //keys
     ItemsLib['KeyRestraintA'] = function () { let x= new KeyRestraint();x.changeId("KeyRestraintA");return(x); }; 
     ItemsLib['KeyRestraintB'] = function () { let x= new KeyRestraint();x.changeId("KeyRestraintB");return(x); };
+    //voucher
     ItemsLib['GameVoucherBronze'] = function () { let x= new GameVoucher();x.changeId("BronzeCoupon");return(x); };
     return ItemsLib; 
 }(window.gm.ItemsLib || {}));

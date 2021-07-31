@@ -877,10 +877,16 @@ class effSpermInWomb extends Effect {   //if you have womb filled with sperm, th
 }
 /////////////// combateffects /////////////////////////
 class effHeal extends CombatEffect {
-    constructor(amount,duration=0) {
+    static setup(amount,duration=0) {
+        let eff = new effHeal();
+        eff.startduration=duration;
+        eff.amount=amount;
+        return(eff);
+    }
+    constructor() {
         super();
-        this.amount = amount;
-        this.data.id = this.data.name= effHeal.name, this.data.startduration = duration, this.data.hidden=0;
+        this.amount = 5;
+        this.data.id = this.data.name= effHeal.name, this.data.startduration = 0, this.data.hidden=0;
     }
     toJSON() {return window.storage.Generic_toJSON("effHeal", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(effHeal, value.data);};
@@ -890,14 +896,12 @@ class effHeal extends CombatEffect {
         this.parent.parent.Stats.increment('health',this.amount);
     }
     merge(neweffect) {
-        if(neweffect.name===this.data.name) {    //extends stun
+        if(neweffect.name===this.data.name) {    //extends
             this.onApply();
             return(true);
         }
     }
-    onCombatEnd() {
-        this.parent.removeItem(this.data.id);
-    }
+    onCombatEnd() { this.parent.removeItem(this.data.id);  }
     onTurnStart() {
         this.data.duration-=1;
         if(this.data.duration<=0) this.parent.removeItem(this.data.id);
@@ -911,19 +915,19 @@ class effGuard extends CombatEffect {
     constructor() {
         super();
         this.data.id = this.data.name= effGuard.name, this.data.duration = 0, this.data.hidden=0;
+        this.amount=5;
     }
     toJSON() {return window.storage.Generic_toJSON("effGuard", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(effGuard, value.data);};
     get desc() {return(effGuard.name);}
     onApply(){
         this.data.duration = 2;
-        this.parent.parent.Stats.addModifier('rstblunt',{id:'rstblunt:Guard', bonus:5});
-        this.parent.parent.Stats.addModifier('rstslash',{id:'rstblunt:Guard', bonus:5});
-        this.parent.parent.Stats.addModifier('rstpierce',{id:'rstpierce:Guard', bonus:5});
+        this.parent.parent.Stats.addModifier('rstblunt',{id:'rstblunt:Guard', bonus:this.amount});
+        this.parent.parent.Stats.addModifier('rstslash',{id:'rstblunt:Guard', bonus:this.amount});
+        this.parent.parent.Stats.addModifier('rstpierce',{id:'rstpierce:Guard', bonus:this.amount});
     }
     merge(neweffect) {
-        if(neweffect.name===this.data.name) {    //extends
-            this.onApply();
+        if(neweffect.name===this.data.name) {
             return(true);
         }
     }
@@ -1124,10 +1128,11 @@ class effUngrappling extends CombatEffect {
     onTurnStart() { this.data.duration-=1; if(this.data.duration<=0) this.parent.removeItem(this.data.id);    }
 }
 class effTeaseDamage extends CombatEffect {
-    static setup(amount,type) {
+    static setup(amount,type,lewds) {
         let eff = new effTeaseDamage();
         eff.amount = amount;
         eff.type = type;
+        eff.lewds = lewds;
         return(eff);
     }
     constructor(amount) {

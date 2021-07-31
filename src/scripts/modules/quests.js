@@ -61,7 +61,7 @@ window.gm.questDef = window.gm.questDef || {};
     quest.addMileStone(new QuestMilestone(900,"","Finish the PurpleBerryQuest.",NOP));
     quest.addMileStone(new QuestMilestone(1000,"","Get past that bridge and find your way to the village",  NOP)); //<--
     quest.addMileStone(new QuestMilestone(1100,"","Ask around in the village for help with that collar.",  NOP));
-    quest.addMileStone(new QuestMilestone(1000,"","Someone called \"Librarian\" might be found in \"Shattered City\"",  NOP));
+    quest.addMileStone(new QuestMilestone(1200,"","Someone called \"Librarian\" might be found in ruins north of plains",  NOP));
     window.gm.questDef[quest.id]= quest;
 }{   // the quest tracks death for tutorial
     let NOP = (function(){  return (0)});
@@ -77,10 +77,10 @@ window.gm.questDef = window.gm.questDef || {};
     let NOP = (function(){  return (0)});
     let hidden = (function(){return(false);});
     let quest = new Quest("qPurpleBerry","qPurpleBerry","qPurpleBerry",hidden );
-    quest.addMileStone(new QuestMilestone(1,"","Search the forest for 5 handful of purple berrys and deliver them to the alchemist.",        NOP,hidden));
-    quest.addMileStone(new QuestMilestone(100,"","You delivered the berries to the alchemist.",        NOP,hidden));
-    quest.addMileStone(new QuestMilestone(200,"","Find 4 purple berrys, 2 apoca-blossoms, 2 leeches.",        NOP,hidden));
-    quest.addMileStone(new QuestMilestone(300,"","Fetch the potion from the alchemist.",        NOP,hidden));
+    quest.addMileStone(new QuestMilestone(1,"","Search the forest for 5 handful of purple berrys and deliver them to the alchemist.",NOP,hidden));
+    quest.addMileStone(new QuestMilestone(100,"","You delivered the berries to the alchemist.",NOP,hidden));
+    quest.addMileStone(new QuestMilestone(200,"","Find 4 purple berrys, 2 apoca-blossoms, 2 leeches.",NOP,hidden));
+    quest.addMileStone(new QuestMilestone(300,"","Fetch the potion from the alchemist.",NOP,hidden));
     window.gm.questDef[quest.id]= quest;
 }{
     let NOP = (function(){  return (0)});
@@ -120,8 +120,9 @@ window.gm.questDef = window.gm.questDef || {};
     let NOP = (function(){  return (0)});
     let hidden = (function(){return(window.gm.quests.getMilestoneState("qBeastKink").id<100);});
     let quest = new Quest("qBeastKink","BeastKink","Humans are fun to fool around with. But how about beasts.",hidden );
-    quest.addMileStone(new QuestMilestone(1,"","Beasts have sex too.",        NOP,hidden));
-    quest.addMileStone(new QuestMilestone(400,"","SEEING is BELIEVING. Catch someone having intercourse with animal.",        NOP,hidden));
-    quest.addMileStone(new QuestMilestone(500,"","Maybe you can find a dog or other canine and play with him.",  NOP));
+    quest.addMileStone(new QuestMilestone(1,"","Beasts have sex too.",NOP,hidden));
+    quest.addMileStone(new QuestMilestone(400,"","SEEING is BELIEVING. Catch someone having intercourse with animal.",NOP,hidden));
+    quest.addMileStone(new QuestMilestone(500,"","Find some infos about mating habits of dogs.",NOP,hidden));
+    quest.addMileStone(new QuestMilestone(600,"","Maybe you can find a dog or other canine and play with him.",  NOP));
     window.gm.questDef[quest.id]= quest;
 }

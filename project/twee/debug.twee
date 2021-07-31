@@ -3,7 +3,7 @@
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 Some things for debugging:</br>
-</br>[[MemoryGame]] [[HangmanGame]] [[MinesweeperAscii]] [[Evade]]</br> <!--todo-->
+</br>[[MemoryGame]] [[HangmanGame]] [[MinesweeperAscii]] [[Evade]] [[Pong]]</br> <!--todo-->
 </br>[[NewGamePlus]]</br> <!--todo-->
 [[Cheats|debug]]</br>
 [[Back|_back_]]</br>

@@ -5,7 +5,7 @@
 - kobold
 - lizard-man
 - naga
-- stag-boy/-Stud
+- stag-boy/-Stud  archer, drumer, warrior
 - cougar-girl/-mistress
 - grizzly
 - werwolf
@@ -39,7 +39,7 @@ class Wolf extends Mob {
         this.name = this.id = 'Wolf';
         this.pic= 'assets/bw_wolf1.png';
         this.level_min =3;
-        this.loot= [{id:'WolfTooth',amount:1}];
+        this.loot= [{id:'WolfTooth',chance:25,amount:1}];
         this.Outfit.addItem(new BaseQuadruped());
         this.Outfit.addItem(SkinFur.factory('wolf','black'));
         this.Outfit.addItem(HandsPaw.factory('wolf'));
@@ -124,6 +124,7 @@ class Dryad extends Mob {
         super();
         this.name = this.id = 'Dryad';
         this.pic= 'assets/icons/icon_question.svg';
+        this.loot= [{id:'DryadVine',chance:25,amount:1}];
         this.Outfit.addItem(new BaseHumanoid());
         this.Outfit.addItem(new SkinHuman());
         this.Outfit.addItem(HandsHuman.factory('human'));
@@ -153,6 +154,9 @@ class Dryad extends Mob {
     }
 }
 class Vine extends Mob {
+    static setup(type) {
+
+    }
     constructor() {
         super();
         this.name = this.id = 'Vine';
@@ -177,7 +181,7 @@ class Vine extends Mob {
             rnd = _.random(0,enemys.length-1);
             result.action = "Grapple";
             result.target = [enemys[rnd]];
-            result.msg =this.fconv("$[I]$ $[snap]$ at "+result.target[0].name+".</br>")+result.msg;
+            result.msg =this.fconv(this.name + " wraps itself around "+result.target[0].name+".</br>")+result.msg;
             return(result);
         } else {
             this.tmp.grappleCoolDown-=1;

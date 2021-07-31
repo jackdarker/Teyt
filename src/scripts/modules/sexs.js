@@ -74,68 +74,159 @@ window.gm.sex.updateScene=function(entry){
 
 }*/
 window.gm.sex.wolfOnPlayer=function(data) {
+    let foo = window.gm.sex.wolfOnPlayer; //each button-click will call this sm again and switch state
+    let player = window.gm.player;
+    let foe = window.story.state.combat.enemyParty[0]; //todo
     window.gm.sex.beginScene();
     let entry = document.createElement('p');
     let createButton=window.gm.sex.createButton;
-    let newdata = {};
+    let newdata = {};//need a copy to create different data-values
     if(data.state<0) { //quit if scene is done
         if(data.battleResult==='victory') window.gm.postVictory(); //todo flee, submit, defeat
         else window.gm.postDefeat();
         return;
     } else if(data.state===0) { //start-menu
         if(data.battleResult==='victory') {
-            entry.textContent ="You arent horny enough. | The beast is quite in the mood to fool around. | You need some hard wolfcock right now. ";
-            //todo detect gender,.. -> available position;
-            data.state='plDomPosSelect';
-            Object.assign(newdata,data);//need a copy to create different data-values
-            newdata.position = 'Straddle Him';
-            createButton(newdata.position,window.gm.sex.wolfOnPlayer.bind(null,newdata));
-            newdata = {},Object.assign(newdata,data);
-            newdata.position = 'On all 4';
-            createButton(newdata.position,window.gm.sex.wolfOnPlayer.bind(null,newdata));
+            if(player.Stats.get('arousal').value>40) {
+                entry.textContent ="The beast is quite in the mood to fool around. | You need some hard wolfcock right now. ";
+                //detect gender,.. -> available position;
+                if(player.getPenis()) {
+                    data.state='plDomPosSelect';
+                    if(foe.getVagina()) {
+                        newdata = {},Object.assign(newdata,data);
+                        newdata.position = 'Mount Her';
+                        createButton(newdata.position,foo.bind(null,newdata));
+                    } 
+                }
+                if(foe.getPenis()) {
+                    data.state='plSubPosSelect';
+                    newdata = {},Object.assign(newdata,data);
+                    newdata.position = 'Straddle Him';
+                    createButton(newdata.position,foo.bind(null,newdata));
+                    newdata = {},Object.assign(newdata,data);
+                    newdata.position = 'On all 4';
+                    createButton(newdata.position,foo.bind(null,newdata));
+                }
+            } else entry.textContent ="You arent horny enough"; 
+
             newdata = {},Object.assign(newdata,data);
             newdata.state=-1;
-            createButton('Walk away',window.gm.sex.wolfOnPlayer.bind(null,newdata));
+            createButton('Walk away',foo.bind(null,newdata));
         } else {
             entry.textContent ="The creature isnt interested in you.";
             data.state=-1;
-            createButton('Pass out',window.gm.sex.wolfOnPlayer.bind(null,data));
+            createButton('Pass out',foo.bind(null,data));
         }
-    } else if(data.state==='plDomPosSelect') { //each button-click will call this sm again and switch state
+    } else if(data.state==='plDomPosSelect') { //player topping
+        if(data.position==='Mount Her') {
+            entry.textContent ="You strip of your gear and crawl up behind her.";
+        }
+        entry.textContent += "Lets see what your option are."
+        //detect available holes and let select
+        data.state='plDomHoleSelect';
+        Object.assign(newdata,data);
+        newdata.hole = "anal";
+        createButton(newdata.hole,foo.bind(null,newdata));
+        if(foe.getVagina()) {
+            newdata = {},Object.assign(newdata,data);
+            newdata.hole = "vaginal";
+            createButton(newdata.hole,foo.bind(null,newdata));
+        }
+    } else if(data.state==='plSubPosSelect') { //ride foe
         if(data.position==='On all 4') {
             entry.textContent ="You strip of your gear and drop down on knees and hands.";
         } else {
             entry.textContent ="Rolling the big,bad wuff on its back, you climb on top of it, straddeling him with your naked body.";
         }
         entry.textContent += "The question now is, which of your holes would you like to get filled?"
-        //todo detect available holes and let select
-        data.state='plDomHoleSelect';
+        //detect available holes and let select
+        data.state='plSubHoleSelect';
         Object.assign(newdata,data);
         newdata.hole = "anal";
-        createButton(newdata.hole,window.gm.sex.wolfOnPlayer.bind(null,newdata));
-        if(window.gm.player.getVagina()) {
+        createButton(newdata.hole,foo.bind(null,newdata));
+        if(player.getVagina()) {
             newdata = {},Object.assign(newdata,data);
             newdata.hole = "vaginal";
-            createButton(newdata.hole,window.gm.sex.wolfOnPlayer.bind(null,newdata));
+            createButton(newdata.hole,foo.bind(null,newdata));
         }
     } else if(data.state==='plDomHoleSelect') {
+        entry.textContent ="You press hard into that wolf-bitchs "+data.hole+" hole.";
+        data.state='plDomOrgasm';
+        Object.assign(newdata,data);
+        createButton("Rile her",foo.bind(null,newdata));
+    } else if(data.state==='plDomOrgasm') {
+        entry.textContent ="You onload your jizzm into that hot wolf-hole."
+        if(data.hole==='vaginal') {
+            foe.getVagina().addSperm('wolf',3);
+        } else if(data.hole==='anal') {         //todo insert sperm in hole
+        }
+        data.state=-1;
+        Object.assign(newdata,data);
+        createButton("Next",foo.bind(null,newdata));
+    } else if(data.state==='plSubHoleSelect') {
         entry.textContent ="The wolf mounts you and drills into your "+data.hole+" opening.";
         // Surprised, you find your comrade has grown a large lump at the base of its cock that now bumps against your entrance.
         // to late you notice that his knot is already swelling in your thight orifice. You wouldnt be able to dislodge unless he gets his rocks off.
-        data.state='plDomOrgasm';
+        data.state='plSubOrgasm';
         Object.assign(newdata,data);
-        createButton("Take it",window.gm.sex.wolfOnPlayer.bind(null,newdata));
-    } else if(data.state==='plDomOrgasm') {
+        createButton("Take it",foo.bind(null,newdata));
+    } else if(data.state==='plSubOrgasm') {
         entry.textContent ="Wolf-jizzm is painting your insides white.";  //Unfortunatly, the stud came before you did -- 
         if(data.hole==='vaginal') {
-            window.gm.player.getVagina().addSperm('wolf',3);
-        } else if(data.hole==='anal') {
-
+            player.getVagina().addSperm('wolf',3);
+        } else if(data.hole==='anal') {         //todo insert sperm in hole
         }
-        //todo insert sperm in hole
         data.state=-1;
         Object.assign(newdata,data);
-        createButton("Pass out",window.gm.sex.wolfOnPlayer.bind(null,newdata));
+        createButton("Pass out",foo.bind(null,newdata));
     }
     window.gm.sex.updateScene(entry); 
+}
+
+window.gm.sex.dryadOnPlayer=function(data) { //todo
+    let foo = window.gm.sex.dryadOnPlayer; //each button-click will call this sm again and switch state
+    let player = window.gm.player;
+    let foe = window.story.state.combat.enemyParty[0]; //todo
+    window.gm.sex.beginScene();
+    let entry = document.createElement('p');
+    let createButton=window.gm.sex.createButton;
+    let newdata = {};//need a copy to create different data-values
+    if(data.state<0) { //quit if scene is done
+        if(data.battleResult==='victory') window.gm.postVictory(); //todo flee, submit, defeat
+        else window.gm.postDefeat();
+        return;
+    } else if(data.state===0) { //start-menu
+        if(data.battleResult==='victory') {
+            if(player.Stats.get('arousal').value>40) {
+                entry.textContent ="How about we get to know each other better?";
+                //detect gender,.. -> available position;
+                if(player.getPenis()) {
+                    data.state='plDomPosSelect';
+                    if(foe.getVagina()) {
+                        newdata = {},Object.assign(newdata,data);
+                        newdata.position = 'Mount Her';
+                        createButton(newdata.position,foo.bind(null,newdata));
+                    } 
+                }
+            } else entry.textContent ="You arent horny enough"; 
+
+            newdata = {},Object.assign(newdata,data);
+            newdata.state=-1;
+            createButton('Walk away',foo.bind(null,newdata));
+        } else {
+            entry.textContent ="The creature isnt interested in you.";
+            data.state=-1;
+            createButton('Pass out',foo.bind(null,data));
+        }
+    } else if(data.state==='plSubOrgasm') {
+            entry.textContent ="Wolf-jizzm is painting your insides white.";  //Unfortunatly, the stud came before you did -- 
+            if(data.hole==='vaginal') {
+                player.getVagina().addSperm('wolf',3);
+            } else if(data.hole==='anal') {         //todo insert sperm in hole
+            }
+            data.state=-1;
+            Object.assign(newdata,data);
+            createButton("Pass out",foo.bind(null,newdata));
+        }
+        window.gm.sex.updateScene(entry); 
 }

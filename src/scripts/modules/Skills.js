@@ -1,4 +1,5 @@
 "use strict";
+//Todo: disarm/disrobe
 
 class SkillInspect extends Skill {
     constructor() {
@@ -63,17 +64,21 @@ class SkillAttack extends Skill {
         let lHand=this.caster.Outfit.getItemForSlot(window.gm.OutfitSlotLib.LHand);
         let rHand=this.caster.Outfit.getItemForSlot(window.gm.OutfitSlotLib.RHand);
         attack.mod=new SkillMod();
-        let lHDmg=0,rHDmg=0;
         if(rHand) { //get weapon damage info
             attack.mod=rHand.attackMod(target);
         } else if(lHand) { //todo dual wield?
             attack.mod=lHand.attackMod(target);
         }
-        if(!lHand && ! rHand) { //if has no weapon get body damage
+        if(!lHand && !rHand) { //if has no weapon get claw damage, mouth damage, ??
             rHand=this.caster.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bHands);
             if(rHand && rHand.attackMod) {
-                    attack.mod=rHand.attackMod(target);
+                attack.mod=rHand.attackMod(target);
             }
+        }
+        if(!lHand && !rHand) { //fallback
+            let mod = new SkillMod();
+            mod.onHit = [{ target:target, eff:[effDamage.setup(3,'blunt')]}];
+            attack.mod=mod;
         }
         return(attack);
     }
@@ -81,27 +86,6 @@ class SkillAttack extends Skill {
         return(this.msg);
     }
 }
-
-/*    __estimateAttack() {
-        let attack =window.gm.combat.defaultAttackData();
-        let lHand=this.caster.Outfit.getItemForSlot(window.gm.OutfitSlotLib.LHand);
-        let rHand=this.caster.Outfit.getItemForSlot(window.gm.OutfitSlotLib.RHand);
-        let rHDmg;
-        if(rHand) { //get weapon damage info
-            rHDmg = rHand.attack;
-        } else if(lHand) { 
-            rHDmg = lHand.attack;
-        }
-        if(!lHand && ! rHand) { //if has no weapon get body damage
-            rHand=this.caster.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bHands);
-            if(rHand) {
-                rHDmg = (rHand.data!=='undefined')?rHand.data.attack || 0:0;
-            }
-        }
-        attack.input=rHDmg;
-        return(attack);
-    }
-*/
 class SkillSmash extends SkillAttack {
     constructor() {
         super();
@@ -235,15 +219,15 @@ class SkillTease extends Skill {
         this.msg = '';
         if(this.isValidTarget(targets)) {
             result.OK = true;
-            let dmg =5;
-            //tease depends on teaseproficiency, clothing slutiness/nudeness,own arousal
-            if(this.parent.parent.Stats.getItem('arousal').value>40) dmg +=5
-            dmg*=Math.max(0,this.magnitude*this.__slutDetector(this.caster));
+            let dmg =5; //todo tease depends on teaseproficiency, clothing slutiness/nudeness,own arousal
+            let lewds=this.caster.Outfit.getLewdness();
+            if(this.parent.parent.Stats.getItem('arousal').value>40) dmg +=5;
+            dmg*=Math.max(0,this.magnitude);
             this.msg = 'Shaking his hips, xxx trys to arouse the audience.'; //todo
             for(var target of targets) {
                 let attack =window.gm.combat.defaultAttackData();
                 attack.mod= new SkillMod();
-                attack.mod.onHit=[{target:target, eff:[effTeaseDamage.setup(dmg)]}]
+                attack.mod.onHit=[{target:target, eff:[effTeaseDamage.setup(dmg,'slut',lewds)]}]
                 let result2 = window.gm.combat.calcTeaseAttack(this.caster,target,attack);
                 this.msg+=result2.msg;
                 result.effects = result.effects.concat(attack.effects); 
@@ -254,7 +238,7 @@ class SkillTease extends Skill {
     __slutDetector(target) {
         let x=1; 
         let lewd=this.caster.Outfit.getLewdness();
-        if(lewd.slut>3) x+=0.1; //todo bondage 
+        if(lewd.slut>3) x+=0.1; //todo bondage & SM
         if(lewd.slut>6) x+=0.1;
         return(x);
     }
@@ -352,7 +336,7 @@ class SkillHeal extends Skill {
             result.OK = true;
             for(var target of targets) {
                 result.effects.push( {target:target,
-                    eff:[new effHeal(10)]})
+                    eff:[effHeal.setup(10)]})
                 }
         }
         return result
@@ -571,9 +555,9 @@ class SkillGuard extends Skill {
         if(this.isValidTarget(targets)) {
             result.OK = true;
             for(var target of targets) {
-                /*result.effects.push( {target:target,
-                    eff:[new effHeal(10)]})*/
-                }
+                result.effects.push( {target:target,
+                    eff:[new effGuard(10)]})
+            }
         }
         return result
     }

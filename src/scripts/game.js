@@ -703,23 +703,25 @@ window.gm.printItem2= function( id,descr,carrier,useOn=null ) {
   }
 };
 //prints an equipment with description; used in wardrobe
-window.gm.printEquipment= function( id,descr) {
+window.gm.printEquipment= function( whom,id) {
   var elmt='';
   var s= window.story.state;
-  var res;
-  elmt +=`<a0 id='${id}' onclick='(function($event){document.querySelector(\"div#${id}\").toggleAttribute(\"hidden\");})(this);'>${id}</a>`;
-  if(window.gm.player.Outfit.countItem(id)<=0) {
+  var res,name,desc;
+  var item=whom.Wardrobe.getItem(id);
+  name=item.name, desc=item.desc;
+  elmt +=`<a0 id='${id}' onclick='(function($event){document.querySelector(\"div#${id}\").toggleAttribute(\"hidden\");})(this);'>${name}</a>`;
+  if(whom.Outfit.countItem(id)<=0) {
       //elmt +=`<a0 id='${id}' onclick='(function($event){window.gm.player.Outfit.addItem(new window.storage.constructors[\"${id}\"]()); window.gm.refreshAllPanel();}(this))'>Equip</a>`;
-      elmt +=`<a0 id='${id}' onclick='(function($event){window.gm.player.Outfit.addItem(window.gm.player.Wardrobe.getItem(\"${id}\")); window.gm.refreshAllPanel();}(this))'>Equip</a>`;
+      elmt +=`<a0 id='${id}' onclick='(function($event,whom){whom.Outfit.addItem(whom.Wardrobe.getItem(\"${id}\")); window.gm.refreshAllPanel();}(this,window.story.state[\"${whom.id}\"]))'>Equip</a>`;
   } else {
-    res = window.gm.player.Outfit.canUnequipItem(id,false);
+    res = whom.Outfit.canUnequipItem(id,false);
     if(res.OK) {
-      elmt +=`<a0 id='${id}' onclick='(function($event){window.gm.player.Outfit.removeItem(\"${id}\"); window.gm.refreshAllPanel();}(this))'>Unequip</a>`;
+      elmt +=`<a0 id='${id}' onclick='(function($event,whom){whom.Outfit.removeItem(\"${id}\"); window.gm.refreshAllPanel();}(this,window.story.state[\"${whom.id}\"]))'>Unequip</a>`;
     } else {
       elmt +='<div>'+res.msg+'</div>';
     }
   }
-  elmt +=`</br><div hidden id='${id}'>${descr}</div>`;
+  elmt +=`</br><div hidden id='${id}'>${desc}</div>`;
 
   if(window.story.passage(id))  elmt +=''.concat("    [[Info|"+id+"]]");  //Todo add comands: drink,eat, use
       elmt +=''.concat("</br>");

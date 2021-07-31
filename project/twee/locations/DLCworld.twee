@@ -120,10 +120,8 @@ function crashThrough() {
 }
 </script>
 
-:: NOP_VR [_nosave_,_back_]
-<!--example-scene for onenter/onexit event-->
+:: NOP_VR [_nosave_ _back_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <p class='dev'> You cant go that way. Either because its WIP or you need to solve a quest first. </p>
-</br>
-[[Back|_back_]]</br>
+</br>[[Back|_back_]]</br>
 </article><article id="LogPanel"></article></section>

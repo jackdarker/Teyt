@@ -199,11 +199,10 @@ In <%=window.gm.player.name%> wardrobe you find: </br></br>
 <!--assumption: every outfit item (worn or not) is present in the wardrobe-->
 <%
 var x = 0, id=''; 
-var inv = window.gm.player.Wardrobe;
-var maxSlots = inv.count(); 
+var whom = window.gm.player;
+var maxSlots = whom.Wardrobe.count(); 
 for(var i=0;i<maxSlots;i++){
-  id=inv.getItemId(i);
-  %><%=window.gm.printEquipment(id,inv.getItem(id).desc)%><%
+  %><%=window.gm.printEquipment(whom,whom.Wardrobe.getItemId(i))%><%
 } 
 %>
 </article><article id="LogPanel"></article></section>
@@ -215,14 +214,15 @@ for(var i=0;i<maxSlots;i++){
 Theme:
 <a href="javascript:window.styleSwitcher.setStyle('default');window.gm.refreshAllPanel();">default</a>
 <a href="javascript:window.styleSwitcher.setStyle('dark');window.gm.refreshAllPanel();">dark</a></br>
-<!--TODO what settings ?-->
+<!--TODO what settings ?
 *  Disable over-penetration </br>
 A lot of female are not happy about the fact that many erotic fiction or imagery picture the penetration of cervix because its pretty painful. You might disable this here therefore. </br>
 On the other hand a lot of males have some kind of fetish for this. </br>
-
+*  Disable snuff & gore
+*  Disable vore
 *  Less-sex-mode
 If you enable this your route to bad end by sex-related action is much shorter. This should enforce a more chaste play.</br>
-
+-->
 </article><article id="LogPanel"></article></section>
 
 
@@ -327,7 +327,7 @@ and run renderToSelector("#panel", "listbuy");
 -->
 <script>
 //define _Entrys in your passage lile this:
-//var _Entrys = [{id:"Dildo_small",count:1,cost:25,costPerv:14}];
+//var _Entrys = [{id:"Dildo",count:1,cost:25,costPerv:14}];
 for(var i=0;_Entrys.length>i;i++) {
     var entry=_Entrys[i];
     let _id = entry.id;

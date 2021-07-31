@@ -4,7 +4,7 @@
 After the VR connects to the server, your avatar appears near the top of a hill in a magic puff. </br>
 A small trail makes it way down the hill to some wooden shed."</br>
 </br>Some leather bracers ly on the road.
-<a0 onclick='takeBracers();'>pickup fancy bracers</a></br>
+<a0 onclick='takeBracers();'>pickup fancy bracers</a></br><a0 onclick='takeBracers2();'>pickup even fancier bracers</a></br>
 <div></br>
 [[Settlement|ForestBorder]]</br></div>
 </article><article id="LogPanel"></article></section>
@@ -13,6 +13,14 @@ function takeBracers() {
     let item = new window.storage.constructors['BracerLeather']();
     item = window.gm.makeCursedItem(item,{lock:true,energydrain:2});
     item = window.gm.makeBonusItem(item,{statBoost:'agility', statBonus:3});
+    window.gm.player.Wardrobe.addItem(item);
+    window.gm.player.Outfit.addItem(item);
+    this.disabled=true;
+}
+function takeBracers2() {
+    let item = new window.storage.constructors['BracerLeather']();
+    item = window.gm.makeCursedItem(item,{convert:'GlovesRubber'});
+    item = window.gm.makeBonusItem(item,{statBoost:'agility', statBonus:2});
     window.gm.player.Wardrobe.addItem(item);
     window.gm.player.Outfit.addItem(item);
     this.disabled=true;
@@ -281,6 +289,16 @@ Some sludgy leeches are crawling up your legs, each easily long as a hand !</br>
 <%=(window.story.state._gm.debug)?("[[Skip|_back_]]"):("")%></br>
 </article><article id="LogPanel"></article></section>
 
+:: ForestDryadEncounter [_back_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<% if(true) {%>
+As you make your way through the trees, a strange woman-like figure steps out behind one of them !</br>
+<a0 onclick='window.gm.encounters.dryad(window.gm.player.location,_.random(1,3))'>Next</a>
+<%}%></br>
+<%=(window.story.state._gm.debug)?("[[Skip|_back_]]"):("")%></br>
+</article><article id="LogPanel"></article></section>
+
+
 :: ForestCliff
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.moveHere();%>
@@ -357,11 +375,32 @@ The path leads up to [[ForestCliff]] or further down to a [[river|NOP]]. </br></
 <%}%>
 </article><article id="LogPanel"></article></section>
 
+:: ForestOldForest
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.moveHere();%>
+<!--todo--> Very old oak-trees grow here with thick branches forking out of the large trunks several meters above the ground. Equally large roots dig into the humid soil. </br> 
+The leaf canopy is dense but in some places bundles of sun rays reach the forest floor.
+</br> <a0 onclick='explore();'>Explore</a></br>
+<div>[[ForestMudGlade]]</br></div> 
+</article><article id="LogPanel"></article></section>
+<script> function explore() {
+    let rnd = _.random(0,100);
+    window.gm.pushLog("rolled "+rnd);
+    window.story.state.tmp.args = [];
+    if(rnd > 0 ) {
+         window.story.show('ForestDryadEncounter');
+    } else {
+        window.story.show('ForestSearchAround'); //nothing
+    }
+}
+</script>
+
+
 
 :: ForestStoneCircle
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.moveHere();%>
-<!--todo--> Aus dem dichten Unterholz trittst du auf eine Lichtung. Das wäre ein idylischer Ort wenn nicht dieser Steinkreis wäre.</br> 
+<!--todo--> Out of the dense undergrowth you step into a clearing. This would be an idyllic place if it weren't for this creepy stone circle.</br> 
 </br> 
 <% if(true) { %>
 <div id='select1' >
@@ -373,14 +412,10 @@ Ansonsten gibt es hier nichts.</br>
 [[Leave|NOP]]
 </div>
 <% } else {%>
-<div>
-[[ForestEntrance]] <a0 onclick='enterBeehive(); '>Enter Beehive</a></br> </br></div> 
+<div>[[ForestEntrance]]</br></div> 
 <%}%>
 </article><article id="LogPanel"></article></section>
-<script> function enterBeehive() {
-    window.gm.dng = window.gm.dngs.BeeHive();
-    window.gm.dng.enterDungeon();
-}
+
 
 
 :: ForestAlchemistHut [name:shaby_hut]

@@ -57,7 +57,7 @@ class FaceHuman extends Equipment {
 }
 class FaceWolf extends Equipment {
     static dataPrototype() {    
-        return({style:'wolf',femininity:0.2,pDamage:0});    }
+        return({style:'wolf',femininity:0.2});    }
     static factory(id) {
         let obj =  new FaceWolf();
         obj.setStyle(id);
@@ -70,17 +70,14 @@ class FaceWolf extends Equipment {
         this.data = FaceWolf.dataPrototype();   
     }
     setStyle(id) {
+        this.data.style = id;
         switch(id) {
             case 'cat':
             case 'dog':
             case 'wolf':
             case 'lizard':
-                this.data.style = id; 
-                this.pDamage = 10;
                 break;
             case 'horse':
-                this.data.style = id; 
-                this.pDamage = 0;
                 break;
             default:
                 throw new Error("unknown Face-style "+id);
@@ -186,7 +183,7 @@ class SkinFur extends Equipment {
 }
 class TailWolf extends Equipment {
     static dataPrototype() {    
-        return({style:'wolf',growth:0.1, maxGrowth: 1.5,pDamage:0});    }
+        return({style:'wolf',growth:0.1, maxGrowth: 1.5});    }
     static factory(id) {
         let obj =  new TailWolf();
         obj.setStyle(id);
@@ -235,7 +232,7 @@ class TailWolf extends Equipment {
 }
 class HandsPaw extends Equipment { //paws of ferals
     static dataPrototype() {    
-        return({style:'wolf', pDamage:0 });
+        return({style:'wolf'});
     }
     static factory(id) {
         let obj =  new HandsPaw();
@@ -249,13 +246,12 @@ class HandsPaw extends Equipment { //paws of ferals
         this.data = HandsPaw.dataPrototype();
     }
     setStyle(id) {
+        this.data.style = id; 
         switch(id) {
             case 'cat':
             case 'dog':
             case 'wolf':
             case 'lizard':
-                this.data.style = id; 
-                this.data.pDamage = 10;
                 break;
             default:
                 throw new Error("unknown HandsPaw-style "+id);
@@ -277,7 +273,7 @@ class HandsPaw extends Equipment { //paws of ferals
 }
 class HandsHuman extends Equipment {
     static dataPrototype() {    
-        return({style:'human', pDamage:0 });
+        return({style:'human'});
     }
     static factory(id) {
         let obj =  new HandsHuman();
@@ -296,14 +292,11 @@ class HandsHuman extends Equipment {
             case 'dog':
             case 'wolf':
             case 'horse':
-                this.data.pDamage = 7;
                 break;
             case 'cat':
             case 'lizard':
-                this.data.pDamage = 14;
                 break;
             case 'human':
-                this.data.pDamage = 0;
                 break;
             default:
                 throw new Error("unknown Hands-style "+id);

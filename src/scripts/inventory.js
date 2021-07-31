@@ -1,7 +1,7 @@
 "use strict";
 class Item {
     constructor(name) {
-        this.id = this.name = name;
+        this.id = this.name = name;  //id is unique in database(no whitespace !); name is for display
         this.tags = [];
     }
     get parent() {return this._parent?this._parent():null;}

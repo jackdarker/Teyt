@@ -5,7 +5,7 @@ window.gm = window.gm || {};
 window.gm.encounters = window.gm.encounters || {};
 
 window.gm.encounters.mole = function(location) {
-    window.gm.Encounter = new CombatSetup();
+    window.gm.Encounter = new Encounter();
     window.gm.Encounter.EnemyFunc = (function() { let x = new window.gm.Mobs.Mole(); x.scaleLevel(window.gm.player.level); return([x]);});
     window.gm.Encounter.Location = location;
     window.gm.Encounter.scenePic = window.gm.getScenePic(location);
@@ -16,7 +16,7 @@ window.gm.encounters.mole = function(location) {
 }
 
 window.gm.encounters.moleX2 = function(location) {
-    window.gm.Encounter = new CombatSetup();
+    window.gm.Encounter = new Encounter();
     window.gm.Encounter.EnemyFunc = (function() { 
         var a = new window.gm.Mobs.Mole();
         var b = new window.gm.Mobs.Mole();
@@ -31,7 +31,7 @@ window.gm.encounters.moleX2 = function(location) {
     window.gm.Encounter.initCombat();
 }
 window.gm.encounters.leech = function(location,amount=1) {
-    window.gm.Encounter = new CombatSetup();
+    window.gm.Encounter = new Encounter();
     window.gm.Encounter.EnemyFunc = (function() { 
         let mobs =[];
         for(var i=amount;i>0;i-=1) {
@@ -44,21 +44,21 @@ window.gm.encounters.leech = function(location,amount=1) {
     window.gm.Encounter.initCombat();
 }
 window.gm.encounters.mechanicguy = function(location) {
-    window.gm.Encounter = new CombatSetup();
+    window.gm.Encounter = new Encounter();
     window.gm.Encounter.EnemyFunc = window.gm.Mobs.Mechanic;
     window.gm.Encounter.Location = location;
     window.gm.Encounter.scenePic = window.gm.getScenePic(location);
     window.gm.Encounter.initCombat();
 }
 window.gm.encounters.huntress = function(location) {
-    window.gm.Encounter = new CombatSetup();
+    window.gm.Encounter = new Encounter();
     window.gm.Encounter.EnemyFunc = window.gm.Mobs.Huntress;
     window.gm.Encounter.Location = location;
     window.gm.Encounter.scenePic = window.gm.getScenePic(location);
     window.gm.Encounter.initCombat();
 }
 window.gm.encounters.wolf = function(location) {
-    window.gm.Encounter = new CombatSetup();
+    window.gm.Encounter = new Encounter();
     window.gm.Encounter.EnemyFunc = (function() { 
         let x = new window.gm.Mobs.Wolf();
         if(_.random(1,100)>50) {
@@ -67,7 +67,6 @@ window.gm.encounters.wolf = function(location) {
             x.Outfit.addItem(PenisHuman.factory('wolf'));
         }
         x.scaleLevel(window.gm.player.level);
-        x.Stats.increment("health",9999); x.Stats.increment("energy",9999);
         return([x]);});
     window.gm.Encounter.Location = location;
     window.gm.Encounter.scenePic = window.gm.getScenePic(location);
@@ -77,7 +76,7 @@ window.gm.encounters.wolf = function(location) {
     window.gm.Encounter.onVictory = function() {
         return('Intimitated, the wolf rolls on its back, whimpering submissively and exposing its throat.</br>'+this.fetchLoot()+'</br>'+ window.gm.printPassageLink('Next','WolfVictory'));
     }
-    window.gm.Encounter.sceneDone=false; //attach flag to combatsetup-Instance;
+    window.gm.Encounter.sceneDone=false; //attach flag to Encounter-Instance;
     window.gm.Encounter.onMoveSelect = function() {
         let s=window.story.state;
         let result = {OK:false, msg:''};
@@ -89,22 +88,29 @@ window.gm.encounters.wolf = function(location) {
     }
     window.gm.Encounter.initCombat();
 }
-window.gm.encounters.dryad = function(location) {
-    window.gm.Encounter = new CombatSetup();
+window.gm.encounters.dryad = function(location,type=1) {
+    window.gm.Encounter = new Encounter();
     window.gm.Encounter.EnemyFunc = (function() { 
         let x = new window.gm.Mobs.Dryad();
         x.scaleLevel(window.gm.player.level);
-        x.Stats.increment("health",9999); x.Stats.increment("energy",9999);
         return([x]);});
     window.gm.Encounter.Location = location;
+    window.gm.Encounter.onSubmit =window.gm.Encounter.onDefeat = function() {
+        return('You cannot fight anymore and surrender to the strange woman.</br>'+ window.gm.printPassageLink('Next','DryadSubmit'));
+    }
+    window.gm.Encounter.onVictory = function() {
+        return('The dryad has run out of energy.</br>'+this.fetchLoot()+'</br>'+ window.gm.printPassageLink('Next','DryadVictory'));
+    }
     window.gm.Encounter.scenePic = window.gm.getScenePic(location);
     window.gm.Encounter.initCombat();
 }
+/////////////////////////////////////////////////////////////
+//special encounter
 window.gm.encounters.Carlia = function(location) {
-    window.gm.Encounter = new CombatSetup();
+    window.gm.Encounter = new Encounter();
     window.gm.Encounter.EnemyFunc = (function() { 
         let x = window.story.state.Carlia;
-        x.Stats.increment("health",9999); x.Stats.increment("energy",9999);
+        x.Stats.increment("health",9999); x.Stats.increment("energy",9999);x.Stats.increment("will",9999);
         return([x]);});
     window.gm.Encounter.Location = location;
     window.gm.Encounter.scenePic = window.gm.getScenePic(location);
@@ -114,7 +120,7 @@ window.gm.encounters.Carlia = function(location) {
     window.gm.Encounter.onVictory = function() {
         return('Carlia doesnt want to fight anymore.</br>'+ window.gm.printPassageLink('Next','CarliaVictory'));
     }
-    window.gm.Encounter.sceneDone=0; //attach flag to combatsetup-Instance;
+    window.gm.Encounter.sceneDone=0; //attach flag to Encounter-Instance;
     window.gm.Encounter.onMoveSelect = function() {
         let s=window.story.state;
         let result = {OK:false, msg:''};
@@ -129,11 +135,10 @@ window.gm.encounters.Carlia = function(location) {
     window.gm.Encounter.initCombat();
 }
 window.gm.encounters.Trent = function(location) {
-    window.gm.Encounter = new CombatSetup();
+    window.gm.Encounter = new Encounter();
     window.gm.Encounter.EnemyFunc = (function() { 
         let x = window.story.state.Trent; 
-        //no leveadaption? x.scaleLevel(window.gm.player.level);
-        x.Stats.increment("health",9999); 
+        x.Stats.increment("health",9999); x.Stats.increment("energy",9999);x.Stats.increment("will",9999); 
         return([x]);});
     window.gm.Encounter.Location = location;
     window.gm.Encounter.scenePic = window.gm.getScenePic(location);
@@ -146,11 +151,10 @@ window.gm.encounters.Trent = function(location) {
     window.gm.Encounter.initCombat();
 }
 window.gm.encounters.Ruff = function(location) {
-    window.gm.Encounter = new CombatSetup();
+    window.gm.Encounter = new Encounter();
     window.gm.Encounter.EnemyFunc = (function() { 
         let x = window.story.state.Ruff; 
-        //no leveadaption? x.scaleLevel(window.gm.player.level);
-        x.Stats.increment("health",9999); 
+        x.Stats.increment("health",9999); x.Stats.increment("energy",9999);x.Stats.increment("will",9999); 
         return([x]);});
     window.gm.Encounter.Location = location;
     window.gm.Encounter.scenePic = window.gm.getScenePic(location);

@@ -45,7 +45,7 @@ class Character {
         }
         stAgility.setup(this.Stats,10,100),stIntelligence.setup(this.Stats,10,100),stLuck.setup(this.Stats,10,100);
         stCharisma.setup(this.Stats,10,100),stPerception.setup(this.Stats,10,100),stStrength.setup(this.Stats,10,100),stEndurance.setup(this.Stats,10,100);
-        stCorruption.setup(this.Stats,0,50),stArousal.setup(this.Stats,1,100);
+        stCorruption.setup(this.Stats,0,50),stArousal.setup(this.Stats,0,50);
         for(let name of stFetish.listFetish()) {
             stFetish.setup(this.Stats,0,10,name);
         }         
@@ -141,6 +141,7 @@ class Character {
                 this._data.unspentStat-=x;
             }
         }
+        
     }
     isDead() {return(this.Stats.get('health').value<=0);}
     /** 

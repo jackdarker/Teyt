@@ -71,17 +71,25 @@ class BracerLeather extends Equipment {
     }
     set style(style) { 
         this._style = style; 
-        //if(style===100) this.lossOnRespawn=false;
+        if(style===200) this.id=this.name='Rubber-Gloves';
     }
     get style() {return this._style;}
     get desc() { 
         let msg ='worn bracers made of leather';
-        if(this.style===100) msg=('leather bracers with steel-studs');
+        switch(this._style) {
+            case 100:
+                msg=('leather bracers with steel-studs');
+                break;
+            case 200:
+                msg=('elbow-length rubber gloves');
+                break;
+            default:
+        }
         return(msg+this.bonusDesc());
     }
     descLong(fconv) {
         let msg='';
-        if(this.isEquipped()) msg='A pair of bracers adorns $[my]$ lower arms.';
+        if(this.isEquipped()) msg='A pair of '+this.desc+' adorns $[my]$ lower arms.';
         else msg='$[I]$ $[have]$ '+this.name+".";
         return(fconv(msg));
     }
@@ -342,7 +350,6 @@ class BowWodden extends Equipment {
         this.tags = [ 'weapon'];
         this.slotUse = ['RHand','LHand'];
         this.lossOnRespawn = true;
-        this.pDamage = 11;
     }
     get desc() { return('A simple bow');}
     toJSON() {return window.storage.Generic_toJSON("BowWodden", this); }
@@ -367,8 +374,7 @@ class DaggerSteel extends Equipment {
         super('DaggerSteel');
         this.tags = [ 'weapon'];
         this.slotUse = ['RHand'];
-        this.lossOnRespawn = true;
-        this.pDamage = 6;
+        this.lossOnRespawn = true;;
     }
     get desc() { return('A steel dagger.');}
     toJSON() {return window.storage.Generic_toJSON("DaggerSteel", this); }
@@ -394,7 +400,6 @@ class StaffWodden extends Equipment {
         this.tags = [ 'weapon'];
         this.slotUse = ['RHand','LHand'];
         this.lossOnRespawn = true;
-        this.pDamage = 5;
     }
     get desc() { return('A staff made from wood.');}
     toJSON() {return window.storage.Generic_toJSON("StaffWodden", this); }
@@ -431,11 +436,6 @@ class MaceSteel extends Equipment {
         this.tags = [ 'weapon'];
         this.slotUse = ['RHand'];
         this.lossOnRespawn = true;
-        this.pDamage = 15;
-        /*this.attack = window.gm.combat.AttackSetup();
-        let dmg = {target:"defender", effect:"effDamage", value: 10};
-        let stun = {target:"defender", effect:"effStun", value: 10};
-        this.attack.apply = [{cond:100, apply:dmg},{cond:50,apply:stun}]; */
     }
     get desc() { return('A heavy steel mace.');}
     toJSON() {return window.storage.Generic_toJSON("MaceSteel", this); }
@@ -512,6 +512,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['TattooGroin'] = function () { return new TattooGroin();};
     ItemsLib['RobesZealot'] = function () { return new RobesZealot();};
     ItemsLib['WristCuffs'] = function () { return new WristCuffs();};
+    ItemsLib['GlovesRubber'] = function () { let x= new BracerLeather();x.style=200;return(x); };
     //special wardrobe-item combination
     ItemsLib['Crowbar']  = function () { return new Crowbar();};
     ItemsLib['Shovel']  = function () { return new Shovel();};

@@ -97,10 +97,8 @@ class Curse {
     }
 }
 //-------------------------------------------------------------------------
-class CrsTrigger {
-    constructor() {
-        this.id='';
-    }
+class CrsTrigger { //each curse has a trigger that evaluates if the curse gets triggered
+    constructor() { this.id='';  }
      /* 
     * parent is the curse !
     * Attention !! _parent will be added dynamical
@@ -152,6 +150,7 @@ class CrsEffect {
     get parent() {return(this._parent?this._parent(): null);} 
     canUnequip() {return({OK:true,msg:'unequipable'});}
     get desc() { return('');}
+    apply(unapply) {} //override to do something!
 }
 class CrsEffLock extends CrsEffect{
     constructor() {
@@ -175,6 +174,29 @@ class CrsEffLock extends CrsEffect{
             window.gm.pushDeferredEvent("GenericDeffered",['With the key, it was now possible to unlock and remove '+this.parent.parent.name+' !']);
         } else {
             window.gm.pushDeferredEvent("GenericDeffered",['As soon as you equiped '+this.parent.parent.name+', some hidden lock sealed the item on you !']);
+        }
+    }
+}
+class CrsEffConvert extends CrsEffect{
+    constructor() {
+        super();
+        this.id='CrsEffConvert';
+        this.newItem='GlovesRubber';
+    }
+    toJSON() {return window.storage.Generic_toJSON("CrsEffConvert", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(CrsEffConvert, value.data));}
+    get desc() {return("Converts the item to "+this.newItem+".")}
+    apply(unapply) {
+        if(unapply) {
+        } else {
+            let item = window.gm.ItemsLib[this.newItem]();
+            window.gm.makeCursedItem(item,{lock:true,energydrain:2});
+            if(this.parent.parent.parent.parent.Outfit.removeItem(this.parent.parent.id).OK) {
+            this.parent.parent.parent.parent.Wardrobe.removeItem(this.parent.parent.id);
+            window.gm.pushDeferredEvent("GenericDeffered",['To your surprise, '+this.parent.parent.name+' contorts its shape to something different, reforming itself into '+item.name+'! ']);
+            this.parent.parent.parent.parent.Wardrobe.addItem(item);
+            this.parent.parent.parent.parent.Outfit.addItem(item);
+            }
         }
     }
 }
@@ -232,6 +254,11 @@ window.gm.makeCursedItem = function(item, extra) {
         eff = new CrsEffLock();
         list.push(eff);
     }
+    if(extra.convert) {
+        eff = new CrsEffConvert();
+        eff.newItem=extra.convert;
+        list.push(eff);
+    }
     if(extra.energydrain) {
         eff = new CrsEffEnergyDrain();
         list.push(eff);
@@ -261,6 +288,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(CrsTrgDelayed);
     window.storage.registerConstructor(CrsTrgOnEquip);
     window.storage.registerConstructor(CrsEffLock);
+    window.storage.registerConstructor(CrsEffConvert);
     window.storage.registerConstructor(CrsEffEnergyDrain);
     window.storage.registerConstructor(CrsEffStatBonus);
 }(window.gm.ItemsLib || {}));
