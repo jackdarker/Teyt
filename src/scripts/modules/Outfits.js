@@ -66,7 +66,7 @@ class BracerLeather extends Equipment {
         super('BracerLeather');
         this.addTags(['cloth']);
         this.slotUse = ['Wrists'];
-        this.style = 0;   
+        this.price=this.basePrice=10;this.style = 0;   
         this.lossOnRespawn = true;
     }
     set style(style) { 
@@ -222,57 +222,6 @@ class TattooGroin extends Equipment {
         } 
         return({OK:true, msg:'tattoed'});}
 }
-//this is an Inventory-item, not wardrobe
-class Crowbar extends Equipment {
-    constructor() {
-        super('Crowbar');
-        this.addTags(['tool', 'weapon']);
-        this.slotUse = ['RHand'];
-        this.lossOnRespawn = true;
-    }
-    descLong(fconv) {return(fconv('$[I]$ $[hold]$ a crowbar.'));}
-    get desc() { return 'durable crowbar.';}
-    toJSON() {return window.storage.Generic_toJSON("Crowbar", this); }
-    static fromJSON(value) {return(window.storage.Generic_fromJSON(Crowbar, value.data));}
-    usable(context) {return(this.canEquip(context));}
-    use(context) { //context here is inventory not outfit
-        if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) {  
-            this.parent.parent.Outfit.removeItem(this.id); 
-            return( {OK:true, msg:'unequipped '+ this.name}); //todo
-        } else {
-            this.parent.parent.Outfit.addItem(this); 
-            return( {OK:true, msg:'equipped '+ this.name}); //todo
-        }
-    }
-    onEquip(context) {
-        //context.parent.Stats.addModifier('pAttack',{id:'pAttack:Crowbar', bonus:2});
-        return({OK:true, msg:'equipped'});}
-    onUnequip() {
-        //this.parent.parent.Stats.removeModifier('pAttack',{id:'pAttack:Crowbar'});
-        return({OK:true, msg:'unequipped'});}
-}
-//this is an Inventory-item, not wardrobe
-class Shovel extends Equipment {
-    constructor() {
-        super('Shovel');
-        this.addTags(['tool', 'weapon']);
-        this.slotUse = ['RHand','LHand'];
-        this.lossOnRespawn = true;
-    }
-    get desc() { return('A rusty,old shovel.');}
-    toJSON() {return window.storage.Generic_toJSON("Shovel", this); }
-    static fromJSON(value) {return(window.storage.Generic_fromJSON(Shovel, value.data));}
-    usable(context) {return(this.canEquip(context));}
-    use(context) { //context here is inventory not outfit
-        if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) {  
-            this.parent.parent.Outfit.removeItem(this.id); 
-            return( {OK:true, msg:'unequipped '+ this.name}); //todo
-        } else {
-            this.parent.parent.Outfit.addItem(this); 
-            return( {OK:true, msg:'equipped '+ this.name}); //todo
-        }
-    }
-}
 class RobesZealot extends Equipment {
     constructor() {
         super('RobesZealot');
@@ -347,10 +296,34 @@ class ShortsLeather extends Equipment {
     toJSON() {return window.storage.Generic_toJSON("ShortsLeather", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(ShortsLeather, value.data));}
 }
-class BowWodden extends Equipment {
+//this is an Inventory-item, not wardrobe
+class Crowbar extends Weapon {
     constructor() {
-        super('BowWodden');
-        this.addTags([ 'weapon']);
+        super();this.id=this.name='Crowbar';
+        this.addTags(['tool', 'weapon']);
+        this.slotUse = ['RHand'];
+        this.lossOnRespawn = true;
+    }
+    descLong(fconv) {return(fconv('$[I]$ $[hold]$ a crowbar.'));}
+    get desc() { return 'durable crowbar.';}
+    toJSON() {return window.storage.Generic_toJSON("Crowbar", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(Crowbar, value.data));}
+}
+//this is an Inventory-item, not wardrobe
+class Shovel extends Weapon {
+    constructor() {
+        super();this.id=this.name='Shovel';
+        this.addTags(['tool', 'weapon']);
+        this.slotUse = ['RHand','LHand'];
+        this.lossOnRespawn = true;
+    }
+    get desc() { return('A rusty,old shovel.');}
+    toJSON() {return window.storage.Generic_toJSON("Shovel", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(Shovel, value.data));}
+}
+class BowWodden extends Weapon {
+    constructor() {
+        super();this.id=this.name='BowWodden';
         this.slotUse = ['RHand','LHand'];
         this.lossOnRespawn = true;
     }
@@ -375,28 +348,15 @@ class BowWodden extends Equipment {
         return(mod);
     }
 }
-class DaggerSteel extends Equipment {
+class DaggerSteel extends Weapon {
     constructor() {
-        super('DaggerSteel');
-        this.addTags([ 'weapon']);
+        super();this.id=this.name='DaggerSteel';
         this.slotUse = ['RHand'];
         this.lossOnRespawn = true;;
     }
     get desc() { return('A steel dagger.');}
     toJSON() {return window.storage.Generic_toJSON("DaggerSteel", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(DaggerSteel, value.data));}
-    usable(context) {return(this.canEquip(context));}
-    use(context) { //context here is inventory not outfit
-        if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) {  
-            this.parent.parent.Outfit.removeItem(this.id); 
-            return( {OK:true, msg:'unequipped '+ this.name});
-        } else {
-            this.parent.parent.Outfit.addItem(this); 
-            return( {OK:true, msg:'equipped '+ this.name}); 
-        }
-    }
-    onEquip(context) {return({OK:true, msg:'equipped'});}
-    onUnequip() {return({OK:true, msg:'unequipped'});}
     attackMod(target){
         let mod = new SkillMod();
         mod.onHit = [{ target:target, eff: [effDamage.setup(5,'slash')]}];
@@ -405,39 +365,76 @@ class DaggerSteel extends Equipment {
         return(mod);
     }
 }
-class StaffWodden extends Equipment {
+class StaffWodden extends Weapon {
     constructor() {
-        super('StaffWodden');
-        this.addTags(['weapon']);
+        super();this.id=this.name='StaffWodden';
         this.slotUse = ['RHand','LHand'];
         this.lossOnRespawn = true;
     }
     get desc() { return('A staff made from wood.');}
     toJSON() {return window.storage.Generic_toJSON("StaffWodden", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(StaffWodden, value.data));}
-    usable(context) {return(this.canEquip(context));}
-    use(context) { //context here is inventory not outfit
-        if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) {  
-            this.parent.parent.Outfit.removeItem(this.id); 
-            return( {OK:true, msg:'unequipped '+ this.name}); //todo
-        } else {
-            this.parent.parent.Outfit.addItem(this); 
-            return( {OK:true, msg:'equipped '+ this.name}); //todo
-        }
-    }
     onEquip(context) {
-        let sk = new SkillSmash();
+        let sk = new SkillStrongHit();
         sk.weapon = this.id;
         this.parent.parent.Skills.addItem(sk);
         return({OK:true, msg:'equipped'});}
     onUnequip() {
-        this.parent.parent.Skills.removeItem('Smash');
+        this.parent.parent.Skills.removeItem('StrongAttack');
         return({OK:true, msg:'unequipped'});}
     attackMod(target){
         let mod = new SkillMod();
         mod.onHit = [{ target:target, eff: [effDamage.setup(11,'blunt')]}];
-        mod.critChance=50;
+        mod.critChance=5;
         mod.onCrit = [{ target:target, eff: [effDamage.setup(11,'blunt'), new effStunned()]}];
+        return(mod);
+    }
+}
+class SpearWodden extends Weapon {
+    static setup(style) {
+        let x = new SpearWodden();
+        x.style=style;
+        return(x);
+    }
+    constructor() {
+        super();
+        this.slotUse = ['RHand','LHand'];
+        this.lossOnRespawn = true;
+        this.style=0;
+    }
+    set style(style) { 
+        this._style = style; 
+        if(style===0) this.id=this.name='SpearWodden';
+        else if(style===100) this.id=this.name='SpearStone';
+        else throw new Error(this.id +' doesnt know '+style);
+    }
+    get style() {return this._style;}
+    get desc() { 
+        let msg ='a large, smooth branch with a firehardened tip';
+        switch(this._style) {
+            case 100:
+                msg=('a stone-triangle mounted on a long stick');
+                break;
+            default:
+        }
+        return(msg);
+    }
+    toJSON() {return window.storage.Generic_toJSON("SpearWodden", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(SpearWodden, value.data));}
+    onEquip(context) {
+        let sk = new SkillStrongHit();
+        sk.weapon = this.id;
+        this.parent.parent.Skills.addItem(sk);
+        return({OK:true, msg:'equipped'});}
+    onUnequip() {
+        this.parent.parent.Skills.removeItem('StrongAttack');
+        return({OK:true, msg:'unequipped'});}
+    attackMod(target){
+        let mod = new SkillMod();
+        let bonus = Math.floor(this.style/20);
+        mod.onHit = [{ target:target, eff: [effDamage.setup(8+bonus,'pierce')]}];
+        mod.critChance=5;
+        mod.onCrit = [{ target:target, eff: [effDamage.setup(10+bonus*1.5,'pierce'), new effBleed(4)]}];
         return(mod);
     }
 }
@@ -487,7 +484,7 @@ class ShieldSmall extends Equipment {
         }
     }
     onEquip(context) {
-        /*let sk = new SkillSmash();
+        /*let sk = new SkillStrongHit();
         sk.weapon = this.id;
         this.parent.parent.Skills.addItem(sk);*/
         return({OK:true, msg:'equipped'});}
@@ -495,28 +492,15 @@ class ShieldSmall extends Equipment {
         //this.parent.parent.Skills.removeItem('Smash');
         return({OK:true, msg:'unequipped'});}
 }
-class MaceSteel extends Equipment {
+class MaceSteel extends Weapon {
     constructor() {
-        super('MaceSteel');
-        this.addTags([ 'weapon']);
+        super();this.id=this.name='MaceSteel';
         this.slotUse = ['RHand'];
         this.lossOnRespawn = true;
     }
     get desc() { return('A heavy steel mace.');}
     toJSON() {return window.storage.Generic_toJSON("MaceSteel", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(MaceSteel, value.data));}
-    usable(context) {return(this.canEquip(context));}
-    use(context) { //context here is inventory not outfit
-        if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) {  
-            this.parent.parent.Outfit.removeItem(this.id); 
-            return( {OK:true, msg:'unequipped '+ this.name}); //todo
-        } else {
-            this.parent.parent.Outfit.addItem(this); 
-            return( {OK:true, msg:'equipped '+ this.name}); //todo
-        }
-    }
-    onEquip(context) {return({OK:true, msg:'equipped'});}
-    onUnequip() {return({OK:true, msg:'unequipped'});}
     attackMod(target){
         let mod = new SkillMod();
         mod.onHit = [{ target:target, eff: [effDamage.setup(11,'blunt')]}];

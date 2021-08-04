@@ -3,14 +3,30 @@ class Item {
     constructor(name) {
         this.id = this.name = name;  //id is unique in database(no whitespace !); name is for display
         this.__tags = [];
+        this.price=this.basePrice =0; //how much worth it is
     }
     get parent() {return this._parent?this._parent():null;}
     _relinkItems(parent){this._parent=window.gm.util.refToParent(parent);}
+    _updateId() { 
+        //because equipment can have dynamic assigned curses, id needs to be generated dynamical too
+        //and then we also have to update id in inventory list
+        var nId="_"+md5(JSON.stringify(this));  //add _ or queryselector() might not work if id starts with number ?!
+        //md5 is less acurate but smaller then LZString.compress(JSON.stringify(this));
+        var _oldId = this.id;
+        this.id=nId;
+        if(this.parent) this.parent._updateId(_oldId);
+    }
     //called by SkillUseItem
     targetFilter(targets) {
         return([]); //default unuseable in combat
     }
     hasTag(tag) {
+        if(tag instanceof Array) {
+            for(var i=0;i<tag.length;i++) {
+                if(this.hasTag(tag[i])) return(true);
+            }
+            return(false);
+        }
         return(this.__tags.includes(tag));
     }
     removeTag(tags){
@@ -50,6 +66,11 @@ class Inventory {
             if(this.list[i].item) this.list[i].item._relinkItems(this);
         }
     }
+    _updateId(oldId) { //updates id if changed, see item._updateId
+        let slot = findItemSlot(oldId);
+        if(slot<0) return;
+        this.list[slot].id = this.list[slot].item.id;
+    }
     postItemChange(id,operation,msg) {
         window.gm.pushLog('Inventory: '+operation+' '+id+' '+msg);
     }
@@ -88,14 +109,15 @@ class Inventory {
             this.list.push({id: item.id,count: count, item:item});
         }
         else this.list[_i].count+=count;
-        this.postItemChange(item.id,"added","");
+        this.postItemChange(item.name,"added","");
     }
     removeItem(id,count=1) {
         var _i = this.findItemSlot(id);
         if(_i<0) return; //just skip if not found
+        var _item = this.getItem(id);
         this.list[_i].count -=count;
         if(this.list[_i].count<1) this.list.splice(_i,1);
-        this.postItemChange(id,"removed","");
+        this.postItemChange(_item.name,"removed","");
     }
     //convience method to check if item is usable
     usable(id,on=null) {
@@ -107,7 +129,7 @@ class Inventory {
         var _item = this.getItem(id);
         var result = _item.use(this,on);
         if(result.OK) {
-            this.postItemChange(id,"used",result.msg);
+            this.postItemChange(_item.name,"used",result.msg);
         }
         return(result);
     }

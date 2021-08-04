@@ -2,29 +2,9 @@
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name; window.gm.enterVR();%>
 After the VR connects to the server, your avatar appears near the top of a hill in a magic puff. </br>
-[[Magic Chest|GlobalChest]]</br>
-</br>Some leather bracers ly on the road.
-<a0 onclick='takeBracers();'>pickup fancy bracers</a></br><a0 onclick='takeBracers2();'>pickup even fancier bracers</a></br>
-<div></br>[[Settlement|ForestBorder]]</br></div>
+<div></br>[[Spawn sanctum|ForestRespawnPodExit]][[Settlement|ForestBorder]]</br></div>
 </article><article id="LogPanel"></article></section>
-<script>
-function takeBracers() {
-    let item = new window.storage.constructors['BracerLeather']();
-    item = window.gm.makeCursedItem(item,{lock:true,energydrain:2});
-    item = window.gm.makeBonusItem(item,{statBoost:'agility', statBonus:3});
-    window.gm.player.Wardrobe.addItem(item);
-    window.gm.player.Outfit.addItem(item);
-    this.disabled=true;
-}
-function takeBracers2() {
-    let item = new window.storage.constructors['BracerLeather']();
-    item = window.gm.makeCursedItem(item,{minItems:2,convert:'GlovesRubber'});
-    item = window.gm.makeBonusItem(item,{statBoost:'agility', statBonus:2});
-    window.gm.player.Wardrobe.addItem(item);
-    window.gm.player.Outfit.addItem(item);
-    this.disabled=true;
-}
-</script>
+
 
 :: ForestRespawnPodExit
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>

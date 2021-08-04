@@ -1,4 +1,4 @@
-:: Mall Floor 0 (postapocalypse)
+:: Mall 0F (postapocalypse)
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 <%window.gm.player.location=window.passage.name;%>
@@ -18,7 +18,7 @@ The stairway to the lower floor is blocked by parts of the building that fell do
 <%window.gm.player.location=window.passage.name;%>
 
 Where would you like to go from here?</br>
-[[Mall 0F|Mall Floor 0]]
+[[Mall 0F|Mall 0F]]
 </article><article id="LogPanel"></article></section>
 
 [[Mall_scavenge]]

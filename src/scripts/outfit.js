@@ -171,6 +171,24 @@ class Equipment extends Item {
         }
     };
 }
+
+class Weapon extends Equipment {
+    constructor() {
+        super();this.addTags(['weapon']);
+    }
+    usable(context) {return(this.canEquip(context));}
+    use(context) { //context here is inventory not outfit
+        if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) {  
+            this.parent.parent.Outfit.removeItem(this.id); 
+            return( {OK:true, msg:'unequipped '+ this.name}); //todo
+        } else {
+            this.parent.parent.Outfit.addItem(this); 
+            return( {OK:true, msg:'equipped '+ this.name}); //todo
+        }
+    }
+    onEquip(context) {return({OK:true, msg:'equipped'});}
+    onUnequip() {return({OK:true, msg:'unequipped'});}
+}
 //a kind of special inventory for worn equipment
 class Outfit { //extends Inventory{
     constructor() {
@@ -208,8 +226,13 @@ class Outfit { //extends Inventory{
             }
         }
     }
-    postItemChange(id,operation,msg) {
-        window.gm.pushLog('Outfit: '+operation+' '+id+' '+msg);
+    _updateId(oldId) {
+        let item= this.getItem(oldId);
+        let slots = item.slotUse
+        for(let k=0; k<slots.length;k++) {
+            let _el = this.list[slots[k]];
+            this.list[slots[k]].id = this.list[slots[k]].item.id;
+        }
     }
     count() {return( Object.keys(this.list).length);}
     //count how many slots are used by an item
@@ -315,7 +338,7 @@ class Outfit { //extends Inventory{
         }
         _item._parent = window.gm.util.refToParent(this);       //Todo currently we have 2 copies of equipment - 1 for wardrobe 1 for outfit otherwise this will not work
         result=_item.onEquip(this);
-        this.postItemChange(_item.name,"equipped",result.msg);
+        this.postItemChange(_item.name,"equipped",""/*result.msg*/);
         return(result);
     }
     //assumme that it was checked before that unequip is allowed
@@ -346,7 +369,7 @@ class Outfit { //extends Inventory{
         } else {
             this.parent.Wardrobe.addItem(_item);
         }
-        this.postItemChange(id,"removed",result.msg);
+        this.postItemChange(id,"removed",""/*result.msg*/);
         //Todo delete _item;    //un-parent
         return(result)
     }

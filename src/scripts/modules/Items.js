@@ -2,26 +2,26 @@
 ///////////////////////////////////////////////////////////////
 //RL-Items
 class LighterDad extends Item {
-    constructor() {        super('LighterDad');    }
+    constructor() {super('LighterDad');this.addTags([window.gm.ItemTags.Quest]);}
     get desc() { return('I got this lighter from my real dad.');}
     toJSON() {return window.storage.Generic_toJSON("LighterDad", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(LighterDad, value.data);};
 };
 class Money extends Item {
-    constructor() {super('Money');}
+    constructor() {super('Money'); this.addTags([window.gm.ItemTags.Money]);}
     get desc() { return('shiny,clinky coin.');}
     toJSON() {return window.storage.Generic_toJSON("Money", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(Money, value.data);};
 };
 
 class LaptopPS extends Item {
-    constructor() {        super('LaptopPS');    }
+    constructor() {super('LaptopPS');this.addTags([window.gm.ItemTags.Quest]);}
     get desc() { return 'Power converter for laptop.';    }
     toJSON() {return window.storage.Generic_toJSON("LaptopPS", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(LaptopPS, value.data);};
 };
 class Dildo extends Item {
-    constructor() {super('Dildo');this.style=0;}
+    constructor() {super('Dildo');this.price=this.basePrice=20;this.style=0;}
     toJSON() {return window.storage.Generic_toJSON("Dildo", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(Dildo, value.data);};
     set style(style) { 
@@ -43,13 +43,13 @@ class Dildo extends Item {
     }
 }
 class Lube extends Item {
-    constructor() {     super('Lube');    }
+    constructor() {     super('Lube');  this.addTags([window.gm.ItemTags.Ingredient]);this.price=this.basePrice=4;  }
     get desc() { return 'Slippery lubricant for personal use.';    }
     toJSON() {return window.storage.Generic_toJSON("Lube", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(Lube, value.data);};
 }
 class Battery extends Item {
-    constructor() { super('Battery'); }
+    constructor() { super('Battery'); this.addTags([window.gm.ItemTags.Ingredient]); this.price=this.basePrice=3;}
     get desc() { return 'Provides electricity for devices.';   }
     toJSON() {return window.storage.Generic_toJSON("Battery", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(Battery, value.data);};
@@ -59,6 +59,7 @@ class Battery extends Item {
 class GameVoucher extends Item {
     constructor() {
         super('GameVoucher');
+        this.addTags([window.gm.ItemTags.Money]);this.price=this.basePrice=100;
         this.style=0;this.lossOnRespawn = false;
     }
     toJSON() {return window.storage.Generic_toJSON("GameVoucher", this); };
@@ -82,7 +83,8 @@ class GameVoucher extends Item {
     }
 };
 class Ingredient extends Item {
-    constructor() { super('Ingredient');   
+    constructor() { super('Ingredient');
+        this.addTags([window.gm.ItemTags.Ingredient]); this.price=this.basePrice=10;   
         this.style=0;this.lossOnRespawn = true;
     }
     set style(style) { //instead of creating full class for every useless junk I use this and just add variable that will be restored after load
@@ -123,7 +125,8 @@ class Ingredient extends Item {
 }
 class SoulGem extends Item {
     constructor() { super('SoulGem');   
-       this.style=0;this.lossOnRespawn = true;
+        this.addTags([window.gm.ItemTags.Ingredient]);this.price=this.basePrice=100;
+        this.style=0;this.lossOnRespawn = true;
     }
     set style(style) { //instead of creating full class for every useless junk I use this and just add variable that will be restored after load
         this._style = style; 
@@ -142,7 +145,8 @@ class SoulGem extends Item {
     static fromJSON(value) { return window.storage.Generic_fromJSON(Ingredient, value.data);};
 }
 class Rope extends Item {
-    constructor() { super('Rope');   
+    constructor() { super('Rope');  
+    this.addTags([window.gm.ItemTags.Tool]); this.price=this.basePrice=10;
        this.style=0;this.lossOnRespawn = true;
     }
     set style(style) { //instead of creating full class for every useless junk I use this and just add variable that will be restored after load
@@ -223,7 +227,7 @@ class FlashBang extends Item {
     }
 };
 class CanOfCoffee extends Item {
-    constructor() {   super('CanOfCoffee');   }
+    constructor() {   super('CanOfCoffee'); this.addTags([window.gm.ItemTags.Drink]);this.price=this.basePrice=2;}
     get desc() { return 'Cold coffee in a can. Tasty? Not really!';    }
     toJSON() {return window.storage.Generic_toJSON("CanOfCoffee", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(CanOfCoffee, value.data);};
@@ -239,7 +243,7 @@ class CanOfCoffee extends Item {
     }
 };
 class SimpleFood extends Item {
-    constructor() {super('SimpleFood');}
+    constructor() {super('SimpleFood'); this.addTags([window.gm.ItemTags.Food]);this.price=this.basePrice=5;}
     get desc() { return 'Something to eat.';    }
     toJSON() {return window.storage.Generic_toJSON("SimpleFood", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(SimpleFood, value.data);};
@@ -259,7 +263,7 @@ class SimpleFood extends Item {
     }
 }
 class HealthPotion extends Item {
-    constructor() { super('HealthPotion'); this.style=0; }
+    constructor() { super('HealthPotion'); this.addTags([window.gm.ItemTags.Drink]); this.price=this.basePrice=5;this.style=0; }
     toJSON() {return window.storage.Generic_toJSON("HealthPotion", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(HealthPotion, value.data);};
     usable(context,on=null) {return({OK:true, msg:'drink'});}
@@ -288,7 +292,7 @@ class HealthPotion extends Item {
     }
 }
 class HorsePotion extends Item {
-    constructor() { super('HorsePotion');this.style=0;}
+    constructor() { super('HorsePotion'); this.addTags([window.gm.ItemTags.Drink]);this.price=this.basePrice=5;this.style=0;}
     toJSON() {return window.storage.Generic_toJSON("HorsePotion", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(HorsePotion, value.data);};
     usable(context,on=null) {return({OK:true, msg:'drink'});}
@@ -317,7 +321,25 @@ class HorsePotion extends Item {
         return(msg);
     }
 }
-
+window.gm.ItemTags = { //
+    //Items
+    Quest   : "quest", //quest-item; dont sell or give away
+    Cursed  : "cursed",
+    Money   : 'money', //...for trading
+    Ingredient : 'ingred',
+    Drink   : 'drink',
+    Food    : 'food',
+    //Outfit
+    Piercing    : "piercing",
+    Tattoo      : "tattoo",
+    Armor      : "armor",
+    //weapons
+    Tool    : 'tool',
+    Weapon  : "weapon",
+    Shield  : "shield",
+    Melee   : "melee",
+    Ranged  : "ranged" 
+};
 window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(LighterDad);
     window.storage.registerConstructor(GameVoucher);

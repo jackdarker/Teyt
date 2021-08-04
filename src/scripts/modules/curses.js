@@ -47,6 +47,9 @@ class Curse {
         this.list=curses;
         item.bonus.push(this);
         this._relinkItems(item);
+        //todo: basePrice if bonus/curse is hidden; if bonus/curse is known, increase/lower price; if bonus/curse is not fully known, increase price slightly 
+        item.price=item.basePrice*(1+item.bonus.length);
+        item._updateId();
     }
     _relinkItems(parent) {
         this._parent = window.gm.util.refToParent(parent);

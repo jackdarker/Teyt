@@ -1,6 +1,5 @@
 :: AM_MAP_Level1 [_back_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%window.gm.moveHere();%>
 You have some kind of map from the mine:</br>
 <pre>
 [E]-[A2]-[A3]      [A5]
@@ -69,3 +68,88 @@ Schwierig noch irgendwas zu sehen...ist da ein Loch im Boden?
 Eine Sackgasse.
 <div></br>[[South|AM_Lv1_B5]]</br>[[Map|AM_MAP_Level1]]</div>
 </article><article id="LogPanel"></article></section>
+
+
+:: AM_MAP_Level2 [_back_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+You have some kind of map:</br>
+<pre>
+[Start]-[B2]-[B3]-[B4]-[B5]-[Exit]
+  |       |                   |
+[Shop]    |--[C2]-[C3]-[C5]---| 
+          |-------[D4]--------|
+</pre>
+Remember: If you have earned some money you should weight the option to retreat and invest that money in better gear.
+That might give you better chances to survive the tougher fights at the cost of fighting the previous foes again.</br>
+Grinding is fun. :)  </br>
+<div></br>[[Back|_back_]]</br></div>
+</article><article id="LogPanel"></article></section>
+
+:: AM_Lv2_Exit [_back_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<% if(window.story.state.tmp.args[0]===''){ %>
+You finished all fights. Congratulation. Now fetch your prize and go partying.
+<div></br><a0 onclick='leave()'>Collect prize</a></div>
+<% }else{ %>
+Are you really going to flee from battle?
+<div></br><a0 onclick='leave()'>Yes</a>[[Back|_back_]]</br></div>
+<% }%>
+<div id='output'></div>
+</article><article id="LogPanel"></article></section>
+<script>function leave() {
+  var tmp=window.story.state.tmp;
+  for(let el of tmp.args[2]) {
+    window.gm.player.changeInventory(window.gm.ItemsLib[el.id](),el.count);
+  }
+  window.story.show('ForestBorder');
+}
+function showPrize() {
+  let msg='', tmp=window.story.state.tmp;
+  for(let el of tmp.args[2]) {
+    msg+=el.count+'x '+window.gm.ItemsLib[el.id]().name+'</br>';
+  }
+  return msg;
+}
+window.gm.printOutput(showPrize());
+</script>
+
+
+:: AM_Lv2_Start
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.moveHere();%>
+You have to challenge several enemys one by one. The stakes increase with each challenge and after each fight you may decide to drop out with the rewards you gathered so far. But if you loose, you dont get anything, just your own insights.</br>
+Are you ready for your first fight?</br>
+<div></br>
+<a href="javascript:void(0)" onclick='($("tw-passage").fadeOut(1000, function() {window.gm.player.sleep(700);window.story.show("AM_Lv2_Start");}));'>Sleep Until Morning</a>
+<a0 onclick='fight()'>Into battle<a/></br>[[Map|AM_MAP_Level2]]</div>
+</article><article id="LogPanel"></article></section>
+<script>function fight() {
+  var tmp=window.story.state.tmp;
+  window.gm.encounters[tmp.args[0]](window.gm.player.location);
+  window.gm.Encounter.onVictory = function() {
+        tmp.args[2]=tmp.args[2].concat(tmp.args[1])
+        return('Intimitated, the wolf rolls on its back, whimpering submissively and exposing its throat.</br>'+ 
+        window.gm.printPassageLink('Next','AM_Lv2_B2'));
+    }
+}
+window.story.state.tmp.args=['wolf',[{id:'Money',count:20}],[]];
+</script>
+
+
+:: AM_Lv2_B2
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.moveHere();%>
+Are you ready for your second fight?</br>
+<div></br>[[Retreat|AM_Lv2_Exit]] <a0 onclick='fight()'>Continue<a/></br>[[Map|AM_MAP_Level2]]</div>
+</article><article id="LogPanel"></article></section>
+<script>function fight() {
+  var tmp=window.story.state.tmp;
+  window.gm.encounters[tmp.args[0]](window.gm.player.location);
+  window.gm.Encounter.onVictory = function() {
+        tmp.args[2]=tmp.args[2].concat(tmp.args[1]),tmp.args[0]='';
+        return('You squished those little buggers.</br>'+ 
+        window.gm.printPassageLink('Next','AM_Lv2_Exit'));
+    }
+}
+window.story.state.tmp.args=['moleX2',[{id:'Money',count:30}],window.story.state.tmp.args[2]];
+</script>

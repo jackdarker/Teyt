@@ -304,15 +304,13 @@ in <script> define variable _Entrys and specify wares to sell
 and run renderToSelector("#panel", "listsell"); 
 -->
 <script>
-//define _Entrys in your passage lile this:
-//var _Entrys = [{id:"Crowbar",count:1,cost:25})];
-for(var i=0;_Entrys.length>i;i++) {
-    var entry=_Entrys[i];
-    let _id = entry.id;
-    let _cost=entry.cost;
-    window.gm.printShopSellEntry(_id,entry.count,
-    cbCanBuy=(function(itemid){return window.gm.defaultCanSell(itemid,_cost)}),
-    cbPostBuy=(function(itemid){window.gm.defaultPostSell(itemid,_cost)}));
+//define window.gm.shop.WaresToSell in your passage !
+for(var i=0;window.gm.shop.WaresToSell.length>i;i++) {
+    let item = window.gm.shop.WaresToSell[i].item;
+    let _cost=window.gm.shop.WaresToSell[i].cost;
+    window.gm.shop.printShopSellEntry(item,_cost,
+    cbCanBuy=(function(item){return(window.gm.shop.defaultCanSell(item,_cost));}),
+    cbPostBuy=(function(item){window.gm.shop.defaultPostSell(item,_cost)}));
 }
 </script>
 
@@ -324,16 +322,13 @@ in <script> define variable _Entrys and specify wares to buy
 and run renderToSelector("#panel", "listbuy"); 
 -->
 <script>
-//define _Entrys in your passage lile this:
-//var _Entrys = [{id:"Dildo",count:1,cost:25,costPerv:14}];
-for(var i=0;_Entrys.length>i;i++) {
-    var entry=_Entrys[i];
-    let _id = entry.id;
-    let _cost=entry.cost;
-    let _costPerv = entry.costPerv;
-    window.gm.printShopBuyEntry(_id,entry.count,
-    cbCanBuy=(function(itemid){return window.gm.cbCanBuyPerverse(itemid,_cost,_costPerv)}),
-    cbPostBuy=(function(itemid){window.gm.defaultPostBuy(itemid,_cost)}));
+//define window.gm.shop.WaresToBuy in your passage !
+for(var i=0;window.gm.shop.WaresToBuy.length>i;i++) {
+    let item=window.gm.shop.WaresToBuy[i].item;
+    let _cost=window.gm.shop.WaresToBuy[i].cost;
+    window.gm.shop.printShopBuyEntry(item,_cost,
+    cbCanBuy=(function(item){return window.gm.shop.cbCanBuyPerverse(item,_cost,0)}),
+    cbPostBuy=(function(item){window.gm.shop.defaultPostBuy(item,_cost)}));
 }
 </script>
 

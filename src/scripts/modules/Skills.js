@@ -86,29 +86,26 @@ class SkillAttack extends Skill {
         return(this.msg);
     }
 }
-class SkillSmash extends SkillAttack {
+class SkillStrongHit extends SkillAttack {
     constructor() {
-        super();
-        this.id=this.name='Smash'
-        this.msg = '';
-        this.weapon='';
+        super();this.id=this.name='StrongAttack'
+        this.msg = '';this.weapon='';
     }
-    toJSON() {return window.storage.Generic_toJSON("SkillSmash", this); }
-    static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillSmash, value.data));}
-    get desc() { return("Use "+this.weapon);}
+    toJSON() {return window.storage.Generic_toJSON("SkillStrongHit", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillStrongHit, value.data));}
+    get desc() { return("Use "+this.weapon+" offensivly for increased critical chance but overall reduced hit chance.");}
     previewCast(targets){
         var result = new SkillResult();
         result.skill =this;
-        result.source = this.caster;
-        result.targets = targets;
+        result.source = this.caster;result.targets = targets;
         this.msg = '';
         if(this.isValidTarget(targets)) {
             result.OK = true;
             for(var target of targets) {
                 let attack =window.gm.combat.defaultAttackData();
                 //get data from weapon
-                let _mod = this.parent.parent.Outfit.getItem(this.weapon).attackMod(target);
-                attack.mod=_mod;
+                attack.mod = this.parent.parent.Outfit.getItem(this.weapon).attackMod(target);
+                attack.mod.critChance=50,attack.mod.hitChance=70;
                 let result2 = window.gm.combat.calcAttack(this.caster,target,attack);
                 this.msg+=result2.msg;
                 result.effects = result.effects.concat(attack.effects); 
@@ -639,7 +636,7 @@ window.gm.SkillsLib = (function (Lib) {
     window.storage.registerConstructor(SkillHeal);
     window.storage.registerConstructor(SkillInspect);
     window.storage.registerConstructor(SkillPoisonCloud);
-    window.storage.registerConstructor(SkillSmash);
+    window.storage.registerConstructor(SkillStrongHit);
     window.storage.registerConstructor(SkillStun);
     window.storage.registerConstructor(SkillSubmit);
     window.storage.registerConstructor(SkillStruggle);

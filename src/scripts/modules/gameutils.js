@@ -1,7 +1,4 @@
 "use strict";
-
-
-
 /* bundles some utility operations*/
 window.gm.getSaveVersion= function(){   return([0,1,0]); };
 // reimplement to setup the game
@@ -19,8 +16,8 @@ window.gm.initGame= function(forceReset,NGP=null) {
     s._gm.dbgShowMoreInfo=true;
     if (!s.vars||forceReset) { // storage of variables that doesnt fit player
         s.vars = {
-        debugInv: new Inventory(),
         inVR: false,
+        spawnAt: 'ForestRespawnPodExit',
         playerPartyVR:[],
         playerPartyRL:[],
         //flags for global states
@@ -39,8 +36,6 @@ window.gm.initGame= function(forceReset,NGP=null) {
         wolfSubmit: 0,
         wolfVictory: 0
         }; 
-        s.vars.debugInv._parent = window.gm.util.refToParent(null);
-        s.vars.debugInv.addItem(new Money(),200);
     }
     
     if (!window.gm.achievements||forceReset) {  //outside of window.story !
@@ -156,7 +151,6 @@ window.gm.getScenePic = function(id){
   return('assets/bg_park.png');//todo placehodler
 }
 window.gm.enterVR=function() {
-  //todo update effects in VR but stop RL effects
   let s= window.story.state;
   if(s.vars.inVR) return;
   s.vars.playerPartyRL = s._gm.playerParty;
@@ -237,14 +231,24 @@ window.gm.respawn=function(conf={keepInventory:false}) {
     let staff = new window.storage.constructors['StaffWodden']();
     window.gm.player.Inv.addItem(staff);
     window.gm.player.Outfit.addItem(staff);
-    window.story.show('ForestRespawnPodExit'); //todo what location
+    window.story.show(window.story.state.vars.spawnAt); //todo what location
   }
-}
+};
 //sets current player location and advances time
 //call this in passage header
-window.gm.moveHere = function(time=10){
+window.gm.moveHere = function(time=15){
   if(window.gm.player.location!==window.passage.name) {
     window.gm.player.location=window.passage.name;
+    var s=window.story.state.vars;
+    switch(window.passage.name){ //when crossing a certain point, set spawnpoint
+      case 'ForestBorder': 
+        s.spawnAt = 'ForestRespawnPodExit'; 
+        break;
+      case 'VillageMarketPlace': 
+        s.spawnAt = 'VillageRespawnPodExit'; 
+        break;
+      default:break;
+    }
     window.gm.addTime(time); 
   }
 };

@@ -1,4 +1,4 @@
-:: Mall Floor 0 {"position":"1250,850"}
+:: Mall 0F {"position":"1250,850"}
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 <%window.gm.player.location=window.passage.name;%>
@@ -14,10 +14,7 @@ Where would you like to go from here?</br>
 [[Exit|Into the city]]
 </article><article id="LogPanel"></article></section>
 <script>
-var _Entrys = [];
-_Entrys.push({id:"Lube",count:10,cost:4,costPerv:10});
-_Entrys.push({id:"Battery",count:4,cost:4,costPerv:0});
-_Entrys.push({id:"Dildo_small",count:1,cost:25,costPerv:14});
+window.gm.shop.findWaresToBuy("Mall:GeneralStore");
 renderToSelector("#panel", "listbuy"); 
 </script>
 
@@ -36,7 +33,7 @@ if(window.gm.player.Stats.get('corruption').value<=10) {%>
 <p class='tPC'>No way I'm going in to that smut-shop. Only perverts do that. </p>
 <%} else {%> [[Adult books and tools]] </br> <%} %>
 Where would you like to go from here?</br>
-[[Mall 0F|Mall Floor 0]]
+[[Mall 0F|Mall 0F]]
 </article><article id="LogPanel"></article></section>
 
 :: Mall Floor -1 {"position":"1000,825"}
@@ -47,7 +44,7 @@ You are actually at [[<%=window.gm.player.location%>]].</br>
 This level of the mall seems to be reserved for the less fancy business. </br> 
 Most of the space is occupied by the usual [[electronics store]] and a [[food store]].
 Where would you like to go from here?</br>
-[[Mall 0F|Mall Floor 0]]
+[[Mall 0F|Mall 0F]]
 </article><article id="LogPanel"></article></section>
 
 :: Adult books and tools {"position":"1025,650"}
@@ -63,7 +60,7 @@ No way I'm going in to that smut-shop. Only perverts do that. </br>
 <%} else {%>
 <%} %>
 Where would you like to go from here?</br>
-[[Mall 0F|Mall Floor 0]]
+[[Mall 0F|Mall 0F]]
 </article><article id="LogPanel"></article></section>
 
 

@@ -97,6 +97,15 @@ class Leech extends Mob {
     }
 }
 class Huntress extends Mob {
+    static setup(type) {
+        let foe = new Huntress();
+        if(type==='spearthrower') {
+            this.Outfit.addItem(SpearWodden.setup(100));
+        } else {
+            this.Outfit.addItem(new DaggerSteel());
+        }
+        return foe;
+    }
     constructor() {
         super();
         this.name = this.id = 'Huntress';
@@ -108,6 +117,7 @@ class Huntress extends Mob {
         this.Outfit.addItem(FaceWolf.factory('cat'));
         this.Outfit.addItem(VulvaHuman.factory('cat'));
         this.Outfit.addItem(new BikiniBottomLeather());
+        this.Outfit.addItem(new BikiniTopLeather());
         this.levelUp(3);
         this.autoLeveling();
     }
@@ -155,7 +165,6 @@ class Dryad extends Mob {
 }
 class Vine extends Mob {
     static setup(type) {
-
     }
     constructor() {
         super();
@@ -223,6 +232,7 @@ class Carlia extends Mob {
       this.Outfit.addItem(BreastHuman.factory('human'));
       this.Outfit.addItem(VulvaHuman.factory('human'));
       this.Outfit.addItem(new BikiniBottomLeather());
+      this.Outfit.addItem(new BikiniTopLeather());
       this.levelUp(3);
       this.autoLeveling();
   }

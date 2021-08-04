@@ -14,7 +14,7 @@ Someone has painted 'Thetain' on the planks above the wooden gate. Most likely t
 <!--todo--> You are at the entrance to the town Thetain.
 </br></br>
 <div></br>
-[[Enter village|VillageMarketPlace]]  [[leave village|PlainsFarmland]]</br></div>
+[[Enter village|VillageMarketPlace]]  [[leave village|PlainsFarmland]] [[Spawn sanctum|VillageRespawnPodExit]]</br></div>
 </article><article id="LogPanel"></article></section>
 
 
@@ -55,9 +55,12 @@ Some tattered notes are pinned to the board: </br>
 <%window.gm.moveHere();%>
 <!--todo--> If this is a shop, then they sell everything: Shoes, cooking pans, assault ballista and chicken.</br> 
 <!--todo-->On the other side of the room is a large [[Wardrobe]] with a [[Mirror]] where you can take a look at yourself.</br>
+<div id="choice"></div></br>  <!--display buy message-->
+<div id="panel"></div></br>    <!--display wares list-->
 <div></br> [[Buy]] or [[Sell]] something.</br>
 [[Square|VillageMarketPlace]]  [[Shopkeeper|NOP]]</br></div>
 </article><article id="LogPanel"></article></section>
+<script></script>
 
 
 :: VillageSmithy
@@ -77,4 +80,13 @@ The man just gives a short glance at it before crossing his arms again before hi
 <p class="tPC">"But who could help me?"</p>
 <p class="tNPC2">"I dunno" he shrugs his shoulders "a magican maybe."</p>
 </br>[[Square|VillageMarketPlace]]  [[Shopkeeper|NOP]]</br></div>
+</article><article id="LogPanel"></article></section>
+
+
+:: VillageRespawnPodExit
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+You are in the sanctum of spawn located in Thetain.</br> 
+</br>[[Magic Chest|GlobalChest]]</br>
+<div></br>[[Leave|VillageEntrance]]</br></div>
 </article><article id="LogPanel"></article></section>
