@@ -159,7 +159,7 @@ class Equipment extends Item {
         return({OK:true, msg:'equipped'});
     }
     onUnequip() {
-        let res = {OK:true, msg:''};
+        let res = {OK:true, msg:'unequipped'};
         for (el of this.bonus) {
             el.onUnequip();
         }
@@ -235,7 +235,7 @@ class Outfit { //extends Inventory{
         if(_idx.length<0) throw new Error('no such item: '+id);
         return(this.list[_idx[0]].item);
     }
-    //returns all Ids in list
+    //returns all Item-Ids in list
     getAllIds() {   
         let ids=[];
         for (el of this.list) {
@@ -308,7 +308,11 @@ class Outfit { //extends Inventory{
             }
             this.list[_idx[k]].id = _item.id;
             this.list[_idx[k]].item = _item;
-        }  
+        } 
+        //if item is from wardrobe/Inventory, remove it there
+        if(item.parent && item.parent.removeItem) {
+            item.parent.removeItem(item.id);
+        }
         _item._parent = window.gm.util.refToParent(this);       //Todo currently we have 2 copies of equipment - 1 for wardrobe 1 for outfit otherwise this will not work
         result=_item.onEquip(this);
         this.postItemChange(_item.name,"equipped",result.msg);
@@ -333,6 +337,14 @@ class Outfit { //extends Inventory{
         result=_item.onUnequip(this);
         for(let i=0; i<_idx.length;i++) {
             this.__clearSlot(_idx[i]);
+        }
+        //unequipped items go into wardrobe except bodyparts
+        if(_item.hasTag('body')) {
+            //dont store bodyparts 
+        }else if(_item.hasTag('weapon')) {
+            this.parent.Inv.addItem(_item);
+        } else {
+            this.parent.Wardrobe.addItem(_item);
         }
         this.postItemChange(id,"removed",result.msg);
         //Todo delete _item;    //un-parent

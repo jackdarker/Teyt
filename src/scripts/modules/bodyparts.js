@@ -3,7 +3,7 @@
 class BaseHumanoid extends Equipment {
     constructor() {
         super('BaseHumanoid');
-        this.tags = ['body'];
+        this.addTags(['body']);
         this.slotUse = ['bBase'];
     }
     descLong(fconv) {return(fconv('$[My]$ body is that of an human.'));} //$[I]$ $[have]$ a humanoid body.
@@ -15,7 +15,7 @@ class BaseHumanoid extends Equipment {
 class BaseQuadruped extends Equipment {
     constructor() {
         super('BaseQuadruped');
-        this.tags = ['body'];
+        this.addTags(['body']);
         this.slotUse = ['bBase'];
     }
     get descShort() {return this.desc;};
@@ -27,7 +27,7 @@ class BaseQuadruped extends Equipment {
 class BaseWorm extends Equipment {
     constructor() {
         super('BaseWorm');
-        this.tags = ['body'];
+        this.addTags(['body']);
         this.slotUse = ['bBase'];
     }
     get descShort() {return this.desc;};
@@ -43,7 +43,7 @@ class FaceHuman extends Equipment {
     }
     constructor() {
         super('FaceHuman');
-        this.tags = ['body'];
+        this.addTags(['body']);
         this.slotUse = ['bFace','bMouth'];
         this.data = FaceHuman.dataPrototype();   
     }
@@ -65,7 +65,7 @@ class FaceWolf extends Equipment {
     }
     constructor() {
         super('FaceWolf');
-        this.tags = ['body'];
+        this.addTags(['body']);
         this.slotUse = ['bFace','bMouth'];  //todo separate mouth-bodypart??
         this.data = FaceWolf.dataPrototype();   
     }
@@ -113,7 +113,7 @@ class FaceHorse extends Equipment {
         return({femininity:0.2});    }
     constructor() {
         super('FaceHorse');
-        this.tags = ['body'];
+        this.addTags(['body']);
         this.slotUse = ['bFace','bMouth'];
         this.data = FaceHorse.dataPrototype();   
     }
@@ -128,7 +128,7 @@ class FaceHorse extends Equipment {
 class SkinHuman extends Equipment {
     constructor() {
         super('SkinHuman');
-        this.tags = ['body'];
+        this.addTags(['body']);
         this.slotUse = ['bSkin'];
     }
     get desc() { 'a smooth tanned skin mostly bare of noticable hair.';}
@@ -148,7 +148,7 @@ class SkinFur extends Equipment {
     }
     constructor() {
         super('SkinFur');
-        this.tags = ['body'];
+        this.addTags(['body']);
         this.slotUse = ['bSkin'];
         this.data = SkinFur.dataPrototype();
     }
@@ -191,7 +191,7 @@ class TailWolf extends Equipment {
     }
     constructor() {
         super('TailWolf');
-        this.tags = ['body'];
+        this.addTags(['body']);
         this.slotUse = ['bTailBase'];
         this.data = TailWolf.dataPrototype();  
     }
@@ -241,7 +241,7 @@ class HandsPaw extends Equipment { //paws of ferals
     }
     constructor() {
         super('HandsPaw');
-        this.tags = ['body'];
+        this.addTags(['body']);
         this.slotUse = ['bHands'];
         this.data = HandsPaw.dataPrototype();
     }
@@ -282,7 +282,7 @@ class HandsHuman extends Equipment {
     }
     constructor() {
         super('HandsHuman');
-        this.tags = ['body'];
+        this.addTags(['body']);
         this.slotUse = ['bHands'];
         this.data = HandsHuman.dataPrototype();
     }
@@ -325,7 +325,7 @@ class BreastHuman extends Equipment {
     }
     constructor() {
         super('BreastHuman');
-        this.tags = ['body'];
+        this.addTags(['body']);
         this.slotUse = ['bBreast'];
         this.data = BreastHuman.dataPrototype();
     }
@@ -366,7 +366,7 @@ class VulvaHuman extends Equipment {
     }
     constructor() {
         super('VulvaHuman');
-        this.tags = ['body'];
+        this.addTags(['body']);
         this.slotUse = ['bVulva'];
         this.data = VulvaHuman.dataPrototype();
     }
@@ -434,7 +434,7 @@ class PenisHuman extends Equipment {
     }
     constructor() {
         super('PenisHuman');
-        this.tags = ['body'];
+        this.addTags(['body']);
         this.slotUse = ['bPenis','bBalls'];
         this.data = PenisHuman.dataPrototype();   
     }

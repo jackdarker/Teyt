@@ -192,20 +192,18 @@ Checking out <%=window.gm.player.name%>:   [[Back|_back_]]</br>
 
 :: Wardrobe [_back_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
-[[Back|_back_]]</br>
-<%=window.gm.player.name%> has equipped: <%=window.gm.printEquipmentSummary()%></br></br>
-(Tools and weapons can be changed via Inventory.)</br></br>
-In <%=window.gm.player.name%> wardrobe you find: </br></br>
-<!--assumption: every outfit item (worn or not) is present in the wardrobe-->
-<%
+[[Back|_back_]] (Tools and weapons can be changed via Inventory.)</br>
+<%=window.gm.player.name%> has equipped: <%=window.gm.printEquipmentSummary()%></br>
+<div id="choice"></div>
+</article><article id="LogPanel"></article></section>
+<script>
 var x = 0, id=''; 
 var whom = window.gm.player;
-var maxSlots = whom.Wardrobe.count(); 
-for(var i=0;i<maxSlots;i++){
-  %><%=window.gm.printEquipment(whom,whom.Wardrobe.getItemId(i))%><%
-} 
-%>
-</article><article id="LogPanel"></article></section>
+var _ids = whom.Wardrobe.getAllIds(); 
+for(var i=0;i<_ids.length;i++){window.gm.printEquipment(whom,whom.Wardrobe.getItem(_ids[i]));}
+_ids = whom.Outfit.getAllIds(); 
+for(var i=0;i<_ids.length;i++){window.gm.printEquipment(whom,whom.Outfit.getItem(_ids[i]));}
+</script>
 
 :: Settings [_back_]
 <section> <!--<aside id="sidebar"></aside>--><article><%=window.story.render("CenterDialogs") %>

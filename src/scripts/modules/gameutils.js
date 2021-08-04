@@ -228,6 +228,7 @@ window.gm.respawn=function(conf={keepInventory:false}) {
       window.story.show('YouDiedWithCursedGear');
   } else {
     let robes = new window.storage.constructors['RobesZealot']();
+    window.gm.makeCursedItem(robes,{minItems:2,convert:'HarnessRubber'});
     window.gm.player.Wardrobe.addItem(robes);
     window.gm.player.Outfit.addItem(robes);
     robes = new window.storage.constructors['Briefs']();

@@ -25,5 +25,5 @@ A skilled hunter could certainly earn his living here with [[hunting]].</br>
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;window.gm.moveHere();%>
 Fields with grain and also with vegetables stretch along the road. In between are farms, barns and windmills, most of them more or less run down.</br>
-[[West: Plains|PlainsEast]] [[East: Village|VillageEntranceIntro]]
+[[West: Plains|PlainsEast]] [[East: Village|VillageEntranceIntro]] [[NorthWest: Large Rocks|AM_Entrance]]
 </article><article id="LogPanel"></article></section>

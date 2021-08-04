@@ -131,7 +131,13 @@ window.gm.initGame= function(forceReset,NGP=null) {
         msg: ''   // memorizes a message to display when returning from _back-passage; please clear it when leaving the passage
       }
     }
-
+    if (!s.GlobalChest||forceReset) {  
+      let ch = new Character();
+      ch.id="GlobalChest";
+      ch.name="GlobalChest";
+      ch.faction="Player";
+      s.GlobalChest=ch;
+    }
     if (!s.combat||forceReset) { //see encounter & combat.js
       s.combat = {
         enemyParty : [],  //collection of enemy-chars involved 
@@ -702,45 +708,104 @@ window.gm.printItem2= function( id,descr,carrier,useOn=null ) {
     $("div#choice")[0].appendChild(entry);      // <- requires this node in html
   }
 };
+/**
+ * prints a list of items/wardrobe and buttons to transfer them
+ * @param {*} from 
+ * @param {*} to 
+ */
+window.gm.printItemTransfer = function(from,to,wardrobe) {
+  let listFrom,listTo;
+  if(wardrobe) listFrom=from.Wardrobe.getAllIds(), listTo=to.Wardrobe.getAllIds(); 
+  else listFrom=from.Inv.getAllIds(), listTo=to.Inv.getAllIds();
+  let allIds = new Map();
+  for(let el of listTo) {
+    allIds.set(el,{name:wardrobe?to.Wardrobe.getItem(el).name:to.Inv.getItem(el).name});
+  }
+  for(let el of listFrom) {
+    allIds.set(el,{name:wardrobe?from.Wardrobe.getItem(el).name:from.Inv.getItem(el).name});
+  }
+  listFrom = Array.from(allIds.keys());listFrom.sort();
+  function give(id,amount,charA,charB) {
+    let item,count = charA.Inv.countItem(id);
+    if(count===0) {
+      count=charA.Wardrobe.countItem(id);
+      item = charA.Wardrobe.getItem(id);
+    } else item = charA.Inv.getItem(id);
+    count=Math.min(count,amount);
+    charA.changeInventory(item,-1*count);
+    item = window.gm.ItemsLib[id]();
+    charB.changeInventory(item,count);
+    window.gm.refreshAllPanel();
+  }
+  for(let id of listFrom) {
+    let g,entry = document.createElement('p');
+    entry.textContent =allIds.get(id).name;
+    let count = wardrobe?from.Wardrobe.countItem(id):from.Inv.countItem(id);
+    g = document.createElement('a');
+    g.href='javascript:void(0)',g.textContent='give 1 of '+window.gm.util.formatNumber(count,0);
+    g.addEventListener("click",give.bind(null,id,1,from,to));
+    if(count>0) entry.appendChild(g)
+    g = document.createElement('a');
+    g.href='javascript:void(0)',g.textContent='give all';
+    g.addEventListener("click",give.bind(null,id,count,from,to));
+    if(count>0) entry.appendChild(g)
+    count = wardrobe?to.Wardrobe.countItem(id):to.Inv.countItem(id);
+    g = document.createElement('a');
+    g.href='javascript:void(0)',g.textContent='take 1 of '+window.gm.util.formatNumber(count,0);
+    g.addEventListener("click",give.bind(null,id,1,to,from));
+    if(count>0) entry.appendChild(g)
+    g = document.createElement('a');
+    g.href='javascript:void(0)',g.textContent='take all';
+    g.addEventListener("click",give.bind(null,id,count,to,from));
+    if(count>0) entry.appendChild(g)
+    $("div#choice")[0].appendChild(entry);      // <- requires this node in html
+  }
+}
 //prints an equipment with description; used in wardrobe
-window.gm.printEquipment= function( whom,id) {
+window.gm.printEquipment= function( whom,item) {
   var elmt='';
   var s= window.story.state;
   var res,name,desc;
-  var item=whom.Wardrobe.getItem(id);
   name=item.name, desc=item.desc;
-  elmt +=`<a0 id='${id}' onclick='(function($event){document.querySelector(\"div#${id}\").toggleAttribute(\"hidden\");})(this);'>${name}</a>`;
-  if(whom.Outfit.countItem(id)<=0) {
-      //elmt +=`<a0 id='${id}' onclick='(function($event){window.gm.player.Outfit.addItem(new window.storage.constructors[\"${id}\"]()); window.gm.refreshAllPanel();}(this))'>Equip</a>`;
-      elmt +=`<a0 id='${id}' onclick='(function($event,whom){whom.Outfit.addItem(whom.Wardrobe.getItem(\"${id}\")); window.gm.refreshAllPanel();}(this,window.story.state[\"${whom.id}\"]))'>Equip</a>`;
+  if(item.hasTag('body')) return; //skip bodyparts; tattoos & piercing cannot unequip
+  let g,entry = document.createElement('p');
+  g = document.createElement('a'),g.href='javascript:void(0)';
+  g.textContent=item.name;g.id=item.id;
+  g.addEventListener("click",(function(evt){document.querySelector("div#"+evt.target.id).toggleAttribute("hidden");}));
+  entry.appendChild(g);
+  g = document.createElement('a'),g.href='javascript:void(0)';
+  if(whom.Outfit.countItem(item.id)<=0) {
+    g.textContent='Equip';
+    g.addEventListener("click",(function(whom,item){
+      return(function(){whom.Outfit.addItem(item);window.gm.refreshAllPanel();});})(whom,item));
   } else {
-    res = whom.Outfit.canUnequipItem(id,false);
+    res = whom.Outfit.canUnequipItem(item.id,false);
     if(res.OK) {
-      elmt +=`<a0 id='${id}' onclick='(function($event,whom){whom.Outfit.removeItem(\"${id}\"); window.gm.refreshAllPanel();}(this,window.story.state[\"${whom.id}\"]))'>Unequip</a>`;
+      g.textContent='Unequip';
+      g.addEventListener("click",(function(whom,item){
+        return(function(){whom.Outfit.removeItem(item.id);window.gm.refreshAllPanel();});})(whom,item));
     } else {
-      elmt +='<div>'+res.msg+'</div>';
+      g.disabled =true; g.textContent=res.msg;
     }
   }
-  elmt +=`</br><div hidden id='${id}'>${desc}</div>`;
-
-  if(window.story.passage(id))  elmt +=''.concat("    [[Info|"+id+"]]");  //Todo add comands: drink,eat, use
+  entry.appendChild(g)
+  g=document.createElement('div');
+  g.id=item.id; g.hidden=true;g.textContent=item.desc;
+  entry.appendChild(g)
+  $("div#choice")[0].appendChild(entry); 
+  /*if(window.story.passage(id))  elmt +=''.concat("[[Info|"+id+"]]");  //Todo passages for items?
       elmt +=''.concat("</br>");
-      return(elmt);
+      return(elmt);*/
 };
-
 //prints a string listing equipped items
 window.gm.printEquipmentSummary= function() {
-  var elmt='';
-  var s= window.story.state;
-  var result ='';
-  var ids = [];
-  for(var i=0;i<window.gm.player.Outfit.count();i++){
-      if(i<window.gm.OutfitSlotLib.Feet) continue; //skip bodyparts
-      var id = window.gm.player.Outfit.getItemId(i);
-      if(id!='' && ids.indexOf(id)<0) {
-          ids.push(id);
-          result+=id+',';
-      }
+  var whom=window.gm.player;
+  var result ='', ids = [];
+  ids = whom.Outfit.getAllIds();
+  for(var i=0;i<ids.length;i++){
+    let item = whom.Outfit.getItem(ids[i]);
+    if(item.hasTag('body')) continue;
+    result+=item.name+',';
   }
   return(result);
 };

@@ -2,7 +2,7 @@
 class Leggings extends Equipment {
     constructor() {
         super('Leggings');
-        this.tags = ['cloth'];
+        this.addTags(['cloth']);
         this.slotUse = ['Legs','Hips'];
     }
     get desc() { return 'Spandex-leggings for sport. (agility+)';}
@@ -18,7 +18,7 @@ class Leggings extends Equipment {
 class Jeans extends Equipment {
     constructor() {
         super('Jeans');
-        this.tags = ['cloth'];
+        this.addTags(['cloth']);
         this.slotUse = ['Legs','Hips'];
     }
     get desc() { return 'plain old blue jeans';    }
@@ -28,7 +28,7 @@ class Jeans extends Equipment {
 class Sneakers extends Equipment {
     constructor() {
         super('Sneakers');
-        this.tags = ['cloth'];
+        this.addTags(['cloth']);
         this.slotUse = ['Feet'];
     }
     get desc() { return 'Sneakers for sport and recreational activities.';    }
@@ -38,7 +38,7 @@ class Sneakers extends Equipment {
 class TankShirt extends Equipment {
     constructor() {
         super('TankShirt');
-        this.tags = ['cloth'];
+        this.addTags(['cloth']);
         this.slotUse = ['Breast','Stomach'];
     }
     get desc() { return 'light blue tank-top';}
@@ -48,7 +48,7 @@ class TankShirt extends Equipment {
 class Pullover extends Equipment {
     constructor() {
         super('Pullover');
-        this.tags = ['cloth'];
+        this.addTags(['cloth']);
         this.slotUse = ['Breast','Stomach','Arms'];
     }
     descLong(fconv) {
@@ -64,14 +64,14 @@ class Pullover extends Equipment {
 class BracerLeather extends Equipment {
     constructor() {
         super('BracerLeather');
-        this.tags = ['cloth'];
+        this.addTags(['cloth']);
         this.slotUse = ['Wrists'];
         this.style = 0;   
         this.lossOnRespawn = true;
     }
     set style(style) { 
         this._style = style; 
-        if(style===200) this.id=this.name='Rubber-Gloves';
+        if(style===200) this.id='GlovesRubber',this.name='Rubber-Gloves';
     }
     get style() {return this._style;}
     get desc() { 
@@ -99,7 +99,7 @@ class BracerLeather extends Equipment {
 class HandCuffs extends Equipment {
     constructor() {
         super('HandCuffs');
-        this.tags = ['restrain'];
+        this.addTags(['restrain']);
         this.slotUse = ['RHand','LHand','Wrists'];
     }
     get desc() { return 'handcuffs like the police use them';  }
@@ -124,7 +124,6 @@ class HandCuffs extends Equipment {
 class WristCuffs extends Equipment {
     constructor() {
         super('WristCuffs');
-        this.tags = [];
         this.slotUse = ['Wrists'];
         this.lossOnRespawn = false;
     }
@@ -150,7 +149,6 @@ class WristCuffs extends Equipment {
 class CollarQuest extends Equipment {
     constructor() {
         super('CollarQuest');
-        this.tags = [];
         this.slotUse = ['Neck'];
         this.lossOnRespawn = false;
     }
@@ -176,7 +174,7 @@ class CollarQuest extends Equipment {
 class PiercingClit extends Equipment {
     constructor() {
         super('PiercingClit');
-        this.tags = ['piercing'];
+        this.addTags(['piercing']);
         this.slotUse = ['pClit'];    
         this.style = 0;   
         this.lossOnRespawn = true;
@@ -201,7 +199,7 @@ class PiercingClit extends Equipment {
 class TattooGroin extends Equipment {
     constructor() {
         super('TattooGroin');
-        this.tags = ['tattoo'];
+        this.addTags(['tattoo']);
         this.slotUse = ['tStomach'];    
         this.style = 0;   
         this.lossOnRespawn = false;
@@ -228,7 +226,7 @@ class TattooGroin extends Equipment {
 class Crowbar extends Equipment {
     constructor() {
         super('Crowbar');
-        this.tags = ['tool', 'weapon'];
+        this.addTags(['tool', 'weapon']);
         this.slotUse = ['RHand'];
         this.lossOnRespawn = true;
     }
@@ -257,7 +255,7 @@ class Crowbar extends Equipment {
 class Shovel extends Equipment {
     constructor() {
         super('Shovel');
-        this.tags = ['tool', 'weapon'];
+        this.addTags(['tool', 'weapon']);
         this.slotUse = ['RHand','LHand'];
         this.lossOnRespawn = true;
     }
@@ -274,31 +272,36 @@ class Shovel extends Equipment {
             return( {OK:true, msg:'equipped '+ this.name}); //todo
         }
     }
-
-    onEquip(context) {
-        //context.parent.Stats.addModifier('pAttack',{id:'pAttack:Shovel', bonus:2});
-        return({OK:true, msg:'equipped'});}
-    onUnequip() {
-        //this.parent.parent.Stats.removeModifier('pAttack',{id:'pAttack:Shovel'});
-        return({OK:true, msg:'unequipped'});}
 }
 class RobesZealot extends Equipment {
     constructor() {
         super('RobesZealot');
-        this.tags = ['cloth'];
+        this.addTags(['cloth']);
         this.slotUse = ['Breast','Stomach','Hips','Legs'];
         this.slotCover = ['bBreast','uBreast','pNipples'];    
         this.lossOnRespawn = true;
     }
-    get desc() { return 'light blue tank-top';}
+    get desc() { return 'a robe made from coarse cloth';}
     toJSON() {return window.storage.Generic_toJSON("RobesZealot", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(RobesZealot, value.data));}
 
 }
+class HarnessRubber extends Equipment {
+    constructor() {
+        super('HarnessRubber');
+        this.addTags(['rubber']);
+        this.slotUse = ['Breast','Stomach'];
+        this.slotCover = ['bBreast','uBreast'];    
+        this.lossOnRespawn = true;
+    }
+    get desc() { return 'a harness made from straps of rubber that barely covers someones torso';}
+    toJSON() {return window.storage.Generic_toJSON("HarnessRubber", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(HarnessRubber, value.data));}
+}
 class Briefs extends Equipment {
     constructor() {
         super('Briefs');
-        this.tags = ['cloth'];
+        this.addTags(['cloth']);
         this.slotUse = ['uHips'];
         this.slotCover = ['bPenis','bVulva','bBalls','bClit','bAnus','pPenis','pClit'];    
         this.lossOnRespawn = true;
@@ -311,7 +314,7 @@ class Briefs extends Equipment {
 class BikiniBottomLeather extends Equipment {
     constructor() {
         super('BikiniBottomLeather');
-        this.tags = ['cloth'];
+        this.addTags(['cloth']);
         this.slotUse = ['uHips'];
         this.slotCover = ['bPenis','bVulva','bBalls','bClit','bAnus','pPenis','pClit'];    
         this.lossOnRespawn = true;
@@ -323,7 +326,7 @@ class BikiniBottomLeather extends Equipment {
 class BikiniTopLeather extends Equipment {
     constructor() {
         super('BikiniTopLeather');
-        this.tags = ['cloth'];
+        this.addTags(['cloth']);
         this.slotUse = ['uBreast'];
         this.slotCover = ['pNipples'];    
         this.lossOnRespawn = true;
@@ -335,7 +338,7 @@ class BikiniTopLeather extends Equipment {
 class ShortsLeather extends Equipment {
     constructor() {
         super('ShortsLeather');
-        this.tags = ['cloth'];
+        this.addTags(['cloth']);
         this.slotUse = ['Hips','Legs'];
         this.slotCover = ['bPenis','bVulva','bBalls','bClit','bAnus','pPenis','pClit'];    
         this.lossOnRespawn = true;
@@ -347,7 +350,7 @@ class ShortsLeather extends Equipment {
 class BowWodden extends Equipment {
     constructor() {
         super('BowWodden');
-        this.tags = [ 'weapon'];
+        this.addTags([ 'weapon']);
         this.slotUse = ['RHand','LHand'];
         this.lossOnRespawn = true;
     }
@@ -364,15 +367,18 @@ class BowWodden extends Equipment {
             return( {OK:true, msg:'equipped '+ this.name}); 
         }
     }
-    onEquip(context) {        
-        return({OK:true, msg:'equipped'});
+    attackMod(target){
+        let mod = new SkillMod();
+        mod.onHit = [{ target:target, eff: [effDamage.setup(6,'pierce')]}];
+        mod.critChance=25;
+        mod.onCrit = [{ target:target, eff: [effDamage.setup(10,'pierce')]}];
+        return(mod);
     }
-    onUnequip() {return({OK:true, msg:'unequipped'});}
 }
 class DaggerSteel extends Equipment {
     constructor() {
         super('DaggerSteel');
-        this.tags = [ 'weapon'];
+        this.addTags([ 'weapon']);
         this.slotUse = ['RHand'];
         this.lossOnRespawn = true;;
     }
@@ -389,15 +395,20 @@ class DaggerSteel extends Equipment {
             return( {OK:true, msg:'equipped '+ this.name}); 
         }
     }
-    onEquip(context) {        
-        return({OK:true, msg:'equipped'});
-    }
+    onEquip(context) {return({OK:true, msg:'equipped'});}
     onUnequip() {return({OK:true, msg:'unequipped'});}
+    attackMod(target){
+        let mod = new SkillMod();
+        mod.onHit = [{ target:target, eff: [effDamage.setup(5,'slash')]}];
+        mod.critChance=50;
+        mod.onCrit = [{ target:target, eff: [effDamage.setup(5,'slash'),effDamage.setup(3,'pierce')]}];
+        return(mod);
+    }
 }
 class StaffWodden extends Equipment {
     constructor() {
         super('StaffWodden');
-        this.tags = [ 'weapon'];
+        this.addTags(['weapon']);
         this.slotUse = ['RHand','LHand'];
         this.lossOnRespawn = true;
     }
@@ -430,10 +441,64 @@ class StaffWodden extends Equipment {
         return(mod);
     }
 }
+class ShieldSmall extends Equipment {
+    constructor() {
+        super('ShieldSmall');
+        this.addTags(['shield']);
+        this.slotUse = ['LHand'];
+        this.style=0; this.lossOnRespawn = true;
+    }
+    set style(style) { 
+        this._style = style; 
+        if(style===100) this.block=3,this.id='ShieldWodden',this.name='wooden shield';
+        else if(style===200) this.block=5,this.id='ShieldIron',this.name='iron shield';
+        else this.block=1,this.id='ShieldBuckler',this.name='small buckler';
+    }
+    get style() {return this._style;}
+    get desc() { 
+        let msg ='small buckler';
+        switch(this._style) {
+            case 100:
+                msg=('small wooden shield');
+                break;
+            case 200:
+                msg=('reinforced shield');
+                break;
+            default:
+        }
+        return(msg+'(blocking +'+this.block+') '+this.bonusDesc());
+    }
+    descLong(fconv) {
+        let msg='';
+        if(this.isEquipped()) msg='In $[my]$ left hand $[I]$ $[carry]$ a '+this.desc+' .';
+        else msg='$[I]$ $[have]$ '+this.name+".";
+        return(fconv(msg));
+    }
+    toJSON() {return window.storage.Generic_toJSON("ShieldSmall", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(ShieldSmall, value.data));}
+    usable(context) {return(this.canEquip(context));}
+    use(context) { //context here is inventory not outfit
+        if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) {  
+            this.parent.parent.Outfit.removeItem(this.id); 
+            return( {OK:true, msg:'unequipped '+ this.name}); //todo
+        } else {
+            this.parent.parent.Outfit.addItem(this); 
+            return( {OK:true, msg:'equipped '+ this.name}); //todo
+        }
+    }
+    onEquip(context) {
+        /*let sk = new SkillSmash();
+        sk.weapon = this.id;
+        this.parent.parent.Skills.addItem(sk);*/
+        return({OK:true, msg:'equipped'});}
+    onUnequip() {
+        //this.parent.parent.Skills.removeItem('Smash');
+        return({OK:true, msg:'unequipped'});}
+}
 class MaceSteel extends Equipment {
     constructor() {
         super('MaceSteel');
-        this.tags = [ 'weapon'];
+        this.addTags([ 'weapon']);
         this.slotUse = ['RHand'];
         this.lossOnRespawn = true;
     }
@@ -450,22 +515,27 @@ class MaceSteel extends Equipment {
             return( {OK:true, msg:'equipped '+ this.name}); //todo
         }
     }
-    onEquip(context) {        
-        return({OK:true, msg:'equipped'});
-    }
+    onEquip(context) {return({OK:true, msg:'equipped'});}
     onUnequip() {return({OK:true, msg:'unequipped'});}
+    attackMod(target){
+        let mod = new SkillMod();
+        mod.onHit = [{ target:target, eff: [effDamage.setup(11,'blunt')]}];
+        mod.critChance=50;
+        mod.onCrit = [{ target:target, eff: [effDamage.setup(11,'blunt'), new effStunned()]}];
+        return(mod);
+    }
 }
 class TailRibbon extends Equipment {
     constructor() {
         super('TailRibbon');
-        this.tags = ['cloth'];
+        this.addTags(['cloth']);
         this.slotUse = ['TailTip'];
     }
     get desc() { 'a fancy color band that can be wrapped around someones tailtip';}
     toJSON() {return window.storage.Generic_toJSON("TailRibbon", this); };
     static fromJSON(value) {return(window.storage.Generic_fromJSON(TailRibbon, value.data));}
     canEquip(context) { 
-        if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) return({OK:true, msg:'unequip'});    //todo check for key
+        if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) return({OK:true, msg:'unequip'});
         else {
             if(this.parent.parent.Outfit.countItem("TailWolf")>0) {
                 return({OK:true, msg:'equip'}); 
@@ -484,6 +554,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(Briefs);
     window.storage.registerConstructor(CollarQuest);
     window.storage.registerConstructor(DaggerSteel);
+    window.storage.registerConstructor(HarnessRubber);
     window.storage.registerConstructor(Leggings);
     window.storage.registerConstructor(MaceSteel);
     window.storage.registerConstructor(TankShirt);
@@ -497,10 +568,14 @@ window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(TattooGroin);
     window.storage.registerConstructor(RobesZealot);
     window.storage.registerConstructor(ShortsLeather);
+    window.storage.registerConstructor(ShieldSmall);
     window.storage.registerConstructor(StaffWodden);
     window.storage.registerConstructor(WristCuffs);
     
     //.. and Wardrobe
+    ItemsLib['BikiniBottomLeather'] = function () { return new BikiniBottomLeather();};
+    ItemsLib['BikiniTopLeather'] = function () { return new BikiniTopLeather();};
+    ItemsLib['Briefs'] = function () { return new Briefs();};
     ItemsLib['CollarQuest'] = function () { return new CollarQuest();};
     ItemsLib['Leggings'] = function () { return new Leggings();};
     ItemsLib['Tank-shirt'] = function () { return new TankShirt(); };
@@ -512,6 +587,8 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['TattooGroin'] = function () { return new TattooGroin();};
     ItemsLib['RobesZealot'] = function () { return new RobesZealot();};
     ItemsLib['WristCuffs'] = function () { return new WristCuffs();};
+    ItemsLib['HarnessRubber'] = function () { return new HarnessRubber();};
+    ItemsLib['BracerLeather'] = function () { let x= new BracerLeather();return(x); };
     ItemsLib['GlovesRubber'] = function () { let x= new BracerLeather();x.style=200;return(x); };
     //special wardrobe-item combination
     ItemsLib['Crowbar']  = function () { return new Crowbar();};
@@ -519,5 +596,8 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['StaffWodden']  = function () { return new StaffWodden();};
     ItemsLib['Handcuffs'] = function () { return new HandCuffs();};
     ItemsLib['DaggerSteel'] = function () { return new DaggerSteel();};
+    ItemsLib['ShieldBuckler'] = function () { let x= new ShieldSmall();x.style=0;return(x); };
+    ItemsLib['ShieldWodden'] = function () { let x= new ShieldSmall();x.style=100;return(x); };
+    ItemsLib['ShieldIron'] = function () { let x= new ShieldSmall();x.style=200;return(x); };
     return ItemsLib; 
 }(window.gm.ItemsLib || {}));

@@ -2,7 +2,7 @@
 class Item {
     constructor(name) {
         this.id = this.name = name;  //id is unique in database(no whitespace !); name is for display
-        this.tags = [];
+        this.__tags = [];
     }
     get parent() {return this._parent?this._parent():null;}
     _relinkItems(parent){this._parent=window.gm.util.refToParent(parent);}
@@ -11,7 +11,17 @@ class Item {
         return([]); //default unuseable in combat
     }
     hasTag(tag) {
-        return(this.tags.includes(tag)>=0);
+        return(this.__tags.includes(tag));
+    }
+    removeTag(tags){
+        for(var i= this.__tags.length-1;i>=0;i--){
+            if(tags.includes(this.__tags[i])) this.__tags.splice(i,1);
+        }
+    }
+    addTags(tags){
+        for(var i= tags.length-1;i>=0;i--){
+            if(!this.__tags.includes(tags[i])) this.__tags.push(tags[i]);
+        }
     }
     //implement this for description
     get desc() { return(this.descShort);}
@@ -26,6 +36,7 @@ class Item {
 class Inventory {
     constructor(externlist) {  
         this.list = externlist ? externlist : [];
+        //todo this.noStack=false;  getItem(id+'§222')
       window.storage.registerConstructor(Inventory);
     }
     get parent() {return this._parent?this._parent():null;}

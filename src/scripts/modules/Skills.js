@@ -108,7 +108,6 @@ class SkillSmash extends SkillAttack {
                 let attack =window.gm.combat.defaultAttackData();
                 //get data from weapon
                 let _mod = this.parent.parent.Outfit.getItem(this.weapon).attackMod(target);
-                //modify chance& values depending on stats??
                 attack.mod=_mod;
                 let result2 = window.gm.combat.calcAttack(this.caster,target,attack);
                 this.msg+=result2.msg;

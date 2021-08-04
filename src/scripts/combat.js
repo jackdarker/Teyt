@@ -241,7 +241,6 @@ printItemList() {
       entry.href='javascript:void(0)';
       let foo = (function(id,carrier){ 
         this._postItemSelect(id);
-        //let _res=carrier.Inv.use(id); window.gm.refreshAllPanel();window.gm.printOutput(_res.msg);
       }).bind(this,id);
       entry.addEventListener("click",foo);
       entry.textContent=id;
@@ -595,18 +594,6 @@ DR = sum of armor (with individual skill-bonus) + magic armor
 attack = weapon damage formula + weakness-bonus
 attack increases on critical
 hp-dmg = attack -DR but min.1 */
-window.gm.combat.calcAbsorbOld=function(attacker,defender, attack) {
-  let result = {OK:true,msg:'',foo:null}
-  let rnd = _.random(1,100);
-  let def = defender.Stats.get('pDefense').value;
-  //todo weakness bonus
-  var dmg = Math.max(1,attack.value* (attack.crit?4:1)-def);
-  window.gm.pushLog(`absorb roll: ${dmg} vs ${def} `,window.story.state._gm.dbgShowCombatRoll);
-  result.msg = defender.name +' got hit by '+attacker.name+' and suffered '+dmg+ (attack.crit?' critical ':'')+'damage. '
-  attack.total = dmg;
-  attack.effects.push( {target:defender,eff:[ effDamage.setup(attack.total,"blunt")]});
-  return(result);
-}
 window.gm.combat.calcAbsorb=function(attacker,defender, attack) {
   let result = {OK:true,msg:''}
   let rnd = _.random(1,100);

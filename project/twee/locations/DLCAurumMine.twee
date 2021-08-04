@@ -1,0 +1,71 @@
+:: AM_MAP_Level1 [_back_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.moveHere();%>
+You have some kind of map from the mine:</br>
+<pre>
+[E]-[A2]-[A3]      [A5]
+      |             |
+    [B2]-[B3]-[B4]-[B5] 
+</pre>
+<div></br>[[Back|_back_]]</br></div>
+</article><article id="LogPanel"></article></section>
+
+:: AM_Entrance
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.moveHere();%>
+Eine dunkle Öffnung in der Felswand ist wohl der Eingang in die Mine.
+<div></br>[[PlainsFarmland]] [[Go In|AM_Lv1_A2]]</br>[[Map|AM_MAP_Level1]]</div>
+</article><article id="LogPanel"></article></section>
+
+
+:: AM_Lv1_A2
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.moveHere();%>
+Es wird schnell dunkler je tiefer du gehst.
+<div></br>[[West|AM_Entrance]] [[East|AM_Lv1_A3]] [[South|AM_Lv1_B3]]</br>[[Map|AM_MAP_Level1]]</div>
+</article><article id="LogPanel"></article></section>
+
+:: AM_Lv1_A3
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.moveHere();%>
+Hier ist die Decke zusammengebrochen und blockiert nun den Weg.
+<div></br>[[West|AM_Lv1_A2]]</br>[[Map|AM_MAP_Level1]]</div>
+</article><article id="LogPanel"></article></section>
+
+:: AM_Lv1_B2
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.moveHere();%>
+Ein Abzweig zum Hauptgang.
+<div></br>[[North|AM_Lv1_A2]] [[East|AM_Lv1_B3]]</br>[[Map|AM_MAP_Level1]]</div>
+</article><article id="LogPanel"></article></section>
+
+:: AM_Lv1_B3
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.moveHere();%>
+Kaum noch Licht vom Ausgang.
+<div></br>[[West|AM_Lv1_B2]] [[East|AM_Lv1_B4]]</br>[[Map|AM_MAP_Level1]]</div>
+</article><article id="LogPanel"></article></section>
+
+
+:: AM_Lv1_B4
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.moveHere();%>
+Die Stützbalken sind durch das eindringende Wasser vermodert.
+<div></br>[[West|AM_Lv1_B3]] [[East|AM_Lv1_B5]]</br>[[Map|AM_MAP_Level1]]</div>
+</article><article id="LogPanel"></article></section>
+
+
+:: AM_Lv1_B5
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.moveHere();%>
+Schwierig noch irgendwas zu sehen...ist da ein Loch im Boden?
+<div></br>[[West|AM_Lv1_B4]] [[North|AM_Lv1_A5]]</br>[[Map|AM_MAP_Level1]]</div>
+</article><article id="LogPanel"></article></section>
+
+
+:: AM_Lv1_A5
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.moveHere();%>
+Eine Sackgasse.
+<div></br>[[South|AM_Lv1_B5]]</br>[[Map|AM_MAP_Level1]]</div>
+</article><article id="LogPanel"></article></section>

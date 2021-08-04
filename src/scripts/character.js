@@ -201,11 +201,11 @@ class Character {
      */
     changeInventory(item,amount) {
         if(item.slotUse && !item.hasTag('weapon')) { //equipment goes into wardrobe except weapons
-            if(amount<0) this.Wardrobe.removeItem(item,true); //todo force?
-            else this.Wardrobe.addItem(item.id,amount);
+            if(amount<0) this.Wardrobe.removeItem(item.id,-1*amount);
+            else if(amount>0) this.Wardrobe.addItem(item,amount);
         } else {
-            if(amount<0) this.Inv.addItem(item,amount); 
-            else this.Inv.removeItem(item.id,-1*amount); 
+            if(amount<0) this.Inv.removeItem(item.id,-1*amount); 
+            else if(amount>0) this.Inv.addItem(item,amount); 
         }
       }
     //combat related

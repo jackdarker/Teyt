@@ -98,7 +98,7 @@ class Curse {
 }
 //-------------------------------------------------------------------------
 class CrsTrigger { //each curse has a trigger that evaluates if the curse gets triggered
-    constructor() { this.id='';  }
+    constructor() { }
      /* 
     * parent is the curse !
     * Attention !! _parent will be added dynamical
@@ -113,9 +113,21 @@ class CrsTrgOnEquip extends CrsTrigger {
     constructor() {
         super();
         this.minItems=0; //if 0 always trigger onEquip
-        this.curseName=''; //todo ..otherwise min no. items with this keyword need to be equipped
+        this.curseName='crs'; // ..otherwise min no. items with this tag need to be equipped
     }
-    onEquip() { return(true);  }
+    onEquip() {
+        if(this.minItems<=0) return(true);
+        let owner=this.parent.parent.parent.parent.Outfit,list = owner.getAllIds();
+        let _c = 0;
+        for(el of list){
+            if(owner.getItem(el).hasTag(this.curseName)) _c+=1;
+        }
+        return(_c>=this.minItems);  
+    }
+    onTimeChange(time) {
+        if(this.minItems<=0) return(false);
+        return(this.onEquip());
+    }
     toJSON() {return window.storage.Generic_toJSON("CrsTrgOnEquip", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(CrsTrgOnEquip, value.data));}
     get desc() { return('when equipped');}
@@ -139,10 +151,7 @@ class CrsTrgDelayed extends CrsTrigger {
 }
 //-------------------------------------------------------------------------
 class CrsEffect {
-    constructor() {
-        this.hidden=0;
-        this.id='';
-    }
+    constructor() {this.hidden=0;}
      /* 
     * parent is the curse !
     * Attention !! _parent will be added dynamical
@@ -153,11 +162,7 @@ class CrsEffect {
     apply(unapply) {} //override to do something!
 }
 class CrsEffLock extends CrsEffect{
-    constructor() {
-        super();
-        this.id='CrsEffLock';
-        this.key='KeyRestraintA';
-    }
+    constructor() { super(); this.key='KeyRestraintA';}
     toJSON() {return window.storage.Generic_toJSON("CrsEffLock", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(CrsEffLock, value.data));}
     get desc() {return("The item can only be unlocked with a "+this.key+".")}
@@ -178,11 +183,7 @@ class CrsEffLock extends CrsEffect{
     }
 }
 class CrsEffConvert extends CrsEffect{
-    constructor() {
-        super();
-        this.id='CrsEffConvert';
-        this.newItem='GlovesRubber';
-    }
+    constructor() {   super(); this.newItem='GlovesRubber'; this.newCurse={lock:true,energydrain:2}; }
     toJSON() {return window.storage.Generic_toJSON("CrsEffConvert", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(CrsEffConvert, value.data));}
     get desc() {return("Converts the item to "+this.newItem+".")}
@@ -190,7 +191,8 @@ class CrsEffConvert extends CrsEffect{
         if(unapply) {
         } else {
             let item = window.gm.ItemsLib[this.newItem]();
-            window.gm.makeCursedItem(item,{lock:true,energydrain:2});
+            item.addTags(['cursed']);//this is ugly
+            window.gm.makeCursedItem(item,this.newCurse); //todo how to configure this
             if(this.parent.parent.parent.parent.Outfit.removeItem(this.parent.parent.id).OK) {
             this.parent.parent.parent.parent.Wardrobe.removeItem(this.parent.parent.id);
             window.gm.pushDeferredEvent("GenericDeffered",['To your surprise, '+this.parent.parent.name+' contorts its shape to something different, reforming itself into '+item.name+'! ']);
@@ -201,10 +203,7 @@ class CrsEffConvert extends CrsEffect{
     }
 }
 class CrsEffEnergyDrain extends CrsEffect{
-    constructor() {
-        super();
-        this.id='CrsEffEnergyDrain';
-    }
+    constructor() {   super();  }
     toJSON() {return window.storage.Generic_toJSON("CrsEffEnergyDrain", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(CrsEffEnergyDrain, value.data));}
     get desc() {return("Drains wearers energy.")}
@@ -220,7 +219,6 @@ class CrsEffEnergyDrain extends CrsEffect{
 class CrsEffStatBonus extends CrsEffect{
     constructor() {
         super();
-        this.id='CrsEffStatBonus';
         this.statid ='strength';
         this.statbonus = 5;
     }
@@ -244,26 +242,33 @@ window.gm.makeCursedItem = function(item, extra) {
     let eff =null;
     let list=[];
     curse.trigger = new CrsTrgOnEquip();
-    if(extra.hidden) { 
+    if(extra.hidden) {          //hidden:4
         curse.hidden=extra.hidden;
     } else curse.hidden=4; //by default hidden
-    if(extra.delayed) {
-        curse.trigger = new CrsTrgDelayed();
+    if(extra.minItems) {
+        curse.trigger.minItems=extra.minItems;
+        curse.trigger.curseName = 'cursed'; //todo PonyCurse
+        item.addTags([curse.trigger.curseName]); 
     }
-    if(extra.lock) {
+    if(extra.delayed) {         //delayed:60
+        curse.trigger = new CrsTrgDelayed();
+        curse.trigger.timeToTrigger=extra.delayed;
+    }
+    if(extra.lock) {            //lock:1
         eff = new CrsEffLock();
         list.push(eff);
     }
-    if(extra.convert) {
+    if(extra.convert) {         //convert:'rubber'
         eff = new CrsEffConvert();
         eff.newItem=extra.convert;
+        eff.newCurse={lock:1};
         list.push(eff);
     }
-    if(extra.energydrain) {
+    if(extra.energydrain) {     //energydrain:3
         eff = new CrsEffEnergyDrain();
         list.push(eff);
     }
-    curse.configureCurse(item,curse.trigger,list);
+    curse.configureCurse(item,curse.trigger,list);  //todo should change item-id or the item would not properly add to wardrobe if there is already similiar item;item.getHash()??
     return(item);
 }
 window.gm.makeBonusItem = function(item, extra) {

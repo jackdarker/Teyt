@@ -638,8 +638,7 @@ class DngMapper {
             let x,y;
             for (j= -3; j <= 3; j++) {   
                 for (i = -3; i <= 3; i++) {
-                    x=i+(playerX- this.minX)*2, y=j+(playerY-this.minY)*2; //coord can be negative !
-                    //if(x>this.maxX || y>this.maxY || x<this.minX || y< this.minY) continue;    
+                    x=i+(playerX- this.minX)*2, y=j+(playerY-this.minY)*2; //coord can be negative ! 
                     if(map.length-1<x || 0>x) continue;   
                     if(map[x].length-1<y || 0>y) continue;           
                     _line += ((i==-3)?"&nbsp;":"")+map[x][y]; //todo hack:if line starts with -, snowman-markdown interprets this as <ul> ?!

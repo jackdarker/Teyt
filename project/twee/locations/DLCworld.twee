@@ -120,6 +120,25 @@ function crashThrough() {
 }
 </script>
 
+:: GlobalChest [_nosave_ _back_] 
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+Items you store in this magic chest dont get lost if you are knocked out.
+</br>[[Back|_back_]] [[Wardrobe...|GlobalChestWardrobe]]</br>
+<div id="choice"></div>
+</br>[[Back|_back_]]</br>
+</article><article id="LogPanel"></article></section>
+<script>window.gm.printItemTransfer(window.gm.player,window.story.state.GlobalChest,false);</script>
+
+
+:: GlobalChestWardrobe [_nosave_] 
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+Items you store in this magic chest dont get lost if you are knocked out.Only unequipped wardrobe can be transferred.
+</br>[[Items...|GlobalChest]]</br>
+<div id="choice"></div>
+</article><article id="LogPanel"></article></section>
+<script>window.gm.printItemTransfer(window.gm.player,window.story.state.GlobalChest,true);</script>
+
+
 :: NOP_VR [_nosave_ _back_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <p class='dev'> You cant go that way. Either because its WIP or you need to solve a quest first. </p>

@@ -45,7 +45,7 @@ class stResistance extends Stat {
     toJSON() {return window.storage.Generic_toJSON("stResistance", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stResistance, value.data);};
 }
-//generic class for armor
+//generic class for armor; 
 class stArmor extends Stat {
     static setup(context, base,name) {   
         let _stat = new stArmor();
