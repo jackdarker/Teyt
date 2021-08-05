@@ -316,7 +316,7 @@ class HandsHuman extends Equipment {
 }
 class BreastHuman extends Equipment {
     static dataPrototype() {    
-        return({size:3});
+        return({style:'human',growth:0.1, maxGrowth: 1.5});
     }
     static factory(id) {
         let obj =  new BreastHuman();
@@ -589,15 +589,15 @@ window.gm.MutationsLib['swapGender'] = function (char,genderItem) {
             msg+= 'A female opening forms itself in your groin.</br>';
         }
     } 
-    if(char===window.gm.player) {
+    if(msg!=='' && char===window.gm.player) {
         window.gm.pushDeferredEvent("GenericDeffered",[msg]);
     }
 }
-window.gm.MutationsLib['mutateWolf'] = function () {
+window.gm.MutationsLib['mutateWolf'] = function (char) {
     let _rnd =_.random(1,100);
     let msg='',_TF="TailWolf";
-    if(window.gm.player.Outfit.countItem(_TF)>0) {
-        let item = window.gm.player.Outfit.getItem("TailWolf");
+    if(char.Outfit.countItem(_TF)>0) {
+        let item = char.Outfit.getItem("TailWolf");
         if(item.getStyle() !=='wolf') {
             item.setStyle('wolf');
             msg=("Your tail is now a fuzzy bush like that of a wolf.</br>");
@@ -607,25 +607,25 @@ window.gm.MutationsLib['mutateWolf'] = function () {
             if(growth >= 1) {
                 msg+="That tail didnt grow any further.</br>";
             } else {
-                item.growth=growth;
+                item.data.growth=growth;
                 msg+="Your bushy tail must have grown and is now "+window.gm.util.formatNumber(growth*maxGrowth,1)+" meter long.</br>";
             }
         }
     } else {
-        window.gm.player.Outfit.addItem(window.storage.constructors[_TF].factory('wolf'));
+        char.Outfit.addItem(window.storage.constructors[_TF].factory('wolf'));
         msg+="You have grown a fuzzy tail !</br>";
     }
     _TF = 'FaceWolf';
-    let face = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bFace);
-    let skin = window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bSkin);
+    let face = char.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bFace);
+    let skin = char.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bSkin);
     if(face ===null || face.id !==_TF) {
-        window.gm.player.Outfit.addItem(window.storage.constructors[_TF].factory('wolf'));
+        char.Outfit.addItem(window.storage.constructors[_TF].factory('wolf'));
         msg+= "Your face got transformed into a dog-like muzzle.</br>"; 
     } else if(face.getStyle() !=='wolf') {
         face.setStyle('wolf');
         msg+= "Your not so human face got transformed into a dog-like muzzle.</br>"; 
-    } else if(skin ===null || skin.id !="SkinFur") {
-        window.gm.player.Outfit.addItem(window.storage.constructors['SkinFur']());
+    } else if(skin===null || skin.id !="SkinFur") {
+        char.Outfit.addItem(window.storage.constructors['SkinFur'].factory('wolf'));
         msg+= "A dense coat of fur spreads over your body.</br>";
     }
     if(msg==='') msg= "Your anxiety goes by as you didnt get any more wolflike."
@@ -633,11 +633,10 @@ window.gm.MutationsLib['mutateWolf'] = function () {
         window.gm.pushDeferredEvent("GenericDeffered",[msg]);
     }
 };
-
-window.gm.MutationsLib['mutateCat'] = function() {
+window.gm.MutationsLib['mutateCat'] = function(char) {
     let msg='', _TF="TailWolf";
-    if(window.gm.player.Outfit.countItem(_TF)>0) {
-        let item = window.gm.player.Outfit.getItem(_TF);
+    if(char.Outfit.countItem(_TF)>0) {
+        let item = char.Outfit.getItem(_TF);
         if(item.getStyle() !=='cat') {
             item.setStyle('cat');
             msg=("Your tail reshapes itself to a be more cat-like.</br>");
@@ -652,10 +651,73 @@ window.gm.MutationsLib['mutateCat'] = function() {
             }
         }
     } else {
-        window.gm.player.Outfit.addItem(window.storage.constructors['TailWolf'].factory('cat'));
+        char.Outfit.addItem(window.storage.constructors['TailWolf'].factory('cat'));
         msg=("You have grown a cat tail !</br>");
     }
     if(char===window.gm.player) {
         window.gm.pushDeferredEvent("GenericDeffered",[msg]);
     }
-}
+};
+window.gm.MutationsLib['mutateHorse'] = function(char) {
+    let msg='', _TF="TailWolf";
+    if(char.Outfit.countItem(_TF)>0) {
+        let item = char.Outfit.getItem(_TF);
+        if(item.getStyle() !=='horse') {
+            item.setStyle('horse');
+            msg=("Your tail reshapes itself to a be more horse-like.</br>");
+        } else {
+            var growth = item.data.growth+0.25;
+            var maxGrowth = 2;//window.gm.player.Outfit.getItem("TailWolf").maxGrowth;
+            if(growth >= 1) {
+                msg=("You already changed to a horse as far as possible.</br>");
+            } else {
+                item.data.growth=growth;
+                msg=("Your tail must have grown and is now "+growth*maxGrowth+" meter long.</br>");
+            }
+        }
+    } else {
+        char.Outfit.addItem(window.storage.constructors['TailWolf'].factory('horse'));
+        msg=("You have grown a horse tail !</br>");
+    }
+    if(char===window.gm.player) {
+        window.gm.pushDeferredEvent("GenericDeffered",[msg]);
+    }
+};
+window.gm.MutationsLib['growBreast'] = function(char) {
+    let msg='', _TF="BreastHuman";
+    if(char.Outfit.countItem(_TF)>0) {
+        let item = char.Outfit.getItem(_TF);
+        var growth = item.data.growth+0.15; //todo shrinking/increase as parameter?
+        var maxGrowth = 3; //todo cupsize dimension?
+        if(growth >= 1) {
+            msg=("Your milkbags are as big as they can get.</br>");
+        } else {
+            item.data.growth=growth;
+            msg=("Your bust size increased further.</br>");
+        }
+    } else {
+        char.Outfit.addItem(window.storage.constructors[_TF].factory('human'));
+        msg="As you feel up your pecks you notice that they seem to be softer than before !</br>";
+    }
+    if(char===window.gm.player) {
+        window.gm.pushDeferredEvent("GenericDeffered",[msg]);
+    }
+};
+window.gm.MutationsLib['growVulva'] = function(char) {
+    let msg = 'Everything is ok, nothing unusual.</br>', _TF="VulvaHuman";
+    if(char.Outfit.countItem(_TF)>0) {
+        let item = char.Outfit.getItem(_TF);
+        msg ="An unusual feeling lets you move your hand down to your nethers.</br>"
+        if(item.data.clitsize>0.9) {
+            vulva.data.stretch+=0.5;
+            msg+= "Your muff seems to be more loose then before !</br>";
+        } else {
+            item.data.clitsize+=0.5;
+            msg+= "You arent quite sure but could it be possible that your clitoris is larger then before?</br>";
+        }
+        msg += "</br>"+item.descLong(window.gm.util.descFixer(char))+"</br>";
+    }
+    if(char===window.gm.player) {
+        window.gm.pushDeferredEvent("GenericDeffered",[msg]);
+    }
+};

@@ -536,23 +536,36 @@ class SkillStruggle extends Skill {
     }
 }
 class SkillGuard extends Skill {
-    constructor() { super("Guard");}
+    constructor() { super("Guard"); this.style=0;}
     toJSON() {return window.storage.Generic_toJSON("SkillGuard", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillGuard, value.data));}
     targetFilter(targets){
         return(this.targetFilterSelf(targets));
     }
-    get desc() { return("Boosts your defense.");}  
+    set style(style) { //skilllevel
+        this._style = style;
+        //this.id=this.name="Guard Lv"+style;
+    }
+    get style() {return this._style;}
+    get desc() { 
+        let msg ='a large, smooth branch with a firehardened tip';
+        switch(this._style) {
+            case 100:
+                msg=('a stone-triangle mounted on a long stick');
+                break;
+            default:
+        }
+        return(msg);
+    }
+    get desc() { return("Lv"+this.style+": Boosts your defense.");}  
     previewCast(targets){
         var result = new SkillResult()
-        result.skill =this;
-        result.source = this.caster;
-        result.targets = targets;
+        result.skill =this;result.source = this.caster; result.targets = targets;
         if(this.isValidTarget(targets)) {
             result.OK = true;
             for(var target of targets) {
                 result.effects.push( {target:target,
-                    eff:[new effGuard(10)]})
+                    eff:[effGuard.setup(10*(1+this.style),this.style*20,this.style)]})
             }
         }
         return result
@@ -560,8 +573,7 @@ class SkillGuard extends Skill {
 }
 class SkillUseItem extends Skill {
     constructor() {super("UseItem");
-        this.item='';
-        this.msg = '';
+        this.item='';this.msg = '';
     }
     toJSON() {return window.storage.Generic_toJSON("SkillUseItem", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillUseItem, value.data));}

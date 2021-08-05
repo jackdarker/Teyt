@@ -247,6 +247,9 @@ window.gm.moveHere = function(time=15){
       case 'VillageMarketPlace': 
         s.spawnAt = 'VillageRespawnPodExit'; 
         break;
+      case 'AM_Lv2_Start':
+        s.spawnAt ='AM_Lv2_Start';
+        break;
       default:break;
     }
     window.gm.addTime(time); 

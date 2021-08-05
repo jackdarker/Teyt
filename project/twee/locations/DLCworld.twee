@@ -130,11 +130,12 @@ Items you store in this magic chest dont get lost if you are knocked out.
 <script>window.gm.printItemTransfer(window.gm.player,window.story.state.GlobalChest,false);</script>
 
 
-:: GlobalChestWardrobe [_nosave_] 
+:: GlobalChestWardrobe [_nosave_ _back_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-Items you store in this magic chest dont get lost if you are knocked out.Only unequipped wardrobe can be transferred.
-</br>[[Items...|GlobalChest]]</br>
+Items you store in this magic chest dont get lost if you are knocked out.</br>Only unequipped equipment can be transferred.
+</br>[[Items...|_back_]]</br>
 <div id="choice"></div>
+</br>[[Items...|_back_]]</br>
 </article><article id="LogPanel"></article></section>
 <script>window.gm.printItemTransfer(window.gm.player,window.story.state.GlobalChest,true);</script>
 

@@ -24,8 +24,25 @@ window.gm.shop.findWaresToSell = function(TagsAllowed,TagsNotAllowed=[window.gm.
         }
     }
 };
+// Todo depending on shop & gamestate, return list of buyables
 window.gm.shop.findWaresToBuy = function(shop) {
-    window.gm.shop.WaresToBuy = window.gm.shop.shopInventory(shop);
+    let list = [];
+    if(shop==='Mall:GeneralStore') {
+        list=[window.gm.ItemsLib['Lube'](),window.gm.ItemsLib['Battery']()];
+    } else if("Arena:Shop") {
+        list=[window.gm.ItemsLib['HealthPotion(small)'](),window.gm.ItemsLib['HealthPotion'](),
+        window.gm.ItemsLib['SpearWodden'](),
+        window.gm.ItemsLib['DaggerSteel']()
+        ];
+    }
+    let list2 = [];
+    for(el of list) {
+        let cost = window.gm.shop.calculateBuyPrice(el);
+        if(cost) {
+            list2.push({item:el,cost:cost});
+        }
+    }
+    window.gm.shop.WaresToBuy = list2;
 };
 window.gm.shop.calculateSellPrice=function(item) {
     let cost={id:'Money',count:1, for:0};
@@ -49,19 +66,4 @@ window.gm.shop.calculateBuyPrice=function(item) {
     cost.count = cost.count*2; //todo: special sales price reduction
     if(cost.for===0) cost=null;
     return(cost);
-};
-// Todo depending on shop & gamestate, return list of buyables
-window.gm.shop.shopInventory = function(shop){
-    let list = [];
-    if(shop==='Mall:GeneralStore') {
-        list=[window.gm.ItemsLib['Lube'](),window.gm.ItemsLib['Battery']()];
-    }
-    let list2 = [];
-    for(el of list) {
-        let cost = window.gm.shop.calculateBuyPrice(el);
-        if(cost) {
-            list2.push({item:el,cost:cost});
-        }
-    }
-    return(list2);
 };

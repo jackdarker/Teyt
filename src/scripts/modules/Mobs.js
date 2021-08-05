@@ -118,14 +118,24 @@ class Huntress extends Mob {
         this.Outfit.addItem(VulvaHuman.factory('cat'));
         this.Outfit.addItem(new BikiniBottomLeather());
         this.Outfit.addItem(new BikiniTopLeather());
+        let sk = new SkillGuard();
+        sk.style=2;
+        this.Skills.addItem(sk);
         this.levelUp(3);
         this.autoLeveling();
     }
     calcCombatMove(enemys,friends){
         let result = {OK:true,msg:''};
+        //if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
         let rnd = _.random(1,100);
         result.action =result.target= null;
         //todo shoot arrow, pounce, throw net
+        if(window.story.state.combat.turnCount%2===0) {
+            result.action = "Guard";
+            result.target = [this];
+            result.msg =this.name+" retreats somewhat and moves into a defensive stance.</br>"+result.msg;
+            return(result);
+        }
         return(super.calcCombatMove(enemys,friends));
     }
 }

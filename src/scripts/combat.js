@@ -282,10 +282,9 @@ execCombatCmd(move) {
   */
   return(result);
 }
-startRound() {
+startRound() { //todo unused??
   var s = window.story.state;
   s.combat.turnCount+=1;
-
   var list = s.combat.allChars = s.combat.enemyParty.concat(s.combat.playerParty);
   //update combateffects
   for(var k=0; k<list.length;k++){

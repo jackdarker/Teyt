@@ -32,6 +32,7 @@ There are also some options to make a fastforward (might behave oddly): </br>
 [[FF Bridge passage unlocked]]</br>
 debug only! :</br>
 [[FF WolfVictory]]</br>
+[[FF TestArena]]</br>
 </article>
 
 :: Intro2
@@ -49,8 +50,7 @@ To divert yourself, you decide to check your emails.
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
 Start at the character creation screen in the VR-game.
-<div></br>
-[[Back|Intro]] <a0 onclick='start();window.story.show("CharacterEditor");'>Start</a></br></div>
+<div></br>[[Back|Intro]] <a0 onclick='start();window.story.show("CharacterEditor");'>Start</a></br></div>
 </article><article id="LogPanel"></article></section>
 <script> function start() {
     window.gm.quests.addQuest("qDLCMain",1);
@@ -69,8 +69,7 @@ Start at the character creation screen in the VR-game.
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
 Start at forest with introductory quest done so far. Roam around and prepare to defeat bridge boss.
-<div></br>
-[[Back|Intro]] <a0 onclick='start();window.story.show("ForestSpawn");'>Start</a></br></div>
+<div></br>[[Back|Intro]] <a0 onclick='start();window.story.show("ForestSpawn");'>Start</a></br></div>
 </article><article id="LogPanel"></article></section>
 <script> function start() {
     window.gm.quests.addQuest("qBeastKink",1);
@@ -88,8 +87,7 @@ Start at forest with introductory quest done so far. Roam around and prepare to 
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
 You can now pass the bridge and leave the forest.
-<div></br>
-[[Back|Intro]] <a0 onclick='start();window.story.show("ForestBridge");'>Start</a></br></div>
+<div></br>[[Back|Intro]] <a0 onclick='start();window.story.show("ForestBridge");'>Start</a></br></div>
 </article><article id="LogPanel"></article></section>
 <script> function start() {
     window.gm.quests.addQuest("qBeastKink",1);
@@ -107,8 +105,7 @@ You can now pass the bridge and leave the forest.
 :: FF WolfVictory
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
-<div></br>
-[[Back|Intro]] <a0 onclick='start();window.story.show("WolfVictory");'>Start</a></br></div>
+<div></br>[[Back|Intro]] <a0 onclick='start();window.story.show("WolfVictory");'>Start</a></br></div>
 </article><article id="LogPanel"></article></section>
 <script> function start() {
     window.gm.quests.addQuest("qBeastKink",1);
@@ -120,5 +117,19 @@ You can now pass the bridge and leave the forest.
     window.gm.enterVR();
     window.gm.MutationsLib['swapGender'](window.gm.player,window.storage.constructors["VulvaHuman"]);
     window.gm.player.addEffect('effLewdMark',new window.storage.constructors['effLewdMark']());
+}
+</script>
+
+
+:: FF TestArena
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+Enter the Grind-geon.
+<div></br>[[Back|Intro]] <a0 onclick='start();'>Start</a></br></div>
+</article><article id="LogPanel"></article></section>
+<script> function start() {
+    window.story.state.vars.spawnAt="AM_Lv2_Start";
+    window.gm.enterVR();
+    window.gm.MutationsLib['swapGender'](window.gm.player,window.storage.constructors["PenisHuman"]);
 }
 </script>

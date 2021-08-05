@@ -56,12 +56,15 @@ Crash if you enter wrong things below !</br>
 <section> <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <div></br>[[Back|_back_]]</br>
 Test transformation events. Because they are deffered-events you need to return to story and move between rooms.</br>
-Anthros:</br>
-<a0 onclick='window.gm.pushDeferredEvent("MutateCat",[1])'>Cat</a>
-<a0 onclick='window.gm.pushDeferredEvent("MutateWolf",[1])'>Wolf</a></br>
-<a0 onclick='window.gm.pushDeferredEvent("MutateHorse",[1])'>Horse</a></br>
-<hr>
-Ferals:</br>
+<a0 onclick='window.gm.MutationsLib.growBreast(window.gm.player)'>Breast grow</a></br>
+<a0 onclick='window.gm.MutationsLib.growVulva(window.gm.player)'>Vagina grow</a></br>
+<a0 onclick='window.gm.MutationsLib.swapGender(window.gm.player,window.storage.constructors["VulvaHuman"])'>to female</a></br>
+<a0 onclick='window.gm.MutationsLib.swapGender(window.gm.player,window.storage.constructors["PenisHuman"])'>to male</a></br>
+<hr>Anthros:</br>
+<a0 onclick='window.gm.MutationsLib.mutateCat(window.gm.player)'>Cat</a>
+<a0 onclick='window.gm.MutationsLib.mutateWolf(window.gm.player)'>Wolf</a></br>
+<a0 onclick='window.gm.MutationsLib.mutateHorse(window.gm.player)'>Horse</a></br>
+<hr>Ferals:</br>
 </article><article id="LogPanel"></article></section>
 
 

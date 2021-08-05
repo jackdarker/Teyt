@@ -580,8 +580,10 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['StaffWodden']  = function () { return new StaffWodden();};
     ItemsLib['Handcuffs'] = function () { return new HandCuffs();};
     ItemsLib['DaggerSteel'] = function () { return new DaggerSteel();};
-    ItemsLib['ShieldBuckler'] = function () { let x= new ShieldSmall();x.style=0;return(x); };
-    ItemsLib['ShieldWodden'] = function () { let x= new ShieldSmall();x.style=100;return(x); };
-    ItemsLib['ShieldIron'] = function () { let x= new ShieldSmall();x.style=200;return(x); };
+    ItemsLib['ShieldBuckler'] = function () { let x= new ShieldSmall();x.style=0;return(x);};
+    ItemsLib['ShieldWodden'] = function () { let x= new ShieldSmall();x.style=100;return(x);};
+    ItemsLib['ShieldIron'] = function () { let x= new ShieldSmall();x.style=200;return(x);};
+    ItemsLib['SpearWodden'] = function () { let x= new SpearWodden();return(x);};
+    ItemsLib['SpearStone'] = function () { let x= new SpearWodden();x.style=100;return(x);};
     return ItemsLib; 
 }(window.gm.ItemsLib || {}));

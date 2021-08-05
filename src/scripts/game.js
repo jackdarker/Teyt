@@ -340,7 +340,7 @@ window.gm.pushBackPassage=function(id) {
 //call on [_back_]-passages to get the previous passage
 window.gm.popBackPassage=function() {
     let pass = window.story.state._gm.passageStack.pop();
-    if(!pass) return('nothing to pop from stack');
+    if(!pass) throw new Error('nothing to pop from stack');
     return(pass);
 };
 window.gm.pushOnHold=function(id) {
@@ -368,11 +368,65 @@ window.story.__proto__.show = function(idOrName, noHistory = false) {
   let tagsnext,namenext,nextp,namenow;
   if(idOrName==='') tagsnext=[];
   else tagsnext = window.story.passage(idOrName).tags;
+  if(inGame && window.story.state._gm.defferedStack.length>0 && //deffered event if allowed and requested
+    //tagsnext.indexOf('_back_')<0 && 
+    tagsnext.indexOf('_nosave_')<0 && tagsnext.indexOf('_nodeffered_')<0 ) { 
+      //before entering a new passage check if there is a defferedEvent that we should do first
+      //if so, push the normal-passage onto stack, show deffered passage
+      //after the deffered passage(s) finish, make sure to show the original passage
+      //this is a problem?how do I know the deffered passage is done? 
+    if(idOrName!=='') {//if not continue-cmd
+      window.gm.pushOnHold(idOrName);
+      if(tagsnext.indexOf('_back_')>=0 && window.passage.name!==idOrName) { //push on stack but only if not re-showing itself
+        window.gm.pushBackPassage(window.passage.name); //todo do we need extra back-stack for onhold?
+      }
+    }
+    next = window.gm.popDeferredEvent();
+    nextp = window.story.passage(next);
+    tagsnext =  nextp.tags;
+  } else if(inGame && idOrName==='' && window.story.state._gm.onholdStack.length>0) { //continue event onhold
+    next =window.gm.popOnHold()
+    if(next === '_back_') { //going back
+      next = window.gm.popBackPassage();
+    }
+    nextp = window.story.passage(next);
+    tagsnext =  nextp.tags;
+  } else if(idOrName === '_back_') { //going back
+    next = window.gm.popBackPassage();
+    tagsnext = window.story.passage(next).tags;
+  } else {  //going forward
+    nextp = window.story.passage(next);
+    if(!nextp) throw new Error('no such passage: '+next);
+    tagsnext = nextp.tags; namenext = nextp.name;
+    if(tagsnext.indexOf('_back_')>=0 ) { //push on stack but only if not re-showing itself
+      namenow = window.passage.name;
+      if(namenext!=namenow) window.gm.pushBackPassage(namenow); 
+    } else if(inGame) { //if not in _back_-passage, drop the _back_-stack
+      window.story.state._gm.passageStack.splice(0,window.story.state._gm.passageStack.length);
+    }
+    //todo not sure about this: a deffered event should not link to normal passages because this would disentangle the original story-chain
+    //this I think could cause issues and should be detected and throw an error
+    //uncoment the following to bypass this 
+    //    window.story.state._gm.onholdStack.splice(0,window.story.state._gm.onholdStack.length);
+  }
+  if(inGame) {//disable save-menu on _nosave_-tag 
+      window.story.state._gm.nosave = (tagsnext.indexOf('_nosave_')>=0 );
+  }
+  noHistory = true; //the engines object causes problems with history, namely refToParent
+  _origStoryShow.call(window.story,next, noHistory);
+};
+/*window.story.__proto__.show = function(idOrName, noHistory = false) {
+  let next = idOrName;
+  let inGame = window.story.state.hasOwnProperty("_gm"); //the logic doesnt work if initGame not already done
+  let tagsnext,namenext,nextp,namenow;
+  if(idOrName==='') tagsnext=[];
+  else tagsnext = window.story.passage(idOrName).tags;
   if(idOrName === '_back_') { //going back
     next = window.gm.popBackPassage();
     tagsnext = window.story.passage(next).tags;
   } else if(inGame && window.story.state._gm.defferedStack.length>0 && //deffered event if allowed and requested
-      /*tagsnext.indexOf('_back_')<0 &&*/ tagsnext.indexOf('_nosave_')<0 && tagsnext.indexOf('_nodeffered_')<0 ) { 
+      //tagsnext.indexOf('_back_')<0 &&
+      tagsnext.indexOf('_nosave_')<0 && tagsnext.indexOf('_nodeffered_')<0 ) { 
         //before entering a new passage check if there is a defferedEvent that we should do first
         //if so, push the normal-passage onto stack, show deffered passage
         //after the deffered passage(s) finish, make sure to show the original passage
@@ -388,8 +442,7 @@ window.story.__proto__.show = function(idOrName, noHistory = false) {
   } else {  //going forward
     nextp = window.story.passage(next);
     if(!nextp) throw new Error('no such passage: '+next);
-    tagsnext = nextp.tags;
-    namenext = nextp.name;
+    tagsnext = nextp.tags; namenext = nextp.name;
     if(tagsnext.indexOf('_back_')>=0 ) { //push on stack but only if not re-showing itself
       namenow = window.passage.name;
       if(namenext!=namenow) window.gm.pushBackPassage(namenow); 
@@ -405,9 +458,9 @@ window.story.__proto__.show = function(idOrName, noHistory = false) {
 if(inGame) {//disable save-menu on _nosave_-tag 
     window.story.state._gm.nosave = (tagsnext.indexOf('_nosave_')>=0 );
 }
-  noHistory = true; //the engines object auses problems with history, namely refToParent
+  noHistory = true; //the engines object causes problems with history, namely refToParent
   _origStoryShow.call(window.story,next, noHistory);
-};
+};*/
 //-----------------------------------------------------------------------------
 //changes the active player and will add him to party!
 window.gm.switchPlayer = function(playername) {

@@ -281,8 +281,8 @@ class HealthPotion extends Item {
     }
     set style(style) {
         this._style = style; 
-        this.id=this.name='HealthPotion',this.amount=40;
-        if(style===10) this.id=this.name='HealthPotion(small)',this.amount=20;
+        if(style===0) this.id=this.name='HealthPotion',this.amount=40;
+        else if(style===10) this.id=this.name='HealthPotion(small)',this.amount=20;
         else throw new Error(this.id +' doesnt know '+style);
     }
     get style() {return this._style;}

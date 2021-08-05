@@ -515,7 +515,7 @@ class effMutateCat extends Effect {
                     if(me.data.cycles<=0) { 
                         Effects.removeItem(me.data.id);
                     }
-                    window.gm.pushDeferredEvent("MutateCat",[me.data.magnitude]);
+                    window.gm.MutationsLib.mutateCat(this.parent.parent);
                     //window.gm.pushDeferredEvent("CatHabit");
                     Effects.removeItem(me.data.id);});
                 }(this));
@@ -553,8 +553,7 @@ class effMutateWolf extends Effect {
                     if(me.data.cycles<=0) { 
                         Effects.removeItem(me.data.id);
                     }
-                    window.gm.pushDeferredEvent("MutateWolf",[me.data.magnitude]);
-                    //window.gm.pushDeferredEvent("CatHabit");
+                    window.gm.MutationsLib.mutateWolf(this.parent.parent);
                     Effects.removeItem(me.data.id);});
                 }(this));
             }
@@ -591,7 +590,8 @@ class effMutateHorse extends Effect {
                     if(me.data.cycles<=0) { 
                         Effects.removeItem(me.data.id);
                     }
-                    window.gm.pushDeferredEvent("MutateHorse",[me.data.magnitude]); //todo non-PC can be mutated (if receives timechange !) but the scene will assume its player?!
+                    window.gm.MutationsLib.effMutateHorse(this.parent.parent);
+                     //todo non-PC can be mutated (if receives timechange !) but the scene will assume its player?!
                     Effects.removeItem(me.data.id);});
                 }(this));
             }
@@ -675,7 +675,7 @@ class effGrowBreast extends Effect {
                         Effects.removeItem(me.data.id);
                         window.gm.pushDeferredEvent("MutateBreastEnd");
                     }
-                    else window.gm.pushDeferredEvent("MutateBreast");
+                    else window.gm.MutationsLib.growBreast(this.parent.parent);
                 });
             }(this));
         }
@@ -714,7 +714,7 @@ class effGrowVulva extends Effect {
                         Effects.removeItem(me.data.id);
                         window.gm.pushDeferredEvent("MutateVulvaEnd");
                     }
-                    else window.gm.pushDeferredEvent("MutateVulva");
+                    else window.gm.MutationsLib.growVulva(this.parent.parent);
                 });
             }(this));
         }
@@ -912,19 +912,24 @@ class effHeal extends CombatEffect {
 }
 
 class effGuard extends CombatEffect {
+    static setup(weapResist,eRecover,duration) {
+        let x = new effGuard();
+        x.data.weapResist = weapResist; x.data.eRecover = eRecover;this.data.duration = duration;
+        return x;
+    }
     constructor() {
         super();
         this.data.id = this.data.name= effGuard.name, this.data.duration = 0, this.data.hidden=0;
-        this.amount=5;
+        this.data.weapResist = 5; this.data.eRecover=0;
     }
     toJSON() {return window.storage.Generic_toJSON("effGuard", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(effGuard, value.data);};
     get desc() {return(effGuard.name);}
     onApply(){
         this.data.duration = 2;
-        this.parent.parent.Stats.addModifier('rstblunt',{id:'rstblunt:Guard', bonus:this.amount});
-        this.parent.parent.Stats.addModifier('rstslash',{id:'rstblunt:Guard', bonus:this.amount});
-        this.parent.parent.Stats.addModifier('rstpierce',{id:'rstpierce:Guard', bonus:this.amount});
+        this.parent.parent.Stats.addModifier('rstblunt',{id:'rstblunt:Guard', bonus:this.weapResist});
+        this.parent.parent.Stats.addModifier('rstslash',{id:'rstblunt:Guard', bonus:this.weapResist});
+        this.parent.parent.Stats.addModifier('rstpierce',{id:'rstpierce:Guard', bonus:this.weapResist});
     }
     merge(neweffect) {
         if(neweffect.name===this.data.name) {
@@ -936,6 +941,7 @@ class effGuard extends CombatEffect {
     }
     onTurnStart() {
         this.data.duration-=1;
+        this.parent.parent.Stats.increment("energy",this.eRecover);
         if(this.data.duration<=0) this.parent.removeItem(this.data.id);
     }
     onRemove(){

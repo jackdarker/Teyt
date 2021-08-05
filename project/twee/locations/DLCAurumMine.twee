@@ -117,11 +117,14 @@ window.gm.printOutput(showPrize());
 :: AM_Lv2_Start
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.moveHere();%>
-You have to challenge several enemys one by one. The stakes increase with each challenge and after each fight you may decide to drop out with the rewards you gathered so far. But if you loose, you dont get anything, just your own insights.</br>
-Are you ready for your first fight?</br>
-<div></br>
+You are stuck in this dungeon and need to find a way out of it.
+You have to challenge several enemys one by one. After each fight you may decide to return here with the loot gathered so far.</br> 
+If you go on and get defeated, you will loose anything you carry with you.</br>
+You can store loot in this chest if you dont want to risk loosing it in battle. Dont forget to gear up in the shop close by.</br>
+</br>Are you ready for your first fight?</br>
+<div></br>[[Magic Chest|GlobalChest]] [[Shop|AM_Lv2_Shop]]
 <a href="javascript:void(0)" onclick='($("tw-passage").fadeOut(1000, function() {window.gm.player.sleep(700);window.story.show("AM_Lv2_Start");}));'>Sleep Until Morning</a>
-<a0 onclick='fight()'>Into battle<a/></br>[[Map|AM_MAP_Level2]]</div>
+</br><a0 onclick='fight()'>Into battle<a/></br>[[Map|AM_MAP_Level2]]</div>
 </article><article id="LogPanel"></article></section>
 <script>function fight() {
   var tmp=window.story.state.tmp;
@@ -134,6 +137,20 @@ Are you ready for your first fight?</br>
 }
 window.story.state.tmp.args=['wolf',[{id:'Money',count:20}],[]];
 </script>
+
+
+:: AM_Lv2_Shop [_back_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.moveHere();%>
+Would you like to buy something?</br>[[Back|_back_]]</br>
+<div id="choice"></div></br></br>   <!--display buy message-->
+<div id="panel"></div></br></br>    <!--display wares list-->
+</article><article id="LogPanel"></article></section>
+<script>
+window.gm.shop.findWaresToBuy("Arena:Shop");
+renderToSelector("#panel", "listbuy");
+</script>
+
 
 
 :: AM_Lv2_B2
