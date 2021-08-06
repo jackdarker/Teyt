@@ -369,7 +369,7 @@ window.story.__proto__.show = function(idOrName, noHistory = false) {
   if(idOrName==='') tagsnext=[];
   else tagsnext = window.story.passage(idOrName).tags;
   if(inGame && window.story.state._gm.defferedStack.length>0 && //deffered event if allowed and requested
-    //tagsnext.indexOf('_back_')<0 && 
+    //tagsnext.indexOf('_back_')<0 &&
     tagsnext.indexOf('_nosave_')<0 && tagsnext.indexOf('_nodeffered_')<0 ) { 
       //before entering a new passage check if there is a defferedEvent that we should do first
       //if so, push the normal-passage onto stack, show deffered passage
@@ -415,52 +415,6 @@ window.story.__proto__.show = function(idOrName, noHistory = false) {
   noHistory = true; //the engines object causes problems with history, namely refToParent
   _origStoryShow.call(window.story,next, noHistory);
 };
-/*window.story.__proto__.show = function(idOrName, noHistory = false) {
-  let next = idOrName;
-  let inGame = window.story.state.hasOwnProperty("_gm"); //the logic doesnt work if initGame not already done
-  let tagsnext,namenext,nextp,namenow;
-  if(idOrName==='') tagsnext=[];
-  else tagsnext = window.story.passage(idOrName).tags;
-  if(idOrName === '_back_') { //going back
-    next = window.gm.popBackPassage();
-    tagsnext = window.story.passage(next).tags;
-  } else if(inGame && window.story.state._gm.defferedStack.length>0 && //deffered event if allowed and requested
-      //tagsnext.indexOf('_back_')<0 &&
-      tagsnext.indexOf('_nosave_')<0 && tagsnext.indexOf('_nodeffered_')<0 ) { 
-        //before entering a new passage check if there is a defferedEvent that we should do first
-        //if so, push the normal-passage onto stack, show deffered passage
-        //after the deffered passage(s) finish, make sure to show the original passage
-        //this is a problem?how do I know the deffered passage is done? 
-    if(idOrName!=='') window.gm.pushOnHold(idOrName);
-    next = window.gm.popDeferredEvent();
-    nextp = window.story.passage(next);
-    tagsnext =  nextp.tags;
-  } else if(inGame && idOrName==='' && window.story.state._gm.onholdStack.length>0) { //continue event onhold
-    next =window.gm.popOnHold()
-    nextp = window.story.passage(next);
-    tagsnext =  nextp.tags;
-  } else {  //going forward
-    nextp = window.story.passage(next);
-    if(!nextp) throw new Error('no such passage: '+next);
-    tagsnext = nextp.tags; namenext = nextp.name;
-    if(tagsnext.indexOf('_back_')>=0 ) { //push on stack but only if not re-showing itself
-      namenow = window.passage.name;
-      if(namenext!=namenow) window.gm.pushBackPassage(namenow); 
-    } else if(inGame) { 
-      //if not in _back_-passage, drop the _back_-stack
-      window.story.state._gm.passageStack.splice(0,window.story.state._gm.passageStack.length);
-    }
-    //todo not sure about this: a deffered event should not link to normal passages because this would disentangle the original story-chain
-    //this I think could cause issues and should be detected and throw an error
-    //uncoment the following to bypass this 
-    //    window.story.state._gm.onholdStack.splice(0,window.story.state._gm.onholdStack.length);
-  }
-if(inGame) {//disable save-menu on _nosave_-tag 
-    window.story.state._gm.nosave = (tagsnext.indexOf('_nosave_')>=0 );
-}
-  noHistory = true; //the engines object causes problems with history, namely refToParent
-  _origStoryShow.call(window.story,next, noHistory);
-};*/
 //-----------------------------------------------------------------------------
 //changes the active player and will add him to party!
 window.gm.switchPlayer = function(playername) {
@@ -605,24 +559,6 @@ window.gm.printItem= function( id,descr,carrier,useOn=null ) {
   if(window.story.passage(id))  elmt +=''.concat("    [[Info|"+id+"]]");  //Todo add comands: drink,eat, use
       elmt +=''.concat("</br>");
       return(elmt);
-};
-window.gm.printItem2= function( id,descr,carrier,useOn=null ) {
-  let elmt='';
-  let s= window.story.state;
-  let _inv = carrier.Inv;
-  let _count =_inv.countItem(id);
-  if(useOn===null) useOn=carrier;
-  let useable = _inv.usable(id);
-  if(_count>0 && useable.OK) {
-    let entry = document.createElement('a');
-    entry.href='javascript:void(0)';
-    let foo = (function(id,carrier,useOn){ 
-      let _res=carrier.Inv.use(id); window.gm.refreshAllPanel();window.gm.printOutput(_res.msg);
-    }).bind(null,id,carrier,useOn);
-    entry.addEventListener("click",foo);
-    entry.textContent=id;
-    $("div#choice")[0].appendChild(entry);      // <- requires this node in html
-  }
 };
 /**
  * prints a list of items/wardrobe and buttons to transfer them

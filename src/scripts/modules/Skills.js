@@ -20,8 +20,12 @@ class SkillInspect extends Skill {
         this.msg = '';
         if(this.isValidTarget(targets)) {
             result.OK = true;
-            result.msg = this.msg = window.gm.printBodyDescription(targets[0],true);
+            this.msg = 'resistance of ';//window.gm.printBodyDescription(targets[0],true);
+            for(let el of window.gm.combat.TypesDamage) {
+                this.msg += el.id+ ' '+ targets[0].Stats.getItem('rst'+el.id).value +','; 
+            }
             //todo display stats dependign on skill
+            result.msg =this.msg;
         }
         return result
     }

@@ -1011,6 +1011,31 @@ class effDamage extends CombatEffect {
     onCombatEnd() { this.parent.removeItem(this.data.id); }
     onTurnStart() { this.data.duration-=1; if(this.data.duration<=0) this.parent.removeItem(this.data.id);    }
 }
+class effMasochist extends CombatEffect {
+    static setup(amount,type) {
+        let eff = new effMasochist();
+        eff.amount = amount;
+        eff.type=type;
+        return(eff);
+    }
+    constructor() {
+        super();
+        this.amount = 8;
+        this.data.id = this.data.name= effMasochist.name, this.data.duration =6, this.data.hidden=0;
+    }
+    toJSON() {return window.storage.Generic_toJSON("effMasochist", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(effMasochist, value.data);};
+    onApply(){
+        if(this.data.duration<1) this.parent.removeItem(this.data.id);  
+    }
+    merge(neweffect) {
+        if(neweffect.name===this.data.name) {    //ignore
+            return;
+        }
+    }
+    onCombatEnd() { this.parent.removeItem(this.data.id); }
+    onTurnStart() { this.data.duration-=1; if(this.data.duration<=0) this.parent.removeItem(this.data.id);    }
+}
 //damage over time todo affects only bleedable targets 
 class effBleed extends CombatEffect {
     constructor(amount) {
@@ -1274,6 +1299,7 @@ window.gm.StatsLib = (function (StatsLib) {
     window.storage.registerConstructor(effStunned);
     window.storage.registerConstructor(effGuard);
     window.storage.registerConstructor(effHeal);
+    window.storage.registerConstructor(effMasochist);
     
     window.storage.registerConstructor(effEnergyDrain);
 

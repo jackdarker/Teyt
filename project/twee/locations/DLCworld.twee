@@ -116,7 +116,7 @@ You crash down through the floor and find yourself back on the lowest level of t
 function crashThrough() {
     var floor1 = window.gm.dng.allFloors()[0];
     var Room = floor1.getRoom(window.gm.dng.actualRoom.name);  //room names are the same at same position of floor
-    window.gm.dng.teleport(floor1, Room);
+    window.gm.dng.teleport(Room);
 }
 </script>
 

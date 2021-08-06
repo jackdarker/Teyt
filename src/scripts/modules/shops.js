@@ -30,9 +30,11 @@ window.gm.shop.findWaresToBuy = function(shop) {
     if(shop==='Mall:GeneralStore') {
         list=[window.gm.ItemsLib['Lube'](),window.gm.ItemsLib['Battery']()];
     } else if("Arena:Shop") {
-        list=[window.gm.ItemsLib['HealthPotion(small)'](),window.gm.ItemsLib['HealthPotion'](),
+        list=[window.gm.ItemsLib['HealthPotionSmall'](),window.gm.ItemsLib['HealthPotion'](),
         window.gm.ItemsLib['SpearWodden'](),
-        window.gm.ItemsLib['DaggerSteel']()
+        window.gm.ItemsLib['DaggerSteel'](),
+        window.gm.ItemsLib['Vaginarium'](),
+        window.gm.ItemsLib['Penilium']()
         ];
     }
     let list2 = [];

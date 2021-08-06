@@ -423,7 +423,7 @@ Ansonsten gibt es hier nichts.</br>
 <p class='tPC'>NOO CAKE !</p>
 <a0 onclick='window.gm.player.Inv.addItem(new window.gm.ItemsLib["KeyRestraintA"]());'>pickup small key</a>
 <% if(window.gm.quests.getMilestoneState("qPurpleBerry").id>=100) {%>
-<a0 onclick='window.gm.player.Inv.removeItem("PurpleBerry",5);window.gm.player.Inv.addItem(new window.gm.ItemsLib["HealthPotion(small)"](),1);window.gm.refreshAllPanel();' <%=(window.gm.player.Inv.countItem("PurpleBerry")>=5)?(""):("hidden")%>>Trade 5 purple berries for 1 health-potion</a></br>
+<a0 onclick='window.gm.player.Inv.removeItem("PurpleBerry",5);window.gm.player.Inv.addItem(new window.gm.ItemsLib["HealthPotionSmall"](),1);window.gm.refreshAllPanel();' <%=(window.gm.player.Inv.countItem("PurpleBerry")>=5)?(""):("hidden")%>>Trade 5 purple berries for 1 health-potion</a></br>
 <a0 onclick='window.gm.player.Inv.removeItem("PurpleBerry",5);window.gm.player.Inv.addItem(new window.gm.ItemsLib["HorsePowerPotion"](),1);window.gm.refreshAllPanel();' <%=(true)?(""):("hidden")%>>Trade xxx for 1 HorsePower-Draft</a>
 <%}%>
 <div></br>[[Outside|ForestBorder]]  [[Alchemist|ForestAlchemistTalk]]</br></div>

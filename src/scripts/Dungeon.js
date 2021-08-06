@@ -334,7 +334,7 @@ class DngDungeon	{
         window.story.state.dng.id = ""; //clear or load would send you into dng again
     }
     //similiar to moveTo except no onenter/onexit processing
-    teleport(Floor, Room) {
+    teleport(Room) {
         this.actualRoom = null;
         this.moveToRoom(Room);
     }
@@ -442,16 +442,17 @@ class DngDungeon	{
             }
             this.addButton(bt, "Leave", this.exitDungeon, false);
         }
-        //add _nosave_ tag except allowed
+        //add _nosave_ tag except allowed; because there could be some fct running in each room, it would be diffivcult to recover those after save
+        //only allow save where nothing special is happening !
         let tags = window.story.passage("Dungeon").tags;
         for(var i=tags.length-1;i>=0;i--) {
             if(tags[i]==='_nosave_') tags.splice(i,1);
         }
-        if(!window.gm.dng.actualRoom.allowSave) {
+        if(!window.gm.dng.actualRoom.allowSave) {  //todo should we allow defferedEvents or could this mess with onEnter/onExit-calls?
             tags.push('_nosave_');
         } 
         let _state = window.story.state.dng;
-        _state.roomId =  this.actualRoom.name;      //Todo how to load dungeon ?
+        _state.roomId =  this.actualRoom.name;
         _state.id = this.name;
         _state.floorId = this.actualRoom.floor.name;
         window.story.show("Dungeon"); //call the scene

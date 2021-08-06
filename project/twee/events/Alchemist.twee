@@ -38,7 +38,7 @@ He shakes his head "Not that I know. Cant you sneak around them or trick them so
 
 :: AlchTalkFinishPurpleBerry
 <div id='select1' > You got enough purple berries to trade in for the alchemist. Will you do so?
-<a0 onclick='window.gm.player.Inv.removeItem("PurpleBerry",5);window.gm.player.Inv.addItem(new window.gm.ItemsLib["HealthPotion(small)"](),2);window.gm.quests.forceQuestMilestone("qPurpleBerry",100,1);window.gm.printTalkLink($("div#select1")[0],"div#choice1a");'>Yes</a>
+<a0 onclick='window.gm.player.Inv.removeItem("PurpleBerry",5);window.gm.player.Inv.addItem(new window.gm.ItemsLib["HealthPotionSmall"](),2);window.gm.quests.forceQuestMilestone("qPurpleBerry",100,1);window.gm.printTalkLink($("div#select1")[0],"div#choice1a");'>Yes</a>
 <a0 onclick='window.story.show("ForestBorder");'>Leave</a>
 </div>
 <div id='choice1a' hidden>

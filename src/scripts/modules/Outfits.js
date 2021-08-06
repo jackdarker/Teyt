@@ -365,6 +365,23 @@ class DaggerSteel extends Weapon {
         return(mod);
     }
 }
+class WhipLeather extends Weapon {
+    constructor() {
+        super();this.id=this.name='WhipLeather';
+        this.slotUse = ['RHand'];
+        this.lossOnRespawn = true;;
+    }
+    get desc() { return('a leather whip.');}
+    toJSON() {return window.storage.Generic_toJSON("WhipLeather", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(WhipLeather, value.data));}
+    attackMod(target){
+        let mod = new SkillMod();
+        mod.onHit = [{ target:target, eff: [effDamage.setup(5,'slash')]}];
+        mod.critChance=5;
+        mod.onCrit = [{ target:target, eff: [effDamage.setup(15,'slash')]}];
+        return(mod);
+    }
+}
 class StaffWodden extends Weapon {
     constructor() {
         super();this.id=this.name='StaffWodden';
@@ -555,7 +572,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(ShieldSmall);
     window.storage.registerConstructor(StaffWodden);
     window.storage.registerConstructor(WristCuffs);
-    
+    window.storage.registerConstructor(WhipLeather);
     //.. and Wardrobe
     ItemsLib['BikiniBottomLeather'] = function () { return new BikiniBottomLeather();};
     ItemsLib['BikiniTopLeather'] = function () { return new BikiniTopLeather();};
@@ -585,5 +602,6 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['ShieldIron'] = function () { let x= new ShieldSmall();x.style=200;return(x);};
     ItemsLib['SpearWodden'] = function () { let x= new SpearWodden();return(x);};
     ItemsLib['SpearStone'] = function () { let x= new SpearWodden();x.style=100;return(x);};
+    ItemsLib['WhipLeather'] = function () { let x= new WhipLeather();return(x);};
     return ItemsLib; 
 }(window.gm.ItemsLib || {}));

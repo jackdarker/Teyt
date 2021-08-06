@@ -3,7 +3,7 @@ class Item {
     constructor(name) {
         this.id = this.name = name;  //id is unique in database(no whitespace !); name is for display
         this.__tags = [];
-        this.price=this.basePrice =0; //how much worth it is
+        this.price=this.basePrice=10; //how much worth it is
     }
     get parent() {return this._parent?this._parent():null;}
     _relinkItems(parent){this._parent=window.gm.util.refToParent(parent);}

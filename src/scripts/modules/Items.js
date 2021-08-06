@@ -282,7 +282,7 @@ class HealthPotion extends Item {
     set style(style) {
         this._style = style; 
         if(style===0) this.id=this.name='HealthPotion',this.amount=40;
-        else if(style===10) this.id=this.name='HealthPotion(small)',this.amount=20;
+        else if(style===10) this.id=this.name='HealthPotionSmall',this.amount=20;
         else throw new Error(this.id +' doesnt know '+style);
     }
     get style() {return this._style;}
@@ -318,6 +318,40 @@ class HorsePotion extends Item {
     get style() {return this._style;}
     get desc() { 
         let msg =this.name;
+        return(msg);
+    }
+}
+class RegenderPotion extends Item {
+    constructor() { super('RegenderPotion'); this.addTags([window.gm.ItemTags.Drink]);this.price=this.basePrice=500;this.style=0;}
+    toJSON() {return window.storage.Generic_toJSON("RegenderPotion", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(RegenderPotion, value.data);};
+    usable(context,on=null) {return({OK:true, msg:'drink'});}
+    use(context,on=null) { 
+        var _gaveAway=false;
+        if(context instanceof Inventory) {
+            if(on===null) on=context.parent;
+            else _gaveAway=true;
+            context.removeItem(this.id);
+            if(on instanceof Character){ 
+                if(on instanceof Character){
+                    window.gm.MutationsLib.swapGender(window.gm.player,
+                        window.storage.constructors[(this.style===0)?"VulvaHuman":"PenisHuman"]);
+                }
+                return({OK:true, msg:on.name+' drank a potion.'});
+            }
+        } else throw new Error('context is invalid');
+    }
+    set style(style) {
+        this._style = style; 
+        if(style===0) this.id=this.name='Vaginarium';
+        else if(style===10) this.id=this.name='Penilium';
+        else throw new Error(this.id +' doesnt know '+style);
+    }
+    get style() {return this._style;}
+    get desc() { 
+        let msg =this.name;
+        if(this.style===0) msg+= ' gets you some female bits.';
+        else if(this.style===10) msg+= ' gets you some male bits.';
         return(msg);
     }
 }
@@ -371,7 +405,10 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['FlashBang'] = function () { return new FlashBang(); };
     //healthpotion
     ItemsLib['HealthPotion'] = function () { let x= new HealthPotion();return(x); };
-    ItemsLib['HealthPotion(small)'] = function () { let x= new HealthPotion();x.style=10;return(x); };
+    ItemsLib['HealthPotionSmall'] = function () { let x= new HealthPotion();x.style=10;return(x); };
+    ItemsLib['HorsePotion'] = function () { let x= new HorsePotion();return(x); }
+    ItemsLib['Vaginarium'] = function () { let x= new RegenderPotion();return(x); };
+    ItemsLib['Penilium'] = function () { let x= new RegenderPotion();x.style=10;return(x); };
     //Ingredient
     ItemsLib['SquishedLeech'] = function(){ let x=new Ingredient();x.style=30;return(x);};
     ItemsLib['BloatedMushroom'] = function(){ let x=new Ingredient();x.style=20;return(x);};

@@ -177,6 +177,15 @@ window.gm.leaveVR=function() {
   window.gm.addTime(60);
   //todo copy fetish-stats back to RLPlayer ?
 }
+window.gm.fightArena=function(enc,prize,next) {
+  window.gm.encounters[enc](window.gm.player.location);
+  window.gm.Encounter.onVictory = function() {
+        window.story.state.dng.arena.loot=window.story.state.dng.arena.loot.concat(prize);
+        return('You defeated the enemy. '+this.fetchLoot()+'</br>'+ 
+        window.gm.printPassageLink('Next',next));
+    }
+  window.gm.Encounter.onFlee = (function(){return('After your retreat you find your way back to start-position.</br>'+ window.gm.printLink('Next','window.gm.postDefeat()'));});
+}
 //call this after onVictory/onFlee-scene to continue in dng or other location
 //this function is also used to restore after loading save !
 window.gm.postVictory=function() {
@@ -231,7 +240,7 @@ window.gm.respawn=function(conf={keepInventory:false}) {
     let staff = new window.storage.constructors['StaffWodden']();
     window.gm.player.Inv.addItem(staff);
     window.gm.player.Outfit.addItem(staff);
-    window.story.show(window.story.state.vars.spawnAt); //todo what location
+    window.story.show(window.story.state.vars.spawnAt);
   }
 };
 //sets current player location and advances time

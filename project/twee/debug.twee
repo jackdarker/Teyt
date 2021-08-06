@@ -36,9 +36,9 @@ Cheat buttons: those are meant for debugging and might break your game</br>
 <a0  onclick='window.gm.player.Stats.increment("arousal",-25);window.gm.refreshAllPanel();'>Arousal -25</a></br>
 Crash if you enter wrong things below !</br>
 <label for="passage">passage:<input type="text" id="passage" name="passage"></label><a0  onclick='window.story.show(document.getElementById("passage").value)'>Go</a></br>
-<label for="additem">add item:<input type="text" id="additem" name="additem"></label><a0  onclick='window.gm.player.Inv.addItem(new window.storage.constructors[document.getElementById("additem").value]())'>Go</a></br>
-(only non-wardrobe-items except weapons!)</br>
-<label for="addoutfit">add wardrobe:<input type="text" id="addoutfit" name="addoutfit"></label><a0  onclick='window.gm.player.Wardrobe.addItem(new window.storage.constructors[document.getElementById("addoutfit").value]())'>Go</a></br>
+<label for="additem">add item:<input type="text" id="additem" name="additem"></label><a0  onclick='window.gm.player.Inv.addItem(window.gm.ItemsLib[document.getElementById("additem").value]())'>Go</a></br>
+(only non-wardrobe-items and weapons!)</br>
+<label for="addoutfit">add wardrobe:<input type="text" id="addoutfit" name="addoutfit"></label><a0  onclick='window.gm.player.Wardrobe.addItem(window.gm.ItemsLib[document.getElementById("addoutfit").value]())'>Go</a></br>
 (only wardrobe-items except weapons! You need to equip them in wardrobe.)</br>
 <label for="startfight">start fight:<input type="text" id="startfight" name="startfight"></label><a0  onclick='window.gm.encounters[document.getElementById("startfight").value]()'>Go</a></br>
 (use Encounter-name, might sent you to certain events on defeat/victory)</br>

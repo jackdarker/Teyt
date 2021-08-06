@@ -113,7 +113,7 @@ window.gm.sex.wolfOnPlayer=function(data) {
             newdata.state=-1;
             createButton('Walk away',foo.bind(null,newdata));
         } else {
-            entry.textContent ="The creature isnt interested in you.";
+            entry.textContent ="The creature isnt interested in you."; //Todo
             data.state=-1;
             createButton('Pass out',foo.bind(null,data));
         }
@@ -184,7 +184,7 @@ window.gm.sex.wolfOnPlayer=function(data) {
 }
 
 window.gm.sex.dryadOnPlayer=function(data) { //todo
-    let foo = window.gm.sex.dryadOnPlayer; //each button-click will call this sm again and switch state
+    let foo = window.gm.sex.dryadOnPlayer;
     let player = window.gm.player;
     let foe = window.story.state.combat.enemyParty[0]; //todo
     window.gm.sex.beginScene();
@@ -229,4 +229,33 @@ window.gm.sex.dryadOnPlayer=function(data) { //todo
             createButton("Pass out",foo.bind(null,newdata));
         }
         window.gm.sex.updateScene(entry); 
+    /**
+     * dryads are female but their tendrils can be fill you up quite well
+     * They produce some kind of sap that is very regenerative but might also make you their slave
+     */
 }
+
+/**
+ * :: HuntressSubmit
+"You are a worthy opponent. Lets see if you have some stamina left."
+She is stradeling your prone form. Gyrating her hips around, she guides your hard pecker between her wet folds. After she grows tired on teasing you and herself, she plunges dowm, engulfing your rigid member in one smooth stroke.
+Riding you like a pro, you have considerable difficulty to not just shoot your load into her.    
+"I dare you, if you cum before I do, I will cut your pecker of. "
+
+
+:: HuntressVictory
+Give her her own poison | Grabing some rope you carry with you, you tie the fierce female face first against a tree.
+Undo her leathers.
+
+Give her some spanking
+
+Tease her cunt
+
+Ravage her vaginally
+
+"Lets sate that appetite of yours."
+...
+Take it all in slut. I hope you bear some big soulgems for me when I met you again.
+ */
+
+

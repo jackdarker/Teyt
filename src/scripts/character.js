@@ -39,7 +39,7 @@ class Character {
         this.Skills._parent = window.gm.util.refToParent(this);
         //create basic stats
         stHealth.setup(this.Stats,10,10),stEnergy.setup(this.Stats,30,30),stWill.setup(this.Stats,0,0);
-        for(el of window.gm.combat.TypesDamage) {
+        for(let el of window.gm.combat.TypesDamage) {
             stResistance.setup(this.Stats,0,el.id);
             stArmor.setup(this.Stats,0,el.id); 
         }

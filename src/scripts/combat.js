@@ -662,6 +662,9 @@ window.gm.combat.scaleEffect = function(attack) {
           rst = target.Stats.getItem('rst'+el.type).value;
           dmg = Math.max(1,(el.amount-arm)*(100-rst)/100);
           el.amount=dmg;
+          if(target.Effects.findEffect("effMasochist").length>0) {
+            op[i].eff.push(effTeaseDamage.setup(dmg,'slut',{slut:1})); //todo lewd-calc
+          }
         }
         if(el.name===effTeaseDamage.name) {
           //todo no dmg if blinded, stunned,

@@ -147,14 +147,6 @@ class BeeHive extends DngDungeon{
     trapDoor(Me) {
         window.story.show('DungeonCrashedThroughFloor');
         return(true);
-        var floor1 = this.floor.dungeon.allFloors()[0];
-        var Room = floor1.getRoom(Me.roomB.name);  //room names are the same at same position of floor
-        if (Room != null) {
-            this.floor.dungeon.teleport(floor1, Room);
-            
-            return true;
-        }
-        return false; 	
     }
 }
 class ShatteredCity extends DngDungeon{
@@ -422,6 +414,123 @@ class ArenaTrialsNo1 extends DngDungeon{
             }
                 msg+='You decided to not continue the fight.</br>';
                 msg+= window.gm.printLink("Next",'window.gm.dng.exitDungeon()');
+        } 
+        return(msg);
+    }
+    /**
+     * 
+     * @param {int} evt: roomNo 
+     */
+    _fight(evt) {
+        this.data.currentRoom = evt;
+        this.data.maxRoom= (this.data.currentRoom>this.data.maxRoom)?this.data.currentRoom:this.data.maxRoom;
+        window.gm.encounters[this.data.challenger[this.data.currentRoom]](window.gm.player.location);
+        window.gm.Encounter.onVictory = (function() { //need to resumeRoom...
+            this.data.currentRoom+=1;
+            return('Victory ! </br>Some '+this.data.rewards[this.data.currentRoom].id+ ' was added to the reward-pile.</br>'+ window.gm.printLink('Next','window.gm.dng.resumeRoom()'));
+        }).bind(this) ;
+        return(true); //return true to indicate a intermittent scene
+    }
+    
+}
+class ArenaTrialsNo2 extends DngDungeon{  //Todo broken...
+    persistentDngDataTemplate() {
+        let _data = {
+            currentRoom: 0,
+            maxRoom : 0
+        };
+        return(_data);
+    }
+    constructor()    {
+        super("ArenaTrialsNo2", ArenaTrialsNo1.desc,window.story.state.dng[ArenaTrialsNo2.name])
+        this.data.currentRoom = 1;
+        this.data.rewards = [{},{id:'Money',amount:20},{id:'Money',amount:20},{id:'Money',amount:20},{id:'Money',amount:20}]
+        this.data.challenger = ['','wolf','moleX2','huntress','wolf'];
+        this.buildFloors();
+    }
+    static desc() {return("Remember: If you have earned some money you should weight the option to retreat and invest that money in better gear."
+        +"That might give you better chances to survive the tougher fights at the cost of fighting the previous foes again.</br>"
+        +"Grinding is fun. :)  </br>");}
+    buildFloors() {
+        var _floors= [];
+        var firstFloor//:DngFloor;
+        var stairUp//:DngRoom;
+        var stairDown//:DngRoom;
+        firstFloor = new DngFloor("1.Floor", function() {return("Arena gauntlet #2.")});
+        var room//:DngRoom;
+        var rooms= new Map();
+        /* first floor
+        *  
+        * E - B1 - B2 - B3 - B4 - B5 - E
+        * |    |                   |
+        * S    |  - C2 - C3 - C4 - |
+        *      |  - D2 - - - -D4 - |
+        * */
+       //Todo should be able to go into arena only once a day/with entryfee
+        let foo1 = (function(){return(ArenaTrialsNo1.desc()+'</br>If you survive your first challenger, you get '+this.data.rewards[this.data.currentRoom].amount+'x '+this.data.rewards[this.data.currentRoom].id+'.</br>');}).bind(this);
+        let foo2 = (function(){return('If you survive the second challenge, you get '+this.data.rewards[this.data.currentRoom].amount+'x '+this.data.rewards[this.data.currentRoom].id+'.</br>');}).bind(this);
+        let foo3 = (function(){return('If you survive the third challenge, you get '+this.data.rewards[this.data.currentRoom].amount+'x '+this.data.rewards[this.data.currentRoom].id+'.</br>');}).bind(this);
+        let foo4 = (function(){return('If you survive the last challenge, you get '+this.data.rewards[this.data.currentRoom].amount+'x '+this.data.rewards[this.data.currentRoom].id+'.</br>');}).bind(this);
+        let foo5 = function(){return('Congratulations. You have passed all the challenges and trully earned your reward.</br>');};
+        let _evt = new DngOperation("Retreat");
+        _evt.canTrigger = function(){return(true);};
+        _evt.onTrigger = function(){
+            this.renderEvent = this.renderRetreat;
+            this.evtData = {};
+            this.renderNext(1);
+        };
+        rooms.set("Start", new DngRoom("Start", foo1,false));
+        rooms.set("B1", new DngRoom("B1", null,false));
+        rooms.set("B2", new DngRoom("B2", null, false));
+        rooms.set("B3", new DngRoom("B3", null, false));
+        rooms.set("B4",new DngRoom("B4", null,false));
+        rooms.set("Exit",new DngRoom("Exit", foo5,false));
+        DngDirection.createDirection(DngDirection.DirE, rooms.get("Start") , rooms.get("B1"),true);
+        DngDirection.createDirection(DngDirection.DirE, rooms.get("B1" ), rooms.get("B2"));
+        DngDirection.createDirection(DngDirection.DirE, rooms.get("B2" ), rooms.get("B3"));
+        DngDirection.createDirection(DngDirection.DirE, rooms.get("B3" ), rooms.get("B4"));
+        DngDirection.createDirection(DngDirection.DirE, rooms.get("B4" ), rooms.get("B5"));
+        room = rooms.get("Exit");
+        room.isDungeonExit = true;
+        room = rooms.get("Start");
+        room.isDungeonEntry = true;
+        room.getDirection(DngDirection.DirE).onExitFct = this._fight.bind(this,1);
+        room = (rooms.get("B1"));
+        room.getDirection(DngDirection.DirE).onExitFct = this._fight.bind(this,2);
+        room.operations = [_evt];
+        room = (rooms.get("B2") );
+        room.getDirection(DngDirection.DirE).onExitFct = this._fight.bind(this,3);
+        room.operations = [_evt];
+        room = (rooms.get("B3") );
+        room.getDirection(DngDirection.DirE).onExitFct = this._fight.bind(this,4);
+        room.operations = [_evt];
+        room = (rooms.get("B4") );
+        room.operations = [_evt];
+        firstFloor.setRooms(Array.from(rooms.values( )));
+        _floors.push(firstFloor);
+        this.setFloors(_floors);
+    }
+    exitDungeon() {
+        super.exitDungeon();
+        window.story.show("PlainsFarmland");
+    }
+    renderNext(id) {
+        window.gm.dng.evtData.id=id;
+        window.story.show("DungeonGenericEvent");
+    }
+    retreat() {
+        this.teleport(this.getFloor("1.Floor").getRoom("Start"));
+    }
+    renderRetreat(evt) { //
+        let msg ='';
+        if(evt.id===1) {
+            for(var i=1; i<this.data.rewards.length;i++) {
+                if(this.data.currentRoom>i) {
+                    window.gm.player.Inv.addItem(window.gm.ItemsLib[this.data.rewards[i].id](),this.data.rewards[i].amount);
+                }
+            }
+                msg+='You decided to not continue the fight.</br>';
+                msg+= window.gm.printLink("Next",'window.gm.dng.retreat()');
         } 
         return(msg);
     }

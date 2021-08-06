@@ -74,9 +74,9 @@ Eine Sackgasse.
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 You have some kind of map:</br>
 <pre>
-[Start]-[B2]-[B3]-[B4]-[B5]-[Exit]
+[Start]-[B2]-[B3]-[B4]-[B5]-[B6]-[B7]-[Exit]
   |       |                   |
-[Shop]    |--[C2]-[C3]-[C5]---| 
+[Shop]    |--[C3]-[C4]-[C5]---| 
           |-------[D4]--------|
 </pre>
 Remember: If you have earned some money you should weight the option to retreat and invest that money in better gear.
@@ -87,7 +87,7 @@ Grinding is fun. :)  </br>
 
 :: AM_Lv2_Exit [_back_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<% if(window.story.state.tmp.args[0]===''){ %>
+<% if(window.story.state.dng.arena.enc===''){ %>
 You finished all fights. Congratulation. Now fetch your prize and go partying.
 <div></br><a0 onclick='leave()'>Collect prize</a></div>
 <% }else{ %>
@@ -97,15 +97,15 @@ Are you really going to flee from battle?
 <div id='output'></div>
 </article><article id="LogPanel"></article></section>
 <script>function leave() {
-  var tmp=window.story.state.tmp;
-  for(let el of tmp.args[2]) {
+  var tmp=window.story.state.dng.arena;
+  for(let el of tmp.loot) {
     window.gm.player.changeInventory(window.gm.ItemsLib[el.id](),el.count);
   }
-  window.story.show('ForestBorder');
+  window.story.show((tmp.enc==='')?'ForestBorder':'AM_Lv2_Start');
 }
 function showPrize() {
-  let msg='', tmp=window.story.state.tmp;
-  for(let el of tmp.args[2]) {
+  let msg='', tmp=window.story.state.dng.arena;
+  for(let el of tmp.loot) {
     msg+=el.count+'x '+window.gm.ItemsLib[el.id]().name+'</br>';
   }
   return msg;
@@ -114,35 +114,9 @@ window.gm.printOutput(showPrize());
 </script>
 
 
-:: AM_Lv2_Start
-<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%window.gm.moveHere();%>
-You are stuck in this dungeon and need to find a way out of it.
-You have to challenge several enemys one by one. After each fight you may decide to return here with the loot gathered so far.</br> 
-If you go on and get defeated, you will loose anything you carry with you.</br>
-You can store loot in this chest if you dont want to risk loosing it in battle. Dont forget to gear up in the shop close by.</br>
-</br>Are you ready for your first fight?</br>
-<div></br>[[Magic Chest|GlobalChest]] [[Shop|AM_Lv2_Shop]]
-<a href="javascript:void(0)" onclick='($("tw-passage").fadeOut(1000, function() {window.gm.player.sleep(700);window.story.show("AM_Lv2_Start");}));'>Sleep Until Morning</a>
-</br><a0 onclick='fight()'>Into battle<a/></br>[[Map|AM_MAP_Level2]]</div>
-</article><article id="LogPanel"></article></section>
-<script>function fight() {
-  var tmp=window.story.state.tmp;
-  window.gm.encounters[tmp.args[0]](window.gm.player.location);
-  window.gm.Encounter.onVictory = function() {
-        tmp.args[2]=tmp.args[2].concat(tmp.args[1])
-        return('Intimitated, the wolf rolls on its back, whimpering submissively and exposing its throat.</br>'+ 
-        window.gm.printPassageLink('Next','AM_Lv2_B2'));
-    }
-}
-window.story.state.tmp.args=['wolf',[{id:'Money',count:20}],[]];
-</script>
-
-
 :: AM_Lv2_Shop [_back_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%window.gm.moveHere();%>
-Would you like to buy something?</br>[[Back|_back_]]</br>
+<%window.gm.moveHere();%> Would you like to buy something?</br>[[Back|_back_]]</br>
 <div id="choice"></div></br></br>   <!--display buy message-->
 <div id="panel"></div></br></br>    <!--display wares list-->
 </article><article id="LogPanel"></article></section>
@@ -152,21 +126,138 @@ renderToSelector("#panel", "listbuy");
 </script>
 
 
+:: AM_Lv2_Start
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<% window.gm.moveHere();window.story.state.dng.arena= window.story.state.dng.arena||{
+  foundGate:0}; if((window.story.state.dng.arena.foundGate & 0x3)===1) {%>
+Deep in the dungeon you found a gate that you suspect to only open with a soulgem.
+Those are quite rare. Some magicans know how to grow them in a females uterus.
+Here is the plan:
+*  you need a lewd mark spell on you. Some lusty demons are granting them for free.
+*  But those demons only show up to those that show there debauchery. Go, grab some lewd gear from the shop.
+*  then, if you are female you just need to find someone to cuddle with to get the gem growing
+*  or you could court a lady and visit her often to have the gem well fed 
+<% } else if((window.story.state.dng.arena.foundGate & 0x2)>0){ %>
+The dungeons gate should be still open, except someone took the soulgem away.  
+<% } else { %>
+You are stuck in this dungeon and need to find a way out of it.
+You have to challenge several enemys one by one. After each fight you may decide to return here with the loot gathered so far.</br> 
+If you go on and get defeated, you will loose anything you carry with you.</br>
+You can store loot in this chest if you dont want to risk loosing it in battle. Dont forget to gear up in the shop close by.</br>
+<% } %>
+</br>Are you ready for your first fight?</br>
+<div></br>[[Magic Chest|GlobalChest]] [[Shop|AM_Lv2_Shop]] [[Map|AM_MAP_Level2]] 
+<a href="javascript:void(0)" onclick='($("tw-passage").fadeOut(1000, function() {window.gm.player.sleep(700);window.story.show("AM_Lv2_Start");}));'>Sleep Until Morning</a>
+</br><a0 onclick='window.gm.fightArena("wolf",[{id:"Money",count:30}],"AM_Lv2_B2")'>Into battle<a/></div>
+</article><article id="LogPanel"></article></section>
+<script>
+window.story.state.dng.arena.loot=[]; //reset flags
+/*foundGate-bits:
+1 = foundgate
+2 = placed soulgem
+4 = 
+8 = impregnated bitch
+16,32,64,128 = preg-counter
+*/
+</script>
+
 
 :: AM_Lv2_B2
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%window.gm.moveHere();%>
-Are you ready for your second fight?</br>
-<div></br>[[Retreat|AM_Lv2_Exit]] <a0 onclick='fight()'>Continue<a/></br>[[Map|AM_MAP_Level2]]</div>
+<%window.gm.moveHere();%> Are you ready for your next fight?</br>
+<div></br>[[Retreat|AM_Lv2_Exit]] [[Map|AM_MAP_Level2]]</br>
+<a0 onclick='window.gm.fightArena("moleX2",[{id:"Money",count:30}],"AM_Lv2_B3")'>Continue to B3<a/> 
+<a0 onclick='window.gm.fightArena("huntress",[{id:"Money",count:30}],"AM_Lv2_C3")'>Continue to C3<a/></div>
 </article><article id="LogPanel"></article></section>
-<script>function fight() {
-  var tmp=window.story.state.tmp;
-  window.gm.encounters[tmp.args[0]](window.gm.player.location);
-  window.gm.Encounter.onVictory = function() {
-        tmp.args[2]=tmp.args[2].concat(tmp.args[1]),tmp.args[0]='';
-        return('You squished those little buggers.</br>'+ 
-        window.gm.printPassageLink('Next','AM_Lv2_Exit'));
-    }
+
+
+:: AM_Lv2_B3 [_nosave_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.moveHere();%> 
+</br>[[Retreat|AM_Lv2_Exit]] [[Map|AM_MAP_Level2]]</br> There is a loot chest !</br>
+<a0 onclick='window.story.show("AM_Lv2_B4")'>Ignore chest</a>
+<a0 onclick='cursedChest("AM_Lv2_B4");window.story.show("AM_Lv2_LootChest")'>Open chest</a>
+</article><article id="LogPanel"></article></section>
+<script> 
+function cursedChest(next) {
+  let rnd = _.random(0,100);
+  window.story.state.tmp.args=[window.passage.name,rnd,next];
 }
-window.story.state.tmp.args=['moleX2',[{id:'Money',count:30}],window.story.state.tmp.args[2]];
+</script>
+
+
+:: AM_Lv2_B4
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.moveHere();%> Are you ready for your next fight?</br>
+<div></br>[[Retreat|AM_Lv2_Exit]] [[Map|AM_MAP_Level2]]</br>
+<a0 onclick='window.gm.fightArena("moleX2",[{id:"Money",count:30}],"AM_Lv2_B5")'>Continue to B5<a/></div>
+</article><article id="LogPanel"></article></section>
+
+
+:: AM_Lv2_B5
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.moveHere();%> Are you ready for your next fight?</br>
+<div></br>[[Retreat|AM_Lv2_Exit]] [[Map|AM_MAP_Level2]]</br>
+<a0 onclick='window.gm.fightArena("moleX2",[{id:"Money",count:30}],"AM_Lv2_B6")'>Continue to B6<a/></div>
+</article><article id="LogPanel"></article></section>
+
+
+:: AM_Lv2_B6
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.moveHere();%> The path forward is blocked by a heavy gate that is somehow locked in place. There is a pedestal near it with an empty stand.</br>
+Maybe you have to place something there to make the gate open. A soulgem possibly. But where to get one?
+<div></br>[[Retreat|AM_Lv2_Exit]] [[Map|AM_MAP_Level2]]</br>
+<div id='output'></div>
+</article><article id="LogPanel"></article></section>
+<script>
+function placeSoulGem(evt) {
+  let msg='You dont have a soulgem.';
+  if((window.story.state.dng.arena.foundGate & 0x2)>0) {
+    msg=window.gm.printPassageLink("Pass the gate","AM_Lv2_B7");
+  } else if (evt===0) {
+    msg=window.gm.printLink("Use soulgem",'placeSoulGem(1)');
+  } else if(window.gm.player.Inv.countItem("TinySoulGem")>0) {
+    window.story.state.dng.arena.foundGate=window.story.state.dng.arena.foundGate | 0x2;
+    msg='As you place the soulgem into the stand, the gate opens.';
+    msg+=window.gm.printPassageLink("Pass the gate","AM_Lv2_B7");
+  }
+  window.gm.printOutput(msg)
+}
+window.story.state.dng.arena.foundGate=window.story.state.dng.arena.foundGate | 0x1;
+placeSoulGem(0);
+</script>
+
+
+:: AM_Lv2_B7
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.moveHere();%> And now?
+<div></br>[[Retreat|AM_Lv2_Exit]] [[Map|AM_MAP_Level2]]</br>
+<div id='output'></div>
+</article><article id="LogPanel"></article></section>
+
+
+:: AM_Lv2_LootChest [_nosave_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+You open the chest and find...<div id='output'></div></br>
+<a0 onclick='foo()'>Next</a>
+</article><article id="LogPanel"></article></section>
+<script>
+var foo,msg='',Items=[];
+var rnd=window.story.state.tmp.args[1],next=window.story.state.tmp.args[2];   
+if(rnd>40) {
+  Items.push(window.gm.ItemsLib.HealthPotionSmall());
+  if(window.story.state.tmp.args[1]>60) {
+    Items.push(window.gm.ItemsLib.HorsePotion());
+  }
+  for(let el of Items) { msg+=el.name+", ";};
+  foo=function(){ window.story.state.tmp.args=[];
+    for(let el of Items) {window.gm.player.changeInventory(el,1);}
+    window.story.show(next); //adding to inventory only if player is leaving the passage, otherwise he could glitch if switching to status-pane and back
+  }
+} else {
+  msg+='trouble !';
+  foo=(function(){ window.story.state.tmp.args=[]; 
+    window.gm.fightArena("moleX2",[{id:"Money",count:30}],next);});
+}
+window.gm.printOutput(msg);
 </script>

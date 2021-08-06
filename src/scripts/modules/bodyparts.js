@@ -3,8 +3,8 @@
 class BaseHumanoid extends Equipment {
     constructor() {
         super('BaseHumanoid');
-        this.addTags(['body']);
-        this.slotUse = ['bBase'];
+        this.addTags(['body']);this.slotUse = ['bBase'];
+        this.race='human'; //todo this is calculated with calcRacialScore
     }
     descLong(fconv) {return(fconv('$[My]$ body is that of an human.'));} //$[I]$ $[have]$ a humanoid body.
     get descShort() {return this.desc;};
@@ -15,8 +15,8 @@ class BaseHumanoid extends Equipment {
 class BaseQuadruped extends Equipment {
     constructor() {
         super('BaseQuadruped');
-        this.addTags(['body']);
-        this.slotUse = ['bBase'];
+        this.addTags(['body']);this.slotUse = ['bBase'];
+        this.race='human';
     }
     get descShort() {return this.desc;};
     get desc() { return '';}
@@ -27,8 +27,8 @@ class BaseQuadruped extends Equipment {
 class BaseWorm extends Equipment {
     constructor() {
         super('BaseWorm');
-        this.addTags(['body']);
-        this.slotUse = ['bBase'];
+        this.addTags(['body']);this.slotUse = ['bBase'];
+        this.race='human';
     }
     get descShort() {return this.desc;};
     get desc() { return '';}
@@ -495,6 +495,28 @@ window.gm.ItemsLib = (function (ItemsLib) {
     return ItemsLib; 
 }(window.gm.ItemsLib || {}));
 
+window.gm.mutate = window.gm.mutate || {};
+/**
+ * checks each bodypart for race and calculates race-score (in %)
+ * @param {*} char 
+ */
+window.gm.mutate.calcRacialScore = function(char) { //todo
+
+}
+window.gm.mutate.getScoreHuman = function(char) {
+    //human body, human face, legs, arms, tail ignored?
+}
+window.gm.mutate.getScoreCat = function(char) { //one fct for Lynx/Lion/tiger ?
+    //
+}
+/**
+ * modify stats for race-bonus, cat -> better agility
+ * @param {*} char 
+ * @param {*} scores 
+ */
+window.gm.mutate.updateRacialBoon = function(char,scores) {
+    //remove old RacialBoon
+}
 //todo randomize what is mutated
 //number of mutations depends on magnitude?
 //temporary mutate to feral?
