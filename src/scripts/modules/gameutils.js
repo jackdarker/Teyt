@@ -101,7 +101,7 @@ window.gm.initGame= function(forceReset,NGP=null) {
         ch.id="PlayerRL";
         ch.name="Andrew";
         ch.faction="Player";
-        ch.Effects.addItem(skCooking.name,new skCooking());
+        ch.Effects.addItem(new skCooking());
         //add some basic inventory
         ch.Inv.addItem(new Money(),20);
         ch.Inv.addItem(new LighterDad());
@@ -122,7 +122,7 @@ window.gm.initGame= function(forceReset,NGP=null) {
         ch.Outfit.addItem(new Sneakers());
         ch.Outfit.addItem(new Pullover());
         //special skills
-        ch.Effects.addItem(effNotTired.name, new effNotTired()); //depending on sleep Tired will be set to NotTired or Tired
+        ch.Effects.addItem(new effNotTired()); //depending on sleep Tired will be set to NotTired or Tired
         //ch.Skills.addItem(SkillCallHelp.setup('Mole'));
         s.PlayerRL=ch;
     }
@@ -185,6 +185,10 @@ window.gm.fightArena=function(enc,prize,next) {
         window.gm.printPassageLink('Next',next));
     }
   window.gm.Encounter.onFlee = (function(){return('After your retreat you find your way back to start-position.</br>'+ window.gm.printLink('Next','window.gm.postDefeat()'));});
+}
+window.gm.cursedChest=function(next) {
+  let rnd = _.random(0,100); //this is rolling the dice, then call Loot-paasage !
+  window.story.state.tmp.args=[window.passage.name,rnd,next];
 }
 //call this after onVictory/onFlee-scene to continue in dng or other location
 //this function is also used to restore after loading save !

@@ -74,10 +74,12 @@ Eine Sackgasse.
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 You have some kind of map:</br>
 <pre>
+
+          
 [Start]-[B2]-[B3]-[B4]-[B5]-[B6]-[B7]-[Exit]
   |       |                   |
 [Shop]    |--[C3]-[C4]-[C5]---| 
-          |-------[D4]--------|
+          |--[D3]-[D4]--------|
 </pre>
 Remember: If you have earned some money you should weight the option to retreat and invest that money in better gear.
 That might give you better chances to survive the tougher fights at the cost of fighting the previous foes again.</br>
@@ -168,6 +170,7 @@ window.story.state.dng.arena.loot=[]; //reset flags
 <div></br>[[Retreat|AM_Lv2_Exit]] [[Map|AM_MAP_Level2]]</br>
 <a0 onclick='window.gm.fightArena("moleX2",[{id:"Money",count:30}],"AM_Lv2_B3")'>Continue to B3<a/> 
 <a0 onclick='window.gm.fightArena("huntress",[{id:"Money",count:30}],"AM_Lv2_C3")'>Continue to C3<a/></div>
+<a0 onclick='window.gm.fightArena("succubus",[{id:"Money",count:30}],"AM_Lv2_D3")'>Continue to D3<a/></div>
 </article><article id="LogPanel"></article></section>
 
 
@@ -176,14 +179,8 @@ window.story.state.dng.arena.loot=[]; //reset flags
 <%window.gm.moveHere();%> 
 </br>[[Retreat|AM_Lv2_Exit]] [[Map|AM_MAP_Level2]]</br> There is a loot chest !</br>
 <a0 onclick='window.story.show("AM_Lv2_B4")'>Ignore chest</a>
-<a0 onclick='cursedChest("AM_Lv2_B4");window.story.show("AM_Lv2_LootChest")'>Open chest</a>
+<a0 onclick='window.gm.cursedChest("AM_Lv2_B4");window.story.show("AM_Lv2_LootChest")'>Open chest</a>
 </article><article id="LogPanel"></article></section>
-<script> 
-function cursedChest(next) {
-  let rnd = _.random(0,100);
-  window.story.state.tmp.args=[window.passage.name,rnd,next];
-}
-</script>
 
 
 :: AM_Lv2_B4
@@ -198,7 +195,7 @@ function cursedChest(next) {
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.moveHere();%> Are you ready for your next fight?</br>
 <div></br>[[Retreat|AM_Lv2_Exit]] [[Map|AM_MAP_Level2]]</br>
-<a0 onclick='window.gm.fightArena("moleX2",[{id:"Money",count:30}],"AM_Lv2_B6")'>Continue to B6<a/></div>
+<a0 onclick='window.gm.fightArena("slug",[{id:"Money",count:30}],"AM_Lv2_B6")'>Continue to B6<a/></div>
 </article><article id="LogPanel"></article></section>
 
 
@@ -261,3 +258,19 @@ if(rnd>40) {
 }
 window.gm.printOutput(msg);
 </script>
+
+:: AM_Lv2_D3 [_nosave_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.moveHere();%> 
+</br>[[Retreat|AM_Lv2_Exit]] [[Map|AM_MAP_Level2]]</br> There is a loot chest !</br>
+<a0 onclick='window.story.show("AM_Lv2_D3")'>Ignore chest</a>
+<a0 onclick='window.gm.cursedChest("AM_Lv2_D4");window.story.show("AM_Lv2_LootChest")'>Open chest</a>
+</article><article id="LogPanel"></article></section>
+
+
+:: AM_Lv2_D4
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.moveHere();%> Are you ready for your next fight?</br>
+<div></br>[[Retreat|AM_Lv2_Exit]] [[Map|AM_MAP_Level2]]</br>
+<a0 onclick='window.gm.fightArena("slug",[{id:"Money",count:30}],"AM_Lv2_B6")'>Continue to B6<a/></div>
+</article><article id="LogPanel"></article></section>

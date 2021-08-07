@@ -95,12 +95,16 @@ class Ingredient extends Item {
         else if(style===30) this.id=this.name='SquishedLeech';
         else if(style===40) this.id=this.name='WolfTooth';
         else if(style===50) this.id=this.name='DryadVine';
+        else if(style===60) this.id=this.name='Dimetrium';
         else throw new Error(this.id +' doesnt know '+style);
     }
     get style() {return this._style;}
     get desc() { 
-        let msg ='yellow bluish flower';
+        let msg ='';
         switch(this._style) {
+            case 0: 
+                msg ='yellow bluish flower';
+                break;
             case 10:
                 msg='purple berrys grown in the forest';
                 break;
@@ -116,7 +120,10 @@ class Ingredient extends Item {
             case 50:
                 msg='fibers of a sturdy plant';
                 break;
-            default:
+            case 60:
+                msg='a arcane metal';
+                break;
+            default: throw new Error(this.id +' doesnt know '+style);
         }
         return(msg);
     }
@@ -217,7 +224,7 @@ class FlashBang extends Item {
                 }
                 result.msg = context.parent.name+' uses '+this.name+'.';
                 for(let _targ of on) {
-                    _targ.addEffect(effStunned.id,new effStunned());  //todo should 'FlashBang:Stunned' merge with other stunned? 
+                    _targ.addEffect(new effStunned(),effStunned.id);  //todo should 'FlashBang:Stunned' merge with other stunned? 
                     result.msg +=_targ.name+' got stunned. ';
                 }
                 result.OK=true;
@@ -236,7 +243,7 @@ class CanOfCoffee extends Item {
         if(context instanceof Inventory) {
             context.removeItem('CanOfCoffee');
             if(context.parent instanceof Character){
-                context.parent.addEffect('CanOfCoffee:Energized',new effEnergized());    //apply over-time-effect instead directly changing stat
+                context.parent.addEffect(new effEnergized(),'CanOfCoffee:Energized');    //apply over-time-effect instead directly changing stat
             return({OK:true, msg:context.parent.name+' gulped down a can of iced coffee.'});
             }
         } else throw new Error('context is invalid');
@@ -255,7 +262,7 @@ class SimpleFood extends Item {
             else _gaveAway=true;
             context.removeItem('Simple food');
             if(on instanceof Character){
-                on.addEffect('Simple food:Energized',new effEnergized());
+                on.addEffect(new effEnergized(),'Simple food:Energized');
             return({OK:true, msg:on.name+' ate some plain foods.'});
             }
         } else throw new Error('context is invalid');
@@ -304,7 +311,7 @@ class HorsePotion extends Item {
             context.removeItem(this.id);
             if(on instanceof Character){ 
                 if(on instanceof Character){
-                    on.addEffect('HorsePower',new effHorsePower());
+                    on.addEffect(new effHorsePower(),'HorsePower');
                     on.Stats.increment("health",100);on.Stats.increment("energy",100);
                 }
                 return({OK:true, msg:on.name+' drank a potion.'});
@@ -335,7 +342,7 @@ class RegenderPotion extends Item {
             if(on instanceof Character){ 
                 if(on instanceof Character){
                     window.gm.MutationsLib.swapGender(window.gm.player,
-                        window.storage.constructors[(this.style===0)?"VulvaHuman":"PenisHuman"]);
+                        new window.storage.constructors[(this.style===0)?"VulvaHuman":"PenisHuman"]);
                 }
                 return({OK:true, msg:on.name+' drank a potion.'});
             }
@@ -416,6 +423,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['WolfTooth'] = function(){ let x=new Ingredient();x.style=40;return(x);};
     ItemsLib['ApocaFlower'] = function(){ let x=new Ingredient();return(x);};
     ItemsLib['DryadVine'] = function(){ let x=new Ingredient();x.style=50;return(x);};
+    ItemsLib['Dimetrium'] = function(){ let x=new Ingredient();x.style=60;return(x);};
     //soulgem
     ItemsLib['TinySoulGem'] = function () { let x= new SoulGem();return(x); };
     //keys

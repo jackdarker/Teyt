@@ -63,13 +63,39 @@ class Wolf extends Mob {
         return(super.calcCombatMove(enemys,friends));
     }
 }
+class Slug extends Mob {
+    constructor() {
+        super();
+        this.name = this.id = 'Slug';
+        this.pic= 'assets/battlers/slug1.svg';
+        this.level_min =1;
+        this.Outfit.addItem(new BaseWorm());
+        this.Outfit.addItem(FaceLeech.factory('slug'));
+        this.fconv = null;
+    }
+    calcCombatMove(enemys,friends){
+        let result = {OK:true,msg:''};
+        let rnd = _.random(1,100);
+        //if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
+        result.action =result.target= null;
+        if(window.story.state.combat.turnCount%2===0) {
+            rnd = _.random(0,enemys.length-1);
+            result.action = "Bite";
+            result.target = [enemys[rnd]];
+            result.msg =this.name+" slurps at "+result.target[0].name+".</br>"+result.msg;
+            return(result);
+        }
+        return(super.calcCombatMove(enemys,friends));
+    }
+}
 class Leech extends Mob {
     constructor() {
         super();
         this.name = this.id = 'Leech';
-        this.pic= 'assets/Leech.png';    //todo
+        this.pic= 'assets/battlers/Leech.png';    //todo
         this.level_min =1;
         this.Outfit.addItem(new BaseWorm());
+        this.Outfit.addItem(FaceLeech.factory('leech'));
         this.Skills.addItem(new SkillLeechHealth());
         this.tmp = {grappleCoolDown:1};
         this.fconv = null; //lazy init because descfixer depends on gm.player
@@ -134,6 +160,52 @@ class Huntress extends Mob {
             result.action = "Guard";
             result.target = [this];
             result.msg =this.name+" retreats somewhat and moves into a defensive stance.</br>"+result.msg;
+            return(result);
+        }
+        return(super.calcCombatMove(enemys,friends));
+    }
+}
+class Succubus extends Mob {
+    static setup(type) {
+        let foe = new Succubus();
+        foe.Outfit.addItem(new WhipLeather());
+        return foe;
+    }
+    constructor() {
+        super();
+        this.name = this.id = 'Succubus';
+        this.pic= 'assets/battlers/succubus1.svg';
+        this.Outfit.addItem(new BaseHumanoid());
+        this.Outfit.addItem(new SkinHuman());
+        this.Outfit.addItem(HandsHuman.factory('human'));
+        this.Outfit.addItem(BreastHuman.factory('human'));
+        this.Outfit.addItem(new FaceHuman());
+        this.Outfit.addItem(VulvaHuman.factory('human'));
+        this.Outfit.addItem(new BikiniBottomLeather());
+        this.Outfit.addItem(new BikiniTopLeather());
+        let sk = new SkillGuard();
+        sk.style=2;
+        this.Skills.addItem(sk);
+        this.levelUp(4);
+        this.autoLeveling();
+        this.Skills.getItem(SkillTease.name).lvl=3;
+    }
+    calcCombatMove(enemys,friends){
+        let result = {OK:true,msg:''};
+        //if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
+        let rnd = _.random(1,100);
+        result.action =result.target= null;
+        //todo whiplash, call tentacles
+        if(window.story.state.combat.turnCount %3 ===0) {
+            result.action = "Guard";
+            result.target = [this];
+            result.msg =this.name+" retreats somewhat and moves into a defensive stance.</br>"+result.msg;
+            return(result);
+        } else if (window.story.state.combat.turnCount %4 ===0) {
+            rnd = _.random(0,enemys.length-1);
+            result.action = "Tease";
+            result.target = [enemys[rnd]];
+            result.msg =this.name+" throws a kiss at "+result.target[0].name+".</br>"+result.msg;
             return(result);
         }
         return(super.calcCombatMove(enemys,friends));
@@ -277,11 +349,13 @@ class Trent extends Mob {
 }
 //collection of mob-constructors
 window.gm.Mobs = (function (Mobs) {
-    Mobs.Mole = function () { return new Mole();  };
-    Mobs.Wolf = function () { return new Wolf();  };    
-    Mobs.Leech = function () { return new Leech();  };   
-    Mobs.Dryad = function () { return new Dryad();  }; 
-    Mobs.Vine = function () { return new Vine();  }; 
+    Mobs.Mole = function () { return new Mole();};
+    Mobs.Wolf = function () { return new Wolf();};    
+    Mobs.Leech = function () { return new Leech();};  
+    Mobs.Slug = function () { return new Slug();}; 
+    Mobs.Succubus = function () { return new Succubus();};
+    Mobs.Dryad = function () { return new Dryad();}; 
+    Mobs.Vine = function () { return new Vine();}; 
     Mobs.Mechanic = function () {return new Mechanic();};
     return Mobs; 
 }(window.gm.Mobs || {}));

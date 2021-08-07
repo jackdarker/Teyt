@@ -192,7 +192,7 @@ class PiercingClit extends Equipment {
     static fromJSON(value) {return(window.storage.Generic_fromJSON(PiercingClit, value.data));}
     onEquip(context) {
         if(this.style===100) {
-            context.parent.addEffect("effGrowVulva",window.storage.constructors['effGrowVulva']()); //only works for player since effects of NPC dont receive ticks!
+            context.parent.addEffect(new window.storage.constructors['effGrowVulva'](),"effGrowVulva",); //only works for player since effects of NPC dont receive ticks!
         } 
         return({OK:true, msg:'equipped'});}
 }
@@ -218,7 +218,7 @@ class TattooGroin extends Equipment {
     canUnequip() {return({OK:false, msg:'not so easy to get rid off'});}
     onEquip(context) {
         if(this.style===100) {
-            context.parent.addEffect("effLewdMark",window.storage.constructors['effLewdMark']()); //only works for player since effects of NPC dont receive ticks!
+            context.parent.addEffect(new window.storage.constructors['effLewdMark'](),"effLewdMark"); //only works for player since effects of NPC dont receive ticks!
         } 
         return({OK:true, msg:'tattoed'});}
 }
@@ -378,7 +378,7 @@ class WhipLeather extends Weapon {
         let mod = new SkillMod();
         mod.onHit = [{ target:target, eff: [effDamage.setup(5,'slash')]}];
         mod.critChance=5;
-        mod.onCrit = [{ target:target, eff: [effDamage.setup(15,'slash')]}];
+        mod.onCrit = [{ target:target, eff: [effDamage.setup(10,'slash'),effMasochist.setup(1)]}];
         return(mod);
     }
 }

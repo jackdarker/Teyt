@@ -125,17 +125,95 @@ class FaceHorse extends Equipment {
         return(fconv('$[I]$ $[have]$ a muzzle like a horse'));
     }
 }
+class FaceLeech extends Equipment {
+    static dataPrototype() {    
+        return({style:'leech'});    }
+    static factory(id) {
+        let obj =  new FaceLeech();
+        obj.setStyle(id);
+        return(obj);
+    }
+    constructor() {
+        super('FaceLeech');
+        this.addTags(['body']);
+        this.slotUse = ['bFace','bMouth'];
+        this.data = FaceLeech.dataPrototype();   
+    }
+    setStyle(id) {
+        this.data.style = id;
+        switch(id) {
+            case 'slug':
+                break;
+            case 'leech':
+                break;
+            default:
+                throw new Error("unknown Face-style "+id);
+        }
+    }
+    getStyle() { return this.data.style; }
+    get descShort() { return (this.desc);}
+    get desc() { return this.data.style+'\'like face.';}
+    toJSON() {return window.storage.Generic_toJSON("FaceLeech", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(FaceLeech, value.data));}
+    onEquip(context) {
+        let old = context.parent.Skills.countItem(SkillBite.name);
+        if(old>0) context.parent.Skills.removeItem(SkillBite.name,old);
+        context.parent.Skills.addItem(new SkillBite());
+        return({OK:true, msg:'shifted'});
+    }
+    onUnequip() {
+        let old = this.parent.parent.Skills.countItem(SkillBite.name);
+        if(old>0) this.parent.parent.Skills.removeItem(SkillBite.name,old);
+        return({OK:true, msg:'shifted'});
+    }
+    descLong(fconv) {
+        return(fconv('$[I]$ $[have]$ a muzzle like a '+this.data.style+'.'));
+    }
+    attackMod(target){
+        let mod = new SkillMod();
+        if(this.data.style==='slug') {
+            mod.onHit = [{ target:target, eff: [effDamage.setup(5,'acid','The slug spits some acid that eats at '+target.name+' armor.')]}];
+        } else {
+            mod.onHit = [{ target:target, eff: [effDamage.setup(5,'acid')]}];
+        }
+        return(mod);
+    }
+}
 class SkinHuman extends Equipment {
+    static dataPrototype() {    
+        return({style:'human', color:'olive', pattern: 'smooth'}); }
+    static factory(id) {
+        let obj =  new SkinHuman();
+        obj.setStyle(id);
+        return(obj);
+    }
     constructor() {
         super('SkinHuman');
         this.addTags(['body']);
         this.slotUse = ['bSkin'];
+        this.data = SkinHuman.dataPrototype();
     }
-    get desc() { 'a smooth tanned skin mostly bare of noticable hair.';}
+    setStyle(id,color='pale') {
+        this.data.style = id; 
+        this.data.color = color;
+        switch(id) {
+            case 'human':
+                this.data.pattern = 'smooth';
+                break;
+            case 'latex':
+                this.data.pattern = 'thick';
+                break;
+            default:
+                throw new Error("unknown Skin-style "+id);
+        }
+    }
+    getStyle() { return this.data.style; }
+    get descShort() { return (this.desc);}
+    get desc() { 'a smooth skin mostly bare of noticable hair.';}
     toJSON() {return window.storage.Generic_toJSON("SkinHuman", this); };
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkinHuman, value.data));}
     descLong(fconv) {
-        return(fconv('Smooth skin covers most of $[my]$ body.'));
+        return(fconv('$[My]$ body is covered with '+this.data.pattern+' '+this.data.color+' '+this.data.style+' skin.'));
     }
 }
 class SkinFur extends Equipment {
@@ -398,8 +476,8 @@ class VulvaHuman extends Equipment {
         return(fconv(msg));
     }
     onEquip(context){
-        context.parent.addEffect('effSpermInWomb',new window.storage.constructors['effSpermInWomb']());
-        context.parent.addEffect('effVaginalFertil',new window.storage.constructors['effVaginalFertil']());
+        context.parent.addEffect(new window.storage.constructors['effSpermInWomb'](),'effSpermInWomb');
+        context.parent.addEffect(new window.storage.constructors['effVaginalFertil'](),'effVaginalFertil');
         return({OK:true,msg:'equipped'});
     }
     onUnequip(context) {
@@ -548,7 +626,7 @@ window.gm.MutationsLib['vaginaSpermDissolve'] = function (char) {
                 pregnancy = new effVaginalPregnant();
                 pregnancy.data.type=vulva.data.spermtype;
                 if(lewdMark) pregnancy.data.type='soulgem'; 
-                char.addEffect(effVaginalPregnant.name, pregnancy)
+                char.addEffect(pregnancy,effVaginalPregnant.name)
             } else msg+="Hopefully there is nothing to worry about?</br>";
         }
     }    
@@ -567,7 +645,7 @@ window.gm.MutationsLib['vaginaPregnancy'] = function (char) {
         if(lewdMark && pregnancy.data.type==='soulgem') {
             if(pregnancy.data.cycles <=0) {
                 pregnancy = new effVaginalFertil();
-                char.addEffect(effVaginalFertil.name, pregnancy);
+                char.addEffect(pregnancy,effVaginalFertil.name);
                 msg+="A homemade soulgem slips out of your nethers !</br>";
                 char.Inv.addItem(window.gm.ItemsLib['TinySoulGem']());
             } else msg+="If you dont provide that soulgem something to feed off, it might absorb some energy from you instead!.</br>";
@@ -634,20 +712,20 @@ window.gm.MutationsLib['mutateWolf'] = function (char) {
             }
         }
     } else {
-        char.Outfit.addItem(window.storage.constructors[_TF].factory('wolf'));
+        char.Outfit.addItem(new window.storage.constructors[_TF].factory('wolf'));
         msg+="You have grown a fuzzy tail !</br>";
     }
     _TF = 'FaceWolf';
     let face = char.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bFace);
     let skin = char.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bSkin);
     if(face ===null || face.id !==_TF) {
-        char.Outfit.addItem(window.storage.constructors[_TF].factory('wolf'));
+        char.Outfit.addItem(new window.storage.constructors[_TF].factory('wolf'));
         msg+= "Your face got transformed into a dog-like muzzle.</br>"; 
     } else if(face.getStyle() !=='wolf') {
         face.setStyle('wolf');
         msg+= "Your not so human face got transformed into a dog-like muzzle.</br>"; 
     } else if(skin===null || skin.id !="SkinFur") {
-        char.Outfit.addItem(window.storage.constructors['SkinFur'].factory('wolf'));
+        char.Outfit.addItem(new window.storage.constructors['SkinFur'].factory('wolf'));
         msg+= "A dense coat of fur spreads over your body.</br>";
     }
     if(msg==='') msg= "Your anxiety goes by as you didnt get any more wolflike."
@@ -673,7 +751,7 @@ window.gm.MutationsLib['mutateCat'] = function(char) {
             }
         }
     } else {
-        char.Outfit.addItem(window.storage.constructors['TailWolf'].factory('cat'));
+        char.Outfit.addItem(new window.storage.constructors['TailWolf'].factory('cat'));
         msg=("You have grown a cat tail !</br>");
     }
     if(char===window.gm.player) {
@@ -698,7 +776,7 @@ window.gm.MutationsLib['mutateHorse'] = function(char) {
             }
         }
     } else {
-        char.Outfit.addItem(window.storage.constructors['TailWolf'].factory('horse'));
+        char.Outfit.addItem(new window.storage.constructors['TailWolf'].factory('horse'));
         msg=("You have grown a horse tail !</br>");
     }
     if(char===window.gm.player) {
@@ -718,7 +796,7 @@ window.gm.MutationsLib['growBreast'] = function(char) {
             msg=("Your bust size increased further.</br>");
         }
     } else {
-        char.Outfit.addItem(window.storage.constructors[_TF].factory('human'));
+        char.Outfit.addItem(new window.storage.constructors[_TF].factory('human'));
         msg="As you feel up your pecks you notice that they seem to be softer than before !</br>";
     }
     if(char===window.gm.player) {

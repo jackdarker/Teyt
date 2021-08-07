@@ -471,6 +471,30 @@ class effTired extends Effect {
         }
     }
 }
+class effCombatRecovery extends Effect {
+    constructor() {
+        super();
+        this.data.id = effCombatRecovery.name, this.data.name="recover", this.data.duration = 0, this.data.hidden=0;
+        this.eRecover=this.wRecover =10;
+    }
+    toJSON() {return window.storage.Generic_toJSON("effCombatRecovery", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(effCombatRecovery, value.data);};
+    get desc() {return(effCombatRecovery.name);}
+
+    onTimeChange(time) { }
+    onApply(){
+        this.data.time = window.gm.getTime();
+    }
+    onTurnStart() { //this is no combat effect but ticked in combat !
+        this.parent.parent.Stats.increment("energy",this.eRecover); //todo recovery depends on?
+        this.parent.parent.Stats.increment("will",this.wRecover);
+    }
+    merge(neweffect) {
+        if(neweffect.name===this.data.name) {
+            return(true);
+        }
+    }
+}
 class effEnergyDrain extends Effect {
     constructor() {
         super();
@@ -630,7 +654,7 @@ class effHorsePower extends Effect {
         if(this.data.magnitude>2) {
             let _i = this.parent.findItemSlot(this.data.id);
             if(_i<0) { //todo extend if exist?
-                this.parent.parent.addEffect(effMutateHorse.id, new effMutateHorse());
+                this.parent.parent.addEffect(new effMutateHorse(),effMutateHorse.name );
             }
         }
         if(this.data.duration<=0) { //remove yourself
@@ -910,11 +934,10 @@ class effHeal extends CombatEffect {
         }
     }
 }
-
 class effGuard extends CombatEffect {
     static setup(weapResist,eRecover,duration) {
         let x = new effGuard();
-        x.data.weapResist = weapResist; x.data.eRecover = eRecover;this.data.duration = duration;
+        x.data.weapResist = weapResist; x.data.eRecover = eRecover;x.data.duration = duration;
         return x;
     }
     constructor() {
@@ -927,9 +950,9 @@ class effGuard extends CombatEffect {
     get desc() {return(effGuard.name);}
     onApply(){
         this.data.duration = 2;
-        this.parent.parent.Stats.addModifier('rstblunt',{id:'rstblunt:Guard', bonus:this.weapResist});
-        this.parent.parent.Stats.addModifier('rstslash',{id:'rstblunt:Guard', bonus:this.weapResist});
-        this.parent.parent.Stats.addModifier('rstpierce',{id:'rstpierce:Guard', bonus:this.weapResist});
+        this.parent.parent.Stats.addModifier('rstblunt',{id:'rstblunt:Guard', bonus:this.data.weapResist});
+        this.parent.parent.Stats.addModifier('rstslash',{id:'rstslash:Guard', bonus:this.data.weapResist});
+        this.parent.parent.Stats.addModifier('rstpierce',{id:'rstpierce:Guard', bonus:this.data.weapResist});
     }
     merge(neweffect) {
         if(neweffect.name===this.data.name) {
@@ -946,7 +969,7 @@ class effGuard extends CombatEffect {
     }
     onRemove(){
         this.parent.parent.Stats.removeModifier('rstblunt',{id:'rstblunt:Guard'});
-        this.parent.parent.Stats.removeModifier('rstblunt',{id:'rstblunt:Guard'});
+        this.parent.parent.Stats.removeModifier('rstslash',{id:'rstslash:Guard'});
         this.parent.parent.Stats.removeModifier('rstpierce',{id:'rstpierce:Guard'});
     }
 }
@@ -979,11 +1002,11 @@ class effCombined extends CombatEffect {
     static fromJSON(value) { return window.storage.Generic_fromJSON(effCombined, value.data);};
 }
 class effDamage extends CombatEffect {
-    static setup(amount,type,onHitCB=null) {
+    static setup(amount,type,msg='') {
         let eff = new effDamage();
         eff.amount = amount;
         eff.type=type;
-        eff.onHit=onHitCB;
+        eff.castMsg=msg;
         return(eff);
     }
     constructor() {
@@ -1012,10 +1035,9 @@ class effDamage extends CombatEffect {
     onTurnStart() { this.data.duration-=1; if(this.data.duration<=0) this.parent.removeItem(this.data.id);    }
 }
 class effMasochist extends CombatEffect {
-    static setup(amount,type) {
+    static setup(amount) {
         let eff = new effMasochist();
         eff.amount = amount;
-        eff.type=type;
         return(eff);
     }
     constructor() {
@@ -1158,12 +1180,17 @@ class effUngrappling extends CombatEffect {
     onCombatEnd() { this.parent.removeItem(this.data.id); }
     onTurnStart() { this.data.duration-=1; if(this.data.duration<=0) this.parent.removeItem(this.data.id);    }
 }
+/**
+ * type says which bonus is applied from lewds
+ * lewds is calculated tease bonus from gear
+ */
 class effTeaseDamage extends CombatEffect {
-    static setup(amount,type,lewds) {
+    static setup(amount,type,lewds,msg='') {
         let eff = new effTeaseDamage();
         eff.amount = amount;
         eff.type = type;
         eff.lewds = lewds;
+        eff.castMsg=msg;
         return(eff);
     }
     constructor(amount) {

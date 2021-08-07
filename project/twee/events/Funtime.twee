@@ -22,7 +22,7 @@ Releasing the pressure on your nubs, they just feel numb right now.
 <script>
 function fondlebreast(elmnt) {
     elmnt.replaceWith("You nipple stiffens under this attention.");
-    window.gm.player.addEffect("effGrowBreast",window.storage.constructors['effGrowBreast']());
+    window.gm.player.addEffect(new window.storage.constructors['effGrowBreast'](),"effGrowBreast");
     window.gm.quests.forceQuestMilestone("qMyPleasure",100,1);
 }
 </script>
@@ -31,7 +31,7 @@ function fondlebreast(elmnt) {
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 The wolf raises a hind leg and gives your prone form a good amount of watering.
 After a final sniff it runs of into the woods.
-<div></br><a0 onclick='window.gm.player.addEffect("effMutateWolf",new window.storage.constructors["effMutateWolf"]());window.gm.postDefeat()');'>Black out</a></br></div>
+<div></br><a0 onclick='window.gm.player.addEffect(new window.storage.constructors["effMutateWolf"](),"effMutateWolf");window.gm.postDefeat()');'>Black out</a></br></div>
 </article><article id="LogPanel"></article></section>
 
 

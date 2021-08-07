@@ -22,7 +22,7 @@ The description of the class is sparse. The picture you see indicates that this 
 <p class="tPC">'I will choose male. Brad would make fun of me all time if I would choose any other option. On the other hand, it is roleplay right?'</p></br>
 <div id='select1' >
 <a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1a");window.gm.MutationsLib["swapGender"](window.gm.player,window.storage.constructors["PenisHuman"]);'>male</a>
-<a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1b");window.gm.MutationsLib["swapGender"](window.gm.player,window.storage.constructors["VulvaHuman"]);window.gm.player.Outfit.addItem(window.storage.constructors["BreastHuman"].factory("human"));'>female</a>
+<a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1b");window.gm.MutationsLib["swapGender"](window.gm.player,window.storage.constructors["VulvaHuman"]);window.gm.player.Outfit.addItem(new window.storage.constructors["BreastHuman"].factory("human"));'>female</a>
 </div><div id='choice1a' hidden> You selected male.
 </br>[[Ready|StartLocation]]</br>
 </div>

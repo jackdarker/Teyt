@@ -282,21 +282,6 @@ execCombatCmd(move) {
   */
   return(result);
 }
-startRound() { //todo unused??
-  var s = window.story.state;
-  s.combat.turnCount+=1;
-  var list = s.combat.allChars = s.combat.enemyParty.concat(s.combat.playerParty);
-  //update combateffects
-  for(var k=0; k<list.length;k++){
-    var effects = list[k].Effects.getAllIds();
-    for(var i=0; i<effects.length; i++) {
-      var effect = list[k].Effects.get(effects[i]);
-      if(effect.onCombatEnd!==null && effect.onCombatEnd!==undefined) {  //typeof effect === CombatEffect doesnt work? so we check presencse of attribut
-        effect.onTurnStart();
-      }
-    }
-  }
-}
 endCombat(){
   var s = window.story.state;
   s.combat.inCombat=false;
@@ -362,7 +347,6 @@ battleInit() {
   this.next=this.preTurn;
   return(result);
 };
-
 preTurn() {
   let result = {OK:false, msg:''};
   let s = window.story.state;
@@ -376,7 +360,7 @@ preTurn() {
     let effects = list[k].Effects.getAllIds();
     for(let i=0; i<effects.length; i++) {
       let effect = list[k].Effects.get(effects[i]);
-      if(effect.onCombatEnd!==null && effect.onCombatEnd!==undefined) {  //typeof effect === CombatEffect doesnt work? so we check presense of attribut
+      if(effect.onTurnStart!==null && effect.onTurnStart!==undefined) {  //typeof effect === CombatEffect doesnt work? so we check presense of attribut
         effect.onTurnStart();
       }
     }
@@ -597,12 +581,12 @@ window.gm.combat.calcAbsorb=function(attacker,defender, attack) {
   let result = {OK:true,msg:''}
   let rnd = _.random(1,100);
   if(attack.mod.onCrit.length>0 && rnd<attack.mod.critChance) {  //is critical
-    result.msg = defender.name +' got critical hit by '+attacker.name;
+    result.msg = defender.name +' got critical hit by '+attacker.name+'. ';
     for(el of attack.mod.onCrit) {
         attack.effects.push( {target:el.target, eff:el.eff}); //el.eff is []
     }
   } else {
-    result.msg = defender.name +' got hit by '+attacker.name;
+    result.msg = defender.name +' got hit by '+attacker.name+'. ';
     for(el of attack.mod.onHit) {
         attack.effects.push( {target:el.target, eff:el.eff});
     }
@@ -620,7 +604,8 @@ window.gm.combat.TypesDamage = [
   {id: 'spark'},
   {id: 'ice'},
   {id: 'fire'},
-  {id: 'poison'}
+  {id: 'poison'},
+  {id: 'acid'}
 ]
 
 //object to store attack-data

@@ -7,7 +7,7 @@ window.gm.getTimeStruct().hour
 window.gm.player.Inv.addItem(new window.gm.ItemsLib.SimpleFood(),2);
 window.gm.player.Inv.removeItem("PurpleBerry",5);
 window.gm.player.Inv.countItem("PurpleBerry");
-window.gm.player.Outfit.addItem(window.storage.constructors['BaseHumanoid']());
+window.gm.player.Outfit.addItem(new window.storage.constructors['BaseHumanoid']());
 
 window.gm.quests.addQuest("qDLCMain",1);
 window.gm.quests.forceQuestMilestone("qDLCMain",600,1);

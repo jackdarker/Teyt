@@ -52,7 +52,7 @@ class Character {
         this.Skills.addItem(new SkillUseItem());this.Skills.addItem(new SkillStruggle());this.Skills.addItem(new SkillAttack());
         this.Skills.addItem(new SkillStun());this.Skills.addItem(new SkillHeal());this.Skills.addItem(new SkillTease());
         this.Skills.addItem(new SkillFlee()),this.Skills.addItem(new SkillSubmit());    
-
+        this.Effects.addItem(new effCombatRecovery())
         window.storage.registerConstructor(Character);
     }
     toJSON() {return window.storage.Generic_toJSON("Character", this); }
@@ -180,11 +180,11 @@ class Character {
         this.Stats.increment('energy',regen);
         this.Stats.increment('will',regen);
         if(delta>360) {
-            this.Effects.addItem(effNotTired.name, new effNotTired());
+            this.Effects.addItem(new effNotTired());
         } 
     }
-    addEffect(id,effect) {
-        this.Effects.addItem(id,effect);
+    addEffect(effect,id) {
+        this.Effects.addItem(effect,id);
     }
     //helper function to change Relation 
     gainRelation(char,val) {

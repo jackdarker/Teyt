@@ -184,7 +184,6 @@ function getMoney(elmnt,val) {
 }
 function touchCatIdol(elmnt) {
 	elmnt.replaceWith("Its just a simple statue."); //elmnt.replaceWith("There is a tickling feeling in your hand.");
-	//window.gm.player.addEffect("effMutateCat",window.storage.constructors['effMutateCat']());
 }
 </script></section>
 

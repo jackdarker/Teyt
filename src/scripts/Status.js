@@ -169,7 +169,8 @@ class Effects extends Inventory {  //Todo a collection of Stats is similiar to I
         _eff.onRemove(this,this.list[_i]);
         this.postItemChange(id,"removed","");
     }
-    addItem(id,effect) {
+    addItem(effect,id='') {
+        if(id==='') id= effect.name;
         let _i = this.findItemSlot(id);
         let res;
         //if effect with same id is already present, merge them
@@ -220,9 +221,7 @@ class Effects extends Inventory {  //Todo a collection of Stats is similiar to I
     //override
     postItemChange(id,operation,msg) {
         window.gm.pushLog('Effects: '+operation+' '+id+' '+msg,
-            window.story.state._gm.debug || 
-            window.gm.player.name===window.story.state.playerVR.name ||
-            window.gm.player.name===window.story.state.playerRL.name);  //todo only show logs for player?
+            window.story.state._gm.debug || (window.gm.player && (window.gm.player.id === this.parent.parent.id)));
     }
 }
 
@@ -268,10 +267,12 @@ class Effect {
 //combat effect use turn-count instead of realtime as duration
 class CombatEffect extends Effect {
     constructor() {
-        super(); 
+        super(); this.castMsg='';
     }
-    get shortDesc() {return(this.desc+" for " + this.data.duration+" turns");}
-    //duration in turns !
+    // shown in skill-select
+    get shortDesc() {return(this.desc+" for " + this.data.duration+" turns");}  //duration in turns !
+    //shown in result
+    castDesc() {return(this.castMsg);}
     onCombatEnd() {}
     //called before targets turn
     onTurnStart() {}

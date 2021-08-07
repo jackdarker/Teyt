@@ -22,7 +22,11 @@ class SkillInspect extends Skill {
             result.OK = true;
             this.msg = 'resistance of ';//window.gm.printBodyDescription(targets[0],true);
             for(let el of window.gm.combat.TypesDamage) {
-                this.msg += el.id+ ' '+ targets[0].Stats.getItem('rst'+el.id).value +','; 
+                this.msg += el.id+ ' '+ targets[0].Stats.getItem('rst'+el.id).value +'%,'; 
+            }
+            this.msg+= '</br>armor of ';
+            for(let el of window.gm.combat.TypesDamage) {
+                this.msg += el.id+ ' '+ targets[0].Stats.getItem('arm'+el.id).value +','; 
             }
             //todo display stats dependign on skill
             result.msg =this.msg;
@@ -204,7 +208,7 @@ class SkillTease extends Skill {
     constructor() {
         super("Tease");
         this.msg = '';
-        this.magnitude=0.5;
+        this.lvl=1;
     }
     toJSON() {return window.storage.Generic_toJSON("SkillTease", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillTease, value.data));}
@@ -222,7 +226,7 @@ class SkillTease extends Skill {
             let dmg =5; //todo tease depends on teaseproficiency, clothing slutiness/nudeness,own arousal
             let lewds=this.caster.Outfit.getLewdness();
             if(this.parent.parent.Stats.getItem('arousal').value>40) dmg +=5;
-            dmg*=Math.max(0,this.magnitude);
+            dmg*=Math.max(0,0.5+this.lvl*0.15);
             this.msg = 'Shaking his hips, xxx trys to arouse the audience.'; //todo
             for(var target of targets) {
                 let attack =window.gm.combat.defaultAttackData();
@@ -234,13 +238,6 @@ class SkillTease extends Skill {
             }
         }
         return result
-    }
-    __slutDetector(target) {
-        let x=1; 
-        let lewd=this.caster.Outfit.getLewdness();
-        if(lewd.slut>3) x+=0.1; //todo bondage & SM
-        if(lewd.slut>6) x+=0.1;
-        return(x);
     }
     getCastDescription(result) {
         return(this.msg);

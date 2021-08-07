@@ -49,7 +49,7 @@ class SkillMod {
     constructor() {
         this.hitChance =100;
         this.critChance =4;
-        this.onHit = [];    // [{ target: 'target', eff: 'damage_pierce', damage: '11'}]
+        this.onHit = [];    // [{ target: 'target', eff: [combatEffect]]
         this.onCrit = [];
         this.onUse = [];
         this.onMiss = [];
@@ -127,11 +127,12 @@ cast(target){
         result.msg = "";
         for(var X of result.effects) {// for each target
             for(var Y of X.eff) {//...multiple effects
-                    X.target.addEffect(Y.id,Y);
+                    X.target.addEffect(Y,Y.id);
+                    result.msg+=Y.castDesc();
             }
         }
         cost.pay(this.parent.parent);
-        result.msg += this.getCastDescription(result); 
+        result.msg = this.getCastDescription(result)+result.msg; 
     }
     return(result)
 }

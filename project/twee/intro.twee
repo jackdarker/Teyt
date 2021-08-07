@@ -116,7 +116,7 @@ You can now pass the bridge and leave the forest.
     window.gm.quests.addQuest("qPurpleBerry",100);
     window.gm.enterVR();
     window.gm.MutationsLib['swapGender'](window.gm.player,window.storage.constructors["VulvaHuman"]);
-    window.gm.player.addEffect('effLewdMark',new window.storage.constructors['effLewdMark']());
+    window.gm.player.addEffect(new window.storage.constructors['effLewdMark'](),'effLewdMark');
 }
 </script>
 
