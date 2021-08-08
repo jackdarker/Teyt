@@ -37,7 +37,7 @@ class Wolf extends Mob {
     constructor() {
         super();
         this.name = this.id = 'Wolf';
-        this.pic= 'assets/bw_wolf1.png';
+        this.pic= 'assets/battlers/wolf1.svg';
         this.level_min =3;
         this.loot= [{id:'WolfTooth',chance:25,amount:1}];
         this.Outfit.addItem(new BaseQuadruped());
@@ -70,7 +70,8 @@ class Slug extends Mob {
         this.pic= 'assets/battlers/slug1.svg';
         this.level_min =1;
         this.Outfit.addItem(new BaseWorm());
-        this.Outfit.addItem(FaceLeech.factory('slug'));
+        this.Outfit.addItem(FaceLeech.factory('slug')); 
+        this.Outfit.addItem(ArmorTorso.factory('slime'));
         this.fconv = null;
     }
     calcCombatMove(enemys,friends){
@@ -92,7 +93,7 @@ class Leech extends Mob {
     constructor() {
         super();
         this.name = this.id = 'Leech';
-        this.pic= 'assets/battlers/Leech.png';    //todo
+        this.pic= 'assets/battlers/Leech1.svg';
         this.level_min =1;
         this.Outfit.addItem(new BaseWorm());
         this.Outfit.addItem(FaceLeech.factory('leech'));
@@ -188,7 +189,7 @@ class Succubus extends Mob {
         this.Skills.addItem(sk);
         this.levelUp(4);
         this.autoLeveling();
-        this.Skills.getItem(SkillTease.name).lvl=3;
+        this.Skills.getItem('Tease').level=3;
     }
     calcCombatMove(enemys,friends){
         let result = {OK:true,msg:''};
@@ -199,7 +200,7 @@ class Succubus extends Mob {
         if(window.story.state.combat.turnCount %3 ===0) {
             result.action = "Guard";
             result.target = [this];
-            result.msg =this.name+" retreats somewhat and moves into a defensive stance.</br>"+result.msg;
+            result.msg =this.name+" moves into a defensive stance.</br>"+result.msg;
             return(result);
         } else if (window.story.state.combat.turnCount %4 ===0) {
             rnd = _.random(0,enemys.length-1);
@@ -350,7 +351,8 @@ class Trent extends Mob {
 //collection of mob-constructors
 window.gm.Mobs = (function (Mobs) {
     Mobs.Mole = function () { return new Mole();};
-    Mobs.Wolf = function () { return new Wolf();};    
+    Mobs.Huntress = function () { return new Huntress();};
+    Mobs.Wolf = function () { return new Wolf();};
     Mobs.Leech = function () { return new Leech();};  
     Mobs.Slug = function () { return new Slug();}; 
     Mobs.Succubus = function () { return new Succubus();};

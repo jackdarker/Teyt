@@ -43,13 +43,14 @@ class SkillAttack extends Skill {
         super("Attack");
         this.msg = '';
         this.weapon='';
+        this.cost.energy =5;
     }
     toJSON() {return window.storage.Generic_toJSON("SkillAttack", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillAttack, value.data));}
     targetFilter(targets){
         return(this.targetFilterEnemy(this.targetFilterAlive(targets)));
     }
-    get desc() { return("Use weapon or claws to deal damage.");}
+    get desc() { return("Use weapon or claws to deal damage. "+this.getCost().asText());}
     previewCast(targets){
         var result = new SkillResult();
         result.skill =this;
@@ -71,19 +72,19 @@ class SkillAttack extends Skill {
         let attack =window.gm.combat.defaultAttackData();
         let lHand=this.caster.Outfit.getItemForSlot(window.gm.OutfitSlotLib.LHand);
         let rHand=this.caster.Outfit.getItemForSlot(window.gm.OutfitSlotLib.RHand);
-        attack.mod=new SkillMod();
+        attack.mod=null;
         if(rHand) { //get weapon damage info
             attack.mod=rHand.attackMod(target);
         } else if(lHand) { //todo dual wield?
             attack.mod=lHand.attackMod(target);
         }
-        if(!lHand && !rHand) { //if has no weapon get claw damage, mouth damage, ??
+        if(attack.mod===null) { //if has no weapon get claw damage, mouth damage, ??
             rHand=this.caster.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bHands);
             if(rHand && rHand.attackMod) {
                 attack.mod=rHand.attackMod(target);
             }
         }
-        if(!lHand && !rHand) { //fallback
+        if(attack.mod===null) { //fallback??
             let mod = new SkillMod();
             mod.onHit = [{ target:target, eff:[effDamage.setup(3,'blunt')]}];
             attack.mod=mod;
@@ -98,10 +99,11 @@ class SkillStrongHit extends SkillAttack {
     constructor() {
         super();this.id=this.name='StrongAttack'
         this.msg = '';this.weapon='';
+        this.cost.energy =20;
     }
     toJSON() {return window.storage.Generic_toJSON("SkillStrongHit", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillStrongHit, value.data));}
-    get desc() { return("Use "+this.weapon+" offensivly for increased critical chance but overall reduced hit chance.");}
+    get desc() { return("Use "+this.weapon+" offensivly for increased critical chance but overall reduced hit chance. "+this.getCost().asText());}
     previewCast(targets){
         var result = new SkillResult();
         result.skill =this;
@@ -146,7 +148,7 @@ class SkillBite extends SkillAttack {
     }
     toJSON() {return window.storage.Generic_toJSON("SkillBite", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillBite, value.data));}
-    get desc() { return("Use your maw to bite the foe.");}
+    get desc() { return("Use your maw to bite the foe. "+this.getCost().asText());}
     __estimateAttack(target) {
         let attack =window.gm.combat.defaultAttackData();
         let mouth=this.caster.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bMouth);
@@ -208,7 +210,6 @@ class SkillTease extends Skill {
     constructor() {
         super("Tease");
         this.msg = '';
-        this.lvl=1;
     }
     toJSON() {return window.storage.Generic_toJSON("SkillTease", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillTease, value.data));}
@@ -226,7 +227,7 @@ class SkillTease extends Skill {
             let dmg =5; //todo tease depends on teaseproficiency, clothing slutiness/nudeness,own arousal
             let lewds=this.caster.Outfit.getLewdness();
             if(this.parent.parent.Stats.getItem('arousal').value>40) dmg +=5;
-            dmg*=Math.max(0,0.5+this.lvl*0.15);
+            dmg*=Math.max(0,0.5+this.level*0.15);
             this.msg = 'Shaking his hips, xxx trys to arouse the audience.'; //todo
             for(var target of targets) {
                 let attack =window.gm.combat.defaultAttackData();
@@ -342,7 +343,9 @@ class SkillHeal extends Skill {
 class SkillFlee extends Skill {
     constructor() { 
         super("Flee"); 
-        this.msg = '';   }
+        this.msg = '';   
+        this.cost.energy =10; this.cost.will =10;
+    }
     toJSON() {return window.storage.Generic_toJSON("SkillFlee", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillFlee, value.data));}
     targetFilter(targets){
@@ -366,6 +369,7 @@ class SkillFlee extends Skill {
         }
         return result
     }
+    get desc() { return("Try to flee from combat. "+this.getCost().asText());}
     getCastDescription(result) {
         return(this.msg);
     }
@@ -674,4 +678,5 @@ Supraconductor: incoming ice-damage has chance to increase spark-damage output f
 BladeMace: deals slash or blunt-damage depending which would cause more damage
 
 PoisonCloud: small damage over time to lifing  
+
  */

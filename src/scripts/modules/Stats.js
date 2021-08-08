@@ -767,7 +767,7 @@ class effLewdMark extends Effect {
     onTimeChange(time) {
         //todo the mark indicates that you can bear soulgems; the stronger the mark, the better the gem
         //with each birth, the mark grows stronger;
-        //while you are pampering the gem, it sucks up your arcana if you dont have sex
+        //while pampering the gem, it sucks up your arcana if you dont have sex
         //chance to go into heat if you dont have a gem
         return(null);
     }
@@ -964,7 +964,7 @@ class effGuard extends CombatEffect {
     }
     onTurnStart() {
         this.data.duration-=1;
-        this.parent.parent.Stats.increment("energy",this.eRecover);
+        this.parent.parent.Stats.increment("energy",this.data.eRecover);
         if(this.data.duration<=0) this.parent.removeItem(this.data.id);
     }
     onRemove(){
@@ -1270,6 +1270,9 @@ class effCallHelp extends CombatEffect {
         this.data.item=item,this.data.faction=faction,this.data.amount=amount;
     }
 }
+
+//Todo effKamikaze if <10%health kill yourslef and damage all enemys 
+
 //skills
 class skCooking extends Effect {
     constructor() {
@@ -1313,6 +1316,7 @@ window.gm.StatsLib = (function (StatsLib) {
     window.storage.registerConstructor(stArmor);   
     //...effects
     window.storage.registerConstructor(effCallHelp);
+    window.storage.registerConstructor(effCombatRecovery);
     window.storage.registerConstructor(effDamage);
     window.storage.registerConstructor(effBleed);
     window.storage.registerConstructor(effCombined);

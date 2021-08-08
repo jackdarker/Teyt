@@ -77,9 +77,9 @@ You have some kind of map:</br>
 
           
 [Start]-[B2]-[B3]-[B4]-[B5]-[B6]-[B7]-[Exit]
-  |       |                   |
-[Shop]    |--[C3]-[C4]-[C5]---| 
-          |--[D3]-[D4]--------|
+  |      |                    |
+[Shop]   |- -[C3]-[C4]-[C5]- -| 
+         |- -[D3]-[D4]-  - - -|
 </pre>
 Remember: If you have earned some money you should weight the option to retreat and invest that money in better gear.
 That might give you better chances to survive the tougher fights at the cost of fighting the previous foes again.</br>
@@ -157,11 +157,58 @@ window.story.state.dng.arena.loot=[]; //reset flags
 /*foundGate-bits:
 1 = foundgate
 2 = placed soulgem
-4 = 
+4 = succubusdeal
 8 = impregnated bitch
 16,32,64,128 = preg-counter
 */
 </script>
+
+:: AM_SucDeal [_nosave_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<p class="tPC">Hey you, I would like to ask you something. Do you know where to get a soulgem?</p>
+<p class="tNPC1">Soulgems? Mages want them as do others that are related to arcana. But I dont have some...unfortunatly.</p>
+<p class="tPC">But where can I find one? Or can they be produced somehow?.</p>
+<p class="tNPC1">If you ask how you could produce one, there is in fact a way I could help you. Soulgems can be grown in a fertile woman. It requires some help of magic to do so.</p>
+<p class="tNPC1">Thats where I come into the game: I can grant you such power.</p>
+Of course there is some footangle with this. She is a demon after all and you should be careful what deal you make.</br>
+<p class="tPC">What prize would you have in mind for that power?</p>
+<p class="tNPC1">My life. You defeated me and could banish me from this plane of existence. But I would like to stay a little longer. So I would repay your kindness with this gift.</p>
+She smiles at you and is even able to not let it look to deviously. Should you take the deal?</br>
+[[Deal|AM_SucDeal2]] [[No Deal|AM_Lv2_Exit]]</br>
+</article><article id="LogPanel"></article></section>
+
+:: AM_SucDeal2 [_nosave_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<p class="tPC">What does this power exactly do and how do I use it?</p>
+<p class="tNPC1">Its a kind of arcane rune, some call it mark of the womb. If its placed on a woman and she is in an situation where she would receive a child, instead she would receive a soulgem.</p>
+<p class="tNPC1">...well a seed of a soulgem that would grow to a soulgem over time.</p>
+<p class="tPC">So this is only working for females?</p>
+<p class="tNPC1">Ahh, for males it would give them the opportunity to impregnate a woman with a soulgem, even if she doesnt bear the mark.</p>
+<p class="tPC">This sounds quite - improper ? I'm not even sure I would find someone to get started with. It's not like this is a big party where a lot of nice people hang around.</p>
+<p class="tNPC1">Oh, you neccesarily dont even need people.</p>
+<p class="tPC">Please?</p>
+She smiles at you and is even able to not let it look to deviously.</br>
+<p class="tNPC1">Well, it wouldn't ultimatly require another human to get this working. A healthy goblin would do the trick too, or anything alike... </p>
+<p class="tPC">I'm not really getting the picture here, and I even dont want too. </p>
+<p class="tNPC1">But you are interested in it. The spell I mean. It could still be helpful.</p>
+<a0 onclick='window.gm.player.Outfit.addItem(new window.gm.ItemsLib["LewdMark"]());window.story.state.dng.arena.foundGate|=0x4;window.story.show("AM_SucDeal3");'>Do it<a/> [[I will find another way|AM_Lv2_Exit]]</br>
+</article><article id="LogPanel"></article></section>
+
+
+:: AM_SucDeal3 [_nosave_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<p class="tPC">Fine, do it !</p>
+She smirks again and strides forward to step in front of you. Then the palm of her hand touches your stomach just below the ribs. And slides a little bit lower.</br> 
+<p class="tPC">Hey what are you...</p> 
+Just as you start to protest she begins to speak some strange words and your lower belly grows warm. Its not an unpleasent feeling and after a moment its gone and she takes her hand away.  
+<p class="tNPC1">All done, now go and start making some gems. And if things aren't going like planned, just come by again. Sometimes those spells need some adjustment.</p>
+<p class="tPC">Thanks...I mean...I will see about that.</p>
+Just to make sure everthing is ok, you check your abdomen below your cloths.
+<p class="tPC">Hey, wait whats that !?.</p> you found your groin to be tattoed with some purple colored rune, shaped like some triangle in tribal style.
+<p class="tNPC1">Thats the mark of course. Isn't it cute? Dont worry, usually it will fade away after some time.</p>
+That might be true, the color seem to grow lighter while you stare at it.</br>
+[[Leave|AM_Lv2_Exit]]
+</article><article id="LogPanel"></article></section>
 
 
 :: AM_Lv2_B2
@@ -170,7 +217,7 @@ window.story.state.dng.arena.loot=[]; //reset flags
 <div></br>[[Retreat|AM_Lv2_Exit]] [[Map|AM_MAP_Level2]]</br>
 <a0 onclick='window.gm.fightArena("moleX2",[{id:"Money",count:30}],"AM_Lv2_B3")'>Continue to B3<a/> 
 <a0 onclick='window.gm.fightArena("huntress",[{id:"Money",count:30}],"AM_Lv2_C3")'>Continue to C3<a/></div>
-<a0 onclick='window.gm.fightArena("succubus",[{id:"Money",count:30}],"AM_Lv2_D3")'>Continue to D3<a/></div>
+<a0 onclick='window.gm.fightArena("succubus",[{id:"Money",count:30}],"<%=((window.story.state.dng.arena.foundGate &0xF)===1)?"AM_SucDeal":"AM_Lv2_D3"%>")'>Continue to D3<a/></div>
 </article><article id="LogPanel"></article></section>
 
 

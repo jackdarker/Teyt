@@ -140,10 +140,6 @@ class WristCuffs extends Equipment {
             return( {OK:true, msg:'equipped '+ this.name}); //todo
         }
     }
-    canEquip(context) { 
-        if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) return({OK:true, msg:'unequip'});
-        else return({OK:true, msg:'equip'});
-    }
     canUnequip() {return({OK:false, msg:'Those cuffs can only be removed by a magican!'});}
 }
 class CollarQuest extends Equipment {
@@ -164,10 +160,6 @@ class CollarQuest extends Equipment {
             this.parent.parent.Outfit.addItem(this); 
             return( {OK:true, msg:'equipped '+ this.name}); //todo
         }
-    }
-    canEquip(context) { 
-        if(this.parent && this.parent.parent.Outfit.findItemSlot(this.id).length>0) return({OK:true, msg:'unequip'});
-        else return({OK:true, msg:'equip'});
     }
     canUnequip() {return({OK:false, msg:'This can only be removed by a magican!'});}
 }
@@ -214,7 +206,6 @@ class TattooGroin extends Equipment {
     }
     toJSON() {return window.storage.Generic_toJSON("TattooGroin", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(TattooGroin, value.data));}
-    canEquip(context) {return({OK:false, msg:'unequipable'});}
     canUnequip() {return({OK:false, msg:'not so easy to get rid off'});}
     onEquip(context) {
         if(this.style===100) {
@@ -586,6 +577,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['TailRibbon'] = function () { return new TailRibbon();};
     ItemsLib['PiercingClit'] = function () { return new PiercingClit();};
     ItemsLib['TattooGroin'] = function () { return new TattooGroin();};
+    ItemsLib['LewdMark'] = function () { let x= new TattooGroin();x.style=100;return(x); };
     ItemsLib['RobesZealot'] = function () { return new RobesZealot();};
     ItemsLib['WristCuffs'] = function () { return new WristCuffs();};
     ItemsLib['HarnessRubber'] = function () { return new HarnessRubber();};

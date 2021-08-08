@@ -152,6 +152,7 @@ class Equipment extends Item {
         }
         return(res);
     }
+    //call Outfit.addItem instead !
     onEquip(context) {
         for (el of this.bonus) {
             el.onEquip();

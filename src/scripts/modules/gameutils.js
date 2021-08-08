@@ -144,11 +144,13 @@ window.gm.getSidebarPic = function(){ //todo display doll ??
   }
   return('assets/icons/icon_cityskyline.svg');
 }
-// lookup function for scene background
+// lookup function for scene background ( 640x300 )
 window.gm.getScenePic = function(id){
-  if(id==='Garden' || id ==='Park')   return('assets/bg_park.png');
-  if(id==='Bedroom' || id==='Your Bedroom')   return('assets/bg_bedroom.png');
-  return('assets/bg_park.png');//todo placehodler
+  if(id==='Garden' || id ==='Park')   return('assets/bg/bg_park.png');
+  if(id==='Bedroom' || id==='Your Bedroom')   return('assets/bg/bg_bedroom.png');
+  if(id.slice(0,7)==='AM_Lv2_') return('assets/bg/bg_dungeon_2.png');
+
+  return('assets/bg/bg_VR_1.png');//todo placehodler
 }
 window.gm.enterVR=function() {
   let s= window.story.state;

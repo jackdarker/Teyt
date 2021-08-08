@@ -182,7 +182,49 @@ window.gm.sex.wolfOnPlayer=function(data) {
     }
     window.gm.sex.updateScene(entry); 
 }
-
+window.gm.sex.succubusOnPlayer=function(data) { //todo
+    let foo = window.gm.sex.dryadOnPlayer;
+    let player = window.gm.player;
+    let foe = window.story.state.combat.enemyParty[0]; //todo
+    window.gm.sex.beginScene();
+    let entry = document.createElement('p');
+    let createButton=window.gm.sex.createButton;
+    let newdata = {};//need a copy to create different data-values
+    if(data.state<0) { //quit if scene is done
+        if(data.battleResult==='victory') window.gm.postVictory(); 
+        else window.gm.postDefeat(); //todo flee, submit, defeat
+        return;
+    } else if(data.state===0) { //start-menu
+        if(data.battleResult==='victory') {
+            if(player.Stats.get('arousal').value>40) {
+                entry.textContent ="How about we get to know each other better?";
+                //detect gender,.. -> available position;
+                if(player.getPenis()) {
+                    data.state='plDomPosSelect';
+                        newdata = {},Object.assign(newdata,data);
+                        newdata.position = 'Mount Her';
+                        createButton(newdata.position,foo.bind(null,newdata));
+                }
+            } else entry.textContent ="You arent horny enough"; 
+            newdata = {},Object.assign(newdata,data);
+            newdata.state=-1;
+            createButton('Walk away',foo.bind(null,newdata));
+        } else {
+            entry.textContent ="The succubus strides over to your defeated form.</br> \"Lets see what we have here...\"</br>";
+            data.state='plSubOrgasm';
+            createButton('Get Dommed',foo.bind(null,data));
+        }
+    } else if(data.state==='plSubOrgasm') {
+            entry.textContent ="serving the Succubus";
+            data.state=-1;
+            Object.assign(newdata,data);
+            createButton("Pass out",foo.bind(null,newdata));
+        }
+        window.gm.sex.updateScene(entry); 
+    /**
+     * 
+     */
+}
 window.gm.sex.dryadOnPlayer=function(data) { //todo
     let foo = window.gm.sex.dryadOnPlayer;
     let player = window.gm.player;

@@ -1,5 +1,5 @@
 :: sidebar {"position":"375,500"}
-<h3><%=window.story.name%></h3><h3>V<%=window.gm.getSaveVersion().toString().replaceAll(",",".")%></h3>
+<h3><%=window.story.name%> V<%=window.gm.getSaveVersion().toString().replaceAll(",",".")%></h3>
 <img src='<%=window.gm.getSidebarPic()%>' width="256" height="256">
 <hr>
 <div style="font-size: smaller;"><%=window.gm.util.printLocationName(window.gm.player.location)%></br> <!--this looks often weird, extract [name:Forest] instead ??-->
@@ -43,7 +43,7 @@ document.querySelector('#settings').addEventListener('click', function(){window.
 
 :: CenterDialogs
 <!--called to include important dialogs; mainly the save-Dialog because of special behaviour-->
-<%=window.story.render("SaveDialog") %></br>
+<%=window.story.render("SaveDialog") %>
 
 
 :: LogPanel

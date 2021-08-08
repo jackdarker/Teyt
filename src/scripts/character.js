@@ -141,7 +141,6 @@ class Character {
                 this._data.unspentStat-=x;
             }
         }
-        
     }
     isDead() {return(this.Stats.get('health').value<=0);}
     /** 

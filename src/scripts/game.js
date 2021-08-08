@@ -619,14 +619,17 @@ window.gm.printEquipment= function( whom,item) {
   var s= window.story.state;
   var res,name,desc;
   name=item.name, desc=item.desc;
-  if(item.hasTag('body')) return; //skip bodyparts; tattoos & piercing cannot unequip
+  if(item.hasTag('body')) return; //skip bodyparts; 
+  let noWear = item.hasTag(['piercing','tattoo']); 
   let g,entry = document.createElement('p');
   g = document.createElement('a'),g.href='javascript:void(0)';
   g.textContent=item.name;g.id=item.id;
   g.addEventListener("click",(function(evt){document.querySelector("div#"+evt.target.id).toggleAttribute("hidden");}));
   entry.appendChild(g);
   g = document.createElement('a'),g.href='javascript:void(0)';
-  if(whom.Outfit.countItem(item.id)<=0) {
+  if(noWear===true) {
+    g.textContent='';//cannot un-/equip tattoos & piercing 
+  } else if(whom.Outfit.countItem(item.id)<=0) {
     g.textContent='Equip';
     g.addEventListener("click",(function(whom,item){
       return(function(){whom.Outfit.addItem(item);window.gm.refreshAllPanel();});})(whom,item));
@@ -708,7 +711,7 @@ window.gm.printEffectSummary= function(who='player',showstats=true,showfetish=fa
   for(var k=0;k<ids.length;k++){
       var data = window.story.state[who].Stats.get(ids[k])
       let isFetish = (data.id.slice(0,2)==='ft'); //Fetish starts with ft
-      let isResistance = (data.id.slice(0,3)==='rst'); //
+      let isResistance = (data.id.slice(0,3)==='rst')||(data.id.slice(0,3)==='arm'); //
       if(data.hidden!==4) {
         if(isFetish && showfetish && !(data.id.slice(-4,-2)==='_M') ) {
           //expects names of fetish like ftXXX and limits ftXXX_Min ftXXX_Max

@@ -64,7 +64,7 @@ spawnChar(item,party,amount){
       uid = Math.max(uid,parseInt(el.name.split('#')[1],10)+1);
     };
   }
-  mob.name = mob.name+"#"+uid.toString(); //TODO need unique name !!
+  mob.name = mob.name+"#"+uid.toString(); //need unique name !!
   if(party === 'Player') {
     mob.calcCombatMove=null; //hack to disable AI  todo
     s.combat.playerParty.push(mob);
@@ -311,7 +311,7 @@ fetchLoot(){ //if you are victorious: grant XP & transfer Loot to player
     for(var i = el.loot.length-1;i>=0;i--) {
       if(_rnd<=el.loot[i].chance) {
         msg+= el.loot[i].amount+'x '+el.loot[i].id+' ';
-        window.gm.player.changeInventory(el.loot[i].id,el.loot[i].amount);
+        window.gm.player.changeInventory(window.gm.ItemsLib[el.loot[i].id](),el.loot[i].amount);
       }
     }
     //XP reduced/increased if your level is bigger/smaller then foes by 25% per level

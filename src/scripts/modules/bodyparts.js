@@ -179,6 +179,69 @@ class FaceLeech extends Equipment {
         return(mod);
     }
 }
+//Armor for creatures not using equipment
+class ArmorTorso extends Equipment {
+    static dataPrototype() {    
+        return({style:'scales'}); }
+    static factory(id) {
+        let obj =  new ArmorTorso();
+        obj.setStyle(id);
+        return(obj);
+    }
+    constructor() {
+        super('ArmorTorso');
+        this.addTags(['body']);
+        this.slotUse = ['Breast','Stomach'];
+        this.data = ArmorTorso.dataPrototype();
+    }
+    setStyle(id) {
+        this.data.style = id;
+        switch(id) {
+            case 'scales':
+                break;
+            case 'slime':
+                break;
+            case 'fur':
+                    break;
+            default:
+                throw new Error("unknown Armor-style "+id);
+        }
+    }
+    getStyle() { return this.data.style; }
+    get descShort() { return (this.desc);}
+    get desc() { 'The '+this.data.style+' improves resistance.';}
+    toJSON() {return window.storage.Generic_toJSON("ArmorTorso", this); };
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(ArmorTorso, value.data));}
+    descLong(fconv) {
+        return(fconv('$[My]$ body is covered with '+this.data.style+' .'));
+    }
+    onEquip(context) {
+        let arm,rst;
+        for(let el of window.gm.combat.TypesDamage) {
+            arm=rst=0;
+            if(this.data.style ==='slime') {
+                if(el.id==='fire' || el.id==='poison' || el.id==='acid') arm=5,rst=70;
+
+            } else if(this.data.style ==='fur') {
+                if(el.id==='ice') arm=5,rst=30;
+                if(el.id==='blunt') arm=5,rst=20;
+            } else if(this.data.style ==='scales') {
+                if(el.id==='ice') rst=-30;
+                if(el.id==='slash') arm=5,rst=20;
+            }
+            if(arm!==0) context.parent.Stats.addModifier('arm'+el.id,{id:'arm'+el.id+':'+this.id, bonus:arm});
+            if(rst!==0) context.parent.Stats.addModifier('rst'+el.id,{id:'rst'+el.id+':'+this.id, bonus:rst});
+        }
+        return({OK:true, msg:'equipped'});
+    }
+    onUnequip() {
+        for(let el of window.gm.combat.TypesDamage) {
+            context.parent.Stats.removeModifier('arm'+el,{id:'arm'+el+':'+this.id});
+            context.parent.Stats.removeModifier('rst'+el,{id:'rst'+el+':'+this.id});
+        }
+        return({OK:true, msg:'unequipped'});
+    }
+}
 class SkinHuman extends Equipment {
     static dataPrototype() {    
         return({style:'human', color:'olive', pattern: 'smooth'}); }
@@ -556,6 +619,7 @@ class PenisHuman extends Equipment {
 }
 //todo BodyPartLib ??
 window.gm.ItemsLib = (function (ItemsLib) {
+    window.storage.registerConstructor(ArmorTorso);
     window.storage.registerConstructor(BaseHumanoid);
     window.storage.registerConstructor(BaseQuadruped);
     window.storage.registerConstructor(BaseWorm);
@@ -563,6 +627,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(HandsPaw);
     window.storage.registerConstructor(FaceHorse);
     window.storage.registerConstructor(FaceHuman);
+    window.storage.registerConstructor(FaceLeech);
     window.storage.registerConstructor(FaceWolf);
     window.storage.registerConstructor(SkinHuman);
     window.storage.registerConstructor(SkinFur);

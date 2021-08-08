@@ -7,8 +7,8 @@ window.gm.encounters = window.gm.encounters || {};
 window.gm.encounters.mole = function(location) {
     window.gm.Encounter = new Encounter();
     window.gm.Encounter.EnemyFunc = (function() { let x = new window.gm.Mobs.Mole(); x.scaleLevel(window.gm.player.level); return([x]);});
-    window.gm.Encounter.Location = location;
-    window.gm.Encounter.scenePic = window.gm.getScenePic(location);
+    window.gm.Encounter.Location = location?location:window.passage.name;
+    window.gm.Encounter.scenePic = window.gm.getScenePic(window.gm.Encounter.Location);
     window.gm.Encounter.onSubmit = function() {
         return('What will now happen to you?</br>'+ window.gm.printPassageLink('Next','Mole Submit'));
     }
@@ -23,8 +23,8 @@ window.gm.encounters.moleX2 = function(location) {
         a.name = a.name+"#1";
         b.name = b.name+"#2";
         return([a,b]);});
-    window.gm.Encounter.Location = location;
-    window.gm.Encounter.scenePic = window.gm.getScenePic(location);
+    window.gm.Encounter.Location = location?location:window.passage.name;
+    window.gm.Encounter.scenePic = window.gm.getScenePic(window.gm.Encounter.Location);
     window.gm.Encounter.onSubmit = function() {
         return('What will now happen to you?</br>'+ window.gm.printPassageLink('Next','Mole Submit'));
     }
@@ -39,8 +39,8 @@ window.gm.encounters.leech = function(location,amount=1) {
             mobs.push(x)
         }
         return(mobs);});
-    window.gm.Encounter.Location = location;
-    window.gm.Encounter.scenePic = window.gm.getScenePic(location);
+    window.gm.Encounter.Location = location?location:window.passage.name;
+    window.gm.Encounter.scenePic = window.gm.getScenePic(window.gm.Encounter.Location);
     window.gm.Encounter.initCombat();
 }
 window.gm.encounters.slug = function(location,amount=1) {
@@ -52,8 +52,8 @@ window.gm.encounters.slug = function(location,amount=1) {
             mobs.push(x)
         }
         return(mobs);});
-    window.gm.Encounter.Location = location;
-    window.gm.Encounter.scenePic = window.gm.getScenePic(location);
+    window.gm.Encounter.Location = location?location:window.passage.name;
+    window.gm.Encounter.scenePic = window.gm.getScenePic(window.gm.Encounter.Location);
     window.gm.Encounter.initCombat();
 }
 window.gm.encounters.succubus = function(location,amount=1) {
@@ -65,22 +65,28 @@ window.gm.encounters.succubus = function(location,amount=1) {
             mobs.push(x)
         }
         return(mobs);});
-    window.gm.Encounter.Location = location;
-    window.gm.Encounter.scenePic = window.gm.getScenePic(location);
+    window.gm.Encounter.Location = location?location:window.passage.name;
+    window.gm.Encounter.scenePic = window.gm.getScenePic(window.gm.Encounter.Location);
     window.gm.Encounter.initCombat();
 }
 window.gm.encounters.mechanicguy = function(location) {
     window.gm.Encounter = new Encounter();
     window.gm.Encounter.EnemyFunc = window.gm.Mobs.Mechanic;
-    window.gm.Encounter.Location = location;
-    window.gm.Encounter.scenePic = window.gm.getScenePic(location);
+    window.gm.Encounter.Location = location?location:window.passage.name;
+    window.gm.Encounter.scenePic = window.gm.getScenePic(window.gm.Encounter.Location);
     window.gm.Encounter.initCombat();
 }
-window.gm.encounters.huntress = function(location) {
+window.gm.encounters.huntress = function(location,amount=1) {
     window.gm.Encounter = new Encounter();
-    window.gm.Encounter.EnemyFunc = window.gm.Mobs.Huntress;
-    window.gm.Encounter.Location = location;
-    window.gm.Encounter.scenePic = window.gm.getScenePic(location);
+    window.gm.Encounter.EnemyFunc = (function() { 
+        let mobs =[];
+        for(var i=amount;i>0;i-=1) {
+            let x = new window.gm.Mobs.Huntress(); x.scaleLevel(window.gm.player.level);
+            mobs.push(x)
+        }
+        return(mobs);});
+    window.gm.Encounter.Location = location?location:window.passage.name;
+    window.gm.Encounter.scenePic = window.gm.getScenePic(window.gm.Encounter.Location);
     window.gm.Encounter.initCombat();
 }
 window.gm.encounters.wolf = function(location) {
@@ -94,8 +100,8 @@ window.gm.encounters.wolf = function(location) {
         }
         x.scaleLevel(window.gm.player.level);
         return([x]);});
-    window.gm.Encounter.Location = location;
-    window.gm.Encounter.scenePic = window.gm.getScenePic(location);
+    window.gm.Encounter.Location = location?location:window.passage.name;
+    window.gm.Encounter.scenePic = window.gm.getScenePic(window.gm.Encounter.Location);
     window.gm.Encounter.onSubmit =window.gm.Encounter.onDefeat = function() {
         return('You cannot fight anymore and surrender to the beast.</br>'+ window.gm.printPassageLink('Next','WolfSubmit'));
     }
@@ -120,14 +126,14 @@ window.gm.encounters.dryad = function(location,type=1) {
         let x = new window.gm.Mobs.Dryad();
         x.scaleLevel(window.gm.player.level);
         return([x]);});
-    window.gm.Encounter.Location = location;
+    window.gm.Encounter.Location = location?location:window.passage.name;
     window.gm.Encounter.onSubmit =window.gm.Encounter.onDefeat = function() {
         return('You cannot fight anymore and surrender to the strange woman.</br>'+ window.gm.printPassageLink('Next','DryadSubmit'));
     }
     window.gm.Encounter.onVictory = function() {
         return('The dryad has run out of energy.</br>'+this.fetchLoot()+'</br>'+ window.gm.printPassageLink('Next','DryadVictory'));
     }
-    window.gm.Encounter.scenePic = window.gm.getScenePic(location);
+    window.gm.Encounter.scenePic = window.gm.getScenePic(window.gm.Encounter.Location);
     window.gm.Encounter.initCombat();
 }
 /////////////////////////////////////////////////////////////
@@ -138,8 +144,8 @@ window.gm.encounters.Carlia = function(location) {
         let x = window.story.state.Carlia;
         x.Stats.increment("health",9999); x.Stats.increment("energy",9999);x.Stats.increment("will",9999);
         return([x]);});
-    window.gm.Encounter.Location = location;
-    window.gm.Encounter.scenePic = window.gm.getScenePic(location);
+    window.gm.Encounter.Location = location?location:window.passage.name;
+    window.gm.Encounter.scenePic = window.gm.getScenePic(window.gm.Encounter.Location);
     window.gm.Encounter.onSubmit =window.gm.Encounter.onDefeat = function() {
         return('You surrender to the monster-girl.</br>'+ window.gm.printPassageLink('Next','CarliaSubmit'));
     }
@@ -166,8 +172,8 @@ window.gm.encounters.Trent = function(location) {
         let x = window.story.state.Trent; 
         x.Stats.increment("health",9999); x.Stats.increment("energy",9999);x.Stats.increment("will",9999); 
         return([x]);});
-    window.gm.Encounter.Location = location;
-    window.gm.Encounter.scenePic = window.gm.getScenePic(location);
+    window.gm.Encounter.Location = location?location:window.passage.name;
+    window.gm.Encounter.scenePic = window.gm.getScenePic(window.gm.Encounter.Location);
     window.gm.Encounter.onSubmit =window.gm.Encounter.onDefeat = function() {
         return('You cannot fight anymore and surrender to the beast-man.</br>'+ window.gm.printPassageLink('Next','TrentSubmit'));
     }
@@ -182,8 +188,8 @@ window.gm.encounters.Ruff = function(location) {
         let x = window.story.state.Ruff; 
         x.Stats.increment("health",9999); x.Stats.increment("energy",9999);x.Stats.increment("will",9999); 
         return([x]);});
-    window.gm.Encounter.Location = location;
-    window.gm.Encounter.scenePic = window.gm.getScenePic(location);
+    window.gm.Encounter.Location = location?location:window.passage.name;
+    window.gm.Encounter.scenePic = window.gm.getScenePic(window.gm.Encounter.Location);
     window.gm.Encounter.onSubmit =window.gm.Encounter.onDefeat = function() {
         return('You cannot fight anymore and surrender to the beast-man.</br>'+ window.gm.printPassageLink('Next','TrentSubmit'));
     }
