@@ -294,6 +294,31 @@ window.gm.giveCyrilFood= function(){
         window.gm.printOutput("you have no food to spare");
     }
 };
+window.gm.printSceneGraphic2 = function () {
+  var  svgDoc = document.getElementById('layer1');
+   var node = SVG(svgDoc);
+   if(node) node.addTo(draw);
+};
+window.gm.printSceneGraphic=function() {
+  var width=600,height=300;
+  var draw = SVG().addTo('#canvas').size(width, height);
+  var background = draw.rect(width, height).attr({ fill: '#f06'});
+  var image = draw.symbol().image('assets/battlers/slug1.svg');
+  image.node.id='slug1';
+   var node = SVG(window.gm.images.wolf2());
+  if(node) node.addTo(draw.symbol());
+  var use  = draw.use('wolf2').move(-20, 20);
+  draw.use('slug1').move(20, 20);
+  draw.use('wolf2').move(100, 20).css({ cursor: 'pointer', fill: '#f03' });
+  var rect = draw.rect(100, 100).fill('#f09')
+  var node2 = SVG(window.gm.images.wolf2());
+  if(node2) node2.addTo(draw);
+  node2.node.getElementById('wolfbody').style.fill= '#f03';
+  var node3 = SVG(window.gm.images.wolf2());
+  node3.node.id='wolf3a';
+  if(node3) node3.addTo(draw);
+  SVG.find('#wolf3a #wolfbody')[0].node.style.fill= '#f03';
+}
 /*
 * ReactTest = a box is moing repeatedly left-right-left and the user has to click on it to 
 * stop it inside a hit area (success if center of moving box is inside one hit-area)

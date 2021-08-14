@@ -63,7 +63,7 @@ class Wolf extends Mob {
         return(super.calcCombatMove(enemys,friends));
     }
 }
-class Slug extends Mob {
+class Slug extends Mob {  //Todo swelling slug explodiert in schleimexplosion
     constructor() {
         super();
         this.name = this.id = 'Slug';

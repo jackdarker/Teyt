@@ -84,7 +84,7 @@ function clearview(){
     <button type="button" id="save8" <%=(window.story.state._gm.nosave?"disabled":"")%>>save 8</button><button type="button" id="load8">load 8</button>
     <button type="button" id="delete8">delete 8</button><label><output8></output8></label></br>
     <button type="button" id="saveFile" <%=(window.story.state._gm.nosave?"disabled":"")%>>save file...</button>
-    <input type="file" id="loadFile" name="image_uploads" onchange=readFile(this)></br>
+    <input type="file" id="loadFile" name="loadfile" onchange=readFile(this)></br>
     </form>
 </dialog>
 <script>

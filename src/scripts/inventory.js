@@ -20,6 +20,7 @@ class Item {
     targetFilter(targets) {
         return([]); //default unuseable in combat
     }
+    //tag or [tag]
     hasTag(tag) {
         if(tag instanceof Array) {
             for(var i=0;i<tag.length;i++) {
