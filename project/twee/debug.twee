@@ -12,7 +12,7 @@ Some things for debugging:</br>
 
 :: debug [_back_]
 <section> <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
-[[Back|_back_]] [[DebugTransform]] [[Styletest]] [[Emergency-Wardrobe|Wardrobe]] [[dont use!|debug_cheat]]</br>
+[[Back|_back_]] [[DebugTransform]] [[Styletest]] [[Emergency-Wardrobe|Wardrobe]] [[DebugImages]] [[dont use!|debug_cheat]]</br>
 Cheat buttons: those are meant for debugging and might break your game</br>
 <a0  onclick='window.gm.player.Inv.addItem(new window.storage.constructors["Money"](),200);window.gm.refreshAllPanel();'>Get 200$</a></br>
 </br>
@@ -54,7 +54,7 @@ Crash if you enter wrong things below !</br>
 
 :: DebugTransform  [_back_]
 <section> <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<div></br>[[Back|_back_]]</br>
+</br>[[Back|_back_]]</br>
 Test transformation events. Because they are deffered-events you need to return to story and move between rooms.</br>
 <a0 onclick='window.gm.MutationsLib.growBreast(window.gm.player)'>Breast grow</a></br>
 <a0 onclick='window.gm.MutationsLib.growVulva(window.gm.player)'>Vagina grow</a></br>
@@ -67,6 +67,15 @@ Test transformation events. Because they are deffered-events you need to return 
 <hr>Ferals:</br>
 </article><article id="LogPanel"></article></section>
 
+
+:: DebugImages  [_back_]
+<section> <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+</br>[[Back|_back_]]</br><div id='canvas'></div></br><div id='choice'></div></br>
+Test svg inlined in code.</br>
+<a0 onclick='window.gm.printSceneGraphic2("",window.gm.images.wolf1())'>wolf1</a></br>
+
+</article><article id="LogPanel"></article></section>
+<script>window.gm.listImages();</script>
 
 :: Styletest [_back_]
 <section> <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>

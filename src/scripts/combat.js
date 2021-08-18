@@ -75,6 +75,47 @@ spawnChar(item,party,amount){
 hideCombatOption() {
   document.querySelector("#choice").remove();
 }
+//renders background & combatants to #canvas
+renderCombatScene() {
+  var w=600,h=300;
+  var _pos =[[25,50],[75,50],[50,50]];
+  //style='"background: url(<%=s.combat.enemyParty[0].pic%>) no-repeat center/contain,url(<%=s.combat.scenePic%>) no-repeat center;color:black;"';
+  var draw = document.getElementById('canvas2');
+  draw.style.height ="300px";
+  var _back = `url("${window.story.state.combat.scenePic}") no-repeat center`;
+  var list = window.story.state.combat.enemyParty;
+  for(var i=list.length-1;i>=0;i--) {
+    var pos = _pos.pop();
+    _back =`url("${list[i].pic}") no-repeat ${pos[0]}% /contain,`+_back;
+    if(_pos.length<=0) break;
+  }
+  draw.style.background=_back;//`url("${window.story.state.combat.enemyParty[0].pic}") no-repeat center/contain,url("${window.story.state.combat.scenePic}") no-repeat center`;
+  
+  return;
+  var draw = SVG().addTo('#canvas').size(w, h);
+  draw.rect(w, h).attr({ fill: '#ffffff'});
+  draw.image(window.story.state.combat.scenePic);//.center(w/2,h/2); todo imagenode has width&height but js dont sees them
+  var list = window.story.state.combat.enemyParty;
+  for(var i=list.length-1;i>=0;i--) {
+    var node;
+    if('string' == (typeof list[i].pic)) { //is path to image
+      node=draw.image(list[i].pic,function (event) {
+        // image loaded
+        // this is the loading event for the underlying img element
+        // you can access the natural width and height of the image with
+        event.target.style.x=200;
+      });
+    } else { //is function returning svg-html
+      node = SVG(list[i].pic());
+      if(node) {
+        var pos = _pos.pop();
+        node.addTo(draw).center(pos[0],pos[1]); //this only works if there is width/height set in svg !
+      }
+    }
+    if(_pos.length<=0) break;
+  }
+
+}
 //creates a list of active effects for combat display
 printCombatEffects(char) {
   let list=[];

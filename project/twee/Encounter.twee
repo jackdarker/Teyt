@@ -1,15 +1,7 @@
-:: EncounterOBSOLETE {"position":"500,25"}
-<!--this passage is entry-point for combat-statemachine (use together with combat.initCombat) -->
-<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
-<%window.story.show("EncounterStartTurn")%><!--skipping ahead-->
-A <%=window.story.state.combat.enemyParty[0].name%> appears ! </br>
-[[Next|EncounterStartTurn]]
-</article><article id="LogPanel"></article></section>
-
 :: EncounterStartTurn [_nosave_] {"position":"650,25"}
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
-<!--todo multiple enemys-->
-<div id='combatCanvas' style='background: url(<%=s.combat.enemyParty[0].pic%>) no-repeat center/contain,url(<%=s.combat.scenePic%>) no-repeat center;color:black;'></div></br>
+<!--<div id='canvas' style='height:300px;background: url(<%=s.combat.enemyParty[0].pic%>) no-repeat center/contain,url(<%=s.combat.scenePic%>) no-repeat center;color:black;'></div>-->
+<div id='canvas2'></div></br>
 <div id="panel"></div></br> <!--filled by statspanel-->
 <div id="choice"></div></br> <!--filled by combat-statemachine-->
 <div id='output'></div></br>    <!--message is rendered here-->
@@ -18,6 +10,7 @@ A <%=window.story.state.combat.enemyParty[0].name%> appears ! </br>
 </section>
 <script>
 window.gm.printOutput(window.gm.Encounter.battle().msg);
+window.gm.Encounter.renderCombatScene();
 renderToSelector("#panel", "statspanel");
 </script>
 

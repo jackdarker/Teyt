@@ -56,6 +56,21 @@ window.gm.encounters.slug = function(location,amount=1) {
     window.gm.Encounter.scenePic = window.gm.getScenePic(window.gm.Encounter.Location);
     window.gm.Encounter.initCombat();
 }
+window.gm.encounters.slugLeech = function(location,amount=1) {
+    window.gm.Encounter = new Encounter();
+    window.gm.Encounter.EnemyFunc = (function() { 
+        let mobs =[];
+        for(var i=amount;i>0;i-=1) {
+            let x = new window.gm.Mobs.Slug(); x.scaleLevel(window.gm.player.level);
+            mobs.push(x);
+            x = new window.gm.Mobs.Leech(); x.scaleLevel(window.gm.player.level);
+            mobs.push(x);
+        }
+        return(mobs);});
+    window.gm.Encounter.Location = location?location:window.passage.name;
+    window.gm.Encounter.scenePic = window.gm.getScenePic(window.gm.Encounter.Location);
+    window.gm.Encounter.initCombat();
+}
 window.gm.encounters.succubus = function(location,amount=1) {
     window.gm.Encounter = new Encounter();
     window.gm.Encounter.EnemyFunc = (function() { 

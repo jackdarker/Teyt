@@ -35,7 +35,6 @@ This game is powered by twine/tweego and snowman.</br>
 :: Intro
 <article><%window.gm.initGame();window.gm.player.location=window.passage.name;%>
 <div id='output'></div>
-<div id='canvas'></div>
 <p>Welcome to Meason, a town somewhere in these days. </br>
 You are a student in the local university and live in a shared house with some other fellows. </br></p>
 <p class='author'>You might see a lot of links that are formated red-strikethrough. Those are currently broken and you shouldnt use them.</p>
@@ -50,10 +49,6 @@ debug only! :</br>
 [[FF WolfVictory]]</br>
 [[FF TestArena]]</br>
 </article>
-<script>
-//renderToSelector("#svgstore","SVG_Wolf2");
-window.gm.printSceneGraphic();
-</script>
 
 :: Intro2
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>

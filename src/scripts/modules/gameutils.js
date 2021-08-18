@@ -149,8 +149,7 @@ window.gm.getScenePic = function(id){
   if(id==='Garden' || id ==='Park')   return('assets/bg/bg_park.png');
   if(id==='Bedroom' || id==='Your Bedroom')   return('assets/bg/bg_bedroom.png');
   if(id.slice(0,7)==='AM_Lv2_') return('assets/bg/bg_dungeon_2.png');
-
-  return('assets/bg/bg_VR_1.png');//todo placehodler
+  return('assets/bg_park.png')//return('assets/bg/bg_VR_1.png');//todo placehodler
 }
 window.gm.enterVR=function() {
   let s= window.story.state;
@@ -300,6 +299,7 @@ window.gm.printSceneGraphic2 = function () {
    if(node) node.addTo(draw);
 };
 window.gm.printSceneGraphic=function() {
+  window.gm.printSceneGraphic2("",window.gm.images.wolf1()); return;
   var width=600,height=300;
   var draw = SVG().addTo('#canvas').size(width, height);
   var background = draw.rect(width, height).attr({ fill: '#f06'});
@@ -318,6 +318,30 @@ window.gm.printSceneGraphic=function() {
   node3.node.id='wolf3a';
   if(node3) node3.addTo(draw);
   SVG.find('#wolf3a #wolfbody')[0].node.style.fill= '#f03';
+}
+window.gm.printSceneGraphic2=function(background,item) {
+  var width=600,height=300;
+  var draw = document.querySelector("#canvas svg");
+  if(!draw) draw = SVG().addTo('#canvas').size(width, height);
+  else draw = SVG(draw);//recover svg document instead appending new one
+  var background = draw.rect(width, height).attr({ fill: '#303030'});
+  draw.image(background);
+  var node = SVG(item);
+  if(node) node.addTo(draw);
+}
+//for debug: builds link-list to display svg
+window.gm.listImages = function(){
+  let list = Object.keys(window.gm.images);
+  let g,entry = document.createElement('p');
+  entry.textContent ="";
+  for(let el of list) {
+    g = document.createElement('a');
+    g.href='javascript:void(0)',g.textContent=el;
+    const x = window.gm.images[el]();
+    g.addEventListener("click",window.gm.printSceneGraphic2.bind(this,"",x));
+    entry.appendChild(g);
+  };
+  $("div#choice")[0].appendChild(entry);      // <- requires this node in html
 }
 /*
 * ReactTest = a box is moing repeatedly left-right-left and the user has to click on it to 
