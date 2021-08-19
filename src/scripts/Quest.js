@@ -119,7 +119,6 @@ class QuestData {
 // the Questmanager contains a list of all quests
 // because of save/restore issues this contains only the IDs of the active quest and milestones; all other data is defined in questDef
 // todo: this should be singleton
-// todo rebuild old quest-milestone structure !!
 class QuestManager {
     //questDef is an object with properties that contain a quest-object and its milestones: questDef["myQuest"] = new Quest("myQuest") 
     constructor(questDef) {

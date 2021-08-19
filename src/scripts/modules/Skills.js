@@ -476,6 +476,7 @@ class SkillLeechHealth extends Skill {
             let foo = function() {
                 _old(); //override  but call orignial fct
                 eff.parent.parent.Stats.increment('health',5);  //todo scale by ??
+                return({OK:true,msg:''});
             }
             return(foo);
         } (this));
@@ -485,6 +486,7 @@ class SkillLeechHealth extends Skill {
             let foo = function() {
                 _old(); //override  but call orignial fct
                 eff.parent.parent.Stats.increment('health',-5);
+                return({OK:true,msg:''});
             }
             return(foo);
         } (this));

@@ -85,13 +85,16 @@ renderCombatScene() {
   var _back = `url("${window.story.state.combat.scenePic}") no-repeat center`;
   var list = window.story.state.combat.enemyParty;
   for(var i=list.length-1;i>=0;i--) {
-    var pos = _pos.pop();
-    _back =`url("${list[i].pic}") no-repeat ${pos[0]}% /contain,`+_back;
+    if(!list[i].isDead()) {
+      var pos = _pos.pop();
+      _back =`url("${list[i].pic}") no-repeat ${pos[0]}% /contain,`+_back;
+    }
     if(_pos.length<=0) break;
   }
   draw.style.background=_back;//`url("${window.story.state.combat.enemyParty[0].pic}") no-repeat center/contain,url("${window.story.state.combat.scenePic}") no-repeat center`;
   
   return;
+  /* images dont work well with svg
   var draw = SVG().addTo('#canvas').size(w, h);
   draw.rect(w, h).attr({ fill: '#ffffff'});
   draw.image(window.story.state.combat.scenePic);//.center(w/2,h/2); todo imagenode has width&height but js dont sees them
@@ -113,8 +116,7 @@ renderCombatScene() {
       }
     }
     if(_pos.length<=0) break;
-  }
-
+  }*/
 }
 //creates a list of active effects for combat display
 printCombatEffects(char) {
@@ -402,13 +404,14 @@ preTurn() {
     for(let i=0; i<effects.length; i++) {
       let effect = list[k].Effects.get(effects[i]);
       if(effect.onTurnStart!==null && effect.onTurnStart!==undefined) {  //typeof effect === CombatEffect doesnt work? so we check presense of attribut
-        effect.onTurnStart();
+        this.msg+=effect.onTurnStart().msg;
       }
     }
   }
   //calculate turnorder
   this.calcTurnOrder();
   this.next=this.checkDefeat;
+  if(this.msg!=='') result.OK=true,this.printNextLink(this.checkDefeat);
   return(result);
 }
 checkDefeat() { //check if party is defeated
@@ -471,8 +474,6 @@ selectMove() {
       result = s.combat.actor.calcCombatMove(window.story.state.combat.playerParty,window.story.state.combat.enemyParty);
       window.story.state.combat.action=result.action;
       window.story.state.combat.target=result.target;
-      //continue with execMove but memorize the moveselection message for display
-            //this.printNextLink(this.execMove) 
       this.next=this.execMove; 
       this.msg=result.msg;
       result.OK=false;

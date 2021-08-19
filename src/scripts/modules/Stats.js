@@ -488,6 +488,7 @@ class effCombatRecovery extends Effect {
     onTurnStart() { //this is no combat effect but ticked in combat !
         this.parent.parent.Stats.increment("energy",this.eRecover); //todo recovery depends on?
         this.parent.parent.Stats.increment("will",this.wRecover);
+        return({OK:true,msg:''});
     }
     merge(neweffect) {
         if(neweffect.name===this.data.name) {
@@ -932,6 +933,7 @@ class effHeal extends CombatEffect {
         else {
             this.parent.parent.Stats.increment('health',this.amount);
         }
+        return({OK:true,msg:''});
     }
 }
 class effGuard extends CombatEffect {
@@ -966,6 +968,7 @@ class effGuard extends CombatEffect {
         this.data.duration-=1;
         this.parent.parent.Stats.increment("energy",this.data.eRecover);
         if(this.data.duration<=0) this.parent.removeItem(this.data.id);
+        return({OK:true,msg:''});
     }
     onRemove(){
         this.parent.parent.Stats.removeModifier('rstblunt',{id:'rstblunt:Guard'});
@@ -979,7 +982,7 @@ class effCombined extends CombatEffect {
         super();
         this.effects = EffectsA.concat(EffectsB);
         this.data.id = this.data.name= effCombined.name, this.data.duration = 0, this.data.hidden=0;
-        for(el of EffectsA) {
+        for(el of this.effects) {
             el.onRemove = (function(me){
                 let _old = el.onRemove.bind(el); 
                 let foo = function() {
@@ -1032,7 +1035,7 @@ class effDamage extends CombatEffect {
         }
     }
     onCombatEnd() { this.parent.removeItem(this.data.id); }
-    onTurnStart() { this.data.duration-=1; if(this.data.duration<=0) this.parent.removeItem(this.data.id);    }
+    onTurnStart() { this.data.duration-=1; if(this.data.duration<=0) this.parent.removeItem(this.data.id); return({OK:true,msg:''}); return({OK:true,msg:''});  }
 }
 class effMasochist extends CombatEffect {
     static setup(amount) {
@@ -1056,7 +1059,7 @@ class effMasochist extends CombatEffect {
         }
     }
     onCombatEnd() { this.parent.removeItem(this.data.id); }
-    onTurnStart() { this.data.duration-=1; if(this.data.duration<=0) this.parent.removeItem(this.data.id);    }
+    onTurnStart() { this.data.duration-=1; if(this.data.duration<=0) this.parent.removeItem(this.data.id); return({OK:true,msg:''});   }
 }
 //damage over time todo affects only bleedable targets 
 class effBleed extends CombatEffect {
@@ -1084,6 +1087,7 @@ class effBleed extends CombatEffect {
         } else {
             this.parent.parent.Stats.increment('health',-1*this.amount);
         }
+        return({OK:true,msg:''});
     }
 }
 //the character is in close combat with whom; 
@@ -1120,8 +1124,7 @@ class effGrappled extends CombatEffect {
     onTurnStart() { 
         this.data.duration-=1; 
         if(this.data.duration<=0) {this.parent.removeItem(this.data.id);}  
-        else {
-        }
+        return({OK:true,msg:''});
     }
 }
 //when a char casts grappling, the target gets effGrappled and the caster gets effGrappling
@@ -1152,10 +1155,8 @@ class effGrappling extends CombatEffect {
     }
     onCombatEnd() { this.parent.removeItem(this.data.id); }
     onTurnStart() { this.data.duration-=1; 
-        if(this.data.duration<=0) {
-            this.parent.removeItem(this.data.id); 
-        } else {
-        }
+        if(this.data.duration<=0) {this.parent.removeItem(this.data.id); } 
+        return({OK:true,msg:''});
     }
 }
 class effUngrappling extends CombatEffect {
@@ -1178,7 +1179,7 @@ class effUngrappling extends CombatEffect {
         }
     }
     onCombatEnd() { this.parent.removeItem(this.data.id); }
-    onTurnStart() { this.data.duration-=1; if(this.data.duration<=0) this.parent.removeItem(this.data.id);    }
+    onTurnStart() { this.data.duration-=1; if(this.data.duration<=0) this.parent.removeItem(this.data.id); return({OK:true,msg:''});   }
 }
 /**
  * type says which bonus is applied from lewds
@@ -1213,7 +1214,7 @@ class effTeaseDamage extends CombatEffect {
         }
     }
     onCombatEnd() { this.parent.removeItem(this.data.id); }
-    onTurnStart() { this.data.duration-=1; if(this.data.duration<=0) this.parent.removeItem(this.data.id);    }
+    onTurnStart() { this.data.duration-=1; if(this.data.duration<=0) this.parent.removeItem(this.data.id); return({OK:true,msg:''});   }
 }
 class effStunned extends CombatEffect {
     constructor() {
@@ -1238,6 +1239,7 @@ class effStunned extends CombatEffect {
     onTurnStart() {
         this.data.duration-=1;
         if(this.data.duration<=0) this.parent.removeItem(this.data.id);
+        return({OK:true,msg:''});
     }
 } 
 class effCallHelp extends CombatEffect {
@@ -1265,13 +1267,48 @@ class effCallHelp extends CombatEffect {
             window.gm.Encounter.spawnChar(this.data.item,this.data.faction,this.data.amount);
             this.parent.removeItem(this.data.id);
         }
+        return({OK:true,msg:''});
+    }
+    configureSpawn(item,faction,amount=1) {
+        this.data.item=item,this.data.faction=faction,this.data.amount=amount;
+    }
+}
+//Todo effKamikaze if <10%health kill yourslef and damage all enemys 
+class effKamikaze extends CombatEffect {
+    constructor() {
+        super();
+        this.effect = null,
+        this.data.id = this.data.name= effKamikaze.name, this.data.duration = 0;
+    }
+    toJSON() {return window.storage.Generic_toJSON("effKamikaze", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(effKamikaze, value.data);};
+    get desc() {return(effKamikaze.name);}
+    onApply(){    }
+    merge(neweffect) {
+        if(neweffect.name===this.data.name) {    //ignore
+            return(true);
+        }
+    }
+    onCombatEnd() { this.parent.removeItem(this.data.id); }
+    onTurnStart() {
+        let result ={OK:true,msg:''};
+        let h = this.parent.parent.Stats.get('health').value, hmax= this.parent.parent.Stats.get('healthMax').value;
+        if(h/hmax<0.7) { //if health is low trigger effect and kill yourself
+            let targets= window.story.state.combat.playerParty;
+            for(let el of targets) {
+                el.addEffect(effDamage.setup(10,'slash'));
+            }
+            this.parent.removeItem(this.data.id);
+            this.parent.parent.Stats.increment("health",h*-1);
+            result.msg= this.parent.parent.name+' decides to explode in a fiery mess. ';
+        }
+        return(result);
     }
     configureSpawn(item,faction,amount=1) {
         this.data.item=item,this.data.faction=faction,this.data.amount=amount;
     }
 }
 
-//Todo effKamikaze if <10%health kill yourslef and damage all enemys 
 
 //skills
 class skCooking extends Effect {

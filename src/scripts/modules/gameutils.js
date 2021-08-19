@@ -298,7 +298,7 @@ window.gm.printSceneGraphic2 = function () {
    var node = SVG(svgDoc);
    if(node) node.addTo(draw);
 };
-window.gm.printSceneGraphic=function() {
+/*window.gm.printSceneGraphic=function() {
   window.gm.printSceneGraphic2("",window.gm.images.wolf1()); return;
   var width=600,height=300;
   var draw = SVG().addTo('#canvas').size(width, height);
@@ -318,7 +318,7 @@ window.gm.printSceneGraphic=function() {
   node3.node.id='wolf3a';
   if(node3) node3.addTo(draw);
   SVG.find('#wolf3a #wolfbody')[0].node.style.fill= '#f03';
-}
+}*/
 window.gm.printSceneGraphic2=function(background,item) {
   var width=600,height=300;
   var draw = document.querySelector("#canvas svg");

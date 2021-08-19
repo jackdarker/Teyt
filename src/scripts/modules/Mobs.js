@@ -79,6 +79,9 @@ class Slug extends Mob {  //Todo swelling slug explodiert in schleimexplosion
         let rnd = _.random(1,100);
         //if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
         result.action =result.target= null;
+        if(this.Stats.countItem(effKamikaze.name)<=0) {
+            this.addEffect(new effKamikaze());
+        }
         if(window.story.state.combat.turnCount%2===0) {
             rnd = _.random(0,enemys.length-1);
             result.action = "Bite";

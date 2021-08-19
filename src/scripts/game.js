@@ -9,7 +9,7 @@
  * @param {*} onend : optional CB fired after #calls or if function returns false
  */
 //todo unused because no simple way to stop running timer?!
-Function.prototype.Timer = function (interval, calls, onend) {
+/*Function.prototype.Timer = function (interval, calls, onend) {
   var count = 0;
   var payloadFunction = this;
   //payloadFunction.abortTimer = false;
@@ -32,7 +32,7 @@ Function.prototype.Timer = function (interval, calls, onend) {
     }
   };
   timerFunction();
-};
+};*/
 /*
 core functionality
 */

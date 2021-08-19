@@ -53,7 +53,6 @@ class Item {
 class Inventory {
     constructor(externlist) {  
         this.list = externlist ? externlist : [];
-        //todo this.noStack=false;  getItem(id+'§222')
       window.storage.registerConstructor(Inventory);
     }
     get parent() {return this._parent?this._parent():null;}

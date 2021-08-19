@@ -275,9 +275,9 @@ class CombatEffect extends Effect {
     castDesc() {return(this.castMsg);}
     onCombatEnd() {}
     //called before targets turn
-    onTurnStart() {}
-    //at end of targets turn
-    onTurnEnd() {}
+    onTurnStart() { return({OK:true,msg:''}); }
+    //at end of targets turn   UNUSED
+    //onTurnEnd() { return({OK:true,msg:''}); }
 }
 
 
