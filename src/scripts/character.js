@@ -109,7 +109,7 @@ class Character {
         this._data.XP-=reqXP; //calculate requires XP and subtract from already gained
         if(this._data.XP<0) this._data.XP=0;
         this._data.level+=add;
-        this._data.unspentStat+=add*5;  //todo 5pt Stat per Level?
+        this._data.unspentStat+=add*4;  //todo ?pt Stat per Level?
     }
     //overwrite this to define the wheighting for autoLeveling
     //returns an array of objects with "id" matching the statname and "wgt" as a number that defines the relativ wheight (f.e. if 1 stat should be 50% more then other set this to 20 and all other to 10)
@@ -189,7 +189,7 @@ class Character {
     gainRelation(char,val) {
         var _idx = this.Rel.findItemSlot(char);
         if(_idx<0) {
-            var _rel = stRelation.setup(this.Rel,val,100,char);
+            stRelation.setup(this.Rel,val,100,char);
         } else {
             this.Rel.increment(char,val);
         }

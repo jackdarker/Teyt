@@ -299,7 +299,7 @@ class HealthPotion extends Item {
     }
 }
 class HorsePotion extends Item {
-    constructor() { super('HorsePotion'); this.addTags([window.gm.ItemTags.Drink]);this.price=this.basePrice=5;this.style=0;}
+    constructor() { super('HorsePotion'); this.addTags([window.gm.ItemTags.Drink]);this.price=this.basePrice=15;this.style=0;}
     toJSON() {return window.storage.Generic_toJSON("HorsePotion", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(HorsePotion, value.data);};
     usable(context,on=null) {return({OK:true, msg:'drink'});}
@@ -311,8 +311,12 @@ class HorsePotion extends Item {
             context.removeItem(this.id);
             if(on instanceof Character){ 
                 if(on instanceof Character){
-                    on.addEffect(new effHorsePower(),'HorsePower');
-                    on.Stats.increment("health",100);on.Stats.increment("energy",100);
+                    if(this.style===0) {
+                        on.addEffect(new effHorsePower(),'HorsePower');
+                    } else if(this.style===10) {
+                        on.addEffect(new effLapineSpeed(),'LapineSpeed');
+                    }
+                    on.Stats.increment("health",80);on.Stats.increment("energy",40);
                 }
                 return({OK:true, msg:on.name+' drank a potion.'});
             }
@@ -320,7 +324,9 @@ class HorsePotion extends Item {
     }
     set style(style) {
         this._style = style;
-        this.id=this.name='HorsePotion';
+        if(style===0)  this.id=this.name='HorsePotion';
+        else if(style===10) this.id=this.name='CarrotJuice';
+        else throw new Error(this.id +' doesnt know '+style); 
     }
     get style() {return this._style;}
     get desc() { 
@@ -414,6 +420,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['HealthPotion'] = function () { let x= new HealthPotion();return(x); };
     ItemsLib['HealthPotionSmall'] = function () { let x= new HealthPotion();x.style=10;return(x); };
     ItemsLib['HorsePotion'] = function () { let x= new HorsePotion();return(x); }
+    ItemsLib['CarrotJuice'] = function () { let x= new HorsePotion();x.style=10;return(x); }
     ItemsLib['Vaginarium'] = function () { let x= new RegenderPotion();return(x); };
     ItemsLib['Penilium'] = function () { let x= new RegenderPotion();x.style=10;return(x); };
     //Ingredient

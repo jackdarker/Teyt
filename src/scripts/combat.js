@@ -159,24 +159,24 @@ printStats() {
       player2 50/100  10/20      Ork2  20/20   10/100
   */
  let elmt = '<table id=\"combatstats\"><tbody>';
-  elmt += "<tr><th>   </th><th>Player</th><th>Health</th><th>Arousal</th><th>Energy</th><th>Will</th><th>   </th><th>Enemys</th><th>Health</th><th>Arousal</th><th>Energy</th><th>Will</th></tr>";
+  elmt += "<tr><th>Player</th><th>Health</th><th>Arousal</th><th>Energy</th><th>Will</th><th>   </th><th>Enemys</th><th>Health</th><th>Arousal</th><th>Energy</th><th>Will</th></tr>";
   for(let i=0;(i<players.length || i<enemys.length);i++) {
     elmt += "<tr>";
     if(i<players.length) {
-      elmt += "<td></td>"+this.statsline(players[i],s.combat.actor && s.combat.actor.name==players[i].name);
+      elmt += this.statsline(players[i],s.combat.actor && s.combat.actor.name==players[i].name);
     } else {
-      elmt += "<td></td><td></td><td></td><td></td><td></td><td></td>";
+      elmt += "<td></td><td></td><td></td><td></td><td></td>";
     }
     if(i<enemys.length) {
       elmt += "<td></td>"+this.statsline(enemys[i],s.combat.actor==enemys[i]);
     } else {
-      elmt += "<tr><td></td><td></td><td></td><td></td><td></td><td></td>";
+      elmt += "<td></td><td></td><td></td><td></td><td></td><td></td>";
     }
     elmt += "</tr><tr>";
     if(i<players.length) { //effects as additional row
-      elmt += "<td></td><td></td><td colspan='3' style=\"font-size:smaller\">"+window.gm.Encounter.printCombatEffects(players[i])+"</td>";
+      elmt += "<td></td><td colspan='3' style=\"font-size:smaller\">"+window.gm.Encounter.printCombatEffects(players[i])+"</td>";
     } else {
-      elmt += "<td></td><td></td><td></td><td></td><td></td><td></td>";
+      elmt += "<td></td><td></td><td></td><td></td><td></td>";
     }
     if(i<enemys.length) {
       elmt += "<td></td><td></td><td colspan='3' style=\"font-size:smaller\">"+window.gm.Encounter.printCombatEffects(enemys[i])+"</td>";
@@ -605,7 +605,7 @@ window.gm.combat.calcParry=function(attacker,target, attack) {
     result.OK = false;
     if(rnd<10) {
       result.msg = target.name +' parried the attack and was even able to land a hit.'  //todo how to add textual variation based on used weapon and skill?
-      attack.effects.push( {target:attacker,eff:([effDamage.setup(5,"blunt")])}); //todo how much damage? 
+      attack.effects.push( {target:attacker,eff:([effDamage.factory(5,"blunt")])}); //todo how much damage? 
     } else {
       result.msg = target.name +' parried the attack.'
     }
@@ -690,7 +690,7 @@ window.gm.combat.scaleEffect = function(attack) {
           dmg = Math.max(1,(el.amount-arm)*(100-rst)/100);
           el.amount=dmg;
           if(target.Effects.findEffect("effMasochist").length>0) {
-            op[i].eff.push(effTeaseDamage.setup(dmg,'slut',{slut:1})); //todo lewd-calc
+            op[i].eff.push(effTeaseDamage.factory(dmg,'slut',{slut:1})); //todo lewd-calc
           }
         }
         if(el.name===effTeaseDamage.name) {

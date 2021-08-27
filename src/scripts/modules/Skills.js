@@ -86,7 +86,7 @@ class SkillAttack extends Skill {
         }
         if(attack.mod===null) { //fallback??
             let mod = new SkillMod();
-            mod.onHit = [{ target:target, eff:[effDamage.setup(3,'blunt')]}];
+            mod.onHit = [{ target:target, eff:[effDamage.factory(3,'blunt')]}];
             attack.mod=mod;
         }
         return(attack);
@@ -135,7 +135,7 @@ class SkillUltraKill extends SkillAttack {
     __estimateAttack(target) {
         let attack =window.gm.combat.defaultAttackData();
         attack.mod = new SkillMod();
-        attack.mod.onHit = [{ target:target, eff: [effDamage.setup(99999,'blunt')]}];
+        attack.mod.onHit = [{ target:target, eff: [effDamage.factory(99999,'blunt')]}];
         return(attack);
     }
 }
@@ -180,7 +180,7 @@ class SkillChainLightning  extends Skill {
             result.OK = true;
             let target = targets[0];
             let attack =window.gm.combat.defaultAttackData();
-            // attack.effects.push(effDamage.setup(15,'spark'))
+            // attack.effects.push(effDamage.factory(15,'spark'))
             //calc hit-chance
             //cause spark-dmg
             //chance to hit secondary target
@@ -232,7 +232,7 @@ class SkillTease extends Skill {
             for(var target of targets) {
                 let attack =window.gm.combat.defaultAttackData();
                 attack.mod= new SkillMod();
-                attack.mod.onHit=[{target:target, eff:[effTeaseDamage.setup(dmg,'slut',lewds)]}]
+                attack.mod.onHit=[{target:target, eff:[effTeaseDamage.factory(dmg,'slut',lewds)]}]
                 let result2 = window.gm.combat.calcTeaseAttack(this.caster,target,attack);
                 this.msg+=result2.msg;
                 result.effects = result.effects.concat(attack.effects); 
@@ -303,7 +303,7 @@ class SkillPoisonCloud extends Skill {
             for(var target of targets) {
                 let attack =window.gm.combat.defaultAttackData();
                 attack.mod= new SkillMod();
-                attack.mod.onHit = [{ target:target, eff: [effDamage.setup(this.amount,'poison')]}];
+                attack.mod.onHit = [{ target:target, eff: [effDamage.factory(this.amount,'poison')]}];
                 let result2 = window.gm.combat.calcAttack(this.caster,target,attack);
                 this.msg+=result2.msg;
                 result.effects = result.effects.concat(attack.effects); 
@@ -334,7 +334,7 @@ class SkillHeal extends Skill {
             result.OK = true;
             for(var target of targets) {
                 result.effects.push( {target:target,
-                    eff:[effHeal.setup(10)]})
+                    eff:[effHeal.factory(10)]})
                 }
         }
         return result
@@ -572,7 +572,7 @@ class SkillGuard extends Skill {
             result.OK = true;
             for(var target of targets) {
                 result.effects.push( {target:target,
-                    eff:[effGuard.setup(10*(1+this.style),this.style*20,this.style)]})
+                    eff:[effGuard.factory(10*(1+this.style),this.style*20,this.style)]})
             }
         }
         return result
@@ -612,7 +612,7 @@ class SkillUseItem extends Skill {
 }
 //calls reinforcement; set item before casting to the mob-name to spawn
 class SkillCallHelp extends Skill {
-    static setup(item) {
+    static factory(item) {
         let sk = new SkillCallHelp();
         sk.item = item;
         //todo delay and cooldown

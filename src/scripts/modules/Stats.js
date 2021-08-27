@@ -197,7 +197,7 @@ class stAgility extends Stat { // core attribute
     toJSON() {return window.storage.Generic_toJSON("stAgility", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stAgility, value.data);};
     updateModifier() {
-        this.parent.addModifier('energyMax',{id:'agility', bonus:this.parent.get('agility').value*2});
+        this.parent.addModifier('energyMax',{id:'agility', bonus:this.parent.get('agility').value*1.5});
     };
 }
 class stPerception extends Stat { // core attribute
@@ -215,7 +215,7 @@ class stPerception extends Stat { // core attribute
     toJSON() {return window.storage.Generic_toJSON("stPerception", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stPerception, value.data);};
     updateModifier() {
-        this.parent.addModifier('willMax',{id:'perception', bonus:this.parent.get('perception').value*2});
+        this.parent.addModifier('willMax',{id:'perception', bonus:this.parent.get('perception').value*1.5});
     };
 }
 class stLuck extends Stat { // core attribute
@@ -250,7 +250,7 @@ class stCharisma extends Stat { // core attribute
     toJSON() {return window.storage.Generic_toJSON("stCharisma", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stCharisma, value.data);};
     updateModifier() {
-        this.parent.addModifier('energyMax',{id:'charisma', bonus:this.parent.get('charisma').value*2});
+        this.parent.addModifier('energyMax',{id:'charisma', bonus:this.parent.get('charisma').value*1.5});
     };
 }
 class stIntelligence extends Stat { // core attribute
@@ -265,7 +265,7 @@ class stIntelligence extends Stat { // core attribute
     toJSON() {return window.storage.Generic_toJSON("stIntelligence", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stIntelligence, value.data);};
     updateModifier() {
-        this.parent.addModifier('willMax',{id:'intelligence', bonus:this.parent.get('intelligence').value*2});
+        this.parent.addModifier('willMax',{id:'intelligence', bonus:this.parent.get('intelligence').value*1.5});
     };
 }
 class stStrength extends Stat { // core attribute
@@ -280,7 +280,7 @@ class stStrength extends Stat { // core attribute
     toJSON() {return window.storage.Generic_toJSON("stStrength", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stStrength, value.data);};
     updateModifier() {
-        this.parent.addModifier('healthMax',{id:'strength', bonus:this.parent.get('strength').value*2});
+        this.parent.addModifier('healthMax',{id:'strength', bonus:this.parent.get('strength').value*1.5});
         //this.parent.addModifier('pAttack',{id:'strength', bonus:Math.floor(this.parent.get('strength').value/4)});
     };
 }
@@ -296,7 +296,7 @@ class stEndurance extends Stat { // core attribute
     toJSON() {return window.storage.Generic_toJSON("stEndurance", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stEndurance, value.data);};
     updateModifier() {
-        this.parent.addModifier('healthMax',{id:'endurance', bonus:this.parent.get('endurance').value*2});
+        this.parent.addModifier('healthMax',{id:'endurance', bonus:this.parent.get('endurance').value*1.5});
         //this.parent.addModifier('pDefense',{id:'strength', bonus:this.parent.get('endurance').value%4});
     };
 }
@@ -481,7 +481,6 @@ class effCombatRecovery extends Effect {
     static fromJSON(value) { return window.storage.Generic_fromJSON(effCombatRecovery, value.data);};
     get desc() {return(effCombatRecovery.name);}
 
-    onTimeChange(time) { }
     onApply(){
         this.data.time = window.gm.getTime();
     }
@@ -602,8 +601,7 @@ class effMutateHorse extends Effect {
     }
     toJSON() {return window.storage.Generic_toJSON("effMutateHorse", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(effMutateHorse, value.data);};
-    get desc() {return("horse-tastic");}
-
+    get desc() {return(this.data.name);}
     onTimeChange(time) {
         //after some time you mutate a bit
         this.data.duration-= window.gm.getDeltaTime(time,this.data.time);
@@ -615,8 +613,7 @@ class effMutateHorse extends Effect {
                     if(me.data.cycles<=0) { 
                         Effects.removeItem(me.data.id);
                     }
-                    window.gm.MutationsLib.effMutateHorse(this.parent.parent);
-                     //todo non-PC can be mutated (if receives timechange !) but the scene will assume its player?!
+                    this.__mutate();
                     Effects.removeItem(me.data.id);});
                 }(this));
             }
@@ -631,6 +628,19 @@ class effMutateHorse extends Effect {
             return(true);
         }
     }
+    __mutate() {
+        window.gm.MutationsLib.effMutateHorse(this.parent.parent);
+        //todo non-PC can be mutated (if receives timechange !) but the scene will assume its player?!
+    }
+}
+class effMutateBunny extends effMutateHorse {
+    constructor() {
+        super();
+        this.data.id = this.data.name= effMutateBunny.name;
+    }
+    toJSON() {return window.storage.Generic_toJSON("effMutateBunny", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(effMutateBunny, value.data);};
+    __mutate() { window.gm.MutationsLib.effMutateBunny(this.parent.parent); }
 }
 class effHorsePower extends Effect {
     constructor() {
@@ -640,7 +650,7 @@ class effHorsePower extends Effect {
     }
     toJSON() {return window.storage.Generic_toJSON("effHorsePower", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(effHorsePower, value.data);};
-     get desc() {return(effHorsePower.name);}
+    get desc() {return(this.data.name);}
 
     onTimeChange(time) {
         //+ 10Energy per hour
@@ -655,7 +665,7 @@ class effHorsePower extends Effect {
         if(this.data.magnitude>2) {
             let _i = this.parent.findItemSlot(this.data.id);
             if(_i<0) { //todo extend if exist?
-                this.parent.parent.addEffect(new effMutateHorse(),effMutateHorse.name );
+                this.__trgMutation();
             }
         }
         if(this.data.duration<=0) { //remove yourself
@@ -663,6 +673,9 @@ class effHorsePower extends Effect {
                 return function(Effects){ Effects.removeItem(me.data.id);}}(this));
         }
         return(null);
+    }
+    __trgMutation() {
+        this.parent.parent.addEffect(new effMutateHorse(),effMutateHorse.name );
     }
     onApply(){
         this.data.duration = 120;
@@ -673,9 +686,21 @@ class effHorsePower extends Effect {
         if(neweffect.id===this.data.id) {
             this.onApply(); //refresh 
             this.data.magnitude +=1; //bonus effect triggers only if added multiple times
-            window.gm.pushDeferredEvent("HorsePowerNotice",[this.data.magnitude]);
+            //window.gm.pushDeferredEvent("HorsePowerNotice",[this.data.magnitude]);
             return(true);
         }
+    }
+}
+class effLapineSpeed extends effHorsePower{
+    constructor() {
+        super();
+        this.data.id = this.data.name= effLapineSpeed.name;
+    }
+    toJSON() {return window.storage.Generic_toJSON("effLapineSpeed", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(effLapineSpeed, value.data);};
+    get desc() {return(effLapineSpeed.name);}
+    __trgMutation() {
+        this.parent.parent.addEffect(new effMutateBunny(),effMutateBunny.name );
     }
 }
 class effGrowBreast extends Effect {
@@ -901,8 +926,9 @@ class effSpermInWomb extends Effect {   //if you have womb filled with sperm, th
     }
 }
 /////////////// combateffects /////////////////////////
+//todo transformSelf: replace the caster with a different class & regenerate energy  
 class effHeal extends CombatEffect {
-    static setup(amount,duration=0) {
+    static factory(amount,duration=0) {
         let eff = new effHeal();
         eff.startduration=duration;
         eff.amount=amount;
@@ -937,7 +963,7 @@ class effHeal extends CombatEffect {
     }
 }
 class effGuard extends CombatEffect {
-    static setup(weapResist,eRecover,duration) {
+    static factory(weapResist,eRecover,duration) {
         let x = new effGuard();
         x.data.weapResist = weapResist; x.data.eRecover = eRecover;x.data.duration = duration;
         return x;
@@ -1005,7 +1031,7 @@ class effCombined extends CombatEffect {
     static fromJSON(value) { return window.storage.Generic_fromJSON(effCombined, value.data);};
 }
 class effDamage extends CombatEffect {
-    static setup(amount,type,msg='') {
+    static factory(amount,type,msg='') {
         let eff = new effDamage();
         eff.amount = amount;
         eff.type=type;
@@ -1038,7 +1064,7 @@ class effDamage extends CombatEffect {
     onTurnStart() { this.data.duration-=1; if(this.data.duration<=0) this.parent.removeItem(this.data.id); return({OK:true,msg:''}); return({OK:true,msg:''});  }
 }
 class effMasochist extends CombatEffect {
-    static setup(amount) {
+    static factory(amount) {
         let eff = new effMasochist();
         eff.amount = amount;
         return(eff);
@@ -1186,7 +1212,7 @@ class effUngrappling extends CombatEffect {
  * lewds is calculated tease bonus from gear
  */
 class effTeaseDamage extends CombatEffect {
-    static setup(amount,type,lewds,msg='') {
+    static factory(amount,type,lewds,msg='') {
         let eff = new effTeaseDamage();
         eff.amount = amount;
         eff.type = type;
@@ -1273,11 +1299,9 @@ class effCallHelp extends CombatEffect {
         this.data.item=item,this.data.faction=faction,this.data.amount=amount;
     }
 }
-//Todo effKamikaze if <10%health kill yourslef and damage all enemys 
-class effKamikaze extends CombatEffect {
+class effKamikaze extends CombatEffect { //if <10%health kill yourslef and damage all enemys
     constructor() {
         super();
-        this.effect = null,
         this.data.id = this.data.name= effKamikaze.name, this.data.duration = 0;
     }
     toJSON() {return window.storage.Generic_toJSON("effKamikaze", this); };
@@ -1294,9 +1318,9 @@ class effKamikaze extends CombatEffect {
         let result ={OK:true,msg:''};
         let h = this.parent.parent.Stats.get('health').value, hmax= this.parent.parent.Stats.get('healthMax').value;
         if(h/hmax<0.7) { //if health is low trigger effect and kill yourself
-            let targets= window.story.state.combat.playerParty;
+            let targets= window.story.state.combat.playerParty; //todo +enemyParty?
             for(let el of targets) {
-                el.addEffect(effDamage.setup(10,'slash'));
+                el.addEffect(effDamage.factory(10,'slash'));
             }
             this.parent.removeItem(this.data.id);
             this.parent.parent.Stats.increment("health",h*-1);
@@ -1372,6 +1396,8 @@ window.gm.StatsLib = (function (StatsLib) {
     window.storage.registerConstructor(effEnergyDrain);
 
     window.storage.registerConstructor(effHorsePower);
+    window.storage.registerConstructor(effLapineSpeed);
+    window.storage.registerConstructor(effMutateBunny);
     window.storage.registerConstructor(effMutateHorse);
     window.storage.registerConstructor(effMutateWolf);
     window.storage.registerConstructor(effMutateCat); 

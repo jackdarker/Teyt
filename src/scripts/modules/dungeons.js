@@ -314,8 +314,8 @@ class ShatteredCity extends DngDungeon{
         return(msg);
     }
     _fight(evt) {
-        if(evt===1) window.gm.encounters.wolf(window.gm.player.location);
-        else window.gm.encounters.wolf(window.gm.player.location);
+        if(evt===1) window.gm.encounters.wolf();
+        else window.gm.encounters.wolf();
     }
     _addItemToPlayer(id) {
         let item = new window.storage.constructors[id]();

@@ -87,18 +87,18 @@ The wolf doesnt do a thing, just stands there and looks at you.
 <div id='choice1a' hidden>
 I'm in this game right now for how long and havent killed anything? </br>
 Lets get started to earn some XP. </br>
-<a0 onclick='window.gm.encounters.wolf(window.gm.player.location)'>Next</a>
+<a0 onclick='window.gm.encounters.wolf()'>Next</a>
 </div>
 <div id='choice1b' hidden>
 There is nearly no chance in real life to accidently run into a wolf. So lets saviour that thrilling feeling even if this is not reallity.</br>
 That wolf is around 1m large from tip to toe. It has a dark gray fur with some darker areas on its back and feet.</br>
 Dark yellow eyes stare into your own and you stare back.</br>
 ...Which provokes the wolf to attack...  
-<a0 onclick='window.gm.encounters.wolf(window.gm.player.location)'>Next</a>
+<a0 onclick='window.gm.encounters.wolf()'>Next</a>
 </div>
 <%} else {%>
 There is a wolf again. Or is it the same?</br>
-<a0 onclick='window.gm.encounters.wolf(window.gm.player.location)'>Next</a>
+<a0 onclick='window.gm.encounters.wolf()'>Next</a>
 <%}%></br>
 <%=(window.story.state._gm.debug)?("[[Skip|_back_]]"):("")%></br>
 </article><article id="LogPanel"></article></section>

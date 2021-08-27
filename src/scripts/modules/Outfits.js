@@ -276,16 +276,38 @@ class BikiniTopLeather extends Equipment {
     static fromJSON(value) {return(window.storage.Generic_fromJSON(BikiniTopLeather, value.data));}
 }
 class ShortsLeather extends Equipment {
-    constructor() {
-        super('ShortsLeather');
-        this.addTags(['cloth']);
-        this.slotUse = ['Hips','Legs'];
-        this.slotCover = ['bPenis','bVulva','bBalls','bClit','bAnus','pPenis','pClit'];    
-        this.lossOnRespawn = true;
-    }
-    get desc() { return 'leather shorts';}
     toJSON() {return window.storage.Generic_toJSON("ShortsLeather", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(ShortsLeather, value.data));}
+    static factory(style) {
+        let x = new ShortsLeather();
+        x.style=style;
+        return(x);
+    }
+    constructor() {
+        super();
+        this.addTags(['cloth']);
+        this.slotUse = ['Hips','Legs'];
+        this.slotCover = ['bPenis','bVulva','bBalls','bClit','bAnus','pPenis','pClit'];   
+        this.lossOnRespawn = true;
+        this.style=0;
+    }
+    set style(style) { 
+        this._style = style; 
+        if(style===0) this.id=this.name='ShortsLeather';
+        else if(style===100) this.id=this.name='Loincloth';
+        else throw new Error(this.id +' doesnt know '+style);
+    }
+    get style() {return this._style;}
+    get desc() { 
+        let msg ='short trousers made from leather';
+        switch(this._style) {
+            case 100:
+                msg=('a crude loincloth made from leather');
+                break;
+            default:
+        }
+        return(msg);
+    }
 }
 //this is an Inventory-item, not wardrobe
 class Crowbar extends Weapon {
@@ -333,9 +355,9 @@ class BowWodden extends Weapon {
     }
     attackMod(target){
         let mod = new SkillMod();
-        mod.onHit = [{ target:target, eff: [effDamage.setup(6,'pierce')]}];
+        mod.onHit = [{ target:target, eff: [effDamage.factory(6,'pierce')]}];
         mod.critChance=25;
-        mod.onCrit = [{ target:target, eff: [effDamage.setup(10,'pierce')]}];
+        mod.onCrit = [{ target:target, eff: [effDamage.factory(10,'pierce')]}];
         return(mod);
     }
 }
@@ -350,9 +372,9 @@ class DaggerSteel extends Weapon {
     static fromJSON(value) {return(window.storage.Generic_fromJSON(DaggerSteel, value.data));}
     attackMod(target){
         let mod = new SkillMod();
-        mod.onHit = [{ target:target, eff: [effDamage.setup(5,'slash')]}];
+        mod.onHit = [{ target:target, eff: [effDamage.factory(5,'slash')]}];
         mod.critChance=50;
-        mod.onCrit = [{ target:target, eff: [effDamage.setup(5,'slash'),effDamage.setup(3,'pierce')]}];
+        mod.onCrit = [{ target:target, eff: [effDamage.factory(5,'slash'),effDamage.factory(3,'pierce')]}];
         return(mod);
     }
 }
@@ -367,9 +389,9 @@ class WhipLeather extends Weapon {
     static fromJSON(value) {return(window.storage.Generic_fromJSON(WhipLeather, value.data));}
     attackMod(target){
         let mod = new SkillMod();
-        mod.onHit = [{ target:target, eff: [effDamage.setup(5,'slash')]}];
+        mod.onHit = [{ target:target, eff: [effDamage.factory(5,'slash')]}];
         mod.critChance=5;
-        mod.onCrit = [{ target:target, eff: [effDamage.setup(10,'slash'),effMasochist.setup(1)]}];
+        mod.onCrit = [{ target:target, eff: [effDamage.factory(10,'slash'),effMasochist.factory(1)]}];
         return(mod);
     }
 }
@@ -392,14 +414,14 @@ class StaffWodden extends Weapon {
         return({OK:true, msg:'unequipped'});}
     attackMod(target){
         let mod = new SkillMod();
-        mod.onHit = [{ target:target, eff: [effDamage.setup(11,'blunt')]}];
+        mod.onHit = [{ target:target, eff: [effDamage.factory(11,'blunt')]}];
         mod.critChance=5;
-        mod.onCrit = [{ target:target, eff: [effDamage.setup(11,'blunt'), new effStunned()]}];
+        mod.onCrit = [{ target:target, eff: [effDamage.factory(11,'blunt'), new effStunned()]}];
         return(mod);
     }
 }
 class SpearWodden extends Weapon {
-    static setup(style) {
+    static factory(style) {
         let x = new SpearWodden();
         x.style=style;
         return(x);
@@ -440,9 +462,9 @@ class SpearWodden extends Weapon {
     attackMod(target){
         let mod = new SkillMod();
         let bonus = Math.floor(this.style/20);
-        mod.onHit = [{ target:target, eff: [effDamage.setup(8+bonus,'pierce')]}];
+        mod.onHit = [{ target:target, eff: [effDamage.factory(8+bonus,'pierce')]}];
         mod.critChance=5;
-        mod.onCrit = [{ target:target, eff: [effDamage.setup(10+bonus*1.5,'pierce'), new effBleed(4)]}];
+        mod.onCrit = [{ target:target, eff: [effDamage.factory(10+bonus*1.5,'pierce'), new effBleed(4)]}];
         return(mod);
     }
 }
@@ -511,9 +533,9 @@ class MaceSteel extends Weapon {
     static fromJSON(value) {return(window.storage.Generic_fromJSON(MaceSteel, value.data));}
     attackMod(target){
         let mod = new SkillMod();
-        mod.onHit = [{ target:target, eff: [effDamage.setup(11,'blunt')]}];
+        mod.onHit = [{ target:target, eff: [effDamage.factory(11,'blunt')]}];
         mod.critChance=50;
-        mod.onCrit = [{ target:target, eff: [effDamage.setup(11,'blunt'), new effStunned()]}];
+        mod.onCrit = [{ target:target, eff: [effDamage.factory(11,'blunt'), new effStunned()]}];
         return(mod);
     }
 }

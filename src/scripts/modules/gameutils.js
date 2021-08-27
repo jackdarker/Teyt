@@ -123,7 +123,7 @@ window.gm.initGame= function(forceReset,NGP=null) {
         ch.Outfit.addItem(new Pullover());
         //special skills
         ch.Effects.addItem(new effNotTired()); //depending on sleep Tired will be set to NotTired or Tired
-        //ch.Skills.addItem(SkillCallHelp.setup('Mole'));
+        //ch.Skills.addItem(SkillCallHelp.factory('Mole'));
         s.PlayerRL=ch;
     }
     /*let dngs = [BeeHive,ShatteredCity]; //add your dngs here !
@@ -178,8 +178,8 @@ window.gm.leaveVR=function() {
   window.gm.addTime(60);
   //todo copy fetish-stats back to RLPlayer ?
 }
-window.gm.fightArena=function(enc,prize,next) {
-  window.gm.encounters[enc](window.gm.player.location);
+window.gm.fightArena=function(enc,params,prize,next) {
+  window.gm.encounters[enc](params);
   window.gm.Encounter.onVictory = function() {
         window.story.state.dng.arena.loot=window.story.state.dng.arena.loot.concat(prize);
         return('You defeated the enemy. '+this.fetchLoot()+'</br>'+ 

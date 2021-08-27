@@ -150,7 +150,7 @@ You can store loot in this chest if you dont want to risk loosing it in battle. 
 </br>Are you ready for your first fight?</br>
 <div></br>[[Magic Chest|GlobalChest]] [[Shop|AM_Lv2_Shop]] [[Map|AM_MAP_Level2]] 
 <a href="javascript:void(0)" onclick='($("tw-passage").fadeOut(1000, function() {window.gm.player.sleep(700);window.story.show("AM_Lv2_Start");}));'>Sleep Until Morning</a>
-</br><a0 onclick='window.gm.fightArena("wolf",[{id:"Money",count:30}],"AM_Lv2_B2")'>Into battle<a/></div>
+</br><a0 onclick='window.gm.fightArena("wolf",null,[{id:"Money",count:30}],"AM_Lv2_B2")'>Into battle<a/></div>
 </article><article id="LogPanel"></article></section>
 <script>
 window.story.state.dng.arena.loot=[]; //reset flags
@@ -215,9 +215,9 @@ That might be true, the color seem to grow lighter while you stare at it.</br>
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.moveHere();%> Are you ready for your next fight?</br>
 <div></br>[[Retreat|AM_Lv2_Exit]] [[Map|AM_MAP_Level2]]</br>
-<a0 onclick='window.gm.fightArena("moleX2",[{id:"Money",count:30}],"AM_Lv2_B3")'>Continue to B3<a/> 
-<a0 onclick='window.gm.fightArena("huntress",[{id:"Money",count:30}],"AM_Lv2_C3")'>Continue to C3<a/></div>
-<a0 onclick='window.gm.fightArena("succubus",[{id:"Money",count:30}],"<%=((window.story.state.dng.arena.foundGate &0xF)===1)?"AM_SucDeal":"AM_Lv2_D3"%>")'>Continue to D3<a/></div>
+<a0 onclick='window.gm.fightArena("mole",{amount:2},[{id:"Money",count:30}],"AM_Lv2_B3")'>Continue to B3<a/> 
+<a0 onclick='window.gm.fightArena("huntress",null,[{id:"Money",count:30}],"AM_Lv2_C3")'>Continue to C3<a/></div>
+<a0 onclick='window.gm.fightArena("succubus",null,[{id:"Money",count:30}],"<%=((window.story.state.dng.arena.foundGate &0xF)===1)?"AM_SucDeal":"AM_Lv2_D3"%>")'>Continue to D3<a/></div>
 </article><article id="LogPanel"></article></section>
 
 
@@ -234,7 +234,7 @@ That might be true, the color seem to grow lighter while you stare at it.</br>
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.moveHere();%> Are you ready for your next fight?</br>
 <div></br>[[Retreat|AM_Lv2_Exit]] [[Map|AM_MAP_Level2]]</br>
-<a0 onclick='window.gm.fightArena("moleX2",[{id:"Money",count:30}],"AM_Lv2_B5")'>Continue to B5<a/></div>
+<a0 onclick='window.gm.fightArena("mole",{amount:2},[{id:"Money",count:30}],"AM_Lv2_B5")'>Continue to B5<a/></div>
 </article><article id="LogPanel"></article></section>
 
 
@@ -242,7 +242,7 @@ That might be true, the color seem to grow lighter while you stare at it.</br>
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.moveHere();%> Are you ready for your next fight?</br>
 <div></br>[[Retreat|AM_Lv2_Exit]] [[Map|AM_MAP_Level2]]</br>
-<a0 onclick='window.gm.fightArena("slug",[{id:"Money",count:30}],"AM_Lv2_B6")'>Continue to B6<a/></div>
+<a0 onclick='window.gm.fightArena("slug",null,[{id:"Money",count:30}],"AM_Lv2_B6")'>Continue to B6<a/></div>
 </article><article id="LogPanel"></article></section>
 
 
@@ -301,7 +301,7 @@ if(rnd>40) {
 } else {
   msg+='trouble !';
   foo=(function(){ window.story.state.tmp.args=[]; 
-    window.gm.fightArena("moleX2",[{id:"Money",count:30}],next);});
+    window.gm.fightArena("mole",{amount:2},[{id:"Money",count:30}],next);});
 }
 window.gm.printOutput(msg);
 </script>
@@ -319,5 +319,5 @@ window.gm.printOutput(msg);
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.moveHere();%> Are you ready for your next fight?</br>
 <div></br>[[Retreat|AM_Lv2_Exit]] [[Map|AM_MAP_Level2]]</br>
-<a0 onclick='window.gm.fightArena("slug",[{id:"Money",count:30}],"AM_Lv2_B6")'>Continue to B6<a/></div>
+<a0 onclick='window.gm.fightArena("slug",null,[{id:"Money",count:30}],"AM_Lv2_B6")'>Continue to B6<a/></div>
 </article><article id="LogPanel"></article></section>

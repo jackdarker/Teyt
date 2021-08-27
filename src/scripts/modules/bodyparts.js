@@ -104,7 +104,7 @@ class FaceWolf extends Equipment {
     }
     attackMod(target){
         let mod = new SkillMod();
-        mod.onHit = [{ target:target, eff: [effDamage.setup(11,'slash')]}];
+        mod.onHit = [{ target:target, eff: [effDamage.factory(11,'slash')]}];
         return(mod);
     }
 }
@@ -172,9 +172,9 @@ class FaceLeech extends Equipment {
     attackMod(target){
         let mod = new SkillMod();
         if(this.data.style==='slug') {
-            mod.onHit = [{ target:target, eff: [effDamage.setup(5,'acid','The slug spits some acid that eats at '+target.name+' armor.')]}];
+            mod.onHit = [{ target:target, eff: [effDamage.factory(5,'acid','The slug spits some acid that eats at '+target.name+' armor.')]}];
         } else {
-            mod.onHit = [{ target:target, eff: [effDamage.setup(5,'acid')]}];
+            mod.onHit = [{ target:target, eff: [effDamage.factory(5,'acid')]}];
         }
         return(mod);
     }
@@ -297,7 +297,7 @@ class SkinFur extends Equipment {
         this.data.style = id; 
         this.data.color = color;
         switch(id) {
-            case 'cat':
+            case 'cat','bunny':
                 this.data.pattern = 'fine';
                 break;
             case 'dog':
@@ -322,6 +322,40 @@ class SkinFur extends Equipment {
         return(fconv('A '+this.data.pattern+', '+this.data.color+' fur covers $[my]$ body.'));
     }
 }
+class SkinScales extends Equipment {
+    static dataPrototype() {    
+        return({style:'lizard', color:'dark green', pattern: 'smooth'}); }
+    static factory(id) {
+        let obj =  new SkinScales();
+        obj.setStyle(id);
+        return(obj);
+    }
+    constructor() {
+        super('SkinScales');
+        this.addTags(['body']);
+        this.slotUse = ['bSkin'];
+        this.data = SkinScales.dataPrototype();
+    }
+    setStyle(id,color='dark grey') {
+        this.data.style = id; 
+        this.data.color = color;
+        switch(id) {
+            case 'lizard':
+                this.data.pattern = 'smooth';
+                break;
+            default:
+                throw new Error("unknown Fur-style "+id);
+        }
+    }
+    getStyle() { return this.data.style; }
+    get descShort() { return (this.desc);}
+    get desc() { 'scales like a eptile.';}  //todo color
+    toJSON() {return window.storage.Generic_toJSON("SkinScales", this); };
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(SkinScales, value.data));}
+    descLong(fconv) {
+        return(fconv('$[My]$ body is covered in '+this.data.pattern+', '+this.data.color+' scales.'));
+    }
+}
 class TailWolf extends Equipment {
     static dataPrototype() {    
         return({style:'wolf',growth:0.1, maxGrowth: 1.5});    }
@@ -337,17 +371,22 @@ class TailWolf extends Equipment {
         this.data = TailWolf.dataPrototype();  
     }
     setStyle(id) {
+        this.data.style = id;
         switch(id) {
-            case 'human':
             case 'cat':
             case 'dog':
             case 'horse':
             case 'wolf':
-            case 'lizard':
-                this.data.style = id; 
+            case 'lizard':  
                 this.data.growth = 0.10; //in %/100 maxGrowth
                 this.data.maxGrowth = 1.2; //in meter, todo depends on bodysize
                 break;
+            case 'bunny':
+                this.data.growth = 0.40; //in %/100 maxGrowth
+                this.data.maxGrowth = 0.2; //in meter, todo depends on bodysize
+            case 'human':
+                this.data.growth =1;
+                this.data.maxGrowth = 0.0; //todo no tail??
             default:
                 throw new Error("unknown Tail-style "+id);
         }
@@ -392,6 +431,7 @@ class HandsPaw extends Equipment { //paws of ferals
             case 'cat':
             case 'dog':
             case 'wolf':
+            case 'bunny':
             case 'lizard':
                 break;
             default:
@@ -408,11 +448,13 @@ class HandsPaw extends Equipment { //paws of ferals
     }
     attackMod(target){
         let mod = new SkillMod();
-        mod.onHit = [{ target:target, eff: [effDamage.setup(10,'slash')]}];
+        let _dmg =5;
+        if(this.data.style==='cat' || this.data.style==='lizard' ) _dmg+=5;
+        mod.onHit = [{ target:target, eff: [effDamage.factory(_dmg,'slash')]}];
         return(mod);
     }
 }
-class HandsHuman extends Equipment {
+class HandsHuman extends Equipment { //hands with digits to use tools
     static dataPrototype() {    
         return({style:'human'});
     }
@@ -433,6 +475,7 @@ class HandsHuman extends Equipment {
             case 'dog':
             case 'wolf':
             case 'horse':
+            case 'bunny':
                 break;
             case 'cat':
             case 'lizard':
@@ -450,7 +493,7 @@ class HandsHuman extends Equipment {
     static fromJSON(value) {return(window.storage.Generic_fromJSON(HandsHuman, value.data));}
     descLong(fconv) { 
         let msg = '$[My]$ hands consist of a palm and fingers.';
-        msg += ['dog','wolf','cat'].includes(this.data.style)?(this.data.style+'-claws adorn the fingertips'):'';
+        msg += ['dog','wolf','cat','bunny'].includes(this.data.style)?(this.data.style+'-claws adorn the fingertips'):'';
         msg += ['lizard'].includes(this.data.style)?('Large talons grow from their fingertips.'):'';
         return(fconv(msg));
     }
@@ -479,6 +522,7 @@ class BreastHuman extends Equipment {
             case 'cat':
             case 'dog':
             case 'wolf':
+            case 'bunny':
                 break;
             case 'lizard':
                 break;
@@ -488,7 +532,7 @@ class BreastHuman extends Equipment {
     }
     getStyle() { return this.data.style; }
     get descShort() { return (this.desc);}
-    get desc() { return 'some human breasts.';}
+    get desc() { return 'some '+this.data.style+' breasts.';}
     toJSON() {return window.storage.Generic_toJSON("BreastHuman", this); };
     static fromJSON(value) {return(window.storage.Generic_fromJSON(BreastHuman, value.data));}
     descLong(fconv) { 
@@ -519,6 +563,7 @@ class VulvaHuman extends Equipment {
             case 'dog':
             case 'horse':
             case 'wolf':
+            case 'bunny':
             case 'lizard':
                 break;
             default:
@@ -587,6 +632,7 @@ class PenisHuman extends Equipment {
             case 'dog':
             case 'horse':
             case 'wolf':
+            case 'bunny':
                 break;
             case 'lizard':    
                 break;
@@ -631,6 +677,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(FaceWolf);
     window.storage.registerConstructor(SkinHuman);
     window.storage.registerConstructor(SkinFur);
+    window.storage.registerConstructor(SkinScales);
     window.storage.registerConstructor(TailWolf);
     window.storage.registerConstructor(BreastHuman);
     window.storage.registerConstructor(PenisHuman);
@@ -843,6 +890,31 @@ window.gm.MutationsLib['mutateHorse'] = function(char) {
     } else {
         char.Outfit.addItem(new window.storage.constructors['TailWolf'].factory('horse'));
         msg=("You have grown a horse tail !</br>");
+    }
+    if(char===window.gm.player) {
+        window.gm.pushDeferredEvent("GenericDeffered",[msg]);
+    }
+};
+window.gm.MutationsLib['mutateBunny'] = function(char) {
+    let msg='', _TF="TailWolf", style='bunny';
+    if(char.Outfit.countItem(_TF)>0) {
+        let item = char.Outfit.getItem(_TF);
+        if(item.getStyle() !==style) {
+            item.setStyle(style);
+            msg=("Your tail reshapes itself to a be more bunny-like.</br>");
+        } else {
+            var growth = item.data.growth+0.25;
+            var maxGrowth = char.Outfit.getItem(_TF).maxGrowth;
+            if(growth >= 1) {
+                msg=("You already changed to a bunny as far as possible.</br>");
+            } else {
+                item.data.growth=growth;
+                msg=("Your tail must have grown and is now "+growth*maxGrowth+" meter long.</br>");
+            }
+        }
+    } else {
+        char.Outfit.addItem(new window.storage.constructors['TailWolf'].factory(style));
+        msg=("You have grown a small, fluffy bunny tail !</br>");
     }
     if(char===window.gm.player) {
         window.gm.pushDeferredEvent("GenericDeffered",[msg]);

@@ -26,14 +26,28 @@
 ////////////////////////////////////////////////////////
 // normal foes
 class Mole extends Mob {
+    static factory(type) {
+        let foe = new Mole();
+        return foe;
+    }
     constructor() {
         super();
         this.name = this.id = 'Mole';
         this.pic= 'assets/mole.jpg';
-        this.Stats.increment('healthMax',-1*(this.health().max-20));
+        this.Stats.increment('healthMax',-0.5*(this.health().max));
     }
 }
 class Wolf extends Mob {
+    static factory(type) {
+        let foe = new Wolf();
+        if(type==='Alpha') {
+            this.name = this.id = 'Alpha-Wolf'; //todo CallHelp
+            this.Stats.increment('healthMax',-0.3*(this.health().max));
+        } else {
+            this.Stats.increment('healthMax',-0.5*(this.health().max));
+        }
+        return foe;
+    }
     constructor() {
         super();
         this.name = this.id = 'Wolf';
@@ -63,7 +77,11 @@ class Wolf extends Mob {
         return(super.calcCombatMove(enemys,friends));
     }
 }
-class Slug extends Mob {  //Todo swelling slug explodiert in schleimexplosion
+class Slug extends Mob { 
+    static factory(type) {
+        let foe = new Slug();
+        return foe;
+    }
     constructor() {
         super();
         this.name = this.id = 'Slug';
@@ -79,7 +97,7 @@ class Slug extends Mob {  //Todo swelling slug explodiert in schleimexplosion
         let rnd = _.random(1,100);
         //if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
         result.action =result.target= null;
-        if(this.Stats.countItem(effKamikaze.name)<=0) {
+        if(this.Stats.countItem(effKamikaze.name)<=0) { //self-exploding
             this.addEffect(new effKamikaze());
         }
         if(window.story.state.combat.turnCount%2===0) {
@@ -93,6 +111,10 @@ class Slug extends Mob {  //Todo swelling slug explodiert in schleimexplosion
     }
 }
 class Leech extends Mob {
+    static factory(type) {
+        let foe = new Leech();
+        return foe;
+    }
     constructor() {
         super();
         this.name = this.id = 'Leech';
@@ -126,11 +148,53 @@ class Leech extends Mob {
         return(super.calcCombatMove(enemys,friends));
     }
 }
+class Lizan extends Mob {
+    static factory(type) {
+        let foe = new Lizan();
+        if(type==='spearthrower') {
+            this.Outfit.addItem(SpearWodden.factory(100));
+        } else {
+            this.Outfit.addItem(new DaggerSteel());
+        }
+        return foe;
+    }
+    constructor() {
+        super();
+        this.name = this.id = 'Lizan';
+        this.pic= 'assets/icons/icon_question.svg';
+        this.Outfit.addItem(new BaseHumanoid());
+        this.Outfit.addItem(SkinScales.factory('lizard'));
+        this.Outfit.addItem(HandsHuman.factory('lizard'));
+        this.Outfit.addItem(BreastHuman.factory('lizard'));
+        this.Outfit.addItem(FaceWolf.factory('lizard'));
+        this.Outfit.addItem(PenisHuman.factory('lizard'));
+        this.Outfit.addItem(ShortsLeather.factory(100));
+        let sk = new SkillGuard();
+        sk.style=2;
+        this.Skills.addItem(sk);
+        this.levelUp(3);
+        this.autoLeveling();
+    }
+    calcCombatMove(enemys,friends){
+        let result = {OK:true,msg:''};
+        //if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
+        let rnd = _.random(1,100);
+        result.action =result.target= null;
+        //todo shoot arrow, pounce, throw net
+        if(window.story.state.combat.turnCount%2===0) {
+            result.action = "Guard";
+            result.target = [this];
+            result.msg =this.name+" retreats somewhat and moves into a defensive stance.</br>"+result.msg;
+            return(result);
+        }
+        return(super.calcCombatMove(enemys,friends));
+    }
+}
 class Huntress extends Mob {
-    static setup(type) {
+    static factory(type) {
         let foe = new Huntress();
         if(type==='spearthrower') {
-            this.Outfit.addItem(SpearWodden.setup(100));
+            this.Outfit.addItem(SpearWodden.factory(100));
         } else {
             this.Outfit.addItem(new DaggerSteel());
         }
@@ -170,7 +234,7 @@ class Huntress extends Mob {
     }
 }
 class Succubus extends Mob {
-    static setup(type) {
+    static factory(type) {
         let foe = new Succubus();
         foe.Outfit.addItem(new WhipLeather());
         return foe;
@@ -216,10 +280,14 @@ class Succubus extends Mob {
     }
 }
 class Dryad extends Mob {
+    static factory(type) {
+        let foe = new Dryad();
+        return foe;
+    }
     constructor() {
         super();
         this.name = this.id = 'Dryad';
-        this.pic= 'assets/icons/icon_question.svg';
+        this.pic= 'assets/battlers/nymph1.svg';
         this.loot= [{id:'DryadVine',chance:25,amount:1}];
         this.Outfit.addItem(new BaseHumanoid());
         this.Outfit.addItem(new SkinHuman());
@@ -228,7 +296,7 @@ class Dryad extends Mob {
         this.Outfit.addItem(new FaceHuman());
         this.Outfit.addItem(VulvaHuman.factory('human'));
         this.Outfit.addItem(new BikiniBottomLeather());
-        this.Skills.addItem(SkillCallHelp.setup('Vine'));
+        this.Skills.addItem(SkillCallHelp.factory('Vine'));
         this.levelUp(3);
         this.autoLeveling();
         this.tmp = {vines:0};
@@ -250,7 +318,9 @@ class Dryad extends Mob {
     }
 }
 class Vine extends Mob {
-    static setup(type) {
+    static factory(type) {
+        let foe = new Vine();
+        return foe;
     }
     constructor() {
         super();
@@ -285,6 +355,10 @@ class Vine extends Mob {
     } 
 }
 class Mechanic extends Mob {
+    static factory(type) {
+        let foe = new Mechanic();
+        return foe;
+    }
     constructor() {
         super();
         this.name = this.id = 'Mechanic-Guy';
@@ -353,14 +427,16 @@ class Trent extends Mob {
 }
 //collection of mob-constructors
 window.gm.Mobs = (function (Mobs) {
-    Mobs.Mole = function () { return new Mole();};
-    Mobs.Huntress = function () { return new Huntress();};
-    Mobs.Wolf = function () { return new Wolf();};
-    Mobs.Leech = function () { return new Leech();};  
-    Mobs.Slug = function () { return new Slug();}; 
-    Mobs.Succubus = function () { return new Succubus();};
-    Mobs.Dryad = function () { return new Dryad();}; 
-    Mobs.Vine = function () { return new Vine();}; 
-    Mobs.Mechanic = function () {return new Mechanic();};
+    Mobs.Mole = Mole.factory;
+    Mobs.Huntress = Huntress.factory;
+    Mobs.Lizan = Lizan.factory;
+    Mobs.Wolf = Wolf.factory;
+    Mobs.AlphaWolf = function() { return function(param){return(Wolf.factory(param));}(100)};
+    Mobs.Leech = Leech.factory;  
+    Mobs.Slug = Slug.factory; 
+    Mobs.Succubus = Succubus.factory;
+    Mobs.Dryad = Dryad.factory; 
+    Mobs.Vine = Vine.factory; 
+    Mobs.Mechanic = Mechanic.factory;
     return Mobs; 
 }(window.gm.Mobs || {}));
