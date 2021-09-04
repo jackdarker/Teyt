@@ -22,11 +22,11 @@ class SkillInspect extends Skill {
             result.OK = true;
             this.msg = 'resistance of ';//window.gm.printBodyDescription(targets[0],true);
             for(let el of window.gm.combat.TypesDamage) {
-                this.msg += el.id+ ' '+ targets[0].Stats.getItem('rst'+el.id).value +'%,'; 
+                this.msg += el.id+ ' '+ targets[0].Stats.getItem('rst_'+el.id).value +'%,'; 
             }
             this.msg+= '</br>armor of ';
             for(let el of window.gm.combat.TypesDamage) {
-                this.msg += el.id+ ' '+ targets[0].Stats.getItem('arm'+el.id).value +','; 
+                this.msg += el.id+ ' '+ targets[0].Stats.getItem('arm_'+el.id).value +','; 
             }
             //todo display stats dependign on skill
             result.msg =this.msg;
@@ -209,12 +209,20 @@ class SkillChainLightning  extends Skill {
 class SkillTease extends Skill {
     constructor() {
         super("Tease");
-        this.msg = '';
+        this.msg = '',this.style=0;
     }
     toJSON() {return window.storage.Generic_toJSON("SkillTease", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillTease, value.data));}
     targetFilter(targets){
         return(this.targetFilterEnemy(this.targetFilterAlive(targets)));
+    }
+    set style(style) { //skilllevel
+        this._style = style;//this.id=this.name="Guard Lv"+style;
+    }
+    get style() {return this._style;}
+    get desc() { 
+        let msg ="Tease Lv"+this.style;
+        return(msg);
     }
     previewCast(targets){
         var result = new SkillResult();
@@ -222,17 +230,21 @@ class SkillTease extends Skill {
         result.source = this.caster;
         result.targets = targets;
         this.msg = '';
+        let fconv =window.gm.util.descFixer(this.parent.parent),_tmp='';
         if(this.isValidTarget(targets)) {
             result.OK = true;
-            let dmg =5; //todo tease depends on teaseproficiency, clothing slutiness/nudeness,own arousal
+            let dmg =5*(1+this.style/5); //teaseproficiency +20%/level
+            //tease depends on clothing slutiness/nudeness,own arousal
             let lewds=this.caster.Outfit.getLewdness();
-            if(this.parent.parent.Stats.getItem('arousal').value>40) dmg +=5;
-            dmg*=Math.max(0,0.5+this.level*0.15);
-            this.msg = 'Shaking his hips, xxx trys to arouse the audience.'; //todo
+            if(this.parent.parent.Stats.getItem('arousal').value>40) dmg *=1.5;
+            //dmg*=Math.max(0,0.5+this.level*0.15);
+            this.msg = fconv('Shaking $[my]$ hips, $[I]$ $[try]$ to arouse the audience.'); //todo
             for(var target of targets) {
                 let attack =window.gm.combat.defaultAttackData();
                 attack.mod= new SkillMod();
-                attack.mod.onHit=[{target:target, eff:[effTeaseDamage.factory(dmg,'slut',lewds)]}]
+                _tmp = fconv(target.name+" gets aroused by $[my]$ lewd display. ");
+                attack.mod.onHit=[{target:target, eff:[effTeaseDamage.factory(dmg,'slut',lewds,_tmp)]}];
+                attack.mod.onCrit=[{target:target, eff:[effTeaseDamage.factory(dmg*2,'slut',lewds,_tmp)]}];
                 let result2 = window.gm.combat.calcTeaseAttack(this.caster,target,attack);
                 this.msg+=result2.msg;
                 result.effects = result.effects.concat(attack.effects); 
@@ -555,13 +567,7 @@ class SkillGuard extends Skill {
     }
     get style() {return this._style;}
     get desc() { 
-        let msg ='a large, smooth branch with a firehardened tip';
-        switch(this._style) {
-            case 100:
-                msg=('a stone-triangle mounted on a long stick');
-                break;
-            default:
-        }
+        let msg ="Guard Lv"+style;
         return(msg);
     }
     get desc() { return("Lv"+this.style+": Boosts your defense.");}  
@@ -610,11 +616,12 @@ class SkillUseItem extends Skill {
         return(this.msg);
     }
 }
-//calls reinforcement; set item before casting to the mob-name to spawn
+//calls reinforcement; set item-string before casting to the mob-name to spawn
 class SkillCallHelp extends Skill {
-    static factory(item) {
+    static factory(item,cooldown=3) {
         let sk = new SkillCallHelp();
-        sk.item = item;
+        sk.item = item,sk.id+=item,sk.name+=' '+item;
+        sk.cost.will =25; 
         //todo delay and cooldown
         return(sk);
     }
@@ -628,6 +635,7 @@ class SkillCallHelp extends Skill {
     targetFilter(targets){
         return(this.targetFilterSelf(targets));
     }
+    targetFilter(targets){ return(this.targetFilterSelf(targets));}
     previewCast(targets){
         var result = new SkillResult()
         result.skill =this,result.source = this.caster,result.targets = targets;

@@ -75,7 +75,13 @@ window.gm.util.printLocationName=function(passage) {
   }
   return(passage);
 }
-
+//prints a div with text "value/max" and bargraph-background
+window.gm.util.bargraph=function(value,max,color) {
+  let msg ='';
+  let rel = value/max*100;
+  msg ='<div class="progressbar"><div style="background-color:'+color+'; width: '+rel.toString()+'%;"><p>'+value.toString()+'/'+max.toString()+'</p></div></div>';
+  return(msg); //todo bargraph css-animation doesnt work because the whole page is reloaded instead of just width change
+}
 //-------------------------------------------------
 // reimplement to setup the game !
 window.gm.initGame= function(forceReset,NGP=null) {
@@ -127,7 +133,6 @@ window.gm.initGame= function(forceReset,NGP=null) {
     if (!s.tmp||forceReset) { 
       // storage of temporary variables; dont use them in stacking passages or deffered events      
       s.tmp = {
-        rnd : 0,  // can be used as a random variable for use in CURRENT passage
         args: [],  // can be used to set arguments before another passage is called (passage-arguments) 
         msg: ''   // memorizes a message to display when returning from _back-passage; please clear it when leaving the passage
       }
@@ -524,6 +529,7 @@ window.gm.printTalkLink =function(elmt,unhideThis,cb=null) {
 window.gm.printPassageLink= function(label,target) {
   return("<a href=\"javascript:void(0)\" data-passage=\""+target+"\">"+label+"</a></br>");
 };
+//prints a link where target is a expression called onClick
 window.gm.printLink= function(label,target) {
   return("<a href=\"javascript:void(0)\" onclick=\""+target+"\">"+label+"</a></br>");
 };
@@ -711,7 +717,7 @@ window.gm.printEffectSummary= function(who='player',showstats=true,showfetish=fa
   for(var k=0;k<ids.length;k++){
       var data = window.story.state[who].Stats.get(ids[k])
       let isFetish = (data.id.slice(0,2)==='ft'); //Fetish starts with ft
-      let isResistance = (data.id.slice(0,3)==='rst')||(data.id.slice(0,3)==='arm'); //
+      let isResistance = (data.id.slice(0,4)==='rst_')||(data.id.slice(0,4)==='arm_'); //
       if(data.hidden!==4) {
         if(isFetish && showfetish && !(data.id.slice(-4,-2)==='_M') ) {
           //expects names of fetish like ftXXX and limits ftXXX_Min ftXXX_Max

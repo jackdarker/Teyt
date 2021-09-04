@@ -45,7 +45,7 @@ class Character {
         }
         stAgility.setup(this.Stats,10,100),stIntelligence.setup(this.Stats,10,100),stLuck.setup(this.Stats,10,100);
         stCharisma.setup(this.Stats,10,100),stPerception.setup(this.Stats,10,100),stStrength.setup(this.Stats,10,100),stEndurance.setup(this.Stats,10,100);
-        stCorruption.setup(this.Stats,0,50),stArousal.setup(this.Stats,0,50);
+        stCorruption.setup(this.Stats,0,100),stArousal.setup(this.Stats,0,100);
         for(let name of stFetish.listFetish()) {
             stFetish.setup(this.Stats,0,10,name);
         }         
@@ -71,7 +71,7 @@ class Character {
     /**
     * calculates how many levels you can upgrade
     * @param {int} XP available
-    * @returns {inz} level from
+    * @returns {int} level from
     */
     static calcXPToLevel(XP,fromLvl=1) {
         let XP2 = Character.calcLevelToXP(fromLvl);
@@ -143,6 +143,7 @@ class Character {
         }
     }
     isDead() {return(this.Stats.get('health').value<=0);}
+    isKnockedOut() {return(this.isDead()||(this.Stats.get('arousal').value>=this.Stats.get('arousalMax').value));}
     /** 
     * "naked" - naked
     * "primal" - cover genitals 
@@ -163,15 +164,10 @@ class Character {
         if(uwOK ) return "primal"  
         return('naked');
     }
-    health() {
-        return({value:this.Stats.get('health').value, max:this.Stats.get('healthMax').value, min:0});
-    }
-    energy() {
-        return({value:this.Stats.get('energy').value, max:this.Stats.get('energyMax').value, min:0});
-    }
-    will() {
-        return({value:this.Stats.get('will').value, max:this.Stats.get('willMax').value, min:0});
-    }
+    health() {return({value:this.Stats.get('health').value, max:this.Stats.get('healthMax').value, min:0});}
+    energy() {return({value:this.Stats.get('energy').value, max:this.Stats.get('energyMax').value, min:0});}
+    will() {return({value:this.Stats.get('will').value, max:this.Stats.get('willMax').value, min:0});}
+    arousal() {return({value:this.Stats.get('arousal').value, max:this.Stats.get('arousalMax').value, min:this.Stats.get('arousalMin').value});}
     sleep(until=700) {
         let {msg,delta}=window.gm.forwardTime(until);
         let regen = delta>=360 ? 9999 : parseInt(delta/60*15);  //todo scaling of regeneration

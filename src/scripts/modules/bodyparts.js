@@ -38,8 +38,13 @@ class BaseWorm extends Equipment {
 }
 class FaceHuman extends Equipment {
     static dataPrototype() {    
-        return({femininity:0.2});
+        return({femininity:0.2,style:'human'});
         //1 = full female 0= male
+    }
+    static factory(id) {
+        let obj =  new FaceHuman();
+        obj.setStyle(id);
+        return(obj);
     }
     constructor() {
         super('FaceHuman');
@@ -47,6 +52,18 @@ class FaceHuman extends Equipment {
         this.slotUse = ['bFace','bMouth'];
         this.data = FaceHuman.dataPrototype();   
     }
+    setStyle(id) {
+        this.data.style = id;
+        switch(id) {
+            case 'human':
+                break;
+            case 'elve':
+                break;
+            default:
+                throw new Error("unknown Face-style "+id);
+        }
+    }
+    getStyle() { return this.data.style; }
     get descShort() { return 'human face';}
     get desc() { return 'hominid face';}
     toJSON() {return window.storage.Generic_toJSON("FaceHuman", this); };
@@ -110,15 +127,30 @@ class FaceWolf extends Equipment {
 }
 class FaceHorse extends Equipment {
     static dataPrototype() {    
-        return({femininity:0.2});    }
+        return({femininity:0.2,style:'horse'});    }
+    static factory(id) {
+            return(new FaceHorse());
+    }
     constructor() {
         super('FaceHorse');
         this.addTags(['body']);
         this.slotUse = ['bFace','bMouth'];
         this.data = FaceHorse.dataPrototype();   
     }
-    get descShort() { return 'wolf muzzle';}
-    get desc() { return 'wolf muzzle';}
+    setStyle(id) {
+        this.data.style = id;
+        switch(id) {
+            case 'horse':
+                break;
+            case 'deer':
+                break;
+            default:
+                throw new Error("unknown Face-style "+id);
+        }
+    }
+    getStyle() { return this.data.style; }
+    get descShort() { return 'horse muzzle';}
+    get desc() { return this.descShort;}
     toJSON() {return window.storage.Generic_toJSON("FaceHorse", this); };
     static fromJSON(value) {return(window.storage.Generic_fromJSON(FaceHorse, value.data));}
     descLong(fconv) {
@@ -229,15 +261,15 @@ class ArmorTorso extends Equipment {
                 if(el.id==='ice') rst=-30;
                 if(el.id==='slash') arm=5,rst=20;
             }
-            if(arm!==0) context.parent.Stats.addModifier('arm'+el.id,{id:'arm'+el.id+':'+this.id, bonus:arm});
-            if(rst!==0) context.parent.Stats.addModifier('rst'+el.id,{id:'rst'+el.id+':'+this.id, bonus:rst});
+            if(arm!==0) context.parent.Stats.addModifier('arm_'+el.id,{id:'arm_'+el.id+':'+this.id, bonus:arm});
+            if(rst!==0) context.parent.Stats.addModifier('rst_'+el.id,{id:'rst_'+el.id+':'+this.id, bonus:rst});
         }
         return({OK:true, msg:'equipped'});
     }
     onUnequip() {
         for(let el of window.gm.combat.TypesDamage) {
-            context.parent.Stats.removeModifier('arm'+el,{id:'arm'+el+':'+this.id});
-            context.parent.Stats.removeModifier('rst'+el,{id:'rst'+el+':'+this.id});
+            context.parent.Stats.removeModifier('arm_'+el,{id:'arm_'+el+':'+this.id});
+            context.parent.Stats.removeModifier('rst_'+el,{id:'rst_'+el+':'+this.id});
         }
         return({OK:true, msg:'unequipped'});
     }
@@ -454,6 +486,47 @@ class HandsPaw extends Equipment { //paws of ferals
         return(mod);
     }
 }
+class HandsHoof extends Equipment { //hoves of horse,...
+    static dataPrototype() {    
+        return({style:'horse'});
+    }
+    static factory(id) {
+        let obj =  new HandsHoof();
+        obj.setStyle(id);
+        return(obj);
+    }
+    constructor() {
+        super('HandsHoof');
+        this.addTags(['body']);
+        this.slotUse = ['bHands'];
+        this.data = HandsHoof.dataPrototype();
+    }
+    setStyle(id) {
+        this.data.style = id; 
+        switch(id) {
+            case 'horse':
+            case 'deer':
+                break;
+            default:
+                throw new Error("unknown HandsHoof-style "+id);
+        }
+    }
+    getStyle() { return this.data.style; }
+    get descShort() { return (this.desc);}
+    get desc() { return this.data.style+'\'like hoves.';}
+    toJSON() {return window.storage.Generic_toJSON("HandsHoof", this); };
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(HandsHoof, value.data));}
+    descLong(fconv) { 
+        return(fconv('$[I]$ $[have]$ hoves like that of a '+this.data.style+'.'));
+    }
+    attackMod(target){
+        let mod = new SkillMod();
+        let _dmg =5;
+        if(this.data.style==='horse' ) _dmg+=5;
+        mod.onHit = [{ target:target, eff: [effDamage.factory(_dmg,'blunt')]}];
+        return(mod);
+    }
+}
 class HandsHuman extends Equipment { //hands with digits to use tools
     static dataPrototype() {    
         return({style:'human'});
@@ -493,6 +566,7 @@ class HandsHuman extends Equipment { //hands with digits to use tools
     static fromJSON(value) {return(window.storage.Generic_fromJSON(HandsHuman, value.data));}
     descLong(fconv) { 
         let msg = '$[My]$ hands consist of a palm and fingers.';
+        msg += ['horse','deer'].includes(this.data.style)?(this.data.style+'-hoofes adorn the fingertips'):'';
         msg += ['dog','wolf','cat','bunny'].includes(this.data.style)?(this.data.style+'-claws adorn the fingertips'):'';
         msg += ['lizard'].includes(this.data.style)?('Large talons grow from their fingertips.'):'';
         return(fconv(msg));
@@ -669,6 +743,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(BaseHumanoid);
     window.storage.registerConstructor(BaseQuadruped);
     window.storage.registerConstructor(BaseWorm);
+    window.storage.registerConstructor(HandsHoof);
     window.storage.registerConstructor(HandsHuman);
     window.storage.registerConstructor(HandsPaw);
     window.storage.registerConstructor(FaceHorse);
@@ -707,13 +782,7 @@ window.gm.mutate.getScoreCat = function(char) { //one fct for Lynx/Lion/tiger ?
 window.gm.mutate.updateRacialBoon = function(char,scores) {
     //remove old RacialBoon
 }
-//todo randomize what is mutated
-//number of mutations depends on magnitude?
-//temporary mutate to feral?
-/*
-* those mutations are usually triggered by effects, calculate some changes and 
-* if related to player pushDeffered Event for displaying message  
-*/
+///////////////////////////////////////////////////////
 window.gm.MutationsLib = window.gm.MutationsLib || {};
 window.gm.MutationsLib['vaginaSpermDissolve'] = function (char) {
     let vulva = char.getVagina();
@@ -870,27 +939,63 @@ window.gm.MutationsLib['mutateCat'] = function(char) {
         window.gm.pushDeferredEvent("GenericDeffered",[msg]);
     }
 };
-window.gm.MutationsLib['mutateHorse'] = function(char) {
-    let msg='', _TF="TailWolf";
-    if(char.Outfit.countItem(_TF)>0) {
-        let item = char.Outfit.getItem(_TF);
-        if(item.getStyle() !=='horse') {
-            item.setStyle('horse');
-            msg=("Your tail reshapes itself to a be more horse-like.</br>");
-        } else {
-            var growth = item.data.growth+0.25;
-            var maxGrowth = 2;//window.gm.player.Outfit.getItem("TailWolf").maxGrowth;
-            if(growth >= 1) {
-                msg=("You already changed to a horse as far as possible.</br>");
+window.gm.MutationsLib['mutateHorse'] = function(char,magnitude=1) {
+    let msg='', bb=window.gm.OutfitSlotLib;
+    let fconv =window.gm.util.descFixer(char);
+    let base=char.Outfit.getItemForSlot(bb.bBase);//todo bodyparts depends also on feral or anthro body
+    let el,slots=[], cnt=0;
+    //which part can mutate?
+    [bb.bFace,bb.bSkin,bb.bTailBase,bb.bHands].forEach(
+        x=>{slots.push({"slot":x,"item":char.Outfit.getItemForSlot(x)})});
+    //select a part to mutate, repick if already mutated    
+    while(slots.length>0 && cnt<magnitude) {//todo legs,skin,genitals
+        el = slots.splice(_.random(0,slots.length-1),1)[0];
+        if(el.slot===bb.bTailBase) {
+            if(el.item===null) {
+                char.Outfit.addItem(window.storage.constructors['TailWolf'].factory('horse'),true);
+                msg+=fconv("$[I]$ $[have]$ grown a horse tail !</br>");
+                cnt++;
+            } else if(el.item.getStyle() !=='horse'|| el.item.id!=='TailWolf') {
+                char.Outfit.removeItem(el.item.id,true);
+                char.Outfit.addItem(window.storage.constructors['TailWolf'].factory('horse'),true);
+                msg+=fconv("$[My]$ tail reshapes itself to a be more horse-like.</br>");
+                cnt++;
             } else {
-                item.data.growth=growth;
-                msg=("Your tail must have grown and is now "+growth*maxGrowth+" meter long.</br>");
+                var growth = el.item.data.growth+0.25;
+                var maxGrowth = 2;//window.gm.player.Outfit.getItem("TailWolf").maxGrowth;
+                if(growth >= 1) {
+                    //msg=("You already changed to a horse as far as possible.</br>");
+                } else {
+                    el.item.data.growth=growth;
+                    msg+=fconv("$[My]$ tail must have grown and is now "+window.gm.util.formatNumber(growth*maxGrowth,1)+" meter long.</br>");
+                    cnt++;
+                }
+            }
+        } else if(el.slot===bb.bFace) {
+            if(el.item===null) { //grow no face?
+            } else if(el.item.getStyle() !=='horse') {
+                char.Outfit.removeItem(el.item.id,true);
+                char.Outfit.addItem(window.storage.constructors['FaceHorse'].factory('horse'),true);
+                msg+=fconv("$[My]$ face transforms into a horse ones.</br>");
+                cnt++;
+            } 
+        } else if(el.slot===bb.bHands) {
+            if(el.item===null) { //grow no hands?
+            } else if(el.item.getStyle() !=='horse') {
+                if(base.id==="BaseHumanoid") {
+                    char.Outfit.removeItem(el.item.id,true);
+                    char.Outfit.addItem(window.storage.constructors['HandsHuman'].factory('horse'),true);
+                    msg+=fconv("$[My]$ hands now look like that of a human but with thick fingernails.</br>");
+                } else {
+                    char.Outfit.removeItem(el.item.id,true);
+                    char.Outfit.addItem(window.storage.constructors['HandsHoof'].factory('horse'),true);
+                    msg+=fconv("$[My]$ hands transforms into a horse-like hoves.</br>");
+                }
+                cnt++;
             }
         }
-    } else {
-        char.Outfit.addItem(new window.storage.constructors['TailWolf'].factory('horse'));
-        msg=("You have grown a horse tail !</br>");
     }
+    if(cnt<magnitude) msg=fconv("$[I]$ already changed to a horse as far as possible.</br>");
     if(char===window.gm.player) {
         window.gm.pushDeferredEvent("GenericDeffered",[msg]);
     }

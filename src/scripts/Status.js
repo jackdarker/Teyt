@@ -5,7 +5,12 @@
     - 
  */
 ///////////////////////////////////////////////////////////////
- class StatsDictionary extends Inventory {  //Todo a collection of Stats is similiar to Inventory?
+ /**
+  * a collection of Stats
+  * @class StatsDictionary
+  * @extends {Inventory}
+  */
+ class StatsDictionary extends Inventory {
     constructor(externlist) {
         super(externlist);
         window.storage.registerConstructor(StatsDictionary);
@@ -16,9 +21,7 @@
         return(_x);
     }
     //
-    get(id) {
-        return(this.getItem(id));
-    }
+    get(id) {return(this.getItem(id));}
     modifyHidden(id,hidden) {
         let _data = this.get(id).data;
         _data.hidden=hidden;
@@ -72,6 +75,11 @@
     }
 }
 //class for an Attribute
+/**
+ * 
+ *
+ * @class Stat
+ */
 class Stat {
     static dataPrototype() {    
         return({id: '', base: 0,value: 0, limits: [],modifier:[], modifys:[], hidden:0});
@@ -135,7 +143,12 @@ class Stat {
     updateModifier() {};
 }
 /////////////////////////////////////////////////////////////////////////
-class Effects extends Inventory {  //Todo a collection of Stats is similiar to Inventory?
+/**
+ * a collection of Effects
+ * @class Effects
+ * @extends {Inventory}
+ */
+class Effects extends Inventory {  //Todo ?
     constructor(externlist) {
         super(externlist);
         window.storage.registerConstructor(Effects);
@@ -226,6 +239,11 @@ class Effects extends Inventory {  //Todo a collection of Stats is similiar to I
 }
 
 /////////////////////////////////////////////////////////////////////////
+/**
+ *
+ *
+ * @class Effect
+ */
 class Effect {  
     constructor() {
         this.data = Effect.dataPrototype();
@@ -235,14 +253,23 @@ class Effect {
         return({id:'xxx', name: Effect.name, time: 0, duration:0,hidden:0});
         //hidden 0 = visible, 1= name unreadable, 2= value unreadable, 4= hidden
     }
-    // Attention !!
-    //_parent will be added dynamical
+    /**
+     * Attention !! _parent will be added dynamical
+     *
+     * @readonly
+     * @memberof Effect
+     */
     get parent() {return this._parent?this._parent():null;}
     _relinkItems(parent){this._parent=window.gm.util.refToParent(parent);}
     // id = SlumberPotion:Stunned;  name = Stunned
     get id() {return(this.data.id);}
     set id(id) { this.data.id=id;}
-    // Attention !!  effTired.name returns constructor-name but Effects.getById('effTired').name returns data.name
+    /**
+     * Attention !!  effTired.name returns constructor-name but Effects.getById('effTired').name returns data.name
+     *
+     * @readonly
+     * @memberof Effect
+     */
     get name() {return(this.data.name);}
     get time() {return(this.data.time);}
     get duration() {return(this.data.duration);}
@@ -250,31 +277,79 @@ class Effect {
     get desc() {return(this.name);}
     get shortDesc() {return(this.name);}
         
-    //is called when a effect is applied to check if the new effect can be combined with an exisitng one
-    //return null if no merge occured
-    //return true if the neweffect was merged into existing one; no other effects are then checked for mergeability
-    //or return function that has to be executed: (function(Effects){ Effects.replace(data.id,NotTired);}));
+    //
+    /**
+     *is called when a effect is applied to check if the new effect can be combined with an exisitng one
+     * return null if no merge occured
+     * return true if the neweffect was merged into existing one; no other effects are then checked for mergeability
+     * or return function that has to be executed: (function(Effects){ Effects.replace(data.id,NotTired);}));
+     *
+     * @param {*} neweffect
+     * @return {*} 
+     * @memberof Effect
+     */
     merge(neweffect) {
         return(null);
     }
+    /**
+     *
+     * @param {*} time
+     * @return {*} 
+     * @memberof Effect
+     */
     onTimeChange(time) {
         return(null);
     }
+    /**
+     *
+     * @memberof Effect
+     */
     onApply(){}
+    /**
+     *
+     * @memberof Effect
+     */
     onRemove(){}
 }
 /////////////////////////////////////////////////////////////////////////
-//combat effect use turn-count instead of realtime as duration
+/**
+ * combat effect use turn-count instead of realtime as duration
+ *
+ * @class CombatEffect
+ * @extends {Effect}
+ */
 class CombatEffect extends Effect {
     constructor() {
         super(); this.castMsg='';
     }
-    // shown in skill-select
+    /**
+     *shown in skill-select
+     *
+     * @readonly
+     * @memberof CombatEffect
+     */
     get shortDesc() {return(this.desc+" for " + this.data.duration+" turns");}  //duration in turns !
-    //shown in result
+    /**
+     *shown when casting the effect
+     *
+     * @return {*} 
+     * @memberof CombatEffect
+     */
     castDesc() {return(this.castMsg);}
+
+    /**
+     * called after victory/defeat (before -scene plays)
+     *
+     * @memberof CombatEffect
+     */
     onCombatEnd() {}
-    //called before targets turn
+    //
+    /**
+     * called before targets turn
+     *
+     * @return {*} 
+     * @memberof CombatEffect
+     */
     onTurnStart() { return({OK:true,msg:''}); }
     //at end of targets turn   UNUSED
     //onTurnEnd() { return({OK:true,msg:''}); }

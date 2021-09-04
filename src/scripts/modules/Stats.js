@@ -37,7 +37,7 @@ class stResistance extends Stat {
     static setup(context, base,kind) {   
         let _stat = new stResistance();
         let _n = _stat.data;
-        _n.id="rst"+kind,_n.base=base, _n.value=base,_n.limits=[{max:100,min:-100}];
+        _n.id="rst_"+kind,_n.base=base, _n.value=base,_n.limits=[{max:100,min:-100}];
         context.addItem(_stat);
         _stat.Calc();
     }
@@ -50,7 +50,7 @@ class stArmor extends Stat {
     static setup(context, base,name) {   
         let _stat = new stArmor();
         let _n = _stat.data;
-        _n.id="arm"+name,_n.base=base, _n.value=base,_n.limits=[{max:999999,min:0}];
+        _n.id="arm_"+name,_n.base=base, _n.value=base,_n.limits=[{max:999999,min:0}];
         context.addItem(_stat);
         _stat.Calc();
     }
@@ -138,7 +138,7 @@ class stArousalMax extends Stat {
     static setup(context, max) {
         var _stat = new stArousalMax();
         var _n = _stat.data;
-        _n.id='arousalMax',_n.base=max, _n.value=max, _n.hidden=3,_n.limits=[{max:999,min:0}];
+        _n.id='arousalMax',_n.base=max, _n.value=max, _n.hidden=3,_n.limits=[{max:9999,min:0}];
         context.addItem(_stat);
         _stat.Calc();
     }
@@ -1087,7 +1087,9 @@ class effMasochist extends CombatEffect {
     onCombatEnd() { this.parent.removeItem(this.data.id); }
     onTurnStart() { this.data.duration-=1; if(this.data.duration<=0) this.parent.removeItem(this.data.id); return({OK:true,msg:''});   }
 }
-//damage over time todo affects only bleedable targets 
+/**
+ * damage over time todo affects only bleedable targets 
+ */
 class effBleed extends CombatEffect {
     constructor(amount) {
         super();
@@ -1268,10 +1270,17 @@ class effStunned extends CombatEffect {
         return({OK:true,msg:''});
     }
 } 
+/**
+ * this effect is usd as a marker to block spawning again while there is still a spawn
+ *
+ * @class effCallHelp
+ * @extends {CombatEffect}
+ */
 class effCallHelp extends CombatEffect {
     constructor() {
         super();
         this.data.id = this.data.name= effCallHelp.name, this.data.duration = 2;
+        this.data.spawns=[];
     }
     toJSON() {return window.storage.Generic_toJSON("effCallHelp", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(effCallHelp, value.data);};
@@ -1284,14 +1293,26 @@ class effCallHelp extends CombatEffect {
             return(true);
         }
     }
+    get shortDesc() {
+        if(this.data.spawns.length>0) return("Summoned a"+this.data.item);
+        else return("Summons "+this.data.item+" in " + this.data.duration+" turns");
+    }
     onCombatEnd() {
         this.parent.removeItem(this.data.id);
     }
     onTurnStart() {
         this.data.duration-=1;
-        if(this.data.duration<=0) {
-            window.gm.Encounter.spawnChar(this.data.item,this.data.faction,this.data.amount);
-            this.parent.removeItem(this.data.id);
+        if(this.data.duration===0) { //spawn after delay
+            this.data.spawns.push(window.gm.Encounter.spawnChar(this.data.item,this.data.faction));
+            
+        } else if(this.data.spawns.length>0) {
+            //remove effect after spawns are killed
+            let remove=true;
+            let mobs = window.story.state.combat.enemyParty.concat(window.story.state.combat.playerParty);
+            for(var i=mobs.length-1;i>=0;i--) {
+                if(this.data.spawns.includes(mobs[i].name)&& !mobs[i].isKnockedOut()) remove=false;
+            }
+            if(remove===true) this.parent.removeItem(this.data.id);
         }
         return({OK:true,msg:''});
     }

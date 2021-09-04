@@ -11,7 +11,7 @@ window.gm.encounters.mole = function(params) {
         let mobs =[];
         for(var i=amount?amount:1;i>0;i-=1) {
             let x = window.gm.Mobs.Mole(); x.scaleLevel(window.gm.player.level);
-            mobs.push(x)
+            x.name+='#'+i;mobs.push(x);
         }
         return(mobs);});
     window.gm.Encounter.Location = location?location:window.passage.name;
@@ -28,7 +28,7 @@ window.gm.encounters.leech = function(params) {
         let mobs =[];
         for(var i=amount?amount:1;i>0;i-=1) {
             let x = window.gm.Mobs.Leech(); x.scaleLevel(window.gm.player.level);
-            mobs.push(x)
+            x.name+='#'+i;mobs.push(x);
         }
         return(mobs);});
     window.gm.Encounter.Location = location?location:window.passage.name;
@@ -42,7 +42,7 @@ window.gm.encounters.slug = function(params) {
         let mobs =[];
         for(var i=amount?amount:1;i>0;i-=1) {
             let x = window.gm.Mobs.Slug(); x.scaleLevel(window.gm.player.level);
-            mobs.push(x)
+            x.name+='#'+i;mobs.push(x);
         }
         return(mobs);});
     window.gm.Encounter.Location = location?location:window.passage.name;
@@ -56,9 +56,9 @@ window.gm.encounters.slugLeech = function(params) {
         let mobs =[];
         for(var i=amount?amount:1;i>0;i-=1) {
             let x = window.gm.Mobs.Slug(); x.scaleLevel(window.gm.player.level);
-            mobs.push(x);
+            x.name+='#'+i;mobs.push(x);
             x = window.gm.Mobs.Leech(); x.scaleLevel(window.gm.player.level);
-            mobs.push(x);
+            x.name+='#'+i;mobs.push(x);
         }
         return(mobs);});
     window.gm.Encounter.Location = location?location:window.passage.name;
@@ -72,7 +72,7 @@ window.gm.encounters.succubus = function(params) {
         let mobs =[];
         for(var i=amount;i>0;i-=1) {
             let x = window.gm.Mobs.Succubus(); x.scaleLevel(window.gm.player.level);
-            mobs.push(x)
+            x.name+='#'+i;mobs.push(x);
         }
         return(mobs);});
     window.gm.Encounter.Location = location?location:window.passage.name;
@@ -94,7 +94,7 @@ window.gm.encounters.huntress = function(params) {
         let mobs =[];
         for(var i=amount;i>0;i-=1) {
             let x = window.gm.Mobs.Huntress(); x.scaleLevel(window.gm.player.level);
-            mobs.push(x)
+            x.name+='#'+i;mobs.push(x);
         }
         return(mobs);});
     window.gm.Encounter.Location = location?location:window.passage.name;
@@ -108,13 +108,14 @@ window.gm.encounters.lizan = function(params) {
         let mobs =[];
         for(var i=amount;i>0;i-=1) {
             let x = window.gm.Mobs.Lizan(); x.scaleLevel(window.gm.player.level);
-            mobs.push(x)
+            x.name+='#'+i;mobs.push(x);
         }
         return(mobs);});
     window.gm.Encounter.Location = location?location:window.passage.name;
     window.gm.Encounter.scenePic = window.gm.getScenePic(window.gm.Encounter.Location);
     window.gm.Encounter.initCombat();
 }
+/*------------------------*/
 window.gm.encounters.wolf = function(params) {
     var amount=(params&&params.amount)?params.amount:1, location=(params&&params.location)?params.location:window.passage.name;
     var type =(params&&params.type)?params.type:0;
@@ -129,7 +130,7 @@ window.gm.encounters.wolf = function(params) {
             } else {
                 x.Outfit.addItem(PenisHuman.factory('wolf'));
             }
-            mobs.push(x)
+            x.name+='#'+i;mobs.push(x);
         }
         return(mobs);});
     window.gm.Encounter.Location = location?location:window.passage.name;
@@ -138,7 +139,9 @@ window.gm.encounters.wolf = function(params) {
         return('You cannot fight anymore and surrender to the beast.</br>'+ window.gm.printPassageLink('Next','WolfSubmit'));
     }
     window.gm.Encounter.onVictory = function() {
-        return('Intimitated, the wolf rolls on its back, whimpering submissively and exposing its throat.</br>'+this.fetchLoot()+'</br>'+ window.gm.printPassageLink('Next','WolfVictory'));
+        window.story.state.tmp.args=[(function() { window.gm.sex.wolfOnPlayer({state:0, battleResult:'victory'});})];
+        return('Intimitated, the wolf rolls on its back, whimpering submissively and exposing its throat.</br>'+this.fetchLoot()+'</br>'+ window.gm.printPassageLink('Next','GenericPassage'));
+        //return('Intimitated, the wolf rolls on its back, whimpering submissively and exposing its throat.</br>'+this.fetchLoot()+'</br>'+ window.gm.printPassageLink('Next','WolfVictory'));
     }
     window.gm.Encounter.sceneDone=false; //attach flag to Encounter-Instance;
     window.gm.Encounter.onMoveSelect = function() {
@@ -156,9 +159,12 @@ window.gm.encounters.dryad = function(params) {
     var amount=(params&&params.amount)?params.amount:1, location=(params&&params.location)?params.location:window.passage.name;
     window.gm.Encounter = new Encounter();
     window.gm.Encounter.EnemyFunc = (function() { 
-        let x = window.gm.Mobs.Dryad();
-        x.scaleLevel(window.gm.player.level);
-        return([x]);});
+        let mobs =[];
+        for(var i=amount;i>0;i-=1) {
+            let x = window.gm.Mobs.Dryad(); x.scaleLevel(window.gm.player.level);
+            x.name+='#'+i;mobs.push(x);
+        }
+        return(mobs);});
     window.gm.Encounter.Location = location?location:window.passage.name;
     window.gm.Encounter.onSubmit =window.gm.Encounter.onDefeat = function() {
         return('You cannot fight anymore and surrender to the strange woman.</br>'+ window.gm.printPassageLink('Next','DryadSubmit'));

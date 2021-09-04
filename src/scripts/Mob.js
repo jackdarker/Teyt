@@ -8,6 +8,7 @@ class Mob extends Character {
         this.loot =[];   //[{id:'healthpotion',chance:5, amount:1}]
         this.levelUp(1);
         this.autoLeveling();
+        this.despawn=false;
     }
     //override to return the next move to execute
     //OK = false if no action, else true

@@ -40,18 +40,20 @@ class Mole extends Mob {
 class Wolf extends Mob {
     static factory(type) {
         let foe = new Wolf();
-        if(type==='Alpha') {
-            this.name = this.id = 'Alpha-Wolf'; //todo CallHelp
-            this.Stats.increment('healthMax',-0.3*(this.health().max));
+        if(type==='AlphaWolf') {
+            foe.name = foe.id = 'AlphaWolf'; //todo CallHelp
+            foe.Stats.increment('healthMax',-0.3*(foe.health().max));
+            foe.Skills.addItem(SkillCallHelp.factory('Wolf')); //todo chance to call?
+            foe.pic= 'assets/battlers/wolf1.svg';
         } else {
-            this.Stats.increment('healthMax',-0.5*(this.health().max));
+            foe.Stats.increment('healthMax',-0.5*(foe.health().max));
         }
         return foe;
     }
     constructor() {
         super();
         this.name = this.id = 'Wolf';
-        this.pic= 'assets/battlers/wolf1.svg';
+        this.pic= 'assets/battlers/wolf3.svg';
         this.level_min =3;
         this.loot= [{id:'WolfTooth',chance:25,amount:1}];
         this.Outfit.addItem(new BaseQuadruped());
@@ -59,12 +61,13 @@ class Wolf extends Mob {
         this.Outfit.addItem(HandsPaw.factory('wolf'));
         this.Outfit.addItem(TailWolf.factory('wolf'));
         this.Outfit.addItem(FaceWolf.factory('wolf'));
-        this.Stats.increment('armblunt',5);
+        this.Stats.increment('arm_blunt',5);
         this.fconv = null; //lazy init because descfixer depends on gm.player
     }
     calcCombatMove(enemys,friends){
         let result = {OK:true,msg:''};//this._canAct();
         let rnd = _.random(1,100);
+        let spawn="CallHelpWolf";
         //if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
         result.action =result.target= null;
         if(window.story.state.combat.turnCount%2===0) {
@@ -72,6 +75,12 @@ class Wolf extends Mob {
             result.action = "Bite";
             result.target = [enemys[rnd]];
             result.msg =this.name+" snaps at "+result.target[0].name+".</br>"+result.msg;
+            return(result);
+        } else if(window.story.state.combat.turnCount>3 && this.Skills.countItem(spawn)>0 &&
+            this.Skills.getItem(spawn).isEnabled().OK) {
+            result.action = spawn;
+            result.target = [this];
+            result.msg =this.name+" howls to call its pack for support.</br>"+result.msg;
             return(result);
         }
         return(super.calcCombatMove(enemys,friends));
@@ -152,16 +161,16 @@ class Lizan extends Mob {
     static factory(type) {
         let foe = new Lizan();
         if(type==='spearthrower') {
-            this.Outfit.addItem(SpearWodden.factory(100));
+            foe.Outfit.addItem(SpearWodden.factory(100));
         } else {
-            this.Outfit.addItem(new DaggerSteel());
+            foe.Outfit.addItem(new DaggerSteel());
         }
         return foe;
     }
     constructor() {
         super();
         this.name = this.id = 'Lizan';
-        this.pic= 'assets/icons/icon_question.svg';
+        this.pic= 'assets/battlers/lizan1.svg';
         this.Outfit.addItem(new BaseHumanoid());
         this.Outfit.addItem(SkinScales.factory('lizard'));
         this.Outfit.addItem(HandsHuman.factory('lizard'));
@@ -184,7 +193,7 @@ class Lizan extends Mob {
         if(window.story.state.combat.turnCount%2===0) {
             result.action = "Guard";
             result.target = [this];
-            result.msg =this.name+" retreats somewhat and moves into a defensive stance.</br>"+result.msg;
+            result.msg =this.name+" croutches into a defensive stance.</br>"+result.msg;
             return(result);
         }
         return(super.calcCombatMove(enemys,friends));
@@ -194,9 +203,9 @@ class Huntress extends Mob {
     static factory(type) {
         let foe = new Huntress();
         if(type==='spearthrower') {
-            this.Outfit.addItem(SpearWodden.factory(100));
+            foe.Outfit.addItem(SpearWodden.factory(100));
         } else {
-            this.Outfit.addItem(new DaggerSteel());
+            foe.Outfit.addItem(new DaggerSteel());
         }
         return foe;
     }

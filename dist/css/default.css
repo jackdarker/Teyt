@@ -26,7 +26,7 @@ article {
   background: #e4e4e4;
 }
 a {
-    line-height: 150%;
+    /*line-height: 150%;*/
     background-color: transparent;
     color:royalblue;
     text-decoration-color: initial;
@@ -67,9 +67,9 @@ tw-story {
   height:100vh; 
   /*width:95vW;*/
   max-width: 60em;
-    margin: 0 0/*auto*/; 
-    line-height: 100%;
-    display: block;
+  margin: 0 0/*auto*/; 
+  line-height: 100%;
+  display: block;
 }
 
 dialog {
@@ -247,7 +247,7 @@ statdown {
   background-color: darkred;
 }
 .author::before {content: 'authors-note: ';}
-.progress-bar-striped {
+.progressbar {
   overflow: hidden;
   background-color: lightgray;
   /*height: 20px;*/
@@ -258,7 +258,7 @@ statdown {
   -moz-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);*/
 }
-.progress-bar-striped > div {
+.progressbar > div {
   /*background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
   background-size: 40px 40px;*/
   float: left;
@@ -275,10 +275,10 @@ statdown {
   -moz-transition: width 1s ease;
   -o-transition: width 1s ease;
   transition: width 1s ease;
-  /*animation: progress-bar-stripes 1s linear infinite;*/
+  /*animation: progressbarstripes 1s linear infinite;*/
   background-color: #de2828;
 }
-/*@keyframes progress-bar-stripes {
+/*@keyframes progressbarstripes {
 
   0% {
     background-position: 40px 0;
@@ -287,7 +287,7 @@ statdown {
     background-position: 0 0;
   }
 }*/
-.progress-bar-striped p{
+.progressbar p{
   margin: 0;
 }
 
@@ -335,7 +335,7 @@ div.scroll {
     padding: 1em;
 	  grid-column: 2;
 	  grid-column-end: -1;
-    line-height: 130%;
+    /*line-height: 130%;*/
     /*height: 100%;*/
     overflow-x: hidden;
     overflow-y: auto;  

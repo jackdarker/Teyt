@@ -166,7 +166,7 @@ targetFilterEnemy(targets){
             var valid = true;
             for(var targ of target) {
                 if(this.caster.faction == targ.faction) valid=false;
-                if(targ.isDead()) valid=false;
+                //if(targ.isKnockedOut()) valid=false;
             }
             if(valid) possibleTarget.push(target);
         }
@@ -188,7 +188,7 @@ targetFilterAlive(targets){    //chars that are not dead
         for(var target of targets){
             var valid = true;
             for(var targ of target) {
-                if(targ.isDead()) valid=false;
+                if(targ.isKnockedOut()) valid=false; //todo ..isDead()??
             }
             if(valid)
                 possibleTarget.push(target); 

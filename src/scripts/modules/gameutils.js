@@ -92,8 +92,11 @@ window.gm.initGame= function(forceReset,NGP=null) {
       ch.Outfit.addItem(new FaceHuman());
       ch.Outfit.addItem(HandsHuman.factory('human'));
       ch.Outfit.addItem(PenisHuman.factory('human'));
-      ch.Skills.addItem(new SkillInspect());
-      ch.Skills.addItem(new SkillUltraKill());
+      if(s._gm.debug) {
+        ch.Skills.addItem(new SkillInspect());
+        ch.Skills.addItem(new SkillUltraKill());
+        ch.Skills.addItem(SkillCallHelp.factory('Wolf'));
+      }
       s.PlayerVR=ch;
     }
     if (!s.PlayerRL||forceReset) {  

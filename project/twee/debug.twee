@@ -41,8 +41,8 @@ Crash if you enter wrong things below !</br>
 <label for="addoutfit">add wardrobe:<input type="text" id="addoutfit" name="addoutfit"></label><a0  onclick='window.gm.player.Wardrobe.addItem(window.gm.ItemsLib[document.getElementById("addoutfit").value]())'>Go</a></br>
 (only wardrobe-items except weapons! You need to equip them in wardrobe.)</br>
 <label for="startfight">start fight:<input type="text" id="startfight" name="startfight"></label><label for="startfight2">params:<input type="text" id="startfight2" name="startfight2"></label>
-<a0  onclick='window.gm.encounters[document.getElementById("startfight").value](document.getElementById("startfight2").value)'>Go</a></br>
-(use Encounter-name, might sent you to certain events on defeat/victory. Might need extra params like {location:'forest', amount:1})</br>
+<a0  onclick='window.gm.encounters[document.getElementById("startfight").value](JSON.parse(document.getElementById("startfight2").value))'>Go</a></br>
+(use Encounter-name, might sent you to certain events on defeat/victory. Might need extra params like {"location":"forest", "amount":1})</br>
 </article><article id="LogPanel"></article></section>
 <script> function unhideStats() {
     var ids = window.gm.player.Stats.getAllIds();
@@ -96,7 +96,7 @@ Theme:
 <statup>Statup</statup>  <statdown>Statdown</statdown> <span class='red'>RED</span><span class='green'>GREEN</span>
 <p class='div_alarm'>ALARM</p>
 <hr>
-<div class="progress-bar-striped">
+<div class="progressbar">
 			<div style="width: 100%;"><b><p>100%</p></b></div>
 		</div>
 		<div>
@@ -122,8 +122,8 @@ Theme:
 <script>
 function change(){
 				var selectedValue = document.querySelector("#progress-value").value;
-				document.querySelector(".progress-bar-striped > div").textContent = selectedValue + "%";
-				document.querySelector(".progress-bar-striped > div").style.width = selectedValue + "%";
+				document.querySelector(".progressbar > div").textContent = selectedValue + "%";
+				document.querySelector(".progressbar > div").style.width = selectedValue + "%";
 			}
 </script>
 

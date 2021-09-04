@@ -50,17 +50,25 @@ initCombat() {
   this.msg='';
   window.story.show("EncounterStartTurn");
 }
-//spawns additional enemys or friends
-//called by effCallHelp at begin of turn
-spawnChar(item,party,amount){
+
+/**
+ *spawns additional enemys or friends
+ *called by effCallHelp at begin of turn
+ * @param {*} item
+ * @param {*} party
+ * @return {*} 
+ * @memberof Encounter
+ */
+spawnChar(item,party){
   let s=window.story.state;
   let mob = window.gm.Mobs[item]();
-  mob.faction = party;
+  mob.faction = party,mob.despawn=true;
   let list = s.combat.enemyParty.concat(s.combat.playerParty);
-  let uid=1;
+  let uid=1;//need to build unique id
   for(el of list) {
     if(mob.__proto__.isPrototypeOf(el)) {
       //expecting Mole#2
+
       uid = Math.max(uid,parseInt(el.name.split('#')[1],10)+1);
     };
   }
@@ -71,6 +79,7 @@ spawnChar(item,party,amount){
   } else {
     s.combat.enemyParty.push(mob);
   }
+  return(mob.name);
 }
 hideCombatOption() {
   document.querySelector("#choice").remove();
@@ -85,7 +94,7 @@ renderCombatScene() {
   var _back = `url("${window.story.state.combat.scenePic}") no-repeat center`;
   var list = window.story.state.combat.enemyParty;
   for(var i=list.length-1;i>=0;i--) {
-    if(!list[i].isDead()) {
+    if(!list[i].isKnockedOut()) { //todo show deathsprite
       var pos = _pos.pop();
       _back =`url("${list[i].pic}") no-repeat ${pos[0]}% /contain,`+_back;
     }
@@ -121,7 +130,7 @@ renderCombatScene() {
 //creates a list of active effects for combat display
 printCombatEffects(char) {
   let list=[];
-  if(char.isDead()) { //if char is dead print this instead other effects; effects also get not updated when dead??
+  if(char.isKnockedOut()) { //if char is dead print this instead other effects; effects also get not updated when dead??
     list.push('knocked out');
   } else {
     let effects = char.Effects.getAllIds();
@@ -134,17 +143,11 @@ printCombatEffects(char) {
   }
   return(list.reduce((sum, current) => sum + current +', ', ''));
 }
-bargraph(value,max,color) {
-  let msg ='';
-  let rel = value/max*100;
-  msg ='<div class="progress-bar-striped"><div style="background-color:'+color+'; width: '+rel.toString()+'%;"><p>'+value.toString()+'/'+max.toString()+'</p></div></div>';
-  return(msg); //todo bargraph animation doesnt work because the whole page is reloaded instead of just width change
-}
 statsline(whom,mark) {
-  let msg='';
+  let msg='',bargraph=window.gm.util.bargraph;
   if(mark) msg = "<td style=\"border-style:dotted;\">";
   else msg = "<td>";
-  msg+=whom.name+" Lv"+whom.level+"</td><td>"+this.bargraph(whom.health().value,whom.health().max,"lightcoral")+"</td><td>"+this.bargraph(whom.Stats.get("arousal").value,whom.Stats.get("arousalMax").value,"lightpink")+"</td><td>"+this.bargraph(whom.energy().value,whom.energy().max,"lightyellow")+"</td><td>"+this.bargraph(whom.Stats.get("will").value,whom.Stats.get("willMax").value,"lightblue")+"</td>";
+  msg+=whom.name+" Lv"+whom.level+"</td><td>"+bargraph(whom.health().value,whom.health().max,"lightcoral")+"</td><td>"+bargraph(whom.Stats.get("arousal").value,whom.Stats.get("arousalMax").value,"lightpink")+"</td><td>"+bargraph(whom.energy().value,whom.energy().max,"lightyellow")+"</td><td>"+bargraph(whom.Stats.get("will").value,whom.Stats.get("willMax").value,"lightblue")+"</td>";
   return(msg);
 }
 //prints a table with all player/enemy data
@@ -203,7 +206,7 @@ printSkillList() {
         return(window.gm.Encounter._postSkillSelect.bind(me,target));}(this,skillIds[i])));
       entry.textContent=s.combat.actor.Skills.getItem(skillIds[i]).name;
       res = s.combat.actor.Skills.getItem(skillIds[i]).isEnabled();
-      entry.disabled=!res.OK; entry.Title=res.msg;  //Todo use pointevent+toasty?
+      entry.disabled=!res.OK; entry.title=res.msg;  //Todo use pointevent+toasty?
       $("div#choice")[0].appendChild(entry);      // <- requires this node in html
     }
   } else {  //cannot do a thing
@@ -368,7 +371,7 @@ fetchLoot(){ //if you are victorious: grant XP & transfer Loot to player
 }
 isAllDefeated(party) {
   for(var i=0;i<party.length;i++) {
-    if(!party[i].isDead()) return(false);
+    if(!party[i].isKnockedOut()) return(false);
   }
   return(true);
 }
@@ -397,7 +400,8 @@ preTurn() {
   let list = s.combat.enemyParty.concat(s.combat.playerParty);
   //update combateffects
   for(let k=list.length-1; k>=0;k--){
-    if(list[k].isDead()) {
+    if(list[k].isKnockedOut()) {
+      if(list[k].despawn===true) list.splice(k,1); //remove spawned chars - you will not get loot for them !
       continue;
     }
     let effects = list[k].Effects.getAllIds();
@@ -450,7 +454,16 @@ selectChar() {
   }
   return(result);
 }
-
+targetFilterAlive(targets){    //chars that are not dead
+  var possibleTarget = [];
+  for(var target of targets){
+      var valid = true;
+      if(target.isKnockedOut()) valid=false; //todo ..isDead()??
+      if(valid)
+          possibleTarget.push(target); 
+  }
+  return possibleTarget;
+}
 selectMove() {
   let s = window.story.state;
   let result = {OK:false, msg:''};
@@ -458,7 +471,7 @@ selectMove() {
     result = this.onMoveSelect();
     if(result.OK) return(result);
   }
-  if(s.combat.actor.isDead())  { //skip char if already dead
+  if(s.combat.actor.isKnockedOut())  { //skip char if already dead
     this.next=this.selectChar;
     return(result);
   }
@@ -471,7 +484,8 @@ selectMove() {
     return(result);
   } else {
     if(s.combat.actor.isAIenabled && s.combat.actor.calcCombatMove) { //selected by AI
-      result = s.combat.actor.calcCombatMove(window.story.state.combat.playerParty,window.story.state.combat.enemyParty);
+      result = s.combat.actor.calcCombatMove(this.targetFilterAlive(window.story.state.combat.playerParty),
+        this.targetFilterAlive(window.story.state.combat.enemyParty));
       window.story.state.combat.action=result.action;
       window.story.state.combat.target=result.target;
       this.next=this.execMove; 
@@ -545,6 +559,12 @@ battle() {
 window.gm.combat.inCombat = function() {
   return(window.story.state.combat.inCombat);
 }
+/**
+ * bonusmultiplicator for target depending on level difference
+ * @param {*} attacker 
+ * @param {*} target 
+ */
+window.gm.combat.lvlDiffBonus = function(attacker,target){return(1+(target.level-attacker.level)*0.15);}; //+2lvl = + 30%
 //calculates if target can evade the attack 
 /*requires minimum Poise
 Evasion depends on Agility & Endurance:
@@ -555,7 +575,7 @@ Stunned/Bound Chars can not evade */
 // on evasion returns false and a message
 window.gm.combat.calcEvasion=function(attacker,target, attack) {
   var result = {OK:true,msg:''}
-  var rnd = window.gm.roll(1,100);
+  var rnd = window.gm.roll(0,100);
 
   if(target.Effects.findItemSlot(effStunned.name)>=0) { //todo chance to miss 
     result.OK = true; 
@@ -563,10 +583,9 @@ window.gm.combat.calcEvasion=function(attacker,target, attack) {
     attack.crit = true; //when stunned always critical hit
     return(result);
   }
- //todo chance depends on ?
-  var lvlDiff = target.level-attacker.level;
-  var chance = target.Stats.get("agility").value + target.Stats.get("perception").value;  
-  chance += lvlDiff*4;
+  var lvlDiffBonus = window.gm.combat.lvlDiffBonus(attacker,target);
+  var chance = 0+lvlDiffBonus*(target.Stats.get("agility").value + target.Stats.get("perception").value);  
+  chance-=attack.mod.hitChance/100*(attacker.Stats.get("agility").value + attacker.Stats.get("perception").value);
   window.gm.pushLog(`evasion roll: ${chance} vs ${rnd} `,window.story.state._gm.dbgShowCombatRoll);
   if(chance>rnd) {
     result.OK = false;
@@ -588,7 +607,7 @@ on success no damage is taken (might consume weapon-stability)
 if a critical is rolled, 50% of the attackers damage is reflected to him*/
 window.gm.combat.calcParry=function(attacker,target, attack) {
   var result = {OK:true,msg:'',foo:null}
-  var rnd = _.random(1,100);
+  var rnd = _.random(0,100);
 
   if(target.Effects.findItemSlot(effStunned.name)>=0) {
     result.OK = true; 
@@ -597,9 +616,9 @@ window.gm.combat.calcParry=function(attacker,target, attack) {
     return(result);
   }
   //todo block if has shield, parry if has weapon
-  var lvlDiff = target.level-attacker.level;
-  var chance = target.Stats.get("agility").value + target.Stats.get("endurance").value;
-  chance += lvlDiff*4;
+  var lvlDiffBonus = window.gm.combat.lvlDiffBonus(attacker,target);
+  var chance = 0+lvlDiffBonus*(target.Stats.get("agility").value + target.Stats.get("endurance").value);  
+  chance-=attack.mod.hitChance/100*(attacker.Stats.get("agility").value + attacker.Stats.get("endurance").value);
   window.gm.pushLog(`parry roll: ${chance} vs ${rnd} `,window.story.state._gm.dbgShowCombatRoll);
   if(chance>rnd && rnd<10) { 
     result.OK = false;
@@ -622,8 +641,8 @@ hp-dmg = attack -DR but min.1 */
 window.gm.combat.calcAbsorb=function(attacker,defender, attack) {
   let result = {OK:true,msg:''}
   let rnd = _.random(1,100);
-  if(attack.mod.onCrit.length>0 && rnd<attack.mod.critChance) {  //is critical
-    result.msg = defender.name +' got critical hit by '+attacker.name+'. ';
+  if(attack.mod.onCrit.length>0 && ((rnd<attack.mod.critChance) || attack.crit===true)) {  //is critical
+    attack.crit=true, result.msg = defender.name +' got critical hit by '+attacker.name+'. ';
     for(el of attack.mod.onCrit) {
         attack.effects.push( {target:el.target, eff:el.eff}); //el.eff is []
     }
@@ -685,8 +704,8 @@ window.gm.combat.scaleEffect = function(attack) {
       target = op[i].target;
       for(el of op[i].eff) {
         if(el.name===effDamage.name) {  //dmg = (attack-armor)*(100%-resistance) but min. 1pt
-          arm = target.Stats.getItem('arm'+el.type).value;
-          rst = target.Stats.getItem('rst'+el.type).value;
+          arm = target.Stats.getItem('arm_'+el.type).value;
+          rst = target.Stats.getItem('rst_'+el.type).value;
           dmg = Math.max(1,(el.amount-arm)*(100-rst)/100);
           el.amount=dmg;
           if(target.Effects.findEffect("effMasochist").length>0) {
@@ -698,8 +717,8 @@ window.gm.combat.scaleEffect = function(attack) {
           //todo vulnerable if inHeat, like/dislike attacker
           //bondage-fetish -> bonus for bond-gear
           el.amount *= 1+Math.sqrt(el.lewds.slut)/10; //bonus for slutty wear
-          arm = target.Stats.getItem('armtease').value;
-          rst = target.Stats.getItem('rsttease').value;
+          arm = target.Stats.getItem('arm_tease').value;
+          rst = target.Stats.getItem('rst_tease').value;
           dmg = Math.max(0,(el.amount-arm)*(100-rst)/100); //might cause 0 dmg
           el.amount=dmg;
         }
@@ -712,12 +731,17 @@ window.gm.combat.scaleEffect = function(attack) {
   return(res);
 }
 window.gm.combat.calcTeaseAttack=function(attacker,defender,attack) {
-  let result = {OK:true,msg:''};
+  let result = {OK:true,msg:''},_tmp='';
   window.gm.combat.scaleEffect(attack);
   //todo chance to fail?
   //todo self-dmg if exhibitionist/stripper
   result = window.gm.combat.calcAbsorb(attacker,defender,attack);  //deal damage
-  var _tmp = result.msg;
+  /*if(attack.crit) { //todo text should be generated in Skill: "by tweezing those nipples on your gorgous DD bust..."
+    result.msg = defender.name +' got heavily teased by '+attacker.name+'. ';
+  } else {
+    result.msg = defender.name +'\'s arousal increased. ';
+  }*/
+  _tmp += result.msg;
   result.msg = _tmp;
   return(result);
 }

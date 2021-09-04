@@ -59,6 +59,15 @@ You cant hold any longer and shoot your jizzm inside her.
 <div></br><a0 onclick='window.gm.respawn();'>Black out</a></br></div>
 </article><article id="LogPanel"></article></section>
 
+:: GenericPassage [_nosave_]
+<!--call this passage after setting -->
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<div id='panel'></div><!--description is rendered here-->
+<div id='choice'></div> <!--choice is rendered here-->
+</article><article id="LogPanel"></article></section>
+<script>window.story.state.tmp.args[0]();
+</script>
+
 :: WolfVictory
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <div id='panel'></div><!--description is rendered here-->
@@ -128,7 +137,7 @@ Several religious directions state that this is against natures law and has to b
 :: ReactionTest
 <p>Click Start and then click somewhere on the bar to stop the green rectangle in the yellow hit-area.</p>
 <div id='canvas'></div>
-<div class="progress-bar" id='clickHere' style='height:1em; width: 100%;'><div id='bar' style="position:relative; width:5%; height:100%; background-color:green;"></div></div>
+<div class="progressbar" id='clickHere' style='height:1em; width: 100%;'><div id='bar' style="position:relative; width:5%; height:100%; background-color:green;"></div></div>
 <a0 id='btStart'>Start</a><p id='result'></p>
 <script>
 function onStop(value) {
@@ -141,7 +150,7 @@ document.getElementById('clickHere').addEventListener("click", _game.click);
 
 :: ReactionTest2
 <p>Click Start and then keypress A/D to fill meter.</p>
-<div class="progress-bar" id='clickHere' style='height:1em; width: 100%;'><div id='bar' style="position:relative; width:5%; height:100%; background-color:green;"></div></div>
+<div class="progressbar" id='clickHere' style='height:1em; width: 100%;'><div id='bar' style="position:relative; width:5%; height:100%; background-color:green;"></div></div>
 <a0 id='btStart'>Start</a><p id='result'></p>
 <p><output id="losgelassen"><output></output></p>
 <script>
