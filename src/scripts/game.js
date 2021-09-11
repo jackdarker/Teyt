@@ -1,43 +1,8 @@
 "use strict";
-/**
- * extends Function with the possibility to execute it multiple times with delay
- * var foo = function test(startTime, count) { alert(startTime + count);};
- * new foo.Timer(2000,3,null);
- * see https://wiki.selfhtml.org/wiki/JavaScript/Tutorials/komfortable_Timer-Funktion
- * @param {int} interval: in ms 
- * @param {*} calls : how many times or use Infinity
- * @param {*} onend : optional CB fired after #calls or if function returns false
- */
-//todo unused because no simple way to stop running timer?!
-/*Function.prototype.Timer = function (interval, calls, onend) {
-  var count = 0;
-  var payloadFunction = this;
-  //payloadFunction.abortTimer = false;
-  var startTime = new Date();
-  var callbackFunction = function () {
-    return payloadFunction(startTime, count);
-  };
-  var endFunction = function () {
-    if (onend) {
-      onend(startTime, count, calls);
-    }
-  };
-  var timerFunction = function () {
-    count++;
-    if(payloadFunction.abortTimer) return;
-    if (count < calls && callbackFunction() != false) {
-      window.setTimeout(timerFunction, interval);
-    } else {
-      endFunction();
-    }
-  };
-  timerFunction();
-};*/
-/*
-core functionality
-*/
+
 window.gm = window.gm || {}; //game related operations
 window.gm.util = window.gm.util || {};  //utility functions
+
 // helper for publisher/subscriber-pattern; myObject.ps =PubSub(); myObject.ps.subscribe(...
 // !! warning, dont use for objects that need to be loaded from savegame
 // the reviver calls constructor of nested objects multiple times which lead to multiple registrations with partially incomplete objects in the PubSub;
@@ -82,6 +47,31 @@ window.gm.util.bargraph=function(value,max,color) {
   msg ='<div class="progressbar"><div style="background-color:'+color+'; width: '+rel.toString()+'%;"><p>'+value.toString()+'/'+max.toString()+'</p></div></div>';
   return(msg); //todo bargraph css-animation doesnt work because the whole page is reloaded instead of just width change
 }
+/* Uploads SVG files from local file system, based on file selected in input; https://github.com/fizzstudio/svg-load-save */
+window.gm.util.loadLocalSVG=function(event) {
+    let file = event.target.files[0]; // FileList object
+    if (file) {
+      const file_reader = new FileReader();
+      if (`image/svg+xml` == file.type) {
+        file_reader.readAsText(file);
+        file_reader.addEventListener(`load`, function () {
+          var file_content = file_reader.result;
+          window.gm.util.insertSvg(file_content);
+        }.bind(this), false);
+      }
+    }
+};
+  /* Inserts SVG files into HTML document */
+window.gm.util.insertSvg=function(file_content) {
+    // insert SVG file into HTML page
+    const svg_container = document.getElementById("svg_container");
+    svg_container.innerHTML = file_content;
+    // TODO: insert any SVG handler here
+    // adds `click` event listener to inserted SVG to test modification of SVG file, for later saving
+    if (this.event_handler) {
+      svg_container.firstChild.addEventListener("click", this.event_handler, false)
+    }
+};
 //-------------------------------------------------
 // reimplement to setup the game !
 window.gm.initGame= function(forceReset,NGP=null) {

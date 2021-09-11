@@ -382,10 +382,12 @@ var s=window.story.state;var result={OK:false,msg:''};this.printTargetList();res
 if(s.combat.action!==null&&s.combat.action!==''){result.msg=s.combat.actor.Skills.getItem(s.combat.action).cast(s.combat.target).msg;}result.OK=true;this.printNextLink(this.checkDefeat);//todo continue automatically if next actor is AI
 return result;}},{key:"postBattle",value:function postBattle(){this.next=null;//terminate SM
 var s=window.story.state;var result={OK:false,msg:''};//check if battle end reason...
-if(s.combat.playerFleeing===true){result.OK=true,result.msg=this.onFlee();}else if(s.combat.playerSubmitting===true){result.OK=true,result.msg=this.onSubmit();}else if(this.isAllDefeated(s.combat.enemyParty)){result.OK=true,result.msg=this.onVictory();}else if(this.isAllDefeated(s.combat.playerParty)){result.OK=true,result.msg=this.onDefeat();}this.endCombat();return result;}//this runs the statemachine and is triggered by user input
-},{key:"battle",value:function battle(){var result={OK:false,msg:''};while(this.next!==null&&!result.OK){//if result =true; user input required
-result=this.next();if(result.OK){result.msg=this.msg+result.msg;return result;}}return result;}}]);return Encounter;}();//returns true if in combat
-window.gm.combat.inCombat=function(){return window.story.state.combat.inCombat;};/**
+if(s.combat.playerFleeing===true){result.OK=true,result.msg=this.onFlee();}else if(s.combat.playerSubmitting===true){result.OK=true,result.msg=this.onSubmit();}else if(this.isAllDefeated(s.combat.enemyParty)){result.OK=true,result.msg=this.onVictory();}else if(this.isAllDefeated(s.combat.playerParty)){result.OK=true,result.msg=this.onDefeat();}this.endCombat();return result;}/**
+ * this runs the statemachine and is triggered by user input
+ */},{key:"battle",value:function battle(){var result={OK:false,msg:''};while(this.next!==null&&!result.OK){//if result =true; user input required
+result=this.next();if(result.OK){result.msg=this.msg+result.msg;return result;}}return result;}}]);return Encounter;}();/*
+ * returns true if in combat
+*/window.gm.combat.inCombat=function(){return window.story.state.combat.inCombat;};/**
  * bonusmultiplicator for target depending on level difference
  * @param {*} attacker 
  * @param {*} target 
@@ -577,41 +579,7 @@ if(minimap){//only print rooms 1 step around player
 _line+=this.floor.name+"</br>";var x,y;for(j=-3;j<=3;j++){for(i=-3;i<=3;i++){x=i+(playerX-this.minX)*2,y=j+(playerY-this.minY)*2;//coord can be negative ! 
 if(map.length-1<x||0>x)continue;if(map[x].length-1<y||0>y)continue;_line+=(i==-3?"&nbsp;":"")+map[x][y];//todo hack:if line starts with -, snowman-markdown interprets this as <ul> ?!
 }_line+="\n";}}else{//full map of floor
-_line+=this.floor.dungeon.name+" "+this.floor.name+"</br>";for(j=0;j<2*(this.maxY-this.minY)+1;j++){for(i=0;i<2*(this.maxX-this.minX)+1;i++){_line+=map[i][j];}_line+="\n";}_line+="<pre>Legend: P=Player, &ang;=Stair, E=Entry/Exit S=Save</pre></br>";}_line+="</pre>";return _line;}}]);return DngMapper;}();"use strict";/**
- * extends Function with the possibility to execute it multiple times with delay
- * var foo = function test(startTime, count) { alert(startTime + count);};
- * new foo.Timer(2000,3,null);
- * see https://wiki.selfhtml.org/wiki/JavaScript/Tutorials/komfortable_Timer-Funktion
- * @param {int} interval: in ms 
- * @param {*} calls : how many times or use Infinity
- * @param {*} onend : optional CB fired after #calls or if function returns false
- */ //todo unused because no simple way to stop running timer?!
-/*Function.prototype.Timer = function (interval, calls, onend) {
-  var count = 0;
-  var payloadFunction = this;
-  //payloadFunction.abortTimer = false;
-  var startTime = new Date();
-  var callbackFunction = function () {
-    return payloadFunction(startTime, count);
-  };
-  var endFunction = function () {
-    if (onend) {
-      onend(startTime, count, calls);
-    }
-  };
-  var timerFunction = function () {
-    count++;
-    if(payloadFunction.abortTimer) return;
-    if (count < calls && callbackFunction() != false) {
-      window.setTimeout(timerFunction, interval);
-    } else {
-      endFunction();
-    }
-  };
-  timerFunction();
-};*/ /*
-core functionality
-*/window.gm=window.gm||{};//game related operations
+_line+=this.floor.dungeon.name+" "+this.floor.name+"</br>";for(j=0;j<2*(this.maxY-this.minY)+1;j++){for(i=0;i<2*(this.maxX-this.minX)+1;i++){_line+=map[i][j];}_line+="\n";}_line+="<pre>Legend: P=Player, &ang;=Stair, E=Entry/Exit S=Save</pre></br>";}_line+="</pre>";return _line;}}]);return DngMapper;}();"use strict";window.gm=window.gm||{};//game related operations
 window.gm.util=window.gm.util||{};//utility functions
 // helper for publisher/subscriber-pattern; myObject.ps =PubSub(); myObject.ps.subscribe(...
 // !! warning, dont use for objects that need to be loaded from savegame
@@ -620,7 +588,11 @@ window.gm.util=window.gm.util||{};//utility functions
 window.gm.util.PubSub=function(){return{events:{},subscribe:function subscribe(event,handler){if(!this.events[event]){this.events[event]=[];}this.events[event].push(handler);},unsubscribe:function unsubscribe(event,handler){if(!this.events[event])return;var i=this.events[event].indexOf(handler);if(i>=0)this.events.splice(i,1);},publish:function publish(event,data){this.events[event]&&this.events[event].forEach(publishData);function publishData(handler){handler(data);};}};};//create pretty name for passage; requires a tag (replace space with _ !) [name:"My_Room"]
 window.gm.util.printLocationName=function(passage){var tags=window.story.passage(passage).tags;var _iterator17=_createForOfIteratorHelper(tags),_step17;try{for(_iterator17.s();!(_step17=_iterator17.n()).done;){el=_step17.value;var ar=el.split(":");if(ar.length>1&&ar[0]==='name'){return ar[1].split('_').join(' ');}}}catch(err){_iterator17.e(err);}finally{_iterator17.f();}return passage;};//prints a div with text "value/max" and bargraph-background
 window.gm.util.bargraph=function(value,max,color){var msg='';var rel=value/max*100;msg='<div class="progressbar"><div style="background-color:'+color+'; width: '+rel.toString()+'%;"><p>'+value.toString()+'/'+max.toString()+'</p></div></div>';return msg;//todo bargraph css-animation doesnt work because the whole page is reloaded instead of just width change
-};//-------------------------------------------------
+};/* Uploads SVG files from local file system, based on file selected in input; https://github.com/fizzstudio/svg-load-save */window.gm.util.loadLocalSVG=function(event){var file=event.target.files[0];// FileList object
+if(file){var file_reader=new FileReader();if("image/svg+xml"==file.type){file_reader.readAsText(file);file_reader.addEventListener("load",function(){var file_content=file_reader.result;window.gm.util.insertSvg(file_content);}.bind(this),false);}}};/* Inserts SVG files into HTML document */window.gm.util.insertSvg=function(file_content){// insert SVG file into HTML page
+var svg_container=document.getElementById("svg_container");svg_container.innerHTML=file_content;// TODO: insert any SVG handler here
+// adds `click` event listener to inserted SVG to test modification of SVG file, for later saving
+if(this.event_handler){svg_container.firstChild.addEventListener("click",this.event_handler,false);}};//-------------------------------------------------
 // reimplement to setup the game !
 window.gm.initGame=function(forceReset){var NGP=arguments.length>1&&arguments[1]!==undefined?arguments[1]:null;window.gm.toasty=new Toasty();$(window).on('sm.passage.showing',function(event,eventObject){// Current Passage object
 $("tw-passage").fadeIn(500);//fade in if was previously faded out
@@ -2481,7 +2453,7 @@ window.storage.registerConstructor(stHealthMax);window.storage.registerConstruct
 window.storage.registerConstructor(effCallHelp);window.storage.registerConstructor(effCombatRecovery);window.storage.registerConstructor(effDamage);window.storage.registerConstructor(effBleed);window.storage.registerConstructor(effCombined);window.storage.registerConstructor(effGrappled);window.storage.registerConstructor(effGrappling);window.storage.registerConstructor(effUngrappling);window.storage.registerConstructor(effEnergized);window.storage.registerConstructor(effNotTired);window.storage.registerConstructor(effTeaseDamage);window.storage.registerConstructor(effTired);window.storage.registerConstructor(effStunned);window.storage.registerConstructor(effGuard);window.storage.registerConstructor(effHeal);window.storage.registerConstructor(effMasochist);window.storage.registerConstructor(effEnergyDrain);window.storage.registerConstructor(effHorsePower);window.storage.registerConstructor(effLapineSpeed);window.storage.registerConstructor(effMutateBunny);window.storage.registerConstructor(effMutateHorse);window.storage.registerConstructor(effMutateWolf);window.storage.registerConstructor(effMutateCat);window.storage.registerConstructor(effGrowBreast);window.storage.registerConstructor(effGrowVulva);window.storage.registerConstructor(effLewdMark);window.storage.registerConstructor(effInHeat);window.storage.registerConstructor(effInRut);window.storage.registerConstructor(effSpermInWomb);window.storage.registerConstructor(effVaginalFertil);window.storage.registerConstructor(effVaginalPregnant);//
 window.storage.registerConstructor(skCooking);return StatsLib;}(window.gm.StatsLib||{});
 /* twine-user-script #2: "Story JavaScript" */
-</script><tw-tag name="_nosave_" color="yellow"></tw-tag><tw-tag name="_nodeffered_" color="yellow"></tw-tag><tw-tag name="_isdeffered_" color="brown"></tw-tag><tw-tag name="template" color="orange"></tw-tag><tw-tag name="_back_" color="gray"></tw-tag><tw-passagedata pid="1" name="Info_Jake" tags="_back_" position="100,100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
+</script><tw-tag name="template" color="orange"></tw-tag><tw-tag name="_back_" color="gray"></tw-tag><tw-tag name="_nosave_" color="yellow"></tw-tag><tw-tag name="_nodeffered_" color="yellow"></tw-tag><tw-tag name="_isdeffered_" color="brown"></tw-tag><tw-passagedata pid="1" name="Info_Jake" tags="_back_" position="100,100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 Jake is here.&lt;/br&gt;
 You barely know anything about him.&lt;/br&gt;
 [[Back|_back_]]&lt;/br&gt;&lt;/br&gt;
@@ -5303,6 +5275,11 @@ This game is powered by twine/tweego and snowman.&lt;/br&gt;
 &lt;/div&gt;
 &lt;div id=&#39;svgstore&#39; hidden=&#39;true&#39;&gt;&lt;/div&gt;</tw-passagedata><tw-passagedata pid="139" name="Intro" tags="" position="1100,1725" size="100,100">&lt;article&gt;&lt;%window.gm.initGame();window.gm.player.location=window.passage.name;%&gt;
 &lt;div id=&#39;output&#39;&gt;&lt;/div&gt;
+&lt;label for=&quot;svg_upload&quot;&gt;Upload SVG file:&lt;/label&gt;    &lt;input type=&quot;file&quot; id=&quot;svg_upload&quot; accept=&quot;.svg&quot;&gt;
+&lt;div id=&quot;svg_container&quot;&gt;&lt;/div&gt;
+&lt;object 
+    data=&quot;assets/battlers/wolf3.svg&quot; 
+    type=&quot;image/svg+xml&quot;&gt;&lt;/object&gt;
 &lt;p&gt;Welcome to Meason, a town somewhere in these days. &lt;/br&gt;
 You are a student in the local university and live in a shared house with some other fellows. &lt;/br&gt;&lt;/p&gt;
 &lt;p class=&#39;author&#39;&gt;You might see a lot of links that are formated red-strikethrough. Those are currently broken and you shouldnt use them.&lt;/p&gt;
@@ -5316,7 +5293,16 @@ There are also some options to make a fastforward (might behave oddly): &lt;/br&
 debug only! :&lt;/br&gt;
 [[FF WolfVictory]]&lt;/br&gt;
 [[FF TestArena]]&lt;/br&gt;
-&lt;/article&gt;</tw-passagedata><tw-passagedata pid="140" name="Intro2" tags="" position="1225,1725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;
+&lt;script&gt;
+document.getElementById(`svg_upload`).addEventListener(`change`, window.gm.util.loadLocalSVG.bind(this), false);
+/*var ev={target:{files:[&#39;assets/battlers/wolf3.svg&#39;]}};
+window.gm.util.loadLocalSVG(ev);*/
+let img = document.createElement(&#39;img&#39;);
+img.style = &#39;position:fixed;top:10px;left:10px;width:100px&#39;;
+document.body.append(img);
+fetch(&#39;assets/battlers/wolf3.svg&#39;).then(response=&gt;{console.log(response);return(response.blob());}).then(blob=&gt;{img.src = URL.createObjectURL(blob)});
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="140" name="Intro2" tags="" position="1225,1725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 Here you are: a student in its early twentys sitting around at home, working on the laptop in front.
 Progress in studys isnt going as smooth as expected.

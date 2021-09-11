@@ -18,3 +18,19 @@ return('<svg width="94.201492mm" height="123.90123mm" viewBox="0 0 94.201491 123
 'id="path29950" class="class1" style="fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:0.535538;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" /></g>'+
 '</svg>');
 }
+
+/*
+das ist alles Dreck - kann nicht von lokaler Datei laden
+<label for="svg_upload">Upload SVG file:</label>    <input type="file" id="svg_upload" accept=".svg">
+<div id="svg_container"></div>
+<object data="assets/battlers/wolf3.svg"  type="image/svg+xml"></object>
+<script>
+//File kann nur durch <input> generiert werden nicht programatisch :(
+document.getElementById(`svg_upload`).addEventListener(`change`, window.gm.util.loadLocalSVG.bind(this), false);
+//fetch funktioniert NICHT mit local files sondern nur mit webservern!
+let img = document.createElement('img');
+img.style = 'position:fixed;top:10px;left:10px;width:100px';
+document.body.append(img);
+fetch('assets/battlers/wolf3.svg').then(response=>{return(response.blob());}).then(blob=>{console.log(blob);img.src = URL.createObjectURL(blob)});
+</script>
+*/

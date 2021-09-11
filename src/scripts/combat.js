@@ -392,7 +392,7 @@ battleInit() {
   result.OK=true,result.msg = this.onStart();
   this.next=this.preTurn;
   return(result);
-};
+}
 preTurn() {
   let result = {OK:false, msg:''};
   let s = window.story.state;
@@ -459,8 +459,7 @@ targetFilterAlive(targets){    //chars that are not dead
   for(var target of targets){
       var valid = true;
       if(target.isKnockedOut()) valid=false; //todo ..isDead()??
-      if(valid)
-          possibleTarget.push(target); 
+      if(valid) possibleTarget.push(target); 
   }
   return possibleTarget;
 }
@@ -540,7 +539,9 @@ postBattle() {
   this.endCombat();
   return(result);
 }
-//this runs the statemachine and is triggered by user input
+/**
+ * this runs the statemachine and is triggered by user input
+ */
 battle() {
   var result = {OK:false, msg:''};
   while(this.next!==null && !result.OK) {
@@ -555,7 +556,9 @@ battle() {
 };
 
 }
-//returns true if in combat
+/*
+ * returns true if in combat
+*/
 window.gm.combat.inCombat = function() {
   return(window.story.state.combat.inCombat);
 }
