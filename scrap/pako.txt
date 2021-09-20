@@ -1,0 +1,19 @@
+<object id="svgObject" data="assets/testMap.svg" type="image/svg+xml" height="250" width="600" onload='init(this)'> SVG-Grafik konnte nicht geladen werden! </object>
+<svg width="140mm" height="80mm" version="1.1" viewBox="0 0 140 80" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g transform="translate(-50 -50)"><rect id="rect846" x="80.476" y="50.476" width="19.047" height="19.047" fill="#c4baaf" fill-rule="evenodd" stop-color="#000000" stroke="#000" stroke-linecap="round" stroke-linejoin="bevel" stroke-width=".95296" style="paint-order:fill markers stroke" onmouseout="style.opacity = 1;" onmouseover="style.opacity = 0.5;"/><path transform="matrix(.23418 0 0 .23418 23.587 -3.2689)" d="m172.02 310.99-33.7-0.26708-23.64-24.018 0.26708-33.7 24.018-23.64 33.7 0.26709 23.64 24.018-0.26709 33.7z" fill="#c4afaf" fill-rule="evenodd" stop-color="#000000" stroke="#000" stroke-linecap="round" stroke-linejoin="bevel" stroke-width="3.7795" style="paint-order:fill markers stroke" onclick="smile('clicked')" onmouseout="style.opacity = 1;" onmouseover="style.opacity = 0.5;"/><use transform="translate(0,30)" width="100%" height="100%" xlink:href="#rect846"/></g></svg>
+
+
+function init() {  console.log('The Script will load now.'); 
+    document.getElementById('path2706').addEventListener('click',(function(e) {e.currentTarget.setAttribute('fill', '#ff00cc');}));
+};
+function pakoTest() {
+  const obj = [ { foo: 'bar', baz: 'БАТ' }, { abra: 1, cadabra: null }];
+  var str = JSON.stringify(obj);
+  var result = window.pako.deflate(str);
+  alert(obj)
+  alert(result)
+  const uncompressed = window.pako.inflate(result,{to:'string'});
+  var obj2 = JSON.parse(uncompressed);
+  alert(obj2);
+}
+function smile(text) {alert();}
+pakoTest();

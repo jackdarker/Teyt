@@ -251,6 +251,40 @@ class Briefs extends Equipment {
     toJSON() {return window.storage.Generic_toJSON("Briefs", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(Briefs, value.data));}
 }
+class ChastityBelt extends Equipment {
+    static factory(style) {
+        let x = new ChastityBelt();
+        x.style=style;
+        return(x);
+    }
+    constructor() {
+        super('ChastityBelt');
+        this.addTags(['steel']);
+        this.slotUse = ['uPenis','uVulva'];
+        this.slotCover = ['bPenis','bVulva','bClit','pPenis','pClit'];    
+        this.lossOnRespawn = false;
+        this.style=0,this.lewd.slut = 1;
+    }
+    toJSON() {return window.storage.Generic_toJSON("ChastityBelt", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(ChastityBelt, value.data));}
+    set style(style) { 
+        this._style = style; 
+        if(style===0) this.id=this.name='ChastityBelt';
+        else if(style===100) this.id=this.name='CockCage';
+        else throw new Error(this.id +' doesnt know '+style);
+    }
+    get style() {return this._style;}
+    get desc() { 
+        let msg ='chastity belt covering your privates';
+        switch(this._style) {
+            case 100:
+                msg=('a cockcage to restirct ones erection');
+                break;
+            default:
+        }
+        return(msg);
+    }
+}
 class BikiniBottomLeather extends Equipment {
     constructor() {
         super('BikiniBottomLeather');
@@ -566,6 +600,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(BikiniTopLeather);
     window.storage.registerConstructor(BracerLeather);
     window.storage.registerConstructor(Briefs);
+    window.storage.registerConstructor(ChastityBelt);
     window.storage.registerConstructor(CollarQuest);
     window.storage.registerConstructor(DaggerSteel);
     window.storage.registerConstructor(HarnessRubber);
@@ -590,6 +625,8 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['BikiniBottomLeather'] = function () { return new BikiniBottomLeather();};
     ItemsLib['BikiniTopLeather'] = function () { return new BikiniTopLeather();};
     ItemsLib['Briefs'] = function () { return new Briefs();};
+    ItemsLib['ChastityBelt'] = function () { let x= new ChastityBelt();x.style=0;return(x); };
+    ItemsLib['CockCage'] = function () { let x= new ChastityBelt();x.style=100;return(x); };
     ItemsLib['CollarQuest'] = function () { return new CollarQuest();};
     ItemsLib['Leggings'] = function () { return new Leggings();};
     ItemsLib['Tank-shirt'] = function () { return new TankShirt(); };

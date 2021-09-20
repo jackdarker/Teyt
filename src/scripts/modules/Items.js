@@ -174,7 +174,7 @@ class KeyRestraint extends Item {
     constructor() { super('KeyRestraint');   
         this.style=0;this.lossOnRespawn = true;
     }
-    set style(style) { //instead of creating full class for every useless junk I use this and just add variable that will be restored after load
+    set style(style) {
         this._style = style; 
         if(style===0) this.id=this.name='KeyRestraintA';
         else if(style===10) this.id=this.name='KeyRestraintB';

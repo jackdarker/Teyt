@@ -258,8 +258,7 @@ window.gm.util.refToParent = function(me){ return function(){return(me);}};  //t
 window.gm.util.formatNumber = function(n, dp){
   var s = ''+(Math.floor(n)), d = Math.abs(n % 1), i = s.length, r = '';
   while ( (i -= 3) > 0 ) { r = ',' + s.substr(i, 3) + r; }  //todo . & , is hardcoded
-  return s.substr(0, i + 3) + r + 
-    (d ? '.' + Math.round(d * Math.pow(10, dp || 2)) : '');
+  return s.substr(0, i + 3) + r + (dp>0 ? '.' +(d ? Math.round(d * Math.pow(10, dp || 2)) : '0'.repeat(dp)) : '');
 };
 //---------------------------------------------------------------------------------
 //TODO 

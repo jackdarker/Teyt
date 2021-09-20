@@ -5,6 +5,7 @@
 - kobold
 - lizard-man
 - naga
+- bunny-girl
 - stag-boy/-Stud  archer, drumer, warrior
 - cougar-girl/-mistress
 - grizzly
@@ -28,6 +29,10 @@
 class Mole extends Mob {
     static factory(type) {
         let foe = new Mole();
+        if(type==='Squirrel') {
+            foe.name = foe.id = 'Squirrel';
+            this.pic= 'assets/Battlers/squirrel1.svg';
+        }
         return foe;
     }
     constructor() {
@@ -41,7 +46,7 @@ class Wolf extends Mob {
     static factory(type) {
         let foe = new Wolf();
         if(type==='AlphaWolf') {
-            foe.name = foe.id = 'AlphaWolf'; //todo CallHelp
+            foe.name = foe.id = 'AlphaWolf';
             foe.Stats.increment('healthMax',-0.3*(foe.health().max));
             foe.Skills.addItem(SkillCallHelp.factory('Wolf')); //todo chance to call?
             foe.pic= 'assets/battlers/wolf1.svg';
@@ -194,6 +199,47 @@ class Lizan extends Mob {
             result.action = "Guard";
             result.target = [this];
             result.msg =this.name+" croutches into a defensive stance.</br>"+result.msg;
+            return(result);
+        }
+        return(super.calcCombatMove(enemys,friends));
+    }
+}
+class Lapine extends Mob {
+    static factory(type) {
+        let foe = new Lapine();
+        if(type==='spearthrower') {
+            foe.Outfit.addItem(SpearWodden.factory(100));
+        } else {
+            foe.Outfit.addItem(new DaggerSteel());
+        }
+        return foe;
+    }
+    constructor() {
+        super();
+        this.name = this.id = 'Lapine';
+        this.pic= 'assets/battlers/Bunny1.svg';
+        this.Outfit.addItem(new BaseHumanoid());
+        this.Outfit.addItem(SkinFur.factory('bunny'));
+        this.Outfit.addItem(HandsHuman.factory('bunny'));
+        this.Outfit.addItem(BreastHuman.factory('bunny'));
+        this.Outfit.addItem(FaceHorse.factory('bunny'));
+        this.Outfit.addItem(VulvaHuman.factory('bunny'));
+        this.Outfit.addItem(ShortsLeather.factory(100));
+        let sk = new SkillKick();
+        this.Skills.addItem(sk);
+        this.levelUp(1);
+        this.autoLeveling();
+    }
+    calcCombatMove(enemys,friends){
+        let result = {OK:true,msg:''};
+        //if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
+        let rnd = _.random(1,100);
+        result.action =result.target= null;
+        let skill = this.Skills.getItem("Kick");
+        if(window.story.state.combat.turnCount>2 && rnd>30 && skill.canPay().OK) {
+            result.action = skill.name;
+            result.target = [this];
+            result.msg =this.name+" prepares for a powerful jump-kick.</br>"+result.msg;
             return(result);
         }
         return(super.calcCombatMove(enemys,friends));
@@ -436,7 +482,9 @@ class Trent extends Mob {
 }
 //collection of mob-constructors
 window.gm.Mobs = (function (Mobs) {
+    Mobs.Lapine = Lapine.factory;
     Mobs.Mole = Mole.factory;
+    Mobs.Squirrel = function() { return function(param){return(Mole.factory(param));}("Squirrel")};
     Mobs.Huntress = Huntress.factory;
     Mobs.Lizan = Lizan.factory;
     Mobs.Wolf = Wolf.factory;

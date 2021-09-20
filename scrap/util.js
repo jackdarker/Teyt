@@ -1,3 +1,52 @@
+  /* images dont work well with svg
+  var draw = SVG().addTo('#canvas').size(w, h);
+  draw.rect(w, h).attr({ fill: '#ffffff'});
+  draw.image(window.story.state.combat.scenePic);//.center(w/2,h/2); todo imagenode has width&height but js dont sees them
+  var list = window.story.state.combat.enemyParty;
+  for(var i=list.length-1;i>=0;i--) {
+    var node;
+    if('string' == (typeof list[i].pic)) { //is path to image
+      node=draw.image(list[i].pic,function (event) {
+        // image loaded
+        // this is the loading event for the underlying img element
+        // you can access the natural width and height of the image with
+        event.target.style.x=200;
+      });
+    } else { //is function returning svg-html
+      node = SVG(list[i].pic());
+      if(node) {
+        var pos = _pos.pop();
+        node.addTo(draw).center(pos[0],pos[1]); //this only works if there is width/height set in svg !
+      }
+    }
+    if(_pos.length<=0) break;
+  }*/
+
+das ist alles Dreck - kann nicht von lokaler Datei laden
+<label for="svg_upload">Upload SVG file:</label>    <input type="file" id="svg_upload" accept=".svg">
+<div id="svg_container"></div>
+<object data="assets/battlers/wolf3.svg"  type="image/svg+xml"></object>
+<script>
+//File kann nur durch <input> generiert werden nicht programatisch :(
+document.getElementById(`svg_upload`).addEventListener(`change`, window.gm.util.loadLocalSVG.bind(this), false);
+//fetch funktioniert NICHT mit local files sondern nur mit webservern!
+let img = document.createElement('img');
+img.style = 'position:fixed;top:10px;left:10px;width:100px';
+document.body.append(img);
+fetch('assets/battlers/wolf3.svg').then(response=>{return(response.blob());}).then(blob=>{console.log(blob);img.src = URL.createObjectURL(blob)});
+</script>
+
+
+<script>
+document.getElementById(`svg_upload`).addEventListener(`change`, window.gm.util.loadLocalSVG.bind(this), false);
+/*var ev={target:{files:['assets/battlers/wolf3.svg']}};
+window.gm.util.loadLocalSVG(ev);*/
+let img = document.createElement('img');
+img.style = 'position:fixed;top:10px;left:10px;width:100px';
+document.body.append(img);
+fetch('assets/battlers/wolf3.svg').then(response=>{console.log(response);return(response.blob());}).then(blob=>{img.src = URL.createObjectURL(blob)});
+</script>
+
 "use strict";
   /* Retrieves SVG files from server, based on filename selected in dropdown */
 /*UNUSED async load_server_file(event) {

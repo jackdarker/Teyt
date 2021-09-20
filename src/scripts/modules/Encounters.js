@@ -3,6 +3,7 @@
 /*bunch of combat encounters are defined here */
 window.gm = window.gm || {};
 window.gm.encounters = window.gm.encounters || {};
+
 //params = {location:window.passage.name, amount:1};
 window.gm.encounters.mole = function(params) {
     var amount=(params&&params.amount)?params.amount:1, location=(params&&params.location)?params.location:window.passage.name;
@@ -155,6 +156,26 @@ window.gm.encounters.wolf = function(params) {
     }
     window.gm.Encounter.initCombat();
 }
+window.gm.encounters.lapine = function(params) {
+    var amount=(params&&params.amount)?params.amount:1, location=(params&&params.location)?params.location:window.passage.name;
+    window.gm.Encounter = new Encounter();
+    window.gm.Encounter.EnemyFunc = (function() { 
+        let mobs =[];
+        for(var i=amount;i>0;i-=1) {
+            let x = window.gm.Mobs.Lapine(); x.scaleLevel(window.gm.player.level);
+            x.name+='#'+i;mobs.push(x);
+        }
+        return(mobs);});
+    window.gm.Encounter.Location = location?location:window.passage.name;
+    window.gm.Encounter.onSubmit =window.gm.Encounter.onDefeat = function() {
+        return('That bunny literally kicked your ass.</br>'+ window.gm.printPassageLink('Next','LapineDefeat'));
+    }
+    window.gm.Encounter.onVictory = function() {
+        return('The bunny surrenders.</br>'+this.fetchLoot()+'</br>'+ window.gm.printPassageLink('Next','LapineVictory'));
+    }
+    window.gm.Encounter.scenePic = window.gm.getScenePic(window.gm.Encounter.Location);
+    window.gm.Encounter.initCombat();
+}
 window.gm.encounters.dryad = function(params) {
     var amount=(params&&params.amount)?params.amount:1, location=(params&&params.location)?params.location:window.passage.name;
     window.gm.Encounter = new Encounter();
@@ -233,10 +254,10 @@ window.gm.encounters.Ruff = function(params) {
     window.gm.Encounter.Location = location?location:window.passage.name;
     window.gm.Encounter.scenePic = window.gm.getScenePic(window.gm.Encounter.Location);
     window.gm.Encounter.onSubmit =window.gm.Encounter.onDefeat = function() {
-        return('You cannot fight anymore and surrender to the beast-man.</br>'+ window.gm.printPassageLink('Next','TrentSubmit'));
+        return('You cannot fight anymore and surrender to the beast-man.</br>'+ window.gm.printPassageLink('Next','RuffSubmit')); //TODO !!
     }
     window.gm.Encounter.onVictory = function() {
-        return('It was barely an even fight but you showed this horsy its place.</br>'+ window.gm.printPassageLink('Next','TrentVictory'));
+        return('It was barely an even fight but you showed this horsy its place.</br>'+ window.gm.printPassageLink('Next','RuffVictory'));
     }
     window.gm.Encounter.initCombat();
 }

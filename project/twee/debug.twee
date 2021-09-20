@@ -41,7 +41,7 @@ Crash if you enter wrong things below !</br>
 <label for="addoutfit">add wardrobe:<input type="text" id="addoutfit" name="addoutfit"></label><a0  onclick='window.gm.player.Wardrobe.addItem(window.gm.ItemsLib[document.getElementById("addoutfit").value]())'>Go</a></br>
 (only wardrobe-items except weapons! You need to equip them in wardrobe.)</br>
 <label for="startfight">start fight:<input type="text" id="startfight" name="startfight"></label><label for="startfight2">params:<input type="text" id="startfight2" name="startfight2"></label>
-<a0  onclick='window.gm.encounters[document.getElementById("startfight").value](JSON.parse(document.getElementById("startfight2").value))'>Go</a></br>
+<a0  onclick='window.gm.encounters[document.getElementById("startfight").value](JSON.parse(document.getElementById("startfight2").value||"{}"))'>Go</a></br>
 (use Encounter-name, might sent you to certain events on defeat/victory. Might need extra params like {"location":"forest", "amount":1})</br>
 </article><article id="LogPanel"></article></section>
 <script> function unhideStats() {
@@ -73,8 +73,6 @@ Test transformation events. Because they are deffered-events you need to return 
 <section> <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 </br>[[Back|_back_]]</br><div id='canvas'></div></br><div id='choice'></div></br>
 Test svg inlined in code.</br>
-<a0 onclick='window.gm.printSceneGraphic2("",window.gm.images.wolf1())'>wolf1</a></br>
-
 </article><article id="LogPanel"></article></section>
 <script>window.gm.listImages();</script>
 

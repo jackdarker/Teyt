@@ -164,7 +164,7 @@ window.gm.sex.wolfOnPlayer=function(data) {
         Object.assign(newdata,data);
         createButton("Rile her",foo.bind(null,newdata));
     } else if(data.state==='plDomOrgasm') {
-        entry.textContent ="You onload your jizzm into that hot wolf-hole."
+        entry.textContent ="You unload your jizzm into that hot wolf-hole."
         if(data.hole==='vaginal') {
             foe.getVagina().addSperm('wolf',3);
         } else if(data.hole==='anal') {         //todo insert sperm in hole
@@ -376,7 +376,83 @@ window.gm.sex.lizanOnPlayer=function(data) { //todo
     }
     window.gm.sex.updateScene(entry); 
 };
+window.gm.sex.lapineOnPlayer=function(data) { //todo
+    let foo = window.gm.sex.lapineOnPlayer,createButton=window.gm.sex.createButton;;
+    let player = window.gm.player,foe = window.story.state.combat.enemyParty[0]; //todo
+    window.gm.sex.beginScene();
+    let entry = document.createElement('p');
+    let newdata = {};//need a copy to create different data-values
+    if(data.state<0) { //quit if scene is done
+        if(data.battleResult==='victory') window.gm.postVictory(); //todo flee, submit, defeat
+        else window.gm.postDefeat();
+        return;
+    } else if(data.state===0) { //start-menu
+        if(data.battleResult==='victory') {
+            if(player.Stats.get('arousal').value>40) {
+                entry.textContent ="\'Lets see what we have here\'.";
+                //detect gender,.. -> available position;
+                if(player.getVagina()) {
+                    data.state='plDomPosSelect';
+                    if(foe.getPenis()) {
+                        newdata = {},Object.assign(newdata,data);
+                        newdata.position = 'Get your pussy plowed';
+                        newdata.yourTool='vagina';newdata.foeTool='penis';
+                        createButton(newdata.position,foo.bind(null,newdata));
+                    } 
+                }
+                if(player.getPenis()) {
+                    data.state='plDomPosSelect';
+                    newdata = {},Object.assign(newdata,data);
+                    newdata.position = 'Rail her ass';
+                    createButton(newdata.position,foo.bind(null,newdata));
+                    if(foe.getVagina()) {
+                        newdata = {},Object.assign(newdata,data);
+                        newdata.position = 'Use her snatch';
+                        newdata.yourTool='penis';newdata.foeTool='vagina';
+                        createButton(newdata.position,foo.bind(null,newdata));
+                    }
+                }
+            } else entry.textContent ="You arent in the mood right now."; 
 
+            newdata = {},Object.assign(newdata,data);
+            newdata.state=-1;
+            createButton('Walk away',foo.bind(null,newdata));
+        } else { //defeat
+            entry.textContent ="She isnt interested in you."; //todo
+            data.state=-1;
+            createButton('Pass out',foo.bind(null,data));
+        }
+    } else if(data.state==='plDomPosSelect') { //player topping
+        if(data.position==='Rail her ass') {
+            entry.textContent ="TODO bunny stuffing";
+        } else if('Use her snatch') {
+            entry.textContent ="TODO stretch her hole";
+        }
+        data.state='plDomOrgasm';
+        Object.assign(newdata,data);
+        createButton("FUCK",foo.bind(null,newdata));
+    } else if(data.state==='plDomOrgasm') {
+        entry.textContent ="</br>You take control, your hips swirling as you bounce up and down. The mind numbing pleasure of your ride is just what you need. Beneath you the lizan gasps and trembles. He holds on for dear life as you ride him hard.";
+		//if (player.hasCock()) outputText("\n\nThen you feel an unexpected wetness. Looking down you watch your servant open his mouth and lick your [cock] again. The trembling lizan tastes you, kissing your [cockHead] and nibbling at its belly. Then he looks up and kisses you and you taste your [cock] on his lips."
+        entry.textContent +="</br>His voice comes out in a hoarse groan as he begins to tremble. You’re riding him as hard as you can now, making him babble like a mad man. His arms hold you tightly as he buries his face in your [fullChest]. You keep up the pressure and soon a strangled cry rises from your servant as heat blooms inside of you. The feeling pushes you over the edge and you erupt, flooding his ejaculating cocks with your vaginal fluids. ";
+        //entry.textContent +=(player.hasCock() ? "Meanwhile, your cock is spurting hot seed into your combined chests." : "");      
+        if(data.yourHole==='vagina' && data.foeTool==='penis') {
+            player.getVagina().addSperm('lapine',3);
+        } 
+        entry.textContent +="</br></br>Unwrappig yourself from the exhausted bunny, you get ready to leave.";
+        data.state=-1;
+        Object.assign(newdata,data);
+        createButton("Get on your way",foo.bind(null,newdata));
+    } else if(data.state==='plSubOrgasm') {
+            if(data.yourHole==='vagina' && data.foeTool==='penis') {
+                player.getVagina().addSperm('lapine',3);
+            } 
+            data.state=-1;
+            Object.assign(newdata,data);
+            createButton("Pass out",foo.bind(null,newdata));
+    }
+    window.gm.sex.updateScene(entry); 
+};
 /**
  * :: HuntressSubmit
 "You are a worthy opponent. Lets see if you have some stamina left."

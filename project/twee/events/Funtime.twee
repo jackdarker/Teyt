@@ -60,7 +60,7 @@ You cant hold any longer and shoot your jizzm inside her.
 </article><article id="LogPanel"></article></section>
 
 :: GenericPassage [_nosave_]
-<!--call this passage after setting -->
+<!--call this passage after setting tmp.args !-->
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <div id='panel'></div><!--description is rendered here-->
 <div id='choice'></div> <!--choice is rendered here-->
@@ -68,7 +68,7 @@ You cant hold any longer and shoot your jizzm inside her.
 <script>window.story.state.tmp.args[0]();
 </script>
 
-:: WolfVictory
+:: WolfVictory  [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <div id='panel'></div><!--description is rendered here-->
 <div id='choice'></div> <!--choice is rendered here-->
@@ -76,7 +76,7 @@ You cant hold any longer and shoot your jizzm inside her.
 <script>window.gm.sex.wolfOnPlayer({state:0, battleResult:'victory'});
 </script>
 
-:: DryadVictory
+:: DryadVictory [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <div id='panel'></div><!--description is rendered here-->
 <div id='choice'></div> <!--choice is rendered here-->
@@ -84,7 +84,19 @@ You cant hold any longer and shoot your jizzm inside her.
 <script>window.gm.sex.dryadOnPlayer({state:0, battleResult:'victory'});
 </script>
 
-:: LizanVictory
+:: LapineVictory [_nosave_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<div id='panel'></div><div id='choice'></div>
+</article><article id="LogPanel"></article></section>
+<script>window.gm.sex.lapineOnPlayer({state:0, battleResult:'victory'});</script>
+
+:: LapineDefeat [_nosave_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<div id='panel'></div><div id='choice'></div>
+</article><article id="LogPanel"></article></section>
+<script>window.gm.sex.lapineOnPlayer({state:0, battleResult:'defeat'});</script>
+
+:: LizanVictory [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <div id='panel'></div><!--description is rendered here-->
 <div id='choice'></div> <!--choice is rendered here-->
@@ -93,7 +105,7 @@ You cant hold any longer and shoot your jizzm inside her.
 </script>
 
 
-:: WolffightIntermezzo
+:: WolffightIntermezzo [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 Wolf snarls at you.
 <div> [[Next|EncounterStartTurn]]</br></div> 

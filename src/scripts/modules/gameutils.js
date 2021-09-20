@@ -5,7 +5,8 @@ window.gm.getSaveVersion= function(){   return([0,1,0]); };
 let _origInitGame = window.gm.initGame;
 window.gm.initGame= function(forceReset,NGP=null) {
   _origInitGame(forceReset,NGP);
-    
+  window.gm.images = loadImages(window.gm.images||{});
+
     var s = window.story.state;
     s._gm.timeRL= s._gm.timeVR = s._gm.time;
     s._gm.dayRL= s._gm.dayVR = s._gm.day;
@@ -296,11 +297,7 @@ window.gm.giveCyrilFood= function(){
         window.gm.printOutput("you have no food to spare");
     }
 };
-window.gm.printSceneGraphic2 = function () {
-  var  svgDoc = document.getElementById('layer1');
-   var node = SVG(svgDoc);
-   if(node) node.addTo(draw);
-};
+
 /*window.gm.printSceneGraphic=function() {
   window.gm.printSceneGraphic2("",window.gm.images.wolf1()); return;
   var width=600,height=300;
@@ -338,11 +335,12 @@ window.gm.listImages = function(){
   let g,entry = document.createElement('p');
   entry.textContent ="";
   for(let el of list) {
+    if(el==='strToBuf'||el==='cache') continue;
     g = document.createElement('a');
     g.href='javascript:void(0)',g.textContent=el;
     const x = window.gm.images[el]();
     g.addEventListener("click",window.gm.printSceneGraphic2.bind(this,"",x));
-    entry.appendChild(g);
+    entry.appendChild(g);entry.appendChild(document.createTextNode(' '));//add \s or no automatic linebreak
   };
   $("div#choice")[0].appendChild(entry);      // <- requires this node in html
 }

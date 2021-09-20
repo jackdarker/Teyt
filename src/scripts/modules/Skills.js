@@ -145,6 +145,7 @@ class SkillBite extends SkillAttack {
         super();
         this.id=this.name='Bite'
         this.msg = '';
+        this.cost.energy =20;
     }
     toJSON() {return window.storage.Generic_toJSON("SkillBite", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillBite, value.data));}
@@ -155,6 +156,27 @@ class SkillBite extends SkillAttack {
         attack.mod= new SkillMod();
         if(mouth && mouth.attackMod) { //get teeth damage info
             attack.mod=mouth.attackMod(target);
+        }
+        return(attack);
+    }
+}
+//execute attack with Feet
+class SkillKick extends SkillAttack {
+    constructor() {
+        super();
+        this.id=this.name='Kick'
+        this.msg = '';
+        this.cost.energy =20;
+    }
+    toJSON() {return window.storage.Generic_toJSON("SkillKick", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillKick, value.data));}
+    get desc() { return("Use your feet kungfu style. "+this.getCost().asText());}
+    __estimateAttack(target) {
+        let attack =window.gm.combat.defaultAttackData();
+        let feet=this.caster.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bFeet);
+        attack.mod= new SkillMod();
+        if(feet && feet.attackMod) { //get feet damage info
+            attack.mod=feet.attackMod(target);
         }
         return(attack);
     }

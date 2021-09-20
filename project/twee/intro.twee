@@ -34,12 +34,6 @@ This game is powered by twine/tweego and snowman.</br>
 
 :: Intro
 <article><%window.gm.initGame();window.gm.player.location=window.passage.name;%>
-<div id='output'></div>
-<label for="svg_upload">Upload SVG file:</label>    <input type="file" id="svg_upload" accept=".svg">
-<div id="svg_container"></div>
-<object 
-    data="assets/battlers/wolf3.svg" 
-    type="image/svg+xml"></object>
 <p>Welcome to Meason, a town somewhere in these days. </br>
 You are a student in the local university and live in a shared house with some other fellows. </br></p>
 <p class='author'>You might see a lot of links that are formated red-strikethrough. Those are currently broken and you shouldnt use them.</p>
@@ -54,15 +48,7 @@ debug only! :</br>
 [[FF WolfVictory]]</br>
 [[FF TestArena]]</br>
 </article>
-<script>
-document.getElementById(`svg_upload`).addEventListener(`change`, window.gm.util.loadLocalSVG.bind(this), false);
-/*var ev={target:{files:['assets/battlers/wolf3.svg']}};
-window.gm.util.loadLocalSVG(ev);*/
-let img = document.createElement('img');
-img.style = 'position:fixed;top:10px;left:10px;width:100px';
-document.body.append(img);
-fetch('assets/battlers/wolf3.svg').then(response=>{console.log(response);return(response.blob());}).then(blob=>{img.src = URL.createObjectURL(blob)});
-</script>
+
 
 :: Intro2
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
