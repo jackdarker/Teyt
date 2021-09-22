@@ -42,7 +42,7 @@ Crash if you enter wrong things below !</br>
 (only wardrobe-items except weapons! You need to equip them in wardrobe.)</br>
 <label for="startfight">start fight:<input type="text" id="startfight" name="startfight"></label><label for="startfight2">params:<input type="text" id="startfight2" name="startfight2"></label>
 <a0  onclick='window.gm.encounters[document.getElementById("startfight").value](JSON.parse(document.getElementById("startfight2").value||"{}"))'>Go</a></br>
-(use Encounter-name, might sent you to certain events on defeat/victory. Might need extra params like {"location":"forest", "amount":1})</br>
+(use Encounter-name, might sent you to certain events on defeat/victory. Might need extra params like {"amount":1}" )</br>
 </article><article id="LogPanel"></article></section>
 <script> function unhideStats() {
     var ids = window.gm.player.Stats.getAllIds();

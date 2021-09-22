@@ -86,11 +86,36 @@ hideCombatOption() {
 }
 //renders background & combatants to #canvas
 renderCombatScene() {
-  var w=600,h=300;
-  var _pos =[[25,50],[75,50],[50,50]];
+  var _pos =[[25,50],[75,50],[50,50]];//sprite position in %
+  var width=600,height=300;
+  var draw = document.querySelector("#canvas svg");
+  if(!draw) draw = SVG().addTo('#canvas').size(width, height);
+  else draw = SVG(draw);//recover svg document instead appending new one
+  draw.rect(width, height).attr({ fill: '#303030'});
+  draw.image(window.story.state.combat.scenePic);
+  var list = window.story.state.combat.enemyParty;
+  for(var i=list.length-1;i>=0;i--) {
+    if(!list[i].isKnockedOut()) { //todo show deathsprite
+      var pos = _pos.pop();
+      var _pic = window.gm.images[list[i].pic]();
+      var node = SVG(_pic);
+      var scaleW = node.width()/width, scaleH=node.height()/height;
+      //todo sprites should be scattered evenly and scaled down to fit into scene 
+      if(scaleW>0.9 || scaleH>0.9 ) {
+        if(scaleW>scaleH) node.width(node.width()/(1.2*scaleW));
+        else node.height(node.height()/(1.2*scaleH));
+        //node.scale(1/(1.2*scaleH)); ??scaling doesnt work?
+      }
+      node.center(pos[0]*width/100,pos[1]*height/100);//reposit. after scaling !
+      node.addTo(draw);
+    }
+    if(_pos.length<=0) break;
+  }
+  
+  return;
   //style='"background: url(<%=s.combat.enemyParty[0].pic%>) no-repeat center/contain,url(<%=s.combat.scenePic%>) no-repeat center;color:black;"';
-  var draw = document.getElementById('canvas2');
-  draw.style.height ="300px";
+  var draw = document.getElementById('canvas');
+  draw.style.height =h.toString()+"px";
   var _back = `url("${window.story.state.combat.scenePic}") no-repeat center`;
   var list = window.story.state.combat.enemyParty;
   for(var i=list.length-1;i>=0;i--) {

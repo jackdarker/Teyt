@@ -31,14 +31,14 @@ class Mole extends Mob {
         let foe = new Mole();
         if(type==='Squirrel') {
             foe.name = foe.id = 'Squirrel';
-            this.pic= 'assets/Battlers/squirrel1.svg';
+            this.pic= 'squirrel1';
         }
         return foe;
     }
     constructor() {
         super();
         this.name = this.id = 'Mole';
-        this.pic= 'assets/mole.jpg';
+        this.pic= 'squirrel1';//todo
         this.Stats.increment('healthMax',-0.5*(this.health().max));
     }
 }
@@ -58,7 +58,7 @@ class Wolf extends Mob {
     constructor() {
         super();
         this.name = this.id = 'Wolf';
-        this.pic= 'assets/battlers/wolf3.svg';
+        this.pic= "wolf3";//'assets/battlers/wolf3.svg';
         this.level_min =3;
         this.loot= [{id:'WolfTooth',chance:25,amount:1}];
         this.Outfit.addItem(new BaseQuadruped());
@@ -99,7 +99,7 @@ class Slug extends Mob {
     constructor() {
         super();
         this.name = this.id = 'Slug';
-        this.pic= 'assets/battlers/slug1.svg';
+        this.pic= 'slug2';
         this.level_min =1;
         this.Outfit.addItem(new BaseWorm());
         this.Outfit.addItem(FaceLeech.factory('slug')); 
@@ -132,7 +132,7 @@ class Leech extends Mob {
     constructor() {
         super();
         this.name = this.id = 'Leech';
-        this.pic= 'assets/battlers/Leech1.svg';
+        this.pic= 'leech2.svg';
         this.level_min =1;
         this.Outfit.addItem(new BaseWorm());
         this.Outfit.addItem(FaceLeech.factory('leech'));
@@ -175,7 +175,7 @@ class Lizan extends Mob {
     constructor() {
         super();
         this.name = this.id = 'Lizan';
-        this.pic= 'assets/battlers/lizan1.svg';
+        this.pic= 'lizan1';
         this.Outfit.addItem(new BaseHumanoid());
         this.Outfit.addItem(SkinScales.factory('lizard'));
         this.Outfit.addItem(HandsHuman.factory('lizard'));
@@ -217,7 +217,7 @@ class Lapine extends Mob {
     constructor() {
         super();
         this.name = this.id = 'Lapine';
-        this.pic= 'assets/battlers/Bunny1.svg';
+        this.pic= 'Bunny1';
         this.Outfit.addItem(new BaseHumanoid());
         this.Outfit.addItem(SkinFur.factory('bunny'));
         this.Outfit.addItem(HandsHuman.factory('bunny'));
@@ -258,7 +258,7 @@ class Huntress extends Mob {
     constructor() {
         super();
         this.name = this.id = 'Huntress';
-        this.pic= 'assets/icons/icon_question.svg';
+        this.pic= 'unknown';
         this.Outfit.addItem(new BaseHumanoid());
         this.Outfit.addItem(new SkinHuman());
         this.Outfit.addItem(HandsHuman.factory('cat'));
@@ -297,7 +297,7 @@ class Succubus extends Mob {
     constructor() {
         super();
         this.name = this.id = 'Succubus';
-        this.pic= 'assets/battlers/succubus1.svg';
+        this.pic= 'succubus1';
         this.Outfit.addItem(new BaseHumanoid());
         this.Outfit.addItem(new SkinHuman());
         this.Outfit.addItem(HandsHuman.factory('human'));
@@ -342,7 +342,7 @@ class Dryad extends Mob {
     constructor() {
         super();
         this.name = this.id = 'Dryad';
-        this.pic= 'assets/battlers/nymph1.svg';
+        this.pic= 'unknown';
         this.loot= [{id:'DryadVine',chance:25,amount:1}];
         this.Outfit.addItem(new BaseHumanoid());
         this.Outfit.addItem(new SkinHuman());
@@ -380,7 +380,7 @@ class Vine extends Mob {
     constructor() {
         super();
         this.name = this.id = 'Vine';
-        this.pic= 'assets/icons/icon_question.svg';
+        this.pic= 'unknown';
         this.Outfit.addItem(new BaseWorm());
         this.Skills.addItem(new SkillGrapple());
         this.levelUp(1);
@@ -417,7 +417,7 @@ class Mechanic extends Mob {
     constructor() {
         super();
         this.name = this.id = 'Mechanic-Guy';
-        this.pic= 'assets/mechanic.jpg';
+        this.pic= 'unknown';
     }
     calcCombatMove(enemys,friends){
         let result = {OK:true,msg:''};
@@ -439,7 +439,7 @@ class Carlia extends Mob {
   constructor() {
       super();
       this.name = this.id = 'Carlia';
-      this.pic= 'assets/icons/icon_question.svg';
+      this.pic= 'unknown';
       this.Outfit.addItem(new BaseHumanoid());
       this.Outfit.addItem(new SkinHuman());
       this.Outfit.addItem(HandsHuman.factory('cat'));
@@ -456,7 +456,7 @@ class Ruff extends Wolf {
     constructor() {
         super();
         this.name = this.id = 'Ruff';
-        this.pic= 'assets/bw_wolf1.png';
+        this.pic= 'unknown';
         this.Outfit.addItem(PenisHuman.factory('wolf'));
         this.levelUp(3);
         this.autoLeveling();
@@ -466,7 +466,7 @@ class Trent extends Mob {
     constructor() {
         super();
         this.name = this.id = 'Trent';
-        this.pic= 'assets/icons/icon_question.svg';
+        this.pic= 'unknown';
         this.Outfit.addItem(new BaseHumanoid());
         this.Outfit.addItem(SkinFur.factory('horse', 'brown'));
         this.Outfit.addItem(HandsHuman.factory('horse'));

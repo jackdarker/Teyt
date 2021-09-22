@@ -302,8 +302,13 @@ var _iterator7=_createForOfIteratorHelper(list),_step7;try{for(_iterator7.s();!(
 uid=Math.max(uid,parseInt(el.name.split('#')[1],10)+1);};}}catch(err){_iterator7.e(err);}finally{_iterator7.f();}mob.name=mob.name+"#"+uid.toString();//need unique name !!
 if(party==='Player'){mob.calcCombatMove=null;//hack to disable AI  todo
 s.combat.playerParty.push(mob);}else{s.combat.enemyParty.push(mob);}return mob.name;}},{key:"hideCombatOption",value:function hideCombatOption(){document.querySelector("#choice").remove();}//renders background & combatants to #canvas
-},{key:"renderCombatScene",value:function renderCombatScene(){var w=600,h=300;var _pos=[[25,50],[75,50],[50,50]];//style='"background: url(<%=s.combat.enemyParty[0].pic%>) no-repeat center/contain,url(<%=s.combat.scenePic%>) no-repeat center;color:black;"';
-var draw=document.getElementById('canvas2');draw.style.height="300px";var _back="url(\"".concat(window.story.state.combat.scenePic,"\") no-repeat center");var list=window.story.state.combat.enemyParty;for(var i=list.length-1;i>=0;i--){if(!list[i].isKnockedOut()){//todo show deathsprite
+},{key:"renderCombatScene",value:function renderCombatScene(){var _pos=[[25,50],[75,50],[50,50]];//sprite position in %
+var width=600,height=300;var draw=document.querySelector("#canvas svg");if(!draw)draw=SVG().addTo('#canvas').size(width,height);else draw=SVG(draw);//recover svg document instead appending new one
+draw.rect(width,height).attr({fill:'#303030'});draw.image(window.story.state.combat.scenePic);var list=window.story.state.combat.enemyParty;for(var i=list.length-1;i>=0;i--){if(!list[i].isKnockedOut()){//todo show deathsprite
+var pos=_pos.pop();var _pic=window.gm.images[list[i].pic]();var node=SVG(_pic);var scaleW=node.width()/width,scaleH=node.height()/height;//todo sprites should be scattered evenly and scaled down to fit into scene
+if(scaleW>0.9||scaleH>0.9){if(scaleW>scaleH)node.width(node.width()/(1.2*scaleW));else node.height(node.height()/(1.2*scaleH));//node.scale(1/(1.2*scaleH)); ??scaling doesnt work?
+}node.center(pos[0]*width/100,pos[1]*height/100);node.addTo(draw);}if(_pos.length<=0)break;}return;//style='"background: url(<%=s.combat.enemyParty[0].pic%>) no-repeat center/contain,url(<%=s.combat.scenePic%>) no-repeat center;color:black;"';
+var draw=document.getElementById('canvas');draw.style.height=h.toString()+"px";var _back="url(\"".concat(window.story.state.combat.scenePic,"\") no-repeat center");var list=window.story.state.combat.enemyParty;for(var i=list.length-1;i>=0;i--){if(!list[i].isKnockedOut()){//todo show deathsprite
 var pos=_pos.pop();_back="url(\"".concat(list[i].pic,"\") no-repeat ").concat(pos[0],"% /contain,")+_back;}if(_pos.length<=0)break;}draw.style.background=_back;//`url("${window.story.state.combat.enemyParty[0].pic}") no-repeat center/contain,url("${window.story.state.combat.scenePic}") no-repeat center`;
 return;}//creates a list of active effects for combat display
 },{key:"printCombatEffects",value:function printCombatEffects(char){var list=[];if(char.isKnockedOut()){//if char is dead print this instead other effects; effects also get not updated when dead??
@@ -1765,7 +1770,8 @@ window.gm.addTime(20);window.story.show(places[r]);};window.gm.giveCyrilFood=fun
   SVG.find('#wolf3a #wolfbody')[0].node.style.fill= '#f03';
 }*/window.gm.printSceneGraphic2=function(background,item){var width=600,height=300;var draw=document.querySelector("#canvas svg");if(!draw)draw=SVG().addTo('#canvas').size(width,height);else draw=SVG(draw);//recover svg document instead appending new one
 var background=draw.rect(width,height).attr({fill:'#303030'});draw.image(background);var node=SVG(item);if(node)node.addTo(draw);};//for debug: builds link-list to display svg
-window.gm.listImages=function(){var list=Object.keys(window.gm.images);var g,entry=document.createElement('p');entry.textContent="";for(var _i5=0,_list=list;_i5<_list.length;_i5++){var _el11=_list[_i5];if(_el11==='strToBuf'||_el11==='cache')continue;g=document.createElement('a');g.href='javascript:void(0)',g.textContent=_el11;var x=window.gm.images[_el11]();g.addEventListener("click",window.gm.printSceneGraphic2.bind(this,"",x));entry.appendChild(g);entry.appendChild(document.createTextNode(' '));};$("div#choice")[0].appendChild(entry);// <- requires this node in html
+window.gm.listImages=function(){var list=Object.keys(window.gm.images);var g,entry=document.createElement('p');entry.textContent="";for(var _i5=0,_list=list;_i5<_list.length;_i5++){var _el11=_list[_i5];if(_el11==='strToBuf'||_el11==='cache')continue;g=document.createElement('a');g.href='javascript:void(0)',g.textContent=_el11;var x=window.gm.images[_el11]();g.addEventListener("click",window.gm.printSceneGraphic2.bind(this,"",x));entry.appendChild(g);entry.appendChild(document.createTextNode(' '));//add \s or no automatic linebreak
+};$("div#choice")[0].appendChild(entry);// <- requires this node in html
 };/*
 * ReactTest = a box is moing repeatedly left-right-left and the user has to click on it to 
 * stop it inside a hit area (success if center of moving box is inside one hit-area)
@@ -1993,7 +1999,8 @@ ItemsLib['GameVoucherBronze']=function(){var x=new GameVoucher();return x;};Item
  */ ////////////////////////////////////////////////////////
 // normal foes
 var Mole=/*#__PURE__*/function(_Mob){_inherits(Mole,_Mob);var _super53=_createSuper(Mole);_createClass(Mole,null,[{key:"factory",value:function factory(type){var foe=new Mole();if(type==='Squirrel'){foe.name=foe.id='Squirrel';this.pic='assets/Battlers/squirrel1.svg';}return foe;}}]);function Mole(){var _this50;_classCallCheck(this,Mole);_this50=_super53.call(this);_this50.name=_this50.id='Mole';_this50.pic='assets/mole.jpg';_this50.Stats.increment('healthMax',-0.5*_this50.health().max);return _this50;}return Mole;}(Mob);var Wolf=/*#__PURE__*/function(_Mob2){_inherits(Wolf,_Mob2);var _super54=_createSuper(Wolf);_createClass(Wolf,null,[{key:"factory",value:function factory(type){var foe=new Wolf();if(type==='AlphaWolf'){foe.name=foe.id='AlphaWolf';foe.Stats.increment('healthMax',-0.3*foe.health().max);foe.Skills.addItem(SkillCallHelp.factory('Wolf'));//todo chance to call?
-foe.pic='assets/battlers/wolf1.svg';}else{foe.Stats.increment('healthMax',-0.5*foe.health().max);}return foe;}}]);function Wolf(){var _this51;_classCallCheck(this,Wolf);_this51=_super54.call(this);_this51.name=_this51.id='Wolf';_this51.pic='assets/battlers/wolf3.svg';_this51.level_min=3;_this51.loot=[{id:'WolfTooth',chance:25,amount:1}];_this51.Outfit.addItem(new BaseQuadruped());_this51.Outfit.addItem(SkinFur.factory('wolf','black'));_this51.Outfit.addItem(HandsPaw.factory('wolf'));_this51.Outfit.addItem(TailWolf.factory('wolf'));_this51.Outfit.addItem(FaceWolf.factory('wolf'));_this51.Stats.increment('arm_blunt',5);_this51.fconv=null;//lazy init because descfixer depends on gm.player
+foe.pic='assets/battlers/wolf1.svg';}else{foe.Stats.increment('healthMax',-0.5*foe.health().max);}return foe;}}]);function Wolf(){var _this51;_classCallCheck(this,Wolf);_this51=_super54.call(this);_this51.name=_this51.id='Wolf';_this51.pic="wolf3";//'assets/battlers/wolf3.svg';
+_this51.level_min=3;_this51.loot=[{id:'WolfTooth',chance:25,amount:1}];_this51.Outfit.addItem(new BaseQuadruped());_this51.Outfit.addItem(SkinFur.factory('wolf','black'));_this51.Outfit.addItem(HandsPaw.factory('wolf'));_this51.Outfit.addItem(TailWolf.factory('wolf'));_this51.Outfit.addItem(FaceWolf.factory('wolf'));_this51.Stats.increment('arm_blunt',5);_this51.fconv=null;//lazy init because descfixer depends on gm.player
 return _this51;}_createClass(Wolf,[{key:"calcCombatMove",value:function calcCombatMove(enemys,friends){var result={OK:true,msg:''};//this._canAct();
 var rnd=_.random(1,100);var spawn="CallHelpWolf";//if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
 result.action=result.target=null;if(window.story.state.combat.turnCount%2===0){rnd=_.random(0,enemys.length-1);result.action="Bite";result.target=[enemys[rnd]];result.msg=this.name+" snaps at "+result.target[0].name+".</br>"+result.msg;return result;}else if(window.story.state.combat.turnCount>3&&this.Skills.countItem(spawn)>0&&this.Skills.getItem(spawn).isEnabled().OK){result.action=spawn;result.target=[this];result.msg=this.name+" howls to call its pack for support.</br>"+result.msg;return result;}return _get(_getPrototypeOf(Wolf.prototype),"calcCombatMove",this).call(this,enemys,friends);}}]);return Wolf;}(Mob);var Slug=/*#__PURE__*/function(_Mob3){_inherits(Slug,_Mob3);var _super55=_createSuper(Slug);_createClass(Slug,null,[{key:"factory",value:function factory(type){var foe=new Slug();return foe;}}]);function Slug(){var _this52;_classCallCheck(this,Slug);_this52=_super55.call(this);_this52.name=_this52.id='Slug';_this52.pic='assets/battlers/slug1.svg';_this52.level_min=1;_this52.Outfit.addItem(new BaseWorm());_this52.Outfit.addItem(FaceLeech.factory('slug'));_this52.Outfit.addItem(ArmorTorso.factory('slime'));_this52.fconv=null;return _this52;}_createClass(Slug,[{key:"calcCombatMove",value:function calcCombatMove(enemys,friends){var result={OK:true,msg:''};var rnd=_.random(1,100);//if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
@@ -2463,7 +2470,7 @@ window.storage.registerConstructor(stHealthMax);window.storage.registerConstruct
 window.storage.registerConstructor(effCallHelp);window.storage.registerConstructor(effCombatRecovery);window.storage.registerConstructor(effDamage);window.storage.registerConstructor(effBleed);window.storage.registerConstructor(effCombined);window.storage.registerConstructor(effGrappled);window.storage.registerConstructor(effGrappling);window.storage.registerConstructor(effUngrappling);window.storage.registerConstructor(effEnergized);window.storage.registerConstructor(effNotTired);window.storage.registerConstructor(effTeaseDamage);window.storage.registerConstructor(effTired);window.storage.registerConstructor(effStunned);window.storage.registerConstructor(effGuard);window.storage.registerConstructor(effHeal);window.storage.registerConstructor(effMasochist);window.storage.registerConstructor(effEnergyDrain);window.storage.registerConstructor(effHorsePower);window.storage.registerConstructor(effLapineSpeed);window.storage.registerConstructor(effMutateBunny);window.storage.registerConstructor(effMutateHorse);window.storage.registerConstructor(effMutateWolf);window.storage.registerConstructor(effMutateCat);window.storage.registerConstructor(effGrowBreast);window.storage.registerConstructor(effGrowVulva);window.storage.registerConstructor(effLewdMark);window.storage.registerConstructor(effInHeat);window.storage.registerConstructor(effInRut);window.storage.registerConstructor(effSpermInWomb);window.storage.registerConstructor(effVaginalFertil);window.storage.registerConstructor(effVaginalPregnant);//
 window.storage.registerConstructor(skCooking);return StatsLib;}(window.gm.StatsLib||{});
 /* twine-user-script #2: "Story JavaScript" */
-</script><tw-tag name="_nodeffered_" color="yellow"></tw-tag><tw-tag name="_isdeffered_" color="brown"></tw-tag><tw-tag name="template" color="orange"></tw-tag><tw-tag name="_back_" color="gray"></tw-tag><tw-tag name="_nosave_" color="yellow"></tw-tag><tw-passagedata pid="1" name="Info_Jake" tags="_back_" position="100,100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
+</script><tw-tag name="template" color="orange"></tw-tag><tw-tag name="_back_" color="gray"></tw-tag><tw-tag name="_nosave_" color="yellow"></tw-tag><tw-tag name="_nodeffered_" color="yellow"></tw-tag><tw-tag name="_isdeffered_" color="brown"></tw-tag><tw-passagedata pid="1" name="Info_Jake" tags="_back_" position="100,100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 Jake is here.&lt;/br&gt;
 You barely know anything about him.&lt;/br&gt;
 [[Back|_back_]]&lt;/br&gt;&lt;/br&gt;
@@ -3122,8 +3129,7 @@ There might also be some pay-by-use offers at respawn like: removal of status al
 &lt;div&gt;&lt;/br&gt;
 [[Checkout|_back_]]&lt;/br&gt;&lt;/div&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="45" name="EncounterStartTurn" tags="_nosave_" position="650,25" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
-&lt;!--&lt;div id=&#39;canvas&#39; style=&#39;height:300px;background: url(&lt;%=s.combat.enemyParty[0].pic%&gt;) no-repeat center/contain,url(&lt;%=s.combat.scenePic%&gt;) no-repeat center;color:black;&#39;&gt;&lt;/div&gt;--&gt;
-&lt;div id=&#39;canvas2&#39;&gt;&lt;/div&gt;&lt;/br&gt;
+&lt;div id=&#39;canvas&#39;&gt;&lt;/div&gt;&lt;/br&gt;
 &lt;div id=&quot;panel&quot;&gt;&lt;/div&gt;&lt;/br&gt; &lt;!--filled by statspanel--&gt;
 &lt;div id=&quot;choice&quot;&gt;&lt;/div&gt;&lt;/br&gt; &lt;!--filled by combat-statemachine--&gt;
 &lt;div id=&#39;output&#39;&gt;&lt;/div&gt;&lt;/br&gt;    &lt;!--message is rendered here--&gt;
@@ -4214,8 +4220,6 @@ Test transformation events. Because they are deffered-events you need to return 
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="80" name="DebugImages" tags="_back_" position="1225,975" size="100,100">&lt;section&gt; &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;/br&gt;[[Back|_back_]]&lt;/br&gt;&lt;div id=&#39;canvas&#39;&gt;&lt;/div&gt;&lt;/br&gt;&lt;div id=&#39;choice&#39;&gt;&lt;/div&gt;&lt;/br&gt;
 Test svg inlined in code.&lt;/br&gt;
-&lt;a0 onclick=&#39;window.gm.printSceneGraphic2(&quot;&quot;,window.gm.images.wolf1())&#39;&gt;wolf1&lt;/a&gt;&lt;/br&gt;
-
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
 &lt;script&gt;window.gm.listImages();&lt;/script&gt;</tw-passagedata><tw-passagedata pid="81" name="Styletest" tags="_back_" position="100,1100" size="100,100">&lt;section&gt; &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;div&gt;&lt;/br&gt;[[Back|_back_]]
@@ -5591,8 +5595,6 @@ You have to challenge several enemys one by one. After each fight you may decide
 If you go on and get defeated, you will loose anything you carry with you.&lt;/br&gt;
 You can store loot in this chest if you dont want to risk loosing it in battle. Dont forget to gear up in the shop close by.&lt;/br&gt;
 &lt;% } %&gt;
-&lt;object id=&quot;svgObject&quot; data=&quot;assets/testMap.svg&quot; type=&quot;image/svg+xml&quot; height=&quot;250&quot; width=&quot;600&quot; onload=&#39;init(this)&#39;&gt; SVG-Grafik konnte nicht geladen werden! &lt;/object&gt;
-&lt;svg width=&quot;140mm&quot; height=&quot;80mm&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 140 80&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot; xmlns:xlink=&quot;http://www.w3.org/1999/xlink&quot;&gt;&lt;g transform=&quot;translate(-50 -50)&quot;&gt;&lt;rect id=&quot;rect846&quot; x=&quot;80.476&quot; y=&quot;50.476&quot; width=&quot;19.047&quot; height=&quot;19.047&quot; fill=&quot;#c4baaf&quot; fill-rule=&quot;evenodd&quot; stop-color=&quot;#000000&quot; stroke=&quot;#000&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;bevel&quot; stroke-width=&quot;.95296&quot; style=&quot;paint-order:fill markers stroke&quot; onmouseout=&quot;style.opacity = 1;&quot; onmouseover=&quot;style.opacity = 0.5;&quot;/&gt;&lt;path transform=&quot;matrix(.23418 0 0 .23418 23.587 -3.2689)&quot; d=&quot;m172.02 310.99-33.7-0.26708-23.64-24.018 0.26708-33.7 24.018-23.64 33.7 0.26709 23.64 24.018-0.26709 33.7z&quot; fill=&quot;#c4afaf&quot; fill-rule=&quot;evenodd&quot; stop-color=&quot;#000000&quot; stroke=&quot;#000&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;bevel&quot; stroke-width=&quot;3.7795&quot; style=&quot;paint-order:fill markers stroke&quot; onclick=&quot;smile(&#39;clicked&#39;)&quot; onmouseout=&quot;style.opacity = 1;&quot; onmouseover=&quot;style.opacity = 0.5;&quot;/&gt;&lt;use transform=&quot;translate(0,30)&quot; width=&quot;100%&quot; height=&quot;100%&quot; xlink:href=&quot;#rect846&quot;/&gt;&lt;/g&gt;&lt;/svg&gt;
 &lt;/br&gt;Are you ready for your first fight?&lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;[[Magic Chest|GlobalChest]] [[Shop|AM_Lv2_Shop]] [[Map|AM_MAP_Level2]] 
 &lt;a href=&quot;javascript:void(0)&quot; onclick=&#39;($(&quot;tw-passage&quot;).fadeOut(1000, function() {window.gm.player.sleep(700);window.story.show(&quot;AM_Lv2_Start&quot;);}));&#39;&gt;Sleep Until Morning&lt;/a&gt;
@@ -5607,22 +5609,6 @@ window.story.state.dng.arena.loot=[]; //reset flags
 8 = impregnated bitch
 16,32,64,128 = preg-counter
 */
-function init() {  console.log(&#39;The Script will load now.&#39;); 
-    /*document.getElementById(&#39;path2706&#39;).addEventListener(&#39;click&#39;, 
-    (function(e) {e.currentTarget.setAttribute(&#39;fill&#39;, &#39;#ff00cc&#39;);}));*/
-    };
-function pakoTest() {
-  const obj = [ { foo: &#39;bar&#39;, baz: &#39;БАТ&#39; }, { abra: 1, cadabra: null }];
-  var str = JSON.stringify(obj);
-  var result = window.pako.deflate(str);
-  alert(obj)
-  alert(result)
-  const uncompressed = window.pako.inflate(result,{to:&#39;string&#39;});
-  var obj2 = JSON.parse(uncompressed);
-  alert(obj2);
-}
-function smile(text) {alert();}
-pakoTest();
 &lt;/script&gt;</tw-passagedata><tw-passagedata pid="169" name="AM_SucDeal" tags="_nosave_" position="1100,2100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;p class=&quot;tPC&quot;&gt;Hey you, I would like to ask you something. Do you know where to get a soulgem?&lt;/p&gt;
 &lt;p class=&quot;tNPC1&quot;&gt;Soulgems? Mages want them as do others that are related to arcana. But I dont have some...unfortunatly.&lt;/p&gt;
