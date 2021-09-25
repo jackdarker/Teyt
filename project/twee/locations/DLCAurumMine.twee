@@ -142,15 +142,15 @@ Here is the plan:
 <% } else if((window.story.state.dng.arena.foundGate & 0x2)>0){ %>
 The dungeons gate should be still open, except someone took the soulgem away.  
 <% } else { %>
-You are stuck in this dungeon and need to find a way out of it.
+You are stuck in this dungeon and need to find your way out.
 You have to challenge several enemys one by one. After each fight you may decide to return here with the loot gathered so far.</br> 
-If you go on and get defeated, you will loose anything you carry with you.</br>
+If you go on and get defeated, you will loose most items you carry with you.</br>
 You can store loot in this chest if you dont want to risk loosing it in battle. Dont forget to gear up in the shop close by.</br>
 <% } %>
 </br>Are you ready for your first fight?</br>
 <div></br>[[Magic Chest|GlobalChest]] [[Shop|AM_Lv2_Shop]] [[Map|AM_MAP_Level2]] 
 <a href="javascript:void(0)" onclick='($("tw-passage").fadeOut(1000, function() {window.gm.player.sleep(700);window.story.show("AM_Lv2_Start");}));'>Sleep Until Morning</a>
-</br><a0 onclick='window.gm.fightArena("wolf",null,[{id:"Money",count:30}],"AM_Lv2_B2")'>Into battle<a/></div>
+</br><a0 onclick='window.gm.fightArena("wolf",null,[{id:"Money",count:30}],"AM_Lv2_B2")'>Into battle</a></div>
 </article><article id="LogPanel"></article></section>
 <script>
 window.story.state.dng.arena.loot=[]; //reset flags
@@ -191,7 +191,7 @@ She smiles at you and is even able to not let it look to deviously.</br>
 <p class="tNPC1">Well, it wouldn't ultimatly require another human to get this working. A healthy goblin would do the trick too, or anything alike... </p>
 <p class="tPC">I'm not really getting the picture here, and I even dont want too. </p>
 <p class="tNPC1">But you are interested in it. The spell I mean. It could still be helpful.</p>
-<a0 onclick='window.gm.player.Outfit.addItem(new window.gm.ItemsLib["LewdMark"]());window.story.state.dng.arena.foundGate|=0x4;window.story.show("AM_SucDeal3");'>Do it<a/> [[I will find another way|AM_Lv2_Exit]]</br>
+<a0 onclick='window.gm.player.Outfit.addItem(new window.gm.ItemsLib["LewdMark"]());window.story.state.dng.arena.foundGate|=0x4;window.story.show("AM_SucDeal3");'>Do it</a> [[I will find another way|AM_Lv2_Exit]]</br>
 </article><article id="LogPanel"></article></section>
 
 
@@ -206,7 +206,7 @@ Just as you start to protest she begins to speak some strange words and your low
 Just to make sure everthing is ok, you check your abdomen below your cloths.
 <p class="tPC">Hey, wait whats that !?.</p> you found your groin to be tattoed with some purple colored rune, shaped like some triangle in tribal style.
 <p class="tNPC1">Thats the mark of course. Isn't it cute? Dont worry, usually it will fade away after some time.</p>
-That might be true, the color seem to grow lighter while you stare at it.</br>
+That might be true, the color seem to fade away while you stare at it.</br>
 [[Leave|AM_Lv2_Exit]]
 </article><article id="LogPanel"></article></section>
 
@@ -215,9 +215,9 @@ That might be true, the color seem to grow lighter while you stare at it.</br>
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.moveHere();%> Are you ready for your next fight?</br>
 <div></br>[[Retreat|AM_Lv2_Exit]] [[Map|AM_MAP_Level2]]</br>
-<a0 onclick='window.gm.fightArena("mole",{amount:2},[{id:"Money",count:30}],"AM_Lv2_B3")'>Continue to B3<a/> 
-<a0 onclick='window.gm.fightArena("huntress",null,[{id:"Money",count:30}],"AM_Lv2_C3")'>Continue to C3<a/></div>
-<a0 onclick='window.gm.fightArena("succubus",null,[{id:"Money",count:30}],"<%=((window.story.state.dng.arena.foundGate &0xF)===1)?"AM_SucDeal":"AM_Lv2_D3"%>")'>Continue to D3<a/></div>
+<a0 onclick='window.gm.fightArena("mole",{amount:2},[{id:"Money",count:30}],"AM_Lv2_B3")'>Continue to B3</a> 
+<a0 onclick='window.gm.fightArena("huntress",null,[{id:"Money",count:30}],"AM_Lv2_C3")'>Continue to C3</a></div>
+<a0 onclick='window.gm.fightArena("succubus",null,[{id:"Money",count:30}],"<%=((window.story.state.dng.arena.foundGate &0xF)===1)?"AM_SucDeal":"AM_Lv2_D3"%>")'>Continue to D3</a></div>
 </article><article id="LogPanel"></article></section>
 
 
@@ -234,7 +234,7 @@ That might be true, the color seem to grow lighter while you stare at it.</br>
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.moveHere();%> Are you ready for your next fight?</br>
 <div></br>[[Retreat|AM_Lv2_Exit]] [[Map|AM_MAP_Level2]]</br>
-<a0 onclick='window.gm.fightArena("mole",{amount:2},[{id:"Money",count:30}],"AM_Lv2_B5")'>Continue to B5<a/></div>
+<a0 onclick='window.gm.fightArena("mole",{amount:2},[{id:"Money",count:30}],"AM_Lv2_B5")'>Continue to B5</a></div>
 </article><article id="LogPanel"></article></section>
 
 
@@ -242,7 +242,7 @@ That might be true, the color seem to grow lighter while you stare at it.</br>
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.moveHere();%> Are you ready for your next fight?</br>
 <div></br>[[Retreat|AM_Lv2_Exit]] [[Map|AM_MAP_Level2]]</br>
-<a0 onclick='window.gm.fightArena("slug",null,[{id:"Money",count:30}],"AM_Lv2_B6")'>Continue to B6<a/></div>
+<a0 onclick='window.gm.fightArena("slug",null,[{id:"Money",count:30}],"AM_Lv2_B6")'>Continue to B6</a></div>
 </article><article id="LogPanel"></article></section>
 
 
@@ -319,5 +319,5 @@ window.gm.printOutput(msg);
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.moveHere();%> Are you ready for your next fight?</br>
 <div></br>[[Retreat|AM_Lv2_Exit]] [[Map|AM_MAP_Level2]]</br>
-<a0 onclick='window.gm.fightArena("slug",null,[{id:"Money",count:30}],"AM_Lv2_B6")'>Continue to B6<a/></div>
+<a0 onclick='window.gm.fightArena("slug",null,[{id:"Money",count:30}],"AM_Lv2_B6")'>Continue to B6</a></div>
 </article><article id="LogPanel"></article></section>

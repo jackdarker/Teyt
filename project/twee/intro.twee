@@ -145,6 +145,7 @@ Enter the Grind-geon.
 <script> function start() {
     window.story.state.vars.spawnAt="AM_Lv2_Start";
     window.gm.enterVR();
+    window.gm.player.levelUp(2);window.gm.player.autoLeveling();//todo else its to difficult against wolf
     window.gm.MutationsLib['swapGender'](window.gm.player,window.storage.constructors["PenisHuman"]);
 }
 </script>

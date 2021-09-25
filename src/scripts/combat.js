@@ -86,7 +86,7 @@ hideCombatOption() {
 }
 //renders background & combatants to #canvas
 renderCombatScene() {
-  var _pos =[[25,50],[75,50],[50,50]];//sprite position in %
+  var _pos =[[25,40],[75,40],[50,60]];//sprite position in %
   var width=600,height=300;
   var draw = document.querySelector("#canvas svg");
   if(!draw) draw = SVG().addTo('#canvas').size(width, height);
@@ -113,21 +113,6 @@ renderCombatScene() {
   }
   
   return;
-  //style='"background: url(<%=s.combat.enemyParty[0].pic%>) no-repeat center/contain,url(<%=s.combat.scenePic%>) no-repeat center;color:black;"';
-  var draw = document.getElementById('canvas');
-  draw.style.height =h.toString()+"px";
-  var _back = `url("${window.story.state.combat.scenePic}") no-repeat center`;
-  var list = window.story.state.combat.enemyParty;
-  for(var i=list.length-1;i>=0;i--) {
-    if(!list[i].isKnockedOut()) { //todo show deathsprite
-      var pos = _pos.pop();
-      _back =`url("${list[i].pic}") no-repeat ${pos[0]}% /contain,`+_back;
-    }
-    if(_pos.length<=0) break;
-  }
-  draw.style.background=_back;//`url("${window.story.state.combat.enemyParty[0].pic}") no-repeat center/contain,url("${window.story.state.combat.scenePic}") no-repeat center`;
-  
-  return;
 }
 //creates a list of active effects for combat display
 printCombatEffects(char) {
@@ -147,7 +132,7 @@ printCombatEffects(char) {
 }
 statsline(whom,mark) {
   let msg='',bargraph=window.gm.util.bargraph;
-  if(mark) msg = "<td style=\"border-style:dotted;\">";
+  if(mark) msg = "<td style=\"border-style:dotted;border-color:darkorchid;border-width:0.3em;\">";
   else msg = "<td>";
   msg+=whom.name+" Lv"+whom.level+"</td><td>"+bargraph(whom.health().value,whom.health().max,"lightcoral")+"</td><td>"+bargraph(whom.Stats.get("arousal").value,whom.Stats.get("arousalMax").value,"lightpink")+"</td><td>"+bargraph(whom.energy().value,whom.energy().max,"lightyellow")+"</td><td>"+bargraph(whom.Stats.get("will").value,whom.Stats.get("willMax").value,"lightblue")+"</td>";
   return(msg);
@@ -308,7 +293,7 @@ _postItemSelect(id){
   window.gm.Encounter.next=window.gm.Encounter.selectTarget;
   window.story.show('EncounterStartTurn');
 }
-//if switching to Status panel and back this will redraw screen and call this this.next; to avoid this set next only in clickhandler 
+//if switching to Status panel and back this will redraw screen and call this.next; to avoid this set next only in clickhandler 
 printNextLink(nextState,label="Next") {
   let entry = document.createElement('a');
   entry.href='javascript:void(0)';
@@ -417,12 +402,11 @@ preTurn() {
   //calculate turnorder
   this.calcTurnOrder();
   this.next=this.checkDefeat;
-  if(this.msg!=='') result.OK=true,this.printNextLink(this.checkDefeat);
   return(result);
 }
 checkDefeat() { //check if party is defeated
   let result = {OK:false, msg:''}; 
-  this.msg = '';
+  //this.msg = '';
   var s = window.story.state;
   if(s.combat.playerFleeing===true) { 
     this.next=this.postBattle;
@@ -479,9 +463,9 @@ selectMove() {
   let stateDesc = s.combat.actor._stateDesc();
   let canAct = s.combat.actor._canAct();
   if(canAct.OK===false) { //skip char if not dead but incapaciated and show msg
-    result.OK = true, result.msg = stateDesc.msg+"</br>"+canAct.msg;
+    //result.OK = true, 
+    result.msg = stateDesc.msg+"</br>"+canAct.msg;
     this.next=this.checkDefeat;
-    this.printNextLink(this.checkDefeat);
     return(result);
   } else {
     if(s.combat.actor.isAIenabled && s.combat.actor.calcCombatMove) { //selected by AI
@@ -490,10 +474,11 @@ selectMove() {
       window.story.state.combat.action=result.action;
       window.story.state.combat.target=result.target;
       this.next=this.execMove; 
-      this.msg=result.msg,result.OK=false;
+      //this.msg=result.msg,
+      result.OK=false;
     } else {
       this.printSkillList();
-      result.OK=true, result.msg=stateDesc.msg+"</br>Choose your action !</br>";
+      result.OK=true, result.msg=stateDesc.msg+"</br>Choose action for "+s.combat.actor.name+"!</br>";
     }
   }
   return(result);
@@ -515,12 +500,11 @@ selectTarget() {  //select target for choosen action
 execMove(){
   var result = {OK:false, msg:''};
   var s = window.story.state;
-  //apply move; AI might not found a possible action
+  //apply move; AI might not find a possible action
   if(s.combat.action!==null && s.combat.action!=='') {
     result.msg=s.combat.actor.Skills.getItem(s.combat.action).cast(s.combat.target).msg;
   }
-  result.OK = true;
-  this.printNextLink(this.checkDefeat);//todo continue automatically if next actor is AI
+  this.next=this.checkDefeat;
   return(result);
 }
 postBattle() {
@@ -545,15 +529,17 @@ postBattle() {
  */
 battle() {
   var result = {OK:false, msg:''};
+  this.msg = '';
   while(this.next!==null && !result.OK) {
-    //if result =true; user input required
+    //if result =true user input required- break loop and wait for click event (msg has to contain printNextLink-call !)
     result =this.next();
-    if(result.OK) {
-      result.msg = this.msg+result.msg;
-      return(result);
-    }
+    this.msg+=result.msg;
+    window.gm.printOutput(this.msg);
+    window.gm.Encounter.renderCombatScene();
+    renderToSelector("#panel", "statspanel");
+    //if(result.OK) {   result.msg = this.msg+result.msg;    return(result);  }
   }
-  return(result);
+  return;
 };
 
 }
@@ -579,7 +565,7 @@ Stunned/Bound Chars can not evade */
 // on evasion returns false and a message
 window.gm.combat.calcEvasion=function(attacker,target, attack) {
   var result = {OK:true,msg:''}
-  var rnd = window.gm.roll(0,100);
+  var rnd = _.random(0,100);
 
   if(target.Effects.findItemSlot(effStunned.name)>=0) { //todo chance to miss 
     result.OK = true; 

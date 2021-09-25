@@ -62,6 +62,9 @@ window.gm.MutationsLib['vaginaSpermDissolve'] = function (char) {
         window.gm.pushDeferredEvent("GenericDeffered",[msg]);
     }
 }
+/* 
+ * triggers pregnancy-scene
+ */
 window.gm.MutationsLib['vaginaPregnancy'] = function (char) {
     let msg='';
     let lewdMark=char.Effects.findEffect(effLewdMark.name)[0];

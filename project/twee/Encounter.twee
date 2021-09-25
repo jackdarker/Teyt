@@ -2,15 +2,13 @@
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 <div id='canvas'></div></br>
 <div id="panel"></div></br> <!--filled by statspanel-->
-<div id="choice"></div></br> <!--filled by combat-statemachine-->
 <div id='output'></div></br>    <!--message is rendered here-->
+<div id="choice"></div></br> <!--filled by combat-statemachine-->
 <div id="choice2"></div></br>  <!--filled by combat-statemachine-->
 </article><article id="LogPanel"></article>
 </section>
 <script>
-window.gm.printOutput(window.gm.Encounter.battle().msg);
-window.gm.Encounter.renderCombatScene();
-renderToSelector("#panel", "statspanel");
+window.gm.Encounter.battle();
 </script>
 
 

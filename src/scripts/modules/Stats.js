@@ -781,6 +781,18 @@ class effGrowVulva extends Effect {
         }
     }
 }
+
+/**
+ * todo 
+ * the mark indicates that you can bear soulgems; the stronger the mark, the better the gem
+ * 
+ * with each birth, the mark grows stronger;
+ * while pampering the gem, it sucks up your arcana if you dont have sex
+ * chance to go into heat if you dont have a gem
+ *
+ * @class effLewdMark
+ * @extends {Effect}
+ */
 class effLewdMark extends Effect {
     constructor() {
         super();
@@ -791,10 +803,7 @@ class effLewdMark extends Effect {
     static fromJSON(value) { return window.storage.Generic_fromJSON(effLewdMark, value.data);};
     get desc() {return(effLewdMark.name);}
     onTimeChange(time) {
-        //todo the mark indicates that you can bear soulgems; the stronger the mark, the better the gem
-        //with each birth, the mark grows stronger;
-        //while pampering the gem, it sucks up your arcana if you dont have sex
-        //chance to go into heat if you dont have a gem
+        
         return(null);
     }
     onApply(){
