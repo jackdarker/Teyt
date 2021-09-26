@@ -64,6 +64,8 @@ class Wolf extends Mob {
         this.Outfit.addItem(new BaseQuadruped());
         this.Outfit.addItem(SkinFur.factory('wolf','black'));
         this.Outfit.addItem(HandsPaw.factory('wolf'));
+        this.Outfit.addItem(PenisHuman.factory('wolf'));
+        this.Outfit.addItem(AnusHuman.factory('wolf'));
         this.Outfit.addItem(TailWolf.factory('wolf'));
         this.Outfit.addItem(FaceWolf.factory('wolf'));
         this.Stats.increment('arm_blunt',5);
@@ -181,6 +183,7 @@ class Lizan extends Mob {
         this.Outfit.addItem(HandsHuman.factory('lizard'));
         this.Outfit.addItem(BreastHuman.factory('lizard'));
         this.Outfit.addItem(FaceWolf.factory('lizard'));
+        this.Outfit.addItem(AnusHuman.factory('lizard'));
         this.Outfit.addItem(PenisHuman.factory('lizard'));
         this.Outfit.addItem(ShortsLeather.factory(100));
         let sk = new SkillGuard();
@@ -223,6 +226,7 @@ class Lapine extends Mob {
         this.Outfit.addItem(HandsHuman.factory('bunny'));
         this.Outfit.addItem(BreastHuman.factory('bunny'));
         this.Outfit.addItem(FaceHorse.factory('bunny'));
+        this.Outfit.addItem(AnusHuman.factory('bunny'));
         this.Outfit.addItem(VulvaHuman.factory('bunny'));
         this.Outfit.addItem(ShortsLeather.factory(100));
         let sk = new SkillKick();
@@ -264,6 +268,7 @@ class Huntress extends Mob {
         this.Outfit.addItem(HandsHuman.factory('cat'));
         this.Outfit.addItem(BreastHuman.factory('cat'));
         this.Outfit.addItem(FaceWolf.factory('cat'));
+        this.Outfit.addItem(AnusHuman.factory('cat'));
         this.Outfit.addItem(VulvaHuman.factory('cat'));
         this.Outfit.addItem(new BikiniBottomLeather());
         this.Outfit.addItem(new BikiniTopLeather());
@@ -303,6 +308,7 @@ class Succubus extends Mob {
         this.Outfit.addItem(HandsHuman.factory('human'));
         this.Outfit.addItem(BreastHuman.factory('human'));
         this.Outfit.addItem(new FaceHuman());
+        this.Outfit.addItem(AnusHuman.factory('human'));
         this.Outfit.addItem(VulvaHuman.factory('human'));
         this.Outfit.addItem(new BikiniBottomLeather());
         this.Outfit.addItem(new BikiniTopLeather());
@@ -349,6 +355,7 @@ class Dryad extends Mob {
         this.Outfit.addItem(HandsHuman.factory('human'));
         this.Outfit.addItem(BreastHuman.factory('human'));
         this.Outfit.addItem(new FaceHuman());
+        this.Outfit.addItem(AnusHuman.factory('human'));
         this.Outfit.addItem(VulvaHuman.factory('human'));
         this.Outfit.addItem(new BikiniBottomLeather());
         this.Skills.addItem(SkillCallHelp.factory('Vine'));
@@ -445,6 +452,7 @@ class Carlia extends Mob {
       this.Outfit.addItem(HandsHuman.factory('cat'));
       this.Outfit.addItem(FaceWolf.factory('cat'));
       this.Outfit.addItem(BreastHuman.factory('human'));
+      CSS
       this.Outfit.addItem(VulvaHuman.factory('human'));
       this.Outfit.addItem(new BikiniBottomLeather());
       this.Outfit.addItem(new BikiniTopLeather());
@@ -457,6 +465,7 @@ class Ruff extends Wolf {
         super();
         this.name = this.id = 'Ruff';
         this.pic= 'unknown';
+        this.Outfit.addItem(AnusHuman.factory('wolf'));
         this.Outfit.addItem(PenisHuman.factory('wolf'));
         this.levelUp(3);
         this.autoLeveling();
@@ -472,6 +481,7 @@ class Trent extends Mob {
         this.Outfit.addItem(HandsHuman.factory('horse'));
         this.Outfit.addItem(TailWolf.factory('horse'));
         this.Outfit.addItem(FaceWolf.factory('horse'));
+        this.Outfit.addItem(AnusHuman.factory('horse'));
         this.Outfit.addItem(PenisHuman.factory('horse'));
         this.Outfit.addItem(new ShortsLeather());
         this.Outfit.addItem(new MaceSteel());

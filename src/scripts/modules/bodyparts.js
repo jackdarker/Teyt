@@ -639,6 +639,63 @@ class BreastHuman extends BodyPart {
         return(fconv('$[My]$ breasts are small but perky.'));
     }
 }
+class AnusHuman extends BodyPart {
+    static dataPrototype() {    
+        return({virgin:true,wetgen:1, stretch:1,depth:1,spermtype:'',sperm:0});
+    }
+    static factory(id) {
+        let obj =  new AnusHuman();
+        obj.setStyle(id);
+        return(obj);
+    }
+    constructor() {
+        super('AnusHuman');
+        this.addTags(['body']);
+        this.slotUse = ['bAnus'];
+        this.data = AnusHuman.dataPrototype();
+    }
+    setStyle(id) {
+        this.data.style = id;
+        switch(id) {
+            case 'human':
+            case 'cat':
+            case 'dog':
+            case 'horse':
+            case 'wolf':
+            case 'bunny':
+            case 'lizard':
+                break;
+            default:
+                throw new Error("unknown anus-style "+id);
+        }
+    }
+    getStyle() { return this.data.style; }
+    get descShort() { return(this.data.style+' hole');}
+    get desc() { return 'tailhole';}
+    toJSON() {return window.storage.Generic_toJSON("AnusHuman", this); };
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(AnusHuman, value.data));}
+    descLong(fconv) {
+        let msg= "$[My]$ anus can snuggly fit around "+this.data.stretch+"cm in diameter and "+this.data.depth+"cm in depth.";
+        if(this.data.spermtype!=='') {
+            msg+= this.data.sperm+"ml of sperm from a "+this.data.spermtype+" might be deposited in $[my]$ bum.";  
+        }
+        return(fconv(msg));
+    }
+    addSperm(type,amount) {
+        if(amount>this.data.sperm || this.data.spermtype) {
+            this.data.spermtype=type;
+        }
+        this.data.sperm+=amount;
+    }
+    removeSperm(amount) {
+        if(amount>0) {
+            this.data.sperm-=amount;
+        } else this.data.sperm=0;
+        if(this.data.sperm<=0) {
+            this.data.sperm=0;this.data.spermtype='';
+        }
+    }
+}
 class VulvaHuman extends BodyPart {
     static dataPrototype() {    
         return({labia:0, virgin:true,wetgen:1, stretch:1,depth:1,clitsize:0.5, spermtype:'',sperm:0});
@@ -683,14 +740,14 @@ class VulvaHuman extends BodyPart {
         return(fconv(msg));
     }
     onEquip(context){
-        context.parent.addEffect(new window.storage.constructors['effSpermInWomb'](),'effSpermInWomb');
+        //context.parent.addEffect(new window.storage.constructors['effSpermDecay'](),'effSpermDecay');
         context.parent.addEffect(new window.storage.constructors['effVaginalFertil'](),'effVaginalFertil');
         return({OK:true,msg:'equipped'});
     }
     onUnequip(context) {
         context.parent.Effects.removeItem('effVaginalFertil');
         context.parent.Effects.removeItem('effVaginalPregnant');
-        context.parent.Effects.removeItem('effSpermInWomb');
+        //context.parent.Effects.removeItem('effSpermDecay');
         return({OK:true,msg:'unequipped'});
     }
     addSperm(type,amount) {
@@ -764,6 +821,7 @@ class PenisHuman extends BodyPart {
 }
 //todo BodyPartLib ??
 window.gm.ItemsLib = (function (ItemsLib) {
+    window.storage.registerConstructor(AnusHuman);
     window.storage.registerConstructor(ArmorTorso);
     window.storage.registerConstructor(BaseHumanoid);
     window.storage.registerConstructor(BaseQuadruped);

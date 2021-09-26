@@ -251,6 +251,47 @@ class Briefs extends Equipment {
     toJSON() {return window.storage.Generic_toJSON("Briefs", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(Briefs, value.data));}
 }
+class AnalPlug extends Equipment {
+    static factory(style) {
+        let x = new AnalPlug();
+        x.style=style;
+        return(x);
+    }
+    constructor() {
+        super('AnalPlug');
+        this.addTags(['ButtPlug']);
+        this.slotUse = ['uAnus'];
+        this.slotCover = [];    
+        this.lossOnRespawn = false;
+        this.style=0,this.lewd.slut = 3;
+    }
+    toJSON() {return window.storage.Generic_toJSON("AnalPlug", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(AnalPlug, value.data));}
+    set style(style) { 
+        this._style = style; 
+        if(style===0) this.id=this.name='AnalPlugSmall';
+        else if(style===100) {
+            this.id=this.name='AnalPlugMedium';
+        }
+        else throw new Error(this.id +' doesnt know '+style);
+    }
+    get style() {return this._style;}
+    get desc() { 
+        let msg ='a small rubber-toy for someones rear';
+        switch(this._style) {
+            case 100:
+                msg=('a medium-sized buttplug');
+                break;
+            default:
+        }
+        return(msg);
+    }
+    onEquip(context) {
+        if(this.style===100) {
+            context.parent.addEffect(new window.storage.constructors['effButtPlugged'](),"effButtPlugged"); //only works for player since effects of NPC dont receive ticks!
+        } 
+        return({OK:true, msg:'stuffed'});}
+}
 class ChastityBelt extends Equipment {
     static factory(style) {
         let x = new ChastityBelt();
@@ -596,6 +637,7 @@ class TailRibbon extends Equipment {
 //todo bow,whip,blowpipe
 //todo vest,chaps,bikini top, greaves , jacket
 window.gm.ItemsLib = (function (ItemsLib) {
+    window.storage.registerConstructor(AnalPlug);
     window.storage.registerConstructor(BikiniBottomLeather);
     window.storage.registerConstructor(BikiniTopLeather);
     window.storage.registerConstructor(BracerLeather);
@@ -622,6 +664,8 @@ window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(WristCuffs);
     window.storage.registerConstructor(WhipLeather);
     //.. and Wardrobe
+    ItemsLib['AnalPlugSmall'] = function () { let x= new AnalPlug();x.style=0;return(x); };
+    ItemsLib['AnalPlugMed'] = function () { let x= new AnalPlug();x.style=100;return(x); };
     ItemsLib['BikiniBottomLeather'] = function () { return new BikiniBottomLeather();};
     ItemsLib['BikiniTopLeather'] = function () { return new BikiniTopLeather();};
     ItemsLib['Briefs'] = function () { return new Briefs();};

@@ -28,11 +28,11 @@ window.gm.mutate.updateRacialBoon = function(char,scores) {
 }
 ///////////////////////////////////////////////////////
 window.gm.MutationsLib = window.gm.MutationsLib || {};
-window.gm.MutationsLib['vaginaSpermDissolve'] = function (char) {
+/*OBSOLETE window.gm.MutationsLib['vaginaSpermDissolve'] = function (char) {
     let vulva = char.getVagina();
     vulva.removeSperm(2); //todo decay depends on looseness, soulgem absorption??
     let msg='';
-    msg+="You can feel some of the cum in your womb dribble down your leg. ";
+    msg+="You can feel some of the cum from your womb dribble down your leg. ";
     let lewdMark=char.Effects.findEffect(effLewdMark.name)[0];
     let pregnancy=char.Effects.findEffect(effVaginalPregnant.name)[0];
     if(pregnancy) {
@@ -61,7 +61,7 @@ window.gm.MutationsLib['vaginaSpermDissolve'] = function (char) {
     if(char===window.gm.player) {
         window.gm.pushDeferredEvent("GenericDeffered",[msg]);
     }
-}
+}*/
 /* 
  * triggers pregnancy-scene
  */
@@ -87,6 +87,41 @@ window.gm.MutationsLib['vaginaPregnancy'] = function (char) {
         if(window.story.state._gm.dbgShowMoreInfo) msg+= window.gm.util.formatNumber(pregnancy.data.cycles*pregnancy.data.duration/(60*24),0)+" days to go.";
     } 
     //todo go in heat if fertility-cycle triggers?
+    if(char===window.gm.player) {
+        window.gm.pushDeferredEvent("GenericDeffered",[msg]);
+    }
+}
+/*
+ * also used for buttplug
+ */
+window.gm.MutationsLib['analPregnancy'] = function (char) {
+    let msg='[something is wrong here]';
+    let plug = char.Outfit.getItemForSlot('uAnus');
+    if(plug) {
+        if(plug.style===100) { //todo
+
+        } else {
+
+        }
+    }
+    /*let pregnancy=char.Effects.findEffect(effAnalPregnant.name)[0]; //todo
+    if(pregnancy) {
+        if(pregnancy.data.type==='soulgem') {
+            if(pregnancy.data.cycles <=0) {
+                pregnancy = new effVaginalFertil();
+                char.addEffect(pregnancy,effVaginalFertil.name);
+                msg+="A homemade soulgem slips out of your nethers !</br>";
+                char.Inv.addItem(window.gm.ItemsLib['TinySoulGem']());
+            } else msg+="If you dont provide that soulgem something to feed off, it might absorb some energy from you instead!.</br>";
+        } else {
+            if(pregnancy.data.cycles <=0) {
+                msg+="Congrats, you brought some more "+pregnancy.data.type+" into this world.</br>";
+            } else {
+                msg+="Your belly is swollen with the spawn of some "+pregnancy.data.type+".</br>"; 
+            }
+        }
+        if(window.story.state._gm.dbgShowMoreInfo) msg+= window.gm.util.formatNumber(pregnancy.data.cycles*pregnancy.data.duration/(60*24),0)+" days to go.";
+    } */
     if(char===window.gm.player) {
         window.gm.pushDeferredEvent("GenericDeffered",[msg]);
     }

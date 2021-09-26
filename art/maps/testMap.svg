@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="600"
+   height="300"
+   viewBox="0 0 240 120"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1 (c68e22c387, 2021-05-23)"
+   sodipodi:docname="testMap.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="false"
+     inkscape:document-units="px"
+     showgrid="true"
+     showguides="false"
+     inkscape:snap-global="true"
+     inkscape:snap-nodes="false"
+     inkscape:snap-to-guides="false"
+     inkscape:snap-bbox="true"
+     inkscape:snap-bbox-midpoints="true"
+     inkscape:zoom="1.96"
+     inkscape:cx="351.78572"
+     inkscape:cy="118.11225"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     inkscape:window-x="1912"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer2"
+     units="px"
+     width="600px"
+     scale-x="0.4">
+    <inkscape:grid
+       type="xygrid"
+       id="grid3052"
+       originx="0"
+       originy="0"
+       dotted="false"
+       spacingx="10"
+       spacingy="10"
+       units="px"
+       empcolor="#050094"
+       empopacity="0.25098039"
+       color="#4545ff"
+       opacity="0.1254902"
+       empspacing="2" />
+  </sodipodi:namedview>
+  <defs
+     id="defs2">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient1714">
+      <stop
+         style="stop-color:#b7a94c;stop-opacity:1"
+         offset="0"
+         id="stop1710" />
+      <stop
+         style="stop-color:#b7a94c;stop-opacity:1"
+         offset="1"
+         id="stop1712" />
+    </linearGradient>
+    <rect
+       x="-169.81483"
+       y="253.76823"
+       width="57.240955"
+       height="72.505211"
+       id="rect1870" />
+    <rect
+       x="-169.81483"
+       y="253.76823"
+       width="74.490372"
+       height="34.025753"
+       id="rect1870-3" />
+    <style
+       id="style1109"><![CDATA[.roomFound {
+  fill:url(#linearGradient1714);
+  fill-opacity:1;
+}
+.roomNotFound {
+  display:none;
+}
+.pathFound {
+  fill:#000000;
+  fill-opacity:1;
+  fill-rule:evenodd;
+  paint-order:fill markers stroke;
+  stop-color:#000000;
+  stroke:#000000;
+  stroke-dasharray:none;
+  stroke-linecap:round;
+  stroke-linejoin:bevel;
+  stroke-miterlimit:4;
+  stroke-opacity:1;
+  stroke-width:2;
+}
+.playerPosition {
+  fill:#00c175;
+  fill-opacity:1;
+}
+]]></style>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient1714"
+       id="linearGradient1716"
+       x1="43.079811"
+       y1="-30.000001"
+       x2="56.920193"
+       y2="-30.000001"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="template"
+     style="display:inline">
+    <rect
+       style="fill-opacity:1;fill-rule:evenodd;paint-order:fill markers stroke;stop-color:#000000;stroke:#000000;stroke-opacity:1"
+       id="tmplRoom"
+       width="13.840382"
+       height="13.840376"
+       x="43.079811"
+       y="-36.920189"
+       onmouseover="style.opacity = 0.5;"
+       onmouseout="style.opacity = 1;"
+       inkscape:label="tmplRoom" />
+    <path
+       sodipodi:type="star"
+       style="fill-opacity:1;fill-rule:evenodd;paint-order:fill markers stroke;stop-color:#000000;stroke:#000000;stroke-opacity:1;stroke-width:6.21910789;stroke-miterlimit:4;stroke-dasharray:none"
+       id="tmplStairs"
+       inkscape:flatsided="true"
+       sodipodi:sides="8"
+       sodipodi:cx="155.49326"
+       sodipodi:cy="270.17377"
+       sodipodi:r1="44.032257"
+       sodipodi:r2="34.9105"
+       sodipodi:arg1="1.1860225"
+       sodipodi:arg2="1.5787216"
+       inkscape:rounded="0"
+       inkscape:randomized="0"
+       d="m 172.02074,310.98653 -33.69977,-0.26708 -23.64048,-24.0182 0.26708,-33.69977 24.0182,-23.64048 33.69977,0.26709 23.64048,24.01819 -0.26708,33.69977 z"
+       transform="matrix(0.17016391,0,0,0.17016391,2.3739954,-75.973827)"
+       onmouseout="style.opacity = 1;"
+       onmouseover="style.opacity = 0.5;"
+       onclick="smile('clicked')"
+       inkscape:label="tmplStairs" />
+    <rect
+       id="tmplCorner"
+       width="0.72664201"
+       height="0.72664201"
+       x="69.636681"
+       y="-30.363321"
+       inkscape:label="tmplCorner"
+       class="pathFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="use3309"
+       width="100%"
+       height="100%"
+       transform="translate(-40.000002)"
+       class="roomNotFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="use1023"
+       width="100%"
+       height="100%"
+       transform="translate(39.999998)"
+       class="playerPosition" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="use1708"
+       width="100%"
+       height="100%"
+       transform="translate(59.999998)"
+       style="fill:url(#linearGradient1716);fill-opacity:1" />
+  </g>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-50,-49.999986)">
+    <path
+       d="m 120,99.999988 20,10e-7"
+       id="path4639"
+       inkscape:connector-type="polyline"
+       inkscape:connector-curvature="0"
+       inkscape:connection-start="#AM_Lv2_Start"
+       inkscape:connection-end="#AM_Lv2_A1"
+       class="pathFound" />
+    <path
+       d="M 160,99.999989 H 140"
+       id="path4641"
+       inkscape:connector-type="polyline"
+       inkscape:connector-curvature="0"
+       inkscape:connection-start="#AM_Lv2_A2"
+       inkscape:connection-end="#AM_Lv2_A1"
+       class="pathFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplStairs"
+       id="AM_Lv2_B7"
+       width="100%"
+       height="100%"
+       transform="translate(231.16666,129.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplStairs"
+       id="AM_Lv2_Start"
+       width="100%"
+       height="100%"
+       transform="translate(91.166664,129.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="AM_Lv2_A1"
+       width="100%"
+       height="100%"
+       transform="translate(89.999998,129.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="AM_Lv2_A2"
+       width="100%"
+       height="100%"
+       transform="translate(110,129.99999)"
+       class="roomFound" />
+    <text
+       xml:space="preserve"
+       transform="matrix(0.19225736,0,0,0.19225736,148.34926,49.039929)"
+       id="text1868-0"
+       style="font-size:20.8054px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial, Normal';text-align:start;white-space:pre;shape-inside:url(#rect1870-3)"
+       x="42.850231"
+       y="0"><tspan
+         x="-169.81445"
+         y="272.50813"
+         id="tspan1962">Start</tspan></text>
+    <text
+       xml:space="preserve"
+       transform="matrix(0.19225736,0,0,0.19225736,289.17055,49.026257)"
+       id="text1868"
+       style="font-size:20.8054px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial, Normal';white-space:pre;shape-inside:url(#rect1870)"><tspan
+         x="-169.81445"
+         y="272.50813"
+         id="tspan1964">Exit</tspan></text>
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplCorner"
+       id="use4614"
+       width="100%"
+       height="100%"
+       transform="translate(69.999998,169.99999)" />
+  </g>
+</svg>

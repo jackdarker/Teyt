@@ -86,7 +86,7 @@ hideCombatOption() {
 }
 //renders background & combatants to #canvas
 renderCombatScene() {
-  var _pos =[[25,40],[75,40],[50,60]];//sprite position in %
+  var _pos =[[25,60],[75,60],[50,40]];//sprite position in %
   var width=600,height=300;
   var draw = document.querySelector("#canvas svg");
   if(!draw) draw = SVG().addTo('#canvas').size(width, height);
@@ -579,7 +579,7 @@ window.gm.combat.calcEvasion=function(attacker,target, attack) {
   window.gm.pushLog(`evasion roll: ${chance} vs ${rnd} `,window.story.state._gm.dbgShowCombatRoll);
   if(chance>rnd) {
     result.OK = false;
-    result.msg += 'Using agility, '+ target.name +' was able to dodge the attack. '
+    result.msg += 'Using agility, '+ target.name +' was able to dodge the attack.</br> '
   }
   return(result);
 }
@@ -613,10 +613,10 @@ window.gm.combat.calcParry=function(attacker,target, attack) {
   if(chance>rnd && rnd<10) { 
     result.OK = false;
     if(rnd<10) {
-      result.msg = target.name +' parried the attack and was even able to land a hit.'  //todo how to add textual variation based on used weapon and skill?
+      result.msg = target.name +' parried the attack and was even able to land a hit.</br>'  //todo how to add textual variation based on used weapon and skill?
       attack.effects.push( {target:attacker,eff:([effDamage.factory(5,"blunt")])}); //todo how much damage? 
     } else {
-      result.msg = target.name +' parried the attack.'
+      result.msg = target.name +' parried the attack.</br> '
     }
   } else {
     result.OK = true;
@@ -637,7 +637,7 @@ window.gm.combat.calcAbsorb=function(attacker,defender, attack) {
         attack.effects.push( {target:el.target, eff:el.eff}); //el.eff is []
     }
   } else {
-    result.msg = defender.name +' got hit by '+attacker.name+'. ';
+    result.msg = defender.name +' got hit by '+attacker.name+'.</br> ';
     for(el of attack.mod.onHit) {
         attack.effects.push( {target:el.target, eff:el.eff});
     }

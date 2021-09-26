@@ -449,8 +449,10 @@ class effTired extends Effect {
     onTimeChange(time) {  
         //duration not used -> will never expire unless replaced
         var delta = window.gm.getTime()-this.data.time;
-        //-10 max energy after 12h, but only up to 3 times
-        if(delta>60) this.parent.parent.Stats.addModifier('energyMax',{id:'energyMax:Tired', bonus:-10});
+        //-10 max energy after xxh, but only up to 3 times
+        if(delta>60*12) this.parent.parent.Stats.addModifier('energyMax',{id:'energyMax:Tired', bonus:-30});
+        else if(delta>60*8) this.parent.parent.Stats.addModifier('energyMax',{id:'energyMax:Tired', bonus:-20});
+        else if(delta>60*4) this.parent.parent.Stats.addModifier('energyMax',{id:'energyMax:Tired', bonus:-10});
     }
     onApply(){
         this.data.time = window.gm.getTime();
@@ -842,6 +844,50 @@ class effInRut extends Effect {
     //more arousal damage by sluts
     //multiple succesful impregations/balldrain or time might end rut
 }
+
+/**
+ * #todo
+ * walking around makes you horny faster and stretches your bum
+ * slowly increases anal sex liking
+ * your bum is secured against infestation unless its a holePlug
+ * 
+ * @class effButtPlugged
+ * @extends {Effect}
+ */
+class effButtPlugged extends Effect {
+    static get cycleDur() {return(60);}
+    constructor() {
+        super();
+        this.data.id = this.data.name= effButtPlugged.name, this.data.duration = effButtPlugged.cycleDur, this.data.hidden=0;
+        this.data.cycles = 0, this.data.magnitude = 1;
+    }
+    toJSON() {return window.storage.Generic_toJSON("effButtPlugged", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(effButtPlugged, value.data);};
+    get desc() {return(effButtPlugged.name);}
+    onTimeChange(time) {
+        let delta = window.gm.getDeltaTime(time,this.data.time);
+        this.data.time = time;this.data.duration-= delta;
+        if(this.data.duration<0) {
+            delta = delta+this.data.duration;
+            this.data.cycles+=1; 
+            this.__mutate();
+            this.data.duration=effButtPlugged.cycleDur;
+        }
+        return(null);
+    }
+    onApply(){
+        this.data.duration = effButtPlugged.cycleDur;
+        this.data.time = window.gm.getTime();
+    }
+    merge(neweffect) {
+        if(neweffect.name===this.data.name) {
+            return(true);
+        }
+    }
+    __mutate() {
+        window.gm.MutationsLib.effMutateButt(this.parent.parent);
+    }
+}
 class effVaginalFertil extends Effect {
     constructor() {
         super();
@@ -901,26 +947,28 @@ class effVaginalPregnant extends Effect {
         }
     }
 }
-//todo VaginalParasite
-class effSpermInWomb extends Effect {   //if you have womb filled with sperm, this handles impregnation and sperm-decay
+
+/**
+ * if you have womb or anus filled with sperm, this handles impregnation and sperm-decay
+ * //todo VaginalParasite
+ * @class effSpermDecay
+ * @extends {Effect}
+ */
+class effSpermDecay extends Effect {   
     constructor() {
         super();
-        this.data.id = this.data.name= effSpermInWomb.name, this.data.duration = 60, this.data.hidden=0;
+        this.data.id = this.data.name= effSpermDecay.name, this.data.duration = 60, this.data.hidden=0;
         this.data.cycles = 1, this.data.magnitude = 2;
     }
-    toJSON() {return window.storage.Generic_toJSON("effSpermInWomb", this); };
-    static fromJSON(value) { return window.storage.Generic_fromJSON(effSpermInWomb, value.data);};
-    get desc() {return(effSpermInWomb.name);}
+    toJSON() {return window.storage.Generic_toJSON("effSpermDecay", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(effSpermDecay, value.data);};
+    get desc() {return(effSpermDecay.name);}
     onTimeChange(time) {
         this.data.duration = Math.max(this.data.duration-window.gm.getDeltaTime(time,this.data.time),0);
         this.data.time = time;
         if(this.data.duration<=0 && this.data.cycles>0) {
             this.data.duration = 60;
-            let vagina=this.parent.parent.getVagina();
-            if(vagina && vagina.data.sperm>0) {  
-                //todo add option to show only big changes/sometime
-                window.gm.MutationsLib.vaginaSpermDissolve(this.parent.parent);
-            }
+            this.__decay();
         }
         return(null);
     }
@@ -931,6 +979,46 @@ class effSpermInWomb extends Effect {   //if you have womb filled with sperm, th
     merge(neweffect) {
         if(neweffect.name===this.data.name) {
             return(true);
+        }
+    }
+    __decay() {
+        let msg='',char =this.parent.parent;
+        let vagina = char.getVagina(), anus = char.getAnus();
+        let lewdMark=char.Effects.findEffect(effLewdMark.name)[0];
+        let pregnancy=char.Effects.findEffect(effVaginalPregnant.name)[0];
+        if(vagina && vagina.data.sperm>0) {
+            vagina.removeSperm(2); //todo decay depends on looseness, soulgem absorption??
+            msg+="You can feel some of the cum from your womb dribble down your leg. ";
+            if(pregnancy) {
+                if(lewdMark) {
+                    msg+="More of that precious seed is absorbed by that soulgem growing in you.</br>";
+                    vagina.removeSperm(2); //todo decay depends on looseness, soulgem absorption??
+                } else msg+="But you are pregnant already anyway.</br>"; 
+            } 
+            if(!pregnancy) {
+                pregnancy=char.Effects.findEffect(effVaginalFertil.name)[0];
+                if(pregnancy) { 
+                    //todo random chance according to base-fertility-stat, sperm-fertility, vagina-fertility
+                    //race-compatibility between father-mother
+                    if(true || _.random(0,100)>75) {
+                        msg+="Has your last fling got you impregnated?</br>";
+                        pregnancy = new effVaginalPregnant();
+                        pregnancy.data.type=vagina.data.spermtype;
+                        if(lewdMark) pregnancy.data.type='soulgem'; 
+                        char.addEffect(pregnancy,effVaginalPregnant.name)
+                    } else msg+="Hopefully there is nothing to worry about?</br>";
+                }
+            }    
+            if(vagina.data.sperm>0) {
+                msg+="There might still be "+window.gm.util.formatNumber(vagina.data.sperm,0)+"ml sperm left.</br>"
+            } else msg+="This was possibly the last remains of sperm from your breeding-hole.</br>";
+        }
+        if(anus && anus.data.sperm>0) {
+            anus.removeSperm(2);
+            msg+="Your butt is lubed up by leaking spunk from your hole. ";
+        }
+        if(msg!=='' && char===window.gm.player) {
+            window.gm.pushDeferredEvent("GenericDeffered",[msg]);
         }
     }
 }
@@ -1436,7 +1524,7 @@ window.gm.StatsLib = (function (StatsLib) {
     window.storage.registerConstructor(effLewdMark);
     window.storage.registerConstructor(effInHeat);
     window.storage.registerConstructor(effInRut);
-    window.storage.registerConstructor(effSpermInWomb);
+    window.storage.registerConstructor(effSpermDecay);
     window.storage.registerConstructor(effVaginalFertil);
     window.storage.registerConstructor(effVaginalPregnant);
     //

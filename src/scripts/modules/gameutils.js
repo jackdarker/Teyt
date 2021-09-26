@@ -5,8 +5,8 @@ window.gm.getSaveVersion= function(){   return([0,1,0]); };
 let _origInitGame = window.gm.initGame;
 window.gm.initGame= function(forceReset,NGP=null) {
   _origInitGame(forceReset,NGP);
-  window.gm.images = loadImages(window.gm.images||{});
-
+  window.gm.images = imagesBattlers(window.gm.images||{});
+  window.gm.images = imagesMaps(window.gm.images);
     var s = window.story.state;
     s._gm.timeRL= s._gm.timeVR = s._gm.time;
     s._gm.dayRL= s._gm.dayVR = s._gm.day;
@@ -92,6 +92,7 @@ window.gm.initGame= function(forceReset,NGP=null) {
       ch.Outfit.addItem(new SkinHuman());
       ch.Outfit.addItem(new FaceHuman());
       ch.Outfit.addItem(HandsHuman.factory('human'));
+      ch.Outfit.addItem(AnusHuman.factory('human'));
       ch.Outfit.addItem(PenisHuman.factory('human'));
       if(s._gm.debug) {
         ch.Skills.addItem(new SkillInspect());
@@ -120,6 +121,7 @@ window.gm.initGame= function(forceReset,NGP=null) {
         ch.Outfit.addItem(new FaceHuman());
         ch.Outfit.addItem(HandsHuman.factory('human'));
         ch.Outfit.addItem(new SkinHuman());
+        ch.Outfit.addItem(AnusHuman.factory('human'));
         ch.Outfit.addItem(PenisHuman.factory('human'));
         ch.Wardrobe.addItem(new Briefs());
         ch.Outfit.addItem(new Jeans());

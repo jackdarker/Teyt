@@ -52,7 +52,8 @@ class Character {
         this.Skills.addItem(new SkillUseItem());this.Skills.addItem(new SkillStruggle());this.Skills.addItem(new SkillAttack());
         this.Skills.addItem(new SkillStun());this.Skills.addItem(new SkillHeal());this.Skills.addItem(new SkillTease());
         this.Skills.addItem(new SkillFlee()),this.Skills.addItem(new SkillSubmit());    
-        this.Effects.addItem(new effCombatRecovery())
+        this.Effects.addItem(new effCombatRecovery());
+        this.Effects.addItem(new effSpermDecay());
         window.storage.registerConstructor(Character);
     }
     toJSON() {return window.storage.Generic_toJSON("Character", this); }
@@ -234,5 +235,8 @@ class Character {
     getVagina() {
         let vulva = this.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bVulva);
         return(vulva);
+    }
+    getAnus() {
+        return(this.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bAnus));
     }
 }

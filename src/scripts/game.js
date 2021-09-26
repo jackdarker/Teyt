@@ -589,11 +589,11 @@ window.gm.printItemTransfer = function(from,to,wardrobe) {
     entry.textContent =allIds.get(id).name;
     let count = wardrobe?from.Wardrobe.countItem(id):from.Inv.countItem(id);
     g = document.createElement('a');
-    g.href='javascript:void(0)',g.textContent='give 1 of '+window.gm.util.formatNumber(count,0);
+    g.href='javascript:void(0)',g.textContent='store 1 of '+window.gm.util.formatNumber(count,0);
     g.addEventListener("click",give.bind(null,id,1,from,to));
     if(count>0) entry.appendChild(g)
     g = document.createElement('a');
-    g.href='javascript:void(0)',g.textContent='give all';
+    g.href='javascript:void(0)',g.textContent='store all';
     g.addEventListener("click",give.bind(null,id,count,from,to));
     if(count>0) entry.appendChild(g)
     count = wardrobe?to.Wardrobe.countItem(id):to.Inv.countItem(id);

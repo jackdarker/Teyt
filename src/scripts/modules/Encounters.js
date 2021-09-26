@@ -127,10 +127,8 @@ window.gm.encounters.wolf = function(params) {
             let x;
             x = window.gm.Mobs.Wolf(type); x.scaleLevel(window.gm.player.level);
             if(_.random(1,100)>50) {
-                x.Outfit.addItem(VulvaHuman.factory('wolf'));
-            } else {
-                x.Outfit.addItem(PenisHuman.factory('wolf'));
-            }
+                window.gm.MutationsLib.swapGender(x,window.storage.constructors["VulvaHuman"]);
+            } 
             x.name+='#'+i;mobs.push(x);
         }
         return(mobs);});

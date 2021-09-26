@@ -132,6 +132,9 @@ You can now pass the bridge and leave the forest.
     window.gm.enterVR();
     window.gm.MutationsLib['swapGender'](window.gm.player,window.storage.constructors["VulvaHuman"]);
     window.gm.player.addEffect(new window.storage.constructors['effLewdMark'](),'effLewdMark');
+    window.gm.player.Stats.increment("arousal",50);
+    var mob = window.gm.Mobs.Wolf();
+    window.story.state.combat.enemyParty[0]=mob;
 }
 </script>
 

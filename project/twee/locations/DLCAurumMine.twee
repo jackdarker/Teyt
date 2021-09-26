@@ -73,9 +73,7 @@ Eine Sackgasse.
 :: AM_MAP_Level2 [_back_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 You have some kind of map:</br>
-<pre>
-
-          
+<pre>         
 [Start]-[B2]-[B3]-[B4]-[B5]-[B6]-[B7]-[Exit]
   |      |                    |
 [Shop]   |- -[C3]-[C4]-[C5]- -| 
@@ -321,3 +319,12 @@ window.gm.printOutput(msg);
 <div></br>[[Retreat|AM_Lv2_Exit]] [[Map|AM_MAP_Level2]]</br>
 <a0 onclick='window.gm.fightArena("slug",null,[{id:"Money",count:30}],"AM_Lv2_B6")'>Continue to B6</a></div>
 </article><article id="LogPanel"></article></section>
+
+
+:: AM_Lv2_XX
+The exit in this room seems to be unable to reach. Its on the opposite wall and some drawbridge is pulled up. But thats not the problem.
+The problem are the dense layer of long spikes sticking out of the floor several meters below you. Jumping down and walking over to the gate isnt an option.
+There seems to be a lever on a platform on your left side. You an only guess that it might lower the drawbridge. But you would have to jump 4m or more to reach it, which seems to be quite far for a human.
+How could anyone reach that lever without the ability to jump really far or to fly? The walls seems also to smooth unless you are a gecko.
+- would there be a way to learn flying, climbing or jumping?
+- could someone help me with the lever?   

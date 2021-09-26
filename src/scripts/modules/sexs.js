@@ -84,8 +84,7 @@ window.gm.sex.updateScene=function(entry){
 }*/
 window.gm.sex.wolfOnPlayer=function(data) {
     let foo = window.gm.sex.wolfOnPlayer; //each button-click will call this sm again and switch state
-    let player = window.gm.player;
-    let foe = window.story.state.combat.enemyParty[0]; //todo
+    let player = window.gm.player, foe = window.story.state.combat.enemyParty[0]; //todo
     window.gm.sex.beginScene();
     let entry = document.createElement('p');
     let createButton=window.gm.sex.createButton;
@@ -183,7 +182,8 @@ window.gm.sex.wolfOnPlayer=function(data) {
         entry.textContent ="Wolf-jizzm is painting your insides white.";  //Unfortunatly, the stud came before you did -- 
         if(data.hole==='vaginal') {
             player.getVagina().addSperm('wolf',3);
-        } else if(data.hole==='anal') {         //todo insert sperm in hole
+        } else if(data.hole==='anal') {         //todo stretch hole with knot
+            player.getAnus().addSperm('wolf',3);
         }
         data.state=-1;
         Object.assign(newdata,data);
