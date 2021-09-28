@@ -696,6 +696,7 @@ class AnusHuman extends BodyPart {
         }
     }
 }
+//variation: snatch - cooch - slit - cunt - cooter - fuck-hole - 
 class VulvaHuman extends BodyPart {
     static dataPrototype() {    
         return({labia:0, virgin:true,wetgen:1, stretch:1,depth:1,clitsize:0.5, spermtype:'',sperm:0});

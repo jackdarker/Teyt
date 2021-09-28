@@ -26,22 +26,23 @@
      showgrid="true"
      showguides="false"
      inkscape:snap-global="true"
-     inkscape:snap-nodes="false"
+     inkscape:snap-nodes="true"
      inkscape:snap-to-guides="false"
-     inkscape:snap-bbox="true"
+     inkscape:snap-bbox="false"
      inkscape:snap-bbox-midpoints="true"
-     inkscape:zoom="1.96"
-     inkscape:cx="351.78572"
-     inkscape:cy="118.11225"
+     inkscape:zoom="2"
+     inkscape:cx="276.75"
+     inkscape:cy="105.25"
      inkscape:window-width="1920"
      inkscape:window-height="1017"
      inkscape:window-x="1912"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
-     inkscape:current-layer="layer2"
+     inkscape:current-layer="layer1"
      units="px"
      width="600px"
-     scale-x="0.4">
+     scale-x="0.4"
+     inkscape:snap-others="false">
     <inkscape:grid
        type="xygrid"
        id="grid3052"
@@ -119,25 +120,125 @@
        x2="56.920193"
        y2="-30.000001"
        gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient1714"
+       id="linearGradient1533-0"
+       x1="42.579803"
+       y1="102.57983"
+       x2="57.420182"
+       y2="102.57983"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient1714"
+       id="linearGradient1533-4"
+       x1="42.579803"
+       y1="102.57983"
+       x2="57.420182"
+       y2="102.57983"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient1714"
+       id="linearGradient1533-2"
+       x1="42.579803"
+       y1="102.57983"
+       x2="57.420182"
+       y2="102.57983"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient1714"
+       id="linearGradient1533-8"
+       x1="42.579803"
+       y1="102.57983"
+       x2="57.420182"
+       y2="102.57983"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient1714"
+       id="linearGradient1533-6"
+       x1="42.579803"
+       y1="102.57983"
+       x2="57.420182"
+       y2="102.57983"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient1714"
+       id="linearGradient1533-18"
+       x1="42.579803"
+       y1="102.57983"
+       x2="57.420182"
+       y2="102.57983"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient1714"
+       id="linearGradient1533-61"
+       x1="42.579803"
+       y1="102.57983"
+       x2="57.420182"
+       y2="102.57983"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient1714"
+       id="linearGradient1533-7"
+       x1="42.579803"
+       y1="102.57983"
+       x2="57.420182"
+       y2="102.57983"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient1714"
+       id="linearGradient1533-01"
+       x1="42.579803"
+       y1="102.57983"
+       x2="57.420182"
+       y2="102.57983"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient1714"
+       id="linearGradient1533-77"
+       x1="42.579803"
+       y1="102.57983"
+       x2="57.420182"
+       y2="102.57983"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient1714"
+       id="linearGradient1716-7"
+       x1="43.079811"
+       y1="-30.000001"
+       x2="56.920193"
+       y2="-30.000001"
+       gradientUnits="userSpaceOnUse" />
   </defs>
   <g
      inkscape:groupmode="layer"
      id="layer2"
      inkscape:label="template"
-     style="display:inline">
+     style="display:inline"
+     sodipodi:insensitive="true">
     <rect
-       style="fill-opacity:1;fill-rule:evenodd;paint-order:fill markers stroke;stop-color:#000000;stroke:#000000;stroke-opacity:1"
+       style="fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-opacity:1;paint-order:fill markers stroke;stop-color:#000000"
        id="tmplRoom"
        width="13.840382"
        height="13.840376"
        x="43.079811"
-       y="-36.920189"
+       y="-26.920189"
        onmouseover="style.opacity = 0.5;"
        onmouseout="style.opacity = 1;"
        inkscape:label="tmplRoom" />
     <path
        sodipodi:type="star"
-       style="fill-opacity:1;fill-rule:evenodd;paint-order:fill markers stroke;stop-color:#000000;stroke:#000000;stroke-opacity:1;stroke-width:6.21910789;stroke-miterlimit:4;stroke-dasharray:none"
+       style="fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:6.21911;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke;stop-color:#000000"
        id="tmplStairs"
        inkscape:flatsided="true"
        sodipodi:sides="8"
@@ -150,7 +251,7 @@
        inkscape:rounded="0"
        inkscape:randomized="0"
        d="m 172.02074,310.98653 -33.69977,-0.26708 -23.64048,-24.0182 0.26708,-33.69977 24.0182,-23.64048 33.69977,0.26709 23.64048,24.01819 -0.26708,33.69977 z"
-       transform="matrix(0.17016391,0,0,0.17016391,2.3739954,-75.973827)"
+       transform="matrix(0.17016391,0,0,0.17016391,2.3739939,-65.973826)"
        onmouseout="style.opacity = 1;"
        onmouseover="style.opacity = 0.5;"
        onclick="smile('clicked')"
@@ -160,7 +261,7 @@
        width="0.72664201"
        height="0.72664201"
        x="69.636681"
-       y="-30.363321"
+       y="-20.363319"
        inkscape:label="tmplCorner"
        class="pathFound" />
     <use
@@ -190,89 +291,481 @@
        height="100%"
        transform="translate(59.999998)"
        style="fill:url(#linearGradient1716);fill-opacity:1" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="use1575"
+       width="100%"
+       height="100%"
+       transform="translate(-1.9073486e-6,-39.999999)"
+       class="roomNotFound" />
+    <text
+       xml:space="preserve"
+       style="font-size:8px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial, Normal';stroke-width:0.4"
+       x="7.8656249"
+       y="132.29062"
+       id="text2366"><tspan
+         sodipodi:role="line"
+         id="tspan2364"
+         style="font-size:8px;stroke-width:0.4"
+         x="7.8656249"
+         y="132.29062">A       B       C      D      E       F       G      H       I       J       K       L</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:8px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial, Normal';stroke-width:0.4"
+       x="-11.540625"
+       y="12.3"
+       id="text8305"><tspan
+         sodipodi:role="line"
+         id="tspan8303"
+         style="font-size:8px;stroke-width:0.4"
+         x="-11.540625"
+         y="12.3">1</tspan><tspan
+         sodipodi:role="line"
+         style="font-size:8px;stroke-width:0.4"
+         x="-11.540625"
+         y="22.299999"
+         id="tspan8719" /><tspan
+         sodipodi:role="line"
+         style="font-size:8px;stroke-width:0.4"
+         x="-11.540625"
+         y="32.299999"
+         id="tspan8721">2</tspan><tspan
+         sodipodi:role="line"
+         style="font-size:8px;stroke-width:0.4"
+         x="-11.540625"
+         y="42.299999"
+         id="tspan8723" /><tspan
+         sodipodi:role="line"
+         style="font-size:8px;stroke-width:0.4"
+         x="-11.540625"
+         y="52.299999"
+         id="tspan8727">3</tspan><tspan
+         sodipodi:role="line"
+         style="font-size:8px;stroke-width:0.4"
+         x="-11.540625"
+         y="62.299999"
+         id="tspan8733" /><tspan
+         sodipodi:role="line"
+         style="font-size:8px;stroke-width:0.4"
+         x="-11.540625"
+         y="72.300003"
+         id="tspan8735">4</tspan><tspan
+         sodipodi:role="line"
+         style="font-size:8px;stroke-width:0.4"
+         x="-11.540625"
+         y="82.300003"
+         id="tspan8737" /><tspan
+         sodipodi:role="line"
+         style="font-size:8px;stroke-width:0.4"
+         x="-11.540625"
+         y="92.300003"
+         id="tspan8739">5</tspan><tspan
+         sodipodi:role="line"
+         style="font-size:8px;stroke-width:0.4"
+         x="-11.540625"
+         y="102.3"
+         id="tspan8741" /><tspan
+         sodipodi:role="line"
+         style="font-size:8px;stroke-width:0.4"
+         x="-11.540625"
+         y="112.3"
+         id="tspan8743">6</tspan></text>
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="use1023-7"
+       width="100%"
+       height="100%"
+       transform="translate(39.999997,-20)"
+       class="playerPosition"
+       style="display:inline;fill:#00c175;fill-opacity:1" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="use1708-1"
+       width="100%"
+       height="100%"
+       transform="translate(59.999997,-20)"
+       style="display:inline;fill:url(#linearGradient1716-7);fill-opacity:1" />
   </g>
   <g
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(-50,-49.999986)">
-    <path
-       d="m 120,99.999988 20,10e-7"
-       id="path4639"
-       inkscape:connector-type="polyline"
-       inkscape:connector-curvature="0"
-       inkscape:connection-start="#AM_Lv2_Start"
-       inkscape:connection-end="#AM_Lv2_A1"
-       class="pathFound" />
-    <path
-       d="M 160,99.999989 H 140"
-       id="path4641"
-       inkscape:connector-type="polyline"
-       inkscape:connector-curvature="0"
-       inkscape:connection-start="#AM_Lv2_A2"
-       inkscape:connection-end="#AM_Lv2_A1"
-       class="pathFound" />
-    <use
-       x="0"
-       y="0"
-       xlink:href="#tmplStairs"
-       id="AM_Lv2_B7"
-       width="100%"
-       height="100%"
-       transform="translate(231.16666,129.99999)"
-       class="roomFound" />
-    <use
-       x="0"
-       y="0"
-       xlink:href="#tmplStairs"
-       id="AM_Lv2_Start"
-       width="100%"
-       height="100%"
-       transform="translate(91.166664,129.99999)"
-       class="roomFound" />
-    <use
-       x="0"
-       y="0"
-       xlink:href="#tmplRoom"
-       id="AM_Lv2_A1"
-       width="100%"
-       height="100%"
-       transform="translate(89.999998,129.99999)"
-       class="roomFound" />
-    <use
-       x="0"
-       y="0"
-       xlink:href="#tmplRoom"
-       id="AM_Lv2_A2"
-       width="100%"
-       height="100%"
-       transform="translate(110,129.99999)"
-       class="roomFound" />
-    <text
-       xml:space="preserve"
-       transform="matrix(0.19225736,0,0,0.19225736,148.34926,49.039929)"
-       id="text1868-0"
-       style="font-size:20.8054px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial, Normal';text-align:start;white-space:pre;shape-inside:url(#rect1870-3)"
-       x="42.850231"
-       y="0"><tspan
-         x="-169.81445"
-         y="272.50813"
-         id="tspan1962">Start</tspan></text>
-    <text
-       xml:space="preserve"
-       transform="matrix(0.19225736,0,0,0.19225736,289.17055,49.026257)"
-       id="text1868"
-       style="font-size:20.8054px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial, Normal';white-space:pre;shape-inside:url(#rect1870)"><tspan
-         x="-169.81445"
-         y="272.50813"
-         id="tspan1964">Exit</tspan></text>
-    <use
-       x="0"
-       y="0"
-       xlink:href="#tmplCorner"
-       id="use4614"
-       width="100%"
-       height="100%"
-       transform="translate(69.999998,169.99999)" />
+    <g
+       id="g20332"
+       data-reveal="20"
+       style="display:inline">
+      <path
+         d="m 80,99.999986 h 20"
+         id="path4639-2-8-5-6-7"
+         inkscape:connector-type="polyline"
+         inkscape:connector-curvature="0"
+         class="pathFound"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke;stop-color:#000000"
+         sodipodi:nodetypes="cc" />
+      <path
+         d="m 80,79.999986 v 20"
+         id="path4639-2-4-17"
+         inkscape:connector-type="polyline"
+         inkscape:connector-curvature="0"
+         class="pathFound"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke;stop-color:#000000"
+         sodipodi:nodetypes="cc" />
+      <use
+         x="0"
+         y="0"
+         xlink:href="#tmplRoom"
+         id="AM_Lv2_B3"
+         width="100%"
+         height="100%"
+         transform="translate(30.000001,119.99999)"
+         class="roomFound"
+         style="fill:url(#linearGradient1533-18);fill-opacity:1"
+         inkscape:label="AM_Lv2_B3" />
+      <use
+         x="0"
+         y="0"
+         xlink:href="#tmplRoom"
+         id="AM_Lv2_B2"
+         width="100%"
+         height="100%"
+         transform="translate(30.000001,99.999991)"
+         class="roomFound"
+         style="fill:url(#linearGradient1533-61);fill-opacity:1"
+         inkscape:label="AM_Lv2_B2" />
+    </g>
+    <g
+       id="g20684"
+       data-reveal="4">
+      <path
+         d="m 120,99.999986 v -20"
+         id="path4639-2"
+         inkscape:connector-type="polyline"
+         inkscape:connector-curvature="0"
+         class="pathFound"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke;stop-color:#000000"
+         sodipodi:nodetypes="cc" />
+      <path
+         d="m 120,79.999986 h 80"
+         id="path4639-2-8"
+         inkscape:connector-type="polyline"
+         inkscape:connector-curvature="0"
+         class="pathFound"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke;stop-color:#000000"
+         sodipodi:nodetypes="cc" />
+      <use
+         x="0"
+         y="0"
+         xlink:href="#tmplRoom"
+         id="AM_Lv2_F2"
+         width="100%"
+         height="100%"
+         transform="translate(110,99.999991)"
+         class="roomFound"
+         inkscape:label="AM_Lv2_F2" />
+      <use
+         x="0"
+         y="0"
+         xlink:href="#tmplRoom"
+         id="AM_Lv2_E2"
+         width="100%"
+         height="100%"
+         transform="translate(90.000001,99.999991)"
+         class="roomFound"
+         inkscape:label="AM_Lv2_E2" />
+      <use
+         x="0"
+         y="0"
+         xlink:href="#tmplRoom"
+         id="AM_Lv2_H2"
+         width="100%"
+         height="100%"
+         transform="translate(150,99.999991)"
+         class="roomFound"
+         inkscape:label="AM_Lv2_H2" />
+    </g>
+    <g
+       id="g20339"
+       data-reveal="10">
+      <path
+         d="m 100,99.999986 h 20"
+         id="path4639-2-8-5-6"
+         inkscape:connector-type="polyline"
+         inkscape:connector-curvature="0"
+         class="pathFound"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke;stop-color:#000000"
+         sodipodi:nodetypes="cc" />
+      <path
+         d="M 100,99.999986 V 139.99999"
+         id="path4639-2-4-6"
+         inkscape:connector-type="polyline"
+         inkscape:connector-curvature="0"
+         class="pathFound"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke;stop-color:#000000"
+         sodipodi:nodetypes="cc" />
+      <use
+         x="0"
+         y="0"
+         xlink:href="#tmplRoom"
+         id="AM_Lv2_C3"
+         width="100%"
+         height="100%"
+         transform="translate(50.000001,119.99999)"
+         class="roomFound"
+         inkscape:label="AM_Lv2_C3" />
+      <use
+         x="0"
+         y="0"
+         xlink:href="#tmplRoom"
+         id="AM_Lv2_C4"
+         width="100%"
+         height="100%"
+         transform="translate(50.000001,139.99999)"
+         class="roomFound"
+         style="fill:url(#linearGradient1533-8);fill-opacity:1"
+         inkscape:label="AM_Lv2_C4" />
+      <use
+         x="0"
+         y="0"
+         xlink:href="#tmplRoom"
+         id="AM_Lv2_C5"
+         width="100%"
+         height="100%"
+         transform="translate(50.000001,159.99999)"
+         class="roomFound"
+         style="fill:url(#linearGradient1533-6);fill-opacity:1"
+         inkscape:label="AM_Lv2_C5" />
+    </g>
+    <g
+       id="g20357"
+       data-reveal="2">
+      <path
+         d="m 140,119.99999 h 80"
+         id="path4639-2-8-5"
+         inkscape:connector-type="polyline"
+         inkscape:connector-curvature="0"
+         class="pathFound"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke;stop-color:#000000"
+         sodipodi:nodetypes="cc" />
+      <path
+         d="M 140,99.999986 V 119.99999"
+         id="path4639-2-4"
+         inkscape:connector-type="polyline"
+         inkscape:connector-curvature="0"
+         class="pathFound"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke;stop-color:#000000"
+         sodipodi:nodetypes="cc" />
+      <use
+         x="0"
+         y="0"
+         xlink:href="#tmplRoom"
+         id="AM_Lv2_F4"
+         width="100%"
+         height="100%"
+         transform="translate(110,139.99999)"
+         class="roomFound"
+         style="fill:url(#linearGradient1533-0);fill-opacity:1"
+         inkscape:label="AM_Lv2_F4" />
+      <use
+         x="0"
+         y="0"
+         xlink:href="#tmplRoom"
+         id="AM_Lv2_G4"
+         width="100%"
+         height="100%"
+         transform="translate(130,139.99999)"
+         class="roomFound"
+         style="fill:url(#linearGradient1533-7);fill-opacity:1"
+         inkscape:label="AM_Lv2_G4" />
+      <use
+         x="0"
+         y="0"
+         xlink:href="#tmplRoom"
+         id="AM_Lv2_H4"
+         width="100%"
+         height="100%"
+         transform="translate(150,139.99999)"
+         class="roomFound"
+         style="fill:url(#linearGradient1533-01);fill-opacity:1"
+         inkscape:label="AM_Lv2_H4" />
+    </g>
+    <g
+       id="g20690">
+      <path
+         d="m 140,139.99999 h 80"
+         id="path4639-2-8-5-1"
+         inkscape:connector-type="polyline"
+         inkscape:connector-curvature="0"
+         class="pathFound"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke;stop-color:#000000"
+         sodipodi:nodetypes="cc" />
+      <path
+         d="m 220,119.99998 v 20.00001"
+         id="path4639-2-4-1"
+         inkscape:connector-type="polyline"
+         inkscape:connector-curvature="0"
+         class="pathFound"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke;stop-color:#000000"
+         sodipodi:nodetypes="cc" />
+      <use
+         x="0"
+         y="0"
+         xlink:href="#tmplRoom"
+         id="AM_Lv2_F5"
+         width="100%"
+         height="100%"
+         transform="translate(110,159.99999)"
+         class="roomFound"
+         style="fill:url(#linearGradient1533-4);fill-opacity:1"
+         inkscape:label="AM_Lv2_F5" />
+      <use
+         x="0"
+         y="0"
+         xlink:href="#tmplRoom"
+         id="AM_Lv2_H5"
+         width="100%"
+         height="100%"
+         transform="translate(150,159.99999)"
+         class="roomFound"
+         style="fill:url(#linearGradient1533-2);fill-opacity:1"
+         inkscape:label="AM_Lv2_H5" />
+    </g>
+    <g
+       id="g20697">
+      <path
+         d="m 120,99.999989 100,-3e-6"
+         id="path4639"
+         inkscape:connector-type="polyline"
+         inkscape:connector-curvature="0"
+         inkscape:connection-start="#AM_Lv2_Start"
+         inkscape:connection-end="#AM_Lv2_A1"
+         class="pathFound"
+         sodipodi:nodetypes="cc" />
+      <use
+         x="0"
+         y="0"
+         xlink:href="#tmplRoom"
+         id="AM_Lv2_E3"
+         width="100%"
+         height="100%"
+         transform="translate(90,119.99999)"
+         class="roomFound"
+         inkscape:label="AM_Lv2_E3" />
+      <use
+         x="0"
+         y="0"
+         xlink:href="#tmplRoom"
+         id="AM_Lv2_F3"
+         width="100%"
+         height="100%"
+         transform="translate(110,119.99999)"
+         class="roomFound"
+         inkscape:label="AM_Lv2_F3" />
+      <use
+         x="0"
+         y="0"
+         xlink:href="#tmplRoom"
+         id="AM_Lv2_G3"
+         width="100%"
+         height="100%"
+         transform="translate(130,119.99999)"
+         class="roomFound"
+         inkscape:label="AM_Lv2_G3" />
+      <use
+         x="0"
+         y="0"
+         xlink:href="#tmplRoom"
+         id="AM_Lv2_H3"
+         width="100%"
+         height="100%"
+         transform="translate(150,119.99999)"
+         class="roomFound"
+         inkscape:label="AM_Lv2_H3" />
+    </g>
+    <g
+       id="g14719">
+      <use
+         x="0"
+         y="0"
+         xlink:href="#tmplStairs"
+         id="AM_Lv2_Start"
+         width="100%"
+         height="100%"
+         transform="translate(91.166666,119.99999)"
+         class="roomFound"
+         sodipodi:insensitive="true" />
+      <text
+         xml:space="preserve"
+         transform="matrix(0.19225736,0,0,0.19225736,148.34926,49.039929)"
+         id="text1868-0"
+         style="font-size:20.8054px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial, Normal';text-align:start;white-space:pre;shape-inside:url(#rect1870-3)"
+         x="42.850231"
+         y="0"><tspan
+           x="-169.81445"
+           y="272.50813"
+           id="tspan20889">Start</tspan></text>
+    </g>
+    <g
+       id="g20350"
+       data-reveal="8">
+      <path
+         d="M 260,99.999986 H 220"
+         id="path4641"
+         inkscape:connector-type="polyline"
+         inkscape:connector-curvature="0"
+         inkscape:connection-start="#AM_Lv2_A2"
+         inkscape:connection-end="#AM_Lv2_A1"
+         class="pathFound"
+         sodipodi:nodetypes="cc" />
+      <g
+         id="g14724">
+        <use
+           x="0"
+           y="0"
+           xlink:href="#tmplStairs"
+           id="AM_Lv2_Exit"
+           width="100%"
+           height="100%"
+           transform="translate(231.16666,119.99999)"
+           class="roomFound"
+           data-reveal="10"
+           inkscape:label="AM_Lv2_Exit" />
+        <text
+           xml:space="preserve"
+           transform="matrix(0.19225736,0,0,0.19225736,289.17055,49.026257)"
+           id="text1868"
+           style="font-size:20.8054px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial, Normal';white-space:pre;shape-inside:url(#rect1870)"><tspan
+             x="-169.81445"
+             y="272.50813"
+             id="tspan20891">Exit</tspan></text>
+      </g>
+      <use
+         x="0"
+         y="0"
+         xlink:href="#tmplRoom"
+         id="AM_Lv2_I3"
+         width="100%"
+         height="100%"
+         transform="translate(170,119.99999)"
+         class="roomFound"
+         inkscape:label="AM_Lv2_I3" />
+      <use
+         x="0"
+         y="0"
+         xlink:href="#tmplRoom"
+         id="AM_Lv2_J3"
+         width="100%"
+         height="100%"
+         transform="translate(190,119.99999)"
+         class="roomFound"
+         style="fill:url(#linearGradient1533-77);fill-opacity:1"
+         inkscape:label="AM_Lv2_J3" />
+    </g>
   </g>
 </svg>

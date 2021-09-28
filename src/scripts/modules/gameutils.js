@@ -299,28 +299,26 @@ window.gm.giveCyrilFood= function(){
         window.gm.printOutput("you have no food to spare");
     }
 };
-
-/*window.gm.printSceneGraphic=function() {
-  window.gm.printSceneGraphic2("",window.gm.images.wolf1()); return;
+/*
+* prints a (svg-) map  
+*/
+window.gm.printMap=function(MapName,playerTile,reveal) {
   var width=600,height=300;
-  var draw = SVG().addTo('#canvas').size(width, height);
-  var background = draw.rect(width, height).attr({ fill: '#f06'});
-  var image = draw.symbol().image('assets/battlers/slug1.svg');
-  image.node.id='slug1';
-   var node = SVG(window.gm.images.wolf2());
-  if(node) node.addTo(draw.symbol());
-  var use  = draw.use('wolf2').move(-20, 20);
-  draw.use('slug1').move(20, 20);
-  draw.use('wolf2').move(100, 20).css({ cursor: 'pointer', fill: '#f03' });
-  var rect = draw.rect(100, 100).fill('#f09')
-  var node2 = SVG(window.gm.images.wolf2());
-  if(node2) node2.addTo(draw);
-  node2.node.getElementById('wolfbody').style.fill= '#f03';
-  var node3 = SVG(window.gm.images.wolf2());
-  node3.node.id='wolf3a';
-  if(node3) node3.addTo(draw);
-  SVG.find('#wolf3a #wolfbody')[0].node.style.fill= '#f03';
-}*/
+  var draw = document.querySelector("#canvas svg");
+  if(!draw) draw = SVG().addTo('#canvas').size(width, height);
+  else draw = SVG(draw);//recover svg document instead appending new one
+  draw.rect(width, height).attr({ fill: '#303030'});
+  var node = SVG(window.gm.images[MapName]());
+  //node.find("#AM_Lv2_A1")[0].addClass('roomNotFound');
+  var el,list= node.find('[data-reveal]');
+  for(el of list) {
+    var x= parseInt(el.attr('data-reveal'),16);
+    if((x&reveal)===0) el.addClass('roomNotFound');
+  }
+  el= node.find('#'+playerTile)[0];
+  if(el) {el.removeClass('roomFound');el.addClass('playerPosition');}
+  node.addTo(draw);
+}
 window.gm.printSceneGraphic2=function(background,item) {
   var width=600,height=300;
   var draw = document.querySelector("#canvas svg");
