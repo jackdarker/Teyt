@@ -61,6 +61,7 @@ constructor(id) {
     this.id=this.name = id;
     this.cost = new SkillCost();
     this.level=1;
+    this.startDelay=0,this.coolDown=0,this.defCoolDown=0; //how many turns disabled after use
 }
 //_parent will be added dynamical
 get parent() {return this._parent?this._parent():null;}
@@ -71,7 +72,7 @@ get desc() { return(this.name);}
 getMaxTargetCount() {return 1;}
 
 isValidPhase() {
-        //returns True if the skill can be used in tha actual game-phase (combatPhase,explorePhase)
+        //todo: returns True if the skill can be used in tha actual game-phase (combatPhase,explorePhase)
         return true;
 }
 /**
@@ -80,8 +81,23 @@ isValidPhase() {
  * call super to check cost !
  */
 isEnabled() {
-    let res=this.getCost().canPay(this.parent.parent);
+    let res={OK:true,msg:''};
+    if(this.coolDown>0) res={OK:false,msg:this.coolDown+' turns cooldown'}; 
+    if(!res.OK) return(res);
+    res=this.getCost().canPay(this.parent.parent);
     return (res);
+}
+/**
+ *
+ *
+ * @memberof Skill
+ */
+onCombatStart(){
+    this.coolDown=this.startDelay;
+}
+
+onTurnStart() { 
+    this.coolDown=Math.max(0,this.coolDown-1);
 }
 //this is used to filter possible targets for a skill
 //the function returns a array of arrays containing the targets  
@@ -132,6 +148,7 @@ cast(target){
             }
         }
         cost.pay(this.parent.parent);
+        this.coolDown=this.defCoolDown;
         result.msg = this.getCastDescription(result)+result.msg; 
     }
     return(result)

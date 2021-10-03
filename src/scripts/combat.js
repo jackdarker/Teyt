@@ -86,15 +86,16 @@ hideCombatOption() {
 }
 //renders background & combatants to #canvas
 renderCombatScene() {
-  var _pos =[[25,60],[75,60],[50,40]];//sprite position in %
-  var width=600,height=300;
-  var draw = document.querySelector("#canvas svg");
+  let _pos =[[0.25,0.60,0.10],[0.75,0.60,0.10],[0.50,0.40,0.80]];//sprite position & scale in % x,y,z
+  let width=600,height=300;
+  let draw = document.querySelector("#canvas svg");
   if(!draw) draw = SVG().addTo('#canvas').size(width, height);
   else draw = SVG(draw);//recover svg document instead appending new one
+  //todo images flash when redrawing page; blitting bakbuffer doesnt help: var draw2 = SVG(); -> draw2.addTo(draw);
   draw.rect(width, height).attr({ fill: '#303030'});
   draw.image(window.story.state.combat.scenePic);
-  var list = window.story.state.combat.enemyParty;
-  for(var i=list.length-1;i>=0;i--) {
+  let el,subnodes,i,list = window.story.state.combat.enemyParty;
+  for(i=list.length-1;i>=0;i--) {
     if(!list[i].isKnockedOut()) { //todo show deathsprite
       var pos = _pos.pop();
       var _pic = window.gm.images[list[i].pic]();
@@ -102,11 +103,21 @@ renderCombatScene() {
       var scaleW = node.width()/width, scaleH=node.height()/height;
       //todo sprites should be scattered evenly and scaled down to fit into scene 
       if(scaleW>0.9 || scaleH>0.9 ) {
-        if(scaleW>scaleH) node.width(node.width()/(1.2*scaleW));
-        else node.height(node.height()/(1.2*scaleH));
-        //node.scale(1/(1.2*scaleH)); ??scaling doesnt work?
+        if(scaleW>scaleH) node.width(node.width()/(1.2*scaleW*pos[2]));
+        else node.height(node.height()/(1.2*scaleH*pos[2]));
       }
-      node.center(pos[0]*width/100,pos[1]*height/100);//reposit. after scaling !
+      node.center(pos[0]*width,pos[1]*height);//reposit. AFTER scaling !
+      //hide parts of sprite
+      subnodes= node.find('[data-male]');
+      for(el of subnodes) {
+        if(list[i].getPenis()===null) el.hide();
+      }
+      subnodes= node.find('[data-arousal]');
+      for(el of subnodes) {
+        var y = el.attr('data-arousal').split(',');
+        var x1= parseInt(y[0],10),x2= parseInt(y[1],10);
+        if(list[i].arousal().value<x1 ||list[i].arousal().value>x2 ) el.hide();
+      }
       node.addTo(draw);
     }
     if(_pos.length<=0) break;
@@ -375,8 +386,30 @@ calcTurnOrder(){
 /////////////////////  State Machine /////////////////////
 //
 battleInit() {
-  var result = {OK:false, msg:''};
+  let result = {OK:false, msg:''}, s = window.story.state;
   result.OK=true,result.msg = this.onStart();
+  let list = s.combat.enemyParty.concat(s.combat.playerParty);
+  //update combateffects
+  for(let k=list.length-1; k>=0;k--){
+    if(list[k].isKnockedOut()) {
+      if(list[k].despawn===true) list.splice(k,1); //remove spawned chars - you will not get loot for them !
+      continue;
+    }
+    let effects = list[k].Effects.getAllIds();
+    for(let i=0; i<effects.length; i++) {
+      let effect = list[k].Effects.get(effects[i]);
+      if(effect.onCombatStart!==null && effect.onCombatStart!==undefined) {  //typeof effect === CombatEffect doesnt work? so we check presense of attribut
+        this.msg+=effect.onCombatStart().msg;
+      }
+    }
+    let skills = list[k].Skills.getAllIds();
+    for(let i=0; i<skills.length; i++) {
+      let skill = list[k].Skills.getItem(skills[i]);
+      if(skill.onCombatStart!==null && skill.onCombatStart!==undefined) {
+        skill.onCombatStart();
+      }
+    }
+  }
   this.next=this.preTurn;
   return(result);
 }
@@ -396,6 +429,13 @@ preTurn() {
       let effect = list[k].Effects.get(effects[i]);
       if(effect.onTurnStart!==null && effect.onTurnStart!==undefined) {  //typeof effect === CombatEffect doesnt work? so we check presense of attribut
         this.msg+=effect.onTurnStart().msg;
+      }
+    }
+    let skills = list[k].Skills.getAllIds();
+    for(let i=0; i<skills.length; i++) {
+      let skill = list[k].Skills.getItem(skills[i]);
+      if(skill.onTurnStart!==null && skill.onTurnStart!==undefined) {
+        skill.onTurnStart();
       }
     }
   }

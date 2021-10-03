@@ -53,8 +53,8 @@ debug only! :</br>
 :: Intro2
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
-Here you are: a student in its early twentys sitting around at home, working on the laptop in front.
-Progress in studys isnt going as smooth as expected.
+Here you are: a student sitting in your dorm, working on the laptop in front.
+Progress in studys isnt going as smooth as expected.</br>
 To divert yourself, you decide to check your emails. 
 <div></br>
 [[Next|GameInvite]]</br></div>

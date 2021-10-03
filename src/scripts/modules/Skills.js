@@ -43,7 +43,7 @@ class SkillAttack extends Skill {
         super("Attack");
         this.msg = '';
         this.weapon='';
-        this.cost.energy =5;
+        this.cost.energy =10;
     }
     toJSON() {return window.storage.Generic_toJSON("SkillAttack", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillAttack, value.data));}
@@ -99,7 +99,7 @@ class SkillStrongHit extends SkillAttack {
     constructor() {
         super();this.id=this.name='StrongAttack'
         this.msg = '';this.weapon='';
-        this.cost.energy =20;
+        this.cost.energy =30;
     }
     toJSON() {return window.storage.Generic_toJSON("SkillStrongHit", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillStrongHit, value.data));}
@@ -185,6 +185,7 @@ class SkillChainLightning  extends Skill {
     constructor() {
         super('ChainLightning');
         this.msg = '';
+        this.cost.energy=20,this.cost.will=10;
     }
     toJSON() {return window.storage.Generic_toJSON("SkillChainLightning", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillChainLightning, value.data));}
@@ -232,6 +233,7 @@ class SkillTease extends Skill {
     constructor() {
         super("Tease");
         this.msg = '',this.style=0;
+        this.cost.energy=15;
     }
     toJSON() {return window.storage.Generic_toJSON("SkillTease", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillTease, value.data));}
@@ -281,7 +283,7 @@ class SkillTease extends Skill {
 class SkillStun extends Skill {
     //execute stun attack
     constructor() {  super("Stun");  
-    this.cost.energy =20;
+    this.cost.energy =25;
     }
     toJSON() {return window.storage.Generic_toJSON("SkillStun", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillStun, value.data));}
@@ -308,6 +310,47 @@ class SkillStun extends Skill {
             for(var target of targets) {
                 result.effects.push( {target:target,
                     eff:[new effStunned()]})
+                }
+        }
+        return result
+    }
+    getCastDescription(result) {
+        //update msg after sucessful cast
+        return(this.caster.name +" stunned " + ((result.targets.length>1)?result.targets.name:result.targets[0].name)+".");
+    }
+}
+
+/**
+ * 
+ *
+ * @class SkillDetermined
+ * @extends {Skill}
+ */
+class SkillDetermined extends Skill {
+    static factory(coolDown=7) {
+        let sk = new SkillDetermined();
+        sk.startDelay=sk.defCoolDown=coolDown;
+        return(sk);
+    }
+    constructor() {  super("Determined");  
+    this.cost.energy =5;
+    }
+    toJSON() {return window.storage.Generic_toJSON("SkillDetermined", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillDetermined, value.data));}
+    targetFilter(targets){
+        return(this.targetFilterSelf(targets));
+    }
+    get desc() { return("Increases recovery of will and energy for some turns. Long cooldown. "+this.getCost().asText());}
+    previewCast(targets){
+        var result = new SkillResult()
+        result.skill =this;
+        result.source = this.caster;
+        result.targets = targets;
+        if(this.isValidTarget(targets)) {
+            result.OK = true;
+            for(var target of targets) {
+                result.effects.push( {target:target,
+                    eff:[new effDetermined.factory(10,10,25,4)]})
                 }
         }
         return result
@@ -368,7 +411,7 @@ class SkillHeal extends Skill {
             result.OK = true;
             for(var target of targets) {
                 result.effects.push( {target:target,
-                    eff:[effHeal.factory(10)]})
+                    eff:[effHeal.factory(15)]})
                 }
         }
         return result
@@ -544,8 +587,9 @@ class SkillStruggle extends Skill {
     isEnabled() {
         let res= super.isEnabled();
         if(res.OK===false) return(res);
-        let x = !(this.parent.parent.Effects.countItem(effGrappled.name)<=0);
-        return({OK:x,msg:''});
+        if(this.parent.parent.Effects.countItem(effGrappled.name)<=0) 
+            return({OK:false,msg:'no need to struggle'});
+        return(res);
     }
     previewCast(targets){
         var result = new SkillResult();
@@ -679,6 +723,7 @@ window.gm.SkillsLib = (function (Lib) {
     window.storage.registerConstructor(SkillAttack);
     window.storage.registerConstructor(SkillBite);
     window.storage.registerConstructor(SkillCallHelp);
+    window.storage.registerConstructor(SkillDetermined);
     window.storage.registerConstructor(SkillGrapple);
     window.storage.registerConstructor(SkillFlee);
     window.storage.registerConstructor(SkillGuard);

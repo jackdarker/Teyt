@@ -41,10 +41,10 @@ window.gm.util.printLocationName=function(passage) {
   return(passage);
 }
 //prints a div with text "value/max" and bargraph-background
-window.gm.util.bargraph=function(value,max,color) {
+window.gm.util.bargraph=function(value,max,color,text="") {
   let msg ='';
   let rel = value/max*100;
-  msg ='<div class="progressbar"><div style="background-color:'+color+'; width: '+rel.toString()+'%;"><p>'+value.toString()+'/'+max.toString()+'</p></div></div>';
+  msg ='<div class="progressbar"><div style="background-color:'+color+'; width: '+rel.toString()+'%;"><div style="width: max-content;">'+text+value.toString()+'/'+max.toString()+'</div></div></div>';
   return(msg); //todo bargraph css-animation doesnt work because the whole page is reloaded instead of just width change
 }
 /* Uploads SVG files from local file system, based on file selected in input; https://github.com/fizzstudio/svg-load-save */

@@ -287,9 +287,9 @@ class AnalPlug extends Equipment {
         return(msg);
     }
     onEquip(context) {
-        if(this.style===100) {
+        //if(this.style===100) {
             context.parent.addEffect(new window.storage.constructors['effButtPlugged'](),"effButtPlugged"); //only works for player since effects of NPC dont receive ticks!
-        } 
+        //} 
         return({OK:true, msg:'stuffed'});}
 }
 class ChastityBelt extends Equipment {

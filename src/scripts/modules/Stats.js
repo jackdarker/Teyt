@@ -73,6 +73,7 @@ class stHealthMax extends Stat {
 class stHealth extends Stat {
     static setup(context, base,max) {
         stHealthMax.setup(context,max);
+        stHealthRegen.setup(context,0,100);
         var _stat = new stHealth();
         var _n = _stat.data;
         _n.id='health',_n.base=base, _n.value=base,_n.limits=[{max:'healthMax',min:0}];
@@ -82,6 +83,18 @@ class stHealth extends Stat {
     constructor() {  super();   }
     toJSON() {return window.storage.Generic_toJSON("stHealth", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stHealth, value.data);};
+}
+class stHealthRegen extends Stat {
+    static setup(context, base,max) {
+        var _stat = new stHealthRegen();
+        var _n = _stat.data;
+        _n.id='healthRegen',_n.base=base, _n.value=base,_n.limits=[{max:max,min:-1*max}];
+        context.addItem(_stat);
+        _stat.Calc();
+    }
+    constructor() { super();}
+    toJSON() {return window.storage.Generic_toJSON("stHealthRegen", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(stHealthRegen, value.data);};
 }
 class stEnergyMax extends Stat {
     static setup(context, max) {
@@ -98,7 +111,7 @@ class stEnergyMax extends Stat {
 class stEnergy extends Stat {
     static setup(context, base,max) {
         stEnergyMax.setup(context,max);
-
+        stEnergyRegen.setup(context,10,100);
         var _stat = new stEnergy();
         var _n = _stat.data;
         _n.id='energy',_n.base=base, _n.value=base,_n.limits=[{max:'energyMax',min:0}];
@@ -108,6 +121,18 @@ class stEnergy extends Stat {
     constructor() { super();   }
     toJSON() {return window.storage.Generic_toJSON("stEnergy", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stEnergy, value.data);};
+}
+class stEnergyRegen extends Stat {
+    static setup(context, base,max) {
+        var _stat = new stEnergyRegen();
+        var _n = _stat.data;
+        _n.id='energyRegen',_n.base=base, _n.value=base,_n.limits=[{max:max,min:-1*max}];
+        context.addItem(_stat);
+        _stat.Calc();
+    }
+    constructor() { super();}
+    toJSON() {return window.storage.Generic_toJSON("stEnergyRegen", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(stEnergyRegen, value.data);};
 }
 class stWillMax extends Stat {
     static setup(context, max) {
@@ -123,7 +148,7 @@ class stWillMax extends Stat {
 class stWill extends Stat {
     static setup(context, base,max) {
         stWillMax.setup(context,max);
-
+        stWillRegen.setup(context,10,100);
         var _stat = new stWill();
         var _n = _stat.data;
         _n.id='will',_n.base=base, _n.value=base,_n.limits=[{max:'willMax',min:0}];
@@ -133,6 +158,18 @@ class stWill extends Stat {
     constructor() { super();   }
     toJSON() {return window.storage.Generic_toJSON("stWill", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stWill, value.data);};
+}
+class stWillRegen extends Stat {
+    static setup(context, base,max) {
+        var _stat = new stWillRegen();
+        var _n = _stat.data;
+        _n.id='willRegen',_n.base=base, _n.value=base,_n.limits=[{max:max,min:-1*max}];
+        context.addItem(_stat);
+        _stat.Calc();
+    }
+    constructor() { super();}
+    toJSON() {return window.storage.Generic_toJSON("stWillRegen", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(stWillRegen, value.data);};
 }
 class stArousalMax extends Stat {
     static setup(context, max) {
@@ -168,6 +205,7 @@ class stArousal extends Stat{
     static setup(context, base,max) {
         stArousalMax.setup(context,max);
         stArousalMin.setup(context,0);
+        stArousalRegen.setup(context,0,100);
         var _stat = new stArousal();
         var _n = _stat.data;
         _n.id='arousal', _n.hidden=3,_n.base=base, _n.value=base,_n.limits=[{max:'arousalMax',min:'arousalMin'}];
@@ -180,6 +218,18 @@ class stArousal extends Stat{
     }
     toJSON() {return window.storage.Generic_toJSON("stArousal", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stArousal, value.data);};
+}
+class stArousalRegen extends Stat {
+    static setup(context, base,max) {
+        var _stat = new stArousalRegen();
+        var _n = _stat.data;
+        _n.id='arousalRegen',_n.base=base, _n.value=base,_n.limits=[{max:max,min:-1*max}];
+        context.addItem(_stat);
+        _stat.Calc();
+    }
+    constructor() { super();}
+    toJSON() {return window.storage.Generic_toJSON("stArousalRegen", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(stArousalRegen, value.data);};
 }
 ////    Base-Stats ///////////////////////////////////////////////
 class stAgility extends Stat { // core attribute
@@ -486,17 +536,18 @@ class effCombatRecovery extends Effect {
     onApply(){
         this.data.time = window.gm.getTime();
     }
-    onTurnStart() { //this is no combat effect but ticked in combat !
-        this.parent.parent.Stats.increment("energy",this.eRecover); //todo recovery depends on?
-        this.parent.parent.Stats.increment("will",this.wRecover);
+    onTurnStart() { //this is no combat effect but ticked in combat; dont remmove after combatend !
+        this.parent.parent.Stats.increment("energy",this.parent.parent.Stats.get('energyRegen').value);
+        this.parent.parent.Stats.increment("will",this.parent.parent.Stats.get('willRegen').value);
+        this.parent.parent.Stats.increment("arousal",this.parent.parent.Stats.get('arousalRegen').value);
+        this.parent.parent.Stats.increment("health",this.parent.parent.Stats.get('healthRegen').value);
         return({OK:true,msg:''});
     }
     merge(neweffect) {
-        if(neweffect.name===this.data.name) {
-            return(true);
-        }
+        if(neweffect.name===this.data.name) {return(true);}
     }
 }
+
 class effEnergyDrain extends Effect {
     constructor() {
         super();
@@ -988,7 +1039,7 @@ class effSpermDecay extends Effect {
         let pregnancy=char.Effects.findEffect(effVaginalPregnant.name)[0];
         if(vagina && vagina.data.sperm>0) {
             vagina.removeSperm(2); //todo decay depends on looseness, soulgem absorption??
-            msg+="You can feel some of the cum from your womb dribble down your leg. ";
+            msg+="You can feel some of the cum from your womb dribble down your leg. "; //todo "into your panties. Cumslut as you are, shoving your fingers down your nethers, you scope up some of it and slurp it into your mouth."Hmm,Taste like wolf" "
             if(pregnancy) {
                 if(lewdMark) {
                     msg+="More of that precious seed is absorbed by that soulgem growing in you.</br>";
@@ -1049,7 +1100,6 @@ class effHeal extends CombatEffect {
             return(true);
         }
     }
-    onCombatEnd() { this.parent.removeItem(this.data.id);  }
     onTurnStart() {
         this.data.duration-=1;
         if(this.data.duration<=0) this.parent.removeItem(this.data.id);
@@ -1075,17 +1125,14 @@ class effGuard extends CombatEffect {
     get desc() {return(effGuard.name);}
     onApply(){
         this.data.duration = 2;
-        this.parent.parent.Stats.addModifier('rstblunt',{id:'rstblunt:Guard', bonus:this.data.weapResist});
-        this.parent.parent.Stats.addModifier('rstslash',{id:'rstslash:Guard', bonus:this.data.weapResist});
-        this.parent.parent.Stats.addModifier('rstpierce',{id:'rstpierce:Guard', bonus:this.data.weapResist});
+        this.parent.parent.Stats.addModifier('rst_blunt',{id:'rst_blunt:Guard', bonus:this.data.weapResist});
+        this.parent.parent.Stats.addModifier('rst_slash',{id:'rst_slash:Guard', bonus:this.data.weapResist});
+        this.parent.parent.Stats.addModifier('rst_pierce',{id:'rst_pierce:Guard', bonus:this.data.weapResist});
     }
     merge(neweffect) {
         if(neweffect.name===this.data.name) {
             return(true);
         }
-    }
-    onCombatEnd() {
-        this.parent.removeItem(this.data.id);
     }
     onTurnStart() {
         this.data.duration-=1;
@@ -1094,9 +1141,46 @@ class effGuard extends CombatEffect {
         return({OK:true,msg:''});
     }
     onRemove(){
-        this.parent.parent.Stats.removeModifier('rstblunt',{id:'rstblunt:Guard'});
-        this.parent.parent.Stats.removeModifier('rstslash',{id:'rstslash:Guard'});
-        this.parent.parent.Stats.removeModifier('rstpierce',{id:'rstpierce:Guard'});
+        this.parent.parent.Stats.removeModifier('rst_blunt',{id:'rst_blunt:Guard'});
+        this.parent.parent.Stats.removeModifier('rst_slash',{id:'rst_slash:Guard'});
+        this.parent.parent.Stats.removeModifier('rst_pierce',{id:'rst_pierce:Guard'});
+    }
+}
+/** todo
+ * boost will&Energy-generation and arousal-resistance
+ */
+class effDetermined extends CombatEffect {
+    static factory(wRecover,eRecover,teaseResist,duration) {
+        let x = new effDetermined();
+        x.data.teaseResist = teaseResist; x.data.eRecover = eRecover;x.data.wRecover = wRecover;x.data.duration = duration;
+        return x;
+    }
+    constructor() {
+        super();
+        this.data.id = this.data.name= effDetermined.name, this.data.duration = 0, this.data.hidden=0;
+        this.data.teaseResist = 5; this.data.wRecover=0;this.data.eRecover=0;
+    }
+    toJSON() {return window.storage.Generic_toJSON("effDetermined", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(effDetermined, value.data);};
+    get desc() {return(effDetermined.name);}
+    onApply(){
+        this.data.duration = 3;
+        this.parent.parent.Stats.addModifier('rst_tease',{id:'rst_tease:Determined', bonus:this.data.teaseResist});
+        this.parent.parent.Stats.addModifier('willRegen',{id:'willRegen:Determined', bonus:this.data.wRecover});
+        this.parent.parent.Stats.addModifier('energyRegen',{id:'energyRegen:Determined', bonus:this.data.eRecover});
+    }
+    merge(neweffect) {
+        if(neweffect.name===this.data.name) return(true);
+    }
+    onTurnStart() {
+        this.data.duration-=1;
+        if(this.data.duration<=0) this.parent.removeItem(this.data.id);
+        return({OK:true,msg:''});
+    }
+    onRemove(){
+        this.parent.parent.Stats.removeModifier('rst_tease',{id:'rst_tease:Determined'});
+        this.parent.parent.Stats.removeModifier('willRegen',{id:'willRegen:Determined'});
+        this.parent.parent.Stats.removeModifier('energyRegen',{id:'energyRegen:Determined'});
     }
 }
 //to combine multiple effects that get dispelled together 
@@ -1157,7 +1241,6 @@ class effDamage extends CombatEffect {
             return;
         }
     }
-    onCombatEnd() { this.parent.removeItem(this.data.id); }
     onTurnStart() { this.data.duration-=1; if(this.data.duration<=0) this.parent.removeItem(this.data.id); return({OK:true,msg:''}); return({OK:true,msg:''});  }
 }
 class effMasochist extends CombatEffect {
@@ -1181,7 +1264,6 @@ class effMasochist extends CombatEffect {
             return;
         }
     }
-    onCombatEnd() { this.parent.removeItem(this.data.id); }
     onTurnStart() { this.data.duration-=1; if(this.data.duration<=0) this.parent.removeItem(this.data.id); return({OK:true,msg:''});   }
 }
 /**
@@ -1205,7 +1287,6 @@ class effBleed extends CombatEffect {
             return(true);
         }
     }
-    onCombatEnd() { this.parent.removeItem(this.data.id); }
     onTurnStart() { this.data.duration-=1; 
         if(this.data.duration<=0) {
             this.parent.removeItem(this.data.id);   
@@ -1245,7 +1326,6 @@ class effGrappled extends CombatEffect {
             this.source=null;
         }
     }
-    onCombatEnd() { this.parent.removeItem(this.data.id); }
     onTurnStart() { 
         this.data.duration-=1; 
         if(this.data.duration<=0) {this.parent.removeItem(this.data.id);}  
@@ -1278,7 +1358,6 @@ class effGrappling extends CombatEffect {
             this.target=null;
         }
     }
-    onCombatEnd() { this.parent.removeItem(this.data.id); }
     onTurnStart() { this.data.duration-=1; 
         if(this.data.duration<=0) {this.parent.removeItem(this.data.id); } 
         return({OK:true,msg:''});
@@ -1303,7 +1382,6 @@ class effUngrappling extends CombatEffect {
             return(true);
         }
     }
-    onCombatEnd() { this.parent.removeItem(this.data.id); }
     onTurnStart() { this.data.duration-=1; if(this.data.duration<=0) this.parent.removeItem(this.data.id); return({OK:true,msg:''});   }
 }
 /**
@@ -1338,7 +1416,6 @@ class effTeaseDamage extends CombatEffect {
             return(false);
         }
     }
-    onCombatEnd() { this.parent.removeItem(this.data.id); }
     onTurnStart() { this.data.duration-=1; if(this.data.duration<=0) this.parent.removeItem(this.data.id); return({OK:true,msg:''});   }
 }
 class effStunned extends CombatEffect {
@@ -1357,9 +1434,6 @@ class effStunned extends CombatEffect {
             this.onApply();
             return(true);
         }
-    }
-    onCombatEnd() {
-        this.parent.removeItem(this.data.id);
     }
     onTurnStart() {
         this.data.duration-=1;
@@ -1393,9 +1467,6 @@ class effCallHelp extends CombatEffect {
     get shortDesc() {
         if(this.data.spawns.length>0) return("Summoned a"+this.data.item);
         else return("Summons "+this.data.item+" in " + this.data.duration+" turns");
-    }
-    onCombatEnd() {
-        this.parent.removeItem(this.data.id);
     }
     onTurnStart() {
         this.data.duration-=1;
@@ -1431,7 +1502,6 @@ class effKamikaze extends CombatEffect { //if <10%health kill yourslef and damag
             return(true);
         }
     }
-    onCombatEnd() { this.parent.removeItem(this.data.id); }
     onTurnStart() {
         let result ={OK:true,msg:''};
         let h = this.parent.parent.Stats.get('health').value, hmax= this.parent.parent.Stats.get('healthMax').value;
@@ -1473,6 +1543,7 @@ window.gm.StatsLib = (function (StatsLib) {
     //...stats
     window.storage.registerConstructor(stHealthMax);
     window.storage.registerConstructor(stHealth);
+    window.storage.registerConstructor(stHealthRegen);
     window.storage.registerConstructor(stRelation);
     window.storage.registerConstructor(stFetish);
     window.storage.registerConstructor(stAgility);
@@ -1485,11 +1556,14 @@ window.gm.StatsLib = (function (StatsLib) {
     window.storage.registerConstructor(stResistance);
     window.storage.registerConstructor(stEnergyMax);
     window.storage.registerConstructor(stEnergy);
+    window.storage.registerConstructor(stEnergyRegen);
     window.storage.registerConstructor(stWillMax);
     window.storage.registerConstructor(stWill);
+    window.storage.registerConstructor(stWillRegen);
     window.storage.registerConstructor(stArousalMax);
     window.storage.registerConstructor(stArousalMin);
     window.storage.registerConstructor(stArousal);
+    window.storage.registerConstructor(stArousalRegen);
     window.storage.registerConstructor(stCorruptionMax);
     window.storage.registerConstructor(stCorruption);
     window.storage.registerConstructor(stArmor);   
@@ -1497,6 +1571,7 @@ window.gm.StatsLib = (function (StatsLib) {
     window.storage.registerConstructor(effCallHelp);
     window.storage.registerConstructor(effCombatRecovery);
     window.storage.registerConstructor(effDamage);
+    window.storage.registerConstructor(effDetermined);
     window.storage.registerConstructor(effBleed);
     window.storage.registerConstructor(effCombined);
     window.storage.registerConstructor(effGrappled);

@@ -98,6 +98,7 @@ window.gm.initGame= function(forceReset,NGP=null) {
         ch.Skills.addItem(new SkillInspect());
         ch.Skills.addItem(new SkillUltraKill());
         ch.Skills.addItem(SkillCallHelp.factory('Wolf'));
+        ch.Skills.addItem(SkillDetermined.factory());
       }
       s.PlayerVR=ch;
     }

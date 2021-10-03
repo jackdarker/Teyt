@@ -199,18 +199,17 @@ There is nothing here
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;window.gm.quests.tick();%>
-The garden behind the house is not very large. </br>
+The garden behind the house is quite a mess. </br>
 <p class="tPC">'There are a lot of molehills on the green. I should teach their creator a lesson.'</p></br>
 <a href="javascript:void(0)" onclick='window.gm.encounters.moleX2(window.gm.player.location);'>Whack a mole</a> </br>
 You accidently stepped on a mole and killed it. Achievement unlocked ! <%window.gm.achievements.moleKillerGoldMedal=true;%>
 <% if(s.mom.location==window.passage.name) { %>
 [[Mom|Info_Mom]] is wandering around. Maybe she is planning to setup some flower beds. </br>
 <%}%>
-<a0 id='SkillTease' onclick='(function($event){window.gm.player.Skills.addItem(new window.storage.constructors[$event.id]());window.gm.refreshSidePanel();}(this))'>Learn to tease</a></br></br>
 <% if(window.gm.player.Inv.countItem('Shovel')<=0) {%>
 <a0 id='Shovel' onclick='(function($event){window.gm.player.Inv.addItem(new window.storage.constructors[$event.id]());window.gm.refreshAllPanel();}(this))'>take shovel</a></br>
 <%} else {%>
-You remeber that you took the shovel from here.</br>
+You remember that you took the shovel from here.</br>
 <%}%>
 Where would you like to go?</br>
 [[Hallway|Home]]</br>

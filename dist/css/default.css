@@ -4,11 +4,12 @@ body {
   color:black;
   padding:0;
   margin:0;
+  font-size:1.25em;
 }
 section {
   background: #ffffff;
   display: grid;
-  grid-template-columns: 0.5fr 1fr 1fr 1fr;
+  grid-template-columns: 0.2fr 1fr 1fr 1fr;
   grid-template-rows: 80% 20%;
   height:100vh;
   /*width:95vw;*/ /*scrollbars*/  }
@@ -41,11 +42,12 @@ a:hover {
   background-color: #ffede0;
   margin: 0.25em 0.25em;
   padding: 0.25em;
-  min-width: 12em;
+  min-width: 10em;
   min-height: 30em;
   text-align: center;
   grid-row-start: 1;
   grid-row-end: 3;
+  font-size: smaller;
 }
 
 #sidebar h3 {

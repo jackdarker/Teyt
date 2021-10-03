@@ -25,7 +25,10 @@ class Mob extends Character {
             result.target = [enemys[rnd]];
             result.msg =this.name+" trys to attack you.</br>"+result.msg;
         } else {
-            //result=window.gm.Encounter.execCombatCmd(window.gm.combat.moveGuard);
+            if(this.Skills.countItem('Guard')>0) {
+                result.action = "Guard";
+                result.target = this;
+            }
             result.msg =this.name+" takes a defensive stance.</br>"+result.msg;
         }
         return(result);

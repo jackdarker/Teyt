@@ -339,16 +339,20 @@ class CombatEffect extends Effect {
 
     /**
      * called after victory/defeat (before -scene plays)
+     * combateffect should be removed after combat (call super if overridden) ! 
      *
      * @memberof CombatEffect
      */
-    onCombatEnd() {}
-    //
+    onCombatEnd(){this.parent.removeItem(this.data.id);}
+
+    /**
+     * 
+     */
+    onCombatStart(){}
     /**
      * called before targets turn
      *
      * @return {*} 
-     * @memberof CombatEffect
      */
     onTurnStart() { return({OK:true,msg:''}); }
     //at end of targets turn   UNUSED
