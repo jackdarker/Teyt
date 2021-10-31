@@ -292,6 +292,40 @@ class AnalPlug extends Equipment {
         //} 
         return({OK:true, msg:'stuffed'});}
 }
+class CockRing extends Equipment {
+    static factory(style) {
+        let x = new CockRing();
+        x.style=style;
+        return(x);
+    }
+    constructor() {
+        super('CockRing');
+        this.addTags(['lewd']);
+        this.slotUse = ['uPenis'];
+        this.slotCover = [];    
+        this.lossOnRespawn = false;
+        this.style=0,this.lewd.slut = 1;
+    }
+    toJSON() {return window.storage.Generic_toJSON("CockRing", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(CockRing, value.data));}
+    set style(style) { 
+        this._style = style; 
+        if(style===0) this.id=this.name='CockRing';
+        else if(style===100) this.id=this.name='CockAndBallRing';
+        else throw new Error(this.id +' doesnt know '+style);
+    }
+    get style() {return this._style;}
+    get desc() { 
+        let msg ='a heavy cockring made of steel';
+        switch(this._style) {
+            case 100:
+                msg=('a contraption that squeezes tightly around base of dick and balls');
+                break;
+            default:
+        }
+        return(msg);
+    }
+}
 class ChastityBelt extends Equipment {
     static factory(style) {
         let x = new ChastityBelt();
@@ -319,7 +353,7 @@ class ChastityBelt extends Equipment {
         let msg ='chastity belt covering your privates';
         switch(this._style) {
             case 100:
-                msg=('a cockcage to restirct ones erection');
+                msg=('a cockcage to restrict ones erection');
                 break;
             default:
         }
@@ -643,6 +677,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(BracerLeather);
     window.storage.registerConstructor(Briefs);
     window.storage.registerConstructor(ChastityBelt);
+    window.storage.registerConstructor(CockRing);
     window.storage.registerConstructor(CollarQuest);
     window.storage.registerConstructor(DaggerSteel);
     window.storage.registerConstructor(HarnessRubber);
@@ -671,6 +706,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['Briefs'] = function () { return new Briefs();};
     ItemsLib['ChastityBelt'] = function () { let x= new ChastityBelt();x.style=0;return(x); };
     ItemsLib['CockCage'] = function () { let x= new ChastityBelt();x.style=100;return(x); };
+    ItemsLib['CockRing'] = function () { let x= new CockRing();x.style=0;return(x); };
     ItemsLib['CollarQuest'] = function () { return new CollarQuest();};
     ItemsLib['Leggings'] = function () { return new Leggings();};
     ItemsLib['Tank-shirt'] = function () { return new TankShirt(); };

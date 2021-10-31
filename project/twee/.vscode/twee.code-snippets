@@ -43,7 +43,7 @@
 			"prefix": "passage",
 			"body": [":: $0","<section><aside id=\"sidebar\"></aside><article><%=window.story.render(\"CenterDialogs\")%>",
 			"<%window.gm.player.location=window.passage.name;%>",
-			"<div> [[Back|_back_]] <a0 onclick='window.story.show(xxx);'>Start</a></br></div>",
+			"</br><p>[[Back|_back_]] <a0 onclick='window.story.show(xxx);'>Start</a></p>",
 			"</article><article id=\"LogPanel\"></article></section>",
 			"<script></script>"]
 		}

@@ -96,6 +96,7 @@ class Ingredient extends Item {
         else if(style===40) this.id=this.name='WolfTooth';
         else if(style===50) this.id=this.name='DryadVine';
         else if(style===60) this.id=this.name='Dimetrium';
+        else if(style===70) this.id=this.name='GiantPlum';
         else throw new Error(this.id +' doesnt know '+style);
     }
     get style() {return this._style;}
@@ -122,6 +123,9 @@ class Ingredient extends Item {
                 break;
             case 60:
                 msg='a arcane metal';
+                break;
+            case 70:
+                msg='a huge purple plum, bigger than your fist';
                 break;
             default: throw new Error(this.id +' doesnt know '+style);
         }
@@ -431,6 +435,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['ApocaFlower'] = function(){ let x=new Ingredient();return(x);};
     ItemsLib['DryadVine'] = function(){ let x=new Ingredient();x.style=50;return(x);};
     ItemsLib['Dimetrium'] = function(){ let x=new Ingredient();x.style=60;return(x);};
+    ItemsLib['GiantPlum'] = function(){ let x=new Ingredient();x.style=70;return(x);};
     //soulgem
     ItemsLib['TinySoulGem'] = function () { let x= new SoulGem();return(x); };
     //keys

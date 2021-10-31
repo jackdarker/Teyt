@@ -16,6 +16,10 @@
 - Giant-Snake
 - Giant wasp
 - spider/tarantula
+- glyphid swarmers/ Brood hive
+- glyphid soldiers
+- cave leech
+- Naeodocyte shocker
 - raptor
 - gryphon
 - felkin
@@ -440,6 +444,37 @@ class Mechanic extends Mob {
         return(super.calcCombatMove(enemys,friends));
     }
 }
+class Hornett extends Mob {
+    static factory(type) {
+        let foe = new Hornett();
+        return foe;
+    }
+    constructor() {
+        super();
+        this.name = this.id = 'Hornett';
+        this.pic= 'Hornett.svg';
+        this.level_min =1;
+        this.Outfit.addItem(new BaseWasp());
+        this.Outfit.addItem(WeaponStinger.factory('wasplike'));
+        this.fconv = null; //lazy init because descfixer depends on gm.player
+    }
+    calcCombatMove(enemys,friends){
+        let result = {OK:true,msg:''};
+        let rnd = _.random(1,100);
+        if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
+        result.action =result.target= null;
+        let sting= 'wasp-stinger';
+        if(this.Skills.getItem(sting).isEnabled()){
+            rnd = _.random(0,enemys.length-1);
+            result.action = sting;
+            result.target = [enemys[rnd]];
+            result.msg =this.fconv("$[I]$ thrust $[my]$ stinger at "+result.target[0].name+".</br>")+result.msg;
+            return(result);
+        } else {
+        } 
+        return(super.calcCombatMove(enemys,friends));
+    }
+}
 /////////////////////////////////////////////////////////
 // special NPC
 class Carlia extends Mob {
@@ -495,6 +530,7 @@ window.gm.Mobs = (function (Mobs) {
     Mobs.Lapine = Lapine.factory;
     Mobs.Mole = Mole.factory;
     Mobs.Squirrel = function() { return function(param){return(Mole.factory(param));}("Squirrel")};
+    Mobs.Hornett = Hornett.factory;
     Mobs.Huntress = Huntress.factory;
     Mobs.Lizan = Lizan.factory;
     Mobs.Wolf = Wolf.factory;

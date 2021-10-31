@@ -197,6 +197,36 @@ window.storage = {
       //copied from window.story.restore because reviver  //window.story.restore(hash) ;
       var save = JSON.parse(LZString.decompressFromBase64(hash), window.storage.Reviver);
       window.story.state = save.state;
+      //todo doesnt work because nested objects are copied by reference, not sub-elements; this would replace already constructed object with old shit: window.story.state=Object.assign(window.story.state,save.state );
+      /*
+       function merge(target,...arg) {
+        // create a new object
+        //let target = {}; todo dont create plain-object, we need proper class-object!
+        // deep merge the object into the target object
+          const merger = (obj) => {
+              for (let prop in obj) {
+                  if (obj.hasOwnProperty(prop)) {
+                      if (Object.prototype.toString.call(obj[prop]) === '[object Object]') {
+                          // if the property is a nested object
+                          target[prop] = merge(target[prop], obj[prop]);  <- todo doesnt work because target["Breast"] might not yet exist
+          !TODO! Reviver works for class-objects because it merges save into constructed object
+          but it doesnt work for plain objects because they dont use reviver
+          ergo: anything needs to be a class or I need special post-load-operation to update plain object to new version
+          ps.: if old saved object has propertys that are not present in new version, they will be attached to the newly created object too and create clutter
+                      } else {
+                          // for regular property
+                          target[prop] = obj[prop];
+                      }
+                  }
+              }
+          };
+          // iterate through all objects and deep merge them with target
+          for (let i = 0; i < arg.length; i++) {
+              merger(arg[i]);
+          }
+          return target;
+      };*/
+      window.story.state = merge(window.story.state,save.state);
       window.story.history = save.history;
       window.story.checkpointName = save.checkpointName;
       window.gm.rebuildObjects();  // this is for handling version-upgrades

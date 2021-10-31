@@ -1,4 +1,12 @@
 "use strict"
+
+/* Todo:
+- wings (insect, leathery, feathered )
+- feet (talons, paws, hooves)
+- horns (antlers, goat)
+- ears
+*/
+
 /*
  * bodyparts are special equipment 
  * base define the overall body structure; how many legs,..
@@ -55,6 +63,18 @@ class BaseWorm extends BodyPart {
     toJSON() {return window.storage.Generic_toJSON("BaseWorm", this); };
     static fromJSON(value) {return(window.storage.Generic_fromJSON(BaseWorm, value.data));}
     descLong(fconv) {return(fconv('$[I]$ $[am]$ wriggling around like a snake.'));}
+}
+class BaseWasp extends BodyPart {
+    constructor() {
+        super('BaseWasp');
+        this.data = {maxGrowth:0.3,growth:1};
+        this.addTags(['body']);this.slotUse = ['bBase'];
+    }
+    get descShort() {return this.desc;};
+    get desc() { return '';}
+    toJSON() {return window.storage.Generic_toJSON("BaseWasp", this); };
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(BaseWasp, value.data));}
+    descLong(fconv) {return(fconv('$[My]$ body is like that of an insect.'));}
 }
 class FaceHuman extends BodyPart {
     static dataPrototype() {    
@@ -298,6 +318,57 @@ class ArmorTorso extends BodyPart {
             context.parent.Stats.removeModifier('rst_'+el,{id:'rst_'+el+':'+this.id});
         }
         return({OK:true, msg:'unequipped'});
+    }
+}
+class WeaponStinger extends BodyPart {
+    static dataPrototype() { return({style:'wasplike', skill:''}); }
+    static factory(id) {
+        let obj =  new WeaponStinger();
+        obj.setStyle(id);
+        return(obj);
+    }
+    constructor() {
+        super('WeaponStinger');
+        this.addTags(['body']);
+        this.slotUse = ['bTailBase'];
+        this.data = WeaponStinger.dataPrototype();
+    }
+    setStyle(id) {
+        this.data.style = id;
+        switch(id) {
+            case 'wasplike': 
+                this.data.skill = 'wasp-stinger';
+                this.slotUse = ['bTailBase'];
+                break;
+            default:
+                throw new Error("unknown Stinger-style "+id);
+        }
+    }
+    getStyle() { return this.data.style; }
+    get descShort() { return (this.desc);}
+    get desc() { 'A '+this.data.style+' stinger.';}
+    toJSON() {return window.storage.Generic_toJSON("WeaponStinger", this); };
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(WeaponStinger, value.data));}
+    descLong(fconv) {
+        return(fconv('$[I]$ $[have]$ a '+this.data.style+' sting.'));
+    }
+    onEquip(context) {
+        let old = context.parent.Skills.countItem(this.data.skill);
+        if(old>0) context.parent.Skills.removeItem(this.data.skill,old);
+        context.parent.Skills.addItem(SkillSting.factory(this.data.skill));
+        return({OK:true, msg:'shifted'});
+    }
+    onUnequip() {
+        let old = this.parent.parent.Skills.countItem(this.data.skill);
+        if(old>0) this.parent.parent.Skills.removeItem(this.data.skill,old);
+        return({OK:true, msg:'shifted'});
+    }
+    attackMod(target){
+        let mod = new SkillMod();
+        let _dmg =5;
+        if(this.data.style==='wasplike' ) _dmg+=5;
+        mod.onHit = [{ target:target, eff: [effDamage.factory(_dmg,'pierce', this.parent.parent.name+' pokes its '+this.data.style+' stinger toward '+target.name )]}];
+        return(mod);
     }
 }
 class SkinHuman extends BodyPart {
@@ -824,8 +895,10 @@ class PenisHuman extends BodyPart {
 window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(AnusHuman);
     window.storage.registerConstructor(ArmorTorso);
+    window.storage.registerConstructor(WeaponStinger);
     window.storage.registerConstructor(BaseHumanoid);
     window.storage.registerConstructor(BaseQuadruped);
+    window.storage.registerConstructor(BaseWasp);
     window.storage.registerConstructor(BaseWorm);
     window.storage.registerConstructor(HandsHoof);
     window.storage.registerConstructor(HandsHuman);

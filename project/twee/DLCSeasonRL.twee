@@ -10,8 +10,7 @@ As you skim through your email, you notice a letter from a Gaming-service where 
 <p class='tNPC2'>"Dear sir or madam, we are happy to announce that your starter subscription will end soon and you will be automatically upgraded to an experienced-member account for free*. 
 If you are no longer interested in our service, click the link below to cancel your membership. However, canceling your membership now would lead to unrecoverable loss of your avatars game-progress, stats and inventory.
 Note*: the upgrade from starter to experienced-member is free of cost; monthly subscription cost will be only 30$ instead of 2$ for your actual starter-membership."</p>
-
-'WTF...they are going to charge me 30 bucks a month! Those fuckers. I cant afford that. There wasn't much good content update recently anyway. '
+<p class='tPC'>'WTF...they are going to charge me 30 bucks a month! Those fuckers. I cant afford that. There wasn't much good content update recently anyway. '</p>
 <div id='select1' >
 <a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1a")'>Call your friend Brad</a>
 </div>

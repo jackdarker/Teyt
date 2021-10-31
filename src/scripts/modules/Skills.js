@@ -160,6 +160,45 @@ class SkillBite extends SkillAttack {
         return(attack);
     }
 }
+//execute attack with Stinger
+class SkillSting extends SkillAttack {
+    static dataPrototype() { return({style:''}); }
+    static factory(id) {
+        let obj =  new SkillSting();
+        obj.setStyle(id);
+        return(obj);
+    }
+    constructor() {
+        super();
+        this.id=this.name='Sting'
+        this.msg = '';
+        this.cost.energy =20;
+    }
+    setStyle(id) {
+        this.data.style = id;
+        switch(id) {
+            case 'wasp-stinger': 
+                this.id=this.name= id; this.data.weapon='bTailBase';
+                this.startDelay=1,this.defCoolDown=3;  //todo poison regeneration depends on?
+                break;
+            default:
+                throw new Error("unknown Stinger-style "+id);
+        }
+    }
+    getStyle() { return this.data.style; }
+    toJSON() {return window.storage.Generic_toJSON("SkillSting", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillSting, value.data));}
+    get desc() { return("Use your "+this.name+" to sting a foe. "+this.getCost().asText());}
+    __estimateAttack(target) {
+        let attack =window.gm.combat.defaultAttackData();
+        let weapon=this.caster.Outfit.getItemForSlot(this.data.weapon);
+        attack.mod= new SkillMod();
+        if(weapon && weapon.attackMod) { //get teeth damage info
+            attack.mod=weapon.attackMod(target);
+        }
+        return(attack);
+    }
+}
 //execute attack with Feet
 class SkillKick extends SkillAttack {
     constructor() {
@@ -733,6 +772,7 @@ window.gm.SkillsLib = (function (Lib) {
     window.storage.registerConstructor(SkillStrongHit);
     window.storage.registerConstructor(SkillStun);
     window.storage.registerConstructor(SkillSubmit);
+    window.storage.registerConstructor(SkillSting);
     window.storage.registerConstructor(SkillStruggle);
     window.storage.registerConstructor(SkillTease);
     window.storage.registerConstructor(SkillUltraKill);

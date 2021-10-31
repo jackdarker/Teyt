@@ -701,7 +701,7 @@ window.gm.combat.TypesDamage = [
 
 //object to store attack-data
 window.gm.combat.defaultAttackData = function() {
-  return({value:0,total:0,crit:false,effects:[]}); 
+  return({msg:'',value:0,total:0,crit:false,effects:[]}); 
 }
 // calculates the damage of an physical attack
 window.gm.combat.calcAttack=function(attacker,defender,attack) {

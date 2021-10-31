@@ -63,7 +63,7 @@ window.gm.OutfitSlotLib = {
     Wrists  :   "Wrists",
     LHand   :   "LHand",
     RHand   :   "RHand",
-    //U  = under wear    P = piercing  T = tattoo  A = Above
+    //U  = under wear    P = piercing  T = tattoo 
     uFeet    : "uFeet",   //socks,stockings
     uAnkles  : "uAnkles",    //stockings, cuffs
     uLegs    : "uLegs",     //stockings

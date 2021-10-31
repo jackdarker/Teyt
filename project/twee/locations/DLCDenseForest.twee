@@ -1,0 +1,95 @@
+:: DF_Lv1_MAP [_back_]
+<hr><p>Map:</p><div id='canvas'></div></br>
+<script> window.gm.printMap("VRMap4",window.gm.player.location.replace('DF_Lv1_','Tile_'),window.story.state.DngDF.mapReveal,window.story.state.DngDF.visitedTiles);
+</script>
+
+
+:: DF_Lv1_Entry
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+</br><p> [[Next|DF_Lv1_F2]] </br></p>
+</article><article id="LogPanel"></article></section>
+
+
+:: DF_Lv1_F2
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+There is a small clearing with a stone-plateu that has some kind of runes on it. 
+<%if(window.story.state.DngDF.dngLevel===1 && window.gm.player.Inv.countItem('GiantPlum')>=3){%>
+    </br>The portal has opened, time for your return.
+    <p>[[Into the portal|DF_Lv1_Success]] </br></p>
+<%}else{%>
+    </br>Once you have fullfilled your task, the portal should reapear opening your way back to the sanctuary.
+    </br>Check your quest-log if you need a reminder on what to do.
+<%}%> 
+</br><p> [[Go East|DF_Lv1_G2]] </br></p><%=window.story.render("DF_Lv1_MAP")%>
+</article><article id="LogPanel"></article></section>
+
+
+:: DF_Lv1_G2
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+</br><p> [[Go North|DF_Lv1_G1]]</br>[[Go West|DF_Lv1_F2]][[Go East|DF_Lv1_H2]]</br>[[Go South|DF_Lv1_G3]]</br></p><%=window.story.render("DF_Lv1_MAP")%>
+</article><article id="LogPanel"></article></section>
+
+
+:: DF_Lv1_H2
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+</br><p> [[Go North|DF_Lv1_H1]]</br>[[Go West|DF_Lv1_G2]][[Go East|DF_Lv1_I2]]</br>[[Go South|DF_Lv1_H3]] </br></p><%=window.story.render("DF_Lv1_MAP")%>
+</article><article id="LogPanel"></article></section>
+
+
+:: DF_Lv1_F3
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+</br><p> [[Go North|DF_Lv1_F2]]</br>[[Go East|DF_Lv1_G3]]</br>[[Go South|DF_Lv1_F4]] </br></p><%=window.story.render("DF_Lv1_MAP")%>
+</article><article id="LogPanel"></article></section>
+
+
+:: DF_Lv1_G3
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+</br><p> [[Go North|DF_Lv1_G2]]</br>[[Go West|DF_Lv1_F3]][[Go East|DF_Lv1_H3]]</br>[[Go South|DF_Lv1_G4]]</br></p><%=window.story.render("DF_Lv1_MAP")%>
+</article><article id="LogPanel"></article></section>
+
+
+:: DF_Lv1_H3
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+
+<%if(window.story.state.DngDF.plumH3===1){%>
+A large purple fruit hangs on one branch of a broad-leafed tree. Its so heavy that it has pulled down the branch to a height where you can reach it with your hand.</br>
+<div id='select1' >
+<a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1a")'>harvest it</a>
+</div><div id='choice1a' hidden>
+As you plug the fruit from the twig, the branch snaps back to its origin.</br>
+That doesnt surprise you. What surprises you is the giant hornett that flys buzzing angrily out of the trees crown toward you.
+<a0 onclick='window.gm.fightArena("hornett",{amount:1},[{id:"GiantPlum",count:1}],"DF_Lv1_H3")'>Defend yourself</a>
+</div>
+<%}%>
+</br><p> [[Go North|DF_Lv1_H2]]</br>[[Go West|DF_Lv1_G3]][[Go East|DF_Lv1_I3]]</br>[[Go South|DF_Lv1_H4]] </br></p><%=window.story.render("DF_Lv1_MAP")%>
+</article><article id="LogPanel"></article></section>
+
+
+:: DF_Lv1_F4
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+
+</br><p> [[Go North|DF_Lv1_F3]]</br>[[Go West|DF_Lv1_E4]][[Go East|DF_Lv1_G4]]</br>[[Go South|DF_Lv1_F5]] </br></p><%=window.story.render("DF_Lv1_MAP")%>
+</article><article id="LogPanel"></article></section>
+
+
+:: DF_Lv1_G4
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+</br><p> [[Go North|DF_Lv1_G3]]</br>[[Go West|DF_Lv1_E4]][[Go East|DF_Lv1_H4]]</br>[[Go South|DF_Lv1_G5]] </br></p><%=window.story.render("DF_Lv1_MAP")%>
+</article><article id="LogPanel"></article></section>
+
+
+:: DF_Lv1_H4
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+</br><p> [[Go North|DF_Lv1_H3]]</br>[[Go West|DF_Lv1_G4]][[Go East|DF_Lv1_I4]]</br>[[Go South|DF_Lv1_H5]] </br></p><%=window.story.render("DF_Lv1_MAP")%>
+</article><article id="LogPanel"></article></section>
+

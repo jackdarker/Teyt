@@ -88,6 +88,20 @@ window.gm.encounters.mechanicguy = function(params) {
     window.gm.Encounter.scenePic = window.gm.getScenePic(window.gm.Encounter.Location);
     window.gm.Encounter.initCombat();
 }
+window.gm.encounters.hornett = function(params) {
+    var amount=(params&&params.amount)?params.amount:1, location=(params&&params.location)?params.location:window.passage.name;
+    window.gm.Encounter = new Encounter();
+    window.gm.Encounter.EnemyFunc = (function() { 
+        let mobs =[];
+        for(var i=amount;i>0;i-=1) {
+            let x = window.gm.Mobs.Hornett(); x.scaleLevel(window.gm.player.level);
+            x.name+='#'+i;mobs.push(x);
+        }
+        return(mobs);});
+    window.gm.Encounter.Location = location?location:window.passage.name;
+    window.gm.Encounter.scenePic = window.gm.getScenePic(window.gm.Encounter.Location);
+    window.gm.Encounter.initCombat();
+}
 window.gm.encounters.huntress = function(params) {
     var amount=(params&&params.amount)?params.amount:1, location=(params&&params.location)?params.location:window.passage.name;
     window.gm.Encounter = new Encounter();
@@ -142,7 +156,7 @@ window.gm.encounters.wolf = function(params) {
         return('Intimitated, the wolf rolls on its back, whimpering submissively and exposing its throat.</br>'+this.fetchLoot()+'</br>'+ window.gm.printPassageLink('Next','GenericPassage'));
         //return('Intimitated, the wolf rolls on its back, whimpering submissively and exposing its throat.</br>'+this.fetchLoot()+'</br>'+ window.gm.printPassageLink('Next','WolfVictory'));
     }
-    window.gm.Encounter.sceneDone=false; //attach flag to Encounter-Instance;
+    /*window.gm.Encounter.sceneDone=false; //attach flag to Encounter-Instance;
     window.gm.Encounter.onMoveSelect = function() {
         let s=window.story.state;
         let result = {OK:false, msg:''};
@@ -151,7 +165,7 @@ window.gm.encounters.wolf = function(params) {
             result.msg = 'Wolf growls at you.</br>'+ window.gm.printPassageLink('Next','WolffightIntermezzo');
         } 
         return(result);
-    }
+    }*/
     window.gm.Encounter.initCombat();
 }
 window.gm.encounters.lapine = function(params) {

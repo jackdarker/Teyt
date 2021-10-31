@@ -41,7 +41,7 @@ window.gm.initGame= function(forceReset,NGP=null) {
     
     if (!window.gm.achievements||forceReset) {  //outside of window.story !
       window.gm.achievements= {
-        moleKillerGoldMedal: false //add your flags here
+        looseEnd: false //add your flags here
       }
       window.storage.loadAchivementsFromBrowser();
     }
@@ -139,6 +139,27 @@ window.gm.initGame= function(forceReset,NGP=null) {
         s.dng[el.name] = el.persistentDngDataTemplate();
       }
     } */   
+    if (!s.DngSY||forceReset) {  
+      s.DngSY = {
+        remainingNights: 0,
+        dngLevel: 0
+      }
+    }
+    if (!s.DngDF||forceReset) {  
+      s.DngDF = {
+        visitedTiles: [],
+        mapReveal: 0,
+        dngLevel: 1,
+        plumH3:0
+      }
+    }
+    if (!s.DngAM||forceReset) {  
+      s.DngAM = {
+        visitedTiles: [],
+        mapReveal: 0,
+        dngLevel: 1
+      }
+    }
     window.gm.switchPlayer("PlayerRL");
     //take over flags for newgameplus
     if(NGP) { window.story.state.vars.crowBarLeft = NGP.crowBarLeft; }
@@ -303,21 +324,29 @@ window.gm.giveCyrilFood= function(){
 /*
 * prints a (svg-) map  
 */
-window.gm.printMap=function(MapName,playerTile,reveal) {
+window.gm.printMap=function(MapName,playerTile,reveal,visitedTiles) {
   var width=600,height=300;
   var draw = document.querySelector("#canvas svg");
   if(!draw) draw = SVG().addTo('#canvas').size(width, height);
   else draw = SVG(draw);//recover svg document instead appending new one
   draw.rect(width, height).attr({ fill: '#303030'});
   var node = SVG(window.gm.images[MapName]());
+  if(playerTile!=='' && visitedTiles.indexOf(playerTile)<0) {
+    visitedTiles.push(playerTile);
+  }
   //node.find("#AM_Lv2_A1")[0].addClass('roomNotFound');
-  var el,list= node.find('[data-reveal]');
+  var _n,el,list= node.find('[data-reveal]');
   for(el of list) {
     var x= parseInt(el.attr('data-reveal'),16);
     if((x&reveal)===0) el.addClass('roomNotFound');
   }
-  el= node.find('#'+playerTile)[0];
-  if(el) {el.removeClass('roomFound');el.addClass('playerPosition');}
+  for(el of visitedTiles) {
+    if(el===playerTile) continue;
+    _n= node.find('#'+el)[0];
+    if(_n) {_n.removeClass('roomFound');_n.addClass('roomVisited');}
+  }
+  _n= node.find('#'+playerTile)[0];
+  if(_n) {_n.removeClass('roomFound');_n.addClass('playerPosition');}
   node.addTo(draw);
 }
 window.gm.printSceneGraphic2=function(background,item) {
