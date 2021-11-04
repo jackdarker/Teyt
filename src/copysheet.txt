@@ -16,7 +16,7 @@ window.gm.quests.getMilestoneState("qFixLaptop").id<1000
 <p class='tPC'>""</p>
 
 <div id='select1' >
-<a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1a")'>Call your friend Brad</a>
+<a0 onclick='window.gm.printTalkLink("div#select1","div#choice1a")'>Call your friend Brad</a>
 </div>
 <div id='choice1a' hidden>
 </div>

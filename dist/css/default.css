@@ -6,6 +6,11 @@ body {
   margin:0;
   font-size:1.25em;
 }
+hr {
+   box-sizing: content-box;
+   height: 0;
+   overflow:hidden;
+}
 section {
   background: #ffffff;
   display: grid;
@@ -20,17 +25,9 @@ section {
 section h2 {
   grid-column: 1 / -1;
 }
-article {
-  background-color: #ffede0;
-}
-#LogPanel {
-  background: #e4e4e4;
-}
 a {
     /*line-height: 150%;*/
     background-color: transparent;
-    color:royalblue;
-    text-decoration-color: initial;
     margin-left:0.25em;
     margin-right:0.25em;
 }
@@ -39,7 +36,6 @@ a:hover {
     text-decoration-color: #008929;
 }
 #sidebar {
-  background-color: #ffede0;
   margin: 0.25em 0.25em;
   padding: 0.25em;
   min-width: 10em;
@@ -55,9 +51,6 @@ a:hover {
   font-variant: small-caps;
 }
 
-#sidebar p {
-  color: black;
-}
 #combatstats th { 
   min-width:1em;/*minimum width empty col*/
   padding-right: 1em;
@@ -223,31 +216,29 @@ button {
   background-color: (rgb(239, 239, 239), rgb(59, 59, 59));
   margin: 0.25em;
 }
-statup {
-  color:green;
+.speech {
+	border: 4px solid rgb(46,37,73);
+	border-radius: 15px;
+	padding: 8px 8px 8px 8px;
+	box-shadow: 5px 5px 3px Black;
+  	text-align: left;
+  	margin: 8px 8px 8px 8px;
 }
-statdown {
-  color:red;
+.avatar {
+	display: block;
+	height: 100px;
+	width: 100px;
+	float: left;
+	margin: 0px 10px 0px 0px;
+	background-size: contain;
 }
-.tPC {	/*talk player*/
-  color: #001eb1;
-  /*slateblue,slategreen,royalblue*/
+
+.tPC .avatar {
+	/*background-image: URL("../assets/icons/icon_question.svg");*/
 }
-.tNPC1 {
-  color: Brown;
-}
-.tNPC2 {
-  color: green;
-}
-.dev {
-  color: #7bedf3;
-  background-color:#11114a;
-}
+
+
 .dev::before {content: 'dev-note: ';}
-.author {
-  color: lightyellow;
-  background-color: darkred;
-}
 .author::before {content: 'authors-note: ';}
 .progressbar {
   overflow: hidden;

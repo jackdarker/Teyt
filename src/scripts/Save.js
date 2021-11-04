@@ -225,8 +225,8 @@ window.storage = {
               merger(arg[i]);
           }
           return target;
-      };*/
-      window.story.state = merge(window.story.state,save.state);
+      };
+      window.story.state = merge(window.story.state,save.state);*/
       window.story.history = save.history;
       window.story.checkpointName = save.checkpointName;
       window.gm.rebuildObjects();  // this is for handling version-upgrades

@@ -42,9 +42,8 @@ function nextDng() {
 <%window.gm.player.location=window.passage.name;%>
 You awake in your room.
 <%if(window.story.state.DngSY.remainingNights<=0){%>
-    The thought is poking at your mind that you have to go through the portal today.
-    Startled you notice that Cyril is waiting in the doorframe.
-    <p class="tNPC2">"It is time now. Meet me in the hall."</p>
+    The thought is poking at your mind that you have to go through the portal today.</br>
+    Startled you notice that Cyril is waiting in the doorframe.<span class="tNPC2">"It is time now. Meet me in the hall."</span>
 <%}else{%>
     Cyril said that you soon have to go through the portal again and that you should prepare for that. </br>
     You can sleep <%=window.story.state.DngSY.remainingNights%> more nights before you have to start another adventure.
@@ -52,6 +51,13 @@ You awake in your room.
 <p> [[Get up|SY_Your_Room]]</br></p>
 </article><article id="LogPanel"></article></section>
 
+
+:: SY_Recover_Death [_nosave_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+Suddenly snapping awake, you find yourself back into Sanctuary. For sure it was just a nightmare you awoke from, a horrible dream about your death. </br>
+You cant even remeber what you exactly dreamed, and maybe thats a good thing.
+</br>[[Next|SY_Your_Room]]
+</article><article id="LogPanel"></article></section>
 
 
 :: SY_Portal
@@ -91,13 +97,26 @@ TODO: soothe mind / learn arcana / learn language
 
 :: SY_Lv1
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<p class="tNPC2">"Your task is to take this glass and fill it with the water from the crystal lake and make your way back to the portal."</p>
+<p class="tNPC2">"Your task is to take this glas and fill it with the water from the crystal lake and make your way back to the portal."</p>
 <p class="tPC">"Crystal lake? I dont know where that is. And where does that portal lead anyway?"</p>
-<p class="tNPC2">"The portal brings you into a dungeon. Just follow the lights down the tunnels until you find a lake where you see large blue crystals growing in a underground lake."</p>
-<p class="tPC">"And thats all? Go to the lake, fill that glass and walk back? Why does it have to be a glass, dont you have a bottle or waterskin?"</p>
+<p class="tNPC2">"The portal brings you into a cave system. Just follow the lights down the tunnels until you find a lake where you see large blue crystals growing in a underground lake."</p>
+<p class="tPC">"And thats all? Go to the lake, fill that glas and walk back? Why does it have to be a glas, dont you have a bottle or waterskin?"</p>
 ....
-<p> <a0 onclick='window.story.state.DngDF.visitedTiles=[];window.story.show("DF_Lv1_Entry");'>Lets go</a></p>
+<div class="speech tNPC2"><span class="avatar"></span>tNPC2<hr><br>dad</div>
+<p class="tNPC2">"You might need this torch. The path should be lightened with candles but sometime they just go out."</p>
+You grab the torch and the glas.</br>
+<p class="tNPC2">"And remember, follow the candles, dont strive into the darker areas."</p>
+<p class="tPC">"I know, I know, pitfalls and such."</p>
+<p class="tNPC2">"Yes...and such."</p>
+That somehow sound like more dangers than falling into a hole.</br>
+<p> <a0 onclick='CV_Lv1_Entry()'>Lets go</a></p>
 </article><article id="LogPanel"></article></section>
+<script> function CV_Lv1_Entry() {
+    let s = window.story.state;
+    s.DngCV.visitedTiles=[];
+    window.story.show("CV_Lv1_Entry");
+}
+</script>
 
 
 :: SY_Lv2
@@ -134,4 +153,7 @@ You need to open up your mind. Mankind futily struggled to separate themself fro
 
 Savageness is what separates us from non-living objects. Without savageness we would lie still like a rock or fall down to earth, blown around by gusts of wind. Savageness lets a deer rush across the plains or a bird fly between clouds. Honor your savagness as this is life.
 
-Cultivating ones savageness is what we try to assume here. you need to grow it, carefully, to not get overwhelmed and loosing yourself,
+Cultivating ones savageness is what we try to assume here. you need to grow it, carefully, to not get overwhelmed and loosing yourself
+
+So you think animals are less worth than humans? he sounds annoyed. No, no of course not. I wouldnt say they are equal to humans. 
+Lets see if you think so after walking in their shoes for a mile.

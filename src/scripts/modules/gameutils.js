@@ -139,31 +139,53 @@ window.gm.initGame= function(forceReset,NGP=null) {
         s.dng[el.name] = el.persistentDngDataTemplate();
       }
     } */   
-    if (!s.DngSY||forceReset) {  
-      s.DngSY = {
-        remainingNights: 0,
-        dngLevel: 0
-      }
-    }
-    if (!s.DngDF||forceReset) {  
-      s.DngDF = {
-        visitedTiles: [],
-        mapReveal: 0,
-        dngLevel: 1,
-        plumH3:0
-      }
-    }
-    if (!s.DngAM||forceReset) {  
-      s.DngAM = {
-        visitedTiles: [],
-        mapReveal: 0,
-        dngLevel: 1
-      }
-    }
+    
+    window.gm.initGameFlags(forceReset,NGP);
     window.gm.switchPlayer("PlayerRL");
     //take over flags for newgameplus
     if(NGP) { window.story.state.vars.crowBarLeft = NGP.crowBarLeft; }
     NGP=null; //release memory
+}
+window.gm.initGameFlags = function(forceReset,NGP=null) {
+  let s= window.story.state;
+  if (forceReset) {  
+    s.DngDF = s.DngAM= s.DngSY=null; 
+  }
+  let DngDF = {
+    visitedTiles: [],
+    mapReveal: 0,
+    dngLevel: 1,
+    plumH3:0
+  }
+  let DngSY = {
+      remainingNights: 0,
+      dngLevel: 0
+  }
+  let DngAM = {
+      visitedTiles: [],
+      mapReveal: 0,
+      dngLevel: 1
+  }
+  let DngCV = {
+    visitedTiles: [],
+    mapReveal: 0,
+    dngLevel: 1,
+    bathedInLake:0,
+    gotWater:0
+  }
+  //see comment in rebuildFromSave why this is done
+  s.DngDF=window.gm.util.mergePlainObject(DngDF,s.DngDF);
+  s.DngAM=window.gm.util.mergePlainObject(DngAM,s.DngAM);
+  s.DngSY=window.gm.util.mergePlainObject(DngSY,s.DngSY);
+  s.DngCV=window.gm.util.mergePlainObject(DngCV,s.DngCV);
+}
+
+// update non-class-objects of previous savegame
+let _origRebuildObjects = window.gm.rebuildObjects;
+window.gm.rebuildObjects= function(){ 
+  var s = window.story.state;
+  _origRebuildObjects();
+  window.gm.initGameFlags(false,null);
 }
 // lookup function for sidebar icon
 window.gm.getSidebarPic = function(){ //todo display doll ??
@@ -258,11 +280,11 @@ window.gm.respawn=function(conf={keepInventory:false}) {
       if(el.item.lossOnRespawn ) window.gm.player.Inv.removeItem(el.id,el.count);
     }
   }
-  if(window.gm.quests.getMilestoneState("qDiedAgain").id===2) {
+  /*if(window.gm.quests.getMilestoneState("qDiedAgain").id===2) {
     window.story.show('YouDiedOnce'); 
   } else if([100,200,300].includes(window.gm.quests.getMilestoneState("qBondageKink").id)){
       window.story.show('YouDiedWithCursedGear');
-  } else {
+  } else {*/
     let robes = new window.storage.constructors['RobesZealot']();
     window.gm.makeCursedItem(robes,{minItems:2,convert:'HarnessRubber'});
     window.gm.player.Wardrobe.addItem(robes);
@@ -274,7 +296,7 @@ window.gm.respawn=function(conf={keepInventory:false}) {
     window.gm.player.Inv.addItem(staff);
     window.gm.player.Outfit.addItem(staff);
     window.story.show(window.story.state.vars.spawnAt);
-  }
+  //}
 };
 //sets current player location and advances time
 //call this in passage header

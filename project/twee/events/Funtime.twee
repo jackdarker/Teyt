@@ -2,13 +2,13 @@
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 <div id='select1' >
-<a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1a")'>Pinch your own nipples.</a></br>
+<a0 onclick='window.gm.printTalkLink("div#select1","div#choice1a")'>Pinch your own nipples.</a></br>
 </div>
 <div id='choice1a' hidden></br>
 Tweasing your [small] nipples between thumb and index finger until it nearly gets painful.</br>
 <div id='select2' >
-<a0 id='tweazeNipple' onclick='window.gm.printTalkLink($("div#select2")[0],"div#choice2a", fondlebreast)'>Just some more</a>
-<a0 onclick='window.gm.printTalkLink($("div#select2")[0],"div#choice2b")'>Stop it</a>
+<a0 id='tweazeNipple' onclick='window.gm.printTalkLink("div#select2","div#choice2a", fondlebreast)'>Just some more</a>
+<a0 onclick='window.gm.printTalkLink("div#select2","div#choice2b")'>Stop it</a>
 </div>
 <div id='choice2a' hidden></br>
 Now you increase the pressure until there is pain.

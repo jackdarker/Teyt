@@ -43,7 +43,8 @@ statdown {
   color:red;
 }
 .tPC {
-  color: floralwhite;
+  	color: floralwhite;
+	border-color:#001eb1;
   /*slateblue,slategreen,royalblue*/
 }
 .tNPC1 {

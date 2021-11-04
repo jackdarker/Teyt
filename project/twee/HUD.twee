@@ -211,7 +211,7 @@ for(var i=0;i<_ids.length;i++){window.gm.printEquipment(whom,whom.Outfit.getItem
 [[Back|_back_]]</br>
 <p class="author">settings are stored in save-game until I find a way to store them in cookies.</p>
 Theme:
-<a href="javascript:window.styleSwitcher.setStyle('default');window.gm.refreshAllPanel();">default</a>
+<a href="javascript:window.styleSwitcher.setStyle('light');window.gm.refreshAllPanel();">light</a>
 <a href="javascript:window.styleSwitcher.setStyle('dark');window.gm.refreshAllPanel();">dark</a></br>
 <!--TODO what settings ?
 *  Disable over-penetration </br>

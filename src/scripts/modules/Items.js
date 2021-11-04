@@ -97,6 +97,8 @@ class Ingredient extends Item {
         else if(style===50) this.id=this.name='DryadVine';
         else if(style===60) this.id=this.name='Dimetrium';
         else if(style===70) this.id=this.name='GiantPlum';
+        else if(style===80) this.id=this.name='EmptyGlas';
+        else if(style===90) this.id=this.name='GlasCrystalWater';
         else throw new Error(this.id +' doesnt know '+style);
     }
     get style() {return this._style;}
@@ -126,6 +128,12 @@ class Ingredient extends Item {
                 break;
             case 70:
                 msg='a huge purple plum, bigger than your fist';
+                break;
+            case 80:
+                msg='an empty drinking glas';
+                break;
+            case 90:
+                msg='a glas filled with crystal clear water';
                 break;
             default: throw new Error(this.id +' doesnt know '+style);
         }
@@ -436,6 +444,8 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['DryadVine'] = function(){ let x=new Ingredient();x.style=50;return(x);};
     ItemsLib['Dimetrium'] = function(){ let x=new Ingredient();x.style=60;return(x);};
     ItemsLib['GiantPlum'] = function(){ let x=new Ingredient();x.style=70;return(x);};
+    ItemsLib['EmptyGlas'] = function(){ let x=new Ingredient();x.style=80;return(x);};
+    ItemsLib['GlasCrystalWater'] = function(){ let x=new Ingredient();x.style=90;return(x);};
     //soulgem
     ItemsLib['TinySoulGem'] = function () { let x= new SoulGem();return(x); };
     //keys

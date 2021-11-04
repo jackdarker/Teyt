@@ -81,8 +81,8 @@ A dog is staring into your face. Its looks very close to a wolf you think. But w
 'Oh wait, I'm in a game. In games wolves are nether to shy to attack.'
 The wolf doesnt do a thing, just stands there and looks at you.
 <div id='select1' >
-<a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1a")'>First strike</a>
-<a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1b")'>Dont move</a>
+<a0 onclick='window.gm.printTalkLink("div#select1","div#choice1a")'>First strike</a>
+<a0 onclick='window.gm.printTalkLink("div#select1","div#choice1b")'>Dont move</a>
 </div>
 <div id='choice1a' hidden>
 I'm in this game right now for how long and havent killed anything? </br>
@@ -158,7 +158,7 @@ As you make your way through the trees, as soon as you think you are out of line
 Holding your breath, you listen carefully.The birds are singing and the wind lets the leaves rustle but nothing else.</br>
 You wait a minute and just as you decide to get back on your way, you hear a dry twig breaking some meters back where you came from.</br>
 <div id='select1' >
-<a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1a")'>Jump out of your cover</a>
+<a0 onclick='window.gm.printTalkLink("div#select1","div#choice1a")'>Jump out of your cover</a>
 </div><div id='choice1a' hidden></br>
 Ejecting yourself out of your cover and facing the direction of the noise, you can discern a figure trying to hide in the shadow of a tree trunk.
 Your eyes need to adapt a moment and in that moment the figur starts running away.
@@ -229,14 +229,14 @@ Now its your time to pounce on her back. Gripping her wrists with your hands and
 <p class="tPC">'And now what?'</p>
 As soon as you let go she will either be up and away or give you some nasty scratching. She is struggling against you pinning her down.
 <div id='select1' >
-<a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1a")'>She is quite in a vulnerable position...</a>
-<a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1b")'>Lets try to talk some sense into her.</a>
+<a0 onclick='window.gm.printTalkLink("div#select1","div#choice1a")'>She is quite in a vulnerable position...</a>
+<a0 onclick='window.gm.printTalkLink("div#select1","div#choice1b")'>Lets try to talk some sense into her.</a>
 </div><div id='choice1a' hidden>
 </br>That bottom of hers rubbing against your groin is quite a diversion.
 <p class="tPC">'I wonder how far I could go in that game..'</p>
 Maybe she picked up your thoughts or she just run out of endurance. But she stopped struggling for the most and started to snuffle and sob.
 <p class="tPC">'Damn, those sobs a really getting onto me. Am I realy such a bad guy to force myself onto her?'</p>
-<div id='choice1a_'><a0 onclick='window.gm.printTalkLink($("div#choice1a_")[0],"div#choice1b")'>Be kind</a></div>
+<div id='choice1a_'><a0 onclick='window.gm.printTalkLink("div#choice1a_","div#choice1b")'>Be kind</a></div>
 </div>
 <div id='choice1b' hidden>
 <p class="tPC">"Hey stop kicking and listen ! I dont want to hurt you."</p>
@@ -302,21 +302,21 @@ As you make your way through the trees, a strange woman-like figure steps out be
 <% if(window.gm.quests.getMilestoneState("qDiedAgain").id===2) { %>
 You fight your way through the dense undergrowth and realize just in time that you have reached the edge of a cliff.</br> 
 <div id='select1' >
-<a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1a")'>Peak into the chasm</a>
+<a0 onclick='window.gm.printTalkLink("div#select1","div#choice1a")'>Peak into the chasm</a>
 </div>
 <div id='choice1a' hidden>
 There is a slab of rock from which you should be able to look down quite well.</br>
 You look carefully over the edge. It's not a real abyss, but a pretty steep, rocky slope. </br>
 'I'm not climbing down there now.' you think when you want to go back to the forest. </br>
 <div id='select2' >
-<a0 onclick='window.gm.printTalkLink($("div#select2")[0],"div#choice2a")'>Next</a>
+<a0 onclick='window.gm.printTalkLink("div#select2","div#choice2a")'>Next</a>
 </div>
 <div id='choice2a' hidden>
 The rock slab is not so rock-solid and just as you turn around it begins to tip into the abyss. 
 Unfortunatly, your jump-ability isn't quite good enough. The slab drags you down with it.</br>
 At some point you see a massive rock coming onto you, reaching out with your hands to stop it squishing you.
 <div id='select3' >
-<a0 onclick='window.gm.printTalkLink($("div#select3")[0],"div#choice3a")'>Next</a>
+<a0 onclick='window.gm.printTalkLink("div#select3","div#choice3a")'>Next</a>
 </div>
 <div id='choice3a' hidden>
 But of course its futile trying to catch that crushing weight. </br>  
@@ -346,8 +346,8 @@ Someone made himself a home here. There is a small fireplace with burned up char
 As you snoop around you find a worn bag or satchel made of leather and fur.</br>
 It could give you some information about its owner if you take a look at it.</br>
 <div id='select1' >
-<a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1a")'>Peek inside</a>
-<a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1b")'>or dont</a>
+<a0 onclick='window.gm.printTalkLink("div#select1","div#choice1a")'>Peek inside</a>
+<a0 onclick='window.gm.printTalkLink("div#select1","div#choice1b")'>or dont</a>
 </div><div id='choice1a' hidden>
 After undoing the clasp, you carefuly peek inside the bag.
 <p class="tPC">'I'm not going to stick my hand in it - better safe then sorry.'</p>
@@ -364,7 +364,7 @@ Maybe you can ask someone for help.</br>
 </div>
 <div id='choice1b' hidden>
 Come on, what kind of adventurer are you? How will you ever get good loot if you dont open every chest and jar you find - or stinky old leatherbags.
-<a0 onclick='window.gm.printTalkLink($("div#choice1b")[0],"div#choice1a")'>Peek inside</a>
+<a0 onclick='window.gm.printTalkLink("div#choice1b","div#choice1a")'>Peek inside</a>
 </div>
 <% } else {%>
 <div>
@@ -401,7 +401,7 @@ The leaf canopy is dense but in some places bundles of sun rays reach the forest
 </br> 
 <% if(true) { %>
 <div id='select1' >
-<a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1a")'>Inspect stone circle</a>
+<a0 onclick='window.gm.printTalkLink("div#select1","div#choice1a")'>Inspect stone circle</a>
 </div>
 <div id='choice1a' hidden>
 Du gehst zu den übermannsgroßen Steinen. Es scheint hier etwas kühler zu sein und etwas Nebel liegt in der Luft.
@@ -442,7 +442,7 @@ You follow the path until after a curve a wooden bridge comes into view.
 The bridge spans about the canyon,a deep chasm between the forest and the eastern area thereof.</br>
 You carefully set a foot on it, so far it looks stable enough to carry ones weight.
 <div id='select1' >
-<a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1a")'>Go on</a>
+<a0 onclick='window.gm.printTalkLink("div#select1","div#choice1a")'>Go on</a>
 </div>
 <div id='choice1a' hidden>
 When you have half of the bridge behind you, a large figure steps into view.</br>
@@ -452,7 +452,7 @@ Squinching your eyes and slowing down your steps, you try to get a better view o
 <p class="tNPC1">"There is no sign yet beause...we where busy with...bridge repair. You give ...20coin and then you may pass."</p>
 <span class="tPC">'Looks more like highwayman then a craftsman'</span> you think to yourself. </br>
 <div id='select2' >
-<a0 onclick='window.gm.printTalkLink($("div#select2")[0],"div#choice2a")'>Cant pay</a>
+<a0 onclick='window.gm.printTalkLink("div#select2","div#choice2a")'>Cant pay</a>
 </div>
 <div id='choice2a' hidden>
 <p class='tPC'>"I cant pay you, I have nothing of value."</p>
@@ -460,7 +460,7 @@ Squinching your eyes and slowing down your steps, you try to get a better view o
 <p class="tPC">'I could tackle him. I bet he wouldnt take the risk of a fight if he is alone and cant expect some loot from me.'</p>
 <p class="tNPC1">"Nice collar. So you are a slave? Maybe you have fled from your master huh? I should just take you into custody for some reward - SLAVE."</p>
 <div id='select3' >
-<a0 onclick='window.gm.printTalkLink($("div#select3")[0],"div#choice3a");'>"I'm not a slave!"</a>
+<a0 onclick='window.gm.printTalkLink("div#select3","div#choice3a");'>"I'm not a slave!"</a>
 </div>
 <div id='choice3a' hidden>
 While you scream at your offender, he bolts forward trying to knock you over.</br>

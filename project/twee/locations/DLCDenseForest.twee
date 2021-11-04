@@ -61,7 +61,7 @@ There is a small clearing with a stone-plateu that has some kind of runes on it.
 <%if(window.story.state.DngDF.plumH3===1){%>
 A large purple fruit hangs on one branch of a broad-leafed tree. Its so heavy that it has pulled down the branch to a height where you can reach it with your hand.</br>
 <div id='select1' >
-<a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1a")'>harvest it</a>
+<a0 onclick='window.gm.printTalkLink("div#select1","div#choice1a")'>harvest it</a>
 </div><div id='choice1a' hidden>
 As you plug the fruit from the twig, the branch snaps back to its origin.</br>
 That doesnt surprise you. What surprises you is the giant hornett that flys buzzing angrily out of the trees crown toward you.

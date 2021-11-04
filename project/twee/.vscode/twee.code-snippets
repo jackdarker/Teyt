@@ -23,6 +23,11 @@
 			"prefix": "pp",
 			"body": ["<${1|p,span|} class=\"${2|dev,author,tPC,tNPC1,tNPC2|}\">${3:${TM_SELECTED_TEXT}}</$1>$0"]
 		},
+		"Insert talk": {
+			"prefix": "tk",
+			"body": ["<div class=\"speech ${1|dev,author,tPC,tNPC1,tNPC2|}\"><span class=\"avatar\"></span>$1<hr><br>${2:${TM_SELECTED_TEXT}}</div>"]
+
+		},
 		"Insert </br>": {
 			"prefix": "bb",
 			"body": ["</br>$0"]
@@ -31,8 +36,8 @@
 		"Insert <select": {
 			"prefix": "sel",
 			"body": ["<div id='select${1:idx}' >",
-			"<a0 onclick='window.gm.printTalkLink($(\"div#select${1:idx}\")[0],\"div#choice${1:idx}a\")'>click a</a>",
-			"<a0 onclick='window.gm.printTalkLink($(\"div#select${1:idx}\")[0],\"div#choice${1:idx}b\")'>click b</a>",
+			"<a0 onclick='window.gm.printTalkLink(\"div#select${1:idx}\")[0],\"div#choice${1:idx}a\")'>click a</a>",
+			"<a0 onclick='window.gm.printTalkLink(\"div#select${1:idx}\")[0],\"div#choice${1:idx}b\")'>click b</a>",
 			"</div><div id='choice${1:idx}a' hidden>","$0</div>","<div id='choice${1:idx}b' hidden>","</div>"]
 		},
 		"Insert <% if": {

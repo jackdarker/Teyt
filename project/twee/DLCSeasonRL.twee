@@ -12,7 +12,7 @@ If you are no longer interested in our service, click the link below to cancel y
 Note*: the upgrade from starter to experienced-member is free of cost; monthly subscription cost will be only 30$ instead of 2$ for your actual starter-membership."</p>
 <p class='tPC'>'WTF...they are going to charge me 30 bucks a month! Those fuckers. I cant afford that. There wasn't much good content update recently anyway. '</p>
 <div id='select1' >
-<a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1a")'>Call your friend Brad</a>
+<a0 onclick='window.gm.printTalkLink("div#select1","div#choice1a")'>Call your friend Brad</a>
 </div>
 <div id='choice1a' hidden>
 <p class='tPC'>"Hey Brad, did you also receive that mail from GameWorld with account-change?"</p>
@@ -155,7 +155,7 @@ As you got home from your daily chores and fiddling with the keys to your dorm, 
 "Pickup parcel from Melanie"</br>
 'Melanie? parcel?' You slap your forehead 'Ah yes, that might be the gaming equipment.'</br>
 <div id='select1' >
-<a0 onclick='window.gm.printTalkLink($("div#select1")[0],"div#choice1a")'>knock at her door</a>
+<a0 onclick='window.gm.printTalkLink("div#select1","div#choice1a")'>knock at her door</a>
 </div></div>
 <div id='choice1a' hidden>
 Melanie opens. You guess she is around 20-something. She alway seemed to be annoyed by something.</br>

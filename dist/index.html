@@ -33,6 +33,7 @@ var SVG=function(){"use strict";const t={},e=[];function n(e,i){if(Array.isArray
 <link rel="stylesheet" href="./css/solid.min.css">
 <link rel="stylesheet" href="./css/toasty.css">
 <link rel="stylesheet" href="./css/default.css" type="text/css" media="screen, projection">
+<link rel="stylesheet" href="./css/light.css" type="text/css" media="screen, projection">
 <link rel="alternate stylesheet" href="./css/dark.css" title='dark' type="text/css" media="screen, projection" disabled="">
 <script src="imagesMaps.js"></script><script src="imagesBattlers.js"></script>
 </head>
@@ -583,13 +584,20 @@ window.gm.util.bargraph=function(value,max,color){var text=arguments.length>3&&a
 if(file){var file_reader=new FileReader();if("image/svg+xml"==file.type){file_reader.readAsText(file);file_reader.addEventListener("load",function(){var file_content=file_reader.result;window.gm.util.insertSvg(file_content);}.bind(this),false);}}};/* Inserts SVG files into HTML document */window.gm.util.insertSvg=function(file_content){// insert SVG file into HTML page
 var svg_container=document.getElementById("svg_container");svg_container.innerHTML=file_content;// TODO: insert any SVG handler here
 // adds `click` event listener to inserted SVG to test modification of SVG file, for later saving
-if(this.event_handler){svg_container.firstChild.addEventListener("click",this.event_handler,false);}};//-------------------------------------------------
+if(this.event_handler){svg_container.firstChild.addEventListener("click",this.event_handler,false);}};/*
+* use this to merge multiple objects into one. If used with class-objects their methods will go missing!
+* this will properly deep-merge nested objects (not like Object.assign)
+*/window.gm.util.mergePlainObject=function(){var target={};// deep merge the object into the target object
+var merger=function merger(obj){for(var prop in obj){if(obj.hasOwnProperty(prop)){if(Object.prototype.toString.call(obj[prop])==='[object Object]'){// if the property is a nested object
+target[prop]=merge(target[prop],obj[prop]);}else{// for regular property
+target[prop]=obj[prop];}}}};// iterate through all objects and deep merge them with target
+for(var i=0;i<arguments.length;i++){merger(i<0||arguments.length<=i?undefined:arguments[i]);}return target;};//-------------------------------------------------
 // reimplement to setup the game !
 window.gm.initGame=function(forceReset){var NGP=arguments.length>1&&arguments[1]!==undefined?arguments[1]:null;window.gm.toasty=new Toasty();$(window).on('sm.passage.showing',function(event,eventObject){// Current Passage object
 $("tw-passage").fadeIn(500);//fade in if was previously faded out
 //console.log('showing '+eventObject.passage.name);
 });// Render the passage named HUD into the element todo replace with <%=%>??
-$(document).on('sm.passage.shown',function(ev,eventObject){window.gm.refreshSidePanel();});var s=window.story.state;//s in template is window.story.state from snowman!
+$(document).on('sm.passage.shown',function(ev,eventObject){window.gm.refreshSidePanel();window.gm.restorePage();});var s=window.story.state;//s in template is window.story.state from snowman!
 if(!window.gm.timeEvent||forceReset){window.gm.timeEvent=window.gm.util.PubSub();//subscribe to "change" event to receive time updates
 // !! make sure to reregister after load !
 }if(!s.quests||forceReset){s.quests=new QuestData();window.gm.quests=new QuestManager(window.gm.questDef);window.gm.quests.setQuestData(s.quests);window.gm.quests.pubSub.subscribe("change",function(data){window.gm.toasty.info("Quest "+data.questId+" updated");});}if(!s._gm||forceReset){s._gm={version:window.gm.getSaveVersion(),style:'default',//ss profile to use
@@ -605,7 +613,8 @@ dbgShowCombatRoll:false,//log combat calculation details
 dbgShowQuestInfo:false,//show internal quest state
 dbgShowMoreInfo:false};}if(!s.dng||forceReset){//stores the state of the current dungeon
 s.dng={id:"",floorId:"",roomId:""};}if(!s.tmp||forceReset){// storage of temporary variables; dont use them in stacking passages or deffered events      
-s.tmp={args:[],// can be used to set arguments before another passage is called (passage-arguments) 
+s.tmp={flags:[],//can store flags for showing/hidding page-elements 
+args:[],// can be used to set arguments before another passage is called (passage-arguments) 
 msg:''// memorizes a message to display when returning from _back-passage; please clear it when leaving the passage
 };}if(!s.GlobalChest||forceReset){var ch=new Character();ch.id="GlobalChest";ch.name="GlobalChest";ch.faction="Player";s.GlobalChest=ch;}if(!s.combat||forceReset){//see encounter & combat.js
 s.combat={enemyParty:[],//collection of enemy-chars involved 
@@ -677,11 +686,10 @@ window.gm.showDeferredEvent= function() {
 //if the new has no back-tag, the stack gets cleared
 window.gm.pushBackPassage=function(id){if(!window.story.state.hasOwnProperty("_gm"))return;//exist only after initGame
 if(window.story.state._gm.passageStack.length>0&&window.story.state._gm.passageStack[window.story.state._gm.passageStack.length-1]===id){//already pushed
-}else{window.story.state._gm.passageStack.push(id);}};//call on [_back_]-passages to get the previous passage
-window.gm.popBackPassage=function(){var pass=window.story.state._gm.passageStack.pop();if(!pass)throw new Error('nothing to pop from stack');return pass;};window.gm.pushOnHold=function(id){if(!window.story.state.hasOwnProperty("_gm"))return;//exist only after initGame
-if(window.story.state._gm.onholdStack.length>0){// && window.story.state._gm.defferedStack[window.story.state._gm.defferedStack.length-1].id===id){
-throw new Error('passage allready onHold: '+id);//already some pushed
-}else{window.story.state._gm.onholdStack.push({id:id,args:window.story.state.tmp.args});}};//
+}else{window.story.state._gm.passageStack.push({id:id,flags:window.story.state.tmp.flags});}};//call on [_back_]-passages to get the previous passage
+window.gm.popBackPassage=function(){var pass=window.story.state._gm.passageStack.pop();if(!pass)throw new Error('nothing to pop from stack');window.story.state.tmp.flags=pass.flags;return pass.id;};window.gm.pushOnHold=function(id){if(!window.story.state.hasOwnProperty("_gm"))return;//exist only after initGame
+if(window.story.state._gm.onholdStack.length>0){throw new Error('passage allready onHold: '+id);//already some pushed
+}else{window.story.state._gm.onholdStack.push(c);}};//
 window.gm.popOnHold=function(){var pass=window.story.state._gm.onholdStack.pop();if(!pass)throw new Error('nothing on hold to pop.');window.story.state.tmp.args=pass.args;return pass.id;};//overriding show:
 //- to enable back-link
 //- todo to intercept with deffered events
@@ -695,19 +703,20 @@ tagsnext.indexOf('_nosave_')<0&&tagsnext.indexOf('_nodeffered_')<0){//before ent
 if(idOrName!==''){//if not continue-cmd
 window.gm.pushOnHold(idOrName);if(tagsnext.indexOf('_back_')>=0&&window.passage.name!==idOrName){//push on stack but only if not re-showing itself
 window.gm.pushBackPassage(window.passage.name);//todo do we need extra back-stack for onhold?
-}}next=window.gm.popDeferredEvent();nextp=window.story.passage(next);tagsnext=nextp.tags;}else if(inGame&&idOrName===''&&window.story.state._gm.onholdStack.length>0){//continue event onhold
+}}next=window.gm.popDeferredEvent();nextp=window.story.passage(next);tagsnext=nextp.tags;window.story.state.tmp.flags={};}else if(inGame&&idOrName===''&&window.story.state._gm.onholdStack.length>0){//continue event onhold
 next=window.gm.popOnHold();if(next==='_back_'){//going back
 next=window.gm.popBackPassage();}nextp=window.story.passage(next);tagsnext=nextp.tags;}else if(idOrName==='_back_'){//going back
 next=window.gm.popBackPassage();tagsnext=window.story.passage(next).tags;}else{//going forward
 nextp=window.story.passage(next);if(!nextp)throw new Error('no such passage: '+next);tagsnext=nextp.tags;namenext=nextp.name;if(tagsnext.indexOf('_back_')>=0){//push on stack but only if not re-showing itself
-namenow=window.passage.name;if(namenext!=namenow)window.gm.pushBackPassage(namenow);}else if(inGame){//if not in _back_-passage, drop the _back_-stack
-window.story.state._gm.passageStack.splice(0,window.story.state._gm.passageStack.length);}//todo not sure about this: a deffered event should not link to normal passages because this would disentangle the original story-chain
+namenow=window.passage.name;if(namenext!=namenow)window.gm.pushBackPassage(namenow);window.story.state.tmp.flags={};}else if(inGame){//if not in _back_-passage, drop the _back_-stack
+window.story.state._gm.passageStack.splice(0,window.story.state._gm.passageStack.length);window.story.state.tmp.flags={};}//todo not sure about this: a deffered event should not link to normal passages because this would disentangle the original story-chain
 //this I think could cause issues and should be detected and throw an error
 //uncoment the following to bypass this 
 //    window.story.state._gm.onholdStack.splice(0,window.story.state._gm.onholdStack.length);
 }if(inGame){//disable save-menu on _nosave_-tag 
 window.story.state._gm.nosave=tagsnext.indexOf('_nosave_')>=0;}noHistory=true;//the engines object causes problems with history, namely refToParent
-_origStoryShow.call(window.story,next,noHistory);};//-----------------------------------------------------------------------------
+_origStoryShow.call(window.story,next,noHistory);};/* when returning from back-passage restore view by hiding/unhiding programatical modified elements
+*/window.gm.restorePage=function(){if(window.story.state.tmp){var elmts=Object.keys(window.story.state.tmp.flags);for(var i=0;i<elmts.length;i++){if(window.story.state.tmp.flags[elmts[i]]==='hidden'){$(elmts[i])[0].setAttribute("hidden","");}else if(window.story.state.tmp.flags[elmts[i]]==='unhide'){$(elmts[i])[0].removeAttribute("hidden");$(elmts[i])[0].scrollIntoView();}}}};//-----------------------------------------------------------------------------
 //changes the active player and will add him to party!
 window.gm.switchPlayer=function(playername){var s=window.story.state;window.gm.player=s[playername];s._gm.activePlayer=playername;window.gm.addToParty(playername);};window.gm.removeFromParty=function(name){var s=window.story.state;var i=s._gm.playerParty.indexOf(name);if(i>=0)s._gm.playerParty.splice(i,1);};//adds the character to the party
 //there has to be a CharacterObject for window.story.state[name]
@@ -730,7 +739,8 @@ window.gm.onSelect=function(elmnt,ex_choice,ex_info){var all=$(ex_choice);//[0].
 for(var i=0;i<all.length;i++){if(all[i].id===elmnt.id){all[i].classList.add("selected");}else all[i].classList.remove("selected");}all=$(ex_info)[0].children;for(var i=0;i<all.length;i++){if(all[i].id===elmnt.id){all[i].hidden=false;}else all[i].hidden=true;}};//call this onclick to make the connected element vanish and to unhide another one (if the passage is revisited the initial state will be restored)
 //unhidethis needs to be jquery-path to a div,span,.. that is initially set to hidden
 //cb can be a function(elmt) that gets called
-window.gm.printTalkLink=function(elmt,unhideThis){var cb=arguments.length>2&&arguments[2]!==undefined?arguments[2]:null;elmt.toggleAttribute("hidden");if(cb!==null)cb(elmt);$(unhideThis)[0].toggleAttribute("hidden");$(unhideThis)[0].scrollIntoView({behavior:"smooth"});};//prints the same kind of link like [[Next]] but can be called from code
+//todo: if navigating to a back-page and return, the initial page will be reset to default; how to memorize and restore the hidden-flags
+window.gm.printTalkLink=function(elmt,unhideThis){var cb=arguments.length>2&&arguments[2]!==undefined?arguments[2]:null;$(elmt)[0].setAttribute("hidden","");if(cb!==null)cb($(elmt)[0]);$(unhideThis)[0].removeAttribute("hidden");$(unhideThis)[0].scrollIntoView({behavior:"smooth"});window.story.state.tmp.flags[elmt]='hidden',window.story.state.tmp.flags[unhideThis]='unhide';};//prints the same kind of link like [[Next]] but can be called from code
 window.gm.printPassageLink=function(label,target){return"<a href=\"javascript:void(0)\" data-passage=\""+target+"\">"+label+"</a></br>";};//prints a link where target is a expression called onClick
 window.gm.printLink=function(label,target){return"<a href=\"javascript:void(0)\" onclick=\""+target+"\">"+label+"</a></br>";};//prints a link that when clicked picksup an item and places it in the inventory, if itemleft is <0, no link appears
 window.gm.printPickupAndClear=function(itemid,desc,itemleft){var cbAfterPickup=arguments.length>3&&arguments[3]!==undefined?arguments[3]:null;var elmt='';var s=window.story.state;if(!(itemleft>0))return elmt;var desc2=desc+" ("+itemleft+" left)";var msg='took '+itemid;elmt+="<a0 id='"+itemid+"' onclick='(function($event){window.gm.pickupAndClear(\""+itemid+"\", \""+desc+"\","+itemleft+","+cbAfterPickup+")})(this);'>"+desc2+"</a></br>";return elmt;};window.gm.pickupAndClear=function(itemid,desc,itemleft){var cbAfterPickup=arguments.length>3&&arguments[3]!==undefined?arguments[3]:null;window.gm.player.Inv.addItem(new window.storage.constructors[itemid]());if(cbAfterPickup)cbAfterPickup();window.gm.refreshAllPanel();};//prints an item with description; used in inventory
@@ -1024,15 +1034,36 @@ div.parentNode.removeChild(div);};fileReader.onerror=function(){alert(fileReader
 var hash=LZString.compressToBase64(JSON.stringify({state:window.story.state,history:window.story.history,checkpointName:window.story.checkpointName}));var ahash=LZString.compressToBase64(window.storage.getAchievements());var options={year:"numeric",month:"short",day:"numeric",hour:"numeric",minute:"numeric",second:"numeric"};var info=window.gm.player.location+' - '+new Intl.DateTimeFormat("default",options).format(new Date());//add storyname to avoid conflict with other games on same host (see Document.origin)
 window.localStorage.setItem(window.story.name+slot.concat('info'),info);window.localStorage.setItem(window.story.name+slot,hash);window.localStorage.setItem(window.story.name+'achievements',ahash);return info;},loadBrowser:function loadBrowser(slot){var hash,info;if(window.storage.ok()){//not possible to save object {info,hash} ??
 hash=window.localStorage.getItem(window.story.name+slot);info=window.storage.getSaveInfo(window.story.name+slot);window.storage.rebuildFromSave(hash,true);var ahash=window.localStorage.getItem(window.story.name+'achievements');window.storage.loadAchivementsFromBrowser();}return info;},rebuildFromSave:function rebuildFromSave(hash,compressed){if(!compressed)hash=LZString.compressToBase64(hash);//copied from window.story.restore because reviver  //window.story.restore(hash) ;
-var save=JSON.parse(LZString.decompressFromBase64(hash),window.storage.Reviver);//window.story.state = save.state;
-//todo doesnt work because nested objects are copied by reference, not sub-elements (how to deep copy??): window.story.state=Object.assign(window.story.state,save.state );
-function merge(target){// create a new object
-//let target = {};
-// deep merge the object into the target object
-var merger=function merger(obj){for(var prop in obj){if(obj.hasOwnProperty(prop)){if(Object.prototype.toString.call(obj[prop])==='[object Object]'){// if the property is a nested object
-target[prop]=merge(target[prop],obj[prop]);}else{// for regular property
-target[prop]=obj[prop];}}}};// iterate through all objects and deep merge them with target
-for(var i=0;i<(arguments.length<=1?0:arguments.length-1);i++){merger(i+1<1||arguments.length<=i+1?undefined:arguments[i+1]);}return target;};window.story.state=merge(window.story.state,save.state);window.story.history=save.history;window.story.checkpointName=save.checkpointName;window.gm.rebuildObjects();// this is for handling version-upgrades
+var save=JSON.parse(LZString.decompressFromBase64(hash),window.storage.Reviver);window.story.state=save.state;//todo doesnt work because nested objects are copied by reference, not sub-elements; this would replace already constructed object with old shit: window.story.state=Object.assign(window.story.state,save.state );
+/*
+       function merge(target,...arg) {
+        // create a new object
+        //let target = {}; todo dont create plain-object, we need proper class-object!
+        // deep merge the object into the target object
+          const merger = (obj) => {
+              for (let prop in obj) {
+                  if (obj.hasOwnProperty(prop)) {
+                      if (Object.prototype.toString.call(obj[prop]) === '[object Object]') {
+                          // if the property is a nested object
+                          target[prop] = merge(target[prop], obj[prop]);  <- todo doesnt work because target["Breast"] might not yet exist
+          !TODO! Reviver works for class-objects because it merges save into constructed object
+          but it doesnt work for plain objects because they dont use reviver
+          ergo: anything needs to be a class or I need special post-load-operation to update plain object to new version
+          ps.: if old saved object has propertys that are not present in new version, they will be attached to the newly created object too and create clutter
+                      } else {
+                          // for regular property
+                          target[prop] = obj[prop];
+                      }
+                  }
+              }
+          };
+          // iterate through all objects and deep merge them with target
+          for (let i = 0; i < arg.length; i++) {
+              merger(arg[i]);
+          }
+          return target;
+      };
+      window.story.state = merge(window.story.state,save.state);*/window.story.history=save.history;window.story.checkpointName=save.checkpointName;window.gm.rebuildObjects();// this is for handling version-upgrades
 window.gm.postVictory();//teleport into dng or other location   
 },getAchievements:function getAchievements(){var ahash=JSON.stringify({achievements:window.gm.achievements});return ahash;},loadAchivementsFromBrowser:function loadAchivementsFromBrowser(){if(window.storage.ok()){var ahash=window.localStorage.getItem(window.story.name+'achievements');if(ahash!==null)window.storage.rebuildAchievements(ahash,true);}},rebuildAchievements:function rebuildAchievements(ahash,compressed){if(!compressed)ahash=LZString.compressToBase64(ahash);var achievements=JSON.parse(LZString.decompressFromBase64(ahash)).achievements;//it might be necessary to adapt the achievements here if a newer game-version is started !
 var _keys=Object.keys(window.gm.achievements);for(var i=0;i<_keys.length;i++){if(achievements.hasOwnProperty(_keys[i])){var _old=achievements[_keys[i]];var _now=window.gm.achievements[_keys[i]];if(_old>_now)window.gm.achievements[_keys[i]]=_old;//merge loaded achievements into present
@@ -1759,9 +1790,11 @@ s.PlayerRL=_ch5;}/*let dngs = [BeeHive,ShatteredCity]; //add your dngs here !
       if (!s.dng[el.name]||forceReset) { 
         s.dng[el.name] = el.persistentDngDataTemplate();
       }
-    } */if(!s.DngSY||forceReset){s.DngSY={remainingNights:0,dngLevel:0};}if(!s.DngDF||forceReset){s.DngDF={visitedTiles:[],mapReveal:0,dngLevel:1,plumH3:0};}if(!s.DngAM||forceReset){s.DngAM={visitedTiles:[],mapReveal:0,dngLevel:1};}window.gm.switchPlayer("PlayerRL");//take over flags for newgameplus
+    } */window.gm.initGameFlags(forceReset,NGP);window.gm.switchPlayer("PlayerRL");//take over flags for newgameplus
 if(NGP){window.story.state.vars.crowBarLeft=NGP.crowBarLeft;}NGP=null;//release memory
-};// lookup function for sidebar icon
+};window.gm.initGameFlags=function(forceReset){var NGP=arguments.length>1&&arguments[1]!==undefined?arguments[1]:null;var s=window.story.state;if(forceReset){s.DngDF=s.DngAM=s.DngSY=null;}var DngDF={visitedTiles:[],mapReveal:0,dngLevel:1,plumH3:0};var DngSY={remainingNights:0,dngLevel:0};var DngAM={visitedTiles:[],mapReveal:0,dngLevel:1};var DngCV={visitedTiles:[],mapReveal:0,dngLevel:1,bathedInLake:0,gotWater:0};//see comment in rebuildFromSave why this is done
+s.DngDF=window.gm.util.mergePlainObject(DngDF,s.DngDF);s.DngAM=window.gm.util.mergePlainObject(DngAM,s.DngAM);s.DngSY=window.gm.util.mergePlainObject(DngSY,s.DngSY);s.DngCV=window.gm.util.mergePlainObject(DngCV,s.DngCV);};// update non-class-objects of previous savegame
+var _origRebuildObjects=window.gm.rebuildObjects;window.gm.rebuildObjects=function(){var s=window.story.state;_origRebuildObjects();window.gm.initGameFlags(false,null);};// lookup function for sidebar icon
 window.gm.getSidebarPic=function(){//todo display doll ??
 if(window.story.state.vars.inVR){return"assets/icons/icon_swordspade.svg";}return'assets/icons/icon_cityskyline.svg';};// lookup function for scene background ( 640x300 )
 window.gm.getScenePic=function(id){if(id==='Garden'||id==='Park')return'assets/bg/bg_park.png';if(id==='Bedroom'||id==='Your Bedroom')return'assets/bg/bg_bedroom.png';if(id.slice(0,7)==='AM_Lv2_')return'assets/bg/bg_dungeon_2.png';return'assets/bg_park.png';//return('assets/bg/bg_VR_1.png');//todo placehodler
@@ -1777,7 +1810,12 @@ window.gm.dng.teleport(floor,room);}else{window.story.show(window.gm.player.loca
 }};//call this after your onDefeat/onSubmit-scene to respawn at respawn-point; cleansup dng-variables
 window.gm.postDefeat=function(){window.story.state.dng.id="";window.gm.dng=null;window.gm.respawn();};//after passing out: heal player and remove inventory {keepInventory=false,location=''}
 window.gm.respawn=function(){var conf=arguments.length>0&&arguments[0]!==undefined?arguments[0]:{keepInventory:false};window.gm.player.Stats.increment("energy",9999);window.gm.player.Stats.increment("will",9999);window.gm.player.Stats.increment("health",9999);if(!conf.keepInventory){//remove inentory and outfit that is not questitem, cursed or permanent
-for(var i=window.gm.player.Outfit.list.length-1;i>=0;i-=1){var _el8=window.gm.player.Outfit.list[i];if(_el8.item&&_el8.item.lossOnRespawn)window.gm.player.Outfit.removeItem(_el8.id,true);}for(var _i5=window.gm.player.Wardrobe.list.length-1;_i5>=0;_i5-=1){var _el9=window.gm.player.Wardrobe.list[0];if(_el9.item.lossOnRespawn)window.gm.player.Wardrobe.removeItem(_el9.id,_el9.count);}for(var _i6=window.gm.player.Inv.list.length-1;_i6>=0;_i6-=1){var _el10=window.gm.player.Inv.list[_i6];if(_el10.item.lossOnRespawn)window.gm.player.Inv.removeItem(_el10.id,_el10.count);}}if(window.gm.quests.getMilestoneState("qDiedAgain").id===2){window.story.show('YouDiedOnce');}else if([100,200,300].includes(window.gm.quests.getMilestoneState("qBondageKink").id)){window.story.show('YouDiedWithCursedGear');}else{var robes=new window.storage.constructors['RobesZealot']();window.gm.makeCursedItem(robes,{minItems:2,convert:'HarnessRubber'});window.gm.player.Wardrobe.addItem(robes);window.gm.player.Outfit.addItem(robes);robes=new window.storage.constructors['Briefs']();window.gm.player.Wardrobe.addItem(robes);window.gm.player.Outfit.addItem(robes);var staff=new window.storage.constructors['StaffWodden']();window.gm.player.Inv.addItem(staff);window.gm.player.Outfit.addItem(staff);window.story.show(window.story.state.vars.spawnAt);}};//sets current player location and advances time
+for(var i=window.gm.player.Outfit.list.length-1;i>=0;i-=1){var _el8=window.gm.player.Outfit.list[i];if(_el8.item&&_el8.item.lossOnRespawn)window.gm.player.Outfit.removeItem(_el8.id,true);}for(var _i5=window.gm.player.Wardrobe.list.length-1;_i5>=0;_i5-=1){var _el9=window.gm.player.Wardrobe.list[0];if(_el9.item.lossOnRespawn)window.gm.player.Wardrobe.removeItem(_el9.id,_el9.count);}for(var _i6=window.gm.player.Inv.list.length-1;_i6>=0;_i6-=1){var _el10=window.gm.player.Inv.list[_i6];if(_el10.item.lossOnRespawn)window.gm.player.Inv.removeItem(_el10.id,_el10.count);}}/*if(window.gm.quests.getMilestoneState("qDiedAgain").id===2) {
+    window.story.show('YouDiedOnce'); 
+  } else if([100,200,300].includes(window.gm.quests.getMilestoneState("qBondageKink").id)){
+      window.story.show('YouDiedWithCursedGear');
+  } else {*/var robes=new window.storage.constructors['RobesZealot']();window.gm.makeCursedItem(robes,{minItems:2,convert:'HarnessRubber'});window.gm.player.Wardrobe.addItem(robes);window.gm.player.Outfit.addItem(robes);robes=new window.storage.constructors['Briefs']();window.gm.player.Wardrobe.addItem(robes);window.gm.player.Outfit.addItem(robes);var staff=new window.storage.constructors['StaffWodden']();window.gm.player.Inv.addItem(staff);window.gm.player.Outfit.addItem(staff);window.story.show(window.story.state.vars.spawnAt);//}
+};//sets current player location and advances time
 //call this in passage header
 window.gm.moveHere=function(){var time=arguments.length>0&&arguments[0]!==undefined?arguments[0]:15;if(window.gm.player.location!==window.passage.name){window.gm.player.location=window.passage.name;var s=window.story.state.vars;switch(window.passage.name){//when crossing a certain point, set spawnpoint
 case'ForestBorder':s.spawnAt='ForestRespawnPodExit';break;case'VillageMarketPlace':s.spawnAt='VillageRespawnPodExit';break;case'AM_Lv2_Start':s.spawnAt='AM_Lv2_Start';break;default:break;}window.gm.addTime(time);}};window.gm.rollExploreCity=function(){var s=window.story.state;var places=[];var r=_.random(0,100);//todo:depending of your actual location you have a chance to find connected locations or end up in a known one
@@ -1968,7 +2006,7 @@ output=output[0].toUpperCase()+output.substr(1);}}else{if(pron==='he'||pron==='s
 var LighterDad=/*#__PURE__*/function(_Item2){_inherits(LighterDad,_Item2);var _super39=_createSuper(LighterDad);function LighterDad(){var _this37;_classCallCheck(this,LighterDad);_this37=_super39.call(this,'LighterDad');_this37.addTags([window.gm.ItemTags.Quest]);return _this37;}_createClass(LighterDad,[{key:"toJSON",value:function toJSON(){return window.storage.Generic_toJSON("LighterDad",this);}},{key:"desc",get:function get(){return'I got this lighter from my real dad.';}}],[{key:"fromJSON",value:function fromJSON(value){return window.storage.Generic_fromJSON(LighterDad,value.data);}}]);return LighterDad;}(Item);;var Money=/*#__PURE__*/function(_Item3){_inherits(Money,_Item3);var _super40=_createSuper(Money);function Money(){var _this38;_classCallCheck(this,Money);_this38=_super40.call(this,'Money');_this38.addTags([window.gm.ItemTags.Money]);return _this38;}_createClass(Money,[{key:"toJSON",value:function toJSON(){return window.storage.Generic_toJSON("Money",this);}},{key:"desc",get:function get(){return'shiny,clinky coin.';}}],[{key:"fromJSON",value:function fromJSON(value){return window.storage.Generic_fromJSON(Money,value.data);}}]);return Money;}(Item);;var LaptopPS=/*#__PURE__*/function(_Item4){_inherits(LaptopPS,_Item4);var _super41=_createSuper(LaptopPS);function LaptopPS(){var _this39;_classCallCheck(this,LaptopPS);_this39=_super41.call(this,'LaptopPS');_this39.addTags([window.gm.ItemTags.Quest]);return _this39;}_createClass(LaptopPS,[{key:"toJSON",value:function toJSON(){return window.storage.Generic_toJSON("LaptopPS",this);}},{key:"desc",get:function get(){return'Power converter for laptop.';}}],[{key:"fromJSON",value:function fromJSON(value){return window.storage.Generic_fromJSON(LaptopPS,value.data);}}]);return LaptopPS;}(Item);;var Dildo=/*#__PURE__*/function(_Item5){_inherits(Dildo,_Item5);var _super42=_createSuper(Dildo);function Dildo(){var _this40;_classCallCheck(this,Dildo);_this40=_super42.call(this,'Dildo');_this40.price=_this40.basePrice=20;_this40.style=0;return _this40;}_createClass(Dildo,[{key:"toJSON",value:function toJSON(){return window.storage.Generic_toJSON("Dildo",this);}},{key:"style",set:function set(style){this._style=style;if(style===0)this.id='DildoSmall',this.name='small dildo';else if(style===100)this.id='DildoMedium',this.name='medium dildo';else throw new Error(this.id+' doesnt know '+style);},get:function get(){return this._style;}},{key:"desc",get:function get(){var msg='A dildo made from rubbery plastic, smaller than an average human dick.';switch(this._style){case 100:msg='A medium sized pink dong.';break;default:}return msg;}}],[{key:"fromJSON",value:function fromJSON(value){return window.storage.Generic_fromJSON(Dildo,value.data);}}]);return Dildo;}(Item);var Lube=/*#__PURE__*/function(_Item6){_inherits(Lube,_Item6);var _super43=_createSuper(Lube);function Lube(){var _this41;_classCallCheck(this,Lube);_this41=_super43.call(this,'Lube');_this41.addTags([window.gm.ItemTags.Ingredient]);_this41.price=_this41.basePrice=4;return _this41;}_createClass(Lube,[{key:"toJSON",value:function toJSON(){return window.storage.Generic_toJSON("Lube",this);}},{key:"desc",get:function get(){return'Slippery lubricant for personal use.';}}],[{key:"fromJSON",value:function fromJSON(value){return window.storage.Generic_fromJSON(Lube,value.data);}}]);return Lube;}(Item);var Battery=/*#__PURE__*/function(_Item7){_inherits(Battery,_Item7);var _super44=_createSuper(Battery);function Battery(){var _this42;_classCallCheck(this,Battery);_this42=_super44.call(this,'Battery');_this42.addTags([window.gm.ItemTags.Ingredient]);_this42.price=_this42.basePrice=3;return _this42;}_createClass(Battery,[{key:"toJSON",value:function toJSON(){return window.storage.Generic_toJSON("Battery",this);}},{key:"desc",get:function get(){return'Provides electricity for devices.';}}],[{key:"fromJSON",value:function fromJSON(value){return window.storage.Generic_fromJSON(Battery,value.data);}}]);return Battery;}(Item);/////////////////////////////////////////////////////////////////
 //VR-Items
 var GameVoucher=/*#__PURE__*/function(_Item8){_inherits(GameVoucher,_Item8);var _super45=_createSuper(GameVoucher);function GameVoucher(){var _this43;_classCallCheck(this,GameVoucher);_this43=_super45.call(this,'GameVoucher');_this43.addTags([window.gm.ItemTags.Money]);_this43.price=_this43.basePrice=100;_this43.style=0;_this43.lossOnRespawn=false;return _this43;}_createClass(GameVoucher,[{key:"toJSON",value:function toJSON(){return window.storage.Generic_toJSON("GameVoucher",this);}},{key:"style",set:function set(style){this._style=style;if(style===0)this.id='BronzeCoupon',this.name='BronzeCoupon';else if(style===100)this.id='SilverCoupon',this.name='SilverCoupon';else throw new Error(this.id+' doesnt know '+style);},get:function get(){return this._style;}},{key:"desc",get:function get(){var msg='bronze-voucher for ingame-shop';switch(this._style){case 100:msg='silver-voucher for ingame-shop';break;default:}return msg;}}],[{key:"fromJSON",value:function fromJSON(value){return window.storage.Generic_fromJSON(GameVoucher,value.data);}}]);return GameVoucher;}(Item);;var Ingredient=/*#__PURE__*/function(_Item9){_inherits(Ingredient,_Item9);var _super46=_createSuper(Ingredient);function Ingredient(){var _this44;_classCallCheck(this,Ingredient);_this44=_super46.call(this,'Ingredient');_this44.addTags([window.gm.ItemTags.Ingredient]);_this44.price=_this44.basePrice=10;_this44.style=0;_this44.lossOnRespawn=true;return _this44;}_createClass(Ingredient,[{key:"toJSON",value:function toJSON(){return window.storage.Generic_toJSON("Ingredient",this);}},{key:"style",set:function set(style){//instead of creating full class for every useless junk I use this and just add variable that will be restored after load
-this._style=style;if(style===0)this.id='ApocaFlower',this.name='ApocaFlower';else if(style===10)this.id=this.name='PurpleBerry';else if(style===20)this.id=this.name='BloatedMushroom';else if(style===30)this.id=this.name='SquishedLeech';else if(style===40)this.id=this.name='WolfTooth';else if(style===50)this.id=this.name='DryadVine';else if(style===60)this.id=this.name='Dimetrium';else if(style===70)this.id=this.name='GiantPlum';else throw new Error(this.id+' doesnt know '+style);},get:function get(){return this._style;}},{key:"desc",get:function get(){var msg='';switch(this._style){case 0:msg='yellow bluish flower';break;case 10:msg='purple berrys grown in the forest';break;case 20:msg='mushrooms from a cave';break;case 30:msg='I dont wanna carry that around';break;case 40:msg='Some canines from a canine';break;case 50:msg='fibers of a sturdy plant';break;case 60:msg='a arcane metal';break;case 70:msg='a huge purple plum, bigger than your fist';break;default:throw new Error(this.id+' doesnt know '+style);}return msg;}}],[{key:"fromJSON",value:function fromJSON(value){return window.storage.Generic_fromJSON(Ingredient,value.data);}}]);return Ingredient;}(Item);var SoulGem=/*#__PURE__*/function(_Item10){_inherits(SoulGem,_Item10);var _super47=_createSuper(SoulGem);function SoulGem(){var _this45;_classCallCheck(this,SoulGem);_this45=_super47.call(this,'SoulGem');_this45.addTags([window.gm.ItemTags.Ingredient]);_this45.price=_this45.basePrice=100;_this45.style=0;_this45.lossOnRespawn=true;return _this45;}_createClass(SoulGem,[{key:"toJSON",value:function toJSON(){return window.storage.Generic_toJSON("SoulGem",this);}},{key:"style",set:function set(style){//instead of creating full class for every useless junk I use this and just add variable that will be restored after load
+this._style=style;if(style===0)this.id='ApocaFlower',this.name='ApocaFlower';else if(style===10)this.id=this.name='PurpleBerry';else if(style===20)this.id=this.name='BloatedMushroom';else if(style===30)this.id=this.name='SquishedLeech';else if(style===40)this.id=this.name='WolfTooth';else if(style===50)this.id=this.name='DryadVine';else if(style===60)this.id=this.name='Dimetrium';else if(style===70)this.id=this.name='GiantPlum';else if(style===80)this.id=this.name='EmptyGlas';else if(style===90)this.id=this.name='GlasCrystalWater';else throw new Error(this.id+' doesnt know '+style);},get:function get(){return this._style;}},{key:"desc",get:function get(){var msg='';switch(this._style){case 0:msg='yellow bluish flower';break;case 10:msg='purple berrys grown in the forest';break;case 20:msg='mushrooms from a cave';break;case 30:msg='I dont wanna carry that around';break;case 40:msg='Some canines from a canine';break;case 50:msg='fibers of a sturdy plant';break;case 60:msg='a arcane metal';break;case 70:msg='a huge purple plum, bigger than your fist';break;case 80:msg='an empty drinking glas';break;case 90:msg='a glas filled with crystal clear water';break;default:throw new Error(this.id+' doesnt know '+style);}return msg;}}],[{key:"fromJSON",value:function fromJSON(value){return window.storage.Generic_fromJSON(Ingredient,value.data);}}]);return Ingredient;}(Item);var SoulGem=/*#__PURE__*/function(_Item10){_inherits(SoulGem,_Item10);var _super47=_createSuper(SoulGem);function SoulGem(){var _this45;_classCallCheck(this,SoulGem);_this45=_super47.call(this,'SoulGem');_this45.addTags([window.gm.ItemTags.Ingredient]);_this45.price=_this45.basePrice=100;_this45.style=0;_this45.lossOnRespawn=true;return _this45;}_createClass(SoulGem,[{key:"toJSON",value:function toJSON(){return window.storage.Generic_toJSON("SoulGem",this);}},{key:"style",set:function set(style){//instead of creating full class for every useless junk I use this and just add variable that will be restored after load
 this._style=style;if(style===0)this.id=this.name='TinySoulGem';else if(style===10)this.id=this.name='TinyBlackSoulGem';else if(style===20)this.id=this.name='SmallSoulGem';else if(style===30)this.id=this.name='SmallBlackSoulGem';else throw new Error(this.id+' doesnt know '+style);},get:function get(){return this._style;}},{key:"desc",get:function get(){var msg=this.name;return msg;}}],[{key:"fromJSON",value:function fromJSON(value){return window.storage.Generic_fromJSON(Ingredient,value.data);}}]);return SoulGem;}(Item);var Rope=/*#__PURE__*/function(_Item11){_inherits(Rope,_Item11);var _super48=_createSuper(Rope);function Rope(){var _this46;_classCallCheck(this,Rope);_this46=_super48.call(this,'Rope');_this46.addTags([window.gm.ItemTags.Tool]);_this46.price=_this46.basePrice=10;_this46.style=0;_this46.lossOnRespawn=true;return _this46;}_createClass(Rope,[{key:"toJSON",value:function toJSON(){return window.storage.Generic_toJSON("Rope",this);}},{key:"style",set:function set(style){//instead of creating full class for every useless junk I use this and just add variable that will be restored after load
 this._style=style;if(style===0)this.id=this.name='Rope';else if(style===10)this.id='RopeSturdy',this.name='Sturdy Rope';else throw new Error(this.id+' doesnt know '+style);},get:function get(){return this._style;}},{key:"desc",get:function get(){var msg=this.name;return msg;}}],[{key:"fromJSON",value:function fromJSON(value){return window.storage.Generic_fromJSON(Rope,value.data);}}]);return Rope;}(Item);var KeyRestraint=/*#__PURE__*/function(_Item12){_inherits(KeyRestraint,_Item12);var _super49=_createSuper(KeyRestraint);function KeyRestraint(){var _this47;_classCallCheck(this,KeyRestraint);_this47=_super49.call(this,'KeyRestraint');_this47.style=0;_this47.lossOnRespawn=true;return _this47;}_createClass(KeyRestraint,[{key:"toJSON",value:function toJSON(){return window.storage.Generic_toJSON("KeyRestraint",this);}},{key:"style",set:function set(style){this._style=style;if(style===0)this.id=this.name='KeyRestraintA';else if(style===10)this.id=this.name='KeyRestraintB';else throw new Error(this.id+' doesnt know '+style);},get:function get(){return this._style;}},{key:"desc",get:function get(){var msg=this.name;return msg;}}],[{key:"fromJSON",value:function fromJSON(value){return window.storage.Generic_fromJSON(KeyRestraint,value.data);}}]);return KeyRestraint;}(Item);var FlashBang=/*#__PURE__*/function(_Item13){_inherits(FlashBang,_Item13);var _super50=_createSuper(FlashBang);function FlashBang(){_classCallCheck(this,FlashBang);return _super50.call(this,'FlashBang');}_createClass(FlashBang,[{key:"toJSON",value:function toJSON(){return window.storage.Generic_toJSON("FlashBang",this);}},{key:"targetFilter",//context is the skillUseItem calling this
 value:function targetFilter(targets,context){if(!window.gm.combat.inCombat())return[];//to use skill-targetfilter we need an instance of skill bound to the caster  - todo this is ugly
@@ -1989,7 +2027,7 @@ window.storage.registerConstructor(FlashBang);window.storage.registerConstructor
 ItemsLib['Money']=function(){return new Money();};ItemsLib['LighterDad']=function(){return new LighterDad();};ItemsLib['LaptopPS']=function(){return new LaptopPS();};ItemsLib['Battery']=function(){return new Battery();};ItemsLib['Dildo_small']=function(){var x=new Dildo();return x;};// consumables
 ItemsLib['Lube']=function(){return new Lube();};ItemsLib['CanOfCoffee']=function(){return new CanOfCoffee();};ItemsLib['SimpleFood']=function(){return new SimpleFood();};ItemsLib['FlashBang']=function(){return new FlashBang();};//healthpotion
 ItemsLib['HealthPotion']=function(){var x=new HealthPotion();return x;};ItemsLib['HealthPotionSmall']=function(){var x=new HealthPotion();x.style=10;return x;};ItemsLib['HorsePotion']=function(){var x=new HorsePotion();return x;};ItemsLib['CarrotJuice']=function(){var x=new HorsePotion();x.style=10;return x;};ItemsLib['Vaginarium']=function(){var x=new RegenderPotion();return x;};ItemsLib['Penilium']=function(){var x=new RegenderPotion();x.style=10;return x;};//Ingredient
-ItemsLib['SquishedLeech']=function(){var x=new Ingredient();x.style=30;return x;};ItemsLib['BloatedMushroom']=function(){var x=new Ingredient();x.style=20;return x;};ItemsLib['PurpleBerry']=function(){var x=new Ingredient();x.style=10;return x;};ItemsLib['WolfTooth']=function(){var x=new Ingredient();x.style=40;return x;};ItemsLib['ApocaFlower']=function(){var x=new Ingredient();return x;};ItemsLib['DryadVine']=function(){var x=new Ingredient();x.style=50;return x;};ItemsLib['Dimetrium']=function(){var x=new Ingredient();x.style=60;return x;};ItemsLib['GiantPlum']=function(){var x=new Ingredient();x.style=70;return x;};//soulgem
+ItemsLib['SquishedLeech']=function(){var x=new Ingredient();x.style=30;return x;};ItemsLib['BloatedMushroom']=function(){var x=new Ingredient();x.style=20;return x;};ItemsLib['PurpleBerry']=function(){var x=new Ingredient();x.style=10;return x;};ItemsLib['WolfTooth']=function(){var x=new Ingredient();x.style=40;return x;};ItemsLib['ApocaFlower']=function(){var x=new Ingredient();return x;};ItemsLib['DryadVine']=function(){var x=new Ingredient();x.style=50;return x;};ItemsLib['Dimetrium']=function(){var x=new Ingredient();x.style=60;return x;};ItemsLib['GiantPlum']=function(){var x=new Ingredient();x.style=70;return x;};ItemsLib['EmptyGlas']=function(){var x=new Ingredient();x.style=80;return x;};ItemsLib['GlasCrystalWater']=function(){var x=new Ingredient();x.style=90;return x;};//soulgem
 ItemsLib['TinySoulGem']=function(){var x=new SoulGem();return x;};//keys
 ItemsLib['Rope']=function(){var x=new Rope();return x;};ItemsLib['RopeSturdy']=function(){var x=new Rope();x.style=10;return x;};ItemsLib['KeyRestraintA']=function(){var x=new KeyRestraint();return x;};ItemsLib['KeyRestraintB']=function(){var x=new KeyRestraint();x.style=10;return x;};//voucher
 ItemsLib['GameVoucherBronze']=function(){var x=new GameVoucher();return x;};ItemsLib['GameVoucherSilver']=function(){var x=new GameVoucher();x.style=100;return x;};return ItemsLib;}(window.gm.ItemsLib||{});"use strict";/*
@@ -2988,7 +3026,7 @@ If you are no longer interested in our service, click the link below to cancel y
 Note*: the upgrade from starter to experienced-member is free of cost; monthly subscription cost will be only 30$ instead of 2$ for your actual starter-membership.&quot;&lt;/p&gt;
 &lt;p class=&#39;tPC&#39;&gt;&#39;WTF...they are going to charge me 30 bucks a month! Those fuckers. I cant afford that. There wasn&#39;t much good content update recently anyway. &#39;&lt;/p&gt;
 &lt;div id=&#39;select1&#39; &gt;
-&lt;a0 onclick=&#39;window.gm.printTalkLink($(&quot;div#select1&quot;)[0],&quot;div#choice1a&quot;)&#39;&gt;Call your friend Brad&lt;/a&gt;
+&lt;a0 onclick=&#39;window.gm.printTalkLink(&quot;div#select1&quot;,&quot;div#choice1a&quot;)&#39;&gt;Call your friend Brad&lt;/a&gt;
 &lt;/div&gt;
 &lt;div id=&#39;choice1a&#39; hidden&gt;
 &lt;p class=&#39;tPC&#39;&gt;&quot;Hey Brad, did you also receive that mail from GameWorld with account-change?&quot;&lt;/p&gt;
@@ -3113,7 +3151,7 @@ As you got home from your daily chores and fiddling with the keys to your dorm, 
 &quot;Pickup parcel from Melanie&quot;&lt;/br&gt;
 &#39;Melanie? parcel?&#39; You slap your forehead &#39;Ah yes, that might be the gaming equipment.&#39;&lt;/br&gt;
 &lt;div id=&#39;select1&#39; &gt;
-&lt;a0 onclick=&#39;window.gm.printTalkLink($(&quot;div#select1&quot;)[0],&quot;div#choice1a&quot;)&#39;&gt;knock at her door&lt;/a&gt;
+&lt;a0 onclick=&#39;window.gm.printTalkLink(&quot;div#select1&quot;,&quot;div#choice1a&quot;)&#39;&gt;knock at her door&lt;/a&gt;
 &lt;/div&gt;&lt;/div&gt;
 &lt;div id=&#39;choice1a&#39; hidden&gt;
 Melanie opens. You guess she is around 20-something. She alway seemed to be annoyed by something.&lt;/br&gt;
@@ -3427,7 +3465,7 @@ for(var i=0;i&lt;_ids.length;i++){window.gm.printEquipment(whom,whom.Outfit.getI
 [[Back|_back_]]&lt;/br&gt;
 &lt;p class=&quot;author&quot;&gt;settings are stored in save-game until I find a way to store them in cookies.&lt;/p&gt;
 Theme:
-&lt;a href=&quot;javascript:window.styleSwitcher.setStyle(&#39;default&#39;);window.gm.refreshAllPanel();&quot;&gt;default&lt;/a&gt;
+&lt;a href=&quot;javascript:window.styleSwitcher.setStyle(&#39;light&#39;);window.gm.refreshAllPanel();&quot;&gt;light&lt;/a&gt;
 &lt;a href=&quot;javascript:window.styleSwitcher.setStyle(&#39;dark&#39;);window.gm.refreshAllPanel();&quot;&gt;dark&lt;/a&gt;&lt;/br&gt;
 &lt;!--TODO what settings ?
 *  Disable over-penetration &lt;/br&gt;
@@ -4419,7 +4457,7 @@ He shakes his head &quot;Not that I know. Cant you sneak around them or trick th
 &quot;The flowers grow in the forest too. They have colorful blue and yellow blossoms. But those leeches...they lurk in dark,humid places, swamps and such.&quot;
 &lt;p class=&quot;tPC&quot;&gt;&quot;I will see to get some.&quot;&lt;/p&gt;
 &lt;a0 onclick=&#39;window.gm.quests.forceQuestMilestone(&quot;qPurpleBerry&quot;,200,100);window.story.show(&quot;ForestBorder&quot;);&#39;&gt;Leave&lt;/a&gt;&lt;/br&gt;</tw-passagedata><tw-passagedata pid="89" name="AlchTalkFinishPurpleBerry" tags="" position="1100,1100" size="100,100">&lt;div id=&#39;select1&#39; &gt; You got enough purple berries to trade in for the alchemist. Will you do so?
-&lt;a0 onclick=&#39;window.gm.player.Inv.removeItem(&quot;PurpleBerry&quot;,5);window.gm.player.Inv.addItem(new window.gm.ItemsLib[&quot;HealthPotionSmall&quot;](),2);window.gm.quests.forceQuestMilestone(&quot;qPurpleBerry&quot;,100,1);window.gm.printTalkLink($(&quot;div#select1&quot;)[0],&quot;div#choice1a&quot;);&#39;&gt;Yes&lt;/a&gt;
+&lt;a0 onclick=&#39;window.gm.player.Inv.removeItem(&quot;PurpleBerry&quot;,5);window.gm.player.Inv.addItem(new window.gm.ItemsLib[&quot;HealthPotionSmall&quot;](),2);window.gm.quests.forceQuestMilestone(&quot;qPurpleBerry&quot;,100,1);window.gm.printTalkLink(&quot;div#select1&quot;,&quot;div#choice1a&quot;);&#39;&gt;Yes&lt;/a&gt;
 &lt;a0 onclick=&#39;window.story.show(&quot;ForestBorder&quot;);&#39;&gt;Leave&lt;/a&gt;
 &lt;/div&gt;
 &lt;div id=&#39;choice1a&#39; hidden&gt;
@@ -4486,13 +4524,13 @@ Your cunt didnt change since some time now. At least you cant see any... &lt;/br
 &lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="96" name="Masturbate" tags="_nosave_" position="725,1225" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;div id=&#39;select1&#39; &gt;
-&lt;a0 onclick=&#39;window.gm.printTalkLink($(&quot;div#select1&quot;)[0],&quot;div#choice1a&quot;)&#39;&gt;Pinch your own nipples.&lt;/a&gt;&lt;/br&gt;
+&lt;a0 onclick=&#39;window.gm.printTalkLink(&quot;div#select1&quot;,&quot;div#choice1a&quot;)&#39;&gt;Pinch your own nipples.&lt;/a&gt;&lt;/br&gt;
 &lt;/div&gt;
 &lt;div id=&#39;choice1a&#39; hidden&gt;&lt;/br&gt;
 Tweasing your [small] nipples between thumb and index finger until it nearly gets painful.&lt;/br&gt;
 &lt;div id=&#39;select2&#39; &gt;
-&lt;a0 id=&#39;tweazeNipple&#39; onclick=&#39;window.gm.printTalkLink($(&quot;div#select2&quot;)[0],&quot;div#choice2a&quot;, fondlebreast)&#39;&gt;Just some more&lt;/a&gt;
-&lt;a0 onclick=&#39;window.gm.printTalkLink($(&quot;div#select2&quot;)[0],&quot;div#choice2b&quot;)&#39;&gt;Stop it&lt;/a&gt;
+&lt;a0 id=&#39;tweazeNipple&#39; onclick=&#39;window.gm.printTalkLink(&quot;div#select2&quot;,&quot;div#choice2a&quot;, fondlebreast)&#39;&gt;Just some more&lt;/a&gt;
+&lt;a0 onclick=&#39;window.gm.printTalkLink(&quot;div#select2&quot;,&quot;div#choice2b&quot;)&#39;&gt;Stop it&lt;/a&gt;
 &lt;/div&gt;
 &lt;div id=&#39;choice2a&#39; hidden&gt;&lt;/br&gt;
 Now you increase the pressure until there is pain.
@@ -5841,12 +5879,125 @@ The problem are the dense layer of long spikes sticking out of the floor several
 There seems to be a lever on a platform on your left side. You an only guess that it might lower the drawbridge. But you would have to jump 4m or more to reach it, which seems to be quite far for a human.
 How could anyone reach that lever without the ability to jump really far or to fly? The walls seems also to smooth unless you are a gecko.
 - would there be a way to learn flying, climbing or jumping?
-- could someone help me with the lever?</tw-passagedata><tw-passagedata pid="182" name="DF_Lv1_MAP" tags="_back_" position="225,2350" size="100,100">&lt;hr&gt;&lt;p&gt;Map:&lt;/p&gt;&lt;div id=&#39;canvas&#39;&gt;&lt;/div&gt;&lt;/br&gt;
+- could someone help me with the lever?</tw-passagedata><tw-passagedata pid="182" name="CV_Lv1_MAP" tags="_back_" position="225,2350" size="100,100">&lt;hr&gt;&lt;p&gt;Map:&lt;/p&gt;&lt;div id=&#39;canvas&#39;&gt;&lt;/div&gt;&lt;/br&gt;
+&lt;script&gt; window.gm.printMap(&quot;CV_Lv1&quot;,window.gm.player.location.replace(&#39;CV_Lv1_&#39;,&#39;Tile_&#39;),window.story.state.DngCV.mapReveal,window.story.state.DngCV.visitedTiles);
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="183" name="CV_Lv1_Entry" tags="" position="350,2350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;%window.gm.player.location=window.passage.name;%&gt;
+TODO teleport tot Caverns 
+&lt;/br&gt;&lt;p&gt; [[Next|CV_Lv1_F6]] &lt;/br&gt;&lt;/p&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="184" name="CV_Lv1_Success" tags="" position="475,2350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;%window.gm.player.location=window.passage.name;%&gt;
+You step through the portal and are facing Cyril again.
+&lt;div class=&quot;speech tNPC2&quot;&gt;&lt;span class=&quot;avatar&quot;&gt;&lt;/span&gt;Cyril&lt;hr&gt;&lt;br&gt;&quot;There you are, I was already worrying what could delay that little task.&quot;&lt;/div&gt;
+&lt;div class=&quot;speech tNPC2&quot;&gt;&lt;span class=&quot;avatar&quot;&gt;&lt;/span&gt;Cyril&lt;hr&gt;&lt;br&gt;&quot;You have the glass with you?&quot;&lt;/div&gt;
+&lt;%if(window.story.state.DngCV.bathedInLake&gt;0){%&gt;
+&lt;div class=&quot;speech tNPC2&quot;&gt;&lt;span class=&quot;avatar&quot;&gt;&lt;/span&gt;Cyril&lt;hr&gt;&lt;br&gt;&quot;And why are your clothes all wet. You didn&#39;t fall in the lake, did you?&quot;&lt;/div&gt;
+You are kinda embarassed, like a child that did something stupid.
+&lt;%}%&gt;
+&lt;div class=&quot;speech tPC&quot;&gt;&lt;span class=&quot;avatar&quot;&gt;&lt;/span&gt;PC&lt;hr&gt;&lt;br&gt;&quot;Here, Sir.&quot;&lt;/div&gt;
+Cyril takes the glass you present him.
+&lt;div class=&quot;speech tNPC2&quot;&gt;&lt;span class=&quot;avatar&quot;&gt;&lt;/span&gt;Cyril&lt;hr&gt;&lt;br&gt;&quot;Please follwo me to the lab. Someone is already waiting to analyse this.&quot;&lt;/div&gt;
+&lt;div class=&quot;speech tPC&quot;&gt;&lt;span class=&quot;avatar&quot;&gt;&lt;/span&gt;PC&lt;hr&gt;&lt;br&gt;&quot;There are others here around? I didn&#39;t notice anyone.&quot;&lt;/div&gt;
+&lt;div class=&quot;speech tNPC2&quot;&gt;&lt;span class=&quot;avatar&quot;&gt;&lt;/span&gt;Cyril&lt;hr&gt;&lt;br&gt;&quot;Kumala just returned this night, thats a good oppurtunity to meet her.&quot;&lt;/div&gt;
+&lt;div class=&quot;speech tPC&quot;&gt;&lt;span class=&quot;avatar&quot;&gt;&lt;/span&gt;PC&lt;hr&gt;&lt;br&gt;&quot;Is she also an acolyte?&quot;&lt;/div&gt;
+You hurry behind Cyril to keep up, following him back to the hall towards its long side where another door is opened. 
+&lt;div class=&quot;speech tNPC2&quot;&gt;&lt;span class=&quot;avatar&quot;&gt;&lt;/span&gt;Cyril&lt;hr&gt;&lt;br&gt;&quot;No she is a instructor and our alchemist. Oh and she also does the cooking.&quot;&lt;/div&gt;
+&lt;div class=&quot;speech tPC&quot;&gt;&lt;span class=&quot;avatar&quot;&gt;&lt;/span&gt;PC&lt;hr&gt;&lt;br&gt;&#39;I just hope she separates the cooking from the alchemy.&#39;&lt;/div&gt;
+The door from the hall opens into another hallway and you both walk to another entrance.
+&lt;div class=&quot;speech tNPC2&quot;&gt;&lt;span class=&quot;avatar&quot;&gt;&lt;/span&gt;Cyril&lt;hr&gt;&lt;br&gt;&quot;Kumala? Kumala are you here?&quot;&lt;/div&gt;
+You look around. Could be a laboratory or a advanced kitchen, you arent sure.&lt;/br&gt;
+There is some clanking going on in a backroom where someone sees busy.
+&lt;div class=&quot;speech tNPC1&quot;&gt;&lt;span class=&quot;avatar&quot;&gt;&lt;/span&gt;NPC1&lt;hr&gt;&lt;br&gt;&quot;Just a moment.. Let me put the preserved on the shelf and I will be right with you.&quot;&lt;/div&gt;
+A moment later a woman appears. She might be in her mid-thirtys and is wearing the same garment as Cyril. She just didnt put on the hood.
+&lt;div class=&quot;speech tNPC1&quot;&gt;&lt;span class=&quot;avatar&quot;&gt;&lt;/span&gt;NPC1&lt;hr&gt;&lt;br&gt;&quot;Ah hello. You are the new apprentice right?&quot;&lt;/div&gt;
+You return the bow with that she greeted you.
+&lt;div class=&quot;speech tPC&quot;&gt;&lt;span class=&quot;avatar&quot;&gt;&lt;/span&gt;PC&lt;hr&gt;&lt;br&gt;&quot;Yes my name is &lt;%=window.gm.player.name%&gt;...&quot;&lt;/div&gt;
+
+&lt;/br&gt;&lt;p&gt; [[Next|SY_Your_Room]] &lt;/br&gt;&lt;/p&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="185" name="CV_Lv1_FallToDeath" tags="" position="600,2350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;%window.gm.player.location=window.passage.name;%&gt;
+&lt;div class=&quot;speech tPC&quot;&gt;&lt;span class=&quot;avatar&quot;&gt;&lt;/span&gt;PC&lt;hr&gt;&lt;br&gt;Its so damn dark, here. Without the torch I wouldnt see my hands.&lt;/div&gt;
+Just as that thought crosses your mind, a gusty wind blows strong enough to let the torch flicker.
+...
+Du stürzt in den Abgrund auf nimmer wiedersehen. &lt;/br&gt;
+&lt;a0 onclick=&#39;window.story.state.vars.spawnAt=&quot;SY_Recover_Death&quot;,window.gm.respawn()&#39;&gt;Next&lt;/a&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="186" name="CV_Lv1_F6" tags="" position="725,2350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;%window.gm.player.location=window.passage.name;%&gt;
+There is a small clearing with a stone-plateu that has some kind of runes on it. 
+&lt;%if(window.story.state.DngCV.dngLevel===1 &amp;&amp; window.gm.player.Inv.countItem(&#39;GlasCrystalWater&#39;)&gt;=1){%&gt;
+    &lt;/br&gt;The portal has opened, time for your return.
+    &lt;p&gt;[[Into the portal|CV_Lv1_Success]] &lt;/br&gt;&lt;/p&gt;
+&lt;%}else{%&gt;
+    &lt;/br&gt;Once you have fullfilled your task, the portal should reapear opening your way back to the sanctuary.
+    &lt;/br&gt;Check your quest-log if you need a reminder on what to do.
+&lt;%}%&gt; 
+&lt;/br&gt;&lt;p&gt; [[Go East|CV_Lv1_G6]] &lt;/br&gt;&lt;/p&gt;&lt;%=window.story.render(&quot;CV_Lv1_MAP&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="187" name="CV_Lv1_G6" tags="" position="850,2350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;%window.gm.player.location=window.passage.name;%&gt;
+There are some candles on the floor. If you [[follow them east|CV_Lv1_I2]] , you should get to the crystal lake.&lt;/br&gt;
+The portal should be in [[opposite direction|CV_Lv1_F6]]. There is also a pathway leading [[north|CV_Lv1_FallToDeath]], but it seems very dark there.&lt;/br&gt;
+&lt;%=window.story.render(&quot;CV_Lv1_MAP&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="188" name="CV_Lv1_I2" tags="" position="975,2350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;%window.gm.player.location=window.passage.name;%&gt;
+You can see the crystal lake from here. Its a little steep downwards. 
+
+&lt;/br&gt;&lt;p&gt; [[Go West|CV_Lv1_G6]][[Go East|CV_Lv1_I3]] &lt;/br&gt;&lt;/p&gt;&lt;%=window.story.render(&quot;CV_Lv1_MAP&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="189" name="CV_Lv1_I3" tags="" position="1100,2350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;%window.gm.player.location=window.passage.name;%&gt;
+&lt;%if(s.DngCV.gotWater&lt;=0){%&gt;
+&lt;p class=&quot;tPC&quot;&gt;&quot;The water at the shore of the lake isnt as clean as it seemed from a distance. Its much cleaner a little further inside.&quot;&lt;/p&gt;
+&lt;p class=&quot;tPC&quot;&gt;&quot;I could just fill the glas here, but maybe they then dont believe me its from the lake if its spoiled with all that grime.&quot;&lt;/p&gt;
+You look around and spot a larger of those crystals growing from the wall toward the center of the lake, just above its surface.
+&lt;p class=&quot;tPC&quot;&gt;&#39;Maybe if I climb on that one and slide on it a little further along away from the polluted shore...&#39; &lt;/p&gt;
+&lt;div id=&#39;select1&#39; &gt;
+&lt;a0 onclick=&#39;window.gm.printTalkLink(&quot;div#select1&quot;,&quot;div#choice1a&quot;)&#39;&gt;Just fill the glas right here&lt;/a&gt;
+&lt;a0 onclick=&#39;window.gm.printTalkLink(&quot;div#select1&quot;,&quot;div#choice1b&quot;)&#39;&gt;climb on the crystal&lt;/a&gt;
+&lt;/div&gt;&lt;div id=&#39;choice1a&#39; hidden&gt;
+    &lt;p class=&quot;tPC&quot;&gt;&#39;Lets get it over with. It shouldnt matter if there is some dirt in it.&#39;&lt;/p&gt;
+    You fill the glas and try to keep most of the grime away. Still, you wouldnt say this is crystal clear.
+    Now its time to return to the entrance but for this you have to climb the steep &lt;a0 onclick=&#39;window.gm.player.Inv.addItem(new window.gm.ItemsLib[&quot;GlasCrystalWater&quot;]()),window.story.state.DngCV.gotWater=1,window.story.show(&quot;CV_Lv1_I3_SlopeUp&quot;)&#39;&gt;slope&lt;/a&gt;.
+&lt;/div&gt;
+&lt;div id=&#39;choice1b&#39; hidden&gt;
+    You walk over to the crystal spike and hit it with your hand.
+    &lt;p class=&quot;tPC&quot;&gt;&#39;Looks solid enough.&#39;&lt;/p&gt;
+    Carefully you place the torch between some rocks &lt;span class=&quot;tPC&quot;&gt;&#39;Better not let this drop into the water&#39;&lt;/span&gt;,
+    then you pull yourself on the smooth crystal and, stradling it, slide forward to a point where you can plunge the glas into the water.
+    &lt;p class=&quot;tPC&quot;&gt;&#39;Its to far, only some fingerwidth...&#39;&lt;/p&gt;
+    The round glas isnt helpful at all. 
+    &lt;p class=&quot;tPC&quot;&gt;&#39;If I hold it just between 2 fingers at the edge, it should be possible to scoop up some water.&#39;&lt;/p&gt;
+    &lt;div id=&#39;select2&#39; &gt;
+    &lt;a0 onclick=&#39;window.gm.printTalkLink(&quot;div#select2&quot;,&quot;div#choice2a&quot;)&#39;&gt;Do it&lt;/a&gt;
+    &lt;/div&gt;&lt;div id=&#39;choice2a&#39; hidden&gt;
+        You are happy that your plan is working, until you notice that the water filled glas is now quite heavy.&lt;/br&gt;
+        Feeling it slip from your fingers, you stretch a little bit further down and try to get a hold on it.&lt;/br&gt;
+        Just a moment later you realize that this was a little bit to far and that your body weight is now drawing you down.
+        &lt;div id=&#39;select3&#39; &gt;
+        &lt;a0 onclick=&#39;window.gm.printTalkLink(&quot;div#select3&quot;,&quot;div#choice3a&quot;),window.story.state.DngCV.bathedInLake=1;&#39;&gt;Next&lt;/a&gt;
+        &lt;/div&gt;&lt;div id=&#39;choice3a&#39; hidden&gt;
+        &lt;span class=&quot;tPC&quot;&gt;&quot;AAhhh...&quot;&lt;/span&gt;, with a splash you fall into the lake.&lt;/br&gt;
+        You trash around to stay above the surface of the cold water. Thankfully you quickly notice that it isnt that deep as it seemed from above and you can stand on the ground.&lt;/br&gt;
+        The glas you somehow still have in your hand and you quickly make your way to escape the pond.
+        &lt;p class=&quot;tPC&quot;&gt;&quot;Thats cold...brr&quot;&lt;/p&gt;
+        You teeth rattle as you step out of the water and the previous shock subsides. Your torch is still flickering, but it doesnt spent enough warmth to dry your clothes quickly.
+        &lt;p class=&quot;tPC&quot;&gt;&quot;Better get going before I catch a cold.&quot;&lt;/p&gt;
+        Now its time to return to the entrance but for this you have to climb the steep &lt;a0 onclick=&#39;window.gm.player.Inv.addItem(new window.gm.ItemsLib[&quot;GlasCrystalWater&quot;]()),window.story.state.DngCV.gotWater=1,window.story.show(&quot;CV_Lv1_I3_SlopeUp&quot;)&#39;&gt;slope&lt;/a&gt;.
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+&lt;%}else{%&gt;
+&lt;/br&gt;&lt;p&gt; [[Go West|CV_Lv1_I2]] &lt;/br&gt;&lt;/p&gt;&lt;%=window.story.render(&quot;CV_Lv1_MAP&quot;)%&gt;
+&lt;%}%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="190" name="CV_Lv1_I3_SlopeUp" tags="" position="1225,2350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;%window.gm.player.location=window.passage.name;%&gt;
+The steep climb would not be a problem if you didn&#39;t have to carry the glas and the torch.
+...
+&lt;/br&gt;&lt;p&gt; [[Go West|CV_Lv1_G6]] &lt;/br&gt;&lt;/p&gt;&lt;%=window.story.render(&quot;CV_Lv1_MAP&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="191" name="DF_Lv1_MAP" tags="_back_" position="100,2475" size="100,100">&lt;hr&gt;&lt;p&gt;Map:&lt;/p&gt;&lt;div id=&#39;canvas&#39;&gt;&lt;/div&gt;&lt;/br&gt;
 &lt;script&gt; window.gm.printMap(&quot;VRMap4&quot;,window.gm.player.location.replace(&#39;DF_Lv1_&#39;,&#39;Tile_&#39;),window.story.state.DngDF.mapReveal,window.story.state.DngDF.visitedTiles);
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="183" name="DF_Lv1_Entry" tags="" position="350,2350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="192" name="DF_Lv1_Entry" tags="" position="225,2475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;/br&gt;&lt;p&gt; [[Next|DF_Lv1_F2]] &lt;/br&gt;&lt;/p&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="184" name="DF_Lv1_F2" tags="" position="475,2350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="193" name="DF_Lv1_F2" tags="" position="350,2475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 There is a small clearing with a stone-plateu that has some kind of runes on it. 
 &lt;%if(window.story.state.DngDF.dngLevel===1 &amp;&amp; window.gm.player.Inv.countItem(&#39;GiantPlum&#39;)&gt;=3){%&gt;
@@ -5857,25 +6008,25 @@ There is a small clearing with a stone-plateu that has some kind of runes on it.
     &lt;/br&gt;Check your quest-log if you need a reminder on what to do.
 &lt;%}%&gt; 
 &lt;/br&gt;&lt;p&gt; [[Go East|DF_Lv1_G2]] &lt;/br&gt;&lt;/p&gt;&lt;%=window.story.render(&quot;DF_Lv1_MAP&quot;)%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="185" name="DF_Lv1_G2" tags="" position="600,2350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="194" name="DF_Lv1_G2" tags="" position="475,2475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;/br&gt;&lt;p&gt; [[Go North|DF_Lv1_G1]]&lt;/br&gt;[[Go West|DF_Lv1_F2]][[Go East|DF_Lv1_H2]]&lt;/br&gt;[[Go South|DF_Lv1_G3]]&lt;/br&gt;&lt;/p&gt;&lt;%=window.story.render(&quot;DF_Lv1_MAP&quot;)%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="186" name="DF_Lv1_H2" tags="" position="725,2350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="195" name="DF_Lv1_H2" tags="" position="600,2475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;/br&gt;&lt;p&gt; [[Go North|DF_Lv1_H1]]&lt;/br&gt;[[Go West|DF_Lv1_G2]][[Go East|DF_Lv1_I2]]&lt;/br&gt;[[Go South|DF_Lv1_H3]] &lt;/br&gt;&lt;/p&gt;&lt;%=window.story.render(&quot;DF_Lv1_MAP&quot;)%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="187" name="DF_Lv1_F3" tags="" position="850,2350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="196" name="DF_Lv1_F3" tags="" position="725,2475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;/br&gt;&lt;p&gt; [[Go North|DF_Lv1_F2]]&lt;/br&gt;[[Go East|DF_Lv1_G3]]&lt;/br&gt;[[Go South|DF_Lv1_F4]] &lt;/br&gt;&lt;/p&gt;&lt;%=window.story.render(&quot;DF_Lv1_MAP&quot;)%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="188" name="DF_Lv1_G3" tags="" position="975,2350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="197" name="DF_Lv1_G3" tags="" position="850,2475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;/br&gt;&lt;p&gt; [[Go North|DF_Lv1_G2]]&lt;/br&gt;[[Go West|DF_Lv1_F3]][[Go East|DF_Lv1_H3]]&lt;/br&gt;[[Go South|DF_Lv1_G4]]&lt;/br&gt;&lt;/p&gt;&lt;%=window.story.render(&quot;DF_Lv1_MAP&quot;)%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="189" name="DF_Lv1_H3" tags="" position="1100,2350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="198" name="DF_Lv1_H3" tags="" position="975,2475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 
 &lt;%if(window.story.state.DngDF.plumH3===1){%&gt;
 A large purple fruit hangs on one branch of a broad-leafed tree. Its so heavy that it has pulled down the branch to a height where you can reach it with your hand.&lt;/br&gt;
 &lt;div id=&#39;select1&#39; &gt;
-&lt;a0 onclick=&#39;window.gm.printTalkLink($(&quot;div#select1&quot;)[0],&quot;div#choice1a&quot;)&#39;&gt;harvest it&lt;/a&gt;
+&lt;a0 onclick=&#39;window.gm.printTalkLink(&quot;div#select1&quot;,&quot;div#choice1a&quot;)&#39;&gt;harvest it&lt;/a&gt;
 &lt;/div&gt;&lt;div id=&#39;choice1a&#39; hidden&gt;
 As you plug the fruit from the twig, the branch snaps back to its origin.&lt;/br&gt;
 That doesnt surprise you. What surprises you is the giant hornett that flys buzzing angrily out of the trees crown toward you.
@@ -5883,26 +6034,26 @@ That doesnt surprise you. What surprises you is the giant hornett that flys buzz
 &lt;/div&gt;
 &lt;%}%&gt;
 &lt;/br&gt;&lt;p&gt; [[Go North|DF_Lv1_H2]]&lt;/br&gt;[[Go West|DF_Lv1_G3]][[Go East|DF_Lv1_I3]]&lt;/br&gt;[[Go South|DF_Lv1_H4]] &lt;/br&gt;&lt;/p&gt;&lt;%=window.story.render(&quot;DF_Lv1_MAP&quot;)%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="190" name="DF_Lv1_F4" tags="" position="1225,2350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="199" name="DF_Lv1_F4" tags="" position="1100,2475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 
 &lt;/br&gt;&lt;p&gt; [[Go North|DF_Lv1_F3]]&lt;/br&gt;[[Go West|DF_Lv1_E4]][[Go East|DF_Lv1_G4]]&lt;/br&gt;[[Go South|DF_Lv1_F5]] &lt;/br&gt;&lt;/p&gt;&lt;%=window.story.render(&quot;DF_Lv1_MAP&quot;)%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="191" name="DF_Lv1_G4" tags="" position="100,2475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="200" name="DF_Lv1_G4" tags="" position="1225,2475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;/br&gt;&lt;p&gt; [[Go North|DF_Lv1_G3]]&lt;/br&gt;[[Go West|DF_Lv1_E4]][[Go East|DF_Lv1_H4]]&lt;/br&gt;[[Go South|DF_Lv1_G5]] &lt;/br&gt;&lt;/p&gt;&lt;%=window.story.render(&quot;DF_Lv1_MAP&quot;)%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="192" name="DF_Lv1_H4" tags="" position="225,2475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="201" name="DF_Lv1_H4" tags="" position="100,2600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;/br&gt;&lt;p&gt; [[Go North|DF_Lv1_H3]]&lt;/br&gt;[[Go West|DF_Lv1_G4]][[Go East|DF_Lv1_I4]]&lt;/br&gt;[[Go South|DF_Lv1_H5]] &lt;/br&gt;&lt;/p&gt;&lt;%=window.story.render(&quot;DF_Lv1_MAP&quot;)%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="193" name="PlainsWest" tags="" position="350,2475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="202" name="PlainsWest" tags="" position="225,2600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;window.gm.moveHere();%&gt;
 Some large grassland is laid out before you. There are some bushes here and there and even group of trees.&lt;/br&gt;
 [[to Forest|ForestBridge]] [[West|PlainsCrossroad]]
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
-&lt;script&gt;&lt;/script&gt;</tw-passagedata><tw-passagedata pid="194" name="PlainsCrossroad" tags="" position="475,2475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;script&gt;&lt;/script&gt;</tw-passagedata><tw-passagedata pid="203" name="PlainsCrossroad" tags="" position="350,2600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;window.gm.moveHere();%&gt;
 The dirtroad branches in different directions and there is also a wodden post with several withered signs on it, pointing in different directions:&lt;/br&gt;
 [[West: to Forest|PlainsWest]] [[East: Village|PlainsEast]]  [[NorthWest: TrumpetHills|NOP]]  [[South: Wasteland|NOP]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="195" name="PlainsEast" tags="" position="600,2475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="204" name="PlainsEast" tags="" position="475,2600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;window.gm.moveHere();%&gt;
 Just more grassland. In the distance you can see herds of animals, probably deer or antelope.&lt;/br&gt;
 A skilled hunter could certainly earn his living here with &lt;a0 onclick=&#39;explore()&#39;&gt;hunting&lt;/a&gt;.&lt;/br&gt;
@@ -5924,11 +6075,11 @@ A skilled hunter could certainly earn his living here with &lt;a0 onclick=&#39;e
         window.story.show(&#39;ForestSearchAround&#39;); //nothing
     }
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="196" name="PlainsFarmland" tags="" position="725,2475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="205" name="PlainsFarmland" tags="" position="600,2600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;window.gm.moveHere();%&gt;
 Fields with grain and also with vegetables stretch along the road. In between are farms, barns and windmills, most of them more or less run down.&lt;/br&gt;
 [[West: Plains|PlainsEast]] [[East: Village|VillageEntranceIntro]] [[NorthWest: Large Rocks|AM_Entrance]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="197" name="SY_Intro" tags="" position="850,2475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="206" name="SY_Intro" tags="" position="725,2600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 You accidently went through a portal and end up in the netherworld.
 You are lucky that you didnt end in one of the more unpleasent areas but in the &quot;Sanctuary&quot;.&lt;/br&gt;
@@ -5941,7 +6092,7 @@ Of course you dont want to stay here forever, so better get started making an es
     window.gm.enterVR();
     window.gm.player.levelUp(5);window.gm.player.autoLeveling();
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="198" name="SY_Your_Room" tags="" position="975,2475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="207" name="SY_Your_Room" tags="" position="850,2600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;%if(window.story.state.DngSY.remainingNights&lt;=0){%&gt;
     You better get equipped and ready for your next task.&lt;/br&gt;
@@ -5960,22 +6111,25 @@ function nextDng() {
         return(&quot;SY_Lv1&quot;);
     }
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="199" name="SY_Your_Room_Sleep" tags="_nosave_" position="1100,2475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="208" name="SY_Your_Room_Sleep" tags="_nosave_" position="975,2600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 You awake in your room.
 &lt;%if(window.story.state.DngSY.remainingNights&lt;=0){%&gt;
-    The thought is poking at your mind that you have to go through the portal today.
-    Startled you notice that Cyril is waiting in the doorframe.
-    &lt;p class=&quot;tNPC2&quot;&gt;&quot;It is time now. Meet me in the hall.&quot;&lt;/p&gt;
+    The thought is poking at your mind that you have to go through the portal today.&lt;/br&gt;
+    Startled you notice that Cyril is waiting in the doorframe.&lt;span class=&quot;tNPC2&quot;&gt;&quot;It is time now. Meet me in the hall.&quot;&lt;/span&gt;
 &lt;%}else{%&gt;
     Cyril said that you soon have to go through the portal again and that you should prepare for that. &lt;/br&gt;
     You can sleep &lt;%=window.story.state.DngSY.remainingNights%&gt; more nights before you have to start another adventure.
 &lt;%}%&gt;
 &lt;p&gt; [[Get up|SY_Your_Room]]&lt;/br&gt;&lt;/p&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="200" name="SY_Portal" tags="" position="1225,2475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="209" name="SY_Recover_Death" tags="_nosave_" position="1100,2600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+Suddenly snapping awake, you find yourself back into Sanctuary. For sure it was just a nightmare you awoke from, a horrible dream about your death. &lt;/br&gt;
+You cant even remeber what you exactly dreamed, and maybe thats a good thing.
+&lt;/br&gt;[[Next|SY_Your_Room]]
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="210" name="SY_Portal" tags="" position="1225,2600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;div&gt; [[Back|_back_]] &lt;a0 onclick=&#39;window.story.show(xxx);&#39;&gt;Start&lt;/a&gt;&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="201" name="SY_Hall" tags="" position="100,2600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="211" name="SY_Hall" tags="" position="100,2725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 The great hall is the center of this complex. Several large pendant chandeliers spread a pleasantly bright light.&lt;/br&gt;
 There is something like [[Shop]] setup on one side with a large banner is nailed over its sign: &gt;&gt;Opening soon&lt;&lt;.&lt;/br&gt;
@@ -5983,25 +6137,38 @@ There is something like [[Shop]] setup on one side with a large banner is nailed
 Speak to him to get a clue where you are heading next.&lt;/br&gt;
 &lt;/br&gt; On the left side of the hall a corridor is leading back to the [[dorms|SY_Your_Room]] or to the [[library]] if you follow it to the end.&lt;/br&gt;
 The corridor on the right side leads to the [[Training grounds]] and [[doctor]].&lt;/br&gt; 
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="202" name="SY_Library" tags="" position="225,2600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="212" name="SY_Library" tags="" position="225,2725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 A lot of books and scrolls are waiting for someone to read them. &lt;/br&gt;
 You can spend some time reading, maybe you learn a spell or some ancient language. Or at least find something to distract your thoughts.&lt;/br&gt;
 &lt;a0 onclick=&#39;window.story.show(\&quot;SY_BOOK\&quot;);&#39;&gt;Browse for some food for your mind &lt;/a&gt;
 &lt;div&gt; [[Back|SY_Hall]] &lt;/br&gt;&lt;/div&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
-&lt;script&gt;&lt;/script&gt;</tw-passagedata><tw-passagedata pid="203" name="SY_BOOK" tags="_back_" position="350,2600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;script&gt;&lt;/script&gt;</tw-passagedata><tw-passagedata pid="213" name="SY_BOOK" tags="_back_" position="350,2725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 TODO: soothe mind / learn arcana / learn language
 &lt;div&gt; [[Back|_back_]] &lt;/br&gt;&lt;/div&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
-&lt;script&gt;&lt;/script&gt;</tw-passagedata><tw-passagedata pid="204" name="SY_Lv1" tags="" position="475,2600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
-&lt;p class=&quot;tNPC2&quot;&gt;&quot;Your task is to take this glass and fill it with the water from the crystal lake and make your way back to the portal.&quot;&lt;/p&gt;
+&lt;script&gt;&lt;/script&gt;</tw-passagedata><tw-passagedata pid="214" name="SY_Lv1" tags="" position="475,2725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;p class=&quot;tNPC2&quot;&gt;&quot;Your task is to take this glas and fill it with the water from the crystal lake and make your way back to the portal.&quot;&lt;/p&gt;
 &lt;p class=&quot;tPC&quot;&gt;&quot;Crystal lake? I dont know where that is. And where does that portal lead anyway?&quot;&lt;/p&gt;
-&lt;p class=&quot;tNPC2&quot;&gt;&quot;The portal brings you into a dungeon. Just follow the lights down the tunnels until you find a lake where you see large blue crystals growing in a underground lake.&quot;&lt;/p&gt;
-&lt;p class=&quot;tPC&quot;&gt;&quot;And thats all? Go to the lake, fill that glass and walk back? Why does it have to be a glass, dont you have a bottle or waterskin?&quot;&lt;/p&gt;
+&lt;p class=&quot;tNPC2&quot;&gt;&quot;The portal brings you into a cave system. Just follow the lights down the tunnels until you find a lake where you see large blue crystals growing in a underground lake.&quot;&lt;/p&gt;
+&lt;p class=&quot;tPC&quot;&gt;&quot;And thats all? Go to the lake, fill that glas and walk back? Why does it have to be a glas, dont you have a bottle or waterskin?&quot;&lt;/p&gt;
 ....
-&lt;p&gt; &lt;a0 onclick=&#39;window.story.state.DngDF.visitedTiles=[];window.story.show(&quot;DF_Lv1_Entry&quot;);&#39;&gt;Lets go&lt;/a&gt;&lt;/p&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="205" name="SY_Lv2" tags="" position="600,2600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;div class=&quot;speech tNPC2&quot;&gt;&lt;span class=&quot;avatar&quot;&gt;&lt;/span&gt;tNPC2&lt;hr&gt;&lt;br&gt;dad&lt;/div&gt;
+&lt;p class=&quot;tNPC2&quot;&gt;&quot;You might need this torch. The path should be lightened with candles but sometime they just go out.&quot;&lt;/p&gt;
+You grab the torch and the glas.&lt;/br&gt;
+&lt;p class=&quot;tNPC2&quot;&gt;&quot;And remember, follow the candles, dont strive into the darker areas.&quot;&lt;/p&gt;
+&lt;p class=&quot;tPC&quot;&gt;&quot;I know, I know, pitfalls and such.&quot;&lt;/p&gt;
+&lt;p class=&quot;tNPC2&quot;&gt;&quot;Yes...and such.&quot;&lt;/p&gt;
+That somehow sound like more dangers than falling into a hole.&lt;/br&gt;
+&lt;p&gt; &lt;a0 onclick=&#39;CV_Lv1_Entry()&#39;&gt;Lets go&lt;/a&gt;&lt;/p&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
+&lt;script&gt; function CV_Lv1_Entry() {
+    let s = window.story.state;
+    s.DngCV.visitedTiles=[];
+    window.story.show(&quot;CV_Lv1_Entry&quot;);
+}
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="215" name="SY_Lv2" tags="" position="600,2725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;p class=&quot;tNPC2&quot;&gt;&quot;Your task is to take gather 3 ripe plums from the trees growing in the forest.&quot;&lt;/p&gt;
 &lt;p class=&quot;tPC&quot;&gt;&quot;Only 3? From this no one gets full.&quot;&lt;/p&gt;
 &lt;p class=&quot;tNPC2&quot;&gt;&quot;Feel free to collect more if you like.&quot;&lt;/p&gt;
@@ -6009,7 +6176,7 @@ Did he just snicker?
 &lt;p class=&quot;tPC&quot;&gt;&quot;Fine.&quot;&lt;/p&gt;
 ....
 &lt;p&gt; &lt;a0 onclick=&#39;window.story.state.DngDF.visitedTiles=[];window.story.show(&quot;DF_Lv2_Entry&quot;);&#39;&gt;Lets go&lt;/a&gt;&lt;/p&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="206" name="SY_Lv3" tags="" position="725,2600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="216" name="SY_Lv3" tags="" position="725,2725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;p class=&quot;tNPC2&quot;&gt;&quot;As you may have seen we have a large library. Unfortunatly some books have gone missing due to some - unfortunate circumstance.&lt;/br&gt;
 Your task would be to gather pages from a book called Igneum Frigus Thalamum. At least 2 pages should be somewhere in a valley.&lt;/p&gt;
 &lt;p class=&quot;tPC&quot;&gt;&quot;Somewhere in a valley? Some more information would be helpful.&quot;&lt;/p&gt;
@@ -6018,7 +6185,7 @@ Your task would be to gather pages from a book called Igneum Frigus Thalamum. At
 &lt;p class=&quot;tPC&quot;&gt;&quot;Its still not clear to me how to find them, but whatever....&quot;&lt;/p&gt;
 ....
 &lt;p&gt; &lt;a0 onclick=&#39;window.story.state.DngDF.visitedTiles=[];window.story.show(&quot;DF_Lv2_Entry&quot;);&#39;&gt;Lets go&lt;/a&gt;&lt;/p&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="207" name="Cyril" tags="" position="850,2600" size="100,100">Was nützt es den Geist zu stärken wenn der Körper nicht mithalten kann. Your body has to embrace your savageness too.
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="217" name="Cyril" tags="" position="850,2725" size="100,100">Was nützt es den Geist zu stärken wenn der Körper nicht mithalten kann. Your body has to embrace your savageness too.
 
 Giving and receiving the essence of life is a sacred action. And as it is with all sacred things, there are always some trying to corrupt them.
 
@@ -6026,11 +6193,14 @@ You need to open up your mind. Mankind futily struggled to separate themself fro
 
 Savageness is what separates us from non-living objects. Without savageness we would lie still like a rock or fall down to earth, blown around by gusts of wind. Savageness lets a deer rush across the plains or a bird fly between clouds. Honor your savagness as this is life.
 
-Cultivating ones savageness is what we try to assume here. you need to grow it, carefully, to not get overwhelmed and loosing yourself,</tw-passagedata><tw-passagedata pid="208" name="ForestSpawn" tags="" position="975,2600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+Cultivating ones savageness is what we try to assume here. you need to grow it, carefully, to not get overwhelmed and loosing yourself
+
+So you think animals are less worth than humans? he sounds annoyed. No, no of course not. I wouldnt say they are equal to humans. 
+Lets see if you think so after walking in their shoes for a mile.</tw-passagedata><tw-passagedata pid="218" name="ForestSpawn" tags="" position="975,2725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name; window.gm.enterVR();%&gt;
 After the VR connects to the server, your avatar appears near the top of a hill in a magic puff. &lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;[[Spawn sanctum|ForestRespawnPodExit]][[Settlement|ForestBorder]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="209" name="ForestRespawnPodExit" tags="" position="1100,2600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="219" name="ForestRespawnPodExit" tags="" position="1100,2725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 You are in the sanctum of spawn. Its located on top of the hill above the settlement.&lt;/br&gt; 
 &lt;/br&gt;[[Magic Chest|GlobalChest]]&lt;/br&gt;
@@ -6055,7 +6225,7 @@ function takeBracers2() {
     window.gm.player.Outfit.addItem(item);
     this.disabled=true;
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="210" name="ForestBorder" tags="" position="1225,2600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="220" name="ForestBorder" tags="" position="1225,2725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.moveHere();%&gt;
 &lt;!--todo--&gt; There is a dirt road here crossing the lush grassland that is bordered by the trees of an forest.&lt;/br&gt; 
 One direction leads east, past a hut. The other direction follows the border of the forest but gets out of view quickly.&lt;/br&gt; 
@@ -6075,7 +6245,7 @@ function enterArena() {
     window.gm.dng = window.gm.dngs.ArenaTrialsNo1();
     window.gm.dng.enterDungeon();
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="211" name="ForestSearchAround" tags="_back_" position="100,2725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="221" name="ForestSearchAround" tags="_back_" position="100,2850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;% let args = window.story.state.tmp.args; if(args[0]===&#39;PurpleBerry&#39; &amp;&amp; args[1]&gt;0){ window.gm.player.Inv.addItem(window.gm.ItemsLib[args[0]](),args[1]); %&gt;
 On a secluded spot you found a batch of berry bushes. Most of them dont have any more berrys but you are able to collect a handful.&lt;/br&gt;
 &lt;%} else if(args[0]===&#39;PurpleBerry&#39;){%&gt;
@@ -6086,15 +6256,15 @@ You found some pretty flowers with blue and yellow blossoms.&lt;/br&gt;
 Unfortunatly you didnt find anything useful.&lt;/br&gt;
 &lt;%}%&gt;
 &lt;div&gt;&lt;/br&gt;[[Next|_back_]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="212" name="ForestWolfEncounter" tags="_back_" position="225,2725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="222" name="ForestWolfEncounter" tags="_back_" position="225,2850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;% window.gm.quests.addQuest(&quot;qWolfMate&quot;,1); if(window.gm.quests.getMilestoneState(&quot;qWolfMate&quot;).id&lt;=1) {%&gt;
 Distracted by rummaging around in the bushes, you just caught by surprise as you turn around.&lt;/br&gt;
 A dog is staring into your face. Its looks very close to a wolf you think. But wolfs would stay away from humans.
 &#39;Oh wait, I&#39;m in a game. In games wolves are nether to shy to attack.&#39;
 The wolf doesnt do a thing, just stands there and looks at you.
 &lt;div id=&#39;select1&#39; &gt;
-&lt;a0 onclick=&#39;window.gm.printTalkLink($(&quot;div#select1&quot;)[0],&quot;div#choice1a&quot;)&#39;&gt;First strike&lt;/a&gt;
-&lt;a0 onclick=&#39;window.gm.printTalkLink($(&quot;div#select1&quot;)[0],&quot;div#choice1b&quot;)&#39;&gt;Dont move&lt;/a&gt;
+&lt;a0 onclick=&#39;window.gm.printTalkLink(&quot;div#select1&quot;,&quot;div#choice1a&quot;)&#39;&gt;First strike&lt;/a&gt;
+&lt;a0 onclick=&#39;window.gm.printTalkLink(&quot;div#select1&quot;,&quot;div#choice1b&quot;)&#39;&gt;Dont move&lt;/a&gt;
 &lt;/div&gt;
 &lt;div id=&#39;choice1a&#39; hidden&gt;
 I&#39;m in this game right now for how long and havent killed anything? &lt;/br&gt;
@@ -6113,7 +6283,7 @@ There is a wolf again. Or is it the same?&lt;/br&gt;
 &lt;a0 onclick=&#39;window.gm.encounters.wolf()&#39;&gt;Next&lt;/a&gt;
 &lt;%}%&gt;&lt;/br&gt;
 &lt;%=(window.story.state._gm.debug)?(&quot;[[Skip|_back_]]&quot;):(&quot;&quot;)%&gt;&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="213" name="ForestEntrance" tags="" position="350,2725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="223" name="ForestEntrance" tags="" position="350,2850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.moveHere();%&gt;
 The forest makes a friendly impression.&lt;/br&gt; The trees are still light and are not yet as expansive and large as that no more light can get through the canopy.&lt;/br&gt; 
 Maybe you can &lt;a0 onclick=&#39;explore(); &#39;&gt;explore&lt;/a&gt; the surrounding woods and see if you can find anything useful.&lt;/br&gt;
@@ -6145,7 +6315,7 @@ Maybe you can &lt;a0 onclick=&#39;explore(); &#39;&gt;explore&lt;/a&gt; the surr
         window.story.show(&#39;ForestSearchAround&#39;); //nothing
     }
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="214" name="ForestMeetCarlia1" tags="_nosave_ _back_" position="475,2725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="224" name="ForestMeetCarlia1" tags="_nosave_ _back_" position="475,2850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 Standing around and thinking where to go next, you get the feeling of beeing watched.&lt;/br&gt;
 You listen carefully but can&#39;t pickup any unusual noise or other sign that something is sneaking up on you.&lt;/br&gt;&lt;/br&gt;
 Then you turn around.&lt;/br&gt;&lt;/br&gt;
@@ -6153,14 +6323,14 @@ Nothing.&lt;/br&gt;
 You turn slowly and let your eyes wander. &lt;/br&gt;
 That tree there, did you just see something vanishing behind it?&lt;/br&gt;&lt;/br&gt;
 &lt;/br&gt;&lt;div&gt; &lt;a0 onclick=&#39;window.gm.quests.addQuest(&quot;qCarlia&quot;,100);window.story.show(&quot;_back_&quot;);&#39;&gt;Next&lt;/a&gt;&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="215" name="ForestMeetCarlia2" tags="_nosave_ _back_" position="600,2725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="225" name="ForestMeetCarlia2" tags="_nosave_ _back_" position="600,2850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 Again you have the feeling on beeing watched, maybe you also heard some rustling in one of those bushes behind you.&lt;/br&gt;
 You decide to go onward. Some way ahead are several large trees and as you already know one of them has a large hollow.&lt;/br&gt;
 As you make your way through the trees, as soon as you think you are out of line of sight, you hide into the musty opening and fall silent.&lt;/br&gt;
 Holding your breath, you listen carefully.The birds are singing and the wind lets the leaves rustle but nothing else.&lt;/br&gt;
 You wait a minute and just as you decide to get back on your way, you hear a dry twig breaking some meters back where you came from.&lt;/br&gt;
 &lt;div id=&#39;select1&#39; &gt;
-&lt;a0 onclick=&#39;window.gm.printTalkLink($(&quot;div#select1&quot;)[0],&quot;div#choice1a&quot;)&#39;&gt;Jump out of your cover&lt;/a&gt;
+&lt;a0 onclick=&#39;window.gm.printTalkLink(&quot;div#select1&quot;,&quot;div#choice1a&quot;)&#39;&gt;Jump out of your cover&lt;/a&gt;
 &lt;/div&gt;&lt;div id=&#39;choice1a&#39; hidden&gt;&lt;/br&gt;
 Ejecting yourself out of your cover and facing the direction of the noise, you can discern a figure trying to hide in the shadow of a tree trunk.
 Your eyes need to adapt a moment and in that moment the figur starts running away.
@@ -6171,7 +6341,7 @@ You werent sure what you saw, but it seemed to be around your size and was movin
 The figure was running into the direction of the cliff. But that might also be a diversion.
 &lt;div&gt; &lt;a0 onclick=&#39;window.gm.quests.forceQuestMilestone(&quot;qCarlia&quot;,200,100);window.story.show(&quot;_back_&quot;);&#39;&gt;Next&lt;/a&gt;&lt;/br&gt;&lt;/div&gt;
 &lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="216" name="ForestMeetCarlia3" tags="_nosave_ _back_" position="725,2725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="226" name="ForestMeetCarlia3" tags="_nosave_ _back_" position="725,2850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 While scrutinizing a bush for further treasues, you hear something plop down on the grassy floor some distance behind you.&lt;/br&gt;
 You swirl around to see whats going on and find yourself confronted with that hooded figure that you already tried to catch.&lt;/br&gt;
 Now it is leering at you in a half crouching stand.&lt;/br&gt;
@@ -6196,7 +6366,7 @@ Now it is leering at you in a half crouching stand.&lt;/br&gt;
 With that, the figure jumps up and runs away diving through the undergrowth with a good amount of speed.
 You hurry after it but its of no use, at some point your target vanishs behind some close standing trees.&lt;/br&gt; 
 &lt;div&gt; &lt;a0 onclick=&#39;window.gm.quests.forceQuestMilestone(&quot;qCarlia&quot;,600,500);window.story.show(&quot;_back_&quot;);&#39;&gt;Next&lt;/a&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="217" name="ForestMeetCarlia4" tags="_nosave_" position="850,2725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="227" name="ForestMeetCarlia4" tags="_nosave_" position="850,2850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 The cloaked pursuer drops from a thick branch just above your head as you pass by below it.&lt;/br&gt;
 Pouncing on you, you get knocked over and the figure is stradling you on your back.
 You hear a &#39;rawr&#39; and feel the choker been pulled thight. Either it want to choke you or to rip of the collar around your neck.
@@ -6212,21 +6382,21 @@ She bares several small but sharph looking teeth.
 &lt;p class=&quot;tPC&quot;&gt;&quot;What the hell are you?&quot;&lt;/p&gt;
 With that, the enraged cat-girl pounces at you with her outstretched hands, adorned with razor-sharph extended claws. 
 &lt;div&gt; &lt;a0 onclick=&#39;window.story.show(&quot;_back_&quot;);&#39;&gt;Next&lt;/a&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="218" name="CarliaMakeDeal" tags="_nosave_" position="975,2725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="228" name="CarliaMakeDeal" tags="_nosave_" position="975,2850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 You dive under Calias claw as she trys to land another hit.&lt;/br&gt;
 At the same time - either because you have some hidden wrestler champion skill or by pure accident - you bring her down face first by tripping a feet.
 Now its your time to pounce on her back. Gripping her wrists with your hands and using your legs to keep hers in check, you can keep her face down on all fours.  
 &lt;p class=&quot;tPC&quot;&gt;&#39;And now what?&#39;&lt;/p&gt;
 As soon as you let go she will either be up and away or give you some nasty scratching. She is struggling against you pinning her down.
 &lt;div id=&#39;select1&#39; &gt;
-&lt;a0 onclick=&#39;window.gm.printTalkLink($(&quot;div#select1&quot;)[0],&quot;div#choice1a&quot;)&#39;&gt;She is quite in a vulnerable position...&lt;/a&gt;
-&lt;a0 onclick=&#39;window.gm.printTalkLink($(&quot;div#select1&quot;)[0],&quot;div#choice1b&quot;)&#39;&gt;Lets try to talk some sense into her.&lt;/a&gt;
+&lt;a0 onclick=&#39;window.gm.printTalkLink(&quot;div#select1&quot;,&quot;div#choice1a&quot;)&#39;&gt;She is quite in a vulnerable position...&lt;/a&gt;
+&lt;a0 onclick=&#39;window.gm.printTalkLink(&quot;div#select1&quot;,&quot;div#choice1b&quot;)&#39;&gt;Lets try to talk some sense into her.&lt;/a&gt;
 &lt;/div&gt;&lt;div id=&#39;choice1a&#39; hidden&gt;
 &lt;/br&gt;That bottom of hers rubbing against your groin is quite a diversion.
 &lt;p class=&quot;tPC&quot;&gt;&#39;I wonder how far I could go in that game..&#39;&lt;/p&gt;
 Maybe she picked up your thoughts or she just run out of endurance. But she stopped struggling for the most and started to snuffle and sob.
 &lt;p class=&quot;tPC&quot;&gt;&#39;Damn, those sobs a really getting onto me. Am I realy such a bad guy to force myself onto her?&#39;&lt;/p&gt;
-&lt;div id=&#39;choice1a_&#39;&gt;&lt;a0 onclick=&#39;window.gm.printTalkLink($(&quot;div#choice1a_&quot;)[0],&quot;div#choice1b&quot;)&#39;&gt;Be kind&lt;/a&gt;&lt;/div&gt;
+&lt;div id=&#39;choice1a_&#39;&gt;&lt;a0 onclick=&#39;window.gm.printTalkLink(&quot;div#choice1a_&quot;,&quot;div#choice1b&quot;)&#39;&gt;Be kind&lt;/a&gt;&lt;/div&gt;
 &lt;/div&gt;
 &lt;div id=&#39;choice1b&#39; hidden&gt;
 &lt;p class=&quot;tPC&quot;&gt;&quot;Hey stop kicking and listen ! I dont want to hurt you.&quot;&lt;/p&gt;
@@ -6245,7 +6415,7 @@ So you let her wrist go, push your self up and hurriedly back away some distance
 With that thought in mind you leave Carlia behind.&lt;/br&gt; 
 &lt;a0 onclick=&#39;window.gm.quests.forceQuestMilestone(&quot;qCarlia&quot;,700,600);window.story.show(&quot;ForestCliff&quot;);&#39;&gt;Next&lt;/a&gt;
 &lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="219" name="ForestMudGlade" tags="" position="1100,2725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="229" name="ForestMudGlade" tags="" position="1100,2850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 This area of the forest seems to be more watery and sludgy. Your feet sink into the muddy soil.
 &lt;a0 onclick=&#39;explore();&#39;&gt;Searching around&lt;/a&gt; might only get you wet and dirty.&lt;/br&gt;
@@ -6261,38 +6431,38 @@ This area of the forest seems to be more watery and sludgy. Your feet sink into 
         window.story.show(&#39;ForestSearchAround&#39;); //nothing
     }
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="220" name="ForestLeechEncounter" tags="_back_" position="1225,2725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="230" name="ForestLeechEncounter" tags="_back_" position="1225,2850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;% if(true) {%&gt;
 Some sludgy leeches are crawling up your legs, each easily long as a hand !&lt;/br&gt;
 &lt;a0 onclick=&#39;window.gm.encounters.leech(window.gm.player.location,_.random(1,3))&#39;&gt;Next&lt;/a&gt;
 &lt;%}%&gt;&lt;/br&gt;
 &lt;%=(window.story.state._gm.debug)?(&quot;[[Skip|_back_]]&quot;):(&quot;&quot;)%&gt;&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="221" name="ForestDryadEncounter" tags="_back_" position="100,2850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="231" name="ForestDryadEncounter" tags="_back_" position="100,2975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;% if(true) {%&gt;
 As you make your way through the trees, a strange woman-like figure steps out behind one of them !&lt;/br&gt;
 &lt;a0 onclick=&#39;window.gm.encounters.dryad(window.gm.player.location,_.random(1,3))&#39;&gt;Next&lt;/a&gt;
 &lt;%}%&gt;&lt;/br&gt;
 &lt;%=(window.story.state._gm.debug)?(&quot;[[Skip|_back_]]&quot;):(&quot;&quot;)%&gt;&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="222" name="ForestCliff" tags="" position="225,2850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="232" name="ForestCliff" tags="" position="225,2975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.moveHere();%&gt;
 &lt;% if(window.gm.quests.getMilestoneState(&quot;qDiedAgain&quot;).id===2) { %&gt;
 You fight your way through the dense undergrowth and realize just in time that you have reached the edge of a cliff.&lt;/br&gt; 
 &lt;div id=&#39;select1&#39; &gt;
-&lt;a0 onclick=&#39;window.gm.printTalkLink($(&quot;div#select1&quot;)[0],&quot;div#choice1a&quot;)&#39;&gt;Peak into the chasm&lt;/a&gt;
+&lt;a0 onclick=&#39;window.gm.printTalkLink(&quot;div#select1&quot;,&quot;div#choice1a&quot;)&#39;&gt;Peak into the chasm&lt;/a&gt;
 &lt;/div&gt;
 &lt;div id=&#39;choice1a&#39; hidden&gt;
 There is a slab of rock from which you should be able to look down quite well.&lt;/br&gt;
 You look carefully over the edge. It&#39;s not a real abyss, but a pretty steep, rocky slope. &lt;/br&gt;
 &#39;I&#39;m not climbing down there now.&#39; you think when you want to go back to the forest. &lt;/br&gt;
 &lt;div id=&#39;select2&#39; &gt;
-&lt;a0 onclick=&#39;window.gm.printTalkLink($(&quot;div#select2&quot;)[0],&quot;div#choice2a&quot;)&#39;&gt;Next&lt;/a&gt;
+&lt;a0 onclick=&#39;window.gm.printTalkLink(&quot;div#select2&quot;,&quot;div#choice2a&quot;)&#39;&gt;Next&lt;/a&gt;
 &lt;/div&gt;
 &lt;div id=&#39;choice2a&#39; hidden&gt;
 The rock slab is not so rock-solid and just as you turn around it begins to tip into the abyss. 
 Unfortunatly, your jump-ability isn&#39;t quite good enough. The slab drags you down with it.&lt;/br&gt;
 At some point you see a massive rock coming onto you, reaching out with your hands to stop it squishing you.
 &lt;div id=&#39;select3&#39; &gt;
-&lt;a0 onclick=&#39;window.gm.printTalkLink($(&quot;div#select3&quot;)[0],&quot;div#choice3a&quot;)&#39;&gt;Next&lt;/a&gt;
+&lt;a0 onclick=&#39;window.gm.printTalkLink(&quot;div#select3&quot;,&quot;div#choice3a&quot;)&#39;&gt;Next&lt;/a&gt;
 &lt;/div&gt;
 &lt;div id=&#39;choice3a&#39; hidden&gt;
 But of course its futile trying to catch that crushing weight. &lt;/br&gt;  
@@ -6309,7 +6479,7 @@ You go forward where you would guess someone would be walking, carefully watchin
 A path leads along the cliff until it vanishs into a [[cave entrance|ForestCliffCave]] .  
 Or you might just return to [[ForestEntrance]]. &lt;/br&gt;&lt;/div&gt; 
 &lt;%}%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="223" name="ForestCliffCave" tags="" position="350,2850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="233" name="ForestCliffCave" tags="" position="350,2975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.moveHere();%&gt;
 &lt;% if(window.gm.quests.getMilestoneState(&quot;qBondageKink&quot;).id&lt;=1 &amp;&amp; window.gm.quests.getMilestoneState(&quot;qCarlia&quot;).id===300) { %&gt;
 At some point the small path leads further downward the cliff, makes a curve and ends in front of a cave.&lt;/br&gt;
@@ -6318,8 +6488,8 @@ Someone made himself a home here. There is a small fireplace with burned up char
 As you snoop around you find a worn bag or satchel made of leather and fur.&lt;/br&gt;
 It could give you some information about its owner if you take a look at it.&lt;/br&gt;
 &lt;div id=&#39;select1&#39; &gt;
-&lt;a0 onclick=&#39;window.gm.printTalkLink($(&quot;div#select1&quot;)[0],&quot;div#choice1a&quot;)&#39;&gt;Peek inside&lt;/a&gt;
-&lt;a0 onclick=&#39;window.gm.printTalkLink($(&quot;div#select1&quot;)[0],&quot;div#choice1b&quot;)&#39;&gt;or dont&lt;/a&gt;
+&lt;a0 onclick=&#39;window.gm.printTalkLink(&quot;div#select1&quot;,&quot;div#choice1a&quot;)&#39;&gt;Peek inside&lt;/a&gt;
+&lt;a0 onclick=&#39;window.gm.printTalkLink(&quot;div#select1&quot;,&quot;div#choice1b&quot;)&#39;&gt;or dont&lt;/a&gt;
 &lt;/div&gt;&lt;div id=&#39;choice1a&#39; hidden&gt;
 After undoing the clasp, you carefuly peek inside the bag.
 &lt;p class=&quot;tPC&quot;&gt;&#39;I&#39;m not going to stick my hand in it - better safe then sorry.&#39;&lt;/p&gt;
@@ -6336,13 +6506,13 @@ Maybe you can ask someone for help.&lt;/br&gt;
 &lt;/div&gt;
 &lt;div id=&#39;choice1b&#39; hidden&gt;
 Come on, what kind of adventurer are you? How will you ever get good loot if you dont open every chest and jar you find - or stinky old leatherbags.
-&lt;a0 onclick=&#39;window.gm.printTalkLink($(&quot;div#choice1b&quot;)[0],&quot;div#choice1a&quot;)&#39;&gt;Peek inside&lt;/a&gt;
+&lt;a0 onclick=&#39;window.gm.printTalkLink(&quot;div#choice1b&quot;,&quot;div#choice1a&quot;)&#39;&gt;Peek inside&lt;/a&gt;
 &lt;/div&gt;
 &lt;% } else {%&gt;
 &lt;div&gt;
 The path leads up to [[ForestCliff]] or further down to a [[river|NOP]]. &lt;/br&gt;&lt;/div&gt; 
 &lt;%}%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="224" name="ForestOldForest" tags="" position="475,2850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="234" name="ForestOldForest" tags="" position="475,2975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.moveHere();%&gt;
 &lt;!--todo--&gt; Very old oak-trees grow here with thick branches forking out of the large trunks several meters above the ground. Equally large roots dig into the humid soil. &lt;/br&gt; 
 The leaf canopy is dense but in some places bundles of sun rays reach the forest floor.
@@ -6359,13 +6529,13 @@ The leaf canopy is dense but in some places bundles of sun rays reach the forest
         window.story.show(&#39;ForestSearchAround&#39;); //nothing
     }
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="225" name="ForestStoneCircle" tags="" position="600,2850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="235" name="ForestStoneCircle" tags="" position="600,2975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.moveHere();%&gt;
 &lt;!--todo--&gt; Out of the dense undergrowth you step into a clearing. This would be an idyllic place if it weren&#39;t for this creepy stone circle.&lt;/br&gt; 
 &lt;/br&gt; 
 &lt;% if(true) { %&gt;
 &lt;div id=&#39;select1&#39; &gt;
-&lt;a0 onclick=&#39;window.gm.printTalkLink($(&quot;div#select1&quot;)[0],&quot;div#choice1a&quot;)&#39;&gt;Inspect stone circle&lt;/a&gt;
+&lt;a0 onclick=&#39;window.gm.printTalkLink(&quot;div#select1&quot;,&quot;div#choice1a&quot;)&#39;&gt;Inspect stone circle&lt;/a&gt;
 &lt;/div&gt;
 &lt;div id=&#39;choice1a&#39; hidden&gt;
 Du gehst zu den übermannsgroßen Steinen. Es scheint hier etwas kühler zu sein und etwas Nebel liegt in der Luft.
@@ -6375,7 +6545,7 @@ Ansonsten gibt es hier nichts.&lt;/br&gt;
 &lt;% } else {%&gt;
 &lt;div&gt;[[ForestEntrance]]&lt;/br&gt;&lt;/div&gt; 
 &lt;%}%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="226" name="ForestAlchemistHut" tags="name:shaby_hut" position="725,2850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="236" name="ForestAlchemistHut" tags="name:shaby_hut" position="725,2975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.moveHere();%&gt;
 &lt;p class=&quot;tPC&quot;&gt;&lt;/p&gt;&#39;Puh, what a stink. I shouldnt stay here for long for I might suffocate&#39;&lt;/p&gt;
 &quot;About that cake we talked earlier - what kind of cake are we speaking about.&quot;
@@ -6386,7 +6556,7 @@ Ansonsten gibt es hier nichts.&lt;/br&gt;
 &lt;a0 onclick=&#39;window.gm.player.Inv.removeItem(&quot;PurpleBerry&quot;,5);window.gm.player.Inv.addItem(new window.gm.ItemsLib[&quot;HorsePowerPotion&quot;](),1);window.gm.refreshAllPanel();&#39; &lt;%=(true)?(&quot;&quot;):(&quot;hidden&quot;)%&gt;&gt;Trade xxx for 1 HorsePower-Draft&lt;/a&gt;
 &lt;%}%&gt;
 &lt;div&gt;&lt;/br&gt;[[Outside|ForestBorder]]  [[Alchemist|ForestAlchemistTalk]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="227" name="ForestBridge" tags="" position="850,2850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="237" name="ForestBridge" tags="" position="850,2975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.moveHere();%&gt;
 &lt;% if(window.gm.quests.getMilestoneState(&quot;qBondageKink&quot;).id&lt;100) { %&gt;
 Somehow you cant go into this direction. Maybe this route unlocks later.
@@ -6397,7 +6567,7 @@ You follow the path until after a curve a wooden bridge comes into view.
 The bridge spans about the canyon,a deep chasm between the forest and the eastern area thereof.&lt;/br&gt;
 You carefully set a foot on it, so far it looks stable enough to carry ones weight.
 &lt;div id=&#39;select1&#39; &gt;
-&lt;a0 onclick=&#39;window.gm.printTalkLink($(&quot;div#select1&quot;)[0],&quot;div#choice1a&quot;)&#39;&gt;Go on&lt;/a&gt;
+&lt;a0 onclick=&#39;window.gm.printTalkLink(&quot;div#select1&quot;,&quot;div#choice1a&quot;)&#39;&gt;Go on&lt;/a&gt;
 &lt;/div&gt;
 &lt;div id=&#39;choice1a&#39; hidden&gt;
 When you have half of the bridge behind you, a large figure steps into view.&lt;/br&gt;
@@ -6407,7 +6577,7 @@ Squinching your eyes and slowing down your steps, you try to get a better view o
 &lt;p class=&quot;tNPC1&quot;&gt;&quot;There is no sign yet beause...we where busy with...bridge repair. You give ...20coin and then you may pass.&quot;&lt;/p&gt;
 &lt;span class=&quot;tPC&quot;&gt;&#39;Looks more like highwayman then a craftsman&#39;&lt;/span&gt; you think to yourself. &lt;/br&gt;
 &lt;div id=&#39;select2&#39; &gt;
-&lt;a0 onclick=&#39;window.gm.printTalkLink($(&quot;div#select2&quot;)[0],&quot;div#choice2a&quot;)&#39;&gt;Cant pay&lt;/a&gt;
+&lt;a0 onclick=&#39;window.gm.printTalkLink(&quot;div#select2&quot;,&quot;div#choice2a&quot;)&#39;&gt;Cant pay&lt;/a&gt;
 &lt;/div&gt;
 &lt;div id=&#39;choice2a&#39; hidden&gt;
 &lt;p class=&#39;tPC&#39;&gt;&quot;I cant pay you, I have nothing of value.&quot;&lt;/p&gt;
@@ -6415,7 +6585,7 @@ Squinching your eyes and slowing down your steps, you try to get a better view o
 &lt;p class=&quot;tPC&quot;&gt;&#39;I could tackle him. I bet he wouldnt take the risk of a fight if he is alone and cant expect some loot from me.&#39;&lt;/p&gt;
 &lt;p class=&quot;tNPC1&quot;&gt;&quot;Nice collar. So you are a slave? Maybe you have fled from your master huh? I should just take you into custody for some reward - SLAVE.&quot;&lt;/p&gt;
 &lt;div id=&#39;select3&#39; &gt;
-&lt;a0 onclick=&#39;window.gm.printTalkLink($(&quot;div#select3&quot;)[0],&quot;div#choice3a&quot;);&#39;&gt;&quot;I&#39;m not a slave!&quot;&lt;/a&gt;
+&lt;a0 onclick=&#39;window.gm.printTalkLink(&quot;div#select3&quot;,&quot;div#choice3a&quot;);&#39;&gt;&quot;I&#39;m not a slave!&quot;&lt;/a&gt;
 &lt;/div&gt;
 &lt;div id=&#39;choice3a&#39; hidden&gt;
 While you scream at your offender, he bolts forward trying to knock you over.&lt;/br&gt;
@@ -6431,35 +6601,35 @@ Maybe you can [[speak up to him|TrentTalk]].&lt;/br&gt;
 A large bridge made of wood crosses a deep canyon that separates the forest from the land east of it.&lt;/br&gt;
 &lt;div&gt;[[to Forest|ForestBorder]] [[to Plains|PlainsWest]]. &lt;/br&gt;&lt;/div&gt;
 &lt;%}%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="228" name="TrentTalk" tags="" position="975,2850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="238" name="TrentTalk" tags="" position="975,2975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 Trent the horse-man is leaning at the handrail of the bridge and says with a smug grin: &lt;/br&gt;
 &lt;p class=&quot;tNPC1&quot;&gt;&quot;There you are again. Are you here for another lesson?&quot;&lt;/p&gt;
 &lt;div&gt; [[Leave|ForestBridge]] [[offer him something]] &lt;a0 onclick=&#39;window.gm.encounters.Trent(window.gm.player.location);&#39;&gt;wrestle with him(again)&lt;/a&gt;&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="229" name="VillageEntranceIntro" tags="" position="1100,2850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="239" name="VillageEntranceIntro" tags="" position="1100,2975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;!--todo--&gt; A neat little village comes into view as you make your way along the dirtroad.&lt;/br&gt;
 Someone has painted &#39;Thetain&#39; on the planks above the wooden gate. Most likely thats the name of this commune.&lt;/br&gt;
 &#39;I wonder if I can really visit those houses or if they are just scenery of the game.&#39;
 &lt;div&gt;&lt;/br&gt;
 [[Continue|VillageMarketPlace]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="230" name="VillageEntrance" tags="" position="1225,2850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="240" name="VillageEntrance" tags="" position="1225,2975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.moveHere();%&gt;
 &lt;!--todo--&gt; You are at the entrance to the town Thetain.
 &lt;/br&gt;&lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Enter village|VillageMarketPlace]]  [[leave village|PlainsFarmland]] [[Spawn sanctum|VillageRespawnPodExit]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="231" name="VillageMarketPlace" tags="" position="100,2975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="241" name="VillageMarketPlace" tags="" position="100,3100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.moveHere();%&gt;
 &lt;!--todo--&gt; No people can be seen around the place right now.&lt;/br&gt; There seems to be a smithy, a Inn and another shop where you cant say what kind of wares - if any - they are trading.&lt;/br&gt;
 &lt;/br&gt; Near the entrance of the Inn is also a [[bulletin-board|VillageBlackboard]]. 
 &lt;div&gt;&lt;/br&gt;
 [[Gate|VillageEntrance]] [[Inn|VillageInn]] [[Smithy|VillageSmithy]] [[Shop|VillagePawnshop]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="232" name="VillageBlackboard" tags="_back_" position="225,2975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="242" name="VillageBlackboard" tags="_back_" position="225,3100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 Some tattered notes are pinned to the board: &lt;/br&gt;
 &lt;hr&gt; Farmhand needed &lt;/br&gt; Someone is searching for help with their farm work.&lt;/br&gt; &quot;I&#39;m here for adventure,not boring work !&quot;&lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Leave|_back_]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="233" name="VillageInn" tags="" position="350,2975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="243" name="VillageInn" tags="" position="350,3100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.moveHere();%&gt;
 &lt;!--todo--&gt; &#39;This really looks like they scavenged that place from a typical fantasy story book.&#39;&lt;/br&gt; 
 &lt;p class=&quot;tPC&quot;&gt;&quot;Hello, uhm... lady. I would like to ask if you know someone who could have some knowledge about magic.&quot;&lt;/p&gt;
@@ -6469,7 +6639,7 @@ Some tattered notes are pinned to the board: &lt;/br&gt;
 &lt;&lt;p class=&quot;tNPC1&quot;&gt;&quot;Please ?!&quot;&lt;/p&gt;&gt;
 &lt;div&gt;&lt;/br&gt;[[Square|VillageMarketPlace]] [[Innkeeper|NOP]] &lt;/br&gt;&lt;/div&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
-&lt;script&gt; &lt;/script&gt;</tw-passagedata><tw-passagedata pid="234" name="VillagePawnshop" tags="" position="475,2975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;script&gt; &lt;/script&gt;</tw-passagedata><tw-passagedata pid="244" name="VillagePawnshop" tags="" position="475,3100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.moveHere();%&gt;
 &lt;!--todo--&gt; If this is a shop, then they sell everything: Shoes, cooking pans, assault ballista and chicken.&lt;/br&gt; 
 &lt;!--todo--&gt;On the other side of the room is a large [[Wardrobe]] with a [[Mirror]] where you can take a look at yourself.&lt;/br&gt;
@@ -6478,7 +6648,7 @@ Some tattered notes are pinned to the board: &lt;/br&gt;
 &lt;div&gt;&lt;/br&gt; [[Buy]] or [[Sell]] something.&lt;/br&gt;
 [[Square|VillageMarketPlace]]  [[Shopkeeper|NOP]]&lt;/br&gt;&lt;/div&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
-&lt;script&gt;&lt;/script&gt;</tw-passagedata><tw-passagedata pid="235" name="VillageSmithy" tags="" position="600,2975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;script&gt;&lt;/script&gt;</tw-passagedata><tw-passagedata pid="245" name="VillageSmithy" tags="" position="600,3100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.moveHere();%&gt;
 This smithy is especially - especially dirty, noisy and smelly.
 &lt;p class=&quot;tPC&quot;&gt;Excuse me, could you help me a second&lt;/p&gt; you shout at the figure working the metal on the forge.
@@ -6494,19 +6664,19 @@ The man just gives a short glance at it before crossing his arms again before hi
 &lt;p class=&quot;tPC&quot;&gt;&quot;But who could help me?&quot;&lt;/p&gt;
 &lt;p class=&quot;tNPC2&quot;&gt;&quot;I dunno&quot; he shrugs his shoulders &quot;a magican maybe.&quot;&lt;/p&gt;
 &lt;/br&gt;[[Square|VillageMarketPlace]]  [[Shopkeeper|NOP]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="236" name="VillageRespawnPodExit" tags="" position="725,2975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="246" name="VillageRespawnPodExit" tags="" position="725,3100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 You are in the sanctum of spawn located in Thetain.&lt;/br&gt; 
 &lt;/br&gt;[[Magic Chest|GlobalChest]]&lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;[[Leave|VillageEntrance]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="237" name="VRSuiteUp" tags="" position="850,2975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="247" name="VRSuiteUp" tags="" position="850,3100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;!--todo--&gt; You are eager to try that virtual reallity game. &lt;/br&gt;
 &quot;Welcome to the test version of our new game. Lets just clarify some things about the beta-testing process. In most cases you just have to play the game as you like. We will track your actions and progress to adapt and improve the experience of the finished game.
 However, at times you might be requested to do certain things and do it in a certain way.  &lt;/br&gt;
 Remember that this is not the final game. We continously modify aspects to get the best experience for the players.&quot;   &lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Start the game|CharacterEditor]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="238" name="CharacterEditor" tags="" position="975,2975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="248" name="CharacterEditor" tags="" position="975,3100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 You say &#39;Create new avatar&#39;. The screen switches to those kind of screens that are common to other RPGs.&lt;/br&gt;
 You can select class, race, character-traits and some visual aspects.&lt;/br&gt;
@@ -6518,15 +6688,15 @@ You can toggle between male and female though the difference between the androgy
 The description of the class is sparse. The picture you see indicates that this class uses a 2-handed staff and light armor. You expect also some magic abilities - its an elf, isn&#39;t it?.&lt;/br&gt;
 &lt;p class=&quot;tPC&quot;&gt;&#39;I will choose male. Brad would make fun of me all time if I would choose any other option. On the other hand, it is roleplay right?&#39;&lt;/p&gt;&lt;/br&gt;
 &lt;div id=&#39;select1&#39; &gt;
-&lt;a0 onclick=&#39;window.gm.printTalkLink($(&quot;div#select1&quot;)[0],&quot;div#choice1a&quot;);window.gm.MutationsLib[&quot;swapGender&quot;](window.gm.player,window.storage.constructors[&quot;PenisHuman&quot;]);&#39;&gt;male&lt;/a&gt;
-&lt;a0 onclick=&#39;window.gm.printTalkLink($(&quot;div#select1&quot;)[0],&quot;div#choice1b&quot;);window.gm.MutationsLib[&quot;swapGender&quot;](window.gm.player,window.storage.constructors[&quot;VulvaHuman&quot;]);window.gm.player.Outfit.addItem(new window.storage.constructors[&quot;BreastHuman&quot;].factory(&quot;human&quot;));&#39;&gt;female&lt;/a&gt;
+&lt;a0 onclick=&#39;window.gm.printTalkLink(&quot;div#select1&quot;,&quot;div#choice1a&quot;);window.gm.MutationsLib[&quot;swapGender&quot;](window.gm.player,window.storage.constructors[&quot;PenisHuman&quot;]);&#39;&gt;male&lt;/a&gt;
+&lt;a0 onclick=&#39;window.gm.printTalkLink(&quot;div#select1&quot;,&quot;div#choice1b&quot;);window.gm.MutationsLib[&quot;swapGender&quot;](window.gm.player,window.storage.constructors[&quot;VulvaHuman&quot;]);window.gm.player.Outfit.addItem(new window.storage.constructors[&quot;BreastHuman&quot;].factory(&quot;human&quot;));&#39;&gt;female&lt;/a&gt;
 &lt;/div&gt;&lt;div id=&#39;choice1a&#39; hidden&gt; You selected male.
 &lt;/br&gt;[[Ready|StartLocation]]&lt;/br&gt;
 &lt;/div&gt;
 &lt;div id=&#39;choice1b&#39; hidden&gt; You selected female.
 &lt;/br&gt;[[Ready|StartLocation]]&lt;/br&gt;
 &lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="239" name="StartLocation" tags="" position="1100,2975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="249" name="StartLocation" tags="" position="1100,3100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;
 window.gm.enterVR();%&gt;
 &lt;%window.gm.quests.forceQuestMilestone(&quot;qDiedAgain&quot;,2,1);window.gm.quests.forceQuestMilestone(&quot;qDLCMain&quot;,700,600)%&gt;
@@ -6534,19 +6704,19 @@ window.gm.enterVR();%&gt;
 You can see some hut from here. You just need to follow the trail down the hill.&quot;&lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Settlement|ForestBorder]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="240" name="Training1" tags="" position="1225,2975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="250" name="Training1" tags="" position="1225,3100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;!--todo--&gt; The path snakes down the grassy flanks of the hill. As you make your way around a large boulder, something strange happens:&lt;/br&gt;
 &lt;devnote&gt;&quot;Welcome to our little world. Just in case you are not used to that kind of game we should get you some training.&quot;&lt;/devnote&gt;&lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Continue|Training1Done]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="241" name="Training1Done" tags="" position="100,3100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="251" name="Training1Done" tags="" position="100,3225" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;!--todo--&gt; &lt;/br&gt;
 &lt;devnote&gt;&quot;I wish you good luck in exploring this world. May the gods be with you.&quot;&lt;/devnote&gt;&lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Continue|ForestBorder]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="242" name="Dungeon" tags="" position="225,3100" size="100,100">&lt;!--dont &quot;show&quot; this! setup the dungeon and call enterDungeon--&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="252" name="Dungeon" tags="" position="225,3225" size="100,100">&lt;!--dont &quot;show&quot; this! setup the dungeon and call enterDungeon--&gt;
 &lt;!--if not explicitly allowed, save is disabled in dungeon--&gt;
 &lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%= window.gm.dng.name%&gt;-&lt;%= window.gm.dng.actualRoom.floor.name%&gt;-&lt;%= window.gm.dng.actualRoom.name%&gt;&lt;/br&gt; 
@@ -6557,22 +6727,22 @@ You can see some hut from here. You just need to follow the trail down the hill.
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
 &lt;script&gt;
 window.gm.dng.printButtons()
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="243" name="DungeonMap" tags="_nosave_" position="350,3100" size="100,100">&lt;!--dont &quot;show&quot; this! setup the dungeon and call displayMap--&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="253" name="DungeonMap" tags="_nosave_" position="350,3225" size="100,100">&lt;!--dont &quot;show&quot; this! setup the dungeon and call displayMap--&gt;
 &lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%= window.gm.dng.Mapper.printMap( window.gm.dng.actualRoom,false)%&gt;&lt;/br&gt;
 &lt;/br&gt; 
 [[Back|Dungeon]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="244" name="DungeonFoundNothing" tags="_nosave_" position="475,3100" size="100,100">&lt;!--example-scene for onenter/onexit event--&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="254" name="DungeonFoundNothing" tags="_nosave_" position="475,3225" size="100,100">&lt;!--example-scene for onenter/onexit event--&gt;
 &lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%= window.gm.dng.actualRoom.descr()%&gt;&lt;/br&gt;
 There are some buckets here, but there is nothing useful inside.&lt;/br&gt;
 &lt;/br&gt;
 &lt;a0 onclick=&#39;window.gm.dng.resumeRoom();&#39;&gt;Go on&lt;/a&gt;&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="245" name="DungeonGenericEvent" tags="_nosave_" position="600,3100" size="100,100">&lt;!--example-scene for operation--&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="255" name="DungeonGenericEvent" tags="_nosave_" position="600,3225" size="100,100">&lt;!--example-scene for operation--&gt;
 &lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;div id=&#39;panel&#39;&gt;&lt;/div&gt;&lt;!--event is rendered here--&gt;
 &lt;%= window.gm.dng.renderEvent(window.gm.dng.evtData)%&gt;&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="246" name="DungeonCrashedThroughFloor" tags="_nosave_" position="725,3100" size="100,100">&lt;!--example-scene for onenter/onexit event--&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="256" name="DungeonCrashedThroughFloor" tags="_nosave_" position="725,3225" size="100,100">&lt;!--example-scene for onenter/onexit event--&gt;
 &lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%= window.gm.dng.actualRoom.descr()%&gt;&lt;/br&gt;
 You crash down through the floor and find yourself back on the lowest level of the area.&lt;/br&gt;
@@ -6585,22 +6755,22 @@ function crashThrough() {
     var Room = floor1.getRoom(window.gm.dng.actualRoom.name);  //room names are the same at same position of floor
     window.gm.dng.teleport(Room);
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="247" name="GlobalChest" tags="_nosave_ _back_" position="850,3100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="257" name="GlobalChest" tags="_nosave_ _back_" position="850,3225" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 Items you store in this magic chest dont get lost if you are knocked out.
 &lt;/br&gt;[[Back|_back_]] [[Wardrobe...|GlobalChestWardrobe]]&lt;/br&gt;
 &lt;div id=&quot;choice&quot;&gt;&lt;/div&gt;
 &lt;/br&gt;[[Back|_back_]]&lt;/br&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
-&lt;script&gt;window.gm.printItemTransfer(window.gm.player,window.story.state.GlobalChest,false);&lt;/script&gt;</tw-passagedata><tw-passagedata pid="248" name="GlobalChestWardrobe" tags="_nosave_ _back_" position="975,3100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;script&gt;window.gm.printItemTransfer(window.gm.player,window.story.state.GlobalChest,false);&lt;/script&gt;</tw-passagedata><tw-passagedata pid="258" name="GlobalChestWardrobe" tags="_nosave_ _back_" position="975,3225" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 Items you store in this magic chest dont get lost if you are knocked out.&lt;/br&gt;Only unequipped equipment can be transferred.
 &lt;/br&gt;[[Items...|_back_]]&lt;/br&gt;
 &lt;div id=&quot;choice&quot;&gt;&lt;/div&gt;
 &lt;/br&gt;[[Items...|_back_]]&lt;/br&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
-&lt;script&gt;window.gm.printItemTransfer(window.gm.player,window.story.state.GlobalChest,true);&lt;/script&gt;</tw-passagedata><tw-passagedata pid="249" name="NOP_VR" tags="_nosave_ _back_" position="1100,3100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;script&gt;window.gm.printItemTransfer(window.gm.player,window.story.state.GlobalChest,true);&lt;/script&gt;</tw-passagedata><tw-passagedata pid="259" name="NOP_VR" tags="_nosave_ _back_" position="1100,3225" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;p class=&#39;dev&#39;&gt; You cant go that way. Either because its WIP or you need to solve a quest first. &lt;/p&gt;
 &lt;/br&gt;[[Back|_back_]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="250" name="Home" tags="name:your_dorms_hallway" position="1225,3100" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="260" name="Home" tags="name:your_dorms_hallway" position="1225,3225" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;%window.gm.quests.addQuest(&quot;qFindGarden&quot;,1);window.gm.quests.addQuest(&quot;qStudy&quot;,1); %&gt;
@@ -6618,7 +6788,7 @@ function checkQuest(){
 	}
 }
 checkQuest();
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="251" name="Kitchen" tags="" position="1231,613" size="100,100">&lt;section&gt; 
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="261" name="Kitchen" tags="" position="1231,613" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 You are in the kitchen. &lt;/br&gt;
@@ -6635,7 +6805,7 @@ Mom will take care to resupply the fridge. But she might be disappointed if you 
 &lt;%}%&gt;
 Where would you like to go?&lt;/br&gt;
 [[Living_Room]]   [[Hallway|Home]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="252" name="Melanies Bedroom" tags="" position="225,3225" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="262" name="Melanies Bedroom" tags="" position="225,3350" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 This is the bedroom of Melanie.
@@ -6666,7 +6836,7 @@ function inviteChar(elmnt) {
 		elmnt.outerHTML=(&quot;&lt;div class=&#39;red&#39;&gt;Cyril added to your team. &lt;/div&gt;&quot;);
 	}
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="253" name="moms_treasure" tags="_back_" position="350,3225" size="100,100">&lt;section&gt; 
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="263" name="moms_treasure" tags="_back_" position="350,3350" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 In one of the nightstand you find some handcuffs.They look thorough but you think they just might be used for some bedplay.&lt;/br&gt;
 &lt;a0 onclick=&#39;useHandcuff(this)&#39;&gt;Play with them&lt;/a&gt;&lt;/br&gt;
@@ -6678,7 +6848,7 @@ function useHandcuff(elmnt) {
 	window.gm.player.Outfit.addItem(new Handcuffs());
 	elmnt.replaceWith(&quot;&lt;div class=&#39;red&#39;&gt;Playing around with the cuffs you suddenly find yourself locked up with them. You panick as you find the locking-mechanic quite tight. You need a key and maybe some help to unlock them!&lt;/div&gt;&quot;);
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="254" name="Your Bedroom" tags="" position="1033,470" size="100,100">&lt;section&gt; 
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="264" name="Your Bedroom" tags="" position="1033,470" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%window.gm.player.location=window.passage.name; 
 window.gm.quests.addQuest(&quot;qMyPleasure&quot;,1);%&gt;
@@ -6707,7 +6877,7 @@ There is a large bed for sleeping with a nightstand aside. &lt;/br&gt;
 &lt;% } else { %&gt;
 Where do you want to go ? &lt;/br&gt;
 [[Hallway|Home]]&lt;/br&gt; &lt;%}%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="255" name="Sleep" tags="" position="600,3225" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="265" name="Sleep" tags="" position="600,3350" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 You fall into your bedsheets and sleep until your smartphone buzzes you out of your dreams.&lt;/br&gt;
 &lt;/br&gt;&lt;div id=&#39;output&#39;&gt;&lt;/div&gt;
@@ -6728,7 +6898,7 @@ function checkJob() {
 	return(text);
 }
 window.gm.printOutput(checkJob());
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="256" name="Living_Room" tags="" position="725,3225" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="266" name="Living_Room" tags="" position="725,3350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 The living room that you share with your mom is sparsely decorated (until now).&lt;/br&gt;
 An old wooden table with 4 chairs rests on a wornout green carpet.&lt;/br&gt;
 Some money is laying on the table. Maybe mom forgot it there.&lt;/br&gt;
@@ -6765,11 +6935,11 @@ function getMoney(elmnt,val) {
 function touchCatIdol(elmnt) {
 	elmnt.replaceWith(&quot;Its just a simple statue.&quot;); //elmnt.replaceWith(&quot;There is a tickling feeling in your hand.&quot;);
 }
-&lt;/script&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="257" name="Cabinet" tags="" position="850,3225" size="100,100">&lt;section&gt; 
+&lt;/script&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="267" name="Cabinet" tags="" position="850,3350" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 There is nothing here
 [[Living_Room]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="258" name="Garden" tags="" position="975,3225" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="268" name="Garden" tags="" position="975,3350" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;window.gm.quests.tick();%&gt;
 The garden behind the house is quite a mess. &lt;/br&gt;
@@ -6786,17 +6956,17 @@ You remember that you took the shovel from here.&lt;/br&gt;
 &lt;%}%&gt;
 Where would you like to go?&lt;/br&gt;
 [[Hallway|Home]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="259" name="Cellar" tags="" position="1100,3225" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="269" name="Cellar" tags="" position="1100,3350" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 The portal is still active. Do you dare to [[enter|Cellar_Portal]] it? &lt;/br&gt;&lt;/br&gt;
 Where would you like to go?&lt;/br&gt;
 [[Hallway|Home]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="260" name="Cellar_PortalReverse" tags="" position="1225,3225" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="270" name="Cellar_PortalReverse" tags="" position="1225,3350" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 The portal spits you out in the dim light of your cellar.&lt;/br&gt;&lt;/br&gt;
 [[Next|Cellar]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="261" name="Cellar_Portal" tags="" position="100,3350" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="271" name="Cellar_Portal" tags="" position="100,3475" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 A blinding light engulfs you just for a second and then a deafening darkness.  &lt;/br&gt;&lt;/br&gt;
 Its impossible to tell what else happens or how long the process takes.&lt;/br&gt;&lt;/br&gt;
@@ -6804,7 +6974,7 @@ As you come back to your senses you find yourself cowering on the floor, still c
 Time to move on.&lt;/br&gt;&lt;/br&gt;&lt;/br&gt;
 Where would you like to go?&lt;/br&gt;
 [[Home|Cellar_PortalReverse]] [[Mall|Mall 0F (postapocalypse)]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="262" name="HairGrow" tags="deferred" position="225,3350" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="272" name="HairGrow" tags="deferred" position="225,3475" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 A blinding light engulfs you just for a second and then a deafening darkness.  &lt;/br&gt;&lt;/br&gt;
 Its impossible to tell what else happens or how long the process takes.&lt;/br&gt;&lt;/br&gt;
@@ -6812,12 +6982,12 @@ As you come back to your senses you find yourself cowering on the floor, still c
 Time to move on.&lt;/br&gt;&lt;/br&gt;&lt;/br&gt;
 Where would you like to go?&lt;/br&gt;
 [[Next|&lt;%=window.gm.player.location%&gt;]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="263" name="Home_Study" tags="" position="350,3350" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="273" name="Home_Study" tags="" position="350,3475" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;% window.gm.player.Stats.increment(&#39;energy&#39;,-20);window.gm.addTime(120);window.gm.quests.forceQuestMilestone(&quot;qStudy&quot;,100,1);%&gt;
 You sit down with your books and scriblings and try to get some sense out of it.&lt;/br&gt;
 [[Give up|&lt;%=window.gm.player.location%&gt;]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="264" name="SC_BarbarianMeetup" tags="_nosave_" position="475,3350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="274" name="SC_BarbarianMeetup" tags="_nosave_" position="475,3475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;!--todo--&gt;
 &quot;Hey you, what are you doing here ?&quot;&lt;/br&gt;
 - you have to prove yourself to gain their trust&lt;/br&gt;
@@ -6827,7 +6997,7 @@ You sit down with your books and scriblings and try to get some sense out of it.
 - they might take advantage of you if you dont have a good standing or sense your horniness&lt;/br&gt;
 &lt;div&gt; &lt;a0 onclick=&#39;window.gm.dng.resumeRoom();&#39;&gt;Leave&lt;/a&gt;&lt;/div&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
-&lt;script&gt;&lt;/script&gt;</tw-passagedata><tw-passagedata pid="265" name="Campus" tags="" position="825,825" size="100,100">&lt;section&gt; 
+&lt;script&gt;&lt;/script&gt;</tw-passagedata><tw-passagedata pid="275" name="Campus" tags="" position="825,825" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;%if(!window.gm.quests.hasActiveQuest(&quot;qFindAJob&quot;)){  %&gt;
@@ -6845,21 +7015,21 @@ You sit down with your books and scriblings and try to get some sense out of it.
     [[Electrical &amp; Mechanical Engineering|NOP]]  [Chemistry &amp; Process Engineering] [Micro-Power &amp; Nano-Engineering] [[Dining Hall]]  [[ITD Office]]  Library &lt;/br&gt;
     [[Into the city]]&lt;/br&gt;&lt;/div&gt; 
 &lt;%}%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="266" name="ITD Office" tags="" position="725,3350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="276" name="ITD Office" tags="" position="725,3475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 This is the office-building of the Institute.&lt;/br&gt;
 The [[counsellor|NOP]] might be available to give you some guidance about institutional affairs.&lt;/br&gt;
 Here in the lobby of the building is also a [[blackboard]]. Maybe you can find some job offers there or informations about upcoming events. &lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Campus]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="267" name="Dining Hall" tags="" position="850,3350" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="277" name="Dining Hall" tags="" position="850,3475" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 Die Mensa ist wahrscheinlich das beliebteste Gebäude des Campus bei den Studenten; es gibt was zu essen und an kann miteinander quatschen.&lt;/br&gt;
 Das Essen ist vielleicht nicht gerade das beste auf der Welt aber dafür ist es recht günstig. Hast du Hunger?&lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Campus]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="268" name="blackboard" tags="_back_" position="975,3350" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="278" name="blackboard" tags="_back_" position="975,3475" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &#39;Lets see if there is anything interesting.&#39;&lt;/br&gt;
@@ -6868,7 +7038,7 @@ There is an announce from Harcon Health Inc. for a [[job|Harcon_Logistic_Ad]] in
 &lt;%}%&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Back|_back_]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="269" name="attend lecture" tags="" position="1100,3350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="279" name="attend lecture" tags="" position="1100,3475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 todo You attend to lectures all morning.&lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
@@ -6880,14 +7050,14 @@ function work() {
     window.gm.forwardTime(1300);
     window.story.show(&quot;Campus&quot;);
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="270" name="Harcon_Logistic_Ad" tags="_back_" position="1225,3350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="280" name="Harcon_Logistic_Ad" tags="_back_" position="1225,3475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 The typewritten note advertises a part-time position in the logistics department.&lt;/br&gt;
 &lt;p class=&quot;tPC&quot;&gt;&#39;Logistic doesnt sound that interesting and I doubt that position is targeted to an engineer. But maybe I should show up there in person and see what it is about.&#39;&lt;/p&gt;&lt;/br&gt;
 The adress points to be somehwere around downtonw.&lt;/br&gt;
 &lt;a0 onclick=&#39;window.gm.quests.forceQuestMilestone(&quot;qFindAJob&quot;,100,1); window.story.show(&quot;ITD Office&quot;);&#39;&gt;Note down the adress&lt;/a&gt;&lt;/br&gt;
 &lt;div&gt;&lt;/br&gt;
 [[Back|_back_]]&lt;/br&gt;&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="271" name="Harcon_Health" tags="" position="100,3475" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="281" name="Harcon_Health" tags="" position="100,3600" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;%if(window.gm.quests.hasActiveQuest(&quot;qFindAJob&quot;,100)){  %&gt;
@@ -6896,11 +7066,11 @@ The adress points to be somehwere around downtonw.&lt;/br&gt;
     &quot;Hallo?.. uhm Ich bin wegen der Stellenazeige hier.&quot;&lt;/br&gt;
     &quot;Stellenanzeige?...gehts etwas genauer...haben Sie einen Termin?&quot;&lt;/br&gt;
     Harcon Health Inc. seems to be a factory or warehouse that is fenced in as usual. So you walk around it until you find a (closed) entrance gate.&lt;/br&gt;
-    Right next to it is a building in the form of a small glass cube that probably houses the gatekeeper.&lt;/br&gt;
+    Right next to it is a building in the form of a small glas cube that probably houses the gatekeeper.&lt;/br&gt;
     &lt;p class=&quot;tPC&quot;&gt;&quot;Hello? ... I am here because of the job offer.&quot;&lt;/p&gt;&lt;/br&gt;
     &quot;Job offer? Well, can you give some more details? Do you have an appointment?&quot;&lt;/br&gt;
     &lt;div id=&#39;select1&#39; &gt;
-    &lt;a0 onclick=&#39;window.gm.printTalkLink($(&quot;div#select1&quot;)[0],&quot;div#choice1a&quot;)&#39;&gt;&quot;Unfortunatly not&quot;&lt;/a&gt;
+    &lt;a0 onclick=&#39;window.gm.printTalkLink(&quot;div#select1&quot;,&quot;div#choice1a&quot;)&#39;&gt;&quot;Unfortunatly not&quot;&lt;/a&gt;
     &lt;/div&gt;
     &lt;div id=&#39;choice1a&#39; hidden&gt;&lt;/br&gt;
     &lt;p class=&quot;tPC&quot;&gt;No. I just saw that ad on the universitys blackboard about a position in your logistics department. So I wanted to show up as soon as possible to see what it is about... &lt;/p&gt;
@@ -6923,7 +7093,7 @@ The adress points to be somehwere around downtonw.&lt;/br&gt;
     This seems to be some kind of factory. You have no business here.&lt;/br&gt;
     &lt;div&gt;&lt;/br&gt;[[Downtown]]&lt;/br&gt;&lt;/div&gt;
 &lt;%}%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="272" name="Harcon_Logistic_Intro" tags="" position="225,3475" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="282" name="Harcon_Logistic_Intro" tags="" position="225,3600" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 ...!--todo--
@@ -6932,8 +7102,8 @@ The adress points to be somehwere around downtonw.&lt;/br&gt;
 &quot;If you work at least 2 shifts a week here, you will get 25$ the shift every week.&quot;&lt;/br&gt;
 &quot;So, do you want the job?&quot; he looks at you.&lt;/br&gt;
 &lt;div id=&#39;select1&#39; &gt;
-&lt;a0 onclick=&#39;window.gm.printTalkLink($(&quot;div#select1&quot;)[0],&quot;div#choice1a&quot;, function(){window.gm.quests.forceQuestMilestone(&quot;qFindAJob&quot;,200,100);})&#39;&gt;&quot;Yes, of course.&quot;&lt;/a&gt;
-&lt;a0 onclick=&#39;window.gm.printTalkLink($(&quot;div#select1&quot;)[0],&quot;div#choice1b&quot;)&#39;&gt;&quot;I have to think about it&quot;&lt;/a&gt;
+&lt;a0 onclick=&#39;window.gm.printTalkLink(&quot;div#select1&quot;,&quot;div#choice1a&quot;, function(){window.gm.quests.forceQuestMilestone(&quot;qFindAJob&quot;,200,100);})&#39;&gt;&quot;Yes, of course.&quot;&lt;/a&gt;
+&lt;a0 onclick=&#39;window.gm.printTalkLink(&quot;div#select1&quot;,&quot;div#choice1b&quot;)&#39;&gt;&quot;I have to think about it&quot;&lt;/a&gt;
 &lt;/div&gt;
 &lt;div id=&#39;choice1a&#39; hidden&gt;&lt;/br&gt;
     You shake hands to make the deal and you are quite proud of yourself that you got your first employment in a smooth move.&lt;/br&gt;
@@ -6944,7 +7114,7 @@ The adress points to be somehwere around downtonw.&lt;/br&gt;
     Mr. Erichson looks quite disappointed.  &lt;/br&gt;
     [[Next|Downtown]]&lt;/br&gt; 
 &lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="273" name="Harcon_work" tags="" position="350,3475" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="283" name="Harcon_work" tags="" position="350,3600" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;%if(window.gm.quests.hasActiveQuest(&quot;qFindAJob&quot;,200)){  %&gt;
@@ -6961,7 +7131,7 @@ function work() {
     window.gm.quests.getQuestState(&quot;qFindAJob&quot;).flags+=1;
     window.story.show(&quot;Downtown&quot;);
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="274" name="Mall 0F" tags="" position="1250,850" size="100,100">&lt;section&gt; 
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="284" name="Mall 0F" tags="" position="1250,850" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 You are actually at [[&lt;%=window.gm.player.location%&gt;]].&lt;/br&gt;
@@ -6978,7 +7148,7 @@ Where would you like to go from here?&lt;/br&gt;
 &lt;script&gt;
 window.gm.shop.findWaresToBuy(&quot;Mall:GeneralStore&quot;);
 renderToSelector(&quot;#panel&quot;, &quot;listbuy&quot;); 
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="275" name="Mall Floor 1" tags="" position="1125,850" size="100,100">&lt;section&gt; 
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="285" name="Mall Floor 1" tags="" position="1125,850" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;%window.gm.printShopBuyEntry(&quot;Lube&quot;,4,cbCanBuy=(function(itemid){return window.gm.cbCanBuyPerverse(itemid,15,10)}),cbPostBuy=(function(itemid){window.gm.defaultPostBuy(itemid,15)}))%&gt;
@@ -6993,7 +7163,7 @@ if(window.gm.player.Stats.get(&#39;corruption&#39;).value&lt;=10) {%&gt;
 &lt;%} else {%&gt; [[Adult books and tools]] &lt;/br&gt; &lt;%} %&gt;
 Where would you like to go from here?&lt;/br&gt;
 [[Mall 0F|Mall 0F]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="276" name="Mall Floor -1" tags="" position="1000,825" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="286" name="Mall Floor -1" tags="" position="1000,825" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 You are actually at [[&lt;%=window.gm.player.location%&gt;]].&lt;/br&gt;
@@ -7001,7 +7171,7 @@ This level of the mall seems to be reserved for the less fancy business. &lt;/br
 Most of the space is occupied by the usual [[electronics store]] and a [[food store]].
 Where would you like to go from here?&lt;/br&gt;
 [[Mall 0F|Mall 0F]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="277" name="Adult books and tools" tags="" position="1025,650" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="287" name="Adult books and tools" tags="" position="1025,650" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 You are actually at [[&lt;%=window.gm.player.location%&gt;]].&lt;/br&gt;
@@ -7014,11 +7184,11 @@ No way I&#39;m going in to that smut-shop. Only perverts do that. &lt;/br&gt;
 &lt;%} %&gt;
 Where would you like to go from here?&lt;/br&gt;
 [[Mall 0F|Mall 0F]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="278" name="Buy" tags="_back_" position="850,350" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="288" name="Buy" tags="_back_" position="850,350" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 
 [[Back|_back_]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="279" name="Mall 0F (postapocalypse)" tags="" position="1100,3475" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="289" name="Mall 0F (postapocalypse)" tags="" position="1100,3600" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 You are actually at [[&lt;%=window.gm.player.location%&gt;]].&lt;/br&gt;
@@ -7029,7 +7199,7 @@ Where would you like to go from here?&lt;/br&gt;
 [[Mall 1F|Mall Floor 1 (postapocalypse)]]
 The stairway to the lower floor is blocked by parts of the building that fell down from top. But there might be other options to get there. &lt;/br&gt; 
 [[Exit|Into the city]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="280" name="Mall Floor 1 (postapocalypse)" tags="" position="1225,3475" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="290" name="Mall Floor 1 (postapocalypse)" tags="" position="1225,3600" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 
@@ -7044,11 +7214,11 @@ Where would you like to go from here?&lt;/br&gt;
 You are on the hunt for useful resources as...
 &lt;a href=&quot;javascript:void(0)&quot; onclick=&#39;window.gm.encounters.mole(window.gm.player.location);&#39;&gt;Next&lt;/a&gt; &lt;/br&gt;
 
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="281" name="skCooking" tags="" position="825,625" size="100,100">You can create tasty meals from basic ingredients. No need to rely on fastfood.
-[[Back|&lt;%=window.gm.player.location%&gt;]]</tw-passagedata><tw-passagedata pid="282" name="skSporty" tags="" position="725,625" size="100,100">You like to do sports.
-[[Back|&lt;%=window.gm.player.location%&gt;]]</tw-passagedata><tw-passagedata pid="283" name="skTechy" tags="" position="825,525" size="100,100">Tinkering and repairing gadgets is your thing.
-[[Back|&lt;%=window.gm.player.location%&gt;]]</tw-passagedata><tw-passagedata pid="284" name="skMoneymaker" tags="" position="725,525" size="100,100">You often find ways to increase your profit a little bit.
-[[Back|&lt;%=window.gm.player.location%&gt;]]</tw-passagedata><tw-passagedata pid="285" name="Start" tags="" position="600,3600" size="100,100">Select a Link:
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="291" name="skCooking" tags="" position="825,625" size="100,100">You can create tasty meals from basic ingredients. No need to rely on fastfood.
+[[Back|&lt;%=window.gm.player.location%&gt;]]</tw-passagedata><tw-passagedata pid="292" name="skSporty" tags="" position="725,625" size="100,100">You like to do sports.
+[[Back|&lt;%=window.gm.player.location%&gt;]]</tw-passagedata><tw-passagedata pid="293" name="skTechy" tags="" position="825,525" size="100,100">Tinkering and repairing gadgets is your thing.
+[[Back|&lt;%=window.gm.player.location%&gt;]]</tw-passagedata><tw-passagedata pid="294" name="skMoneymaker" tags="" position="725,525" size="100,100">You often find ways to increase your profit a little bit.
+[[Back|&lt;%=window.gm.player.location%&gt;]]</tw-passagedata><tw-passagedata pid="295" name="Start" tags="" position="600,3725" size="100,100">Select a Link:
 &lt;ul&gt;
     &lt;li&gt;[[_SuperSimpleStory_]]&lt;/li&gt;
 	&lt;li&gt;[[_ImagesAndOtherMedia_]]&lt;/li&gt;
@@ -7057,9 +7227,9 @@ You are on the hunt for useful resources as...
     &lt;li&gt;[[_Inventory_]]&lt;/li&gt;
     &lt;li&gt;[[_SaveAndRestore_]]&lt;/li&gt;
     &lt;li&gt;[[StartPage]]&lt;/li&gt;
-&lt;/ul&gt;</tw-passagedata><tw-passagedata pid="286" name="NewGamePlus" tags="" position="725,3600" size="100,100">You finished the game in some way but maybe you have missed something. &lt;/br&gt;
+&lt;/ul&gt;</tw-passagedata><tw-passagedata pid="296" name="NewGamePlus" tags="" position="725,3725" size="100,100">You finished the game in some way but maybe you have missed something. &lt;/br&gt;
 Would you like to start a new game while taking some of your equipment/skills with you?&lt;/br&gt;
-&lt;a0 onclick=&#39;window.gm.newGamePlus()&#39;&gt;Start new game plus&lt;/a&gt;&lt;/br&gt;</tw-passagedata><tw-passagedata pid="287" name="TowerOfKinks" tags="" position="850,3600" size="100,100">ClitPiercing of Stamina
+&lt;a0 onclick=&#39;window.gm.newGamePlus()&#39;&gt;Start new game plus&lt;/a&gt;&lt;/br&gt;</tw-passagedata><tw-passagedata pid="297" name="TowerOfKinks" tags="" position="850,3725" size="100,100">ClitPiercing of Stamina
 
 resistance to   poisoned air, slime, cold
 
@@ -7128,7 +7298,7 @@ pyramids: chaste
     priest, acolythe, anubis, scarab
 
 underworld:
-    succubus, hellhound,</tw-passagedata><tw-passagedata pid="288" name="SucubusTrade" tags="" position="975,3600" size="100,100">&quot;I could help you and increase the size of your load.&quot;
+    succubus, hellhound,</tw-passagedata><tw-passagedata pid="298" name="SucubusTrade" tags="" position="975,3725" size="100,100">&quot;I could help you and increase the size of your load.&quot;
 &quot;Whats the catch?&quot;
 Your apple-sized gonads are heavy with spunk. Staying blueballed like this might set you at risk to give in to the next person offering you a good fuck.
 

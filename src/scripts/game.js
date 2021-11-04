@@ -72,6 +72,32 @@ window.gm.util.insertSvg=function(file_content) {
       svg_container.firstChild.addEventListener("click", this.event_handler, false)
     }
 };
+/*
+* use this to merge multiple objects into one. If used with class-objects their methods will go missing!
+* this will properly deep-merge nested objects (not like Object.assign)
+*/
+window.gm.util.mergePlainObject=function(...arg) {
+  let target = {};
+  // deep merge the object into the target object
+    const merger = (obj) => {
+        for (let prop in obj) {
+            if (obj.hasOwnProperty(prop)) {
+                if (Object.prototype.toString.call(obj[prop]) === '[object Object]') {
+                    // if the property is a nested object
+                    target[prop] = merge(target[prop], obj[prop]);
+                } else {
+                    // for regular property
+                    target[prop] = obj[prop];
+                }
+            }
+        }
+    };
+    // iterate through all objects and deep merge them with target
+    for (let i = 0; i < arg.length; i++) {
+        merger(arg[i]);
+    }
+    return target;
+};
 //-------------------------------------------------
 // reimplement to setup the game !
 window.gm.initGame= function(forceReset,NGP=null) {
@@ -82,7 +108,10 @@ window.gm.initGame= function(forceReset,NGP=null) {
       //console.log('showing '+eventObject.passage.name);
     });
     // Render the passage named HUD into the element todo replace with <%=%>??
-    $(document).on('sm.passage.shown', function (ev,eventObject) { window.gm.refreshSidePanel();});
+    $(document).on('sm.passage.shown', function (ev,eventObject) { 
+      window.gm.refreshSidePanel();
+      window.gm.restorePage();
+    });
     var s = window.story.state; //s in template is window.story.state from snowman!
     if (!window.gm.timeEvent||forceReset) {
       window.gm.timeEvent = window.gm.util.PubSub();  //subscribe to "change" event to receive time updates
@@ -123,6 +152,7 @@ window.gm.initGame= function(forceReset,NGP=null) {
     if (!s.tmp||forceReset) { 
       // storage of temporary variables; dont use them in stacking passages or deffered events      
       s.tmp = {
+        flags: [], //can store flags for showing/hidding page-elements 
         args: [],  // can be used to set arguments before another passage is called (passage-arguments) 
         msg: ''   // memorizes a message to display when returning from _back-passage; please clear it when leaving the passage
       }
@@ -328,21 +358,22 @@ window.gm.pushBackPassage=function(id) {
   if(window.story.state._gm.passageStack.length>0 && window.story.state._gm.passageStack[window.story.state._gm.passageStack.length-1]===id){
     //already pushed
   } else {
-    window.story.state._gm.passageStack.push(id);
+    window.story.state._gm.passageStack.push({id:id, flags:window.story.state.tmp.flags});
   }
 };
 //call on [_back_]-passages to get the previous passage
 window.gm.popBackPassage=function() {
     let pass = window.story.state._gm.passageStack.pop();
     if(!pass) throw new Error('nothing to pop from stack');
-    return(pass);
+    window.story.state.tmp.flags = pass.flags;
+    return(pass.id);
 };
 window.gm.pushOnHold=function(id) {
   if(!window.story.state.hasOwnProperty("_gm")) return;  //exist only after initGame
-  if(window.story.state._gm.onholdStack.length>0){// && window.story.state._gm.defferedStack[window.story.state._gm.defferedStack.length-1].id===id){
+  if(window.story.state._gm.onholdStack.length>0){
     throw new Error('passage allready onHold: '+id); //already some pushed
   } else {
-    window.story.state._gm.onholdStack.push({id:id, args:window.story.state.tmp.args});
+    window.story.state._gm.onholdStack.push(c);
   }
 };
 //
@@ -377,7 +408,7 @@ window.story.__proto__.show = function(idOrName, noHistory = false) {
     }
     next = window.gm.popDeferredEvent();
     nextp = window.story.passage(next);
-    tagsnext =  nextp.tags;
+    tagsnext =  nextp.tags; window.story.state.tmp.flags={};
   } else if(inGame && idOrName==='' && window.story.state._gm.onholdStack.length>0) { //continue event onhold
     next =window.gm.popOnHold()
     if(next === '_back_') { //going back
@@ -395,8 +426,10 @@ window.story.__proto__.show = function(idOrName, noHistory = false) {
     if(tagsnext.indexOf('_back_')>=0 ) { //push on stack but only if not re-showing itself
       namenow = window.passage.name;
       if(namenext!=namenow) window.gm.pushBackPassage(namenow); 
+      window.story.state.tmp.flags={};
     } else if(inGame) { //if not in _back_-passage, drop the _back_-stack
       window.story.state._gm.passageStack.splice(0,window.story.state._gm.passageStack.length);
+      window.story.state.tmp.flags={};
     }
     //todo not sure about this: a deffered event should not link to normal passages because this would disentangle the original story-chain
     //this I think could cause issues and should be detected and throw an error
@@ -409,6 +442,22 @@ window.story.__proto__.show = function(idOrName, noHistory = false) {
   noHistory = true; //the engines object causes problems with history, namely refToParent
   _origStoryShow.call(window.story,next, noHistory);
 };
+/* when returning from back-passage restore view by hiding/unhiding programatical modified elements
+*/
+window.gm.restorePage=function() {
+  if(window.story.state.tmp) {
+    let elmts =Object.keys(window.story.state.tmp.flags);
+    for(var i=0;i<elmts.length;i++) {
+      if(window.story.state.tmp.flags[elmts[i]]==='hidden') {
+        $(elmts[i])[0].setAttribute("hidden","");
+      } else if(window.story.state.tmp.flags[elmts[i]]==='unhide') {
+        $(elmts[i])[0].removeAttribute("hidden");
+        $(elmts[i])[0].scrollIntoView();
+      }
+    }
+  }
+}
+
 //-----------------------------------------------------------------------------
 //changes the active player and will add him to party!
 window.gm.switchPlayer = function(playername) {
@@ -508,11 +557,13 @@ window.gm.onSelect = function(elmnt,ex_choice,ex_info) {
 //call this onclick to make the connected element vanish and to unhide another one (if the passage is revisited the initial state will be restored)
 //unhidethis needs to be jquery-path to a div,span,.. that is initially set to hidden
 //cb can be a function(elmt) that gets called
+//todo: if navigating to a back-page and return, the initial page will be reset to default; how to memorize and restore the hidden-flags
 window.gm.printTalkLink =function(elmt,unhideThis,cb=null) {
-  elmt.toggleAttribute("hidden");
-  if(cb!==null) cb(elmt);
-  $(unhideThis)[0].toggleAttribute("hidden");
+  $(elmt)[0].setAttribute("hidden","");
+  if(cb!==null) cb($(elmt)[0]);
+  $(unhideThis)[0].removeAttribute("hidden");
   $(unhideThis)[0].scrollIntoView({behavior: "smooth"});
+  window.story.state.tmp.flags[elmt]='hidden',window.story.state.tmp.flags[unhideThis]='unhide';
 }
 //prints the same kind of link like [[Next]] but can be called from code
 window.gm.printPassageLink= function(label,target) {

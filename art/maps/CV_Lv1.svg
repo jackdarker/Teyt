@@ -1,0 +1,961 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="600"
+   height="300"
+   viewBox="0 0 240 120"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1 (c68e22c387, 2021-05-23)"
+   sodipodi:docname="CV_Lv1.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="false"
+     inkscape:document-units="px"
+     showgrid="true"
+     showguides="false"
+     inkscape:snap-global="true"
+     inkscape:snap-nodes="true"
+     inkscape:snap-to-guides="false"
+     inkscape:snap-bbox="false"
+     inkscape:snap-bbox-midpoints="true"
+     inkscape:zoom="1.4142136"
+     inkscape:cx="316.43028"
+     inkscape:cy="136.82516"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     inkscape:window-x="1912"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer2"
+     units="px"
+     width="600px"
+     scale-x="0.4"
+     inkscape:snap-others="true"
+     inkscape:snap-object-midpoints="true"
+     inkscape:object-nodes="false">
+    <inkscape:grid
+       type="xygrid"
+       id="grid3052"
+       originx="0"
+       originy="0"
+       dotted="false"
+       spacingx="10"
+       spacingy="10"
+       units="px"
+       empcolor="#050094"
+       empopacity="0.25098039"
+       color="#4545ff"
+       opacity="0.1254902"
+       empspacing="2" />
+  </sodipodi:namedview>
+  <defs
+     id="defs2">
+    <style
+       id="style1109"><![CDATA[
+.roomVisited {
+  fill:#afa200;
+  fill-opacity:1;
+}
+.roomFound {
+  fill:#464100;
+  fill-opacity:1;
+}
+.roomNotFound {
+  display:none;
+}
+.pathFound {
+  fill:#000000;
+  fill-opacity:1;
+  fill-rule:evenodd;
+  paint-order:fill markers stroke;
+  stop-color:#000000;
+  stroke:#000000;
+  stroke-dasharray:none;
+  stroke-linecap:round;
+  stroke-linejoin:bevel;
+  stroke-miterlimit:4;
+  stroke-opacity:1;
+  stroke-width:2;
+}
+.playerPosition {
+  fill:#00c175;
+  fill-opacity:1;
+}
+]]></style>
+  </defs>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="template"
+     style="display:inline">
+    <rect
+       style="fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-opacity:1;paint-order:fill markers stroke;stop-color:#000000"
+       id="tmplRoom2"
+       width="13.840382"
+       height="13.840376"
+       x="43.079811"
+       y="-26.920189"
+       onmouseover="style.opacity = 0.5;"
+       onmouseout="style.opacity = 1;"
+       inkscape:label="tmplRoom2" />
+    <path
+       sodipodi:type="star"
+       style="fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:6.21911;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke;stop-color:#000000"
+       id="tmplRoom"
+       inkscape:flatsided="true"
+       sodipodi:sides="8"
+       sodipodi:cx="155.49326"
+       sodipodi:cy="270.17377"
+       sodipodi:r1="44.032257"
+       sodipodi:r2="34.9105"
+       sodipodi:arg1="1.1860225"
+       sodipodi:arg2="1.5787216"
+       inkscape:rounded="0"
+       inkscape:randomized="0"
+       d="m 172.02074,310.98653 -33.69977,-0.26708 -23.64048,-24.0182 0.26708,-33.69977 24.0182,-23.64048 33.69977,0.26709 23.64048,24.01819 -0.26708,33.69977 z"
+       transform="matrix(0.17016391,0,0,0.17016391,2.3739939,-65.973826)"
+       onmouseout="style.opacity = 1;"
+       onmouseover="style.opacity = 0.5;"
+       onclick="smile('clicked')"
+       inkscape:label="tmplRoom" />
+    <rect
+       id="tmplCorner"
+       width="0.72664201"
+       height="0.72664201"
+       x="69.636681"
+       y="-20.363319"
+       inkscape:label="tmplCorner"
+       class="pathFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="use3309"
+       width="100%"
+       height="100%"
+       transform="translate(-40.000002)"
+       class="roomNotFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="use1023"
+       width="100%"
+       height="100%"
+       transform="translate(39.999998)"
+       class="playerPosition" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="use1708"
+       width="100%"
+       height="100%"
+       transform="translate(59.999998)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="use1575"
+       width="100%"
+       height="100%"
+       transform="translate(-1.9073486e-6,-39.999999)"
+       class="roomNotFound" />
+    <text
+       xml:space="preserve"
+       style="font-size:8px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial, Normal';stroke-width:0.4"
+       x="7.8656249"
+       y="132.29062"
+       id="text2366"><tspan
+         sodipodi:role="line"
+         id="tspan2364"
+         style="font-size:8px;stroke-width:0.4"
+         x="7.8656249"
+         y="132.29062">A       B       C      D      E       F       G      H       I       J       K       L</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:8px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial, Normal';stroke-width:0.4"
+       x="-12.435688"
+       y="11.45147"
+       id="text8305"><tspan
+         sodipodi:role="line"
+         id="tspan8303"
+         style="font-size:8px;stroke-width:0.4"
+         x="-12.435688"
+         y="11.45147">1</tspan><tspan
+         sodipodi:role="line"
+         style="font-size:8px;stroke-width:0.4"
+         x="-12.435688"
+         y="21.451471"
+         id="tspan8719" /><tspan
+         sodipodi:role="line"
+         style="font-size:8px;stroke-width:0.4"
+         x="-12.435688"
+         y="31.451471"
+         id="tspan8721">2</tspan><tspan
+         sodipodi:role="line"
+         style="font-size:8px;stroke-width:0.4"
+         x="-12.435688"
+         y="41.451469"
+         id="tspan8723" /><tspan
+         sodipodi:role="line"
+         style="font-size:8px;stroke-width:0.4"
+         x="-12.435688"
+         y="51.451469"
+         id="tspan8727">3</tspan><tspan
+         sodipodi:role="line"
+         style="font-size:8px;stroke-width:0.4"
+         x="-12.435688"
+         y="61.451469"
+         id="tspan8733" /><tspan
+         sodipodi:role="line"
+         style="font-size:8px;stroke-width:0.4"
+         x="-12.435688"
+         y="71.451469"
+         id="tspan8735">4</tspan><tspan
+         sodipodi:role="line"
+         style="font-size:8px;stroke-width:0.4"
+         x="-12.435688"
+         y="81.451469"
+         id="tspan8737" /><tspan
+         sodipodi:role="line"
+         style="font-size:8px;stroke-width:0.4"
+         x="-12.435688"
+         y="91.451469"
+         id="tspan8739">5</tspan><tspan
+         sodipodi:role="line"
+         style="font-size:8px;stroke-width:0.4"
+         x="-12.435688"
+         y="101.45147"
+         id="tspan8741" /><tspan
+         sodipodi:role="line"
+         style="font-size:8px;stroke-width:0.4"
+         x="-12.435688"
+         y="111.45147"
+         id="tspan8743">6</tspan></text>
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="use1023-7"
+       width="100%"
+       height="100%"
+       transform="translate(39.999997,-20)"
+       class="playerPosition" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="use1708-1"
+       width="100%"
+       height="100%"
+       transform="translate(59.999997,-20)"
+       class="roomFound" />
+    <g
+       id="g14719"
+       transform="translate(9.9999997,-119.99999)">
+      <use
+         x="0"
+         y="0"
+         xlink:href="#tmplRoom"
+         id="Tile_Entry"
+         width="100%"
+         height="100%"
+         transform="translate(91.166666,119.99999)"
+         class="roomFound"
+         style="fill:url(#linearGradient2189)" />
+    </g>
+    <path
+       d="M -10,-40 H 30"
+       id="path4639-2-8-2"
+       inkscape:connector-type="polyline"
+       inkscape:connector-curvature="0"
+       class="pathFound"
+       sodipodi:nodetypes="cc" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom2"
+       id="use1775"
+       width="100%"
+       height="100%"
+       transform="translate(59.999998,-19.999999)"
+       class="roomVisited" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom2"
+       id="use2317"
+       width="100%"
+       height="100%"
+       transform="translate(59.999998)"
+       class="roomVisited" />
+  </g>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-50,-49.999986)">
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_E1"
+       width="100%"
+       height="100%"
+       transform="translate(111.16667,79.999985)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_L2"
+       width="100%"
+       height="100%"
+       transform="translate(251.16667,99.999985)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_K6"
+       width="100%"
+       height="100%"
+       transform="translate(231.16666,179.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_L6"
+       width="100%"
+       height="100%"
+       transform="translate(251.16666,179.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_K5"
+       width="100%"
+       height="100%"
+       transform="translate(231.16666,159.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_L5"
+       width="100%"
+       height="100%"
+       transform="translate(251.16666,159.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_K4"
+       width="100%"
+       height="100%"
+       transform="translate(231.16666,139.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_L4"
+       width="100%"
+       height="100%"
+       transform="translate(251.16666,139.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_K3"
+       width="100%"
+       height="100%"
+       transform="translate(231.16666,119.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_L3"
+       width="100%"
+       height="100%"
+       transform="translate(251.16666,119.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_K2"
+       width="100%"
+       height="100%"
+       transform="translate(231.16667,99.999985)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_K1"
+       width="100%"
+       height="100%"
+       transform="translate(231.16667,79.999987)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_L1"
+       width="100%"
+       height="100%"
+       transform="translate(251.16667,79.999987)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_B2"
+       width="100%"
+       height="100%"
+       transform="translate(51.166666,99.999985)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_A6"
+       width="100%"
+       height="100%"
+       transform="translate(31.166656,179.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_B6"
+       width="100%"
+       height="100%"
+       transform="translate(51.166656,179.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_A5"
+       width="100%"
+       height="100%"
+       transform="translate(31.166658,159.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_B5"
+       width="100%"
+       height="100%"
+       transform="translate(51.166658,159.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_A4"
+       width="100%"
+       height="100%"
+       transform="translate(31.166666,139.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_B4"
+       width="100%"
+       height="100%"
+       transform="translate(51.16666,139.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_A3"
+       width="100%"
+       height="100%"
+       transform="translate(31.166662,119.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_B3"
+       width="100%"
+       height="100%"
+       transform="translate(51.166662,119.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_A2"
+       width="100%"
+       height="100%"
+       transform="translate(31.166664,99.999985)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_A1"
+       width="100%"
+       height="100%"
+       transform="translate(31.166666,79.999987)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_B1"
+       width="100%"
+       height="100%"
+       transform="translate(51.166666,79.999987)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_F1"
+       width="100%"
+       height="100%"
+       transform="translate(131.16667,79.999985)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_G1"
+       width="100%"
+       height="100%"
+       transform="translate(151.16667,79.999985)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_H1"
+       width="100%"
+       height="100%"
+       transform="translate(171.16667,79.999985)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_I1"
+       width="100%"
+       height="100%"
+       transform="translate(191.16667,79.999985)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_D1"
+       width="100%"
+       height="100%"
+       transform="translate(91.166666,79.999985)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_C1"
+       width="100%"
+       height="100%"
+       transform="translate(71.166666,79.999985)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_J1"
+       width="100%"
+       height="100%"
+       transform="translate(211.16667,79.999985)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_E2"
+       width="100%"
+       height="100%"
+       transform="translate(111.16666,99.999985)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_F2"
+       width="100%"
+       height="100%"
+       transform="translate(131.16667,99.999985)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_G2"
+       width="100%"
+       height="100%"
+       transform="translate(151.16667,99.999985)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_H2"
+       width="100%"
+       height="100%"
+       transform="translate(171.16667,99.999985)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_I2"
+       width="100%"
+       height="100%"
+       transform="translate(191.16667,99.999985)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_C2"
+       width="100%"
+       height="100%"
+       transform="translate(71.166664,99.999985)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_J2"
+       width="100%"
+       height="100%"
+       transform="translate(211.16667,99.999985)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_E3"
+       width="100%"
+       height="100%"
+       transform="translate(111.16666,119.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_F3"
+       width="100%"
+       height="100%"
+       transform="translate(131.16667,119.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_G3"
+       width="100%"
+       height="100%"
+       transform="translate(151.16667,119.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_H3"
+       width="100%"
+       height="100%"
+       transform="translate(171.16667,119.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_I3"
+       width="100%"
+       height="100%"
+       transform="translate(191.16667,119.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_D3"
+       width="100%"
+       height="100%"
+       transform="translate(91.166662,119.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_C3"
+       width="100%"
+       height="100%"
+       transform="translate(71.166662,119.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_J3"
+       width="100%"
+       height="100%"
+       transform="translate(211.16667,119.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_E4"
+       width="100%"
+       height="100%"
+       transform="translate(111.16666,139.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_F4"
+       width="100%"
+       height="100%"
+       transform="translate(131.16667,139.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_G4"
+       width="100%"
+       height="100%"
+       transform="translate(151.16667,139.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_H4"
+       width="100%"
+       height="100%"
+       transform="translate(171.16667,139.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_I4"
+       width="100%"
+       height="100%"
+       transform="translate(191.16667,139.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_D4"
+       width="100%"
+       height="100%"
+       transform="translate(91.16666,139.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_C4"
+       width="100%"
+       height="100%"
+       transform="translate(71.16666,139.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_J4"
+       width="100%"
+       height="100%"
+       transform="translate(211.16667,139.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_E5"
+       width="100%"
+       height="100%"
+       transform="translate(111.16666,159.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_F5"
+       width="100%"
+       height="100%"
+       transform="translate(131.16667,159.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_G5"
+       width="100%"
+       height="100%"
+       transform="translate(151.16667,159.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_H5"
+       width="100%"
+       height="100%"
+       transform="translate(171.16667,159.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_I5"
+       width="100%"
+       height="100%"
+       transform="translate(191.16667,159.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_D5"
+       width="100%"
+       height="100%"
+       transform="translate(91.166658,159.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_C5"
+       width="100%"
+       height="100%"
+       transform="translate(71.166658,159.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_J5"
+       width="100%"
+       height="100%"
+       transform="translate(211.16667,159.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_E6"
+       width="100%"
+       height="100%"
+       transform="translate(111.16666,179.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_F6"
+       width="100%"
+       height="100%"
+       transform="translate(131.16667,179.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_G6"
+       width="100%"
+       height="100%"
+       transform="translate(151.16667,179.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_H6"
+       width="100%"
+       height="100%"
+       transform="translate(171.16667,179.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_I6"
+       width="100%"
+       height="100%"
+       transform="translate(191.16667,179.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_D6"
+       width="100%"
+       height="100%"
+       transform="translate(91.166656,179.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_C6"
+       width="100%"
+       height="100%"
+       transform="translate(71.166656,179.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_J6"
+       width="100%"
+       height="100%"
+       transform="translate(211.16667,179.99999)"
+       class="roomFound" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#tmplRoom"
+       id="Tile_D2"
+       width="100%"
+       height="100%"
+       transform="translate(91.166666,99.999985)"
+       class="roomFound" />
+  </g>
+</svg>
