@@ -29,8 +29,8 @@ section {
   color: black;
 }
 .author {
-  color: lightyellow;
-  background-color: darkred;
+  /*color: lightyellow;
+  background-color: darkred;*/
 }
 .dev {
   color: #7bedf3;

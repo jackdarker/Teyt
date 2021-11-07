@@ -236,10 +236,29 @@ button {
 .tPC .avatar {
 	/*background-image: URL("../assets/icons/icon_question.svg");*/
 }
-
-
-.dev::before {content: 'dev-note: ';}
-.author::before {content: 'authors-note: ';}
+.dev {
+  padding: 0.5em;
+}
+.dev::before {
+	display: block;
+	margin: -0.5em -0.5em 0.5em -0.5em;
+	padding: 0.5em;
+	text-decoration-line: underline;
+	content: 'Information from your Beta-Test-Support-Center:';
+}
+.author {
+	border: 1px solid red;
+	padding: 0.5em;
+}
+.author::before {
+	content: 'authors-note: ';
+	display: block;
+	background: red;
+	color: white;
+	font: bold /*16px sans-serif*/;
+	margin: -0.5em -0.5em 0.5em -0.5em;
+	padding: 0.5em;
+}
 .progressbar {
   overflow: hidden;
   background-color: lightgray;

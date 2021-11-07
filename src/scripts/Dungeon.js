@@ -78,10 +78,6 @@ class DngDirection{
     static get DirS() { return(2); }
     static get StairUp() { return(6); }
     static get StairDown() { return(5); }
-           
-    // default functions for callbacks
-    static FALSE(Me) { return false; };
-    static TRUE(Me) { return true; };
     
     constructor(dirEnum,name,descr){	
         this.name = name,this.descr = (descr===null) ? function() {return(name)}:descr;

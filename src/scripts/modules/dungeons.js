@@ -326,6 +326,130 @@ class ShatteredCity extends DngDungeon{
         }
     }
 }
+class MinoLair extends DngDungeon{
+    persistentDngDataTemplate() {
+        let _data = {
+            currentRoom: 0,
+            maxRoom : 0
+        };
+        return(_data);
+    }
+    constructor()    {
+        super("MinoLair", MinoLair.desc,window.story.state.dng[MinoLair.name])
+        this.data.currentRoom = 1; 
+        this.data.minoTile='D3';this.data.minoDelay=0;
+        this.buildFloors();
+    }
+    static desc() {return("Escape the Mean Mino");}
+    buildFloors() {
+        var _floors= [];
+        var firstFloor//:DngFloor;
+        var stairUp//:DngRoom;
+        var stairDown//:DngRoom;
+        firstFloor = new DngFloor("1.Floor", function() {return("floor#1.")});
+        var room//:DngRoom;
+        var rooms= new Map();
+        /* first floor
+        *  
+        * E  - B2 - C2 - D2 - E2
+        * |                   |
+        * A3 - B3 - C3 - D3 - E3
+        *   
+        * */
+       //Todo should be able to go into arena only once a day/with entryfee
+        /*let foo1 = (function(){return(ArenaTrialsNo1.desc()+'</br>If you survive your first challenger, you get '+this.data.rewards[this.data.currentRoom].amount+'x '+this.data.rewards[this.data.currentRoom].id+'.</br>');}).bind(this);
+        let foo2 = (function(){return('If you survive the second challenge, you get '+this.data.rewards[this.data.currentRoom].amount+'x '+this.data.rewards[this.data.currentRoom].id+'.</br>');}).bind(this);
+        let foo3 = (function(){return('If you survive the third challenge, you get '+this.data.rewards[this.data.currentRoom].amount+'x '+this.data.rewards[this.data.currentRoom].id+'.</br>');}).bind(this);
+        let foo4 = (function(){return('If you survive the last challenge, you get '+this.data.rewards[this.data.currentRoom].amount+'x '+this.data.rewards[this.data.currentRoom].id+'.</br>');}).bind(this);
+        let foo5 = function(){return('Congratulations. You have passed all the challenges and trully earned your reward.</br>');};
+        let _evt = new DngOperation("Retreat");
+        _evt.canTrigger = function(){return(true);};
+        _evt.onTrigger = function(){
+            this.renderEvent = this.renderRetreat;
+            this.evtData = {};
+            this.renderNext(1);
+        };*/
+        let _evt = new DngOperation("tickMino");
+        _evt.canTrigger = function(){return(true);};
+        _evt.onTrigger = function(){
+            this.renderEvent = this.tickMino;
+            this.evtData = {};
+            this.renderNext(1);
+        };
+        rooms.set("Entrance", new DngRoom("Entrance", null,false));
+        rooms.set("B2", new DngRoom("B2", null,false));
+        rooms.set("C2", new DngRoom("C2", null, false));
+        rooms.set("D2", new DngRoom("D2", null, false));
+        rooms.set("E2",new DngRoom("E2", null,false));
+        rooms.set("A3",new DngRoom("A3", null,false));
+        rooms.set("B3", new DngRoom("B3", null,false));
+        rooms.set("C3", new DngRoom("C3", null, false));
+        rooms.set("D3", new DngRoom("D3", null, false));
+        rooms.set("E3",new DngRoom("E3", null,false));
+        DngDirection.createDirection(DngDirection.DirE, rooms.get("Entrance") , rooms.get("B2"),true);
+        DngDirection.createDirection(DngDirection.DirE, rooms.get("B2" ), rooms.get("C2"));
+        DngDirection.createDirection(DngDirection.DirE, rooms.get("C2" ), rooms.get("D2"));
+        DngDirection.createDirection(DngDirection.DirE, rooms.get("D2" ), rooms.get("E2"));
+        DngDirection.createDirection(DngDirection.DirE, rooms.get("A3") , rooms.get("B3"),true);
+        DngDirection.createDirection(DngDirection.DirE, rooms.get("B3" ), rooms.get("C3"));
+        DngDirection.createDirection(DngDirection.DirE, rooms.get("C3" ), rooms.get("D3"));
+        DngDirection.createDirection(DngDirection.DirE, rooms.get("D3" ), rooms.get("E3"));
+        DngDirection.createDirection(DngDirection.DirS, rooms.get("Entrance" ), rooms.get("A3"));
+        DngDirection.createDirection(DngDirection.DirS, rooms.get("E2" ), rooms.get("E3"));
+        room =rooms.get("Entrance");
+        room.isDungeonEntry = room.isDungeonExit = true;
+        //room.getDirection(DngDirection.DirE).onExitFct = this._fight.bind(this,1);
+        room =rooms.get("B2");
+        //room.getDirection(DngDirection.DirE).onExitFct = this._fight.bind(this,2);
+        room.operations = [_evt];
+        room = rooms.get("C2");
+        //room.getDirection(DngDirection.DirE).onExitFct = this._fight.bind(this,3);
+        room.operations = [_evt];
+        room = rooms.get("D2");
+        //room.getDirection(DngDirection.DirE).onExitFct = this._fight.bind(this,4);
+        room.operations = [_evt];
+        room = rooms.get("E2");
+        room.operations = [_evt];
+        firstFloor.setRooms(Array.from(rooms.values( )));
+        _floors.push(firstFloor);
+        this.setFloors(_floors);
+    }
+    exitDungeon() {
+        super.exitDungeon();
+        window.story.show("PlainsFarmland");
+    }
+    renderNext(id) {
+        window.gm.dng.evtData.id=id;
+        window.story.show("DungeonGenericEvent");
+    }
+    tickMino(evt) { //
+        let msg ='';
+        if(evt.id===1) {
+            this.moveMino();
+            msg+='Mino is now at'+this.data.minoTile+' and moves in '+ this.data.minoDelay+' turns. </br>';
+            msg+= window.gm.printLink("Next",'window.gm.dng.resumeRoom()');//'window.gm.dng.exitDungeon()'
+        } 
+        return(msg);
+    }
+    moveMino() {
+
+    }
+    /**
+     * 
+     * @param {int} evt: roomNo 
+     */
+    _fight(evt) {
+        this.data.currentRoom = evt;
+        this.data.maxRoom= (this.data.currentRoom>this.data.maxRoom)?this.data.currentRoom:this.data.maxRoom;
+        window.gm.encounters.wolf();
+        window.gm.Encounter.onVictory = (function() { //need to resumeRoom...
+            this.data.currentRoom+=1;
+            return('Victory ! </br>Some '+this.data.rewards[this.data.currentRoom].id+ ' was added to the reward-pile.</br>'+ window.gm.printLink('Next','window.gm.dng.resumeRoom()'));
+        }).bind(this) ;
+        return(true); //return true to indicate a intermittent scene
+    }
+    
+}
 class ArenaTrialsNo1 extends DngDungeon{
     persistentDngDataTemplate() {
         let _data = {
@@ -550,5 +674,6 @@ window.gm.dngs = (function (dngs) {
     dngs.BeeHive = function () { return(new BeeHive());};  
     dngs.ShatteredCity = function () { return(new ShatteredCity());};  
     dngs.ArenaTrialsNo1 = function () { return(new ArenaTrialsNo1());};
+    dngs.MinoLair = function () { return(new MinoLair());};
     return dngs; 
 }(window.gm.dngs || {}));

@@ -1,0 +1,91 @@
+:: MN_Lv3_MAP [_back_]
+<hr><p>Map:</p><div id='canvas'></div></br>
+<script> window.gm.printMap(window.story.state.DngSY.dng,window.gm.player.location.replace(window.story.state.DngSY.dng+'_','Tile_'),
+    window.story.state.DngMN.mapReveal,window.story.state.DngMN.visitedTiles);
+</script>
+
+
+:: MN_Lv3_Entry
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+The other side of the portal exits on a large slab of rock. It is located at the upper end of a cliff.
+From here you have a great view of the lower valley and a large waterfall on the other side of the crevasse. The water thunders into a rushing river that meanders through the canyon. 
+</br><p> [[Next|MN_Lv3_I3]] </br></p>
+</article><article id="LogPanel"></article></section>
+<script>
+    var s = window.story.state;
+    s.vars.spawnAt="SY_Recover_Death";//might also set this in encounter
+    s.DngMN.visitedTiles=[],
+    s.DngSY.dng='MN_Lv3';
+    s.DngMN.page={};
+</script>
+
+
+:: MN_Lv3_F1
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+
+</br><p> <%=window.gm.printNav('Go north','north')%></br><%=window.gm.printNav('Go west','west')%><%=window.gm.printNav('Go east','east')%></br><%=window.gm.printNav('Go south','south')%></br></p><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%>
+</article><article id="LogPanel"></article></section>
+
+
+:: MN_Lv3_F2
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+</br><p> <%=window.gm.printNav('Go north','north')%></br><%=window.gm.printNav('Go west','west')%><%=window.gm.printNav('Go east','east')%></br><%=window.gm.printNav('Go south','south')%></br></p><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%>
+</article><article id="LogPanel"></article></section>
+
+
+:: MN_Lv3_G2
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+
+</br><p> <%=window.gm.printNav('Go north','north')%></br><%=window.gm.printNav('Go west','west')%><%=window.gm.printNav('Go east','east')%></br><%=window.gm.printNav('Go south','south')%></br></p><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%>
+</article><article id="LogPanel"></article></section>
+
+
+:: MN_Lv3_H2
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+
+</br><p> <%=window.gm.printNav('Go north','north')%></br><%=window.gm.printNav('Go west','west')%><%=window.gm.printNav('Go east','east')%></br><%=window.gm.printNav('Go south','south')%></br></p><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%>
+</article><article id="LogPanel"></article></section>
+
+
+:: MN_Lv3_I2
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+
+</br><p> <%=window.gm.printNav('Go north','north')%></br><%=window.gm.printNav('Go west','west')%><%=window.gm.printNav('Go east','east')%></br><%=window.gm.printNav('Go south','south')%></br></p><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%>
+</article><article id="LogPanel"></article></section>
+
+
+:: MN_Lv3_J2
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+
+</br><p> <%=window.gm.printNav('Go north','north')%></br><%=window.gm.printNav('Go west','west')%><%=window.gm.printNav('Go east','east')%></br><%=window.gm.printNav('Go south','south')%></br></p><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%>
+</article><article id="LogPanel"></article></section>
+
+
+:: MN_Lv3_I3
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+
+</br><p> <%=window.gm.printNav('Go north','north')%></br><%=window.gm.printNav('Go west','west')%><%=window.gm.printNav('Go east','east')%></br><%=window.gm.printNav('Go south','south')%></br></p><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%>
+</article><article id="LogPanel"></article></section>
+
+:: MN_Lv3_J3
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+
+</br><p> <%=window.gm.printNav('Go north','north')%></br><%=window.gm.printNav('Go west','west')%><%=window.gm.printNav('Go east','east')%></br><%=window.gm.printNav('Go south','south')%></br></p><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%>
+</article><article id="LogPanel"></article></section>
+
+
+:: MN_Lv3_K3
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+
+</br><p> <%=window.gm.printNav('Go north','north')%></br><%=window.gm.printNav('Go west','west')%><%=window.gm.printNav('Go east','east')%></br><%=window.gm.printNav('Go south','south')%></br></p><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%>
+</article><article id="LogPanel"></article></section>

@@ -84,7 +84,7 @@ window.gm.util.mergePlainObject=function(...arg) {
             if (obj.hasOwnProperty(prop)) {
                 if (Object.prototype.toString.call(obj[prop]) === '[object Object]') {
                     // if the property is a nested object
-                    target[prop] = merge(target[prop], obj[prop]);
+                    target[prop] = window.gm.util.mergePlainObject(target[prop], obj[prop]);
                 } else {
                     // for regular property
                     target[prop] = obj[prop];
@@ -368,12 +368,13 @@ window.gm.popBackPassage=function() {
     window.story.state.tmp.flags = pass.flags;
     return(pass.id);
 };
+//push passage on hold before playing deffered passage
 window.gm.pushOnHold=function(id) {
   if(!window.story.state.hasOwnProperty("_gm")) return;  //exist only after initGame
   if(window.story.state._gm.onholdStack.length>0){
     throw new Error('passage allready onHold: '+id); //already some pushed
   } else {
-    window.story.state._gm.onholdStack.push(c);
+    window.story.state._gm.onholdStack.push({id:id, args:window.story.state.tmp.args});
   }
 };
 //
@@ -442,7 +443,7 @@ window.story.__proto__.show = function(idOrName, noHistory = false) {
   noHistory = true; //the engines object causes problems with history, namely refToParent
   _origStoryShow.call(window.story,next, noHistory);
 };
-/* when returning from back-passage restore view by hiding/unhiding programatical modified elements
+/* when returning from back-passage, restore view by hiding/unhiding programatical modified elements, see printTalkLink
 */
 window.gm.restorePage=function() {
   if(window.story.state.tmp) {
@@ -567,11 +568,11 @@ window.gm.printTalkLink =function(elmt,unhideThis,cb=null) {
 }
 //prints the same kind of link like [[Next]] but can be called from code
 window.gm.printPassageLink= function(label,target) {
-  return("<a href=\"javascript:void(0)\" data-passage=\""+target+"\">"+label+"</a></br>");
+  return("<a href=\"javascript:void(0)\" data-passage=\""+target+"\">"+label+"</a>");
 };
 //prints a link where target is a expression called onClick
 window.gm.printLink= function(label,target) {
-  return("<a href=\"javascript:void(0)\" onclick=\""+target+"\">"+label+"</a></br>");
+  return("<a href=\"javascript:void(0)\" onclick=\""+target+"\">"+label+"</a>");
 };
 
 //prints a link that when clicked picksup an item and places it in the inventory, if itemleft is <0, no link appears
@@ -737,9 +738,7 @@ window.gm.printAchievements= function() {
   var ids = Object.keys(window.gm.achievements);
   ids.sort();
   for(var k=0;k<ids.length;k++){
-      if(ids[k].split("_").length===1) {   //ignore _min/_max
           result+='<tr><td>'+ids[k]+':</td><td>'+window.gm.achievements[ids[k]]+'</td></tr>';
-      }
   }   //todo print mom : 10 of 20
   result+='</table>';
   return(result);

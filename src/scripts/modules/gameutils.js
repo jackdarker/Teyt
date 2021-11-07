@@ -149,35 +149,47 @@ window.gm.initGame= function(forceReset,NGP=null) {
 window.gm.initGameFlags = function(forceReset,NGP=null) {
   let s= window.story.state;
   if (forceReset) {  
-    s.DngDF = s.DngAM= s.DngSY=null; 
+    s.DngCV =s.DngDF = s.DngAM= s.DngSY=s.DngMN=s.DngAT=null; 
   }
   let DngDF = {
     visitedTiles: [],
     mapReveal: 0,
-    dngLevel: 1,
-    plumH3:0
+    plum:{} //which plums got collected
   }
   let DngSY = {
       remainingNights: 0,
-      dngLevel: 0
+      mapReveal: 0,
+      dng:'',
+      dngLevel:1
   }
   let DngAM = {
       visitedTiles: [],
-      mapReveal: 0,
-      dngLevel: 1
+      mapReveal: 0
+  }
+  let DngAT = {
+    visitedTiles: [],
+    mapReveal: 0,
+    gotRing: {}
   }
   let DngCV = {
     visitedTiles: [],
     mapReveal: 0,
-    dngLevel: 1,
     bathedInLake:0,
     gotWater:0
   }
+  let DngMN = {
+    visitedTiles: [],
+    mapReveal: 0,
+    page:{} //which bookpages got collected
+}
   //see comment in rebuildFromSave why this is done
   s.DngDF=window.gm.util.mergePlainObject(DngDF,s.DngDF);
   s.DngAM=window.gm.util.mergePlainObject(DngAM,s.DngAM);
   s.DngSY=window.gm.util.mergePlainObject(DngSY,s.DngSY);
   s.DngCV=window.gm.util.mergePlainObject(DngCV,s.DngCV);
+  s.DngMN=window.gm.util.mergePlainObject(DngMN,s.DngMN);
+  s.DngAT=window.gm.util.mergePlainObject(DngAT,s.DngAT);
+  //todo cleanout obsolete data ( filtering those not defined in template) 
 }
 
 // update non-class-objects of previous savegame
@@ -318,6 +330,39 @@ window.gm.moveHere = function(time=15){
     }
     window.gm.addTime(time); 
   }
+};
+/* used for the dungeons ..state.DngSY.dng 
+* creates link for ('enter door', 'north'):  [[enter door| MN_Lv3_F2]]  - assuming you are in tile MN_Lv3_F3 in MN_Lv3  
+*/
+window.gm.printNav=function(label,dir){
+  let here = window.passage.name.replace(window.story.state.DngSY.dng+'_','');
+  let to=window.story.state.DngSY.dng+'_',i=0;
+  const X=['A','B','C','D','E','F','G','H','I','J','K','L'],Y=['0','1','2','3','4','5','6'];
+  switch(dir) {
+    case 'north':
+      i=Y.findIndex((el)=>{return(el===here[1]);});
+      if(i<0||i<=0) return('');
+      to += here[0]+Y[i-1];
+      break;
+    case 'south':
+      i=Y.findIndex((el)=>{return(el===here[1]);});
+      if(i<0||i>=Y.length-1) return('');
+      to += here[0]+Y[i+1];
+      break;
+    case 'east':
+      i=X.findIndex((el)=>{return(el===here[0]);});
+      if(i<0||i>=X.length-1) return('');
+      to += X[i+1]+here[1];
+      break;
+    case 'west':
+      i=X.findIndex((el)=>{return(el===here[0]);});
+      if(i<0||i<=0) return('');
+      to += X[i-1]+here[1];
+      break;
+    default: return('');
+  }
+  if(!window.story.passage(to)) return('');
+  return(window.gm.printPassageLink(label,to));
 };
 window.gm.rollExploreCity= function() {
   let s=window.story.state;

@@ -13,12 +13,12 @@ class Encounter {
     //the following function should get reassigned;they should return a message what will happen next and provide a link to passage to follow f.e. return to window.gm.player.location
     this.onStart = (function(){return('A '+window.story.state.combat.enemyParty[0].name+' appears !'+ window.gm.printPassageLink('Engage','EncounterStartTurn'));});
     //...endCombat is called after this and if you need to check on effects, you have to do this here !
-    this.onDefeat = (function(){return('You are defeated.</br>'+ window.gm.printLink('Next','window.gm.postDefeat()'));});
-    this.onSubmit = (function(){return('You submit to the foe.</br>'+ window.gm.printLink('Next','window.gm.postDefeat()'));});
-    this.onFlee = (function(){return('You retreat hastily.</br>'+ window.gm.printLink('Next','window.gm.postVictory()'));});
+    this.onDefeat = (function(){return('</br></br>You are defeated.</br>'+ window.gm.printLink('Next','window.gm.postDefeat()'));});
+    this.onSubmit = (function(){return('</br></br>You submit to the foe.</br>'+ window.gm.printLink('Next','window.gm.postDefeat()'));});
+    this.onFlee = (function(){return('</br></br>You retreat hastily.</br>'+ window.gm.printLink('Next','window.gm.postVictory()'));});
 
     //...dont forget to fetchLoot on victory
-    this.onVictory = (function(){return('You defeated the foe.</br> '+this.fetchLoot()+'</br>'+ window.gm.printLink('Next','window.gm.postVictory()'));});
+    this.onVictory = (function(){return('</br></br>You defeated the foe.</br> '+this.fetchLoot()+'</br>'+ window.gm.printLink('Next','window.gm.postVictory()'));});
 
     //if you override onMoveSelect (like the others), you can jump out of battle, show some scene and return to battle
     //- do not modify window.gm.player.location

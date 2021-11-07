@@ -90,6 +90,7 @@ window.gm.encounters.mechanicguy = function(params) {
 }
 window.gm.encounters.hornett = function(params) {
     var amount=(params&&params.amount)?params.amount:1, location=(params&&params.location)?params.location:window.passage.name;
+    var noStart = (params&&params.noStart)?true:false;
     window.gm.Encounter = new Encounter();
     window.gm.Encounter.EnemyFunc = (function() { 
         let mobs =[];
@@ -100,7 +101,7 @@ window.gm.encounters.hornett = function(params) {
         return(mobs);});
     window.gm.Encounter.Location = location?location:window.passage.name;
     window.gm.Encounter.scenePic = window.gm.getScenePic(window.gm.Encounter.Location);
-    window.gm.Encounter.initCombat();
+    if(!noStart) window.gm.Encounter.initCombat();
 }
 window.gm.encounters.huntress = function(params) {
     var amount=(params&&params.amount)?params.amount:1, location=(params&&params.location)?params.location:window.passage.name;

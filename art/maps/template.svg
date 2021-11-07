@@ -31,14 +31,14 @@
      inkscape:snap-bbox="false"
      inkscape:snap-bbox-midpoints="true"
      inkscape:zoom="1"
-     inkscape:cx="289.99999"
+     inkscape:cx="92.5"
      inkscape:cy="136.5"
-     inkscape:window-width="1291"
-     inkscape:window-height="1003"
-     inkscape:window-x="140"
-     inkscape:window-y="60"
-     inkscape:window-maximized="0"
-     inkscape:current-layer="layer2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     inkscape:window-x="1912"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer4"
      units="px"
      width="600px"
      scale-x="0.4"
@@ -81,13 +81,13 @@
   fill-rule:evenodd;
   paint-order:fill markers stroke;
   stop-color:#000000;
-  stroke:#000000;
+  stroke:#736b00;
   stroke-dasharray:none;
   stroke-linecap:round;
   stroke-linejoin:bevel;
   stroke-miterlimit:4;
   stroke-opacity:1;
-  stroke-width:2;
+  stroke-width:6;
 }
 .playerPosition {
   fill:#00c175;
@@ -305,10 +305,60 @@
        class="roomVisited" />
   </g>
   <g
+     inkscape:groupmode="layer"
+     id="layer4"
+     inkscape:label="Layer 2">
+    <path
+       d="m 170,50 h 40"
+       id="path4639-2-8-2-8"
+       inkscape:connector-type="polyline"
+       inkscape:connector-curvature="0"
+       class="pathFound"
+       sodipodi:nodetypes="cc"
+       style="display:inline;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#736b00;stroke-width:6;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke;stop-color:#000000" />
+    <path
+       d="m 110,30 h 80"
+       id="path4639-2-8-2-8-4"
+       inkscape:connector-type="polyline"
+       inkscape:connector-curvature="0"
+       class="pathFound"
+       sodipodi:nodetypes="cc" />
+    <path
+       d="M 190,30 V 50"
+       id="path4639-2-8-2-8-0"
+       inkscape:connector-type="polyline"
+       inkscape:connector-curvature="0"
+       class="pathFound"
+       sodipodi:nodetypes="cc" />
+    <path
+       d="M 210,50 V 90"
+       id="path4639-2-8-2-8-0-5"
+       inkscape:connector-type="polyline"
+       inkscape:connector-curvature="0"
+       class="pathFound"
+       sodipodi:nodetypes="cc" />
+    <path
+       d="M 110,10 V 30"
+       id="path4639-2-8-2-8-0-8"
+       inkscape:connector-type="polyline"
+       inkscape:connector-curvature="0"
+       class="pathFound"
+       sodipodi:nodetypes="cc"
+       style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#736b00;stroke-width:6;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke;stop-color:#000000" />
+    <path
+       d="m 150,90 h 80"
+       id="path4639-2-8-2-8-7"
+       inkscape:connector-type="polyline"
+       inkscape:connector-curvature="0"
+       class="pathFound"
+       sodipodi:nodetypes="cc" />
+  </g>
+  <g
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-50,-49.999986)">
+     transform="translate(-50,-49.999986)"
+     sodipodi:insensitive="true">
     <use
        x="0"
        y="0"

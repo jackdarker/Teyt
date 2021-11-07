@@ -170,7 +170,8 @@ class SkillSting extends SkillAttack {
     }
     constructor() {
         super();
-        this.id=this.name='Sting'
+        this.id=this.name='Sting';
+        this.data = SkillSting.dataPrototype();
         this.msg = '';
         this.cost.energy =20;
     }

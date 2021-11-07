@@ -53,7 +53,7 @@ class Wolf extends Mob {
             foe.name = foe.id = 'AlphaWolf';
             foe.Stats.increment('healthMax',-0.3*(foe.health().max));
             foe.Skills.addItem(SkillCallHelp.factory('Wolf')); //todo chance to call?
-            foe.pic= 'assets/battlers/wolf1.svg';
+            foe.pic= 'assets/battlers/wolf1';
         } else {
             foe.Stats.increment('healthMax',-0.5*(foe.health().max));
         }
@@ -138,7 +138,7 @@ class Leech extends Mob {
     constructor() {
         super();
         this.name = this.id = 'Leech';
-        this.pic= 'leech2.svg';
+        this.pic= 'leech2';
         this.level_min =1;
         this.Outfit.addItem(new BaseWorm());
         this.Outfit.addItem(FaceLeech.factory('leech'));
@@ -452,7 +452,7 @@ class Hornett extends Mob {
     constructor() {
         super();
         this.name = this.id = 'Hornett';
-        this.pic= 'Hornett.svg';
+        this.pic= 'wasp1';
         this.level_min =1;
         this.Outfit.addItem(new BaseWasp());
         this.Outfit.addItem(WeaponStinger.factory('wasplike'));
