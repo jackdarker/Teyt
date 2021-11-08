@@ -337,7 +337,8 @@ class MinoLair extends DngDungeon{
     constructor()    {
         super("MinoLair", MinoLair.desc,window.story.state.dng[MinoLair.name])
         this.data.currentRoom = 1; 
-        this.data.minoTile='D3';this.data.minoDelay=0;
+        this.data.minoTile='E2';this.data.minoDelay=2;
+        this.Mapper = new DngMapper(this.extMapInfo.bind(this));
         this.buildFloors();
     }
     static desc() {return("Escape the Mean Mino");}
@@ -351,24 +352,14 @@ class MinoLair extends DngDungeon{
         var rooms= new Map();
         /* first floor
         *  
+        * A1   B1 - C1 - D1   S
+        * |     |        |    |
         * E  - B2 - C2 - D2 - E2
         * |                   |
         * A3 - B3 - C3 - D3 - E3
-        *   
+        *      |     |   |
+        * A4 - B4   C4 - D4 - E4  
         * */
-       //Todo should be able to go into arena only once a day/with entryfee
-        /*let foo1 = (function(){return(ArenaTrialsNo1.desc()+'</br>If you survive your first challenger, you get '+this.data.rewards[this.data.currentRoom].amount+'x '+this.data.rewards[this.data.currentRoom].id+'.</br>');}).bind(this);
-        let foo2 = (function(){return('If you survive the second challenge, you get '+this.data.rewards[this.data.currentRoom].amount+'x '+this.data.rewards[this.data.currentRoom].id+'.</br>');}).bind(this);
-        let foo3 = (function(){return('If you survive the third challenge, you get '+this.data.rewards[this.data.currentRoom].amount+'x '+this.data.rewards[this.data.currentRoom].id+'.</br>');}).bind(this);
-        let foo4 = (function(){return('If you survive the last challenge, you get '+this.data.rewards[this.data.currentRoom].amount+'x '+this.data.rewards[this.data.currentRoom].id+'.</br>');}).bind(this);
-        let foo5 = function(){return('Congratulations. You have passed all the challenges and trully earned your reward.</br>');};
-        let _evt = new DngOperation("Retreat");
-        _evt.canTrigger = function(){return(true);};
-        _evt.onTrigger = function(){
-            this.renderEvent = this.renderRetreat;
-            this.evtData = {};
-            this.renderNext(1);
-        };*/
         let _evt = new DngOperation("tickMino");
         _evt.canTrigger = function(){return(true);};
         _evt.onTrigger = function(){
@@ -376,6 +367,11 @@ class MinoLair extends DngDungeon{
             this.evtData = {};
             this.renderNext(1);
         };
+        rooms.set("A1",new DngRoom("A1", null,false));
+        rooms.set("B1", new DngRoom("B1", null,false));
+        rooms.set("C1", new DngRoom("C1", null, false));
+        rooms.set("D1", new DngRoom("D1", null, false));
+        rooms.set("Stairs",new DngRoom("Stairs", null,false));
         rooms.set("Entrance", new DngRoom("Entrance", null,false));
         rooms.set("B2", new DngRoom("B2", null,false));
         rooms.set("C2", new DngRoom("C2", null, false));
@@ -386,19 +382,44 @@ class MinoLair extends DngDungeon{
         rooms.set("C3", new DngRoom("C3", null, false));
         rooms.set("D3", new DngRoom("D3", null, false));
         rooms.set("E3",new DngRoom("E3", null,false));
-        DngDirection.createDirection(DngDirection.DirE, rooms.get("Entrance") , rooms.get("B2"),true);
+        rooms.set("A4",new DngRoom("A4", null,false));
+        rooms.set("B4", new DngRoom("B4", null,false));
+        rooms.set("C4", new DngRoom("C4", null, false));
+        rooms.set("D4", new DngRoom("D4", null, false));
+        rooms.set("E4",new DngRoom("E4", null,false));
+        //horizontal
+        //DngDirection.createDirection(DngDirection.DirE, rooms.get("A1") , rooms.get("B1"));
+        DngDirection.createDirection(DngDirection.DirE, rooms.get("B1" ), rooms.get("C1"));
+        DngDirection.createDirection(DngDirection.DirE, rooms.get("C1" ), rooms.get("D1"));
+        //DngDirection.createDirection(DngDirection.DirE, rooms.get("D1" ), rooms.get("E1"));
+        DngDirection.createDirection(DngDirection.DirE, rooms.get("Entrance") , rooms.get("B2"));
         DngDirection.createDirection(DngDirection.DirE, rooms.get("B2" ), rooms.get("C2"));
         DngDirection.createDirection(DngDirection.DirE, rooms.get("C2" ), rooms.get("D2"));
         DngDirection.createDirection(DngDirection.DirE, rooms.get("D2" ), rooms.get("E2"));
-        DngDirection.createDirection(DngDirection.DirE, rooms.get("A3") , rooms.get("B3"),true);
+        DngDirection.createDirection(DngDirection.DirE, rooms.get("A3") , rooms.get("B3"));
         DngDirection.createDirection(DngDirection.DirE, rooms.get("B3" ), rooms.get("C3"));
         DngDirection.createDirection(DngDirection.DirE, rooms.get("C3" ), rooms.get("D3"));
         DngDirection.createDirection(DngDirection.DirE, rooms.get("D3" ), rooms.get("E3"));
+        DngDirection.createDirection(DngDirection.DirE, rooms.get("A4") , rooms.get("B4"));
+        //DngDirection.createDirection(DngDirection.DirE, rooms.get("B4" ), rooms.get("C4"));
+        DngDirection.createDirection(DngDirection.DirE, rooms.get("C4" ), rooms.get("D4"));
+        DngDirection.createDirection(DngDirection.DirE, rooms.get("D4" ), rooms.get("E4"));
+        //vertical
+        DngDirection.createDirection(DngDirection.DirS, rooms.get("A1" ), rooms.get("Entrance"));
+        DngDirection.createDirection(DngDirection.DirS, rooms.get("B1" ), rooms.get("B2"));
+        DngDirection.createDirection(DngDirection.DirS, rooms.get("D1" ), rooms.get("D2"));
+        DngDirection.createDirection(DngDirection.DirS, rooms.get("Stairs" ), rooms.get("E2"));
         DngDirection.createDirection(DngDirection.DirS, rooms.get("Entrance" ), rooms.get("A3"));
         DngDirection.createDirection(DngDirection.DirS, rooms.get("E2" ), rooms.get("E3"));
+        DngDirection.createDirection(DngDirection.DirS, rooms.get("B3" ), rooms.get("B4"));
+        DngDirection.createDirection(DngDirection.DirS, rooms.get("C3" ), rooms.get("C4"));
+        DngDirection.createDirection(DngDirection.DirS, rooms.get("D3" ), rooms.get("D4"));
+        for(var i=0;i<rooms.length;i++) {
+            rooms[i].operations = [_evt];
+        }
         room =rooms.get("Entrance");
         room.isDungeonEntry = room.isDungeonExit = true;
-        //room.getDirection(DngDirection.DirE).onExitFct = this._fight.bind(this,1);
+        /*//room.getDirection(DngDirection.DirE).onExitFct = this._fight.bind(this,1);
         room =rooms.get("B2");
         //room.getDirection(DngDirection.DirE).onExitFct = this._fight.bind(this,2);
         room.operations = [_evt];
@@ -409,7 +430,7 @@ class MinoLair extends DngDungeon{
         //room.getDirection(DngDirection.DirE).onExitFct = this._fight.bind(this,4);
         room.operations = [_evt];
         room = rooms.get("E2");
-        room.operations = [_evt];
+        room.operations = [_evt];*/
         firstFloor.setRooms(Array.from(rooms.values( )));
         _floors.push(firstFloor);
         this.setFloors(_floors);
@@ -426,13 +447,30 @@ class MinoLair extends DngDungeon{
         let msg ='';
         if(evt.id===1) {
             this.moveMino();
-            msg+='Mino is now at'+this.data.minoTile+' and moves in '+ this.data.minoDelay+' turns. </br>';
-            msg+= window.gm.printLink("Next",'window.gm.dng.resumeRoom()');//'window.gm.dng.exitDungeon()'
+            if(window.gm.dng.actualRoom.Name===this.data.minoTile) {
+                msg+='The mean mino got you. </br>';
+                msg+= window.gm.printLink("Next",'window.gm.dng.exitDungeon()');
+            } else {
+                msg+='Mino is now at '+this.data.minoTile+' and moves in '+ this.data.minoDelay+' turns. </br>';
+                msg+= window.gm.printLink("Next",'window.gm.dng.resumeRoom()');//'window.gm.dng.exitDungeon()'
+            }
         } 
         return(msg);
     }
     moveMino() {
-
+        this.data.minoDelay=0;
+        let grid = this.allFloors()[0].allRooms();
+        let start = new window.GraphNode(this.allFloors()[0].getRoom(this.data.minoTile),1), 
+            end = new window.GraphNode(this.allFloors()[0].getRoom('D2'),1)
+        let graph = new window.Graph(grid);
+        let path = window.astar.search(graph,start,end);
+        if(path.length>0) {
+            this.data.minoTile=path[0].origNode.name;
+        }
+    }
+    extMapInfo(roomInfo) {
+        if(roomInfo.Name===this.data.minoTile) roomInfo.Boss=1;
+        return(roomInfo);
     }
     /**
      * 

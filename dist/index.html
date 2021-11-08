@@ -267,7 +267,7 @@ main .word {
 // Implements the astar search algorithm in javascript using a Binary Heap.
 // Includes Binary Heap (with modifications) from Marijn Haverbeke.
 // http://eloquentjavascript.net/appendix2.html
-(function(definition){/* global module, define */if((typeof module==="undefined"?"undefined":_typeof(module))==='object'&&_typeof(module.exports)==='object'){module.exports=definition();}else if(typeof define==='function'&&define.amd){define([],definition);}else{var exports=definition();window.astar=exports.astar;window.Graph=exports.Graph;}})(function(){function pathTo(node){var curr=node;var path=[];while(curr.parent){path.unshift(curr);curr=curr.parent;}return path;}function getHeap(){return new BinaryHeap(function(node){return node.f;});}var astar={/**
+(function(definition){/* global module, define */if((typeof module==="undefined"?"undefined":_typeof(module))==='object'&&_typeof(module.exports)==='object'){module.exports=definition();}else if(typeof define==='function'&&define.amd){define([],definition);}else{var exports=definition();window.astar=exports.astar;window.Graph=exports.Graph;window.GraphNode=exports.GridNode;}})(function(){function pathTo(node){var curr=node;var path=[];while(curr.parent){path.unshift(curr);curr=curr.parent;}return path;}function getHeap(){return new BinaryHeap(function(node){return node.f;});}var astar={/**
     * Perform an A* Search on a graph given a start and end node.
     * @param {Graph} graph
     * @param {GridNode} start
@@ -280,12 +280,14 @@ main .word {
     */search:function search(graph,start,end,options){graph.cleanDirty();options=options||{};var heuristic=options.heuristic||astar.heuristics.manhattan;var closest=options.closest||false;var openHeap=getHeap();var closestNode=start;// set the start node to be the closest if required
 start.h=heuristic(start,end);graph.markDirty(start);openHeap.push(start);while(openHeap.size()>0){// Grab the lowest f(x) to process next.  Heap keeps this sorted for us.
 var currentNode=openHeap.pop();// End case -- result has been found, return the traced path.
-if(currentNode===end){return pathTo(currentNode);}// Normal case -- move currentNode from open to closed, process each of its neighbors.
+if(currentNode.equals(end)){return pathTo(currentNode);}// Normal case -- move currentNode from open to closed, process each of its neighbors.
 currentNode.closed=true;// Find all neighbors for the current node.
-var neighbors=graph.neighbors(currentNode);for(var i=0,il=neighbors.length;i<il;++i){var neighbor=neighbors[i];if(neighbor.closed||neighbor.isWall()){// Not a valid node to process, skip to next neighbor.
+var neighbors=graph.neighbors(currentNode);for(var i=0,il=neighbors.length;i<il;++i){var neighbor=neighbors[i];if(neighbor.closed){//??|| neighbor.isWall()) {
+// Not a valid node to process, skip to next neighbor.
 continue;}// The g score is the shortest distance from start to current node.
 // We need to check if the path we have arrived at this neighbor is the shortest one we have seen yet.
-var gScore=currentNode.g+neighbor.getCost(currentNode);var beenVisited=neighbor.visited;if(!beenVisited||gScore<neighbor.g){// Found an optimal (so far) path to this node.  Take score for node to see how good it is.
+var gScore=currentNode.g+graph.getCost(currentNode,neighbor);//neighbor.getCost(currentNode);
+var beenVisited=neighbor.visited;if(!beenVisited||gScore<neighbor.g){// Found an optimal (so far) path to this node.  Take score for node to see how good it is.
 neighbor.visited=true;neighbor.parent=currentNode;neighbor.h=neighbor.h||heuristic(neighbor,end);neighbor.g=gScore;neighbor.f=neighbor.g+neighbor.h;graph.markDirty(neighbor);if(closest){// If the neighbour is closer than the current closestNode or if it's equally close but has
 // a cheaper path than the current closest node then it becomes the closest node
 if(neighbor.h<closestNode.h||neighbor.h===closestNode.h&&neighbor.g<closestNode.g){closestNode=neighbor;}}if(!beenVisited){// Pushing to heap will put it in proper place based on the 'f' value.
@@ -297,16 +299,95 @@ heuristics:{manhattan:function manhattan(pos0,pos1){var d1=Math.abs(pos1.x-pos0.
    * @param {Array} gridIn 2D array of input weights
    * @param {Object} [options]
    * @param {bool} [options.diagonal] Specifies whether diagonal moves are allowed
-   */function Graph(gridIn,options){options=options||{};this.nodes=[];this.diagonal=!!options.diagonal;this.grid=[];for(var x=0;x<gridIn.length;x++){this.grid[x]=[];for(var y=0,row=gridIn[x];y<row.length;y++){var node=new GridNode(x,y,row[y]);this.grid[x][y]=node;this.nodes.push(node);}}this.init();}Graph.prototype.init=function(){this.dirtyNodes=[];for(var i=0;i<this.nodes.length;i++){astar.cleanNode(this.nodes[i]);}};Graph.prototype.cleanDirty=function(){for(var i=0;i<this.dirtyNodes.length;i++){astar.cleanNode(this.dirtyNodes[i]);}this.dirtyNodes=[];};Graph.prototype.markDirty=function(node){this.dirtyNodes.push(node);};Graph.prototype.neighbors=function(node){var ret=[];var x=node.x;var y=node.y;var grid=this.grid;// West
-if(grid[x-1]&&grid[x-1][y]){ret.push(grid[x-1][y]);}// East
-if(grid[x+1]&&grid[x+1][y]){ret.push(grid[x+1][y]);}// South
-if(grid[x]&&grid[x][y-1]){ret.push(grid[x][y-1]);}// North
-if(grid[x]&&grid[x][y+1]){ret.push(grid[x][y+1]);}if(this.diagonal){// Southwest
-if(grid[x-1]&&grid[x-1][y-1]){ret.push(grid[x-1][y-1]);}// Southeast
-if(grid[x+1]&&grid[x+1][y-1]){ret.push(grid[x+1][y-1]);}// Northwest
-if(grid[x-1]&&grid[x-1][y+1]){ret.push(grid[x-1][y+1]);}// Northeast
-if(grid[x+1]&&grid[x+1][y+1]){ret.push(grid[x+1][y+1]);}}return ret;};Graph.prototype.toString=function(){var graphString=[];var nodes=this.grid;for(var x=0;x<nodes.length;x++){var rowDebug=[];var row=nodes[x];for(var y=0;y<row.length;y++){rowDebug.push(row[y].weight);}graphString.push(rowDebug.join(" "));}return graphString.join("\n");};function GridNode(x,y,weight){this.x=x;this.y=y;this.weight=weight;}GridNode.prototype.toString=function(){return"["+this.x+" "+this.y+"]";};GridNode.prototype.getCost=function(fromNeighbor){// Take diagonal weight into consideration.
-if(fromNeighbor&&fromNeighbor.x!=this.x&&fromNeighbor.y!=this.y){return this.weight*1.41421;}return this.weight;};GridNode.prototype.isWall=function(){return this.weight===0;};function BinaryHeap(scoreFunction){this.content=[];this.scoreFunction=scoreFunction;}BinaryHeap.prototype={push:function push(element){// Add the new element to the end of the array.
+   */function Graph(gridIn,options){options=options||{};this.nodes=[];this.diagonal=!!options.diagonal;for(var x=0;x<gridIn.length;x++){var node=new GridNode(gridIn[x],1);// (x,y,row[y])
+this.nodes.push(node);}this.init();}/*function Graph(gridIn, options) {
+    options = options || {};
+    this.nodes = [];
+    this.diagonal = !!options.diagonal;
+    this.grid = [];
+    for (var x = 0; x < gridIn.length; x++) {
+      this.grid[x] = [];
+  
+      for (var y = 0, row = gridIn[x]; y < row.length; y++) {
+        var node = new GridNode(x, y, row[y]);
+        this.grid[x][y] = node;
+        this.nodes.push(node);
+      }
+    }
+    this.init();
+  } */Graph.prototype.init=function(){this.dirtyNodes=[];for(var i=0;i<this.nodes.length;i++){astar.cleanNode(this.nodes[i]);}};Graph.prototype.cleanDirty=function(){for(var i=0;i<this.dirtyNodes.length;i++){astar.cleanNode(this.dirtyNodes[i]);}this.dirtyNodes=[];};Graph.prototype.markDirty=function(node){this.dirtyNodes.push(node);};Graph.prototype.getCost=function(from,to){// Take diagonal weight into consideration.
+/*if (from && from.x != to.x && from.y != to.y) {
+      return to.weight * 1.41421;
+    }*/return to.getWeight();};Graph.prototype.neighbors=function(node){var ret=[];var dirs=node.origNode.getDirections();for(var i=0;i<dirs.length;i++){if(dirs[i]!==null){var room=dirs[i].roomB;var next=this.nodes.find(function(el){return el.origNode===room;});ret.push(next);}}return ret;};/*Graph.prototype.neighbors = function(node) {
+    var ret = [];
+    var x = node.x;
+    var y = node.y;
+    var grid = this.grid;
+  
+    // West
+    if (grid[x - 1] && grid[x - 1][y]) {
+      ret.push(grid[x - 1][y]);
+    }
+    // East
+    if (grid[x + 1] && grid[x + 1][y]) {
+      ret.push(grid[x + 1][y]);
+    }
+    // South
+    if (grid[x] && grid[x][y - 1]) {
+      ret.push(grid[x][y - 1]);
+    }
+    // North
+    if (grid[x] && grid[x][y + 1]) {
+      ret.push(grid[x][y + 1]);
+    }
+    if (this.diagonal) {
+      // Southwest
+      if (grid[x - 1] && grid[x - 1][y - 1]) {
+        ret.push(grid[x - 1][y - 1]);
+      }
+      // Southeast
+      if (grid[x + 1] && grid[x + 1][y - 1]) {
+        ret.push(grid[x + 1][y - 1]);
+      }
+      // Northwest
+      if (grid[x - 1] && grid[x - 1][y + 1]) {
+        ret.push(grid[x - 1][y + 1]);
+      }
+      // Northeast
+      if (grid[x + 1] && grid[x + 1][y + 1]) {
+        ret.push(grid[x + 1][y + 1]);
+      }
+    }
+    return ret;
+  };*/ /*Graph.prototype.toString = function() {
+    var graphString = [];
+    var nodes = this.grid;
+    for (var x = 0; x < nodes.length; x++) {
+      var rowDebug = [];
+      var row = nodes[x];
+      for (var y = 0; y < row.length; y++) {
+        rowDebug.push(row[y].weight);
+      }
+      graphString.push(rowDebug.join(" "));
+    }
+    return graphString.join("\n");
+  };*/ /*function GridNode(x, y, weight) {
+    this.x = x;
+    this.y = y;
+    this.weight = weight;
+  }
+  GridNode.prototype.toString = function() {
+    return "[" + this.x + " " + this.y + "]";
+  };*/ /*GridNode.prototype.getCost = function(fromNeighbor) {
+    // Take diagonal weight into consideration.
+    if (fromNeighbor && fromNeighbor.x != this.x && fromNeighbor.y != this.y) {
+      return this.weight * 1.41421;
+    }
+    return this.weight;
+  };*/function GridNode(origNode){this.origNode=origNode;}GridNode.prototype.equals=function(other){return this.origNode===other.origNode;};GridNode.prototype.getWeight=function(){return 1;//todo origNode.getCost()
+};/*GridNode.prototype.isWall = function() {
+    return this.weight === 0;
+  };*/function BinaryHeap(scoreFunction){this.content=[];this.scoreFunction=scoreFunction;}BinaryHeap.prototype={push:function push(element){// Add the new element to the end of the array.
 this.content.push(element);// Allow it to sink down.
 this.sinkDown(this.content.length-1);},pop:function pop(){// Store the first element so we can return it later.
 var result=this.content[0];// Get the element at the end of the array.
@@ -329,7 +410,7 @@ var child1=this.content[child1N];child1Score=this.scoreFunction(child1);// If th
 if(child1Score<elemScore){swap=child1N;}}// Do the same checks for the other child.
 if(child2N<length){var child2=this.content[child2N];var child2Score=this.scoreFunction(child2);if(child2Score<(swap===null?elemScore:child1Score)){swap=child2N;}}// If the element needs to be moved, swap it, and continue.
 if(swap!==null){this.content[n]=this.content[swap];this.content[swap]=element;n=swap;}// Otherwise, we are done.
-else{break;}}}};return{astar:astar,Graph:Graph};});"use strict";/**
+else{break;}}}};return{astar:astar,Graph:Graph,GridNode:GridNode};});"use strict";/**
 * a class to provide methods to work with PC & NPC
 */var Character=/*#__PURE__*/function(){_createClass(Character,null,[{key:"defaultData",value:function defaultData(){return{id:'',name:'',faction:'Enemy',location:"Home",XP:0,//this is the XP you have earned but not yet spent
 level:0,unspentStat:0,//on level up you get Stat-points to distribute
@@ -534,16 +615,7 @@ result=window.gm.combat.calcAbsorb(attacker,defender,attack);//deal damage
     result.msg = defender.name +' got heavily teased by '+attacker.name+'. ';
   } else {
     result.msg = defender.name +'\'s arousal increased. ';
-  }*/_tmp+=result.msg;result.msg=_tmp;return result;};/*  demo.js http://github.com/bgrins/javascript-astar
-    MIT License
-
-    Set up the demo page for the A* Search
-*/ /* global Graph, astar, $ */var WALL=0,performance=window.performance;$(function(){var $grid=$("#search_grid"),$selectWallFrequency=$("#selectWallFrequency"),$selectGridSize=$("#selectGridSize"),$checkDebug=$("#checkDebug"),$searchDiagonal=$("#searchDiagonal"),$checkClosest=$("#checkClosest");var opts={wallFrequency:$selectWallFrequency.val(),gridSize:$selectGridSize.val(),debug:$checkDebug.is("checked"),diagonal:$searchDiagonal.is("checked"),closest:$checkClosest.is("checked")};var grid=new GraphSearch($grid,opts,astar.search);$("#btnGenerate").click(function(){grid.initialize();});$selectWallFrequency.change(function(){grid.setOption({wallFrequency:$(this).val()});grid.initialize();});$selectGridSize.change(function(){grid.setOption({gridSize:$(this).val()});grid.initialize();});$checkDebug.change(function(){grid.setOption({debug:$(this).is(":checked")});});$searchDiagonal.change(function(){var val=$(this).is(":checked");grid.setOption({diagonal:val});grid.graph.diagonal=val;});$checkClosest.change(function(){grid.setOption({closest:$(this).is(":checked")});});$("#generateWeights").click(function(){if($("#generateWeights").prop("checked")){$('#weightsKey').slideDown();}else{$('#weightsKey').slideUp();}});});var css={start:"start",finish:"finish",wall:"wall",active:"active"};function GraphSearch($graph,options,implementation){this.$graph=$graph;this.search=implementation;this.opts=$.extend({wallFrequency:0.1,debug:true,gridSize:10},options);this.initialize();}GraphSearch.prototype.setOption=function(opt){this.opts=$.extend(this.opts,opt);this.drawDebugInfo();};GraphSearch.prototype.initialize=function(){this.grid=[];var self=this,nodes=[],$graph=this.$graph;$graph.empty();var cellWidth=$graph.width()/this.opts.gridSize-2,// -2 for border
-cellHeight=$graph.height()/this.opts.gridSize-2,$cellTemplate=$("<span />").addClass("grid_item").width(cellWidth).height(cellHeight),startSet=false;for(var x=0;x<this.opts.gridSize;x++){var $row=$("<div class='clear' />"),nodeRow=[],gridRow=[];for(var y=0;y<this.opts.gridSize;y++){var id="cell_"+x+"_"+y,$cell=$cellTemplate.clone();$cell.attr("id",id).attr("x",x).attr("y",y);$row.append($cell);gridRow.push($cell);var isWall=Math.floor(Math.random()*(1/self.opts.wallFrequency));if(isWall===0){nodeRow.push(WALL);$cell.addClass(css.wall);}else{var cell_weight=$("#generateWeights").prop("checked")?Math.floor(Math.random()*3)*2+1:1;nodeRow.push(cell_weight);$cell.addClass('weight'+cell_weight);if($("#displayWeights").prop("checked")){$cell.html(cell_weight);}if(!startSet){$cell.addClass(css.start);startSet=true;}}}$graph.append($row);this.grid.push(gridRow);nodes.push(nodeRow);}this.graph=new Graph(nodes);// bind cell event, set start/wall positions
-this.$cells=$graph.find(".grid_item");this.$cells.click(function(){self.cellClicked($(this));});};GraphSearch.prototype.cellClicked=function($end){var end=this.nodeFromElement($end);if($end.hasClass(css.wall)||$end.hasClass(css.start)){return;}this.$cells.removeClass(css.finish);$end.addClass("finish");var $start=this.$cells.filter("."+css.start),start=this.nodeFromElement($start);var sTime=performance?performance.now():new Date().getTime();var path=this.search(this.graph,start,end,{closest:this.opts.closest});var fTime=performance?performance.now():new Date().getTime(),duration=(fTime-sTime).toFixed(2);if(path.length===0){$("#message").text("couldn't find a path ("+duration+"ms)");this.animateNoPath();}else{$("#message").text("search took "+duration+"ms.");this.drawDebugInfo();this.animatePath(path);}};GraphSearch.prototype.drawDebugInfo=function(){this.$cells.html(" ");var that=this;if(this.opts.debug){that.$cells.each(function(){var node=that.nodeFromElement($(this)),debug=false;if(node.visited){debug="F: "+node.f+"<br />G: "+node.g+"<br />H: "+node.h;}if(debug){$(this).html(debug);}});}};GraphSearch.prototype.nodeFromElement=function($cell){return this.graph.grid[parseInt($cell.attr("x"))][parseInt($cell.attr("y"))];};GraphSearch.prototype.animateNoPath=function(){var $graph=this.$graph;var jiggle=function jiggle(lim,i){if(i>=lim){$graph.css("top",0).css("left",0);return;}if(!i)i=0;i++;$graph.css("top",Math.random()*6).css("left",Math.random()*6);setTimeout(function(){jiggle(lim,i);},5);};jiggle(15);};GraphSearch.prototype.animatePath=function(path){var grid=this.grid,timeout=1000/grid.length,elementFromNode=function elementFromNode(node){return grid[node.x][node.y];};var self=this;// will add start class if final
-var removeClass=function removeClass(path,i){if(i>=path.length){// finished removing path, set start positions
-return setStartClass(path,i);}elementFromNode(path[i]).removeClass(css.active);setTimeout(function(){removeClass(path,i+1);},timeout*path[i].getCost());};var setStartClass=function setStartClass(path,i){if(i===path.length){self.$graph.find("."+css.start).removeClass(css.start);elementFromNode(path[i-1]).addClass(css.start);}};var addClass=function addClass(path,i){if(i>=path.length){// Finished showing path, now remove
-return removeClass(path,0);}elementFromNode(path[i]).addClass(css.active);setTimeout(function(){addClass(path,i+1);},timeout*path[i].getCost());};addClass(path,0);this.$graph.find("."+css.start).removeClass(css.start);this.$graph.find("."+css.finish).removeClass(css.finish).addClass(css.start);};"use strict";/* bundles some operations related to dungeon navigation */window.gm=window.gm||{};window.gm.dng=window.gm.dng||null;//{};
+  }*/_tmp+=result.msg;result.msg=_tmp;return result;};"use strict";/* bundles some operations related to dungeon navigation */window.gm=window.gm||{};window.gm.dng=window.gm.dng||null;//{};
 //represents a button the player can press for directions N,E,S,W; this will also be used to generate the map
 //if you have to connect 2 rooms, you have to define direction in both of them
 var DngDirection=/*#__PURE__*/function(){_createClass(DngDirection,null,[{key:"createDirection",//creates direction between 2 rooms and assigns them to them; you can then modify them
@@ -597,10 +669,11 @@ value:function canTrigger(){return false;}//override this to do something;
  */var DngDungeon=/*#__PURE__*/function(){function DngDungeon(name,descr){_classCallCheck(this,DngDungeon);this.name=name;//name of the dungeon
 this.descr=descr;//text diplayed when entering the dungeon
 var persistData=window.story.state.dng[name];if(persistData===undefined||persistData===null){persistData=window.story.state.dng[name]=this.persistentDngDataTemplate();}this.data=persistData;this.floors=[];//list of Dngfloors
-this.actualRoom=null;this.Mapper={};//DngMapper; 
+this.actualRoom=null;this.Mapper=new DngMapper();//DngMapper; 
 this.buttons=[];this.inRoomedDungeonResume=this.inRoomedDungeonDefeat=null;}//override this to return a data-object that will be used to store persistent data
 _createClass(DngDungeon,[{key:"persistentDngDataTemplate",value:function persistentDngDataTemplate(){return{};}},{key:"setFloors",value:function setFloors(Floors){this.floors=Floors;for(var i=0;i<this.floors.length;i++){this.floors[i]._parent=window.gm.util.refToParent(this);}}},{key:"allFloors",value:function allFloors(){return this.floors;}},{key:"getFloor",value:function getFloor(Name){var found=null;for(var i=0;i<this.floors.length;i++){found=this.floors[i];if(found==null)continue;if(found.name==Name){break;}found=null;}return found;}//enters the dungeon; also does some checks to verify that dungeon was properly setup
-},{key:"enterDungeon",value:function enterDungeon(){this.Mapper=new DngMapper();this.actualRoom=null;var Entry=null;var Exit=null;var Room;//search the dungeon-Entry, has to be in first floor
+},{key:"enterDungeon",value:function enterDungeon(){//this.Mapper = new DngMapper();
+this.actualRoom=null;var Entry=null;var Exit=null;var Room;//search the dungeon-Entry, has to be in first floor
 var rooms=this.floors[0].allRooms();for(var i=0;i<rooms.length;i++){Room=rooms[i];if(Room.isDungeonEntry){Entry=Room;}if(Room.isDungeonExit){Exit=Room;}}if(Entry==null||Exit==null){throw new Error('Error: Dungeon-Exit or Entry missing');}this.inRoomedDungeonDefeat=this.exitDungeon;this.moveToRoom(Entry);// playerMenu();
 }//used to exit the dungeon via Leave-button or by battledefeat
 //You need to override this to return to a proper passage with window.story.show
@@ -637,9 +710,10 @@ tags.push('_nosave_');}var _state=window.story.state.dng;_state.roomId=this.actu
 },{key:"displayMap",value:function displayMap(){//this.Mapper.createMap(this.actualRoom.floor);
 window.story.show("DungeonMap");}}]);return DngDungeon;}();// a helper class to store info for a room
 var DngMapperInfo=function DngMapperInfo(){_classCallCheck(this,DngMapperInfo);this.X=this.Y=0;this.Name="";this.Hidden=false;this.Connect=0;//bitwise encoding of directions
+this.Boss=0;//boss-marker
 };// builds the map from the dungeons info and actualRoom
 // it is expected that all rooms in a floor are somehow connected with each other - no isolated rooms !
-var DngMapper=/*#__PURE__*/function(){function DngMapper(){_classCallCheck(this,DngMapper);this.dungeon=this.floor=null;this.allInfo=[];this.maxX=this.maxY=this.minX=this.minY=0;}//todo only show parts of the map the player already visited or knows off - but this would bloat save
+var DngMapper=/*#__PURE__*/function(){function DngMapper(){var CBMoreInfo=arguments.length>0&&arguments[0]!==undefined?arguments[0]:null;_classCallCheck(this,DngMapper);this.dungeon=this.floor=null;this.allInfo=[];this.CBMoreInfo=CBMoreInfo;this.maxX=this.maxY=this.minX=this.minY=0;}//todo only show parts of the map the player already visited or knows off - but this would bloat save
 _createClass(DngMapper,[{key:"createMap",value:function createMap(Floor){this.floor=Floor;var allrooms=Floor.allRooms();var roomIndexs=[];this.allinfo=new Array(allrooms.length);var dirs;var dir;//:DngDirection;
 var room,room2;var x,y,m;var roomInfo=new DngMapperInfo();var roomInfo2;roomInfo.X=x=this.maxX=this.minX=0;roomInfo.Y=y=this.maxY=this.minY=0;/*  put 1.room of actual floor to dictionary, set coord XY ={0,0]
         *  get next room from dictionary until no more
@@ -649,9 +723,10 @@ var room,room2;var x,y,m;var roomInfo=new DngMapperInfo();var roomInfo2;roomInfo
         * 			calculate coord of target room  (f.e. direction =E then X/Y = {+1 , +0})
         * 		...
         *  ...
-        */this.allinfo[0]=roomInfo;roomIndexs[0]=0;for(var i=0;i<roomIndexs.length;i++){//allrooms.length??
-m=roomIndexs[i];room=allrooms[m];roomInfo=this.allinfo[m];roomInfo.Name=room.name;roomInfo.Hidden=roomInfo.Hidden||room.isHidden;dirs=room.getDirections();for(var k=0;k<dirs.length;k++){if(dirs[k]==null)continue;dir=dirs[k];room2=dir.roomB;roomInfo.Connect=roomInfo.Connect+(1<<dir.direction);m=allrooms.indexOf(room2);if(m>=0){//create new roominfo and set coordinate
-roomInfo2=new DngMapperInfo();roomInfo2.Hidden=dir.hidden();roomInfo.Entry=room.isDungeonEntry||room.isDungeonExit;roomInfo.Save=room.allowSave;switch(dir.direction){case DngDirection.DirN:roomInfo2.X=roomInfo.X;roomInfo2.Y=roomInfo.Y-1;break;case DngDirection.DirS:roomInfo2.X=roomInfo.X;roomInfo2.Y=roomInfo.Y+1;break;case DngDirection.DirE:roomInfo2.X=roomInfo.X+1;roomInfo2.Y=roomInfo.Y;break;case DngDirection.DirW:roomInfo2.X=roomInfo.X-1;roomInfo2.Y=roomInfo.Y;break;default:break;}if(roomInfo2.X<this.minX)this.minX=roomInfo2.X;if(roomInfo2.X>this.maxX)this.maxX=roomInfo2.X;if(roomInfo2.Y<this.minY)this.minY=roomInfo2.Y;if(roomInfo2.Y>this.maxY)this.maxY=roomInfo2.Y;if(roomIndexs.indexOf(m)<0){roomIndexs.push(m);this.allinfo[m]=roomInfo2;}}}}return;}/* now we have a dictonary of all rooms, their coordinate and flags
+        */this.allinfo[0]=roomInfo;roomIndexs[0]=0;for(var i=0;i<roomIndexs.length;i++){m=roomIndexs[i];room=allrooms[m];roomInfo=this.allinfo[m];roomInfo.Name=room.name;roomInfo.Hidden=roomInfo.Hidden||room.isHidden;if(this.CBMoreInfo!==null)roomInfo=this.CBMoreInfo(roomInfo);dirs=room.getDirections();for(var k=0;k<dirs.length;k++){if(dirs[k]==null)continue;dir=dirs[k];room2=dir.roomB;roomInfo.Connect=roomInfo.Connect+(1<<dir.direction);m=allrooms.indexOf(room2);if(m>=0){//create new roominfo and set coordinate
+roomInfo2=new DngMapperInfo();roomInfo2.Hidden=dir.hidden();roomInfo.Entry=room.isDungeonEntry||room.isDungeonExit;roomInfo.Save=room.allowSave;switch(dir.direction){case DngDirection.DirN:roomInfo2.X=roomInfo.X;roomInfo2.Y=roomInfo.Y-1;break;case DngDirection.DirS:roomInfo2.X=roomInfo.X;roomInfo2.Y=roomInfo.Y+1;break;case DngDirection.DirE:roomInfo2.X=roomInfo.X+1;roomInfo2.Y=roomInfo.Y;break;case DngDirection.DirW:roomInfo2.X=roomInfo.X-1;roomInfo2.Y=roomInfo.Y;break;default:break;}//check if room is outside of print-area and expand
+if(roomInfo2.X<this.minX)this.minX=roomInfo2.X;if(roomInfo2.X>this.maxX)this.maxX=roomInfo2.X;if(roomInfo2.Y<this.minY)this.minY=roomInfo2.Y;if(roomInfo2.Y>this.maxY)this.maxY=roomInfo2.Y;if(roomIndexs.indexOf(m)<0){//add room to info-array
+roomIndexs.push(m);this.allinfo[m]=roomInfo2;}}}}return;}/* now we have a dictonary of all rooms, their coordinate and flags
         * create 2DArray of size ( 2*(maxX-minX) , 2*(maxY-minY)) ; even indices store rooms "[ ]", uneven indices store directions " - "
         * for every room in dictionary
         * 		update Array[2*(X-minX)][2*(Y-minY)] with room-information
@@ -667,7 +742,7 @@ roomInfo2=new DngMapperInfo();roomInfo2.Hidden=dir.hidden();roomInfo.Entry=room.
 var _line="";var map=[];var roomInfo;var i,j;var playerX=0,playerY=0;this.createMap(playerRoom.floor);//todo only recreate if necessary
 //create 2d-array to store textual representation of room and connection between them
 map=new Array(2*(this.maxX-this.minX)+1);for(i=0;i<map.length;i++){var submap=new Array(2*(this.maxY-this.minY)+1);for(j=0;j<submap.length;j++){submap[j]="   ";}map[i]=submap;}//convert the MapperInfo to textual representation
-for(i=0;i<this.allinfo.length;i++){if(this.allinfo[i]==null)continue;roomInfo=this.allinfo[i];_line=" ";if(roomInfo.Connect&1<<DngDirection.StairDown||roomInfo.Connect&1<<DngDirection.StairUp){_line="&ang;";}if(playerRoom!=null&&playerRoom.name==roomInfo.Name){_line="P";playerX=roomInfo.X,playerY=roomInfo.Y;}if(roomInfo.Save&&playerRoom.name!=roomInfo.Name){_line="S";}if(roomInfo.Entry&&playerRoom.name!=roomInfo.Name){_line="E";}//each room/connection has to be 3 chars long or it will messup formatting !
+for(i=0;i<this.allinfo.length;i++){if(this.allinfo[i]==null)continue;roomInfo=this.allinfo[i];_line=" ";if(roomInfo.Connect&1<<DngDirection.StairDown||roomInfo.Connect&1<<DngDirection.StairUp){_line="&ang;";}if(playerRoom!=null&&playerRoom.name==roomInfo.Name){_line="P";playerX=roomInfo.X,playerY=roomInfo.Y;}if(roomInfo.Save&&playerRoom.name!=roomInfo.Name){_line="S";}if(roomInfo.Entry&&playerRoom.name!=roomInfo.Name){_line="E";}if(roomInfo.Boss&&playerRoom.name!=roomInfo.Name){_line="B";}//each room/connection has to be 3 chars long or it will messup formatting !
 //todo format as table?
 if(!roomInfo.Hidden){_line="["+_line+"]";map[2*(roomInfo.X-this.minX)][2*(roomInfo.Y-this.minY)]=_line;if(roomInfo.Connect&1<<DngDirection.DirN){_line=" | ";map[2*(roomInfo.X-this.minX)+0][2*(roomInfo.Y-this.minY)-1]=_line;}if(roomInfo.Connect&1<<DngDirection.DirE){_line=" - ";map[2*(roomInfo.X-this.minX)+1][2*(roomInfo.Y-this.minY)+0]=_line;}if(roomInfo.Connect&1<<DngDirection.DirS){_line=" | ";map[2*(roomInfo.X-this.minX)+0][2*(roomInfo.Y-this.minY)+1]=_line;}if(roomInfo.Connect&1<<DngDirection.DirW){_line=" - ";map[2*(roomInfo.X-this.minX)-1][2*(roomInfo.Y-this.minY)-0]=_line;}}}//print
 _line="<pre>";//pre-formatted or messup allignment of ascii-rows
@@ -675,7 +750,144 @@ if(minimap){//only print rooms 1 step around player
 _line+=this.floor.name+"</br>";var x,y;for(j=-3;j<=3;j++){for(i=-3;i<=3;i++){x=i+(playerX-this.minX)*2,y=j+(playerY-this.minY)*2;//coord can be negative ! 
 if(map.length-1<x||0>x)continue;if(map[x].length-1<y||0>y)continue;_line+=(i==-3?"&nbsp;":"")+map[x][y];//todo hack:if line starts with -, snowman-markdown interprets this as <ul> ?!
 }_line+="\n";}}else{//full map of floor
-_line+=this.floor.dungeon.name+" "+this.floor.name+"</br>";for(j=0;j<2*(this.maxY-this.minY)+1;j++){for(i=0;i<2*(this.maxX-this.minX)+1;i++){_line+=map[i][j];}_line+="\n";}_line+="<pre>Legend: P=Player, &ang;=Stair, E=Entry/Exit S=Save</pre></br>";}_line+="</pre>";return _line;}}]);return DngMapper;}();"use strict";window.gm=window.gm||{};//game related operations
+_line+=this.floor.dungeon.name+" "+this.floor.name+"</br>";for(j=0;j<2*(this.maxY-this.minY)+1;j++){for(i=0;i<2*(this.maxX-this.minX)+1;i++){_line+=map[i][j];}_line+="\n";}_line+="<pre>Legend: P=Player, &ang;=Stair, E=Entry/Exit S=Save</pre></br>";}_line+="</pre>";return _line;}}]);return DngMapper;}();/*
+class BinaryHeap {
+    constructor(scoreFunction) {
+    this.content = [];
+    this.scoreFunction = scoreFunction;
+  }
+    push(element) {
+      // Add the new element to the end of the array.
+      this.content.push(element);
+  
+      // Allow it to sink down.
+      this.sinkDown(this.content.length - 1);
+    }
+    pop() {
+      // Store the first element so we can return it later.
+      var result = this.content[0];
+      // Get the element at the end of the array.
+      var end = this.content.pop();
+      // If there are any elements left, put the end element at the
+      // start, and let it bubble up.
+      if (this.content.length > 0) {
+        this.content[0] = end;
+        this.bubbleUp(0);
+      }
+      return result;
+    }
+    remove(node) {
+      var i = this.content.indexOf(node);
+  
+      // When it is found, the process seen in 'pop' is repeated
+      // to fill up the hole.
+      var end = this.content.pop();
+  
+      if (i !== this.content.length - 1) {
+        this.content[i] = end;
+  
+        if (this.scoreFunction(end) < this.scoreFunction(node)) {
+          this.sinkDown(i);
+        } else {
+          this.bubbleUp(i);
+        }
+      }
+    }
+    size() {
+      return this.content.length;
+    }
+    rescoreElement(node) {
+      this.sinkDown(this.content.indexOf(node));
+    }
+    sinkDown(n) {
+      // Fetch the element that has to be sunk.
+      var element = this.content[n];
+  
+      // When at 0, an element can not sink any further.
+      while (n > 0) {
+  
+        // Compute the parent element's index, and fetch it.
+        var parentN = ((n + 1) >> 1) - 1;
+        var parent = this.content[parentN];
+        // Swap the elements if the parent is greater.
+        if (this.scoreFunction(element) < this.scoreFunction(parent)) {
+          this.content[parentN] = element;
+          this.content[n] = parent;
+          // Update 'n' to continue at the new position.
+          n = parentN;
+        }
+        // Found a parent that is less, no need to sink any further.
+        else {
+          break;
+        }
+      }
+    }
+    bubbleUp(n) {
+      // Look up the target element and its score.
+      var length = this.content.length;
+      var element = this.content[n];
+      var elemScore = this.scoreFunction(element);
+  
+      while (true) {
+        // Compute the indices of the child elements.
+        var child2N = (n + 1) << 1;
+        var child1N = child2N - 1;
+        // This is used to store the new position of the element, if any.
+        var swap = null;
+        var child1Score;
+        // If the first child exists (is inside the array)...
+        if (child1N < length) {
+          // Look it up and compute its score.
+          var child1 = this.content[child1N];
+          child1Score = this.scoreFunction(child1);
+  
+          // If the score is less than our element's, we need to swap.
+          if (child1Score < elemScore) {
+            swap = child1N;
+          }
+        }
+  
+        // Do the same checks for the other child.
+        if (child2N < length) {
+          var child2 = this.content[child2N];
+          var child2Score = this.scoreFunction(child2);
+          if (child2Score < (swap === null ? elemScore : child1Score)) {
+            swap = child2N;
+          }
+        }
+  
+        // If the element needs to be moved, swap it, and continue.
+        if (swap !== null) {
+          this.content[n] = this.content[swap];
+          this.content[swap] = element;
+          n = swap;
+        }
+        // Otherwise, we are done.
+        else {
+          break;
+        }
+      }
+    }
+}
+class DngPathFinder {
+    constructor(floor){
+        this.floor=floor;
+    }
+
+    static pathTo(node) {
+        var curr = node;
+        var path = [];
+        while (curr.parent) {
+            path.unshift(curr);
+            curr = curr.parent;
+        }
+        return path;
+    }
+    static getHeap() {
+        return new BinaryHeap(function(node) {
+            return node.f; });
+    }
+}*/"use strict";window.gm=window.gm||{};//game related operations
 window.gm.util=window.gm.util||{};//utility functions
 // helper for publisher/subscriber-pattern; myObject.ps =PubSub(); myObject.ps.subscribe(...
 // !! warning, dont use for objects that need to be loaded from savegame
@@ -1826,7 +2038,7 @@ room.getDirection(DngDirection.DirS).canExitFct=this.hasItem;stairUp=rooms.get("
 window.gm.dng.evtData.id=id;window.story.show("DungeonGenericEvent");}},{key:"sneekAround",value:function sneekAround(){var cb=function(that){return function(me){that.renderEvent=that.renderSneekAround;that.evtData={};that.renderNext(1);return true;};}(this);return cb;}},{key:"renderSneekAround",value:function renderSneekAround(evt){var msg='';var _rnd=_.random(0,100);if(evt.id===1){window.gm.addTime(30);msg='There is a gang of barbarians. You could try to sneek around them, talk your way through it or start a surprise attack.</br>';msg+=window.gm.printLink("sneak around","window.gm.dng.renderNext(2)");msg+=window.gm.printPassageLink("approach","SC_BarbarianMeetup");msg+=window.gm.printLink("attack","window.gm.dng._fight(1)");}else if(evt.id===2){if(_rnd>70){msg+='Someone spotted you !</br>';msg+=window.gm.printLink("Next",'window.gm.dng._fight()');}else{msg='You succesfully bypassed the threat.</br>';msg+=window.gm.printLink("Leave","window.gm.dng.resumeRoom()");}}else if(evt.id===3){msg+='Someone spotted you !</br>';msg+=window.gm.printLink("Next",'window.gm.dng._fight()');}return msg;}},{key:"renderChestA1",value:function renderChestA1(evt){//this is some statemachine to render the screen for lootchest
 var msg='';if(evt.id===1){window.gm.addTime(30);msg='There is a chest. Do you dare to open it?</br>';msg+=window.gm.printLink("open chest","window.gm.dng.renderNext(2)");msg+=window.gm.printLink("Leave","window.gm.dng.resumeRoom()");}else if(evt.id===2&&this.data.A1Chest.length>0){msg='You find:'+this.data.A1Chest.join(",")+'</br>';msg+=window.gm.printLink("Take all","window.gm.dng.renderNext(3)");}else if(evt.id===3){var _iterator56=_createForOfIteratorHelper(this.data.A1Chest),_step56;try{for(_iterator56.s();!(_step56=_iterator56.n()).done;){el=_step56.value;this._addItemToPlayer(el);}}catch(err){_iterator56.e(err);}finally{_iterator56.f();}this.data.A1Chest=[];msg='You take everything from the chest.</br>';msg+=window.gm.printLink("Leave","window.gm.dng.resumeRoom()");}else{msg='There is nothing useful.</br>';msg+=window.gm.printLink("Leave","window.gm.dng.resumeRoom()");}return msg;}},{key:"renderScavengeA3",value:function renderScavengeA3(evt){//
 var msg='';var _rnd=_.random(0,100);if(evt.id===1){window.gm.addTime(30);//todo would be better to update time after battle
-msg='You search the area for something useful...</br>';if(_rnd>30){msg+='... and found some trouble !</br>';msg+=window.gm.printLink("Next",'window.gm.dng._fight()');}else{msg='...but you didnt find anything.</br>';msg+=window.gm.printLink("Leave","window.gm.dng.resumeRoom()");}}return msg;}},{key:"_fight",value:function _fight(evt){if(evt===1)window.gm.encounters.wolf();else window.gm.encounters.wolf();}},{key:"_addItemToPlayer",value:function _addItemToPlayer(id){var item=new window.storage.constructors[id]();if(item.canEquip){window.gm.player.Wardrobe.addItem(item);}else{window.gm.player.Inv.addItem(item);}}}]);return ShatteredCity;}(DngDungeon);var MinoLair=/*#__PURE__*/function(_DngDungeon3){_inherits(MinoLair,_DngDungeon3);var _super37=_createSuper(MinoLair);_createClass(MinoLair,[{key:"persistentDngDataTemplate",value:function persistentDngDataTemplate(){var _data={currentRoom:0,maxRoom:0};return _data;}}]);function MinoLair(){var _this35;_classCallCheck(this,MinoLair);_this35=_super37.call(this,"MinoLair",MinoLair.desc,window.story.state.dng[MinoLair.name]);_this35.data.currentRoom=1;_this35.data.minoTile='D3';_this35.data.minoDelay=0;_this35.buildFloors();return _this35;}_createClass(MinoLair,[{key:"buildFloors",value:function buildFloors(){var _floors=[];var firstFloor;//:DngFloor;
+msg='You search the area for something useful...</br>';if(_rnd>30){msg+='... and found some trouble !</br>';msg+=window.gm.printLink("Next",'window.gm.dng._fight()');}else{msg='...but you didnt find anything.</br>';msg+=window.gm.printLink("Leave","window.gm.dng.resumeRoom()");}}return msg;}},{key:"_fight",value:function _fight(evt){if(evt===1)window.gm.encounters.wolf();else window.gm.encounters.wolf();}},{key:"_addItemToPlayer",value:function _addItemToPlayer(id){var item=new window.storage.constructors[id]();if(item.canEquip){window.gm.player.Wardrobe.addItem(item);}else{window.gm.player.Inv.addItem(item);}}}]);return ShatteredCity;}(DngDungeon);var MinoLair=/*#__PURE__*/function(_DngDungeon3){_inherits(MinoLair,_DngDungeon3);var _super37=_createSuper(MinoLair);_createClass(MinoLair,[{key:"persistentDngDataTemplate",value:function persistentDngDataTemplate(){var _data={currentRoom:0,maxRoom:0};return _data;}}]);function MinoLair(){var _this35;_classCallCheck(this,MinoLair);_this35=_super37.call(this,"MinoLair",MinoLair.desc,window.story.state.dng[MinoLair.name]);_this35.data.currentRoom=1;_this35.data.minoTile='D3';_this35.data.minoDelay=0;_this35.Mapper=new DngMapper(_this35.extMapInfo.bind(_assertThisInitialized(_this35)));_this35.buildFloors();return _this35;}_createClass(MinoLair,[{key:"buildFloors",value:function buildFloors(){var _floors=[];var firstFloor;//:DngFloor;
 var stairUp;//:DngRoom;
 var stairDown;//:DngRoom;
 firstFloor=new DngFloor("1.Floor",function(){return"floor#1.";});var room;//:DngRoom;
@@ -1853,8 +2065,8 @@ room=rooms.get("B2");//room.getDirection(DngDirection.DirE).onExitFct = this._fi
 room.operations=[_evt];room=rooms.get("C2");//room.getDirection(DngDirection.DirE).onExitFct = this._fight.bind(this,3);
 room.operations=[_evt];room=rooms.get("D2");//room.getDirection(DngDirection.DirE).onExitFct = this._fight.bind(this,4);
 room.operations=[_evt];room=rooms.get("E2");room.operations=[_evt];firstFloor.setRooms(Array.from(rooms.values()));_floors.push(firstFloor);this.setFloors(_floors);}},{key:"exitDungeon",value:function exitDungeon(){_get(_getPrototypeOf(MinoLair.prototype),"exitDungeon",this).call(this);window.story.show("PlainsFarmland");}},{key:"renderNext",value:function renderNext(id){window.gm.dng.evtData.id=id;window.story.show("DungeonGenericEvent");}},{key:"tickMino",value:function tickMino(evt){//
-var msg='';if(evt.id===1){this.moveMino();msg+='Mino is now at'+this.data.minoTile+' and moves in '+this.data.minoDelay+' turns. </br>';msg+=window.gm.printLink("Next",'window.gm.dng.resumeRoom()');//'window.gm.dng.exitDungeon()'
-}return msg;}},{key:"moveMino",value:function moveMino(){}/**
+var msg='';if(evt.id===1){this.moveMino();msg+='Mino is now at '+this.data.minoTile+' and moves in '+this.data.minoDelay+' turns. </br>';msg+=window.gm.printLink("Next",'window.gm.dng.resumeRoom()');//'window.gm.dng.exitDungeon()'
+}return msg;}},{key:"moveMino",value:function moveMino(){this.data.minoDelay=0;var grid=this.allFloors()[0].allRooms();var start=new window.GraphNode(this.allFloors()[0].getRoom(this.data.minoTile),1),end=new window.GraphNode(this.allFloors()[0].getRoom('D2'),1);var graph=new window.Graph(grid);var path=window.astar.search(graph,start,end);if(path.length>0){this.data.minoTile=path[0].origNode.name;}}},{key:"extMapInfo",value:function extMapInfo(roomInfo){if(roomInfo.Name===this.data.minoTile)roomInfo.Boss=1;return roomInfo;}/**
      * 
      * @param {int} evt: roomNo 
      */},{key:"_fight",value:function _fight(evt){this.data.currentRoom=evt;this.data.maxRoom=this.data.currentRoom>this.data.maxRoom?this.data.currentRoom:this.data.maxRoom;window.gm.encounters.wolf();window.gm.Encounter.onVictory=function(){//need to resumeRoom...

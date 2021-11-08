@@ -272,7 +272,7 @@ class DngDungeon	{
         this.data = persistData;
         this.floors =[];//list of Dngfloors
         this.actualRoom = null;
-        this.Mapper = {};//DngMapper; 
+        this.Mapper = new DngMapper();//DngMapper; 
         this.buttons=[];
         this.inRoomedDungeonResume = this.inRoomedDungeonDefeat = null;
     }
@@ -299,7 +299,7 @@ class DngDungeon	{
     }
     //enters the dungeon; also does some checks to verify that dungeon was properly setup
     enterDungeon() {
-        this.Mapper = new DngMapper();
+        //this.Mapper = new DngMapper();
         this.actualRoom = null;
         var Entry = null;
         var Exit = null;
@@ -466,14 +466,16 @@ class DngMapperInfo {
         this.Name="";
         this.Hidden=false;
         this.Connect= 0;	//bitwise encoding of directions
+        this.Boss=0;    //boss-marker
     }  
 }
 // builds the map from the dungeons info and actualRoom
 // it is expected that all rooms in a floor are somehow connected with each other - no isolated rooms !
 class DngMapper { 
-    constructor()   {
+    constructor(CBMoreInfo=null)   {
         this.dungeon = this.floor=null;
         this.allInfo=[];
+        this.CBMoreInfo=CBMoreInfo;
         this.maxX=this.maxY=this.minX=this.minY=0;
     }
     //todo only show parts of the map the player already visited or knows off - but this would bloat save
@@ -501,12 +503,13 @@ class DngMapper {
         */ 
         this.allinfo[0] = roomInfo;
         roomIndexs[0] = 0;
-        for (var i = 0; i < roomIndexs.length; i++ ) { //allrooms.length??
+        for (var i = 0; i < roomIndexs.length; i++ ) {
             m = (roomIndexs[i]);
             room = (allrooms[m]);
             roomInfo = (this.allinfo[m]);
             roomInfo.Name = room.name;
             roomInfo.Hidden = roomInfo.Hidden || room.isHidden;
+            if(this.CBMoreInfo!==null) roomInfo=this.CBMoreInfo(roomInfo);
             dirs = room.getDirections();
             for (var k=0; k < dirs.length; k++ ) {
                 if (dirs[k] == null) continue;
@@ -539,12 +542,12 @@ class DngMapper {
                         default:
                             break;
                     }
+                    //check if room is outside of print-area and expand
                     if (roomInfo2.X < this.minX) this.minX = roomInfo2.X;
                     if (roomInfo2.X > this.maxX) this.maxX = roomInfo2.X;
                     if (roomInfo2.Y < this.minY) this.minY = roomInfo2.Y;
                     if (roomInfo2.Y > this.maxY) this.maxY = roomInfo2.Y;
-                    if (roomIndexs.indexOf(m) < 0) 
-                    {
+                    if (roomIndexs.indexOf(m) < 0) { //add room to info-array
                         roomIndexs.push(m);
                         this.allinfo[m] = roomInfo2;
                     }
@@ -552,7 +555,6 @@ class DngMapper {
             }
         
         }
-
         return;
     }
 
@@ -603,6 +605,9 @@ class DngMapper {
             }
             if (roomInfo.Entry && playerRoom.name != roomInfo.Name) {
                 _line = "E";
+            }
+            if (roomInfo.Boss && playerRoom.name != roomInfo.Name) {
+                _line = "B";
             }
             //each room/connection has to be 3 chars long or it will messup formatting !
             //todo format as table?
@@ -656,3 +661,141 @@ class DngMapper {
         return _line;
     }
 }
+/*
+class BinaryHeap {
+    constructor(scoreFunction) {
+    this.content = [];
+    this.scoreFunction = scoreFunction;
+  }
+    push(element) {
+      // Add the new element to the end of the array.
+      this.content.push(element);
+  
+      // Allow it to sink down.
+      this.sinkDown(this.content.length - 1);
+    }
+    pop() {
+      // Store the first element so we can return it later.
+      var result = this.content[0];
+      // Get the element at the end of the array.
+      var end = this.content.pop();
+      // If there are any elements left, put the end element at the
+      // start, and let it bubble up.
+      if (this.content.length > 0) {
+        this.content[0] = end;
+        this.bubbleUp(0);
+      }
+      return result;
+    }
+    remove(node) {
+      var i = this.content.indexOf(node);
+  
+      // When it is found, the process seen in 'pop' is repeated
+      // to fill up the hole.
+      var end = this.content.pop();
+  
+      if (i !== this.content.length - 1) {
+        this.content[i] = end;
+  
+        if (this.scoreFunction(end) < this.scoreFunction(node)) {
+          this.sinkDown(i);
+        } else {
+          this.bubbleUp(i);
+        }
+      }
+    }
+    size() {
+      return this.content.length;
+    }
+    rescoreElement(node) {
+      this.sinkDown(this.content.indexOf(node));
+    }
+    sinkDown(n) {
+      // Fetch the element that has to be sunk.
+      var element = this.content[n];
+  
+      // When at 0, an element can not sink any further.
+      while (n > 0) {
+  
+        // Compute the parent element's index, and fetch it.
+        var parentN = ((n + 1) >> 1) - 1;
+        var parent = this.content[parentN];
+        // Swap the elements if the parent is greater.
+        if (this.scoreFunction(element) < this.scoreFunction(parent)) {
+          this.content[parentN] = element;
+          this.content[n] = parent;
+          // Update 'n' to continue at the new position.
+          n = parentN;
+        }
+        // Found a parent that is less, no need to sink any further.
+        else {
+          break;
+        }
+      }
+    }
+    bubbleUp(n) {
+      // Look up the target element and its score.
+      var length = this.content.length;
+      var element = this.content[n];
+      var elemScore = this.scoreFunction(element);
+  
+      while (true) {
+        // Compute the indices of the child elements.
+        var child2N = (n + 1) << 1;
+        var child1N = child2N - 1;
+        // This is used to store the new position of the element, if any.
+        var swap = null;
+        var child1Score;
+        // If the first child exists (is inside the array)...
+        if (child1N < length) {
+          // Look it up and compute its score.
+          var child1 = this.content[child1N];
+          child1Score = this.scoreFunction(child1);
+  
+          // If the score is less than our element's, we need to swap.
+          if (child1Score < elemScore) {
+            swap = child1N;
+          }
+        }
+  
+        // Do the same checks for the other child.
+        if (child2N < length) {
+          var child2 = this.content[child2N];
+          var child2Score = this.scoreFunction(child2);
+          if (child2Score < (swap === null ? elemScore : child1Score)) {
+            swap = child2N;
+          }
+        }
+  
+        // If the element needs to be moved, swap it, and continue.
+        if (swap !== null) {
+          this.content[n] = this.content[swap];
+          this.content[swap] = element;
+          n = swap;
+        }
+        // Otherwise, we are done.
+        else {
+          break;
+        }
+      }
+    }
+}
+class DngPathFinder {
+    constructor(floor){
+        this.floor=floor;
+    }
+
+    static pathTo(node) {
+        var curr = node;
+        var path = [];
+        while (curr.parent) {
+            path.unshift(curr);
+            curr = curr.parent;
+        }
+        return path;
+    }
+    static getHeap() {
+        return new BinaryHeap(function(node) {
+            return node.f; });
+    }
+}*/

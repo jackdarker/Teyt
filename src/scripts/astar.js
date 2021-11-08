@@ -14,6 +14,7 @@
       var exports = definition();
       window.astar = exports.astar;
       window.Graph = exports.Graph;
+      window.GraphNode = exports.GridNode;
     }
   })(function() {
   
@@ -50,46 +51,36 @@
       options = options || {};
       var heuristic = options.heuristic || astar.heuristics.manhattan;
       var closest = options.closest || false;
-  
       var openHeap = getHeap();
       var closestNode = start; // set the start node to be the closest if required
-  
       start.h = heuristic(start, end);
       graph.markDirty(start);
-  
       openHeap.push(start);
   
       while (openHeap.size() > 0) {
-  
         // Grab the lowest f(x) to process next.  Heap keeps this sorted for us.
         var currentNode = openHeap.pop();
-  
         // End case -- result has been found, return the traced path.
-        if (currentNode === end) {
+        if (currentNode.equals(end)) {
           return pathTo(currentNode);
         }
-  
         // Normal case -- move currentNode from open to closed, process each of its neighbors.
         currentNode.closed = true;
-  
         // Find all neighbors for the current node.
         var neighbors = graph.neighbors(currentNode);
-  
         for (var i = 0, il = neighbors.length; i < il; ++i) {
           var neighbor = neighbors[i];
-  
-          if (neighbor.closed || neighbor.isWall()) {
+          if (neighbor.closed ){//??|| neighbor.isWall()) {
             // Not a valid node to process, skip to next neighbor.
             continue;
           }
   
           // The g score is the shortest distance from start to current node.
           // We need to check if the path we have arrived at this neighbor is the shortest one we have seen yet.
-          var gScore = currentNode.g + neighbor.getCost(currentNode);
+          var gScore = currentNode.g + graph.getCost(currentNode,neighbor)//neighbor.getCost(currentNode);
           var beenVisited = neighbor.visited;
   
           if (!beenVisited || gScore < neighbor.g) {
-  
             // Found an optimal (so far) path to this node.  Take score for node to see how good it is.
             neighbor.visited = true;
             neighbor.parent = currentNode;
@@ -158,6 +149,16 @@
     options = options || {};
     this.nodes = [];
     this.diagonal = !!options.diagonal;
+    for (var x = 0; x < gridIn.length; x++) {
+        var node = new GridNode(gridIn[x], 1);// (x,y,row[y])
+        this.nodes.push(node);
+    }
+    this.init();
+  }
+  /*function Graph(gridIn, options) {
+    options = options || {};
+    this.nodes = [];
+    this.diagonal = !!options.diagonal;
     this.grid = [];
     for (var x = 0; x < gridIn.length; x++) {
       this.grid[x] = [];
@@ -169,7 +170,7 @@
       }
     }
     this.init();
-  }
+  } */
   
   Graph.prototype.init = function() {
     this.dirtyNodes = [];
@@ -188,8 +189,26 @@
   Graph.prototype.markDirty = function(node) {
     this.dirtyNodes.push(node);
   };
-  
+  Graph.prototype.getCost = function(from,to) {
+    // Take diagonal weight into consideration.
+    /*if (from && from.x != to.x && from.y != to.y) {
+      return to.weight * 1.41421;
+    }*/
+    return to.getWeight();
+  };
   Graph.prototype.neighbors = function(node) {
+    var ret = [];
+    var dirs = node.origNode.getDirections();
+    for(var i=0;i<dirs.length;i++) {
+      if(dirs[i]!==null) {
+        var room = dirs[i].roomB;
+        var next=this.nodes.find((el)=>{return(el.origNode===room);})
+        ret.push(next);
+      }
+    }
+    return ret;
+  };
+  /*Graph.prototype.neighbors = function(node) {
     var ret = [];
     var x = node.x;
     var y = node.y;
@@ -199,48 +218,39 @@
     if (grid[x - 1] && grid[x - 1][y]) {
       ret.push(grid[x - 1][y]);
     }
-  
     // East
     if (grid[x + 1] && grid[x + 1][y]) {
       ret.push(grid[x + 1][y]);
     }
-  
     // South
     if (grid[x] && grid[x][y - 1]) {
       ret.push(grid[x][y - 1]);
     }
-  
     // North
     if (grid[x] && grid[x][y + 1]) {
       ret.push(grid[x][y + 1]);
     }
-  
     if (this.diagonal) {
       // Southwest
       if (grid[x - 1] && grid[x - 1][y - 1]) {
         ret.push(grid[x - 1][y - 1]);
       }
-  
       // Southeast
       if (grid[x + 1] && grid[x + 1][y - 1]) {
         ret.push(grid[x + 1][y - 1]);
       }
-  
       // Northwest
       if (grid[x - 1] && grid[x - 1][y + 1]) {
         ret.push(grid[x - 1][y + 1]);
       }
-  
       // Northeast
       if (grid[x + 1] && grid[x + 1][y + 1]) {
         ret.push(grid[x + 1][y + 1]);
       }
     }
-  
     return ret;
-  };
-  
-  Graph.prototype.toString = function() {
+  };*/
+  /*Graph.prototype.toString = function() {
     var graphString = [];
     var nodes = this.grid;
     for (var x = 0; x < nodes.length; x++) {
@@ -252,29 +262,36 @@
       graphString.push(rowDebug.join(" "));
     }
     return graphString.join("\n");
-  };
+  };*/
   
-  function GridNode(x, y, weight) {
+  /*function GridNode(x, y, weight) {
     this.x = x;
     this.y = y;
     this.weight = weight;
   }
-  
   GridNode.prototype.toString = function() {
     return "[" + this.x + " " + this.y + "]";
-  };
+  };*/
   
-  GridNode.prototype.getCost = function(fromNeighbor) {
+  /*GridNode.prototype.getCost = function(fromNeighbor) {
     // Take diagonal weight into consideration.
     if (fromNeighbor && fromNeighbor.x != this.x && fromNeighbor.y != this.y) {
       return this.weight * 1.41421;
     }
     return this.weight;
-  };
-  
-  GridNode.prototype.isWall = function() {
+  };*/
+  function GridNode(origNode) {
+    this.origNode = origNode;
+  }
+  GridNode.prototype.equals = function(other) {
+    return(this.origNode===other.origNode);
+  }
+  GridNode.prototype.getWeight = function() {
+    return(1); //todo origNode.getCost()
+  }
+  /*GridNode.prototype.isWall = function() {
     return this.weight === 0;
-  };
+  };*/
   
   function BinaryHeap(scoreFunction) {
     this.content = [];
@@ -398,7 +415,8 @@
   
   return {
     astar: astar,
-    Graph: Graph
+    Graph: Graph,
+    GridNode: GridNode
   };
   
   });
