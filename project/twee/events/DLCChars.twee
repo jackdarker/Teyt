@@ -19,3 +19,17 @@ Maybe he warms up to you over time.
 
 
 :: Kumala
+
+
+:: MinoRant [_nosave_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+You hear the angry huff of the mino.
+</br><p><a0 onclick='window.gm.dng.resumeRoom()'>Next</a></p>
+</article><article id="LogPanel"></article></section>
+
+
+:: MinoMeet [_nosave_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+Mino found you.
+</br><p><a0 onclick='window.gm.dng.resumeRoom()'>Next</a></p>
+</article><article id="LogPanel"></article></section>

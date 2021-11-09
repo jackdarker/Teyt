@@ -262,7 +262,7 @@ window.gm.postVictory=function() {
     var floor = window.gm.dng.getFloor(window.story.state.dng.floorId);
     var room = floor.getRoom(window.story.state.dng.roomId);
     if(reloadDng) window.gm.dng.enterDungeon();//first call enterdungeon to setup everything !
-    window.gm.dng.teleport(floor,room);
+    window.gm.dng.teleport(room);
   } else {
     window.story.show(window.gm.player.location);//history disabled ! window.story.history[window.story.history.length - 1], true);   
   }

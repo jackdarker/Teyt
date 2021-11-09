@@ -46,14 +46,16 @@
     * @param {Function} [options.heuristic] Heuristic function (see
     *          astar.heuristics).
     */
-    search: function(graph, start, end, options) {
+    search: function(graph, start, end,mob, options) {
       graph.cleanDirty();
       options = options || {};
+      this.mob=mob;
       var heuristic = options.heuristic || astar.heuristics.manhattan;
       var closest = options.closest || false;
       var openHeap = getHeap();
       var closestNode = start; // set the start node to be the closest if required
-      start.h = heuristic(start, end);
+      this.cleanNode(start),this.cleanNode(end);
+      start.h = heuristic(start, end,mob);
       graph.markDirty(start);
       openHeap.push(start);
   
@@ -77,14 +79,14 @@
   
           // The g score is the shortest distance from start to current node.
           // We need to check if the path we have arrived at this neighbor is the shortest one we have seen yet.
-          var gScore = currentNode.g + graph.getCost(currentNode,neighbor)//neighbor.getCost(currentNode);
+          var gScore = currentNode.g + graph.getCost(currentNode,neighbor);
           var beenVisited = neighbor.visited;
   
           if (!beenVisited || gScore < neighbor.g) {
             // Found an optimal (so far) path to this node.  Take score for node to see how good it is.
             neighbor.visited = true;
             neighbor.parent = currentNode;
-            neighbor.h = neighbor.h || heuristic(neighbor, end);
+            neighbor.h = neighbor.h || heuristic(neighbor, end,mob);
             neighbor.g = gScore;
             neighbor.f = neighbor.g + neighbor.h;
             graph.markDirty(neighbor);
@@ -116,18 +118,19 @@
     },
     // See list of heuristics: http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html
     heuristics: {
-      manhattan: function(pos0, pos1) {
-        var d1 = Math.abs(pos1.x - pos0.x);
-        var d2 = Math.abs(pos1.y - pos0.y);
-        return d1 + d2;
-      },
+      manhattan: function(pos0, pos1, mob) {
+        var d1 = Math.abs(pos1.origNode.x - pos0.origNode.x);
+        var d2 = Math.abs(pos1.origNode.y - pos0.origNode.y);
+        return d1 + d2;  //how to get distance if there is no x/y??
+
+      }/*,   todo fix it
       diagonal: function(pos0, pos1) {
         var D = 1;
         var D2 = Math.sqrt(2);
         var d1 = Math.abs(pos1.x - pos0.x);
         var d2 = Math.abs(pos1.y - pos0.y);
         return (D * (d1 + d2)) + ((D2 - (2 * D)) * Math.min(d1, d2));
-      }
+      }*/
     },
     cleanNode: function(node) {
       node.f = 0;
@@ -155,23 +158,6 @@
     }
     this.init();
   }
-  /*function Graph(gridIn, options) {
-    options = options || {};
-    this.nodes = [];
-    this.diagonal = !!options.diagonal;
-    this.grid = [];
-    for (var x = 0; x < gridIn.length; x++) {
-      this.grid[x] = [];
-  
-      for (var y = 0, row = gridIn[x]; y < row.length; y++) {
-        var node = new GridNode(x, y, row[y]);
-        this.grid[x][y] = node;
-        this.nodes.push(node);
-      }
-    }
-    this.init();
-  } */
-  
   Graph.prototype.init = function() {
     this.dirtyNodes = [];
     for (var i = 0; i < this.nodes.length; i++) {
@@ -190,10 +176,6 @@
     this.dirtyNodes.push(node);
   };
   Graph.prototype.getCost = function(from,to) {
-    // Take diagonal weight into consideration.
-    /*if (from && from.x != to.x && from.y != to.y) {
-      return to.weight * 1.41421;
-    }*/
     return to.getWeight();
   };
   Graph.prototype.neighbors = function(node) {
@@ -208,78 +190,6 @@
     }
     return ret;
   };
-  /*Graph.prototype.neighbors = function(node) {
-    var ret = [];
-    var x = node.x;
-    var y = node.y;
-    var grid = this.grid;
-  
-    // West
-    if (grid[x - 1] && grid[x - 1][y]) {
-      ret.push(grid[x - 1][y]);
-    }
-    // East
-    if (grid[x + 1] && grid[x + 1][y]) {
-      ret.push(grid[x + 1][y]);
-    }
-    // South
-    if (grid[x] && grid[x][y - 1]) {
-      ret.push(grid[x][y - 1]);
-    }
-    // North
-    if (grid[x] && grid[x][y + 1]) {
-      ret.push(grid[x][y + 1]);
-    }
-    if (this.diagonal) {
-      // Southwest
-      if (grid[x - 1] && grid[x - 1][y - 1]) {
-        ret.push(grid[x - 1][y - 1]);
-      }
-      // Southeast
-      if (grid[x + 1] && grid[x + 1][y - 1]) {
-        ret.push(grid[x + 1][y - 1]);
-      }
-      // Northwest
-      if (grid[x - 1] && grid[x - 1][y + 1]) {
-        ret.push(grid[x - 1][y + 1]);
-      }
-      // Northeast
-      if (grid[x + 1] && grid[x + 1][y + 1]) {
-        ret.push(grid[x + 1][y + 1]);
-      }
-    }
-    return ret;
-  };*/
-  /*Graph.prototype.toString = function() {
-    var graphString = [];
-    var nodes = this.grid;
-    for (var x = 0; x < nodes.length; x++) {
-      var rowDebug = [];
-      var row = nodes[x];
-      for (var y = 0; y < row.length; y++) {
-        rowDebug.push(row[y].weight);
-      }
-      graphString.push(rowDebug.join(" "));
-    }
-    return graphString.join("\n");
-  };*/
-  
-  /*function GridNode(x, y, weight) {
-    this.x = x;
-    this.y = y;
-    this.weight = weight;
-  }
-  GridNode.prototype.toString = function() {
-    return "[" + this.x + " " + this.y + "]";
-  };*/
-  
-  /*GridNode.prototype.getCost = function(fromNeighbor) {
-    // Take diagonal weight into consideration.
-    if (fromNeighbor && fromNeighbor.x != this.x && fromNeighbor.y != this.y) {
-      return this.weight * 1.41421;
-    }
-    return this.weight;
-  };*/
   function GridNode(origNode) {
     this.origNode = origNode;
   }

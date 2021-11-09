@@ -330,8 +330,10 @@ class MinoLair extends DngDungeon{
     persistentDngDataTemplate() {
         let _data = {
             currentRoom: 0,
-            maxRoom : 0
+            maxRoom : 0,
+            mobData: [],
         };
+        _data.mobData.push({homeTile: 'E3', actualTile:'E3', speed:2})
         return(_data);
     }
     constructor()    {
@@ -366,6 +368,11 @@ class MinoLair extends DngDungeon{
             this.renderEvent = this.tickMino;
             this.evtData = {};
             this.renderNext(1);
+        };
+        let _evt2 = new DngOperation("tickMobs");
+        _evt2.canTrigger = function(){return(true);};
+        _evt2.onTrigger = function(){
+            this.tickMobs();
         };
         rooms.set("A1",new DngRoom("A1", null,false));
         rooms.set("B1", new DngRoom("B1", null,false));
@@ -414,11 +421,13 @@ class MinoLair extends DngDungeon{
         DngDirection.createDirection(DngDirection.DirS, rooms.get("B3" ), rooms.get("B4"));
         DngDirection.createDirection(DngDirection.DirS, rooms.get("C3" ), rooms.get("C4"));
         DngDirection.createDirection(DngDirection.DirS, rooms.get("D3" ), rooms.get("D4"));
-        for(var i=0;i<rooms.length;i++) {
-            rooms[i].operations = [_evt];
+        for (room of rooms.values( )) {
+            room.operations = [_evt,_evt2];
         }
         room =rooms.get("Entrance");
         room.isDungeonEntry = room.isDungeonExit = true;
+        room =rooms.get("A4");
+        room.allowSave=true;
         /*//room.getDirection(DngDirection.DirE).onExitFct = this._fight.bind(this,1);
         room =rooms.get("B2");
         //room.getDirection(DngDirection.DirE).onExitFct = this._fight.bind(this,2);
@@ -434,10 +443,13 @@ class MinoLair extends DngDungeon{
         firstFloor.setRooms(Array.from(rooms.values( )));
         _floors.push(firstFloor);
         this.setFloors(_floors);
+        let mob=new DngMob();
+        mob.data.homeTile=mob.data.actualTile='E3'
+        this.addMob(mob);
     }
     exitDungeon() {
         super.exitDungeon();
-        window.story.show("PlainsFarmland");
+        window.story.show("ForestBorder");
     }
     renderNext(id) {
         window.gm.dng.evtData.id=id;
@@ -447,7 +459,7 @@ class MinoLair extends DngDungeon{
         let msg ='';
         if(evt.id===1) {
             this.moveMino();
-            if(window.gm.dng.actualRoom.Name===this.data.minoTile) {
+            if(window.gm.dng.actualRoom.name===this.data.minoTile) {
                 msg+='The mean mino got you. </br>';
                 msg+= window.gm.printLink("Next",'window.gm.dng.exitDungeon()');
             } else {
@@ -461,7 +473,7 @@ class MinoLair extends DngDungeon{
         this.data.minoDelay=0;
         let grid = this.allFloors()[0].allRooms();
         let start = new window.GraphNode(this.allFloors()[0].getRoom(this.data.minoTile),1), 
-            end = new window.GraphNode(this.allFloors()[0].getRoom('D2'),1)
+            end = new window.GraphNode(this.allFloors()[0].getRoom(this.actualRoom.name),1)
         let graph = new window.Graph(grid);
         let path = window.astar.search(graph,start,end);
         if(path.length>0) {
@@ -469,7 +481,10 @@ class MinoLair extends DngDungeon{
         }
     }
     extMapInfo(roomInfo) {
-        if(roomInfo.Name===this.data.minoTile) roomInfo.Boss=1;
+        for(var i=this.Mobs.length-1;i>=0;i-- ){
+            if(roomInfo.name===this.Mobs[i].data.actualTile) roomInfo.boss=1;
+        }
+        if(roomInfo.name===this.data.minoTile) roomInfo.boss=1;
         return(roomInfo);
     }
     /**
