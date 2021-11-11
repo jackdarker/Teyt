@@ -51,7 +51,7 @@
       options = options || {};
       this.mob=mob;
       var heuristic = options.heuristic || astar.heuristics.manhattan;
-      var closest = options.closest || false;
+      var closest = options.hasOwnProperty("closest")? options.closest :true;
       var openHeap = getHeap();
       var closestNode = start; // set the start node to be the closest if required
       this.cleanNode(start),this.cleanNode(end);

@@ -7,13 +7,16 @@ window.gm.dng = window.gm.dng || null; //{};
 //if you have to connect 2 rooms, you have to define direction in both of them
 class DngDirection{
     //creates direction between 2 rooms and assigns them to them; you can then modify them
-    static createDirection(DirEnum, RoomA, RoomB, onlyAtoB=false) {
+    static createDirection(DirEnum, RoomA, RoomB, options) {
+        options = options || {};
         var Label = DngDirection.DirEnumToString(DirEnum);
         var DirAtoB = new DngDirection(DirEnum,Label, "");
         var inverseDir = DngDirection.inverseDirection(DirEnum);
         var backLabel = DngDirection.DirEnumToString(inverseDir);
         var DirBtoA = new DngDirection(inverseDir,backLabel, "");
-        DirBtoA.oneWay=onlyAtoB;
+        DirAtoB.tags=options.tags||[]; //todo should clone?
+        DirBtoA.tags=options.tags||[];
+        DirBtoA.oneWay=options.onlyAtoB||false;
         DirAtoB.roomA = DirBtoA.roomB = RoomA;
         DirAtoB.roomB = DirBtoA.roomA = RoomB;
         if(RoomA != null) RoomA.setDirection(DirEnum, DirAtoB);
@@ -83,6 +86,7 @@ class DngDirection{
         this.name = name,this.descr = (descr===null) ? function() {return(name)}:descr;
         this.direction = dirEnum;
         this.oneWay=false;
+        this.tags=[];
         this.onExitFct= this.onEnterFct = null; //should return true if something is happening (aborts other fct-evaluation! )
         this.canExitFct= null;
         
@@ -105,6 +109,15 @@ class DngDirection{
         if (this.canExitFct == null) return(!this.oneWay);
         return this.canExitFct(this); 
     }
+    hasTag(tag) {
+        if(tag instanceof Array) {
+            for(var i=0;i<tag.length;i++) {
+                if(this.hasTag(tag[i])) return(true);
+            }
+            return(false);
+        }
+        return(this.tags.includes(tag));
+    }
     //the direction is hidden if one of the connected rooms is hidden
     hidden() {
         return (this.roomA.isHidden || this.roomB.isHidden);
@@ -112,7 +125,7 @@ class DngDirection{
 }
 // a room connected by directions
 class DngRoom {
-    constructor(name,descr,hidden) {
+    constructor(name,descr,hidden,tags) {
         this.name = name, this.descr = (descr===null)?function(){ return(name)}:descr; 
         this.directions/*DngDirection*/ = [null, null, null, null, null, null];	//list of directions
         this.isHidden = hidden;
@@ -122,8 +135,8 @@ class DngRoom {
         this.operations/*DngOperations*/ = []; //list of additional operations (= buttons you can press)
         this.allowSave=false;
         this.onEnterFct = null; //should return true if something is happening, see also DngDirection.onEnterFct/onExitFct
+        this.tags=tags;
         //internal
-        this.origResumeFct = null;
         this.it;
         this.fromRoom;
     }
@@ -142,10 +155,11 @@ class DngRoom {
     }
 
     moveHere(from) {
-        this.origResumeFct = this.floor.dungeon.inRoomedDungeonResume;
+        //this.origResumeFct = this.floor.dungeon.inRoomedDungeonResume;
         this.fromRoom = from;
         this.it = 0;//a counter to keep track from what iteration to continue
-        this.moveIterator();
+        this.floor.dungeon.resumeRoom=this.moveIterator.bind(this);
+        this.floor.dungeon.resumeRoom();
     }
 
     // Whats that good for: onExit or onEnter might trigger an interaction/combat that we have to finish first befor displaying navigation buttons again.
@@ -163,9 +177,8 @@ class DngRoom {
             this.it = _it;
             dir = element;// as DngDirection;
             if (dir.roomA == this.fromRoom && dir.roomB==this) {
-                if (dir.onExit())
-                {
-                    this.floor.dungeon.inRoomedDungeonResume = this.moveIterator
+                if (dir.onExit()){
+                    //this.floor.dungeon.inRoomedDungeonResume = this.moveIterator
                     return;
                 }
             }
@@ -181,19 +194,24 @@ class DngRoom {
             dir = element1;// as DngDirection;
             if (dir.roomA==this && dir.roomB == this.fromRoom) {
                 if (dir.onEnter()) {
-                    this.floor.dungeon.inRoomedDungeonResume = this.moveIterator
+                    //this.floor.dungeon.inRoomedDungeonResume = this.moveIterator
                     return;
                 }
             }
         }
         _it = _it +1; 
         if (_it > this.it && this.onEnter()) {
-            this.it = _it;
-            this.floor.dungeon.inRoomedDungeonResume = this.moveIterator
+            this.it = _it; //this.floor.dungeon.inRoomedDungeonResume = this.moveIterator
             return;
         }
+        _it = _it +1; 
+        if (_it > this.it && this.floor.dungeon.onEnterRoom!==null && this.floor.dungeon.onEnterRoom(this)) { //todo if there are multiple events on enter?
+            this.it = _it; //this.floor.dungeon.inRoomedDungeonResume = this.moveIterator
+            return;
+        } 
         
-        this.floor.dungeon.inRoomedDungeonResume = this.origResumeFct;
+        
+        this.floor.dungeon.inRoomedDungeonResume = this.floor.dungeon.resumeRoomMenu;//this.origResumeFct;
         this.floor.dungeon.inRoomedDungeonResume();
     
     }
@@ -241,6 +259,17 @@ class DngFloor {
         }
         return found;
     }	
+    getRoomByXY(x,y) {
+        var found = null;
+        for (var i=0; i<this.rooms.length;i++ ) {
+            found = this.rooms[i];
+            if (found === null) continue;
+            if (found.x ===x && found.y===y) {
+                return(found);
+            }
+        }
+        return(null);
+    }
 }
 // an additional operation that the player can trigger by pressing a button
 class DngOperation {
@@ -274,7 +303,9 @@ class DngDungeon	{
         this.actualRoom = null;
         this.Mapper = new DngMapper();//DngMapper; 
         this.buttons=[];
+        this.onEnterRoom=null; //global onEnter
         this.inRoomedDungeonResume = this.inRoomedDungeonDefeat = null;
+        this.evtData={id:0},this.renderEvent = function(id){ return("You have to set a function to renderEvent before calling renderNext"+ window.gm.printLink("Whatever","window.gm.dng.resumeRoom()"));};
         this.Mobs=[]; //list of mobs on actual floor
     }
     //override this to return a data-object that will be used to store persistent data
@@ -314,6 +345,7 @@ class DngDungeon	{
     enterDungeon() {
         //this.Mapper = new DngMapper();
         this.actualRoom = null;
+        this.resumeRoom=this.resumeRoomMenu;
         var Entry = null;
         var Exit = null;
         var Room;
@@ -353,13 +385,16 @@ class DngDungeon	{
     moveToRoom(newRoom) {
         var _actualRoom = this.actualRoom;
         this.actualRoom = newRoom;
-        this.inRoomedDungeonResume = this.resumeRoom;
         if (_actualRoom != null) {
             if(_actualRoom.floor!==newRoom.floor) this.floorChange(_actualRoom.floor,newRoom.floor);
             newRoom.moveHere(_actualRoom); //this will trigger onExit/onEnter
         } else {   
-            this.inRoomedDungeonResume();
+            this.resumeRoom();
         }
+    }
+    renderNext(id) {
+        window.gm.dng.evtData.id=id;
+        window.story.show("DungeonGenericEvent");
     }
     clearButtons() {
         this.buttons=[];
@@ -402,6 +437,9 @@ class DngDungeon	{
 
     }
     resumeRoom() {
+
+    }
+    resumeRoomMenu() {
         /*		Menu Layout
             * 		[ Op1 ]	[ Op2 ]	[ Op3 ]	[ Op4 ]	[More ]
             * 		[ Up  ]	[  N  ]	[Down ]	[Mast ]	[     ]
@@ -478,12 +516,13 @@ class DngDungeon	{
     tickMobs(it=0) {
         //a tick could cause a mob to do something that should be noted on the screen
         //MobA detects MobB-> show notification; MobB finds player -> combat; next 
+        this.resumeRoom=this.resumeRoomMenu;
         for(var i=this.Mobs.length-1-it;i>=0;i--) {
             var mob = this.Mobs[i];
-            it-=1;
+            it+=1;
             if (mob.tick()) {
                 //
-                this.inRoomedDungeonResume = this.tickMobs.bind(this,it);
+                this.resumeRoom = this.tickMobs.bind(this,it);
                 return;
             };
         }
@@ -496,42 +535,93 @@ class DngMob {
             name:'bad Bull',
             homeTile:'',
             actualTile:'',
-            nextTile:'',
+            path:[],
+            idle:'wait',    // wait / hide
+            mode:'idle',    // hunt / seek / wait / return / flee
+            oldmode:'idle',
+            waitBeforeHome:3,
             enabled:true
         }
     }
     //needs to be set with ._parent=window.gm.util.refToParent(this);
     get dungeon() {return this._parent();}
     decide(){
-        //check sensors
-        //decide
         let floor = this.dungeon.actualRoom.floor;
         let grid = floor.allRooms();
-        let start = new window.GraphNode(floor.getRoom(this.data.actualTile),1), 
-            end = new window.GraphNode(floor.getRoom(this.dungeon.actualRoom.name),1);//player
         let graph = new window.Graph(grid);
-        let path = window.astar.search(graph,start,end);
-        if(path.length>0) {
-            this.data.nextTile=path[0].origNode.name;
+        let end=null,path=null;
+        let room=floor.getRoom(this.dungeon.actualRoom.name),//player
+        start = floor.getRoom(this.data.actualTile);
+        //check line of sight
+        const checkView=[{x:2,y:0},{x:0,y:2},{x:-2,y:0},{x:0,y:-2},{x:1,y:0},{x:0,y:1},{x:-1,y:0},{x:0,y:-1}];
+        for(var i=checkView.length-1;i>=0;i--) {
+            if(room.x===start.x+checkView[i].x && room.y===start.y+checkView[i].y){
+                //ignore if room is not connected in straight line
+                path = window.astar.search(graph,new window.GraphNode(start,1),new window.GraphNode(room,1),{closest:false});
+                if(path.length===Math.abs(checkView[i].x)+Math.abs(checkView[i].y)) {
+                    end=room;  //found player
+                    this.data.mode='hunt';
+                    break;
+                }
+            }
+        }
+        if(end===null) {//check noise
+            const checkHear=[{x:-1,y:1},{x:1,y:1},{x:-1,y:-1},{x:1,y:-1},{x:1,y:0},{x:0,y:1},{x:-1,y:0},{x:0,y:-1}];
+            for(var i=checkHear.length-1;i>=0;i--) {
+                if(room.x===start.x+checkHear[i].x && room.y===start.y+checkHear[i].y){
+                    end=room;  //found player
+                    this.data.mode='hunt';
+                    break;
+                }
+            }
+        }
+        //check smell
+        //decide
+        if(end===null) { //lost player
+            if(this.data.mode==='hunt') {
+                this.data.waitBeforeHome=3; this.data.mode='wait';
+            } else if(this.data.mode==='wait') {
+                this.data.waitBeforeHome-=1;
+                if(this.data.waitBeforeHome<=0) {
+                    this.data.mode==='return';
+                    end = floor.getRoom(this.data.homeTile);
+                }
+            } else if(this.data.mode==='return') {
+                if(this.data.actualTile===this.data.homeTile) {
+                    this.data.mode==='idle';
+                }
+            }
+        }
+        if(end!==null) {
+            start = new window.GraphNode(start,1)
+            end = new window.GraphNode(end,1);
+            path = window.astar.search(graph,start,end);
+            this.data.path=path.map((el)=>{return(el.origNode.name);})
         }
     }
     //return true if scene plays 
     //to return back to dungeon add to scene window.gm.printLink('Next','window.gm.dng.resumeRoom()')
     do() {
-        let res=false;
-        if(this.data.nextTile!==this.data.actualTile) {
-            this.data.actualTile=this.data.nextTile; //move to
+        let res=false, nextTile=this.data.path.shift();
+        if(nextTile!==undefined && nextTile!=='' && nextTile!==this.data.actualTile) {
+            this.data.actualTile=nextTile; //move to
         }
-        this.data.nextTile='';
-        if(this.data.actualTile==='C2') {
-            window.story.show('MinoRant');
+        if(this.data.oldmode!==this.data.mode ){
+            this.data.oldmode=this.data.mode;
+            //window.story.show('MinoRant');
+            this.dungeon.renderEvent = function(me){return function(id){ return(me.data.name+" huffs angryly.</br>"+ window.gm.printLink("Whatever","window.gm.dng.resumeRoom()"));}}(this);
+            this.dungeon.renderNext(1);
             return(true);
         } else if (this.dungeon.actualRoom.name===this.data.actualTile) {
-            window.story.show('MinoMeet');
-            return(true);
+            res=this.onCollidePlayer();
         } else {
         }
         return(res);
+    }
+    onCollidePlayer() {
+        this.dungeon.renderEvent = function(me){return function(id){ return(me.data.name+" found you.</br>"+ window.gm.printLink("Whatever","window.gm.dng.resumeRoom()"));}}(this);
+        this.dungeon.renderNext(1);
+        return(true);
     }
     //call to calculate
     tick() {
@@ -591,6 +681,8 @@ class DngMapper {
             roomInfo = (this.allInfo[m]);
             roomInfo.name = room.name;
             roomInfo.hidden = roomInfo.hidden || room.isHidden;
+            roomInfo.Entry = room.isDungeonEntry || room.isDungeonExit;
+            roomInfo.Save = room.allowSave;
             if(this.CBMoreInfo!==null) roomInfo=this.CBMoreInfo(roomInfo);
             dirs = room.getDirections();
             for (var k=0; k < dirs.length; k++ ) {
@@ -602,8 +694,6 @@ class DngMapper {
                 if (m >= 0) {	//create new roominfo and set coordinate
                     roomInfo2 = new DngMapperInfo();
                     roomInfo2.hidden = dir.hidden();
-                    roomInfo.Entry = room.isDungeonEntry || room.isDungeonExit;
-                    roomInfo.Save = room.allowSave;
                     switch (dir.direction) {
                         case DngDirection.DirN: 
                             roomInfo2.X = roomInfo.X;
@@ -673,9 +763,9 @@ class DngMapper {
         for (i = 0; i < this.allInfo.length; i++ ) {
             if (this.allInfo[i] == null) continue;
             roomInfo = this.allInfo[i] ;
+            let room=playerRoom.floor.getRoom(roomInfo.name);
             _line = " ";
-            if ((roomInfo.connect & (1 << DngDirection.StairDown)) ||
-                (roomInfo.connect & (1 << DngDirection.StairUp)) ) {
+            if ((roomInfo.connect & (1 << DngDirection.StairDown)) || (roomInfo.connect & (1 << DngDirection.StairUp)) ) {
                 _line = "&ang;";
             }
             if (playerRoom != null && playerRoom.name == roomInfo.name) {
@@ -693,24 +783,28 @@ class DngMapper {
             }
             //each room/connection has to be 3 chars long or it will messup formatting !
             //todo format as table?
-            if (!roomInfo.hidden) {
+            if (!room.isHidden) {
                 _line = "[" +_line+ "]";
                 map[2 * (roomInfo.X - this.minX)][2 * (roomInfo.Y - this.minY)] = _line; 
-            
-                if ((roomInfo.connect & (1 << DngDirection.DirN))) {
-                    _line = " | ";
+                //&loz; = Raute, &cap;=Tor, &cup;= inv. Tor, # = Gitter
+                let dir = room.getDirection(DngDirection.DirN);
+                if (dir) {//roomInfo.connect & (1 << DngDirection.DirN)) {
+                    _line = dir.tags[0]==='duct'?" o ":" | "; 
                     map[2 * (roomInfo.X - this.minX) + 0][2 * (roomInfo.Y - this.minY) - 1] = _line;
                 }
-                if ((roomInfo.connect & (1 << DngDirection.DirE))) {
-                    _line = " - ";
+                dir = room.getDirection(DngDirection.DirE);
+                if (dir){//(roomInfo.connect & (1 << DngDirection.DirE))) {
+                    _line = dir.tags[0]==='duct'?" o ":" - "; 
                     map[2 * (roomInfo.X - this.minX) + 1][2 * (roomInfo.Y - this.minY) + 0] = _line;
                 }
-                if ((roomInfo.connect & (1 << DngDirection.DirS))) {
-                    _line = " | ";
+                dir = room.getDirection(DngDirection.DirS);
+                if (dir){//((roomInfo.connect & (1 << DngDirection.DirS))) {
+                    _line = dir.tags[0]==='duct'?" o ":" | ";
                     map[2 * (roomInfo.X - this.minX) + 0][2 * (roomInfo.Y - this.minY) + 1] = _line;
                 }
-                if ((roomInfo.connect & (1 << DngDirection.DirW))) {
-                    _line = " - ";
+                dir = room.getDirection(DngDirection.DirW);
+                if (dir){//((roomInfo.connect & (1 << DngDirection.DirW))) {
+                    _line = dir.tags[0]==='duct'?" o ":" - "; 
                     map[2 * (roomInfo.X - this.minX) - 1][2 * (roomInfo.Y - this.minY) - 0] = _line;
                 }
             }
