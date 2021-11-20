@@ -1,9 +1,9 @@
 :: SY_Intro
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
-You accidently went through a portal and end up in the netherworld.
-You are lucky that you didnt end in one of the more unpleasent areas but in the "Sanctuary".</br>
-Of course you dont want to stay here forever, so better get started making an escape plan. 
+You accidently went through a portal and end up in the netherworld.</br>
+You were lucky that you didnt end in one of the more unpleasent areas but in the "Sanctuary".</br>
+Of course you dont want to stay here forever, so better get started making an escape plan.</br>
 <div></br>[[Back|Intro]] <a0 onclick='start();'>Next</a></br></div>
 </article><article id="LogPanel"></article></section>
 <script> function start() {
@@ -12,6 +12,7 @@ Of course you dont want to stay here forever, so better get started making an es
     window.gm.enterVR();
     window.gm.MutationsLib['swapGender'](window.gm.player,window.storage.constructors["VulvaHuman"]);
     window.gm.player.levelUp(5);window.gm.player.autoLeveling();
+    window.story.state.DngSY.dngLevel=6;//todo
 }
 </script>
 
@@ -31,17 +32,7 @@ Of course you dont want to stay here forever, so better get started making an es
 </br>There is a trunk to store your [[Wardrobe]] and also a [[Mirror]] where you can take a look at yourself.
 </article><article id="LogPanel"></article></section>
 <script>
-function nextDng() {
-    if(window.story.state.DngSY.dngLevel<=1) {
-        return('SY_Lv6');//"SY_Lv1");
-    } else if(window.story.state.DngSY.dngLevel<=2) {
-        return("SY_Lv2");
-    } else if(window.story.state.DngSY.dngLevel<=3) {
-        return("SY_Lv3");
-    }else {
-        return("NOP");
-    }
-}
+function nextDng() {return("SY_Lv"+window.story.state.DngSY.dngLevel.toString());}
 </script>
 
 :: SY_Your_Room_Sleep [_nosave_]

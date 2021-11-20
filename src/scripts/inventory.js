@@ -2,7 +2,7 @@
 class Item {
     constructor(name) {
         this.id = this.name = name;  //id is unique in database(no whitespace !); name is for display
-        this.__tags = [];
+        this.tags = [];
         this.price=this.basePrice=10; //how much worth it is
     }
     get parent() {return this._parent?this._parent():null;}
@@ -21,23 +21,23 @@ class Item {
         return([]); //default unuseable in combat
     }
     //tag or [tag]
-    hasTag(tag) {
-        if(tag instanceof Array) {
-            for(var i=0;i<tag.length;i++) {
-                if(this.hasTag(tag[i])) return(true);
+    hasTag(tags) {
+        if(tags instanceof Array) {
+            for(var i=0;i<tags.length;i++) {
+                if(this.hasTag(tags[i])) return(true);
             }
             return(false);
         }
-        return(this.__tags.includes(tag));
+        return(this.tags.includes(tags));
     }
-    removeTag(tags){
-        for(var i= this.__tags.length-1;i>=0;i--){
-            if(tags.includes(this.__tags[i])) this.__tags.splice(i,1);
+    removeTags(tags){
+        for(var i= this.tags.length-1;i>=0;i--){
+            if(tags.includes(this.tags[i])) this.tags.splice(i,1);
         }
     }
     addTags(tags){
         for(var i= tags.length-1;i>=0;i--){
-            if(!this.__tags.includes(tags[i])) this.__tags.push(tags[i]);
+            if(!this.tags.includes(tags[i])) this.tags.push(tags[i]);
         }
     }
     //implement this for description

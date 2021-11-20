@@ -79,7 +79,7 @@
   
           // The g score is the shortest distance from start to current node.
           // We need to check if the path we have arrived at this neighbor is the shortest one we have seen yet.
-          var gScore = currentNode.g + graph.getCost(currentNode,neighbor);
+          var gScore = currentNode.g + graph.getCost(currentNode,neighbor,mob);
           var beenVisited = neighbor.visited;
   
           if (!beenVisited || gScore < neighbor.g) {
@@ -175,15 +175,17 @@
   Graph.prototype.markDirty = function(node) {
     this.dirtyNodes.push(node);
   };
-  Graph.prototype.getCost = function(from,to) {
-    return to.getWeight();
+  Graph.prototype.getCost = function(from,to,mob) {
+    return 1;// to.getWeight();
   };
   Graph.prototype.neighbors = function(node) {
-    var ret = [];
+    var dir,ret = [];
     var dirs = node.origNode.getDirections();
     for(var i=0;i<dirs.length;i++) {
-      if(dirs[i]!==null) {
-        var room = dirs[i].roomB;
+      dir=dirs[i];
+      if(dir!==null) {
+        if(dir.hasTag(['barrier'])) continue; //todo mobs cant pass through barrier and other?
+        var room = dir.roomB;
         var next=this.nodes.find((el)=>{return(el.origNode===room);})
         ret.push(next);
       }
@@ -196,9 +198,9 @@
   GridNode.prototype.equals = function(other) {
     return(this.origNode===other.origNode);
   }
-  GridNode.prototype.getWeight = function() {
+  /*GridNode.prototype.getWeight = function() {
     return(1); //todo origNode.getCost()
-  }
+  }*/
   /*GridNode.prototype.isWall = function() {
     return this.weight === 0;
   };*/

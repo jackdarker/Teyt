@@ -159,7 +159,8 @@ window.gm.initGameFlags = function(forceReset,NGP=null) {
   let DngSY = {
       remainingNights: 0,
       mapReveal: 0,
-      dng:'',
+      dng:'', //current dungeon name
+      dngMap:{},
       dngLevel:1
   }
   let DngAM = {
@@ -168,8 +169,8 @@ window.gm.initGameFlags = function(forceReset,NGP=null) {
   }
   let DngAT = {
     visitedTiles: [],
-    mapReveal: 0,
-    gotRing: {}
+    mapReveal: [],
+    tmp: {}
   }
   let DngCV = {
     visitedTiles: [],
@@ -331,13 +332,13 @@ window.gm.moveHere = function(time=15){
     window.gm.addTime(time); 
   }
 };
-/* used for the dungeons ..state.DngSY.dng 
+/* used for the dungeons ..state.DngSY.dng. Creates links for adjoined tiles (you might need to delete some links manually) 
 * creates link for ('enter door', 'north'):  [[enter door| MN_Lv3_F2]]  - assuming you are in tile MN_Lv3_F3 in MN_Lv3  
 */
 window.gm.printNav=function(label,dir){
   let here = window.passage.name.replace(window.story.state.DngSY.dng+'_','');
   let to=window.story.state.DngSY.dng+'_',i=0;
-  const X=['A','B','C','D','E','F','G','H','I','J','K','L'],Y=['0','1','2','3','4','5','6'];
+  const X=['A','B','C','D','E','F','G','H','I','J','K','L','M','N'],Y=['0','1','2','3','4','5','6','7','8','9'];
   switch(dir) {
     case 'north':
       i=Y.findIndex((el)=>{return(el===here[1]);});
@@ -416,6 +417,63 @@ window.gm.printMap=function(MapName,playerTile,reveal,visitedTiles) {
   if(_n) {_n.removeClass('roomFound');_n.addClass('playerPosition');}
   node.addTo(draw);
 }
+/* 
+* constructs map from template and dng-data
+*/
+window.gm.printMap2=function(dng,playerTile,reveal,visitedTiles) {
+  var step=32, width=step*(dng.width||12),height=step*(dng.height||8);
+  const X=['A','B','C','D','E','F','G','H','I','J','K','L','M','N'],Y=['0','1','2','3','4','5','6','7','8','9'];
+  function nameToXY(name) {
+    let i,pos={x:0,y:0};
+    i=Y.findIndex((el)=>{return(el===name[1]);});
+    pos.y=i*step;//if(i<0||i>=Y.length-1) return('');
+    i=X.findIndex((el)=>{return(el===name[0]);});
+    pos.x=i*step;//if(i<0||i>=Y.length-1) return('');
+    return(pos);
+  }  
+  function addAnno(){
+    const dx2= [6,6,-6,-6], dy2=[0,10,10,0]; //
+    for(k=room.anno?room.anno.length-1:-1;k>=0;k--){//add up to 4 annotation-letters
+      if(k>3) continue;
+      
+      lRoom.text(function(add) {add.tspan(room.anno[k])}).addClass('textLabel').ax(_rA.cx()+ox+dx2[k]).ay(_rA.cy()+oy+dy2[k]);
+    }
+  }
+  var draw = document.querySelector("#canvas svg");
+  if(!draw) draw = SVG().addTo('#canvas').size(width, height);
+  else draw = SVG(draw);//recover svg document instead appending new one
+  draw.rect(width, height).attr({ fill: '#303030'});
+  var node = SVG(window.gm.images['template3']()); //get the source-svg
+  node.size(width,height);
+  var lRoom=node.find('#layer1')[0]; //fetch a layergroup by id to add to
+  var lPath=node.find('#layer2')[0]; 
+  var tmpl = node.find('#tmplRoom')[0];
+  var ox= tmpl.cx(),oy=tmpl.cy(); //offset tmpl
+  if(playerTile!=='' && visitedTiles.indexOf(playerTile)<0) {
+    visitedTiles.push(playerTile);
+  }
+  let _rA,i,k,xy,room,dir;
+  let xyB,dx,dy;
+  for(i=dng.grid.length-1;i>=0;i--) {// foreach room create room
+    room=dng.grid[i];
+    xy=nameToXY(room.room);
+    _rA=lRoom.use('tmplRoom').attr({id:room.room}).move(xy.x, xy.y);
+    if(visitedTiles.indexOf(room.room)<0) {
+      if(reveal.indexOf(room.room)<0)_rA.addClass('roomNotFound');
+      else _rA.addClass('roomFound');addAnno();
+    }else {
+      if(room.room===playerTile) {_rA.removeClass('roomFound').addClass('playerPosition');} else _rA.addClass('roomVisited');
+      addAnno();
+      for(k=room.dirs.length-1;k>=0;k--) {//foreach direction create path to next room
+        dir=room.dirs[k];
+        xyB=nameToXY(dir); dx=xyB.x-xy.x,dy=xyB.y-xy.y;
+        lPath.polyline([[_rA.cx()+ox,_rA.cy()+oy],[_rA.cx()+ox+dx/2,_rA.cy()+oy+dy/2]]).addClass('pathFound');//.insertBefore(_rA)
+      }
+    }
+  }
+ node.addTo(draw);
+}
+//display svg
 window.gm.printSceneGraphic2=function(background,item) {
   var width=600,height=300;
   var draw = document.querySelector("#canvas svg");

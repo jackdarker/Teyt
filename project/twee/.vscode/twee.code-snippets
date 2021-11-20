@@ -36,8 +36,8 @@
 		"Insert <select": {
 			"prefix": "sel",
 			"body": ["<div id='select${1:idx}' >",
-			"<a0 onclick='window.gm.printTalkLink(\"div#select${1:idx}\")[0],\"div#choice${1:idx}a\")'>click a</a>",
-			"<a0 onclick='window.gm.printTalkLink(\"div#select${1:idx}\")[0],\"div#choice${1:idx}b\")'>click b</a>",
+			"<a0 onclick='window.gm.printTalkLink(\"div#select${1:idx}\",\"div#choice${1:idx}a\")'>click a</a>",
+			"<a0 onclick='window.gm.printTalkLink(\"div#select${1:idx}\",\"div#choice${1:idx}b\")'>click b</a>",
 			"</div><div id='choice${1:idx}a' hidden>","$0</div>","<div id='choice${1:idx}b' hidden>","</div>"]
 		},
 		"Insert <% if": {
