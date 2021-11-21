@@ -4,16 +4,10 @@
     window.story.state.DngAT.mapReveal,window.story.state.DngAT.visitedTiles);
 </script>
 
-:: AT_Lv6_MAPold [_back_]
-<hr><p>Map:</p><div id='canvas'></div></br>
-<script> window.gm.printMap(window.story.state.DngSY.dng,window.gm.player.location.replace(window.story.state.DngSY.dng+'_','Tile_'),
-    window.story.state.DngAT.mapReveal,window.story.state.DngAT.visitedTiles);
-</script>
 
-
-:: AT_Lv6_Entry
+:: AT_Entry
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%>
+<%window.gm.player.location=window.passage.name;%>
 TODO Through the portal you arrive at a dark and eerie underground location.
 </br><p> [[Next|AT_Lv6_J6]] </br></p>
 </article><article id="LogPanel"></article></section>
@@ -26,7 +20,9 @@ function buildRooms() {
         '    |   |       |     ',
         'G4--H4--I4      K4    ',
         '    |           |     ',
-        '    H5--I5--J5--K5--L5'];
+        '    H5--I5--J5--K5--L5',
+        '                    | ',
+        '            J6--K6--L6'];
     let grid =[
     {room:'H2', dirs:['H3','I2']},
     {room:'I2', dirs:['H2','J2']},
@@ -65,7 +61,7 @@ function buildRooms() {
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%>
 A dark, eerie tunnel in an old temple. 
-</br><p> <%=window.gm.printNav('Go north','north')%></br><%=window.gm.printNav('Go west','west')%><%=window.gm.printNav('Go east','east')%></br><%=window.gm.printNav('Go south','south')%></br></p>
+</br><p><%=window.gm.printNav('Go north','north')%></br><%=window.gm.printNav('Go west','west')%><%=window.gm.printNav('Go east','east')%></br><%=window.gm.printNav('Go south','south')%></br></p>
 </article><article id="LogPanel"></article></section>
 
 
@@ -252,7 +248,7 @@ A dark, eerie tunnel in an old temple.
 <%}else{%>
     There is the usual stoneplate in the ground that marks the spot where the portal will appear after you finished your task.</br>
 <%}%> 
-</br><p> <%=window.gm.printNav('Go west','west')%><%=window.gm.printNav('Go east','east')%></br></p>
+</br><p><%=window.gm.printNav('Go north','north')%></br><%=window.gm.printNav('Go west','west')%><%=window.gm.printNav('Go east','east')%></br><%=window.gm.printNav('Go south','south')%></br></p>
 </article><article id="LogPanel"></article></section>
 
 

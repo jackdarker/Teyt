@@ -29,6 +29,14 @@ window.gm.util.PubSub = function(){
     }
   }); 
 };
+// can be used to create deep clones of class-obj; 
+// requires that the class has registered its constructor to window.storage 
+// and class implements _relinkItems() to restore parent-ship of sub-objects
+window.gm.util.deepClone=function(obj){
+  let clone=JSON.parse(JSON.stringify(obj), window.storage.Reviver);
+  clone._relinkItems();
+  return(clone);
+};
 //create pretty name for passage; requires a tag (replace space with _ !) [name:"My_Room"]
 window.gm.util.printLocationName=function(passage) {
   let tags = window.story.passage(passage).tags;
@@ -626,13 +634,13 @@ window.gm.printItemTransfer = function(from,to,wardrobe) {
   listFrom = Array.from(allIds.keys());listFrom.sort();
   function give(id,amount,charA,charB) {
     let item,count = charA.Inv.countItem(id);
-    if(count===0) {
+    if(count===0) { //wardrobe or item
       count=charA.Wardrobe.countItem(id);
       item = charA.Wardrobe.getItem(id);
     } else item = charA.Inv.getItem(id);
     count=Math.min(count,amount);
     charA.changeInventory(item,-1*count);
-    item = window.gm.ItemsLib[id]();
+    item = window.gm.util.deepClone(item);//item = window.gm.ItemsLib[id](); doesnt work for dynamic created items
     charB.changeInventory(item,count);
     window.gm.refreshAllPanel();
   }

@@ -345,3 +345,4 @@ window.gm.MutationsLib['growVulva'] = function(char) {
         window.gm.pushDeferredEvent("GenericDeffered",[msg]);
     }
 };
+//todo grow/shrinkHips

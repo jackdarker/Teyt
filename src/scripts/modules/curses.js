@@ -42,6 +42,13 @@ class Curse {
     * Attention !! _parent will be added dynamical
     */
     get parent() {return(this._parent?this._parent(): null);} 
+    _relinkItems(parent) {
+        this._parent = window.gm.util.refToParent(parent);
+        this.trigger._parent=window.gm.util.refToParent(this);
+        for(el of this.list) {
+            el._parent=window.gm.util.refToParent(this);
+        }
+    }
     configureCurse(item,trigger,curses) {
         this.trigger = trigger;
         this.list=curses;
@@ -51,15 +58,8 @@ class Curse {
         item.price=item.basePrice*(1+item.bonus.length);
         item._updateId();
     }
-    _relinkItems(parent) {
-        this._parent = window.gm.util.refToParent(parent);
-        this.trigger._parent=window.gm.util.refToParent(this);
-        for(el of this.list) {
-            el._parent=window.gm.util.refToParent(this);
-        }
-    }
     toJSON() {return window.storage.Generic_toJSON("Curse", this); }
-    static fromJSON(value) {return(window.storage.Generic_fromJSON(Curse, value.data));}
+    static fromJSON(value) {let x=window.storage.Generic_fromJSON(Curse, value.data);return(x);}
     onEquip() {
         if(this.trigger.onEquip()) this.apply();
     }
@@ -107,6 +107,7 @@ class CrsTrigger { //each curse has a trigger that evaluates if the curse gets t
     * Attention !! _parent will be added dynamical
     */
     get parent() {return(this._parent?this._parent(): null);} 
+    _relinkItems(parent){this._parent=window.gm.util.refToParent(parent);}
     onEquip() {return(false);}
     onUnequip() {return(true);} //by default trigger unapply when unequipped
     onTimeChange(time) {return(false);}

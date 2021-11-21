@@ -84,7 +84,7 @@ Theme:
 <a href="javascript:window.styleSwitcher.setStyle('dark');window.gm.refreshAllPanel();">dark</a></br></div>
 </br><hr>
 <div class="speech tNPC2"><span class="avatar"></span>NPCx<hr><br>"There you are"</div>
-<p class='tPC'>PC-talk</p><p class='tNPC1'>NPC1-talk</p><p class='tNPC2'>NPC2-talk</p>
+<p class='tPC'>PC-talk</p><p class='tNPC1'>NPC1-talk</p><p class='tNPC2'>NPC2-talk</p><p class='tNPC3'>NPC3-talk</p><p class='tNPC4'>NPC4-talk</p>
 <p class='dev'>notes from developer.</p>
 <p class='author'>notes from author.</p>
 <form><ul style="list-style-type: none; padding-inline-start: 0px;" ><legend>List</legend>
@@ -95,13 +95,9 @@ Theme:
 <statup>Statup</statup>  <statdown>Statdown</statdown> <span class='red'>RED</span><span class='green'>GREEN</span>
 <p class='div_alarm'>ALARM</p>
 <hr>
-<div class="progressbar">
-			<div style="width: 100%;"><b><p>100%</p></b></div>
-		</div>
-		<div>
-			<input id="progress-value" type="number" placeholder="Enter desired percentage" min="0" max="100" value="7" />
-			<input type="button" value="Change" onclick="change()"/>
-		</div>
+<div id='bartest' class="progressbar"><div style="width: 100%;"><b><p>100%</p></b></div></div>
+<div><input id="progress-value" type="number" placeholder="Enter desired percentage" min="0" max="100" value="7" />
+	<input type="button" value="Change" onclick="change()"/></div>
 <hr>
 <label>[hint]<input type="checkbox"  style="display: none;" >
   <span role='tooltip'>hkljj  fdggfdsf gf   dfsd afsdafgdae sgfegf</span>
@@ -121,8 +117,8 @@ Theme:
 <script>
 function change(){
 				var selectedValue = document.querySelector("#progress-value").value;
-				document.querySelector(".progressbar > div").textContent = selectedValue + "%";
-				document.querySelector(".progressbar > div").style.width = selectedValue + "%";
+				document.querySelector("#bartest > div").textContent = selectedValue + "%";
+				document.querySelector("#bartest > div").style.width = selectedValue + "%";
 			}
 </script>
 

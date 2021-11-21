@@ -36,13 +36,13 @@
 		"Insert <select": {
 			"prefix": "sel",
 			"body": ["<div id='select${1:idx}' >",
-			"<a0 onclick='window.gm.printTalkLink(\"div#select${1:idx}\",\"div#choice${1:idx}a\")'>click a</a>",
-			"<a0 onclick='window.gm.printTalkLink(\"div#select${1:idx}\",\"div#choice${1:idx}b\")'>click b</a>",
+			"<a0 onclick='window.gm.printTalkLink(\"div#select${1:idx}\",\"div#choice${1:idx}a\")'>click a</a></br>",
+			"<a0 onclick='window.gm.printTalkLink(\"div#select${1:idx}\",\"div#choice${1:idx}b\")'>click b</a></br>",
 			"</div><div id='choice${1:idx}a' hidden>","$0</div>","<div id='choice${1:idx}b' hidden>","</div>"]
 		},
 		"Insert <% if": {
 			"prefix": "if",
-			"body": ["<% if($0){%>","","<% }else{%>", "","<% }%>"]
+			"body": ["<% if($0){%>","","<%}else{%>", "","<%}%>"]
 		},
 		"Insert passage": {
 			"prefix": "passage",

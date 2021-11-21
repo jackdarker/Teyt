@@ -1,6 +1,7 @@
 :: SY_Intro
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
+Todo better intro</br>
 You accidently went through a portal and end up in the netherworld.</br>
 You were lucky that you didnt end in one of the more unpleasent areas but in the "Sanctuary".</br>
 Of course you dont want to stay here forever, so better get started making an escape plan.</br>
@@ -12,7 +13,7 @@ Of course you dont want to stay here forever, so better get started making an es
     window.gm.enterVR();
     window.gm.MutationsLib['swapGender'](window.gm.player,window.storage.constructors["VulvaHuman"]);
     window.gm.player.levelUp(5);window.gm.player.autoLeveling();
-    window.story.state.DngSY.dngLevel=6;//todo
+    window.story.state.DngSY.dngLevel=2;//todo
 }
 </script>
 
@@ -22,14 +23,14 @@ Of course you dont want to stay here forever, so better get started making an es
 <%window.gm.player.location=window.passage.name;%>
 <%if(window.story.state.DngSY.remainingNights<=0){%>
     You better get equipped and ready for your next task.</br>
-    <p> <a0 onclick='window.story.show(nextDng());'>Seek the portal</a></p>
+    <p><a0 onclick='window.story.show(nextDng());'>Seek the portal</a></p>
 <%}else{%>
     This is your room. You can <a href="javascript:void(0)" onclick='($("tw-passage").fadeOut(1000, function() {window.gm.player.sleep(700);window.story.state.DngSY.remainingNights-=1;window.story.show("SY_Your_Room_Sleep");}));'>sleep</a> here.
     </br>But maybe you shouldnt do that all day, even if you are tired. Look around in the sanctuary, maybe you can find someone to talk to or get some training.
-    <p> You can sleep <%=window.story.state.DngSY.remainingNights%> more nights before you have to start another adventure. So better use the time here for preping.</p>
+    <p> You can sleep <b><%=window.story.state.DngSY.remainingNights%> more nights</b> before you have to start another adventure. So better use the time here for preping.</p>
     <div> [[Hallway|SY_Hall]]</br></div>
 <%}%>
-</br>There is a trunk to store your [[Wardrobe]] and also a [[Mirror]] where you can take a look at yourself.
+</br>There is a [[trunk|GlobalChest]] to store anything you dont want to lose. You might also change your [[Wardrobe]] and take a closer look on yourself in the [[Mirror]].
 </article><article id="LogPanel"></article></section>
 <script>
 function nextDng() {return("SY_Lv"+window.story.state.DngSY.dngLevel.toString());}
@@ -45,7 +46,7 @@ You awake in your room.
     Startled you notice that Cyril is waiting in the doorframe.<span class="tNPC2">"It is time now. Meet me in the hall."</span>
 <%}else{%>
     Cyril said that you soon have to go through the portal again and that you should prepare for that. </br>
-    You can sleep <%=window.story.state.DngSY.remainingNights%> more nights before you have to start another adventure.
+    You can sleep <b><%=window.story.state.DngSY.remainingNights%> more nights</b> before you have to start another adventure.
 <%}%>
 <p> [[Get up|SY_Your_Room]]</br></p>
 </article><article id="LogPanel"></article></section>
@@ -53,7 +54,7 @@ You awake in your room.
 
 :: SY_Recover_Death [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-Suddenly snapping awake, you find yourself back into Sanctuary. For sure it was just a nightmare you awoke from, a horrible dream about your death. </br>
+Suddenly snapping awake, you find yourself back into Sanctuary. For sure it was just a nightmare you awoke from, a sick dream about a horrible fate. </br>
 You cant even remember what you exactly dreamed, and maybe thats a good thing.
 </br>[[Next|SY_Your_Room]]
 </article><article id="LogPanel"></article></section>
@@ -62,7 +63,25 @@ You cant even remember what you exactly dreamed, and maybe thats a good thing.
 :: SY_Portal
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
-<div> [[Back|_back_]] <a0 onclick='window.story.show(xxx);'>Start</a></br></div>
+In the center of this round hall, a magic portal can be summoned. </br>
+So far, its the only exit you know from this fortress. 
+While you are not busy with other task, you could explore some of the areas that you already visited.</br>
+But why not stay in this cozy home?</br>
+The portal could you bring to the following places:</br>
+
+<p><a0 onclick='window.story.state.DngSY.dngOW=true;window.story.show("FM_Entry");'>Farm</a></p>
+<p><a0 onclick='window.story.state.DngSY.dngOW=true;window.story.show("CV_Entry");'>Crystal Cave</a></p>
+<p><a0 onclick='window.story.state.DngSY.dngOW=true;window.story.show("DF_Entry");'>Lush forest</a></p>
+<p><a0 onclick='window.story.state.DngSY.dngOW=true;window.story.show("MN_Entry");'>Mountains</a></p>
+<!--
+<p><a0 onclick='window.story.state.DngSY.dngOW=true;window.story.show("LB_Entry");'>Smudgy Bog</a></p>
+<p><a0 onclick='window.story.state.DngSY.dngOW=true;window.story.show("AT_Entry");'>Ancient Temple</a></p>
+<p><a0 onclick='window.story.state.DngSY.dngOW=true;window.story.show("SC_Entry");'>Sunken City</a></p>
+<p><a0 onclick='window.story.state.DngSY.dngOW=true;window.story.show("");'>Jungle Ruins</a></p>
+<p><a0 onclick='window.story.state.DngSY.dngOW=true;window.story.show("");'>Steam Glacier</a></p>
+<p><a0 onclick='window.story.state.DngSY.dngOW=true;window.story.show("");'>Savanah Rift</a></p>
+-->
+<p> [[Back|SY_Hall]]</p>
 </article><article id="LogPanel"></article></section>
 
 :: SY_Hall
@@ -70,10 +89,11 @@ You cant even remember what you exactly dreamed, and maybe thats a good thing.
 <%window.gm.player.location=window.passage.name;%>
 The great hall is the center of this complex. Several large pendant chandeliers spread a pleasantly bright light.</br>
 There is something like a [[Shop]] setup on one side but a sign displays: >>Closed<<.</br>
-</br>[[Cyril|Talk_Cyril]] is waiting idle right next to the impressive door at the end of the hall.</br> 
+</br>[[Cyril|Talk_Cyril]] is waiting idle right next to the [[impressive door|SY_Portal]] at the end of the hall.</br> 
 Speak to him to get a clue where you are heading next.</br>
-</br> On the left side of the hall a corridor is leading back to the [[dorms|SY_Your_Room]] or to the [[library]] if you follow it to the end.</br>
-The corridor on the right side leads to the [[Training grounds]] and [[doctor]].</br> 
+</br> On the left side of the hall a corridor is leading back to the [[dorms|SY_Your_Room]] or to the [[library|SY_Library]] if you follow it to the end.</br>
+A secluded room nearby contains a [[shrine|SY_Shrine]] where you can mediate or pray to whatever god you see fit.</br> 
+The corridor on the right side leads to the [[Training grounds|SY_Train]] and [[Laboratory|SY_Lab]].</br> 
 </article><article id="LogPanel"></article></section>
 
 :: SY_Library
@@ -81,17 +101,37 @@ The corridor on the right side leads to the [[Training grounds]] and [[doctor]].
 <%window.gm.player.location=window.passage.name;%>
 A lot of books and scrolls are waiting for someone to read them. </br>
 You can spend some time reading, maybe you learn a spell or some ancient language. Or at least find something to distract your thoughts.</br>
-<a0 onclick='window.story.show(\"SY_BOOK\");'>Browse for some food for your mind </a>
+<a0 onclick='window.story.show(\"SY_Book\");'>Browse for some food for your mind </a>
 <div> [[Back|SY_Hall]] </br></div>
 </article><article id="LogPanel"></article></section>
 <script></script>
 
-:: SY_BOOK [_back_]
+:: SY_Book [_back_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 TODO: soothe mind / learn arcana / learn language
-<div> [[Back|_back_]] </br></div>
+<p> [[Back|_back_]] </br></p>
 </article><article id="LogPanel"></article></section>
 <script></script>
+
+:: SY_Shrine [_back_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+TODO: what gods?  mediation helps with? confession both to revel in your perverted thoughts?</br>
+On one side of the room a ornate chest is placed on a desk. It is used for [[donations|SY_Donation]] to the community.</br>
+<p> [[Back|_back_]] </br></p>
+</article><article id="LogPanel"></article></section>
+<script></script>
+
+:: SY_Donation [_back_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+TODO: The keepers expect that you show your dedication by offering donations.</br>
+Contributing something valuable might improve your standing and secure you the benevolence of fate.</br>
+An improper offering on the other side could have some consequences.</br>
+Actually, your offerings might rank: damnable unworthy disappointing bad aberrant nothing low frugal good significant high enormous</br>
+Would you like to [[offer|NOP]] something?</br>
+<p> [[Back|_back_]] </br></p>
+</article><article id="LogPanel"></article></section>
+<script></script>
+
 
 
 :: SY_Lv1
@@ -107,7 +147,7 @@ You grab the glas.</br>
 <p class="tPC">"I know, I know, pitfalls and such."</p>
 <p class="tNPC2">"Yes...and such."</p>
 That somehow sound like more dangers than falling into a hole.</br>
-<p> <a0 onclick='window.story.show("CV_Lv1_Entry");'>Lets go</a></p>
+<p> <a0 onclick='window.story.show("CV_Entry");'>Lets go</a></p>
 </article><article id="LogPanel"></article></section>
 
 
@@ -119,7 +159,7 @@ That somehow sound like more dangers than falling into a hole.</br>
 Did he just snicker? 
 <p class="tPC">"Fine."</p>
 ....
-<p> <a0 onclick='window.story.show("DF_Lv2_Entry");'>Lets go</a></p>
+<p> <a0 onclick='window.story.show("DF_Entry");'>Lets go</a></p>
 </article><article id="LogPanel"></article></section>
 
 
@@ -132,7 +172,28 @@ Your task would be to gather pages from a book called Igneum Frigus Thalamum. At
 <p class="tNPC2">"The other one is stuck on the roof of a hut. That one is part of a small settlement nort-east from the portal."</p>
 <p class="tPC">"Its still not clear to me how to find them, but whatever...."</p>
 ....
-<p> <a0 onclick='window.story.show("MN_Lv3_Entry");'>Lets go</a></p>
+<p> <a0 onclick='window.story.show("MN_Entry");'>Lets go</a></p>
+</article><article id="LogPanel"></article></section>
+
+:: SY_Lv4
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<p class="tNPC2">"I'm not sure we can trust you with a job. Therefore, you will work on the farm until we decide how to proceed."</p>
+<p class="tPC">"There is a farm? "</p>
+<p class="tNPC2">"Yes. Where do you think all the food is coming from."</p>
+<p class="tNPC2">"Kelly is the boss there, she will explain what you have to do. I dont need to remind you that you have to earn your stay here, do I?"</p>
+<p class="tPC">"No sir."</p>
+<p> <a0 onclick='window.story.show("FM_Entry");'>Lets go</a></p>
+</article><article id="LogPanel"></article></section>
+
+
+:: SY_Lv4
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<p class="tNPC2">"I'm not sure we can trust you with a job. Therefore, you will work on the farm until we decide how to proceed."</p>
+<p class="tPC">"There is a farm? "</p>
+<p class="tNPC2">"Yes. Where do you think all the food is coming from."</p>
+<p class="tNPC2">"Kelly is the boss there, she will explain what you have to do. I dont need to remind you that you have to earn your stay here, do I?"</p>
+<p class="tPC">"No sir."</p>
+<p> <a0 onclick='window.story.show("FM_Entry");'>Lets go</a></p>
 </article><article id="LogPanel"></article></section>
 
 
@@ -153,5 +214,5 @@ Most likely it is in the central chamber.</p>
 He hands you a couple thumb-thick rolls. They are made of cardboard and a handspan long.</br>
 <p class="tNPC2">"They ignite if you undo the cap. They even burn in water."</p>
 <p class="tPC">'Great, a stick and some flares. What else would I need to handle a minotaur.'</p>
-You mumble before <a0 onclick='window.story.show("AT_Lv6_Entry");'>stepping</a> into the portal.
+You mumble before <a0 onclick='window.story.show("AT_Entry");'>stepping</a> into the portal.
 </article><article id="LogPanel"></article></section>
