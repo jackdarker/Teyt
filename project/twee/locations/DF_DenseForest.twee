@@ -90,7 +90,7 @@ Carrying your truckload of fruits toward the laboratory, you right away run into
 <%window.gm.player.location=window.passage.name;%>
 <p class='tNPC1'>"Oh my, those should be more then enough for me."</p>
 <p class='tPC'>"What are you going to do with them? Boil down as jam or preserve?"</p>
-<p class='tNPC1'>"I will have to do some analyzes. But indeed, if something remains I could still make something out of it."</p>
+<p class='tNPC1'>"I will have to do some analyzes. But indeed, if there are remains I could still make something out of it."</p>
 <p class='tPC'>"Why are you analyze those things anyway?"</p>
 <p class='tNPC1'>"Did you run into those hornets? Didn't you think they are somewhat oversized."</p>
 <p class='tPC'>"Oh, yes. For sure people at home would panic if they are facing some buggers like that. You think the plums have something to do with it?"</p>
@@ -101,9 +101,9 @@ Carrying your truckload of fruits toward the laboratory, you right away run into
 </div><div id='choice1a' hidden>
     <p class='tNPC1'>"Oh my. Are you feeling well? How many stings did you receive? I have some antitoxin to neutralize the poison. But it need to be properly dosed.</p>
     <div id='select2' >
-    <a0 onclick='window.gm.printTalkLink("div#select2","div#choice2a")'><span class='tPC'>"It wasn't more then 3 times."</span></a>
-    <a0 onclick='window.gm.printTalkLink("div#select2","div#choice2a")'><span class='tPC'>"5 times or more, I guess."</span></a>
-    <a0 onclick='window.gm.printTalkLink("div#select2","div#choice2c")'><span class='tPC'>"I can't remember. I will just sit it out."</span></a>
+    <a0 onclick='window.gm.printTalkLink("div#select2","div#choice2a")'><span class='tPC'>"It wasn't more then 3 times."</span></a></br>
+    <a0 onclick='window.gm.printTalkLink("div#select2","div#choice2a")'><span class='tPC'>"5 times or more, I guess."</span></a></br>
+    <a0 onclick='window.gm.printTalkLink("div#select2","div#choice2c")'><span class='tPC'>"I can't remember. I will just sit it out."</span></a></br>
     </div><div id='choice2a' hidden>
         <p class='tNPC1'>"Here trink that, it should neutralize the toxins.</p>
         You down the concotion she hands you.

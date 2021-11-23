@@ -82,6 +82,38 @@ class GameVoucher extends Item {
         return(msg);
     }
 };
+class QuestItems extends Item { //ingredients you have to collect for quest
+    constructor() { super('QuestItems');
+    this.addTags([window.gm.ItemTags.Quest]); this.price=this.basePrice=10;   
+    this.style=0;this.lossOnRespawn = true;
+    }
+    set style(style) { //instead of creating full class for every useless junk I use this and just add variable that will be restored after load
+        this._style = style; 
+        if(style===0) this.id='IgneumPage',this.name='IgneumPage';
+        else if(style===10) this.id=this.name='RedAnkh';
+        else if(style===20) this.id=this.name='RingOfBurden';
+        else throw new Error(this.id +' doesnt know '+style);
+    }
+    get style() {return this._style;}
+    get desc() { 
+        let msg ='';
+        switch(this._style) {
+            case 0: 
+                msg ='Pages from the book Igneum Frigus Thalamum';
+                break;
+            case 10:
+                msg='A pendant made from red crystal shaped like the famous Ankh.';
+                break;
+            case 20:
+                msg='This ring is heavyer then it looks.';
+                break;
+            default: throw new Error(this.id +' doesnt know '+style);
+        }
+        return(msg);
+    }
+    toJSON() {return window.storage.Generic_toJSON("QuestItems", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(QuestItems, value.data);};
+}
 class Ingredient extends Item {
     constructor() { super('Ingredient');
         this.addTags([window.gm.ItemTags.Ingredient]); this.price=this.basePrice=10;   
@@ -415,6 +447,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(HorsePotion);
     window.storage.registerConstructor(Ingredient);//only need constructor for base-ingredient
     window.storage.registerConstructor(FlashBang);
+    window.storage.registerConstructor(QuestItems);
     window.storage.registerConstructor(SoulGem);
     
     //Some of those items are generics that need some setup; so I create a template-library here
@@ -446,6 +479,10 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['GiantPlum'] = function(){ let x=new Ingredient();x.style=70;return(x);};
     ItemsLib['EmptyGlas'] = function(){ let x=new Ingredient();x.style=80;return(x);};
     ItemsLib['GlasCrystalWater'] = function(){ let x=new Ingredient();x.style=90;return(x);};
+    //Questitems
+    ItemsLib['IgneumPage'] = function(){ let x=new Ingredient();x.style=0;return(x);};
+    ItemsLib['RedAnkh'] = function(){ let x=new Ingredient();x.style=10;return(x);};
+    ItemsLib['RingOfBurden'] = function(){ let x=new Ingredient();x.style=20;return(x);};
     //soulgem
     ItemsLib['TinySoulGem'] = function () { let x= new SoulGem();return(x); };
     //keys

@@ -69,7 +69,7 @@ window.gm.util.loadLocalSVG=function(event) {
       }
     }
 };
-  /* Inserts SVG files into HTML document */
+/* Inserts SVG files into HTML document */
 window.gm.util.insertSvg=function(file_content) {
     // insert SVG file into HTML page
     const svg_container = document.getElementById("svg_container");
@@ -466,7 +466,6 @@ window.gm.restorePage=function() {
     }
   }
 }
-
 //-----------------------------------------------------------------------------
 //changes the active player and will add him to party!
 window.gm.switchPlayer = function(playername) {

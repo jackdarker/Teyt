@@ -86,7 +86,7 @@ hideCombatOption() {
 }
 //renders background & combatants to #canvas
 renderCombatScene() {
-  let _pos =[[0.25,0.60,0.10],[0.75,0.60,0.10],[0.50,0.40,0.80]];//sprite position & scale in % x,y,z
+  let _pos =[[0.25,0.60,1],[0.75,0.60,1],[0.50,0.40,0.80]];//sprite position & scale in % x,y,z
   let width=600,height=300;
   let draw = document.querySelector("#canvas svg");
   if(!draw) draw = SVG().addTo('#canvas').size(width, height);

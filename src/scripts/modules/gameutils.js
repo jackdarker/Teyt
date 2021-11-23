@@ -1,6 +1,6 @@
 "use strict";
 /* bundles some utility operations*/
-window.gm.getSaveVersion= function(){   return([0,1,0]); };
+window.gm.getSaveVersion= function(){return([0,0,1,0]);};
 // reimplement to setup the game
 let _origInitGame = window.gm.initGame;
 window.gm.initGame= function(forceReset,NGP=null) {
@@ -968,7 +968,7 @@ window.gm.printBodyDescription= function(whom,onlyvisible=false) {
   all = all.concat(legs).concat([null]).concat(groin).concat([null]).concat(breast).concat([null]).concat(other);
   for(el of all){ msg+= (el!==null)?el.descLong(conv)+' ':'</br>';}
   let lewd = whom.Outfit.getLewdness();
-  msg +='</br>Total lewdness sluty:'+lewd.slut+' bondage:'+lewd.bondage+' sm:'+lewd.sm;
+  //msg +='</br>Total lewdness sluty:'+lewd.slut+' bondage:'+lewd.bondage+' sm:'+lewd.sm;
 	return msg+"</br>";
 };
 // returns singular pronoun for the char depending on gender

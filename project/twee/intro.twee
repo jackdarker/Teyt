@@ -52,20 +52,28 @@ Those are very present through the game and in the main-story (also check the se
 
 :: Intro
 <article><%window.gm.initGame();window.gm.player.location=window.passage.name;%>
-<p>To avoid problems with the local law enforcement, you temporarily moved to another settlement. </br>
-As you look around for possible sources of income, e.g. stuff that someone carelessly leaves lying around, you also come across a temple of some sort.</br> 
-There you see interesting items - interesting for you because they look valuable and could easily be hidden in your pockets. </br>
-But the first thing you grab is a monk's robe drying on the line.</br> 
-As you secure one shiny gadget, you trigger some magic... </br></p>
 <p class='author'>You might see a lot of links that are formated red-strikethrough. Those are currently broken and you shouldnt use them.</p>
 <p class="author">Player name and start gender are currently unchangeable.</p>
 <p class='author'>Loading of savegame is only possible in game. Saving might be disabled in some locations.</p>
-<p class='author'>[[Fetishes ! (spoiler alert)|List_Fetish]]</p>
-<p>[[That magic portal sucks you in...|SY_Intro]]</p></br>
+<p class='author'>[[Fetishes ! (spoiler alert)|List_Fetish]]</p></br></br><hr>
+<p>To avoid problems with the local law enforcement, you temporarily moved to another settlement. </br>
+As you look around for possible sources of income, e.g. stuff that someone carelessly leaves lying around, you also come across a temple of some sort.</br> 
+There you see interesting items - interesting for you because they look valuable and could easily be hidden in your pockets. </br>
+But the first thing you grab is a monk's robe drying on the line. That coarse cloak should help you to move through the temple without arousing suspicion.</br> 
+As you secure one shiny gadget, you trigger some magic anomaly... </br></p>
+<p><a0 onclick='start();'>That magic portal sucks you right in...wush</a></p>
 There are also some options to make a fastforward (might behave oddly): </br>
 ...nothing right now...
 </article>
-
+<script> function start() {
+    window.story.state.DngSY.remainingNights=1;
+    window.story.state.vars.spawnAt="SY_Your_Room";
+    window.gm.enterVR();
+    //window.gm.MutationsLib['swapGender'](window.gm.player,window.storage.constructors["VulvaHuman"]);
+    window.gm.player.levelUp(5);window.gm.player.autoLeveling();
+    window.story.state.DngSY.dngLevel=2;//todo
+}
+</script>
 
 :: Intro_old
 <article><%window.gm.initGame();window.gm.player.location=window.passage.name;%>
