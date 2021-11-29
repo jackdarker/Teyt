@@ -2,7 +2,7 @@
 <h3><%=window.story.name%> V<%=window.gm.getSaveVersion().toString().replaceAll(",",".")%></h3>
 <img src='<%=window.gm.getSidebarPic()%>' width="256" height="256">
 <hr>
-<div><%=window.gm.util.printLocationName(window.gm.player.location)%></br> <!--this looks often weird, extract [name:Forest] instead ??-->
+<div><%=window.gm.util.printLocationName(window.gm.player.location)%></br>
 <%=window.gm.getTimeString()%> </br> <%=window.gm.getDateString()%></br>
 <hr>
 <%=window.gm.player.name%></br></div>
@@ -10,9 +10,9 @@
 <%=window.gm.util.bargraph(window.gm.player.energy().value,window.gm.player.energy().max,"yellow","Energy: ")%>
 <%=window.gm.util.bargraph(window.gm.player.will().value,window.gm.player.will().max,"green","Will: ")%>
 <%=window.gm.util.bargraph(window.gm.player.arousal().value,window.gm.player.arousal().max,"coral","Arousal: ")%>
-<%=window.gm.util.bargraph(window.gm.player.Stats.get("corruption").value,window.gm.player.Stats.get("corruptionMax").value,"darkred","Corruption: ")%>
-<div>Money: <%=window.gm.player.Inv.countItem('Money') %> </div>
-<div <%=window.gm.player.canLevelUp?"class=\"green\"":""%>>XP/Level: <%=window.gm.player._data.XP+"/"+window.gm.player._data.level%></div>
+<%=window.gm.util.bargraph(window.gm.player.Stats.get("savageness").value,window.gm.player.Stats.get("savagenessMax").value,"darkred","Savageness: ")%>
+<!--<div>Money: <%=window.gm.player.Inv.countItem('Money') %> </div>
+<div <%=window.gm.player.canLevelUp?"class=\"green\"":""%>>XP/Level: <%=window.gm.player._data.XP+"/"+window.gm.player._data.level%></div>-->
 <hr>
 <form>
 <button type="button" id="status">Status</button>

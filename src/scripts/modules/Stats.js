@@ -360,8 +360,7 @@ class stCorruptionMax extends Stat {
         _stat.Calc();
     }
     constructor() {
-        super();
-        
+        super();    
     }
     toJSON() {return window.storage.Generic_toJSON("stCorruptionMax", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stCorruptionMax, value.data);};
@@ -376,11 +375,39 @@ class stCorruption extends Stat {
         _stat.Calc();
     }
     constructor() {
-        super();
-        
+        super();        
     }
     toJSON() {return window.storage.Generic_toJSON("stCorruption", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stCorruption, value.data);};
+}
+class stSavagenessMax extends Stat {
+    static setup(context, base,max) {
+        var _stat = new stSavagenessMax();
+        var _n = _stat.data;
+        _n.id='savagenessMax', _n.hidden=3,_n.base=base, _n.value=base,_n.limits=[{max:99999,min:0}];
+        context.addItem(_stat);
+        _stat.Calc();
+    }
+    constructor() {
+        super();    
+    }
+    toJSON() {return window.storage.Generic_toJSON("stSavagenessMax", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(stSavagenessMax, value.data);};
+}
+class stSavageness extends Stat {
+    static setup(context, base,max) {
+        stSavagenessMax.setup(context,max);
+        var _stat = new stSavageness();
+        var _n = _stat.data;
+        _n.id='savageness', _n.hidden=3,_n.base=base, _n.value=base,_n.limits=[{max:'savagenessMax',min:0}];
+        context.addItem(_stat);
+        _stat.Calc();
+    }
+    constructor() {
+        super();        
+    }
+    toJSON() {return window.storage.Generic_toJSON("stSavageness", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(stSavageness, value.data);};
 }
 //Fetish
 // value >0 means character likes that fetish or <0 hates it  
@@ -1566,6 +1593,8 @@ window.gm.StatsLib = (function (StatsLib) {
     window.storage.registerConstructor(stArousalRegen);
     window.storage.registerConstructor(stCorruptionMax);
     window.storage.registerConstructor(stCorruption);
+    window.storage.registerConstructor(stSavagenessMax);
+    window.storage.registerConstructor(stSavageness);
     window.storage.registerConstructor(stArmor);   
     //...effects
     window.storage.registerConstructor(effCallHelp);

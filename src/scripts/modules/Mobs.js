@@ -244,7 +244,7 @@ class Lapine extends Mob {
         let rnd = _.random(1,100);
         result.action =result.target= null;
         let skill = this.Skills.getItem("Kick");
-        if(window.story.state.combat.turnCount>2 && rnd>30 && skill.canPay().OK) {
+        if(window.story.state.combat.turnCount>2 && rnd>30 && skill.isEnabled().OK) {
             result.action = skill.name;
             result.target = [this];
             result.msg =this.name+" prepares for a powerful jump-kick.</br>"+result.msg;
@@ -447,6 +447,12 @@ class Mechanic extends Mob {
 class Hornett extends Mob {
     static factory(type) {
         let foe = new Hornett();
+        if(type==='PillRoller') {
+            foe.name = foe.id = 'PillRoller';
+            foe.pic= 'PillRoller1';
+        } else if(type==='Hornett') {
+            foe.Outfit.addItem(WeaponStinger.factory('wasplike'));
+        }
         return foe;
     }
     constructor() {
@@ -455,7 +461,9 @@ class Hornett extends Mob {
         this.pic= 'wasp1';
         this.level_min =1;
         this.Outfit.addItem(new BaseWasp());
-        this.Outfit.addItem(WeaponStinger.factory('wasplike'));
+        this.Outfit.addItem(new ArmorTorso('chitin'));
+        this.Outfit.addItem(new FaceInsect('wasp'));
+        
         this.fconv = null; //lazy init because descfixer depends on gm.player
     }
     calcCombatMove(enemys,friends){
@@ -463,13 +471,15 @@ class Hornett extends Mob {
         let rnd = _.random(1,100);
         if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
         result.action =result.target= null;
-        let sting= 'wasp-stinger';
-        if(this.Skills.getItem(sting).isEnabled()){
-            rnd = _.random(0,enemys.length-1);
-            result.action = sting;
-            result.target = [enemys[rnd]];
-            result.msg =this.fconv("$[I]$ thrust $[my]$ stinger at "+result.target[0].name+".</br>")+result.msg;
-            return(result);
+        if(this.id === 'Hornett') {
+            let sting= 'wasp-stinger';
+            if(this.Skills.getItem(sting).isEnabled().OK){
+                rnd = _.random(0,enemys.length-1);
+                result.action = sting;
+                result.target = [enemys[rnd]];
+                result.msg =this.fconv("$[I]$ thrust $[my]$ stinger at "+result.target[0].name+".</br>")+result.msg;
+                return(result);
+            }
         } else {
         } 
         return(super.calcCombatMove(enemys,friends));
@@ -530,7 +540,8 @@ window.gm.Mobs = (function (Mobs) {
     Mobs.Lapine = Lapine.factory;
     Mobs.Mole = Mole.factory;
     Mobs.Squirrel = function() { return function(param){return(Mole.factory(param));}("Squirrel")};
-    Mobs.Hornett = Hornett.factory;
+    Mobs.Hornett = function() { return function(param){return(Hornett.factory(param));}("Hornett")};
+    Mobs.PillRoller = function() { return function(param){return(Hornett.factory(param));}("PillRoller")};
     Mobs.Huntress = Huntress.factory;
     Mobs.Lizan = Lizan.factory;
     Mobs.Wolf = Wolf.factory;

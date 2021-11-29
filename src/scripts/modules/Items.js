@@ -123,14 +123,14 @@ class Ingredient extends Item {
         this._style = style; 
         if(style===0) this.id='ApocaFlower',this.name='ApocaFlower';
         else if(style===10) this.id=this.name='PurpleBerry';
-        else if(style===20) this.id=this.name='BloatedMushroom';
+        else if(style===20) this.id=this.name='BogBovus';
         else if(style===30) this.id=this.name='SquishedLeech';
         else if(style===40) this.id=this.name='WolfTooth';
         else if(style===50) this.id=this.name='DryadVine';
         else if(style===60) this.id=this.name='Dimetrium';
         else if(style===70) this.id=this.name='GiantPlum';
         else if(style===80) this.id=this.name='EmptyGlas';
-        else if(style===90) this.id=this.name='GlasCrystalWater';
+        else if(style===90) this.id=this.name='CrystalWater';
         else throw new Error(this.id +' doesnt know '+style);
     }
     get style() {return this._style;}
@@ -144,7 +144,7 @@ class Ingredient extends Item {
                 msg='purple berrys grown in the forest';
                 break;
             case 20:
-                msg='mushrooms from a cave';
+                msg='a mushroom with purple cap and yellow splotches';
                 break;
             case 30:
                 msg='I dont wanna carry that around';
@@ -470,7 +470,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['Penilium'] = function () { let x= new RegenderPotion();x.style=10;return(x); };
     //Ingredient
     ItemsLib['SquishedLeech'] = function(){ let x=new Ingredient();x.style=30;return(x);};
-    ItemsLib['BloatedMushroom'] = function(){ let x=new Ingredient();x.style=20;return(x);};
+    ItemsLib['BogBovus'] = function(){ let x=new Ingredient();x.style=20;return(x);};
     ItemsLib['PurpleBerry'] = function(){ let x=new Ingredient();x.style=10;return(x);};
     ItemsLib['WolfTooth'] = function(){ let x=new Ingredient();x.style=40;return(x);};
     ItemsLib['ApocaFlower'] = function(){ let x=new Ingredient();return(x);};
@@ -478,11 +478,11 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['Dimetrium'] = function(){ let x=new Ingredient();x.style=60;return(x);};
     ItemsLib['GiantPlum'] = function(){ let x=new Ingredient();x.style=70;return(x);};
     ItemsLib['EmptyGlas'] = function(){ let x=new Ingredient();x.style=80;return(x);};
-    ItemsLib['GlasCrystalWater'] = function(){ let x=new Ingredient();x.style=90;return(x);};
+    ItemsLib['CrystalWater'] = function(){ let x=new Ingredient();x.style=90;return(x);};
     //Questitems
-    ItemsLib['IgneumPage'] = function(){ let x=new Ingredient();x.style=0;return(x);};
-    ItemsLib['RedAnkh'] = function(){ let x=new Ingredient();x.style=10;return(x);};
-    ItemsLib['RingOfBurden'] = function(){ let x=new Ingredient();x.style=20;return(x);};
+    ItemsLib['IgneumPage'] = function(){ let x=new QuestItems();x.style=0;return(x);};
+    ItemsLib['RedAnkh'] = function(){ let x=new QuestItems();x.style=10;return(x);};
+    ItemsLib['RingOfBurden'] = function(){ let x=new QuestItems();x.style=20;return(x);};
     //soulgem
     ItemsLib['TinySoulGem'] = function () { let x= new SoulGem();return(x); };
     //keys

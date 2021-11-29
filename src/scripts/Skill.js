@@ -55,7 +55,7 @@ class SkillMod {
         this.onMiss = [];
     }
 }
-
+//skills are collected in separate inventory
 class Skill {
 constructor(id) {
     this.id=this.name = id;

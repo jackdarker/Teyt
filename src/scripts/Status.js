@@ -20,13 +20,23 @@
         let _x = window.storage.Generic_fromJSON(StatsDictionary, value.data);
         return(_x);
     }
-    //
+    /**
+     *
+     *
+     * @param {*} id
+     * @return {*} 
+     * @memberof StatsDictionary
+     */
     get(id) {return(this.getItem(id));}
     modifyHidden(id,hidden) {
         let _data = this.get(id).data;
         _data.hidden=hidden;
     }
-    // adds a modifier to a Stat or replaces it
+    /**
+     *
+     * adds a modifier to a Stat or replaces it
+     * @memberof StatsDictionary
+     */
     addModifier(toId, modData) {
         let _stat = this.get(toId);
         let _oldMods = _stat.data.modifier;
@@ -68,6 +78,13 @@
         this.list.splice(_i,1);
         _stat.calc();   //trigger update of dependent stat
     }
+    /**
+     *
+     *
+     * @param {*} id
+     * @param {*} value
+     * @memberof StatsDictionary
+     */
     increment( id, value) {
         let attr = this.get(id);
         attr.data.base += value;

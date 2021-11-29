@@ -21,7 +21,7 @@
 		},
 		"Insert <p-talk": {
 			"prefix": "pp",
-			"body": ["<${1|p,span|} class=\"${2|dev,author,tPC,tNPC1,tNPC2|}\">${3:${TM_SELECTED_TEXT}}</$1>$0"]
+			"body": ["<${1|p,span|} class=\"${2|dev,author,tPC,tNPC1,tNPC2,tNPC3,tNPC4|}\">${3:${TM_SELECTED_TEXT}}</$1>$0"]
 		},
 		"Insert talk": {
 			"prefix": "tk",
@@ -38,7 +38,7 @@
 			"body": ["<div id='select${1:idx}' >",
 			"<a0 onclick='window.gm.printTalkLink(\"div#select${1:idx}\",\"div#choice${1:idx}a\")'>click a</a></br>",
 			"<a0 onclick='window.gm.printTalkLink(\"div#select${1:idx}\",\"div#choice${1:idx}b\")'>click b</a></br>",
-			"</div><div id='choice${1:idx}a' hidden>","$0</div>","<div id='choice${1:idx}b' hidden>","</div>"]
+			"</div><div id='choice${1:idx}a' hidden></br>","$0</div>","<div id='choice${1:idx}b' hidden></br>","</div>"]
 		},
 		"Insert <% if": {
 			"prefix": "if",

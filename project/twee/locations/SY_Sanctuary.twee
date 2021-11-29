@@ -8,17 +8,27 @@ Of course you dont want to stay here forever, so better get started making an es
 <p>[[Next|SY_Your_Room]]<p>
 </article><article id="LogPanel"></article></section>
 
+
+:: SY_Hallway_Dorms
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+This corridor connects the dorms with the [[Hallway|SY_Hall]]. Most of the doors on both sides of the corridor seemm to lead to rooms for the guests here. One of them is assigned as [[Your room|SY_Your_Room]].</br>
+</article><article id="LogPanel"></article></section>
+
+
 :: SY_Your_Room
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
 <%if(window.story.state.DngSY.remainingNights<=0){%>
     You better get equipped and ready for your next task.</br>
+    <p class="author">Now is a good point to save and and stow everything you don't want to lose in the trunk.</p>
     <p><a0 onclick='window.story.show(nextDng());'>Seek the portal</a></p>
 <%}else{%>
     This is your own private room. You can <a href="javascript:void(0)" onclick='($("tw-passage").fadeOut(1000, function() {window.gm.player.sleep(700);window.story.state.DngSY.remainingNights-=1;window.story.show("SY_Your_Room_Sleep");}));'>sleep</a> here to regain health and energy.
     </br>But maybe you shouldnt do that all day, even if you are tired. Look around in the sanctuary, maybe you can find someone to talk to or get some training.
     <p> You can sleep <b><%=window.story.state.DngSY.remainingNights%> more nights</b> before you have to start another adventure. So better use the time here for preping.</p>
-    <div> [[Hallway|SY_Hall]]</br></div>
+    <p> <%=(window.story.state.DngSY.dildo & 0x1)?'[[Train your oral skills...|SA_Train_OralLv1]]':''%></p>
+    <p> Go to: [[Dorms|SY_Hallway_Dorms]] [[Hallway|SY_Hall]]</p>
 <%}%>
 </br>There is a [[trunk|GlobalChest]] to store anything you dont want to lose. You might also change your [[Wardrobe]] and take a closer look on yourself in the [[Mirror]].
 </article><article id="LogPanel"></article></section>
@@ -30,15 +40,18 @@ function nextDng() {return("SY_Lv"+window.story.state.DngSY.dngLevel.toString())
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
 You awake in your room.
-<p class="author">Now is a good point to save.</p>
-<%if(window.story.state.DngSY.remainingNights<=0){%>
+<%if(window.story.state.DngSY.dngLevel===2 && window.gm.player.Skills.countItem('Tease')<1){%>
+    Someone slipped a note through the gap below your door: "meet me in the lab, Kumala". </br>
+    So Kumala want you to [[visit her|SA_TeaseLv1]].
+<%}else if(window.story.state.DngSY.remainingNights<=0){%>
     The thought is poking at your mind that you have to go through the portal today.</br>
     Startled you notice that Cyril is waiting in the doorframe.<span class="tNPC2">"It is time now. Meet me in the hall."</span>
+    <p> [[Get up|SY_Your_Room]]</p>
 <%}else{%>
     Cyril said that you soon have to go through the portal again and that you should prepare for that. </br>
     You can sleep <b><%=window.story.state.DngSY.remainingNights%> more nights</b> before you have to start another adventure.
+    <p> [[Get up|SY_Your_Room]]</br></p>
 <%}%>
-<p> [[Get up|SY_Your_Room]]</br></p>
 </article><article id="LogPanel"></article></section>
 
 
@@ -81,12 +94,16 @@ window.gm.printOutput(msg,'#choice');
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
 The great hall is the center of this complex. Several large pendant chandeliers spread a pleasantly bright light.</br>
-There is something like a [[Shop]] setup on one side but a sign displays: >>Closed<<.</br>
+<!--There is something like a [[Shop]] setup on one side but a sign displays: >>Closed<<.</br>-->
 </br>[[Cyril|Talk_Cyril]] is waiting idle right next to the [[impressive door|SY_Portal]] at the end of the hall.</br> 
 Speak to him to get a clue where you are heading next.</br>
-</br> On the left side of the hall a corridor is leading back to the [[dorms|SY_Your_Room]] or to the [[library|SY_Library]] if you follow it to the end.</br>
-A secluded room nearby contains a [[shrine|SY_Shrine]] where you can mediate or pray to whatever god you see fit.</br> 
-The corridor on the right side leads to the [[Training grounds|SY_Train]] and [[Laboratory|SY_Lab]].</br> 
+</br> On the left side of the hall a corridor is leading back to the [[dorms|SY_Hallway_Dorms]] or to the [[library|SY_Library]] if you follow it to the end.</br>
+<%if(window.story.state.DngSY.dngLevel>=4){%>
+    A secluded room nearby contains a [[shrine|SY_Shrine]] where you can mediate or pray to whatever god you see fit.</br>
+<%}%>
+<%if(window.story.state.DngSY.dngLevel>=2){%>
+    The corridor on the right side leads to the [[Training grounds|SA_Entry]] and [[Laboratory|SY_Lab]].</br> 
+<%}%>
 </article><article id="LogPanel"></article></section>
 
 :: SY_Library
@@ -95,7 +112,7 @@ The corridor on the right side leads to the [[Training grounds|SY_Train]] and [[
 A lot of books and scrolls are waiting for someone to read them. </br>
 You can spend some time reading, maybe you learn a spell or some ancient language. Or at least find something to distract your thoughts.</br>
 [[Browse for some food for your mind|NOP]]
-<div> [[Back|SY_Hall]] </br></div>
+<p>[[Back|SY_Hall]]</p>
 </article><article id="LogPanel"></article></section>
 <script></script>
 
@@ -106,11 +123,11 @@ TODO: soothe mind / learn arcana / learn language
 </article><article id="LogPanel"></article></section>
 <script></script>
 
-:: SY_Shrine [_back_]
+:: SY_Shrine
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 TODO: what gods?  mediation helps with? confession both to revel in your perverted thoughts?</br>
 On one side of the room a ornate chest is placed on a desk. It is used for [[donations|NOP]] to the community.</br>
-<p> [[Back|_back_]] </br></p>
+<p>[[Back|SY_Hall]]</p>
 </article><article id="LogPanel"></article></section>
 <script></script>
 
@@ -121,10 +138,18 @@ Contributing something valuable might improve your standing and secure you the b
 An improper offering on the other side could have some consequences.</br>
 Actually, your offerings might rank: damnable unworthy disappointing bad aberrant nothing low frugal good significant high enormous</br>
 Would you like to [[offer|NOP]] something?</br>
-<p> [[Back|_back_]] </br></p>
+<p> [[Back|_back_]]</p>
 </article><article id="LogPanel"></article></section>
 <script></script>
 
+:: SY_Lab 
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+This is Kumalas Laboratory. And Kitchen. </br>
+As usual she is busy on some of the retorts, concentratin on reading some recipe book and stiring a pot with a spoon in her free hand.</br> 
+Maybe you an [[ask her|NOP]] about mixing up some potions or if she needs something.</br>
+<p>[[Back|SY_Hall]]</p>
+</article><article id="LogPanel"></article></section>
 
 
 :: SY_Lv1
@@ -179,8 +204,14 @@ Your task would be to gather pages from a book called Igneum Frigus Thalamum. At
 
 :: SY_Lv5
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-
-<p> <a0 onclick='window.story.state.DngSY.dngOW=false,window.story.show("FM_Entry");'>Lets go</a></p>
+<p class="tNPC1">"I need some BogBovus from the forest. Thats a kind of mushroom, bloated with a purple bulb and yellow splotches. Please be careful when you collect it."</p>
+<p class="tPC">"Are they safe? I mean they arent poisonous or something ? "</p>
+<p class="tNPC1">"I recommend not to get in contact with the yellow splotches or the milky sap. It doesn't kill you, but it might already be uncomfortable."</p>
+<p class="tPC">"How muh do you need?"</p>
+<p class="tNPC1">"4 or 5 should be enough. Just make sure they have the right color: yellow on purple."</p>
+<p class="tNPC1">"And stay on the path. Dont wander into the muddier hollows. And stay away from the water."</p>
+<p>You wonder what water she means, last time you didnt see any water there. </p>
+<p> <a0 onclick='window.story.state.DngSY.dngOW=false,window.story.show("LB_Entry");'>Lets go</a></p>
 </article><article id="LogPanel"></article></section>
 
 

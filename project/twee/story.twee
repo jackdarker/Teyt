@@ -1,10 +1,26 @@
 :: StoryTitle
-DLCSeason
+SanctumPortal
 
 
 :: StoryData
 {
-	"ifid": "90EFC306-4C57-4786-8CD3-9789B523C8AF",
+	"ifid": "A440E3EC-8B67-4FD6-B38B-0CCB4FCD4A96",	"ifid_name":"SanctumPortal",
+	"format": "Snowman",
+	"format-version": "2.0.2",
+	"Start": "Intro",
+	"tag-colors": {
+		"template": "orange",
+		"_back_": "gray",
+		"_nosave_": "yellow",
+		"_nodeffered_": "yellow",
+		"_isdeffered_": "brown"
+	},
+	"zoom": 1
+}
+
+:: StoryData_DLCSeason
+{
+	"ifid": "90EFC306-4C57-4786-8CD3-9789B523C8AF","ifid_name":"DLCSeason",
 	"format": "Snowman",
 	"format-version": "2.0.2",
 	"Start": "Intro",

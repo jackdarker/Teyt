@@ -71,3 +71,20 @@ That didnt went as planned. That bully delivered a though blow and knocked you o
 <a0 onclick='window.gm.postDefeat();'>Black out</a>
 </article><article id="LogPanel"></article></section>
 
+:: Leon_Arrival
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+As you make your way back to your room, you run right into Cyril how is accompanied by another person.
+<p class="tNPC2">"Ah, there you are. Please welcome Leon, he is also an acolythe and I'm showing him around."</p>
+<p class="tPC">"Good afternoon Leon, I'm <%= window.gm.player.name%> and I'm seeing to work together."</p> 
+Well, actually you dont know what work that will be but whatever...</br>
+He is around your age, maybe 1 or 2 years off and looks pretty self confident and pampered.</br>
+<p class="tNPC3">"Hello <%= window.gm.player.name%>. Master Cyril is showing me around this fabolous location. I feel chosen to be in such a magical place."</p>
+<p class="tNPC3">"For sure only the best of our circle can be selected to study here and learn the ways of the temple."</p>
+<p class="tNPC3">"Just help me. I cant remember your face and name. You werent in the Aborus-course, or? "</p>
+<p class="tPC">'Uh oh. Thats not good - he could blow my cover.'</p>
+<p class="tPC">"No I was in a different course, a different part of the temple school even."</p>
+<p class="tNPC2">"I'm sorry but we really need to move on. For sure you will find time later for chit-chat."</p>
+<p class="tPC">"Yes, I'm in a hurry too."</p>
+<p class="tPC">'That was close. How am I'm going to keep my cover up?'</p>
+Continue to your [[room|SY_Your_Room]]
+</article><article id="LogPanel"></article></section>

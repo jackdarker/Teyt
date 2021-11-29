@@ -15,15 +15,15 @@ The portal drops you within a clearing of a beautiful, thriving forest.
 <script>
 function buildRooms() {
     const _m=[
-        'F2--G2--H2  I2--J2        ',
-        '    |   |       |         ',
-        'F3  G3  H3  I3  J3--K3    ',
-        '|   |   |                 ',
-        'F4--G4--H4  I4--J4--K4    ',
-        '|   |           |         ',
-        'F5  G5--H5  I5--J5--K5--L5',
-        '|   |                     ',
-        'F6--G6      I6--J6--K6--L6'];
+        'A2--B2--C2--D2--E2--F2--G2--H2  I2--J2  K2--L2 ',
+        '                        |   |   |   |   |   |  ',
+        'A3  B3--C3--D3--E3  F3  G3  H3  I3  J3--K3  L3 ',
+        '                    |   |   |   |           |   ',
+        'A4--B4--C4--D4--E4  F4--G4--H4  I4--J4--K4  L4  ',
+        '                    |   |           |       |  ',
+        'A5--B5--C5--D5--E5--F5  G5--H5  I5--J5--K5--L5',
+        '                    |   |                   |  ',
+        'A6--B6--C6--D6--E6  F6--G6      I6--J6--K6--L6'];
     let grid =[
     {room:'F2', dirs:['G2']             ,anno:['E']},
     {room:'G2', dirs:['F2','H2','G3']},
@@ -113,12 +113,58 @@ Carrying your truckload of fruits toward the laboratory, you right away run into
     </div>
     <div id='choice2c' hidden>
         <p class='tNPC1'>"Hmm, Please see me if it does cause problems."</p>
-        You are feeling somewhat nauseous now that she seemed to be worried about the wasps toxins. Maybe you should get to your [[room|SY_Your_Room]] and take a nap.</br>
+        You are feeling somewhat nauseous now that she seemed to be worried about the wasps toxins. Maybe you should get to your [[room|Leon_Arrival]] and take a nap.</br>
+            Todo TF of...
     </div>
-    Todo TF of...
 </div>
 </article><article id="LogPanel"></article></section>
 
+:: DF_Lv2_Encounters
+<script>
+function tick() {
+    let here = window.passage.name;
+    if(here===window.story.state.DngDF.tmp.tickPass) return;
+    window.story.state.DngDF.tmp.tickPass=here;
+    if(here==='MN_Lv3_I2' || here==='MN_Lv3_F2') {
+        window.gm.encounters.wolf({amount:1});
+        window.gm.Encounter.initCombat();
+    }
+}
+function fightHornet() {
+    window.gm.encounters.hornett({amount:(window.gm.player.Inv.countItem('GiantPlum')>=2)?2:1, noStart:true});
+    window.gm.Encounter.onVictory = (function(){
+        window.story.state.DngDF.plum[window.gm.player.location]=true;
+        window.gm.player.Inv.addItem(new window.gm.ItemsLib['GiantPlum']());
+        return('You defeated the angry hornet and earned that <b>juicy fruit</b>.</br> '+this.fetchLoot()+'</br>' + window.gm.printLink('Next','window.gm.postVictory()'));});
+    window.gm.Encounter.initCombat();
+}
+function fightLapine() {
+    window.gm.encounters.lapine({amount:1, noStart:true});
+    window.story.state.DngDF.lapine.met=true;
+    window.gm.Encounter.initCombat();
+}
+function fightWolf() {
+    window.gm.encounters.wolf({amount:1, noStart:true});
+    window.gm.Encounter.initCombat();
+}
+function explore() {
+    let rnd = _.random(0,100);
+    window.gm.pushLog("rolled "+rnd);
+    window.story.state.tmp.args = [];
+    if(rnd > 70 ) {
+        window.gm.encounters.huntress();
+    }else if(rnd > 50) {
+        let find = ['PurpleBerry','ApocaFlower'];
+        let rnd2 = _.random(0,find.length-1);
+        window.story.state.tmp.args = [find[rnd2],1]
+        window.story.show('ForestSearchAround');
+    }
+    else {
+        window.story.show('ForestSearchAround'); //nothing
+    }
+}
+tick();
+</script>
 
 :: DF_Lv2_F2
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
@@ -176,24 +222,7 @@ No more plums are growing on the trees here.</br>
 <%}%>
 <%=window.gm.printNav()%>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("DF_Lv2_fightHornet")%>
-
-
-:: DF_Lv2_fightHornet
-<script> function fightHornet() {
-    window.gm.encounters.hornett({amount:(window.gm.player.Inv.countItem('GiantPlum')>=2)?2:1, noStart:true});
-    window.gm.Encounter.onVictory = (function(){
-        window.story.state.DngDF.plum[window.gm.player.location]=true;
-        window.gm.player.Inv.addItem(new window.gm.ItemsLib['GiantPlum']());
-        return('You defeated the angry hornet and earned that <b>juicy fruit</b>.</br> '+this.fetchLoot()+'</br>' + window.gm.printLink('Next','window.gm.postVictory()'));});
-    window.gm.Encounter.initCombat();
-}
-function fightLapine() {
-    window.gm.encounters.lapine({amount:1, noStart:true});
-    window.story.state.DngDF.lapine.met=true;
-    window.gm.Encounter.initCombat();
-}
-</script>
+<%=window.story.render("DF_Lv2_Encounters")%>
 
 
 :: DF_Lv2_H3
@@ -213,7 +242,7 @@ No more plums are growing on the trees here.</br>
 <%}%>
 <%=window.gm.printNav()%>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("DF_Lv2_fightHornet")%>
+<%=window.story.render("DF_Lv2_Encounters")%>
 
 :: DF_Lv2_F4
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
@@ -274,7 +303,7 @@ High grass grows between sparse bushes.
 <%=window.gm.printNav()%>
 <%}%>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("DF_Lv2_fightHornet")%>
+<%=window.story.render("DF_Lv2_Encounters")%>
 
 :: DF_Lv2_H4
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
@@ -299,7 +328,7 @@ No more plums are growing on the trees here.</br>
 <%}%>
 <%=window.gm.printNav()%>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("DF_Lv2_fightHornet")%>
+<%=window.story.render("DF_Lv2_Encounters")%>
 
 :: DF_Lv2_G5
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
@@ -318,7 +347,7 @@ No more plums are growing on the trees here.</br>
 <%}%>
 <%=window.gm.printNav()%>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("DF_Lv2_fightHornet")%>
+<%=window.story.render("DF_Lv2_Encounters")%>
 
 
 :: DF_Lv2_H5

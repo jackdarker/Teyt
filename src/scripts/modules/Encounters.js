@@ -103,6 +103,21 @@ window.gm.encounters.hornett = function(params) {
     window.gm.Encounter.scenePic = window.gm.getScenePic(window.gm.Encounter.Location);
     if(!noStart) window.gm.Encounter.initCombat();
 }
+window.gm.encounters.pillRoller = function(params) {
+    var amount=(params&&params.amount)?params.amount:1, location=(params&&params.location)?params.location:window.passage.name;
+    var noStart = (params&&params.noStart)?true:false;
+    window.gm.Encounter = new Encounter();
+    window.gm.Encounter.EnemyFunc = (function() { 
+        let mobs =[];
+        for(var i=amount;i>0;i-=1) {
+            let x = window.gm.Mobs.PillRoller(); x.scaleLevel(window.gm.player.level);
+            x.name+='#'+i;mobs.push(x);
+        }
+        return(mobs);});
+    window.gm.Encounter.Location = location?location:window.passage.name;
+    window.gm.Encounter.scenePic = window.gm.getScenePic(window.gm.Encounter.Location);
+    if(!noStart) window.gm.Encounter.initCombat();
+}
 window.gm.encounters.huntress = function(params) {
     var amount=(params&&params.amount)?params.amount:1, location=(params&&params.location)?params.location:window.passage.name;
     window.gm.Encounter = new Encounter();

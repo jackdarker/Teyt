@@ -45,13 +45,13 @@ class Character {
         }
         stAgility.setup(this.Stats,10,100),stIntelligence.setup(this.Stats,10,100),stLuck.setup(this.Stats,10,100);
         stCharisma.setup(this.Stats,10,100),stPerception.setup(this.Stats,10,100),stStrength.setup(this.Stats,10,100),stEndurance.setup(this.Stats,10,100);
-        stCorruption.setup(this.Stats,0,100),stArousal.setup(this.Stats,0,100);
+        stSavageness.setup(this.Stats,0,5),stCorruption.setup(this.Stats,0,100),stArousal.setup(this.Stats,0,100);
         for(let name of stFetish.listFetish()) {
             stFetish.setup(this.Stats,0,10,name);
         }         
         this.Skills.addItem(new SkillUseItem());this.Skills.addItem(new SkillStruggle());this.Skills.addItem(new SkillAttack());
-        this.Skills.addItem(new SkillStun());this.Skills.addItem(new SkillHeal());this.Skills.addItem(new SkillTease());
-        this.Skills.addItem(new SkillFlee()),this.Skills.addItem(new SkillSubmit());    
+        //this.Skills.addItem(new SkillStun());this.Skills.addItem(new SkillHeal());this.Skills.addItem(new SkillTease()),this.Skills.addItem(new SkillSubmit());
+        this.Skills.addItem(new SkillFlee());    
         this.Effects.addItem(new effCombatRecovery());
         this.Effects.addItem(new effSpermDecay());
         window.storage.registerConstructor(Character);

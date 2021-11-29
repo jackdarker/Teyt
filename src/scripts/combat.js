@@ -86,7 +86,7 @@ hideCombatOption() {
 }
 //renders background & combatants to #canvas
 renderCombatScene() {
-  let _pos =[[0.25,0.60,1],[0.75,0.60,1],[0.50,0.40,0.80]];//sprite position & scale in % x,y,z
+  let _pos =[[0.25,0.50,1],[0.50,0.40,1],[0.75,0.50,1]];//sprite position & scale in % x,y,z
   let width=600,height=300;
   let draw = document.querySelector("#canvas svg");
   if(!draw) draw = SVG().addTo('#canvas').size(width, height);
@@ -100,11 +100,11 @@ renderCombatScene() {
       var pos = _pos.pop();
       var _pic = window.gm.images[list[i].pic]();
       var node = SVG(_pic);
-      var scaleW = node.width()/width, scaleH=node.height()/height;
-      //todo sprites should be scattered evenly and scaled down to fit into scene 
+      //sprites should be scattered evenly and scaled down to fit into scene (with respect of offset in scene)
+      var scaleW2,scaleH2,scaleW = node.width()/(width*(1-Math.abs(0.5-pos[0])*2)), scaleH=node.height()/(height*(1-Math.abs(0.5-pos[1])*2));
       if(scaleW>0.9 || scaleH>0.9 ) {
-        if(scaleW>scaleH) node.width(node.width()/(1.2*scaleW*pos[2]));
-        else node.height(node.height()/(1.2*scaleH*pos[2]));
+        if(scaleW>scaleH) node.width(node.width()/(1.2*scaleW));
+        else node.height(node.height()/(1.2*scaleH));
       }
       node.center(pos[0]*width,pos[1]*height);//reposit. AFTER scaling !
       //hide parts of sprite

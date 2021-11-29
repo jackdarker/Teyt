@@ -240,7 +240,7 @@ class FaceLeech extends BodyPart {
         return({OK:true, msg:'shifted'});
     }
     descLong(fconv) {
-        return(fconv('$[I]$ $[have]$ a muzzle like a '+this.data.style+'.'));
+        return(fconv('$[I]$ $[have]$ a mouth like a '+this.data.style+'.'));
     }
     attackMod(target){
         let mod = new SkillMod();
@@ -249,6 +249,56 @@ class FaceLeech extends BodyPart {
         } else {
             mod.onHit = [{ target:target, eff: [effDamage.factory(5,'acid')]}];
         }
+        return(mod);
+    }
+}
+class FaceInsect extends BodyPart {
+    static dataPrototype() {    
+        return({style:'wasp'});    }
+    static factory(id) {
+        let obj =  new FaceInsect();
+        obj.setStyle(id);
+        return(obj);
+    }
+    constructor() {
+        super('FaceInsect');
+        this.addTags(['body']);
+        this.slotUse = ['bFace','bMouth'];
+        this.data = FaceInsect.dataPrototype();   
+    }
+    setStyle(id) {
+        this.data.style = id;
+        switch(id) {
+            case 'wasp':
+                break;
+            case 'bug':
+                break;
+            default:
+                throw new Error("unknown Face-style "+id);
+        }
+    }
+    getStyle() { return this.data.style; }
+    get descShort() { return (this.desc);}
+    get desc() { return this.data.style+'\'like face.';}
+    toJSON() {return window.storage.Generic_toJSON("FaceInsect", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(FaceInsect, value.data));}
+    onEquip(context) {
+        let old = context.parent.Skills.countItem(SkillBite.name);
+        if(old>0) context.parent.Skills.removeItem(SkillBite.name,old);
+        context.parent.Skills.addItem(new SkillBite());
+        return({OK:true, msg:'shifted'});
+    }
+    onUnequip() {
+        let old = this.parent.parent.Skills.countItem(SkillBite.name);
+        if(old>0) this.parent.parent.Skills.removeItem(SkillBite.name,old);
+        return({OK:true, msg:'shifted'});
+    }
+    descLong(fconv) {
+        return(fconv('$[I]$ $[have]$ mandibles like a '+this.data.style+'.'));
+    }
+    attackMod(target){
+        let mod = new SkillMod();
+        mod.onHit = [{ target:target, eff: [effDamage.factory(5,'blunt')]}];
         return(mod);
     }
 }
@@ -281,6 +331,8 @@ class ArmorTorso extends BodyPart {
                 break;
             case 'fur':
                     break;
+            case 'chitin':
+                break;
             default:
                 throw new Error("unknown Armor-style "+id);
         }
@@ -303,7 +355,7 @@ class ArmorTorso extends BodyPart {
             } else if(this.data.style ==='fur') {
                 if(el.id==='ice') arm=5,rst=30;
                 if(el.id==='blunt') arm=5,rst=20;
-            } else if(this.data.style ==='scales') {
+            } else if(this.data.style ==='scales' || this.data.style ==='chitin') {
                 if(el.id==='ice') rst=-30;
                 if(el.id==='slash') arm=5,rst=20;
             }
@@ -905,6 +957,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(HandsPaw);
     window.storage.registerConstructor(FaceHorse);
     window.storage.registerConstructor(FaceHuman);
+    window.storage.registerConstructor(FaceInsect);
     window.storage.registerConstructor(FaceLeech);
     window.storage.registerConstructor(FaceWolf);
     window.storage.registerConstructor(SkinHuman);

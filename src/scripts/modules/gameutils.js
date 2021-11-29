@@ -156,6 +156,8 @@ window.gm.initGameFlags = function(forceReset,NGP=null) {
       remainingNights: 0,
       dngLevel: 1, //tracks the mainquest you have finished
       dngOW: false, //if this flag is set while in dng, player is here for some freeplay (no quest)  
+      dildo:0, //1 small oraltraining,
+      pussy:0,
       visitedTiles: [],mapReveal: [],
       dng:'', //current dungeon name
       dngMap:{} //dungeon map info
@@ -187,8 +189,7 @@ window.gm.initGameFlags = function(forceReset,NGP=null) {
   }
   let DngCV = {
     visitedTiles: [],mapReveal: [],
-    bathedInLake:0,
-    gotWater:0
+    tmp: {}
   }
   let DngMN = {
     visitedTiles: [],mapReveal: [],
@@ -226,6 +227,8 @@ window.gm.getScenePic = function(id){
   if(id==='Garden' || id ==='Park')   return('assets/bg/bg_park.png');
   if(id==='Bedroom' || id==='Your Bedroom')   return('assets/bg/bg_bedroom.png');
   if(id.slice(0,7)==='AM_Lv2_') return('assets/bg/bg_dungeon_2.png');
+  if(id.slice(0,9)==='CV_Lv1_I3') return('assets/bg/bg_cave_4.png');
+  if(id.slice(0,7)==='CV_Lv1_') return('assets/bg/bg_cave_2.png');
   return('assets/bg_park.png')//return('assets/bg/bg_VR_1.png');//todo placehodler
 }
 window.gm.enterVR=function() {
@@ -503,7 +506,8 @@ window.gm.printMap2=function(dng,playerTile,reveal,visitedTiles) {
       }
     }
   }
- node.addTo(draw);
+  node.text(function(add) {add.tspan(dng.legend||'')}).addClass('textLabel').ax(0).ay(0);
+  node.addTo(draw);
 }
 //display svg
 window.gm.printSceneGraphic2=function(background,item) {

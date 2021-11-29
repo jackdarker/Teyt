@@ -61,9 +61,9 @@ As you look around for possible sources of income, e.g. stuff that someone carel
 There you see interesting items - interesting for you because they look valuable and could easily be hidden in your pockets. </br>
 But the first thing you grab is a monk's robe drying on the line. That coarse cloak should help you to move through the temple without arousing suspicion.</br> 
 As you secure one shiny gadget, you trigger some magic anomaly... </br></p>
-<p><a0 onclick='start();'>That magic portal sucks you right in...wush</a></p>
+<p><a0 onclick='start();'>That magic portal sucks you right in...wush</a></p><hr>
 There are also some options to make a fastforward (might behave oddly): </br>
-...nothing right now...
+[[FF Endgame]]
 </article>
 <script> function start() {
     window.story.state.DngSY.remainingNights=1;
@@ -71,7 +71,23 @@ There are also some options to make a fastforward (might behave oddly): </br>
     window.gm.enterVR();
     //window.gm.MutationsLib['swapGender'](window.gm.player,window.storage.constructors["VulvaHuman"]);
     window.gm.player.levelUp(5);window.gm.player.autoLeveling();
-    window.story.state.DngSY.dngLevel=2;//todo
+    window.story.state.DngSY.dngLevel=1;//todo
+}
+</script>
+
+:: FF Endgame
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+This is for testing purpose with some configurable settings.
+<div></br>[[Back|Intro]] <a0 onclick='start();'>Start</a></br></div>
+</article><article id="LogPanel"></article></section>
+<script> function start() {
+    window.story.state.DngSY.remainingNights=1;
+    window.story.state.vars.spawnAt="SY_Your_Room";
+    window.gm.enterVR();
+    //window.gm.MutationsLib['swapGender'](window.gm.player,window.storage.constructors["VulvaHuman"]);
+    window.gm.player.levelUp(5);window.gm.player.autoLeveling();
+    window.gm.player.Stats.increment(stSavagenessMax.id,100);
+    window.story.state.DngSY.dngLevel=10;//todo
 }
 </script>
 
