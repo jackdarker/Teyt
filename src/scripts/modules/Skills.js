@@ -194,7 +194,7 @@ class SkillSting extends SkillAttack {
         let attack =window.gm.combat.defaultAttackData();
         let weapon=this.caster.Outfit.getItemForSlot(this.data.weapon);
         attack.mod= new SkillMod();
-        if(weapon && weapon.attackMod) { //get teeth damage info
+        if(weapon && weapon.attackMod) { //get damage info
             attack.mod=weapon.attackMod(target);
         }
         return(attack);
@@ -684,10 +684,45 @@ class SkillGuard extends Skill {
             result.OK = true;
             for(var target of targets) {
                 result.effects.push( {target:target,
-                    eff:[effGuard.factory(10*(1+this.style),this.style*20,this.style)]})
+                    eff:[effGuard.factory(10*(1+this.style),this.style*20,this.style)]});
             }
         }
         return result
+    }
+}
+class SkillFly extends Skill {
+    constructor() {
+        super();
+        this.id=this.name='Fly'
+        this.msg = '';
+        this.cost.energy =20;
+    }
+    toJSON() {return window.storage.Generic_toJSON("SkillFly", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillFly, value.data));}
+    targetFilter(targets){
+        return(this.targetFilterSelf(targets));
+    }
+    isActive() {
+        let res={OK:false,msg:''};
+        res.OK = (this.parent.parent.Effects.countItem(effFlying.name)>0);
+        return (res);
+    }
+    get desc() { return((!this.isActive().OK)?"Fly around to increase dodge chance. "+this.getCost().asText():'Stop flying.');}
+    //onCombatStart(){} Todo birds start combat flying
+    previewCast(targets){
+        var result = new SkillResult()
+        result.skill =this;
+        result.source = this.caster;
+        result.targets = targets;
+        if(this.isValidTarget(targets)) {
+            result.OK = true;
+            var target = targets[0];
+            result.effects.push( {target:target, eff:[new effFlying()]});
+        }
+        return result
+    }
+    getCastDescription(result) {
+        return(this.msg);
     }
 }
 class SkillUseItem extends Skill {

@@ -73,7 +73,6 @@ class Wolf extends Mob {
         this.Outfit.addItem(TailWolf.factory('wolf'));
         this.Outfit.addItem(FaceWolf.factory('wolf'));
         this.Stats.increment('arm_blunt',5);
-        this.fconv = null; //lazy init because descfixer depends on gm.player
     }
     calcCombatMove(enemys,friends){
         let result = {OK:true,msg:''};//this._canAct();
@@ -110,7 +109,6 @@ class Slug extends Mob {
         this.Outfit.addItem(new BaseWorm());
         this.Outfit.addItem(FaceLeech.factory('slug')); 
         this.Outfit.addItem(ArmorTorso.factory('slime'));
-        this.fconv = null;
     }
     calcCombatMove(enemys,friends){
         let result = {OK:true,msg:''};
@@ -144,7 +142,6 @@ class Leech extends Mob {
         this.Outfit.addItem(FaceLeech.factory('leech'));
         this.Skills.addItem(new SkillLeechHealth());
         this.tmp = {grappleCoolDown:1};
-        this.fconv = null; //lazy init because descfixer depends on gm.player
     }
     calcCombatMove(enemys,friends){
         let result = {OK:true,msg:''};
@@ -444,6 +441,41 @@ class Mechanic extends Mob {
         return(super.calcCombatMove(enemys,friends));
     }
 }
+class Hawk extends Mob {
+    static factory(type) {
+        let foe = new Hawk();
+        return foe;
+    }
+    constructor() {
+        super();
+        this.name = this.id = 'Hawk';
+        this.pic= 'Hawk1';
+        this.level_min =1;
+        this.Outfit.addItem(new BaseBiped());
+        this.Outfit.addItem(new ArmorTorso('feathers'));
+        this.Outfit.addItem(new SkinFeathers('hawk'));
+        this.Outfit.addItem(new FaceBird('hawk'));
+        this.Outfit.addItem(Wings.factory('feathered'));
+        this.Outfit.addItem(PenisHuman.factory('bird'));
+        this.Outfit.addItem(AnusHuman.factory('bird'));
+    }
+    calcCombatMove(enemys,friends){
+        let result = {OK:true,msg:''};
+        let rnd = _.random(1,100);
+        if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
+        result.action =result.target= null;
+        if(this.id === 'Hawk') {
+            let skill= 'Fly';
+            if(this.Skills.getItem(skill).isEnabled().OK && !this.Skills.getItem(skill).isActive().OK){
+                result.action = skill;
+                result.target = [this];
+                result.msg =this.fconv(result.target[0].name + " starts flying.</br>")+result.msg;
+                return(result);
+            }
+        } 
+        return(super.calcCombatMove(enemys,friends));
+    }
+}
 class Hornett extends Mob {
     static factory(type) {
         let foe = new Hornett();
@@ -452,6 +484,7 @@ class Hornett extends Mob {
             foe.pic= 'PillRoller1';
         } else if(type==='Hornett') {
             foe.Outfit.addItem(WeaponStinger.factory('wasplike'));
+            foe.Outfit.addItem(Wings.factory('chitinous'));
         }
         return foe;
     }
@@ -460,11 +493,9 @@ class Hornett extends Mob {
         this.name = this.id = 'Hornett';
         this.pic= 'wasp1';
         this.level_min =1;
-        this.Outfit.addItem(new BaseWasp());
+        this.Outfit.addItem(new BaseInsect());
         this.Outfit.addItem(new ArmorTorso('chitin'));
         this.Outfit.addItem(new FaceInsect('wasp'));
-        
-        this.fconv = null; //lazy init because descfixer depends on gm.player
     }
     calcCombatMove(enemys,friends){
         let result = {OK:true,msg:''};
@@ -472,15 +503,21 @@ class Hornett extends Mob {
         if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
         result.action =result.target= null;
         if(this.id === 'Hornett') {
-            let sting= 'wasp-stinger';
-            if(this.Skills.getItem(sting).isEnabled().OK){
+            let skill= 'Fly';
+            if(this.Skills.getItem(skill).isEnabled().OK && !this.Skills.getItem(skill).isActive().OK){
+                result.action = skill;
+                result.target = this;
+                result.msg =this.fconv(result.target[0].name + " starts flying.</br>")+result.msg;
+                return(result);
+            }
+            skill= 'wasp-stinger';
+            if(this.Skills.getItem(skill).isEnabled().OK){
                 rnd = _.random(0,enemys.length-1);
-                result.action = sting;
+                result.action = skill;
                 result.target = [enemys[rnd]];
                 result.msg =this.fconv("$[I]$ thrust $[my]$ stinger at "+result.target[0].name+".</br>")+result.msg;
                 return(result);
             }
-        } else {
         } 
         return(super.calcCombatMove(enemys,friends));
     }
@@ -540,6 +577,7 @@ window.gm.Mobs = (function (Mobs) {
     Mobs.Lapine = Lapine.factory;
     Mobs.Mole = Mole.factory;
     Mobs.Squirrel = function() { return function(param){return(Mole.factory(param));}("Squirrel")};
+    Mobs.Hawk = function() { return function(param){return(Hawk.factory(param));}("Hawk")};
     Mobs.Hornett = function() { return function(param){return(Hornett.factory(param));}("Hornett")};
     Mobs.PillRoller = function() { return function(param){return(Hornett.factory(param));}("PillRoller")};
     Mobs.Huntress = Huntress.factory;

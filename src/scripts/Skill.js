@@ -88,6 +88,13 @@ isEnabled() {
     return (res);
 }
 /**
+ * returns if the skill is already acitvated, e.g. energy-shield
+ *
+ * @return {*} 
+ * @memberof Skill
+ */
+isActive() {return ({OK:false,msg:''});}
+/**
  *
  *
  * @memberof Skill
@@ -126,9 +133,9 @@ getName(){
     //returns name of the skill for listboxes/labels"""
     return this.name;
 }
-getCastDescription(result) {
+getCastDescription(castPreview) {
     //update msg after sucessful cast
-    return(this.caster.name +" uses "+ this.name +" on " + result.targets[0].name+".");
+    return(this.caster.name +" uses "+ this.name +" on " + castPreview.targets[0].name+".");
 }
 previewCast(target){
     var result = new SkillResult();

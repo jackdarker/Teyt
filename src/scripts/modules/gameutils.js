@@ -99,6 +99,10 @@ window.gm.initGame= function(forceReset,NGP=null) {
         ch.Skills.addItem(new SkillUltraKill());
         ch.Skills.addItem(SkillCallHelp.factory('Wolf'));
         ch.Skills.addItem(SkillDetermined.factory());
+        ch.Skills.addItem(new SkillStun());
+        ch.Skills.addItem(new SkillHeal());
+        ch.Skills.addItem(new SkillTease());
+        ch.Skills.addItem(new SkillSubmit());
       }
       s.PlayerVR=ch;
     }
@@ -149,9 +153,13 @@ window.gm.initGame= function(forceReset,NGP=null) {
 window.gm.initGameFlags = function(forceReset,NGP=null) {
   let s= window.story.state;
   if (forceReset) {  
-    s.DngCV =s.DngDF = s.DngAM= s.DngSY=s.DngMN=s.DngAT=null; 
+    s.Settings=s.DngCV =s.DngDF = s.DngAM= s.DngSY=s.DngMN=s.DngAT=null; 
     s.DngFM=s.DngSC=s.DngLB=null;
   }
+  let Settings = {
+    showCombatPictures:true,
+    showNSFWPictures:true
+  };
   let DngSY = {
       remainingNights: 0,
       dngLevel: 1, //tracks the mainquest you have finished
@@ -161,41 +169,42 @@ window.gm.initGameFlags = function(forceReset,NGP=null) {
       visitedTiles: [],mapReveal: [],
       dng:'', //current dungeon name
       dngMap:{} //dungeon map info
-  }
+  };
   let DngAM = {
       visitedTiles: [],mapReveal: []
-  }
+  };
   let DngAT = {
     visitedTiles: [],mapReveal: [],
     tmp: {}
-  }
+  };
   let DngDF = {
     visitedTiles: [],mapReveal: [],
     plum:{}, //which plums got collected
     lapine:{},
     tmp:{}
-  }
+  };
   let DngFM = {
     visitedTiles: [],mapReveal: [],
     tmp: {}
-  }
+  };
   let DngLB = {
     visitedTiles: [],mapReveal: [],
     tmp: {}
-  }
+  };
   let DngSC = {
     visitedTiles: [],mapReveal: [],
     tmp: {}
-  }
+  };
   let DngCV = {
     visitedTiles: [],mapReveal: [],
     tmp: {}
-  }
+  };
   let DngMN = {
     visitedTiles: [],mapReveal: [],
     page:{} //which bookpages got collected
-}
+  };
   //see comment in rebuildFromSave why this is done
+  s.Settings=window.gm.util.mergePlainObject(Settings,s.Settings);
   s.DngDF=window.gm.util.mergePlainObject(DngDF,s.DngDF);
   s.DngAM=window.gm.util.mergePlainObject(DngAM,s.DngAM);
   s.DngSY=window.gm.util.mergePlainObject(DngSY,s.DngSY);

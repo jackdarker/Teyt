@@ -70,6 +70,15 @@ function tick() {
         window.gm.Encounter.initCombat();
     }
 }
+function fightHawk() {
+    window.gm.encounters.hawk({amount:1, noStart:true});
+    window.gm.Encounter.onVictory = (function(){
+        window.story.state.DngMN.tmp.page[window.gm.player.location]=true;
+        window.gm.player.Inv.addItem(new window.gm.ItemsLib['"IgneumPage"']());
+        return('After getting rid of that huge hawk, that <b>book page</b> is yours.</br> '+this.fetchLoot()+'</br>' + window.gm.printLink('Next','window.gm.postVictory()'));});
+
+    window.gm.Encounter.initCombat();
+}
 function fightWolf() {
     window.gm.encounters.wolf({amount:1, noStart:true});
     window.gm.Encounter.initCombat();
@@ -119,16 +128,13 @@ A large nest is enthroned on a rocky peak that protrudes from the rock face a fe
 <p class="tPC">"Oh my thats quite a big collection of sticks up there."</p>
 <%if(!window.story.state.DngMN.tmp.page['MN_Lv3_I5']){%>
 <div id='select5'>
-<a0 onclick='window.story.state.DngMN.tmp.page[window.gm.player.location]=true;window.gm.player.Inv.addItem(new window.gm.ItemsLib["IgneumPage"]());window.gm.printTalkLink("div#select5","div#choice5a")'>Grab the page</a></br>
-</div><div id='choice5a' hidden> You've got the page. Now just get away from here before the owner of this aerie appears.
-    <div id='select10' >
-    <a0 onclick='window.gm.printTalkLink("div#select10","div#choice10a")'>Leave</a></br>
-    </div><div id='choice10a' hidden></br>
-    </div>
+<a0 onclick='window.gm.printTalkLink("div#select5","div#choice5a")'>Grab the page</a></br>
+</div><div id='choice5a' hidden> Just as you are fishing among the branches for the paper, the owner of the nest appears. It is a hawk, but with a wingspan of easily 3m.
+    <a0 onclick='fightHawk()'>Defend yourself</a></br>
 </div>
 <%}else{%><%=window.gm.printNav()%><%}%>
 </article><article id="LogPanel"></article></section>
-
+<%=window.story.render("MN_Lv3_Encounters")%>
 
 :: MN_Lv3_F2
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>

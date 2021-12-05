@@ -16,9 +16,11 @@ Do some hands on combat in the [[arena|NOP]].</br>
 A door is leading from the fortress into a circular arena that reminds you of a giant bowl.</br> 
 That place is also open to the sky that is curently light blue except where some fluffy louds are floating.</br>
 Because a high stonewall is surrounding the outer ring, you cant see what is below the horizon.</br>
-<a0 onclick=''>lapine-"Training"</a></br>
-<a0 onclick=''>wolf-"Training"</a></br>
-<a0 onclick=''>lizan-"Training"</a></br>
+<a0 onclick='' hidden>hawk-"Training"</a></br>
+<a0 onclick='' hidden>hornett-"Training"</a></br>
+<a0 onclick='' hidden>lapine-"Training"</a></br>
+<a0 onclick='' hidden>lizan-"Training"</a></br>
+<a0 onclick='' hidden>wolf-"Training"</a></br>
 <p>[[Back|SY_Hall]]</p>
 </article><article id="LogPanel"></article></section>
 
@@ -152,11 +154,51 @@ Consumes some energy, progress is capped
 :: SA_Train_Oral_Leon
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
-Later on, you walk by Leons room and some muffled squelches are coming from his room.
+Later on, you through the dorms hallway and some muffled squelches are coming from his room.
 [[sneak a peek]][[Nah]]
 Leon is lying on his bed and is busy lavishing that artifical vulva with his tongue.
+[[retreat]][[wait]]
+He suddenly shifts his cloth aside and you notice his hardon.
+"I will show ya where that cunt belongs" he mumbles to himself and impales the artifical vulva with his manmeat
+"Oh yes, nice and wet."
+You get aroused at the sight.
+[[retreat !]][[wait]]
+When you realize that you are still here and spying on a lad masturbating, you ask yourself 'Am I pervert?'
+Maybe you just want to know how he performs - just for comparission of course. 
+Your thoughts are interuppted as you hear a frantic "yes mmh yes, take it baby.." 
+With eager bucks of his hips he fires his load into the artifical pussy.
+[[better leave now before he notice]]
+Kumala will not be pleased if she ever got a hint on that. But you can't tell her without giving away that you were watching the lad rubbing one of.
 </article><article id="LogPanel"></article></section>
 
+:: SA_OralLv2
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+<p class="tNPC1">"Whats that!"</p> Leon blushs furiously as Kumala inspects the tool.
+<p class="tNPC3">"I couldnt resist, it was just to big of a tease."</p>
+<p class="tNPC1">"And you didnt even care to clean it properly."</p>
+<p class="tNPC3">"I tried but its a blind hole and some...some of it got stuck down there."</p>
+<p class="tNPC3">"Thats your excuse? You will clean that!"</p> annoyed she pushs the tool back into his hands.
+<p class="tNPC1">"Yes maam"</p> intimidated as he is by Kumala's appearance you could almost feel sorry for him - almost.
+<p class="tNPC1">"I said clean it - now!"</p>
+<p class="tNPC3">"What...how?"</p> he asks confused.
+<p class="tNPC1">"Use your mouth and your tongue. Suck it if you cant reach that far."</p>
+<p class="tNPC1">"Thats what you should have trained anyway. Now you are going to learn the hard way."</p>
+<p class="tNPC3">"Can...can he at least leave?"</p> 
+<p class="tPC">"No, thats a lesson for both of you."</p>
+[[Look away]] [[watch]] [[smirk at his predicament]]
+<p class="tNPC1">"What are you grinning at? Do you think I'm funny?"</p>
+<p class="tPC">"No,.."</p> you shake your head.
+<p class="tNPC1">"Maybe you need a lesson too. You both are going to switch turns."</p>
+<p class="tPC">"What ? I cant...with my mouth...his spunk...."</p>
+<p class="tNPC1">"You can and you will!"</p>
+She snatches the pussy from Leons hands and presents you the opening.
+[[start working]]
+You take the toy and hesitantly give it a lick that makes you shudder.
+<p class="tNPC1">"Whenever one of you has to catch their breath, the other takes over."</p>
+<p class="tPC">'What is she doing to us? At least Cyril doesnt see this. I couldnt look him in the eyes. Kumala isnt going to tell him, right?'</p>
+PussyLover++ CumSlurper++
+</article><article id="LogPanel"></article></section>
 
 :: SA_Train_OralLv1
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
@@ -171,3 +213,11 @@ Why would you put that thing in your mouth? It is so silly, maybe its just some 
 </div>
 </br><p> <a0 onclick='window.story.show("SY_Your_Room");'>Start</a></p>
 </article><article id="LogPanel"></article></section>
+
+
+:: SA_Train_Parcour
+Cyril has setup a course with obstacles for your training. This should help you train your agility and endurance.
+---
+You are still equipped with the plugs and the bondage restraints. "Sir please I cant do this. Its to difficult with...with all that." you let your chaines chime.
+"And thatswhy you need to train. You can't expect that you'll always be in the most favorable circumstances."
+The parcours is a pain in the ass -literary - The plug is already noticeable when walking but if you then still have to cope with the obstacles...

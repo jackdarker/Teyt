@@ -1,7 +1,6 @@
 "use strict"
 
 /* Todo:
-- wings (insect, leathery, feathered )
 - feet (talons, paws, hooves)
 - horns (antlers, goat)
 - ears
@@ -28,15 +27,25 @@ class BodyPart extends Equipment {
         return(window.gm.util.formatNumber(bodysize,2)+"m");
     }
 }
-class BaseHumanoid extends BodyPart {
+class BaseBiped extends BodyPart {
     constructor() {
-        super('BaseHumanoid');
+        super('BaseBiped');
         this.data = {maxGrowth:1.8,growth:1};
         this.addTags(['body']);this.slotUse = ['bBase'];
     }
-    descLong(fconv) {return(fconv('$[My]$ body is that of an human, around '+this.sizeString(1)+' in size.'));}
+    descLong(fconv) {return(fconv('$[I]$ $[have]$ two legs and $[walk]§ upright at a bodysize of around '+this.sizeString(1)+'.'));}
     get descShort() {return this.desc;};
     get desc() { return '';}
+    toJSON() {return window.storage.Generic_toJSON("BaseBiped", this); };
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(BaseBiped, value.data));}
+}
+class BaseHumanoid extends BaseBiped {
+    constructor() {
+        super();
+        this.id = this.name = 'BaseHumanoid';
+        this.data = {maxGrowth:1.8,growth:1};
+    }
+    descLong(fconv) {return(fconv('$[My]$ body is that of an human, around '+this.sizeString(1)+' in size.'));}
     toJSON() {return window.storage.Generic_toJSON("BaseHumanoid", this); };
     static fromJSON(value) {return(window.storage.Generic_fromJSON(BaseHumanoid, value.data));}
 }
@@ -64,16 +73,16 @@ class BaseWorm extends BodyPart {
     static fromJSON(value) {return(window.storage.Generic_fromJSON(BaseWorm, value.data));}
     descLong(fconv) {return(fconv('$[I]$ $[am]$ wriggling around like a snake.'));}
 }
-class BaseWasp extends BodyPart {
+class BaseInsect extends BodyPart {
     constructor() {
-        super('BaseWasp');
+        super('BaseInsect');
         this.data = {maxGrowth:0.3,growth:1};
         this.addTags(['body']);this.slotUse = ['bBase'];
     }
     get descShort() {return this.desc;};
     get desc() { return '';}
-    toJSON() {return window.storage.Generic_toJSON("BaseWasp", this); };
-    static fromJSON(value) {return(window.storage.Generic_fromJSON(BaseWasp, value.data));}
+    toJSON() {return window.storage.Generic_toJSON("BaseInsect", this); };
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(BaseInsect, value.data));}
     descLong(fconv) {return(fconv('$[My]$ body is like that of an insect.'));}
 }
 class FaceHuman extends BodyPart {
@@ -302,6 +311,56 @@ class FaceInsect extends BodyPart {
         return(mod);
     }
 }
+class FaceBird extends BodyPart {
+    static dataPrototype() {    
+        return({style:'hawk'});    }
+    static factory(id) {
+        let obj =  new FaceBird();
+        obj.setStyle(id);
+        return(obj);
+    }
+    constructor() {
+        super('FaceBird');
+        this.addTags(['body']);
+        this.slotUse = ['bFace','bMouth'];
+        this.data = FaceBird.dataPrototype();   
+    }
+    setStyle(id) {
+        this.data.style = id;
+        switch(id) {
+            case 'wasp':
+                break;
+            case 'bug':
+                break;
+            default:
+                throw new Error("unknown Face-style "+id);
+        }
+    }
+    getStyle() { return this.data.style; }
+    get descShort() { return (this.desc);}
+    get desc() { return this.data.style+'\'like face.';}
+    toJSON() {return window.storage.Generic_toJSON("FaceBird", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(FaceBird, value.data));}
+    onEquip(context) {
+        let old = context.parent.Skills.countItem(SkillBite.name);
+        if(old>0) context.parent.Skills.removeItem(SkillBite.name,old);
+        context.parent.Skills.addItem(new SkillBite());
+        return({OK:true, msg:'shifted'});
+    }
+    onUnequip() {
+        let old = this.parent.parent.Skills.countItem(SkillBite.name);
+        if(old>0) this.parent.parent.Skills.removeItem(SkillBite.name,old);
+        return({OK:true, msg:'shifted'});
+    }
+    descLong(fconv) {
+        return(fconv('$[I]$ $[have]$ a beak like a '+this.data.style+'.'));
+    }
+    attackMod(target){
+        let mod = new SkillMod();
+        mod.onHit = [{ target:target, eff: [effDamage.factory(5,'blunt')]}];
+        return(mod);
+    }
+}
 /**
  * natural Armor for creatures not using gear
  *
@@ -330,8 +389,10 @@ class ArmorTorso extends BodyPart {
             case 'slime':
                 break;
             case 'fur':
-                    break;
+                break;
             case 'chitin':
+                break;
+            case 'feathers':
                 break;
             default:
                 throw new Error("unknown Armor-style "+id);
@@ -343,7 +404,7 @@ class ArmorTorso extends BodyPart {
     toJSON() {return window.storage.Generic_toJSON("ArmorTorso", this); };
     static fromJSON(value) {return(window.storage.Generic_fromJSON(ArmorTorso, value.data));}
     descLong(fconv) {
-        return(fconv('$[My]$ body is covered with '+this.data.style+' .'));
+        return(fconv('$[My]$ body is covered with '+this.data.style+'.'));
     }
     onEquip(context) {
         let arm,rst;
@@ -352,7 +413,7 @@ class ArmorTorso extends BodyPart {
             if(this.data.style ==='slime') {
                 if(el.id==='fire' || el.id==='poison' || el.id==='acid') arm=5,rst=70;
 
-            } else if(this.data.style ==='fur') {
+            } else if(this.data.style ==='fur' || this.data.style ==='feathers') {
                 if(el.id==='ice') arm=5,rst=30;
                 if(el.id==='blunt') arm=5,rst=20;
             } else if(this.data.style ==='scales' || this.data.style ==='chitin') {
@@ -501,6 +562,40 @@ class SkinFur extends BodyPart {
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkinFur, value.data));}
     descLong(fconv) {
         return(fconv('A '+this.data.pattern+', '+this.data.color+' fur covers $[my]$ body.'));
+    }
+}
+class SkinFeathers extends BodyPart {
+    static dataPrototype() {    
+        return({style:'bird', color:'dark grey', pattern: 'smooth'}); }
+    static factory(id) {
+        let obj =  new SkinFeathers();
+        obj.setStyle(id);
+        return(obj);
+    }
+    constructor() {
+        super('SkinFeathers');
+        this.addTags(['body']);
+        this.slotUse = ['bSkin'];
+        this.data = SkinFeathers.dataPrototype();
+    }
+    setStyle(id,color='dark grey') {
+        this.data.style = id; 
+        this.data.color = color;
+        switch(id) {
+            case 'bird','hawk':
+                this.data.pattern = 'fine';
+                break;
+            default:
+                throw new Error("unknown Feather-style "+id);
+        }
+    }
+    getStyle() { return this.data.style; }
+    get descShort() { return (this.desc);}
+    get desc() { 'a fine coat of feathers cover the body.';} 
+    toJSON() {return window.storage.Generic_toJSON("SkinFeathers", this); };
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(SkinFeathers, value.data));}
+    descLong(fconv) {
+        return(fconv('A '+this.data.pattern+', '+this.data.color+' layer of feathers covers $[my]$ body.'));
     }
 }
 class SkinScales extends BodyPart {
@@ -721,6 +816,56 @@ class HandsHuman extends BodyPart { //hands with digits to use tools
         return(fconv(msg));
     }
 }
+class Wings extends BodyPart { //wings attached to back or as arms  <- todo
+    static dataPrototype() {    
+        return({style:'feathered', size:1}); 
+        //todo flight-skill depends on wing-to-body-size; 1=can fly permanently, <0.5 cant fly, >1.5 can fly fast
+    }
+    static factory(id) {
+        let obj =  new Wings();
+        obj.setStyle(id);
+        return(obj);
+    }
+    constructor() {
+        super('Wings');
+        this.addTags(['body']);
+        this.slotUse = ['bWings'];
+        this.data = Wings.dataPrototype();
+    }
+    setStyle(id) {
+        this.data.style = id; 
+        switch(id) {
+            case 'chitinous':
+                break;
+            case 'leathery':
+                break;
+            case 'feathered':
+                break;
+            default:
+                throw new Error("unknown Wings-style "+id);
+        }
+    }
+    getStyle() { return this.data.style; }
+    get descShort() { return (this.desc);}
+    get desc() { return (this.data.style+' wings.');}
+    toJSON() {return window.storage.Generic_toJSON("Wings", this); };
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(Wings, value.data));}
+    descLong(fconv) { 
+        let msg = 'A pair of '+this.data.style+' wings are located on $[my]$ back.';
+        return(fconv(msg));
+    }
+    onEquip(context) {
+        let old = context.parent.Skills.countItem(SkillFly.name);
+        if(old>0) context.parent.Skills.removeItem(SkillFly.name,old);
+        context.parent.Skills.addItem(new SkillFly());
+        return({OK:true, msg:'shifted'});
+    }
+    onUnequip() {
+        let old = this.parent.parent.Skills.countItem(SkillFly.name);
+        if(old>0) this.parent.parent.Skills.removeItem(SkillFly.name,old);
+        return({OK:true, msg:'shifted'});
+    }
+}
 class BreastHuman extends BodyPart {
     static dataPrototype() {    
         return({style:'human',growth:0.1, maxGrowth: 1.5});
@@ -781,6 +926,7 @@ class AnusHuman extends BodyPart {
         this.data.style = id;
         switch(id) {
             case 'human':
+            case 'bird':
             case 'cat':
             case 'dog':
             case 'horse':
@@ -839,6 +985,7 @@ class VulvaHuman extends BodyPart {
         this.data.style = id;
         switch(id) {
             case 'human':
+            case 'bird':
             case 'cat':
             case 'dog':
             case 'horse':
@@ -908,6 +1055,7 @@ class PenisHuman extends BodyPart {
         this.data.style = id;
         switch(id) {
             case 'human':
+            case 'bird':    //todo split this in different classes?
             case 'cat':
             case 'dog':
             case 'horse':
@@ -939,7 +1087,11 @@ class PenisHuman extends BodyPart {
     canUnequip() {return({OK:true, msg:'unequipable'});}
     descLong(fconv) {
         let msg= "$[My]$ "+this.data.style+"-dong is around "+this.sizeString(this.data.growth*this.data.maxGrowth)+" long.";
-        msg+= "A Ballsack dangles below it that measures around "+this.data.ballsize+"cm.";   
+        if(this.data.style==='lizard' || this.data.style==='bird') {
+            msg+= "The testicles are hidden inside the body but might be around "+this.data.ballsize+"cm.";
+        } else {
+            msg+= "A Ballsack dangles below it that measures around "+this.data.ballsize+"cm.";   
+        }
         return(fconv(msg));
     }
 }
@@ -948,18 +1100,21 @@ window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(AnusHuman);
     window.storage.registerConstructor(ArmorTorso);
     window.storage.registerConstructor(WeaponStinger);
+    window.storage.registerConstructor(BaseBiped);
     window.storage.registerConstructor(BaseHumanoid);
     window.storage.registerConstructor(BaseQuadruped);
-    window.storage.registerConstructor(BaseWasp);
+    window.storage.registerConstructor(BaseInsect);
     window.storage.registerConstructor(BaseWorm);
     window.storage.registerConstructor(HandsHoof);
     window.storage.registerConstructor(HandsHuman);
     window.storage.registerConstructor(HandsPaw);
+    window.storage.registerConstructor(FaceBird);
     window.storage.registerConstructor(FaceHorse);
     window.storage.registerConstructor(FaceHuman);
     window.storage.registerConstructor(FaceInsect);
     window.storage.registerConstructor(FaceLeech);
     window.storage.registerConstructor(FaceWolf);
+    window.storage.registerConstructor(SkinFeathers);
     window.storage.registerConstructor(SkinHuman);
     window.storage.registerConstructor(SkinFur);
     window.storage.registerConstructor(SkinScales);
@@ -967,5 +1122,6 @@ window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(BreastHuman);
     window.storage.registerConstructor(PenisHuman);
     window.storage.registerConstructor(VulvaHuman);
+    window.storage.registerConstructor(Wings);
     return ItemsLib; 
 }(window.gm.ItemsLib || {}));

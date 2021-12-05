@@ -9,6 +9,7 @@ class Mob extends Character {
         this.levelUp(1);
         this.autoLeveling();
         this.despawn=false;
+        this.fconv = null; //lazy init because descfixer depends on gm.player
     }
     //override to return the next move to execute
     //OK = false if no action, else true

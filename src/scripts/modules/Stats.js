@@ -428,14 +428,22 @@ class stFetish extends Stat {
         _stat.Calc();
     }
     static listFetish() {
-        let list = [
+        let list = [/*
         'ftZoophil',
         'ftBondage',
         'ftDominant',
         'ftSubmissive',
-        'ftreceiveAnal',
-        'ftgiveAnal',
-        'ftExhibition'];
+        'ftAnalLover',
+        'ftAnalSlut',
+        'ftVaginalLover',
+        'ftVaginalSlut',
+        'ftOralLover',
+        'ftOralSlut',
+        'ftCumSlurper',
+        'ftEggSlut',
+        'ftMasochist',
+        'ftSadist',
+        'ftExhibition'  */];
         return(list);
     }
     constructor() {   super();  }
@@ -542,7 +550,7 @@ class effTired extends Effect {
             return(function(me){
                 return (function(Effects){ 
                 var newdata =new effNotTired(); Effects.replace(me.data.id,newdata);});
-                }(this));
+            }(this));
         }
         if(neweffect.name===this.data.name) {
             //just ignore
@@ -1468,6 +1476,31 @@ class effStunned extends CombatEffect {
         return({OK:true,msg:''});
     }
 } 
+class effFlying extends CombatEffect {
+    constructor() {
+        super();
+        this.data.id = this.data.name= effFlying.name, this.data.duration = 0;
+    }
+    toJSON() {return window.storage.Generic_toJSON("effFlying", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(effFlying, value.data);};
+    get desc() {return(this.data.name);}
+    onApply(){
+        this.data.duration = 4;
+    }
+    merge(neweffect) {
+        if(neweffect.name===this.data.name) {    //applying effect again toggles it !
+            return(function(me){
+                return (function(Effects){ 
+                    Effects.removeItem(me.data.id);});
+            }(this));
+        }
+    }
+    onTurnStart() {
+        this.data.duration-=1;
+        if(this.data.duration<=0) this.parent.removeItem(this.data.id); //todo stop flying if no more stamina
+        return({OK:true,msg:''});
+    }
+} 
 /**
  * this effect is usd as a marker to block spawning again while there is still a spawn
  *
@@ -1601,6 +1634,7 @@ window.gm.StatsLib = (function (StatsLib) {
     window.storage.registerConstructor(effCombatRecovery);
     window.storage.registerConstructor(effDamage);
     window.storage.registerConstructor(effDetermined);
+    window.storage.registerConstructor(effFlying);
     window.storage.registerConstructor(effBleed);
     window.storage.registerConstructor(effCombined);
     window.storage.registerConstructor(effGrappled);

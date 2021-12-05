@@ -86,15 +86,30 @@ hideCombatOption() {
 }
 //renders background & combatants to #canvas
 renderCombatScene() {
-  let _pos =[[0.25,0.50,1],[0.50,0.40,1],[0.75,0.50,1]];//sprite position & scale in % x,y,z
   let width=600,height=300;
-  let draw = document.querySelector("#canvas svg");
-  if(!draw) draw = SVG().addTo('#canvas').size(width, height);
-  else draw = SVG(draw);//recover svg document instead appending new one
-  //todo images flash when redrawing page; blitting bakbuffer doesnt help: var draw2 = SVG(); -> draw2.addTo(draw);
-  draw.rect(width, height).attr({ fill: '#303030'});
-  draw.image(window.story.state.combat.scenePic);
-  let el,subnodes,i,list = window.story.state.combat.enemyParty;
+  let holder,draw = document.querySelector("#canvas svg");
+  if(!draw) {
+    draw = SVG().addTo('#canvas').size(width, height);
+    draw.rect(width, height).attr({ fill: '#303030'});
+    draw.image(window.story.state.combat.scenePic);
+  }
+  else {
+    draw = SVG(draw);//recover svg document instead appending new one
+    holder = draw.findOne('#holder');
+    holder.remove(); //remove all because they could be dead  todo only redraw if necessary
+  }
+  holder=SVG().group({id:'holder'}).addTo(draw);
+  //todo images flash when redrawing page; blitting backbuffer doesnt help: var draw2 = SVG(); -> draw2.addTo(draw);
+  let el,subnodes,i,list=[],list2 = window.story.state.combat.enemyParty;
+  for(i=list2.length-1;i>=0;i--) {
+    if(!list2[i].isKnockedOut()) { //todo show deathsprite
+      list.push(list2[i]);
+    }
+  }
+  let _pos =[[0.25,0.50,1],[0.75,0.50,1],[0.50,0.40,1]];//sprite position & scale in % x,y,z
+  if(list.length<=1) { //1 large centered sprite
+    _pos =[[0.50,0.50,1]];
+  } 
   for(i=list.length-1;i>=0;i--) {
     if(!list[i].isKnockedOut()) { //todo show deathsprite
       var pos = _pos.pop();
@@ -107,18 +122,21 @@ renderCombatScene() {
         else node.height(node.height()/(1.2*scaleH));
       }
       node.center(pos[0]*width,pos[1]*height);//reposit. AFTER scaling !
-      //hide parts of sprite
-      subnodes= node.find('[data-male]');
-      for(el of subnodes) {
-        if(list[i].getPenis()===null) el.hide();
+      if(window.story.state.Settings.showNSFWPictures){
+        //hide parts of sprite
+        var penis=(list[i].getPenis()!==null),vagina=(list[i].getVagina()!==null),arousal=list[i].arousal().value;
+        subnodes= node.find('[data-male]');
+        for(el of subnodes) {penis?el.show():el.hide(); }
+        subnodes= node.find('[data-female]');
+        for(el of subnodes) {vagina?el.show:el.hide(); }
+        subnodes= node.find('[data-arousal]');
+        for(el of subnodes) {
+          var y = el.attr('data-arousal').split(',');
+          var x1= parseInt(y[0],10),x2= parseInt(y[1],10);
+          if(arousal<x1 ||arousal>x2 ) el.hide(); else el.show();
+        }
       }
-      subnodes= node.find('[data-arousal]');
-      for(el of subnodes) {
-        var y = el.attr('data-arousal').split(',');
-        var x1= parseInt(y[0],10),x2= parseInt(y[1],10);
-        if(list[i].arousal().value<x1 ||list[i].arousal().value>x2 ) el.hide();
-      }
-      node.addTo(draw);
+      node.addTo(holder);
     }
     if(_pos.length<=0) break;
   }
@@ -575,7 +593,7 @@ battle() {
     result =this.next();
     this.msg+=result.msg;
     window.gm.printOutput(this.msg);
-    window.gm.Encounter.renderCombatScene();
+    window.story.state.Settings.showCombatPictures?window.gm.Encounter.renderCombatScene():0;
     renderToSelector("#panel", "statspanel");
     //if(result.OK) {   result.msg = this.msg+result.msg;    return(result);  }
   }
@@ -607,10 +625,18 @@ window.gm.combat.calcEvasion=function(attacker,target, attack) {
   var result = {OK:true,msg:''}
   var rnd = _.random(0,100);
 
-  if(target.Effects.findItemSlot(effStunned.name)>=0) { //todo chance to miss 
+  if(target.Effects.findItemSlot(effStunned.name)>=0 && rnd>50) { //todo chance to miss 
+    //a stunned target cannot dodge
     result.OK = true; 
     result.msg = target.name+' is stunned and cannot evade. '
     attack.crit = true; //when stunned always critical hit
+    return(result);
+  }
+  if(attacker.Effects.findItemSlot(effFlying.name)<0 && target.Effects.findItemSlot(effFlying.name)>=0 && rnd>50) { //todo chance to miss 
+    //non-heay flying target can dodge out of range 
+    //todo evade by flying only for close combat attacks   
+    result.OK = false; 
+    result.msg = target.name+' dodges the attack with a flight maneuver. '
     return(result);
   }
   var lvlDiffBonus = window.gm.combat.lvlDiffBonus(attacker,target);

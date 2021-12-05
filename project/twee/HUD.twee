@@ -213,6 +213,8 @@ for(var i=0;i<_ids.length;i++){window.gm.printEquipment(whom,whom.Outfit.getItem
 Theme:
 <a href="javascript:window.styleSwitcher.setStyle('light');window.gm.refreshAllPanel();">light</a>
 <a href="javascript:window.styleSwitcher.setStyle('dark');window.gm.refreshAllPanel();">dark</a></br>
+show Combat-Pictures: <input type="checkbox" id='showNSFWPictures' onclick='toggleSetting(this);' name="showNSFWPictures" value="x"> (If false, lewd graphics are not shown/replaced with SFW.)</br>
+show Combat-Pictures: <input type="checkbox" id='showCombatPictures' onclick='toggleSetting(this);' name="showCombatPictures" value="x"> (Some graphics are large and take time to render, thus slowing down combat.)</br>
 <!--TODO what settings ?
 *  Disable over-penetration </br>
 A lot of female are not happy about the fact that many erotic fiction or imagery picture the penetration of cervix because its pretty painful. You might disable this here therefore. </br>
@@ -223,7 +225,14 @@ On the other hand a lot of males have some kind of fetish for this. </br>
 If you enable this your route to bad end by sex-related action is much shorter. This should enforce a more chaste play.</br>
 -->
 </article><article id="LogPanel"></article></section>
-
+<script>
+function toggleSetting(elmt) {
+  let toggle=window.story.state.Settings[elmt.id]=!window.story.state.Settings[elmt.id];
+  elmt.checked=toggle;
+}
+document.querySelector("#showNSFWPictures").checked=window.story.state.Settings['showNSFWPictures'];
+document.querySelector("#showCombatPictures").checked=window.story.state.Settings['showCombatPictures'];
+</script>
 
 :: Settings2 [_back_]
 <!--just test-->
