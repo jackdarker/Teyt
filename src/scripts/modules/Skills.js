@@ -1,5 +1,4 @@
 "use strict";
-//Todo: disarm/disrobe
 
 class SkillInspect extends Skill {
     constructor() {
@@ -281,7 +280,7 @@ class SkillTease extends Skill {
         return(this.targetFilterEnemy(this.targetFilterAlive(targets)));
     }
     set style(style) { //skilllevel
-        this._style = style;//this.id=this.name="Guard Lv"+style;
+        this._style = style;
     }
     get style() {return this._style;}
     get desc() { 
@@ -801,6 +800,7 @@ window.gm.SkillsLib = (function (Lib) {
     window.storage.registerConstructor(SkillDetermined);
     window.storage.registerConstructor(SkillGrapple);
     window.storage.registerConstructor(SkillFlee);
+    window.storage.registerConstructor(SkillFly);
     window.storage.registerConstructor(SkillGuard);
     window.storage.registerConstructor(SkillHeal);
     window.storage.registerConstructor(SkillInspect);
@@ -818,6 +818,9 @@ window.gm.SkillsLib = (function (Lib) {
 }(window.gm.SkillsLib || {}));
 
 /*todo 
+//Todo: disarm/disrobe  ArmorMelting
+
+
 Slash: (weapontype) causes slash-damage; chance to cause bleed on critical (on non-constructs/conjuration)
 
 Stoneskin: (passive) if a slash-attack would cause bleed; attackers weapon gets blunted for rest of fight

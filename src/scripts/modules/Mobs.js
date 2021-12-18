@@ -506,7 +506,7 @@ class Hornett extends Mob {
             let skill= 'Fly';
             if(this.Skills.getItem(skill).isEnabled().OK && !this.Skills.getItem(skill).isActive().OK){
                 result.action = skill;
-                result.target = this;
+                result.target = [this];
                 result.msg =this.fconv(result.target[0].name + " starts flying.</br>")+result.msg;
                 return(result);
             }

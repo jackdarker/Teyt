@@ -668,7 +668,7 @@ class TailRibbon extends Equipment {
         }
     }
 }
-//todo bow,whip,blowpipe
+//todo bow,blowpipe
 //todo vest,chaps,bikini top, greaves , jacket
 window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(AnalPlug);
