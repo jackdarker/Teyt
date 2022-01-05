@@ -80,7 +80,7 @@ msg+=(lvl>=4)?'<p><a0 onclick=\'window.story.state.DngSY.dngOW=true;window.story
 msg+=(lvl>=2)?'<p><a0 onclick=\'window.story.state.DngSY.dngOW=true;window.story.show(\"CV_Entry\");\'>Crystal Cave</a></p>':'';
 msg+=(lvl>=2)?'<p><a0 onclick=\'window.story.state.DngSY.dngOW=true;window.story.show(\"DF_Entry\");\'>Lush forest</a></p>':'';
 msg+=(lvl>=2)?'<p><a0 onclick=\'window.story.state.DngSY.dngOW=true;window.story.show(\"MN_Entry\");\'>Silver Mountains</a></p>':'';
-msg+=(lvl>=2)?'<p><a0 onclick=\'window.story.state.DngSY.dngOW=true;window.story.show(\"AT_Entry\");\'>Ancient Temple</a></p>':'';
+msg+=(lvl>=2||true)?'<p><a0 onclick=\'window.story.state.DngSY.dngOW=true;window.story.show(\"AT_Entry\");\'>Ancient Temple</a></p>':'';
 msg+=(false)?'<p><a0 onclick=\'window.story.state.DngSY.dngOW=true;window.story.show(\"LB_Entry\");\'>Smudgy Bog</a></p>':'';
 msg+=(false)?'<p><a0 onclick=\'window.story.state.DngSY.dngOW=true;window.story.show(\"SC_Entry\");\'>Sunken City</a></p>':'';
 msg+=(false)?'<p><a0 onclick=\'window.story.state.DngSY.dngOW=true;window.story.show(\"\");\'>Jungle Ruins</a></p>':'';

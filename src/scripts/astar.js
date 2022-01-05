@@ -63,7 +63,7 @@
         // Grab the lowest f(x) to process next.  Heap keeps this sorted for us.
         var currentNode = openHeap.pop();
         // End case -- result has been found, return the traced path.
-        if (currentNode.equals(end)) {
+        if (graph.areNodesEqual(currentNode,end)) {
           return pathTo(currentNode);
         }
         // Normal case -- move currentNode from open to closed, process each of its neighbors.
@@ -178,6 +178,9 @@
   Graph.prototype.getCost = function(from,to,mob) {
     return 1;// to.getWeight();
   };
+  Graph.prototype.areNodesEqual = function(nodeA,nodeB) {
+    return(nodeA.origNode===nodeB.origNode);
+  }
   Graph.prototype.neighbors = function(node) {
     var dir,ret = [];
     var dirs = node.origNode.getDirections();
@@ -195,9 +198,9 @@
   function GridNode(origNode) {
     this.origNode = origNode;
   }
-  GridNode.prototype.equals = function(other) {
+  /*GridNode.prototype.equals = function(other) {   
     return(this.origNode===other.origNode);
-  }
+  }*/
   /*GridNode.prototype.getWeight = function() {
     return(1); //todo origNode.getCost()
   }*/

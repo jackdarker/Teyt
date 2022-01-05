@@ -420,6 +420,7 @@ class Vine extends Mob {
 class Mechanic extends Mob {
     static factory(type) {
         let foe = new Mechanic();
+        foe.Skills.addItem(new SkillStun());
         return foe;
     }
     constructor() {

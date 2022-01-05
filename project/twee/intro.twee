@@ -64,6 +64,7 @@ As you secure one shiny gadget, you trigger some magic anomaly... </br></p>
 <p><a0 onclick='start();'>That magic portal sucks you right in...wush</a></p><hr>
 There are also some options to make a fastforward (might behave oddly): </br>
 [[FF Endgame]]
+[[BlockPuzzleTest]]
 </article>
 <script> function start() {
     window.story.state.DngSY.remainingNights=1;

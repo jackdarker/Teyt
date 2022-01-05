@@ -143,13 +143,11 @@ As you enter the hall, you notice Kumala and Leon already waiting there.
         Maybe becoming a member of this cult is the easier approach and there is still the possibility to find an escape route later.</p>
         <a0 onclick='window.gm.printTalkLink("div#select15","div#choice15a")'>choose to become a acolyte</a></br>
         [[choose to be banished]]
-        </div><div id='choice15a' hidden></br>
+        </div><div id='choice15a' hidden></br> <a0 onclick='lvl4()'>Go to your room</a>.
         </div>
         <div id='choice15b' hidden></br>
         </div>
 </div>
-
-<a0 onclick='lvl4()'>Go to your room</a>.
 </div>
 </article><article id="LogPanel"></article></section>
 <script>function lvl4() {
