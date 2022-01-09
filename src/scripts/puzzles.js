@@ -1,49 +1,45 @@
 "use strict";
 window.gm = window.gm || {};
 window.gm.startBlockPuzzle=function(){
-    let data ={
-        init:init,
-        setup:defSetup
-    }
     const PUZZLE_HOVER_TINT = '#009900';
     var _stage, _canvas, _mtt;
     var _pieces,_goals;
-    var _puzzleWidth=500,_puzzleHeight=500;
-    var _gridwidth= _puzzleWidth/10;
+    var _puzzleWidth,_puzzleHeight,_gridwidth;
     var startX =0, startY= 0;
     // Goal is an array of gridfields that need to be completely covered with puzzle-pieces
     var Goal = function(x,y,grid,parts) {
-        this.x = x;this.y = y;
-        this.parts = parts;
-        this.grid = grid;
-        this.render = function(ctx) {
-            ctx.save();
-            ctx.strokeStyle ='#000000';ctx.fillStyle = '#AAAAAA';
-            ctx.setLineDash([5, 10]);
-            ctx.beginPath();
-            for(var _r of this.parts) {
-                ctx.rect(this.grid*_r[0]+this.x , this.grid*_r[1]+this.y , this.grid, this.grid);
-            }
-            ctx.fill();ctx.stroke();
-            ctx.restore();
-        };
-        this.getGrid =function() {
-            let grid=[];
-            for(var _r of this.parts) {
-                var x=_r[0]*this.grid+this.x,y=_r[1]*this.grid+this.y;
-                grid.push([x,y]);
-            }
-            return(grid);
-        }
+      this.x = x*grid;this.y = y*grid;
+      this.parts = parts;this.grid = grid;
+      this.render = function(ctx) {
+          ctx.save();
+          ctx.strokeStyle ='#000000';ctx.fillStyle = '#AAAAAA';
+          ctx.setLineDash([5, 10]);
+          ctx.beginPath();
+          for(var _r of this.parts) {
+              ctx.rect(this.grid*_r[0]+this.x , this.grid*_r[1]+this.y , this.grid, this.grid);
+          }
+          ctx.fill();ctx.stroke();
+          ctx.restore();
+      };
+      this.getGrid =function() {
+          let grid=[];
+          for(var _r of this.parts) {
+              var x=_r[0]*this.grid+this.x,y=_r[1]*this.grid+this.y;
+              grid.push([x,y]);
+          }
+          return(grid);
+      }
     }
-    //Piece is a puzzle-piece which shape is defined by parts
+    //Piece is a puzzle-piece which shape is defined by parts. 
+    //Grid defines the size of the part-rects. x/y is specified in multiples of grid
+    //parts is an array of arrays with 2 elements specifiying x,y; x/y is relativ to piece-x/y 
     var Piece = function(x, y, grid, parts,design) {
-        this.x = x;this.y = y;
-        this.oldX=this.newX=x;this.oldY=this.newY=y;
-        this.parts = parts;
-        this.grid = grid;
+        this.x = x*grid;this.y = y*grid;
+        this.oldX=this.newX=this.x;this.oldY=this.newY=this.y;
+        this.parts = parts;this.grid = grid;
         this.isDragging = false;
         this.fill=(design&&design.fill)?design.fill:'#2793ef';
+        this.canRotate=(design&&design.canRotate)?design.canRotate:false;
         this.render = function(ctx) {
             ctx.save();
             if(this.isDragging) {
@@ -69,6 +65,15 @@ window.gm.startBlockPuzzle=function(){
             }
             return(grid);
         }
+        this.rotate=function(angle) {
+          //rotate-Matrix 90°
+          // 0 -1
+          // 1  0
+          if(!this.canRotate) return;
+          this.parts=this.parts.map(
+            function(pt){ return([pt[1]*-1,pt[0]*1]);}
+          );
+        }
         this.isHit=function(x,y) {
             for(var _r of this.parts) {
                 /*if (x > this.grid*_r[0]+this.x - this.grid * 0.5                && y > this.grid*_r[1]+this.y - this.grid * 0.5 && 
@@ -80,6 +85,17 @@ window.gm.startBlockPuzzle=function(){
             }
             return false;
         };
+    }
+    let data ={
+      init:init,
+      setup:demoLevel,
+      start:start,
+      onWin:demoWinLevel,
+      onLoss:demoLossLevel,
+      onFinish:demoWinGame,
+      level:1,
+      createGoal:Goal,
+      createPiece:Piece
     }
     //utility function to track touch & mouse movement
     var MouseTouchTracker = function(canvas, callback){
@@ -93,6 +109,7 @@ window.gm.startBlockPuzzle=function(){
         }
         function onDown(evt) {
             evt.preventDefault();
+            _canvas.focus(); //this is to make sure canvas can receive keyup; canvas also has to have tabindex set to be focusable!
             var coords = processEvent(evt);
             callback('down', coords.x, coords.y);
         }
@@ -105,21 +122,29 @@ window.gm.startBlockPuzzle=function(){
             var coords = processEvent(evt);
             callback('move', coords.x, coords.y);
         }
+        function onKey(evt) {
+          evt.preventDefault();
+          callback('key', evt.code);
+      }
+        var _canvas=canvas;
         canvas.ontouchmove = onMove;
         canvas.onmousemove = onMove;
         canvas.ontouchstart = onDown;
         canvas.onmousedown = onDown;
         canvas.ontouchend = onUp;
         canvas.onmouseup = onUp;
+        canvas.onkeyup = onKey;
     }
-    function init(){
+    function init(grid){
         _canvas = document.getElementById('canvas');
         _stage = _canvas.getContext('2d');
-        _canvas.width = _puzzleWidth;
+        /*_canvas.width = _puzzleWidth;
         _canvas.height = _puzzleHeight;
-        _canvas.style.border = "1px solid black";
+        _canvas.style.border = "1px solid black";*/
+        _gridwidth=grid;
+        _puzzleWidth=_canvas.width; _puzzleHeight=canvas.height;
         _mtt = new MouseTouchTracker(_canvas,dragPiece);
-        initPuzzle();
+        start(this.level);
     }
     //draw canvas
     function redraw(){
@@ -166,6 +191,15 @@ window.gm.startBlockPuzzle=function(){
     //drag&drop operation
     function dragPiece(evtType, x, y) {
         switch(evtType) {
+        case 'key':
+          if(x==='KeyR') {
+            for(el of _pieces) {
+              if (el.isDragging) {
+                el.rotate(90);
+              }
+            }
+          }
+          break;
         case 'down':
             startX = x;
             startY = y;
@@ -180,9 +214,6 @@ window.gm.startBlockPuzzle=function(){
             for(el of _pieces) { 
                 el.isDragging = false;
                 if(collides(el)){ el.x =el.oldX,el.y=el.oldY;}
-            }
-            if(checkWin()){
-                alert("Finished !");
             }
             break;
         case 'move':
@@ -200,20 +231,38 @@ window.gm.startBlockPuzzle=function(){
             break;
         }
         redraw();
+        if(evtType==='up' && checkWin()){
+          data.onWin(data.level);
+        }
     }
-    function defSetup() {
-        return({goals:[new Goal(3*_gridwidth,3*_gridwidth,_gridwidth,[[0,0],[0,1],[1,0],[1,1],[1,2],[2,2],[2,3]])],
-        pieces:[new Piece(0*_gridwidth, 0*_gridwidth, _gridwidth, [[0,0],[1,0],[1,1]],{fill:'#57535f'}),
-            new Piece(4*_gridwidth, 1*_gridwidth, _gridwidth, [[0,0],[0,1],[1,0],[1,1]])
-        ]})
-    }
-    function initPuzzle(){
+    function start(level){
         _pieces=[];_goals=[];
-        var tmp=data.setup();
-        _goals=tmp.goals;
-        _pieces=tmp.pieces;
-        //note that x/y is in pixel
+        data.level=level;
+        var tmp=data.setup(level);
+        if(!tmp) {
+          data.onFinish(level);
+        } else {
+          _goals=tmp.goals;
+          _pieces=tmp.pieces;
+        }
         redraw();
+    }
+    //note that x/y is in pixel
+    function demoLevel(level) {
+      return({goals:[new Goal(3,3,_gridwidth,[[0,0],[0,1],[1,0],[1,1],[1,2],[2,2],[2,3]])],
+      pieces:[new Piece(0, 0, _gridwidth, [[0,0],[1,0],[1,1]],{fill:'#57535f'}),
+          new Piece(4, 1, _gridwidth, [[0,0],[0,1],[1,0],[1,1]])
+      ]})
+    }
+    function demoWinGame(level) {
+      alert("You solved all puzzles");
+    }
+    function demoWinLevel(level) {
+      alert("You solved the puzzle-level "+level);
+      this.start(level+1);
+    }
+    function demoLossLevel(level) {
+      alert("You failed to solve the puzzle");
     }
     return(data);
 };
