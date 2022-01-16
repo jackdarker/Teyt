@@ -1,5 +1,5 @@
 :: DF_Lv2_MAP [_back_]
-<hr><div id='canvas'></div></br>
+<hr><div id='canvas'></div><div id='svgpopup'></div></br>
 <script> window.gm.printMap2(window.story.state.DngSY.dngMap,window.gm.player.location.replace(window.story.state.DngSY.dng+'_',''),
     window.story.state.DngDF.mapReveal,window.story.state.DngDF.visitedTiles);
 </script>

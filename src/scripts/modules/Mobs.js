@@ -3,13 +3,12 @@
 - imp
 - nymph
 - kobold
-- lizard-man
 - naga
-- bunny-girl
-- stag-boy/-Stud  archer, drumer, warrior
+- stag-boy/-Stud  archer, drummer, warrior
 - cougar-girl/-mistress
 - grizzly
 - werwolf
+- fungus/spore-pod
 - vile vine
 - lush orchid
 - slug
@@ -425,7 +424,7 @@ class Mechanic extends Mob {
     }
     constructor() {
         super();
-        this.name = this.id = 'Mechanic-Guy';
+        this.name = this.id = 'Mechanical-Guy';
         this.pic= 'unknown';
     }
     calcCombatMove(enemys,friends){

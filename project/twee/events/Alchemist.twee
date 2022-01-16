@@ -1,13 +1,13 @@
 :: ForestAlchemistTalk [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<% if(!window.gm.quests.hasActiveQuest("qPurpleBerry") || window.gm.quests.getMilestoneState("qPurpleBerry").id<1) { 
-    window.story.render("AlchTalkStartPurpleBerry"); %>
-<% } else if(window.gm.quests.getMilestoneState("qPurpleBerry").id===1 && window.gm.player.Inv.countItem("PurpleBerry")>=5) { 
-    window.story.render("AlchTalkFinishPurpleBerry"); %>
-<% } else if(window.gm.quests.getMilestoneState("qBondageKink").id===300) {
-    window.story.render("AlchTalkFinishPurpleBerry"); %>
-<% } else if(window.gm.quests.getMilestoneState("qCarlia").id===700) {
-    window.story.render("AlchTalkShelterCarlia"); %>
+<% if(!window.gm.quests.hasActiveQuest("qPurpleBerry") || window.gm.quests.getMilestoneState("qPurpleBerry").id<1) { %>
+    <%=window.story.render("AlchTalkStartPurpleBerry"); %>
+<% } else if(window.gm.quests.getMilestoneState("qPurpleBerry").id===1 && window.gm.player.Inv.countItem("PurpleBerry")>=5) { %>
+    <%=window.story.render("AlchTalkFinishPurpleBerry"); %>
+<% } else if(window.gm.quests.getMilestoneState("qBondageKink").id===300) {%>
+    <%=window.story.render("AlchTalkFinishPurpleBerry"); %>
+<% } else if(window.gm.quests.getMilestoneState("qCarlia").id===700) {%>
+    <%=window.story.render("AlchTalkShelterCarlia"); %>
 <%} else {%> He seems busy right now. [[Back|ForestAlchemistHut]] <%}%>
 </article><article id="LogPanel"></article></section>
 

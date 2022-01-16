@@ -32,7 +32,10 @@
 			"prefix": "bb",
 			"body": ["</br>$0"]
 		},
-
+		"Insert hint": {
+			"prefix": "hint",
+			"body": ["<a0 id='$1' onclick='(function(me){document.querySelector(\"#\"+id+\"~p\").toggleAttribute(\"hidden\");})(this);'>${2:Hint}</a><p hidden>${3:${TM_SELECTED_TEXT}}<p>$0"]
+		},
 		"Insert <select": {
 			"prefix": "sel",
 			"body": ["<div id='select${1:idx}' >",

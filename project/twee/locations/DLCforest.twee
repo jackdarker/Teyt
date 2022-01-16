@@ -309,21 +309,21 @@ You fight your way through the dense undergrowth and realize just in time that y
 <div id='select1' >
 <a0 onclick='window.gm.printTalkLink("div#select1","div#choice1a")'>Peak into the chasm</a>
 </div>
-<div id='choice1a' hidden>
+<div id='choice1a' hidden></br>
 There is a slab of rock from which you should be able to look down quite well.</br>
 You look carefully over the edge. It's not a real abyss, but a pretty steep, rocky slope. </br>
 'I'm not climbing down there now.' you think when you want to go back to the forest. </br>
 <div id='select2' >
 <a0 onclick='window.gm.printTalkLink("div#select2","div#choice2a")'>Next</a>
 </div>
-<div id='choice2a' hidden>
+<div id='choice2a' hidden></br>
 The rock slab is not so rock-solid and just as you turn around it begins to tip into the abyss. 
 Unfortunatly, your jump-ability isn't quite good enough. The slab drags you down with it.</br>
 At some point you see a massive rock coming onto you, reaching out with your hands to stop it squishing you.
 <div id='select3' >
 <a0 onclick='window.gm.printTalkLink("div#select3","div#choice3a")'>Next</a>
 </div>
-<div id='choice3a' hidden>
+<div id='choice3a' hidden></br>
 But of course its futile trying to catch that crushing weight. </br>  
 You dont feel any pain, everything is just going <a0 onclick='window.gm.respawn();'>black</a> as if pulling the cord from a TV.</br>  
 </div></div></div>
@@ -424,8 +424,7 @@ Ansonsten gibt es hier nichts.</br>
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.moveHere();%>
 <p class="tPC"></p>'Puh, what a stink. I shouldnt stay here for long for I might suffocate'</p>
-"About that cake we talked earlier - what kind of cake are we speaking about."
-<p class='tPC'>NOO CAKE !</p>
+<!--"About that cake we talked earlier - what kind of cake are we speaking about."<p class='tPC'>NOO CAKE !</p>-->
 <a0 onclick='window.gm.player.Inv.addItem(new window.gm.ItemsLib["KeyRestraintA"]());'>pickup small key</a>
 <% if(window.gm.quests.getMilestoneState("qPurpleBerry").id>=100) {%>
 <a0 onclick='window.gm.player.Inv.removeItem("PurpleBerry",5);window.gm.player.Inv.addItem(new window.gm.ItemsLib["HealthPotionSmall"](),1);window.gm.refreshAllPanel();' <%=(window.gm.player.Inv.countItem("PurpleBerry")>=5)?(""):("hidden")%>>Trade 5 purple berries for 1 health-potion</a></br>

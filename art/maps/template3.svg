@@ -31,8 +31,8 @@
      inkscape:snap-bbox="false"
      inkscape:snap-bbox-midpoints="true"
      inkscape:zoom="2"
-     inkscape:cx="216.75"
-     inkscape:cy="53.25"
+     inkscape:cx="211"
+     inkscape:cy="93.25"
      inkscape:window-width="1920"
      inkscape:window-height="1017"
      inkscape:window-x="1912"
@@ -86,6 +86,18 @@
   </sodipodi:namedview>
   <defs
      id="defs2">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient1940">
+      <stop
+         style="stop-color:#8d8300;stop-opacity:1;"
+         offset="0"
+         id="stop1936" />
+      <stop
+         style="stop-color:#8d8300;stop-opacity:1"
+         offset="1"
+         id="stop1938" />
+    </linearGradient>
     <linearGradient
        id="linearGradient6530"
        inkscape:swatch="solid">
@@ -171,6 +183,25 @@ text-align:center;
        y2="10"
        gradientUnits="userSpaceOnUse"
        gradientTransform="translate(4.0000028,4.0000002)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient1940"
+       id="linearGradient1942"
+       x1="-19.538403"
+       y1="91.289526"
+       x2="-12.82618"
+       y2="91.289526"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient1940"
+       id="linearGradient2060"
+       x1="15.27832"
+       y1="203.70508"
+       x2="368.27637"
+       y2="203.70508"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(0,-208)" />
   </defs>
   <g
      inkscape:groupmode="layer"
@@ -184,8 +215,8 @@ text-align:center;
        height="24"
        x="4"
        y="4"
-       onmouseover="style.opacity = 0.5;"
-       onmouseout="style.opacity = 1;"
+       onmouseover=""
+       onmouseout=""
        inkscape:label="tmplRoom" />
     <path
        sodipodi:type="star"
@@ -229,78 +260,6 @@ text-align:center;
        height="100%"
        transform="translate(164,-44)"
        class="roomFound" />
-    <text
-       xml:space="preserve"
-       x="15.518555"
-       y="212.29492"
-       id="text2366"
-       class="textLabel"><tspan
-         sodipodi:role="line"
-         id="tspan2364"
-         x="15.518555"
-         y="212.29492"
-         class="textLabel">A       B       C      D       E       F        G      H         I        J       K       L</tspan></text>
-    <text
-       xml:space="preserve"
-       x="-16"
-       y="16"
-       id="text8305"
-       class="textLabel"><tspan
-         sodipodi:role="line"
-         id="tspan8303"
-         style="font-size:13.3333px;stroke-width:0.4"
-         x="-16"
-         y="16">1</tspan><tspan
-         sodipodi:role="line"
-         style="font-size:13.3333px;stroke-width:0.4"
-         x="-16"
-         y="31.99996"
-         id="tspan8719" /><tspan
-         sodipodi:role="line"
-         style="font-size:13.3333px;stroke-width:0.4"
-         x="-16"
-         y="47.99992"
-         id="tspan8721">2</tspan><tspan
-         sodipodi:role="line"
-         style="font-size:13.3333px;stroke-width:0.4"
-         x="-16"
-         y="63.999882"
-         id="tspan29330" /><tspan
-         sodipodi:role="line"
-         style="font-size:13.3333px;stroke-width:0.4"
-         x="-16"
-         y="79.99984"
-         id="tspan8727">3</tspan><tspan
-         sodipodi:role="line"
-         style="font-size:13.3333px;stroke-width:0.4"
-         x="-16"
-         y="95.999802"
-         id="tspan8733" /><tspan
-         sodipodi:role="line"
-         style="font-size:13.3333px;stroke-width:0.4"
-         x="-16"
-         y="111.99976"
-         id="tspan8735">4</tspan><tspan
-         sodipodi:role="line"
-         style="font-size:13.3333px;stroke-width:0.4"
-         x="-16"
-         y="127.99972"
-         id="tspan8737" /><tspan
-         sodipodi:role="line"
-         style="font-size:13.3333px;stroke-width:0.4"
-         x="-16"
-         y="143.99968"
-         id="tspan8739">5</tspan><tspan
-         sodipodi:role="line"
-         style="font-size:13.3333px;stroke-width:0.4"
-         x="-16"
-         y="159.99965"
-         id="tspan8741" /><tspan
-         sodipodi:role="line"
-         style="font-size:13.3333px;stroke-width:0.4"
-         x="-16"
-         y="175.9996"
-         id="tspan8743">6</tspan></text>
     <use
        x="0"
        y="0"
@@ -386,21 +345,97 @@ text-align:center;
          id="tspan3592"
          x="80"
          y="-48">E</tspan></text>
+    <text
+       xml:space="preserve"
+       x="192"
+       y="0"
+       id="text2366"
+       class="textLabel"
+       style="fill:url(#linearGradient2060);fill-opacity:1"><tspan
+         sodipodi:role="line"
+         id="tspan2364"
+         x="192"
+         y="0"
+         class="textLabel"
+         style="fill:url(#linearGradient2060);fill-opacity:1">A       B       C      D       E       F        G      H         I        J       K       L</tspan></text>
+    <text
+       xml:space="preserve"
+       x="-16"
+       y="16"
+       id="text8305"
+       class="textLabel"
+       style="fill:url(#linearGradient1942);fill-opacity:1"><tspan
+         sodipodi:role="line"
+         id="tspan8303"
+         style="font-size:13.3333px;fill:url(#linearGradient1942);fill-opacity:1;stroke-width:0.4"
+         x="-16"
+         y="16">1</tspan><tspan
+         sodipodi:role="line"
+         style="font-size:13.3333px;fill:url(#linearGradient1942);fill-opacity:1;stroke-width:0.4"
+         x="-16"
+         y="31.99996"
+         id="tspan8719" /><tspan
+         sodipodi:role="line"
+         style="font-size:13.3333px;fill:url(#linearGradient1942);fill-opacity:1;stroke-width:0.4"
+         x="-16"
+         y="47.99992"
+         id="tspan8721">2</tspan><tspan
+         sodipodi:role="line"
+         style="font-size:13.3333px;fill:url(#linearGradient1942);fill-opacity:1;stroke-width:0.4"
+         x="-16"
+         y="63.999882"
+         id="tspan29330" /><tspan
+         sodipodi:role="line"
+         style="font-size:13.3333px;fill:url(#linearGradient1942);fill-opacity:1;stroke-width:0.4"
+         x="-16"
+         y="79.99984"
+         id="tspan8727">3</tspan><tspan
+         sodipodi:role="line"
+         style="font-size:13.3333px;fill:url(#linearGradient1942);fill-opacity:1;stroke-width:0.4"
+         x="-16"
+         y="95.999802"
+         id="tspan8733" /><tspan
+         sodipodi:role="line"
+         style="font-size:13.3333px;fill:url(#linearGradient1942);fill-opacity:1;stroke-width:0.4"
+         x="-16"
+         y="111.99976"
+         id="tspan8735">4</tspan><tspan
+         sodipodi:role="line"
+         style="font-size:13.3333px;fill:url(#linearGradient1942);fill-opacity:1;stroke-width:0.4"
+         x="-16"
+         y="127.99972"
+         id="tspan8737" /><tspan
+         sodipodi:role="line"
+         style="font-size:13.3333px;fill:url(#linearGradient1942);fill-opacity:1;stroke-width:0.4"
+         x="-16"
+         y="143.99968"
+         id="tspan8739">5</tspan><tspan
+         sodipodi:role="line"
+         style="font-size:13.3333px;fill:url(#linearGradient1942);fill-opacity:1;stroke-width:0.4"
+         x="-16"
+         y="159.99965"
+         id="tspan8741" /><tspan
+         sodipodi:role="line"
+         style="font-size:13.3333px;fill:url(#linearGradient1942);fill-opacity:1;stroke-width:0.4"
+         x="-16"
+         y="175.9996"
+         id="tspan8743">6</tspan></text>
   </g>
   <g
      inkscape:groupmode="layer"
      id="layer2"
-     inkscape:label="Layer 2">
+     inkscape:label="Layer 2"
+     style="display:inline">
     <use
        x="0"
        y="0"
        xlink:href="#tmplRoom"
-       id="Tile_L6-6"
+       id="Tile_L6-2"
        width="100%"
        height="100%"
        transform="translate(352)"
        class="roomFound"
-       style="display:none" />
+       style="display:none;fill:#464100;fill-opacity:1" />
   </g>
   <g
      inkscape:label="Layer 1"

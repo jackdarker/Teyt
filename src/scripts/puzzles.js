@@ -1,5 +1,10 @@
 "use strict";
 window.gm = window.gm || {};
+/* initialize a puzzle with tetris-styled pieces; 
+* the player has to dragNdrop all pieces to completely cover the goals; Note that the pieces dont have to fit completely into the goals 
+* custom shapes of pieces/goals can be set.
+* the function returns a data-object that you have to configure before calling init()
+*/
 window.gm.startBlockPuzzle=function(){
     const PUZZLE_HOVER_TINT = '#009900';
     var _stage, _canvas, _mtt;
@@ -8,9 +13,8 @@ window.gm.startBlockPuzzle=function(){
     var startX =0, startY= 0;
     // Goal is an array of gridfields that need to be completely covered with puzzle-pieces
     var Goal = function(x,y,grid,parts) {
-      this.x = x*grid;this.y = y*grid;
-      this.parts = parts;this.grid = grid;
-      this.render = function(ctx) {
+      let goal={x:x*grid,y:y*grid,parts:parts,grid:grid};
+      goal.render = function(ctx) {
           ctx.save();
           ctx.strokeStyle ='#000000';ctx.fillStyle = '#AAAAAA';
           ctx.setLineDash([5, 10]);
@@ -21,7 +25,7 @@ window.gm.startBlockPuzzle=function(){
           ctx.fill();ctx.stroke();
           ctx.restore();
       };
-      this.getGrid =function() {
+      goal.getGrid =function() {
           let grid=[];
           for(var _r of this.parts) {
               var x=_r[0]*this.grid+this.x,y=_r[1]*this.grid+this.y;
@@ -29,18 +33,17 @@ window.gm.startBlockPuzzle=function(){
           }
           return(grid);
       }
+      return(goal);
     }
-    //Piece is a puzzle-piece which shape is defined by parts. 
+    //Piece is a puzzle-piece which shape is defined by part-rects. 
     //Grid defines the size of the part-rects. x/y is specified in multiples of grid
-    //parts is an array of arrays with 2 elements specifiying x,y; x/y is relativ to piece-x/y 
+    //parts is an array of arrays with 2 elements specifiying x,y of every part-rect; x/y is relativ to piece-x/y 
     var Piece = function(x, y, grid, parts,design) {
-        this.x = x*grid;this.y = y*grid;
-        this.oldX=this.newX=this.x;this.oldY=this.newY=this.y;
-        this.parts = parts;this.grid = grid;
-        this.isDragging = false;
-        this.fill=(design&&design.fill)?design.fill:'#2793ef';
-        this.canRotate=(design&&design.canRotate)?design.canRotate:false;
-        this.render = function(ctx) {
+      let piece={x:x*grid,y:y*grid,parts:parts,grid:grid,isDragging:false,
+        fill:(design&&design.fill)?design.fill:'#2793ef',
+        canRotate:(design&&design.canRotate)?design.canRotate:false};
+        piece.oldX=piece.newX=piece.x;piece.oldY=piece.newY=piece.y;
+        piece.render = function(ctx) {
             ctx.save();
             if(this.isDragging) {
                 ctx.globalAlpha = .4;
@@ -51,13 +54,17 @@ window.gm.startBlockPuzzle=function(){
             ctx.strokeStyle ='#000000';
             ctx.beginPath();
             for(var _r of this.parts) {
-                /*ctx.rect(   this.grid*_r[0]+this.x - this.grid * 0.5, this.grid*_r[1]+this.y - this.grid * 0.5, this.grid, this.grid);*/
                 ctx.rect(this.grid*_r[0]+this.x , this.grid*_r[1]+this.y , this.grid, this.grid);
+                if(_r[0]===0 && _r[1]===0 && this.canRotate) { //mark rotation on part [0,0]
+                  var _cx=this.grid*(_r[0]+0.5)+this.x,_cy=this.grid*(_r[1]+0.5)+this.y;
+                  ctx.moveTo(_cx+this.grid*0.3,_cy); //if ..(_cx,_cy) there would be another line from circle to center
+                  ctx.arc(_cx,_cy,this.grid*0.3,0,Math.PI*2);
+                }
             }
             ctx.fill();ctx.stroke();
             ctx.restore();
         };
-        this.getGrid =function() {
+        piece.getGrid =function() {
             let grid=[];
             for(var _r of this.parts) {
                 var x=_r[0]*this.grid+this.x,y=_r[1]*this.grid+this.y;
@@ -65,7 +72,7 @@ window.gm.startBlockPuzzle=function(){
             }
             return(grid);
         }
-        this.rotate=function(angle) {
+        piece.rotate=function(angle) {
           //rotate-Matrix 90°
           // 0 -1
           // 1  0
@@ -74,7 +81,7 @@ window.gm.startBlockPuzzle=function(){
             function(pt){ return([pt[1]*-1,pt[0]*1]);}
           );
         }
-        this.isHit=function(x,y) {
+        piece.isHit=function(x,y) {
             for(var _r of this.parts) {
                 /*if (x > this.grid*_r[0]+this.x - this.grid * 0.5                && y > this.grid*_r[1]+this.y - this.grid * 0.5 && 
                     x < this.grid*_r[0]+this.x + this.grid - this.grid * 0.5    && y < this.grid*_r[1]+this.y + this.grid - this.grid * 0.5) {*/
@@ -85,17 +92,19 @@ window.gm.startBlockPuzzle=function(){
             }
             return false;
         };
+        return(piece);
     }
+    // this structure is returned by the start-fct and is the public interface to the game
     let data ={
-      init:init,
-      setup:demoLevel,
-      start:start,
-      onWin:demoWinLevel,
-      onLoss:demoLossLevel,
-      onFinish:demoWinGame,
-      level:1,
-      createGoal:Goal,
-      createPiece:Piece
+      init:init,      //points to the init-function
+      setup:demoLevel, //set this to a function that defines the level; see demoLevel
+      start:start,  //(re-)starts the game at a level
+      onWin:demoWinLevel, //callback called on solving a level
+      onLoss:demoLossLevel, //todo callback called on failing a level
+      onFinish:demoWinGame, //callback called on solving all level
+      level:1,  //tracks the current level
+      createGoal:Goal,  //points to a helper-function to build goal-areas
+      createPiece:Piece //points to a helper-fct to build pieces
     }
     //utility function to track touch & mouse movement
     var MouseTouchTracker = function(canvas, callback){
@@ -135,18 +144,21 @@ window.gm.startBlockPuzzle=function(){
         canvas.onmouseup = onUp;
         canvas.onkeyup = onKey;
     }
+    /**
+     * expects a canvas-element with proper size on the page with id='canvas'
+     * initialize setup-function before calling this !
+     *
+     * @param {*} grid : puzzle-part-size in pixel
+     */
     function init(grid){
         _canvas = document.getElementById('canvas');
         _stage = _canvas.getContext('2d');
-        /*_canvas.width = _puzzleWidth;
-        _canvas.height = _puzzleHeight;
-        _canvas.style.border = "1px solid black";*/
         _gridwidth=grid;
         _puzzleWidth=_canvas.width; _puzzleHeight=canvas.height;
         _mtt = new MouseTouchTracker(_canvas,dragPiece);
         start(this.level);
     }
-    //draw canvas
+    //draw canvas; called internally
     function redraw(){
         _stage.clearRect(0, 0, _canvas.width, _canvas.height);
         for(el of _goals) {
@@ -156,7 +168,7 @@ window.gm.startBlockPuzzle=function(){
             el.render(_stage);
         }
     }
-    //returns true if pieces collides with other piece or outside border
+    //returns true if pieces collides with other piece or outside border; called internally
     function collides(piece) { 
         var _a=piece.getGrid();
         //todo outside border
@@ -172,7 +184,7 @@ window.gm.startBlockPuzzle=function(){
         }
         return(false);
     }
-    //check if goals are completly covered (but pieces dont have to be completely inside goal)
+    //check if goals are completly covered (but pieces dont have to be completely inside goal); called internally
     function checkWin() {
         let won=true;
         let a,allG=[],allP=[];
@@ -188,7 +200,7 @@ window.gm.startBlockPuzzle=function(){
         }
         return(won);
     }
-    //drag&drop operation
+    //drag&drop operation; called internally
     function dragPiece(evtType, x, y) {
         switch(evtType) {
         case 'key':
@@ -235,6 +247,7 @@ window.gm.startBlockPuzzle=function(){
           data.onWin(data.level);
         }
     }
+    //used to start a certain level; the onWin-callback has to call this to continue the game
     function start(level){
         _pieces=[];_goals=[];
         data.level=level;
@@ -247,7 +260,7 @@ window.gm.startBlockPuzzle=function(){
         }
         redraw();
     }
-    //note that x/y is in pixel
+    //the setup-fct receives a level-No and has to return a object containing the goals and pieces of that level
     function demoLevel(level) {
       return({goals:[new Goal(3,3,_gridwidth,[[0,0],[0,1],[1,0],[1,1],[1,2],[2,2],[2,3]])],
       pieces:[new Piece(0, 0, _gridwidth, [[0,0],[1,0],[1,1]],{fill:'#57535f'}),

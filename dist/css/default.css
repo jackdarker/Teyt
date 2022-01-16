@@ -83,6 +83,24 @@ dialog::backdrop, #backdrop {
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);    
 }
+#svgpopup {
+  width: 40px;
+  padding: 6px;
+  background-color: white;
+  border-radius: 4px;
+  position: absolute;
+  display: none;
+}
+#svgpopup::before {
+  content: "";
+  width: 12px;
+  height: 12px;
+  transform: rotate(45deg);
+  background-color: white;
+  position: absolute;
+  left: -6px;
+  top: 6px;
+}
 .popup {
   position: relative;
   display: inline-block;

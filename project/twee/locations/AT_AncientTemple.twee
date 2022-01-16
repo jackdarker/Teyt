@@ -1,5 +1,5 @@
 :: AT_Lv6_MAP [_back_]
-<hr><div id='canvas'></div></br>
+<hr><div id='canvas'></div><div id='svgpopup'></div></br>
 <script> window.gm.printMap2(window.story.state.DngSY.dngMap,window.gm.player.location.replace(window.story.state.DngSY.dng+'_',''),
     window.story.state.DngAT.mapReveal,window.story.state.DngAT.visitedTiles);
 </script>
@@ -225,7 +225,7 @@ The lever is currently <%=(!window.story.state.DngAT.leverG4)?'not':''%> pulled.
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 A dark, eerie tunnel in an old temple. 
-</br><p> <%=window.gm.printNav('Go north','north')%></br><%=window.gm.printNav('Go west','west')%><%=window.gm.printNav('Go east','east')%></br><%=window.gm.printNav('Go south','south')%></br></p>
+</br><p> <%=window.gm.printNav()%></br></p>
 </article><article id="LogPanel"></article></section>
 <%=window.story.render("AT_Encounters")%>
 

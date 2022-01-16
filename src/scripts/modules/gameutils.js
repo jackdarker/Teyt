@@ -467,6 +467,17 @@ window.gm.printMap=function(MapName,playerTile,reveal,visitedTiles) {
 window.gm.printMap2=function(dng,playerTile,reveal,visitedTiles) {
   var step=32, width=step*(dng.width||12),height=step*(dng.height||8);
   const X=['A','B','C','D','E','F','G','H','I','J','K','L','M','N'],Y=['0','1','2','3','4','5','6','7','8','9'];
+  var mypopup = document.getElementById("svgpopup"); //todo popup-functions as parameters
+  function showPopup(evt) {
+    //var iconPos = evt.getBoundingClientRect();
+    mypopup.style.left = (evt.x+12)+"px";//(iconPos.right + 20) + "px";
+    mypopup.style.top = (evt.y-12)+"px";//(window.scrollY + iconPos.top - 60) + "px";
+    mypopup.textContent=evt.currentTarget.id;
+    mypopup.style.display = "block";
+  }
+  function hidePopup(evt) {
+    mypopup.style.display = "none";
+  }
   function nameToXY(name) {
     let i,pos={x:0,y:0};
     i=Y.findIndex((el)=>{return(el===name[1]);});
@@ -475,11 +486,10 @@ window.gm.printMap2=function(dng,playerTile,reveal,visitedTiles) {
     pos.x=i*step;//if(i<0||i>=Y.length-1) return('');
     return(pos);
   }  
-  function addAnno(){
+  function addAnno(){//add up to 4 annotation-letters
     const dx2= [6,6,-6,-6], dy2=[0,10,10,0]; //
-    for(k=room.anno?room.anno.length-1:-1;k>=0;k--){//add up to 4 annotation-letters
+    for(k=room.anno?room.anno.length-1:-1;k>=0;k--){
       if(k>3) continue;
-      
       lRoom.text(function(add) {add.tspan(room.anno[k])}).addClass('textLabel').ax(_rA.cx()+ox+dx2[k]).ay(_rA.cy()+oy+dy2[k]);
     }
   }
@@ -501,7 +511,9 @@ window.gm.printMap2=function(dng,playerTile,reveal,visitedTiles) {
   for(i=dng.grid.length-1;i>=0;i--) {// foreach room create room
     room=dng.grid[i];
     xy=nameToXY(room.room);
-    _rA=lRoom.use('tmplRoom').attr({id:room.room}).move(xy.x, xy.y);
+    _rA=lRoom.use('tmplRoom').attr({id:room.room, title:room.room}).move(xy.x, xy.y);
+    //var link = document.createElement('title');    link.textContent=room.room;    _rA.put(link);// appendchild is unknown // adding title to use dosnt work - would have to add to template
+    _rA.node.addEventListener("mouseover", showPopup);_rA.node.addEventListener("mouseout", hidePopup);
     if(visitedTiles.indexOf(room.room)<0) {
       if(reveal.indexOf(room.room)<0){_rA.addClass('roomNotFound');}
       else {_rA.addClass('roomFound'); addAnno();}

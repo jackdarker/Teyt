@@ -141,7 +141,10 @@ Several religious directions state that this is against natures law and has to b
 
 :: BlockPuzzleTest
 <div style="background-color:lightgray;">
-<p>Click here to restart <a0 id='btStart'>Start</a></p><p id='result'></p>
+<p>Click here to restart <a0 id='btStart'>Start</a></p><p>Press 'R' while dragging a part with a circle to rotate them.</p>
+<a0 id='howtoplay' onclick='(function($event){document.querySelector("#"+id+"~p").toggleAttribute("hidden");})(this);'>How to play</a>
+<p hidden>You have to cover all gray rectangles with dashed border with the other colored pieces. DragNDrop the pieces with left click. Parts with a circle in it can be rotated while dragging by pressing 'R'.</p>
+<p id='result'></p>
 <canvas id="canvas" tabindex="3" width="400" height="400" style="background-color: #ddd;border:1px solid black;"></canvas></div>
 <script>
 const grid=40;
@@ -150,15 +153,16 @@ document.getElementById('btStart').addEventListener("click", function(){_game.st
 //document.getElementById('clickHere').addEventListener("click", _game.click);
 _game.setup=function(level) {
   if(level===2) {
-   return({goals:[new _game.createGoal(3,3 ,grid,[ [0,0],[0,1],[1,0],[1,1] ]),
-            new _game.createGoal(3 ,6 ,grid,[ [1,2],[2,2],[2,3] ])],
-    pieces:[new _game.createPiece(2 , 0 , grid, [ [0,0],[-1,0],[0,1] ],{canRotate:true, fill:'#57535f'}),
-            new _game.createPiece(4 , 1 , grid, [ [0,0],[0,1],[1,0],[1,1] ])
+   return({goals:[ _game.createGoal(3,3 ,grid,[ [0,0],[0,1],[1,0],[1,1] ]),
+             _game.createGoal(3 ,6 ,grid,[ [1,2],[2,2],[2,3] ])],
+    pieces:[ _game.createPiece(2 , 0 , grid, [ [0,0],[-1,0],[0,1] ],{ fill:'#f08080'}),
+             _game.createPiece(4 , 1 , grid, [ [0,0],[0,1],[1,0],[1,1] ]),
+             _game.createPiece(2 , 4 , grid, [ [0,0],[-1,0],[0,1],[1,1],[2,1] ],{ canRotate:true,fill:'#f0f080'})
         ]})
   } else if(level===1) {
-    return({goals:[new this.createGoal(3 ,3 ,grid,[ [0,0],[0,1],[1,0],[1,1],[1,2],[2,2],[2,3] ])],
-    pieces:[new this.createPiece(0 , 0 , grid, [ [0,0],[1,0],[1,1] ],{fill:'#57535f'}),
-            new this.createPiece(4 , 1 , grid, [ [0,0],[0,1],[1,0],[1,1] ])
+    return({goals:[ this.createGoal(3 ,3 ,grid,[ [0,0],[0,1],[1,0],[1,1],[1,2],[2,2],[2,3] ])],
+    pieces:[ this.createPiece(0 , 0 , grid, [ [0,0],[1,0],[1,1] ],{canRotate:true,fill:'#f08080'}),
+             this.createPiece(4 , 1 , grid, [ [0,0],[0,1],[1,0],[1,1] ])
         ]})
     } else return(null);
 };

@@ -64,7 +64,6 @@ As you secure one shiny gadget, you trigger some magic anomaly... </br></p>
 <p><a0 onclick='start();'>That magic portal sucks you right in...wush</a></p><hr>
 There are also some options to make a fastforward (might behave oddly): </br>
 [[FF Endgame]]
-[[BlockPuzzleTest]]
 </article>
 <script> function start() {
     window.story.state.DngSY.remainingNights=1;
@@ -87,12 +86,12 @@ This is for testing purpose with some configurable settings.
     window.gm.enterVR();
     //window.gm.MutationsLib['swapGender'](window.gm.player,window.storage.constructors["VulvaHuman"]);
     window.gm.player.levelUp(5);window.gm.player.autoLeveling();
-    window.gm.player.Stats.increment(stSavagenessMax.id,100);
+    window.gm.player.Stats.increment("savagenessMax",100);
     window.story.state.DngSY.dngLevel=10;//todo
 }
 </script>
 
-:: Intro_old
+:: Intro_DLC
 <article><%window.gm.initGame();window.gm.player.location=window.passage.name;%>
 <p>Welcome to Meason, a town somewhere in these days. </br>
 You are a student in the local university and live in a shared house with some other fellows. </br></p>
@@ -105,7 +104,6 @@ There are also some options to make a fastforward (might behave oddly): </br>
 [[FF before the bridge]]</br>
 [[FF Bridge passage unlocked]]</br>
 debug only! :</br>
-[[SY_Intro]]</br>
 [[FF WolfVictory]]</br>
 [[FF TestArena]]</br>
 </article>
