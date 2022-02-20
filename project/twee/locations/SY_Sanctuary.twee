@@ -76,6 +76,7 @@ The portal could you bring to the following places:</br>
 </article><article id="LogPanel"></article></section>
 <script>
 var msg='',lvl=window.story.state.DngSY.dngLevel;
+msg+=(true)?'<p><a0 onclick=\'window.story.state.DngSY.dngOW=true;window.story.show(\"HC_Entry\");\'>Haunted Castle</a></p>':'';
 msg+=(lvl>=4)?'<p><a0 onclick=\'window.story.state.DngSY.dngOW=true;window.story.show(\"FM_Entry\");\'>Farm</a></p>':'';
 msg+=(lvl>=2)?'<p><a0 onclick=\'window.story.state.DngSY.dngOW=true;window.story.show(\"CV_Entry\");\'>Crystal Cave</a></p>':'';
 msg+=(lvl>=2)?'<p><a0 onclick=\'window.story.state.DngSY.dngOW=true;window.story.show(\"DF_Entry\");\'>Lush forest</a></p>':'';

@@ -154,7 +154,7 @@ window.gm.initGameFlags = function(forceReset,NGP=null) {
   let s= window.story.state;
   if (forceReset) {  
     s.Settings=s.DngCV =s.DngDF = s.DngAM= s.DngSY=s.DngMN=s.DngAT=null; 
-    s.DngFM=s.DngSC=s.DngLB=null;
+    s.DngFM=s.DngSC=s.DngLB=s.DngHC=null;
   }
   let Settings = {
     showCombatPictures:true,
@@ -168,6 +168,7 @@ window.gm.initGameFlags = function(forceReset,NGP=null) {
       pussy:0,
       visitedTiles: [],mapReveal: [],
       dng:'', //current dungeon name
+      prevLocation:'', nextLocation:'',
       dngMap:{} //dungeon map info
   };
   let DngAM = {
@@ -186,6 +187,10 @@ window.gm.initGameFlags = function(forceReset,NGP=null) {
   let DngFM = {
     visitedTiles: [],mapReveal: [],
     tmp: {}
+  };
+  let DngHC = {
+    visitedTiles: [],mapReveal: [],
+    tmp:{} ,tasks:{}
   };
   let DngLB = {
     visitedTiles: [],mapReveal: [],
@@ -213,6 +218,7 @@ window.gm.initGameFlags = function(forceReset,NGP=null) {
   s.DngAT=window.gm.util.mergePlainObject(DngAT,s.DngAT);
   s.DngFM=window.gm.util.mergePlainObject(DngFM,s.DngFM);
   s.DngSC=window.gm.util.mergePlainObject(DngSC,s.DngSC);
+  s.DngHC=window.gm.util.mergePlainObject(DngHC,s.DngHC);
   s.DngLB=window.gm.util.mergePlainObject(DngLB,s.DngLB);
   //todo cleanout obsolete data ( filtering those not defined in template) 
 }
@@ -363,12 +369,13 @@ window.gm.moveHere = function(time=15){
 * creates link for ('enter door', 'north'):  [[enter door| MN_Lv3_F2]]  - assuming you are in tile MN_Lv3_F3 in MN_Lv3 
 * only creates the link if the passage with this name exist and the direction in the dngMap is specified 
 */
-window.gm.printNav=function(label,dir){
+window.gm.printNav=function(label,dir,args=null){
   if(!label && !dir) {
-    return('</br><p>'+window.gm.printNav('Go north','north')+'</br>'+
-    window.gm.printNav('Go west','west')+' '+window.gm.printNav('Go east','east')+'</br>'+
-    window.gm.printNav('Go south','south')+'</br></p>');
+    return('</br><p>'+window.gm.printNav('Go north','north',args)+'</br>'+
+    window.gm.printNav('Go west','west',args)+' '+window.gm.printNav('Go east','east',args)+'</br>'+
+    window.gm.printNav('Go south','south',args)+'</br></p>');
   }
+  let foo= (args!==null && args.func)?args.func:(function(to){return('window.story.show(\"'+to+'\");');}); 
   let here = window.passage.name.replace(window.story.state.DngSY.dng+'_','');
   let to,k,i=0;
   const X=['A','B','C','D','E','F','G','H','I','J','K','L','M','N'],Y=['0','1','2','3','4','5','6','7','8','9'];
@@ -407,7 +414,7 @@ window.gm.printNav=function(label,dir){
   if(!found) return(''); //no dir
   to=window.story.state.DngSY.dng+'_'+to;
   if(!window.story.passage(to)) return(''); //no passage
-  return(window.gm.printPassageLink(label,to));
+  return(window.gm.printLink(label,foo(to)));//return(window.gm.printPassageLink(label,to));
 };
 window.gm.rollExploreCity= function() {
   let s=window.story.state;

@@ -171,13 +171,13 @@ window.gm.encounters.lizan = function(params) {
 /*------------------------*/
 window.gm.encounters.wolf = function(params) {
     var amount=(params&&params.amount)?params.amount:1, location=(params&&params.location)?params.location:window.passage.name;
-    var type =(params&&params.type)?params.type:0;
+    var type =(params&&params.type)?params.type:0, levelUp=(params&&params.levelUp)?params.levelUp:0;
     window.gm.Encounter = new Encounter();
     window.gm.Encounter.EnemyFunc = (function() { 
         let mobs =[];
         for(var i=amount;i>0;i-=1) {
             let x;
-            x = window.gm.Mobs.Wolf(type); x.scaleLevel(window.gm.player.level);
+            x = window.gm.Mobs.Wolf(type); x.scaleLevel(window.gm.player.level+levelUp);
             if(_.random(1,100)>50) {
                 window.gm.MutationsLib.swapGender(x,window.storage.constructors["VulvaHuman"]);
             } 

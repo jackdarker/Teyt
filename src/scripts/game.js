@@ -577,9 +577,9 @@ window.gm.printTalkLink =function(elmt,unhideThis,cb=null) {
 window.gm.printPassageLink= function(label,target) {
   return("<a href=\"javascript:void(0)\" data-passage=\""+target+"\">"+label+"</a>");
 };
-//prints a link where target is a expression called onClick
+//prints a link where target is a expression called onClick. Use \" instead of " or ' !
 window.gm.printLink= function(label,target) {
-  return("<a href=\"javascript:void(0)\" onclick=\""+target+"\">"+label+"</a>");
+  return('<a href=\'javascript:void(0)\' onclick=\''+target+'\'>'+label+'</a>');
 };
 
 //prints a link that when clicked picksup an item and places it in the inventory, if itemleft is <0, no link appears

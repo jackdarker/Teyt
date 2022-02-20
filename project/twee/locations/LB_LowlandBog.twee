@@ -8,7 +8,7 @@
 :: LB_Entry
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
-TODO Appear at farm.
+TODO Appear at bog.
 </br><p> [[Next|LB_Lvx_J4]] </br></p>
 </article><article id="LogPanel"></article></section>
 <script>

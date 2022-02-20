@@ -27,19 +27,51 @@ window.gm.gridToGraph=function(grid) {
   graph.areNodesEqual=function(nodeA,nodeB){return(nodeA.origNode.name===nodeB.origNode.name)};
   return(graph)
 }
-window.gm.testA=function() {
-    var width=400,height=200,step=32;
-    var draw = document.querySelector("#canvas svg");
-    if(!draw) draw = SVG().addTo('#canvas').size(width, height);
-    else draw = SVG(draw);//recover svg document instead appending new one
-    draw.rect(width, height).attr({ fill: '#303030'});
-    var node = SVG(window.gm.images['template3']()); //get the source-svg
-    var group=node.find('#layer1')[0]; //fetch a layergroup by id to add to
-    var tmpl = node.find('#tmplRoom')[0];
-    var ox= tmpl.cx(),oy=tmpl.cy(); //
-    var A1 = group.use('tmplRoom').attr({id:"Tile_A1"}).move(0, 0).addClass('roomFound');
-    var A2 = group.use('tmplRoom').attr({id:"Tile_A2"}).move(0, step).addClass('roomVisited');
-    group.text(function(add) {add.tspan('E')}).addClass('textLabel').ax(A2.cx()+ox).ay(A2.cy()+oy);
-    var door = group.polyline([[A1.cx()+ox,A1.cy()+oy], [A2.cx()+ox,A2.cy()+oy]]).attr({id:"A1A2"}).insertBefore(A1).addClass('pathFound');
-    node.addTo(draw);
-  }
+window.gm.printNav2=function(label,to) {
+    let args = { func: function(to){return('window.gm.navHere(\"'+to+'\")');}};
+    return(window.gm.printNav(label,to,args));
+}
+window.gm.navHere = function(to) {
+    window.story.state.DngSY.prevLocation=window.gm.player.location;
+    window.story.state.DngSY.nextLocation=to;
+    let room=to.replace(window.story.state.DngSY.dng+"_","");
+    switch(window.story.state.DngSY.dng) { //add specific functions here
+        case "HC_Lvx": to=window.gm.navEvent_HC(room); break;
+        default: break;
+    }
+    if(to==="") to=window.story.state.DngSY.nextLocation;
+    window.gm.addTime(15);
+    window.story.show(to);
+}
+window.gm.navEvent_HC = function(room) {
+    let to = '';
+    let evt,evts = window.story.state.DngHC.tmp.evt[room];
+    //tick = timestamp  
+    //state: 0-inactive  1-active  2-done 
+    if(evts) {
+        evt = evts["dog"];
+        if(evt) {
+            if(evt.state===0) to="HC_Meet_Dog";
+        } else {}
+    }
+    return(to);
+}
+window.gm.randomTask = function() {
+    let tasks = window.story.state.DngHC.tasks;
+    if(tasks==={}) { //init tasks
+        //within 1 day gather 3 mushrooms
+        //find 3 black candles
+        //banish 2 hounds
+        //open 4 containers within 3 days
+        //drink 3 mysterious potions 
+        //deliver 2l milk in 2 days
+        //help milikin the steeds and collect 2l cum
+        //get pierced
+        //recover your virginity within 5days
+        //
+        //walk around nude (except forced gear) for 3 days
+        //wear a tail-plug for 3 days
+
+    }
+    let currTask
+}

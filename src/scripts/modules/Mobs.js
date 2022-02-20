@@ -2,6 +2,7 @@
 /*
 - imp
 - nymph
+- beauty nurse
 - kobold
 - naga
 - stag-boy/-Stud  archer, drummer, warrior
@@ -52,7 +53,11 @@ class Wolf extends Mob {
             foe.name = foe.id = 'AlphaWolf';
             foe.Stats.increment('healthMax',-0.3*(foe.health().max));
             foe.Skills.addItem(SkillCallHelp.factory('Wolf')); //todo chance to call?
-            foe.pic= 'assets/battlers/wolf1';
+            foe.pic= 'wolf3';
+        } else if(type==='Guarddog') {
+            foe.name = foe.id = 'Guarddog';
+            foe.Stats.increment('healthMax',-0.3*(foe.health().max));
+            foe.pic= 'wolf1';
         } else {
             foe.Stats.increment('healthMax',-0.5*(foe.health().max));
         }
@@ -231,8 +236,6 @@ class Lapine extends Mob {
         this.Outfit.addItem(ShortsLeather.factory(100));
         let sk = new SkillKick();
         this.Skills.addItem(sk);
-        this.levelUp(1);
-        this.autoLeveling();
     }
     calcCombatMove(enemys,friends){
         let result = {OK:true,msg:''};
@@ -390,8 +393,6 @@ class Vine extends Mob {
         this.pic= 'unknown';
         this.Outfit.addItem(new BaseWorm());
         this.Skills.addItem(new SkillGrapple());
-        this.levelUp(1);
-        this.autoLeveling();
         this.tmp = {grappleCoolDown:1};
     }
     calcCombatMove(enemys,friends){

@@ -30,15 +30,15 @@
      inkscape:snap-to-guides="false"
      inkscape:snap-bbox="false"
      inkscape:snap-bbox-midpoints="true"
-     inkscape:zoom="2"
-     inkscape:cx="211"
-     inkscape:cy="93.25"
+     inkscape:zoom="8"
+     inkscape:cx="98.5"
+     inkscape:cy="-80.4375"
      inkscape:window-width="1920"
      inkscape:window-height="1017"
      inkscape:window-x="1912"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
-     inkscape:current-layer="layer2"
+     inkscape:current-layer="layerTmpl"
      units="px"
      width="600px"
      scale-x="0.4"
@@ -86,6 +86,107 @@
   </sodipodi:namedview>
   <defs
      id="defs2">
+    <marker
+       style="overflow:visible"
+       id="Tail"
+       refX="0.0"
+       refY="0.0"
+       orient="auto"
+       inkscape:stockid="Tail"
+       inkscape:isstock="true">
+      <g
+         transform="scale(-1.2)"
+         id="g1217">
+        <path
+           style="fill:none;fill-rule:evenodd;stroke:context-stroke;stroke-width:0.8;stroke-linecap:round"
+           d="M -3.8048674,-3.9585227 L 0.54352094,0"
+           id="path1205" />
+        <path
+           style="fill:none;fill-rule:evenodd;stroke:context-stroke;stroke-width:0.8;stroke-linecap:round"
+           d="M -1.2866832,-3.9585227 L 3.0617053,0"
+           id="path1207" />
+        <path
+           style="fill:none;fill-rule:evenodd;stroke:context-stroke;stroke-width:0.8;stroke-linecap:round"
+           d="M 1.3053582,-3.9585227 L 5.6537466,0"
+           id="path1209" />
+        <path
+           style="fill:none;fill-rule:evenodd;stroke:context-stroke;stroke-width:0.8;stroke-linecap:round"
+           d="M -3.8048674,4.1775838 L 0.54352094,0.21974226"
+           id="path1211" />
+        <path
+           style="fill:none;fill-rule:evenodd;stroke:context-stroke;stroke-width:0.8;stroke-linecap:round"
+           d="M -1.2866832,4.1775838 L 3.0617053,0.21974226"
+           id="path1213" />
+        <path
+           style="fill:none;fill-rule:evenodd;stroke:context-stroke;stroke-width:0.8;stroke-linecap:round"
+           d="M 1.3053582,4.1775838 L 5.6537466,0.21974226"
+           id="path1215" />
+      </g>
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="DotM"
+       refX="0.0"
+       refY="0.0"
+       orient="auto"
+       inkscape:stockid="DotM"
+       inkscape:isstock="true">
+      <path
+         transform="scale(0.4) translate(7.4, 1)"
+         style="fill-rule:evenodd;fill:context-stroke;stroke:context-stroke;stroke-width:1.0pt"
+         d="M -2.5,-1.0 C -2.5,1.7600000 -4.7400000,4.0 -7.5,4.0 C -10.260000,4.0 -12.5,1.7600000 -12.5,-1.0 C -12.5,-3.7600000 -10.260000,-6.0 -7.5,-6.0 C -4.7400000,-6.0 -2.5,-3.7600000 -2.5,-1.0 z "
+         id="path1233" />
+    </marker>
+    <linearGradient
+       id="linearGradient2214"
+       inkscape:swatch="solid">
+      <stop
+         style="stop-color:#736b00;stop-opacity:1;"
+         offset="0"
+         id="stop2212" />
+    </linearGradient>
+    <marker
+       style="overflow:visible"
+       id="TriangleInS"
+       refX="0.0"
+       refY="0.0"
+       orient="auto"
+       inkscape:stockid="TriangleInS"
+       inkscape:isstock="true">
+      <path
+         transform="scale(-0.2)"
+         style="fill-rule:evenodd;fill:context-stroke;stroke:context-stroke;stroke-width:1.0pt"
+         d="M 5.77,0.0 L -2.88,5.0 L -2.88,-5.0 L 5.77,0.0 z "
+         id="path1308" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="StopL"
+       refX="0.0"
+       refY="0.0"
+       orient="auto"
+       inkscape:stockid="StopL"
+       inkscape:isstock="true">
+      <path
+         transform="scale(0.8)"
+         style="fill:none;fill-opacity:0.75000000;fill-rule:evenodd;stroke:context-stroke;stroke-width:1.0pt"
+         d="M 0.0,5.65 L 0.0,-5.65"
+         id="path1338" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="SquareL"
+       refX="0.0"
+       refY="0.0"
+       orient="auto"
+       inkscape:stockid="SquareL"
+       inkscape:isstock="true">
+      <path
+         transform="scale(0.8)"
+         style="fill-rule:evenodd;fill:context-stroke;stroke:context-stroke;stroke-width:1.0pt"
+         d="M -5.0,-5.0 L -5.0,5.0 L 5.0,5.0 L 5.0,-5.0 L -5.0,-5.0 z "
+         id="path1239" />
+    </marker>
     <linearGradient
        inkscape:collect="always"
        id="linearGradient1940">
@@ -159,8 +260,59 @@
   font-size:12px;
   line-height:1.2;
   stroke-width:0.5;
-text-anchor:middle;
-text-align:center;
+  text-anchor:middle;
+  text-align:center;
+}
+.pathBlocked {
+  display:inline;
+  fill:#000000;
+  fill-opacity:1;
+  fill-rule:evenodd;
+  paint-order:fill markers stroke;
+  stop-color:#000000;
+  stroke:#731600;
+  stroke-dasharray:04,4;
+  stroke-dashoffset:0;
+  stroke-linecap:butt;
+  stroke-linejoin:bevel;
+  stroke-miterlimit:4;
+  stroke-opacity:1;
+  stroke-width:15.99874016;
+}
+.pathSmall {
+  fill:none;
+  stroke:#e67719;
+  stroke-dasharray:7.55905533,3.77952766;
+  stroke-dashoffset:0;
+  stroke-linecap:butt;
+  stroke-linejoin:miter;
+  stroke-miterlimit:4;
+  stroke-opacity:1;
+  stroke-width:3.77952766;
+}
+.textLabel2 {
+  -inkscape-font-specification:Arial;
+  -inkscape-stroke:none;
+  fill:#0000ff;
+  fill-opacity:1;
+  font-family:Arial;
+  font-size:16px;
+  font-stretch:normal;
+  font-style:normal;
+  font-variant:normal;
+  font-weight:normal;
+  opacity:1;
+  stop-color:#000000;
+  stop-opacity:1;
+  stroke:#5ea230;
+  stroke-dasharray:none;
+  stroke-dashoffset:0;
+  stroke-linecap:butt;
+  stroke-linejoin:miter;
+  stroke-miterlimit:4;
+  stroke-opacity:0.766129;
+  stroke-width:0.999999;
+  vector-effect:none;
 }
 ]]></style>
     <linearGradient
@@ -420,6 +572,28 @@ text-align:center;
          x="-16"
          y="175.9996"
          id="tspan8743">6</tspan></text>
+    <path
+       d="M 0,-80 H 32"
+       id="path4639-2-8-2-1"
+       inkscape:connector-type="polyline"
+       inkscape:connector-curvature="0"
+       class="pathBlocked"
+       sodipodi:nodetypes="cc" />
+    <path
+       d="m -112,-64 h 64"
+       id="path2936"
+       sodipodi:nodetypes="cc"
+       class="pathSmall" />
+    <text
+       xml:space="preserve"
+       x="96"
+       y="-80"
+       id="text26358"
+       class="textLabel2"><tspan
+         sodipodi:role="line"
+         id="tspan26356"
+         x="96"
+         y="-80">label2</tspan></text>
   </g>
   <g
      inkscape:groupmode="layer"
