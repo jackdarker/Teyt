@@ -60,7 +60,9 @@ window.gm.randomTask = function() {
     let tasks = window.story.state.DngHC.tasks;
     if(tasks==={}) { //init tasks
         //within 1 day gather 3 mushrooms
+        tasks.shrooms={state:0,finished:0,timeStart:window.gm.getTime()};
         //find 3 black candles
+
         //banish 2 hounds
         //open 4 containers within 3 days
         //drink 3 mysterious potions 
@@ -73,5 +75,5 @@ window.gm.randomTask = function() {
         //wear a tail-plug for 3 days
 
     }
-    let currTask
+    let currTask=tasks.shrooms;
 }

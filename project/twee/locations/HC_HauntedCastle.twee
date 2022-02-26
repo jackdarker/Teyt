@@ -68,7 +68,7 @@ function buildRooms() {
     s.vars.spawnAt="SY_Recover_Death";
     var evt = { //events on tile-enter
         G3: {dog:{tick:'',state:0 }}, 
-        I4: {dog:{tick:'',state:0 }},
+        J4: {dog:{tick:'',state:0 }},
         F4: {dog:{tick:'',state:0 }}
     }
     s.DngHC.tmp={bovus:[], tickPass:'',
@@ -222,7 +222,7 @@ As soon as you enter the room you notice that some of the cell-doors are standin
 :: HC_Lvx_G5
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
-The altar of the good deeds: A demure person might <a0 onclick=''>pray</a> here to get a blessing or a penalty removed. But you might have a deed to fullfill to prove you are a worthy person. 
+The altar of the good deeds: A demure person might <a0 onclick='window.story.show(\"HC_Lvx_Altar\")'>pray</a> here to get a blessing or a penalty removed. But you might have a deed to fullfill to prove you are a worthy person. 
 <%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
 <%=window.story.render("HC_Encounters")%>
@@ -292,3 +292,17 @@ The area here is flooded with some murky water. You cant know how deep it is - o
 <%=window.story.render("HC_Encounters")%>
 
 
+:: HC_Lvx_Altar
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+"There is a portal hidden somewhere here but it is vamished and corrrupted. You need to resurrect its power to be able to flee from this place."</br>
+"No one will come here to help you. If you just stay in that cell, you will just starve to death or get insane.."</br>
+"To be able to help you, you have to help me first. "</br>
+<div id='select1' > "Find some black candles"
+<a0 onclick='window.gm.printTalkLink("div#select1","div#choice1a")'>click a</a></br>
+<a0 onclick='window.gm.printTalkLink("div#select1","div#choice1b")'>click b</a></br>
+</div><div id='choice1a' hidden></br>
+</div>
+<div id='choice1b' hidden></br>
+</div>
+</article><article id="LogPanel"></article></section>
+<%=window.story.render("HC_Encounters")%>

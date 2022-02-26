@@ -165,7 +165,7 @@ window.gm.MutationsLib['mutateWolf'] = function (char) {
             item.setStyle('wolf');
             msg=("Your tail is now a fuzzy bush like that of a wolf.</br>");
         } else {
-            let growth = item.growth+0.25;
+            let growth = item.data.growth+0.25;
             let maxGrowth = item.maxGrowth;
             if(growth >= 1) {
                 msg+="That tail didnt grow any further.</br>";

@@ -627,7 +627,7 @@ class effMutateCat extends Effect {
                     if(me.data.cycles<=0) { 
                         Effects.removeItem(me.data.id);
                     }
-                    window.gm.MutationsLib.mutateCat(this.parent.parent);
+                    window.gm.MutationsLib.mutateCat(me.parent.parent);
                     //window.gm.pushDeferredEvent("CatHabit");
                     Effects.removeItem(me.data.id);});
                 }(this));
@@ -665,7 +665,7 @@ class effMutateWolf extends Effect {
                     if(me.data.cycles<=0) { 
                         Effects.removeItem(me.data.id);
                     }
-                    window.gm.MutationsLib.mutateWolf(this.parent.parent);
+                    window.gm.MutationsLib.mutateWolf(me.parent.parent);
                     Effects.removeItem(me.data.id);});
                 }(this));
             }
