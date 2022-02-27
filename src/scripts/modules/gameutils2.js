@@ -45,7 +45,7 @@ window.gm.navHere = function(to) {
 }
 window.gm.navEvent_HC = function(room) {
     let to = '';
-    let evt,evts = window.story.state.DngHC.tmp.evt[room];
+    let evt,evts = window.story.state.DngHC.tmp.evtEnter[room];
     //tick = timestamp  
     //state: 0-inactive  1-active  2-done 
     if(evts) {
@@ -55,6 +55,25 @@ window.gm.navEvent_HC = function(room) {
         } else {}
     }
     return(to);
+}
+window.gm.renderRoom= function(room){
+    let msg="",deltaT,_evt,_evts= window.story.state.DngHC.tmp.evtSpawn[room];
+    if(!_evts) return(msg);
+    _evt=_evts["chest"];
+    if(_evt && (_evt.state===0 || _evt.state===1)) {
+      msg+=window.story.render("HC_Lvx_Chest");
+    }
+    _evt=_evts["mushroom"];
+    if(_evt && (_evt.state===0 || _evt.state===1)) {
+        deltaT=window.gm.getDeltaTime(window.gm.getTime(),_evt.tick);
+        if(_evt.loot==="BrownMushroom" && deltaT>4800) {
+            _evt.tick=window.gm.getTime();_evt.loot="RottenMushroom";
+        } else if(_evt.loot==="ViolettMushroom" && deltaT>2400){
+            _evt.tick=window.gm.getTime();_evt.loot="BrownMushroom";
+        }
+        msg+=window.story.render("HC_Lvx_Mushroom");
+    }
+    return(msg);
 }
 window.gm.randomTask = function() {
     let tasks = window.story.state.DngHC.tasks;

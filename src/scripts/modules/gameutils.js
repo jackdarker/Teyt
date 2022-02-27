@@ -168,7 +168,7 @@ window.gm.initGameFlags = function(forceReset,NGP=null) {
       pussy:0,
       visitedTiles: [],mapReveal: [],
       dng:'', //current dungeon name
-      prevLocation:'', nextLocation:'',
+      prevLocation:'', nextLocation:'', //used for nav-logic
       dngMap:{} //dungeon map info
   };
   let DngAM = {
@@ -534,6 +534,8 @@ window.gm.printMap2=function(dng,playerTile,reveal,visitedTiles) {
       }
     }
   }
+  //todo add gridlines and grid-labels
+  //add legend
   node.text(function(add) {add.tspan(dng.legend||'')}).addClass('textLabel').ax(0).ay(0);
   node.addTo(draw);
 }

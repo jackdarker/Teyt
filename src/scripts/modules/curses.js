@@ -180,9 +180,26 @@ class CrsEffLock extends CrsEffect{
     apply(unapply) {
         if(unapply) {
             this.parent.parent.parent.parent.Inv.removeItem(this.key,1);
-            window.gm.pushDeferredEvent("GenericDeffered",['With the key, it was now possible to unlock and remove '+this.parent.parent.name+' !']);
+            window.gm.pushDeferredEvent("GenericDeffered",['With the key, it was now possible to unlock '+this.parent.parent.name+' !']);
         } else {
             window.gm.pushDeferredEvent("GenericDeffered",['As soon as you equiped '+this.parent.parent.name+', some hidden lock sealed the item on you !']);
+        }
+    }
+}
+class CrsEffSeal extends CrsEffect{
+    constructor() { super(); this.key='KeyRestraintA';}
+    toJSON() {return window.storage.Generic_toJSON("CrsEffSeal", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(CrsEffSeal, value.data));}
+    get desc() {return("The item is sealed magically to its wearer. The magic seal has to be weakened before the item can be removed.")}
+    canUnequip() {
+        let res= {OK:false,msg:'This device is seald by magic.'};
+        return(res);
+    }
+    apply(unapply) {
+        if(unapply) {
+            window.gm.pushDeferredEvent("GenericDeffered",['The seal was removed!']);
+        } else {
+            window.gm.pushDeferredEvent("GenericDeffered",['As soon as you equiped '+this.parent.parent.name+', the item sealed itself on you!']);
         }
     }
 }
@@ -262,6 +279,10 @@ window.gm.makeCursedItem = function(item, extra) {
         eff = new CrsEffLock();
         list.push(eff);
     }
+    if(extra.lock) {            //seal:1
+        eff = new CrsEffSeal();
+        list.push(eff);
+    }
     if(extra.convert) {         //convert:'rubber'
         eff = new CrsEffConvert();
         eff.newItem=extra.convert;
@@ -297,6 +318,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(CrsTrgDelayed);
     window.storage.registerConstructor(CrsTrgOnEquip);
     window.storage.registerConstructor(CrsEffLock);
+    window.storage.registerConstructor(CrsEffSeal);
     window.storage.registerConstructor(CrsEffConvert);
     window.storage.registerConstructor(CrsEffEnergyDrain);
     window.storage.registerConstructor(CrsEffStatBonus);

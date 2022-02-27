@@ -105,6 +105,14 @@ window.gm.questDef = window.gm.questDef || {};
     quest.addMileStone(new QuestMilestone(400,"","Is that wolf stronger than you? Lets find out.",        NOP,hidden));
     quest.addMileStone(new QuestMilestone(500,"","",  NOP));
     window.gm.questDef[quest.id]= quest;
+}{
+    let NOP = (function(){  return (0)});
+    let hidden = (function(){return(window.gm.quests.getMilestoneState("qBlackCandle").id<100);});
+    let quest = new Quest("qBlackCandle","Black Candles","Black Candles",hidden );
+    quest.addMileStone(new QuestMilestone(1,"","",        NOP,hidden));
+    quest.addMileStone(new QuestMilestone(100,"","Return 3 black candles to the altar. Maybe they are just stored away in a chest or so.",        NOP,hidden));
+    quest.addMileStone(new QuestMilestone(200,"","You returned with the candles.",        NOP,hidden));
+    window.gm.questDef[quest.id]= quest;
 }{   // 
     let NOP = (function(){  return (0)});
     let hidden = (function(){return(window.gm.quests.getMilestoneState("qBondageKink").id<100);});

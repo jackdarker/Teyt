@@ -11,6 +11,7 @@
 - werwolf
 - fungus/spore-pod
 - vile vine
+- mimic
 - lush orchid
 - slug
 - Giant-Snake

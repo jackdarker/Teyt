@@ -39,6 +39,7 @@ class Character {
         this.Skills._parent = window.gm.util.refToParent(this);
         //create basic stats
         stHealth.setup(this.Stats,10,10),stEnergy.setup(this.Stats,30,30),stWill.setup(this.Stats,0,0);
+        stHunger.setup(this.Stats,100,100);
         for(let el of window.gm.combat.TypesDamage) {
             stResistance.setup(this.Stats,0,el.id);
             stArmor.setup(this.Stats,0,el.id); 
@@ -51,6 +52,7 @@ class Character {
         }         
         this.Skills.addItem(new SkillUseItem());this.Skills.addItem(new SkillStruggle());this.Skills.addItem(new SkillAttack());
         this.Skills.addItem(new SkillFlee());    
+        this.Effects.addItem(new effHunger());
         this.Effects.addItem(new effCombatRecovery());
         this.Effects.addItem(new effSpermDecay());
         window.storage.registerConstructor(Character);

@@ -254,11 +254,8 @@ class Effects extends Inventory {  //Todo ?
             window.story.state._gm.debug || (window.gm.player && (window.gm.player.id === this.parent.parent.id)));
     }
 }
-
 /////////////////////////////////////////////////////////////////////////
 /**
- *
- *
  * @class Effect
  */
 class Effect {  

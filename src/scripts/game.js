@@ -457,6 +457,7 @@ window.gm.restorePage=function() {
   if(window.story.state.tmp) {
     let elmts =Object.keys(window.story.state.tmp.flags);
     for(var i=0;i<elmts.length;i++) {
+      if(!$(elmts[i])[0]) continue; //there might be snowman-logic in the page that swaps out parts of the text!
       if(window.story.state.tmp.flags[elmts[i]]==='hidden') {
         $(elmts[i])[0].setAttribute("hidden","");
       } else if(window.story.state.tmp.flags[elmts[i]]==='unhide') {
