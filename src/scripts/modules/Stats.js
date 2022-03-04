@@ -182,7 +182,7 @@ class stHungerMax extends Stat {
     toJSON() {return window.storage.Generic_toJSON("stHungerMax", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stHungerMax, value.data);};
 }
-class stHunger extends Stat { //low value==starving
+class stHunger extends Stat { //high value==starving
     static setup(context, base,max) {
         stHungerMax.setup(context,max);
         stHungerRegen.setup(context,10,100);
@@ -467,7 +467,6 @@ class stFetish extends Stat {
     static listFetish() {
         let list = [/*
         'ftZoophil',
-        'ftBondage',
         'ftDominant',
         'ftSubmissive',
         'ftAnalLover',
@@ -481,6 +480,7 @@ class stFetish extends Stat {
         'ftEggSlut',
         'ftMasochist',
         'ftSadist',
+        'ftBondage',
         'ftExhibition'  */];
         return(list);
     }
@@ -611,7 +611,7 @@ class effHunger extends Effect {
             this.data.time = time;
             this.data.duration =60;
         } else delta=0;
-        this.parent.parent.Stats.increment('hunger',-2*delta/60);
+        this.parent.parent.Stats.increment('hunger',2*delta/60);
         return(null);
     }
     onApply(){

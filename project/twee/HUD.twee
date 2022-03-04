@@ -18,6 +18,7 @@
 <form>
 <button type="button" id="status">Status</button>
 <button type="button" id="inv">Inventory</button>
+<button type="button" id="outfit">Outfit</button>
 <button type="button" id="quests">Quests</button>
 <button type="button" id="dashboard">More</button>
 <!--<button type="button" id="wait" style="width: 100%">Rest 45min</button>-->
@@ -40,6 +41,7 @@ document.querySelector('#status').addEventListener('click', function(){window.st
 document.querySelector('#save').addEventListener('click', function(){window.gm.toggleDialog('#dialog_save');});
 document.querySelector('#help').addEventListener('click', function(){window.story.show('Help_Index');}); 
 document.querySelector('#settings').addEventListener('click', function(){window.story.show('Settings');}); 
+document.querySelector('#outfit').addEventListener('click', function(){window.story.show('Wardrobe');}); 
 </script>
 
 

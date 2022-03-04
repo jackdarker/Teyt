@@ -63,7 +63,7 @@ Those are very present through the game and in the main-story (also check the se
     window.story.state.DngSY.remainingNights=0,window.story.state.DngSY.dngLevel=0;
     window.story.state.vars.spawnAt="HC_Entry";
     window.gm.enterVR();
-    window.gm.quests.addQuest("qBlackCandle",1);
+    window.gm.quests.addQuest("qBlackCandle",1);window.gm.quests.addQuest("qDoorControl",1);
     //window.gm.MutationsLib['swapGender'](window.gm.player,window.storage.constructors["VulvaHuman"]);
     window.gm.player.levelUp(5);window.gm.player.autoLeveling();
 }

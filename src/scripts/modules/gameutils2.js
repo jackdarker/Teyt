@@ -34,27 +34,37 @@ window.gm.printNav2=function(label,to) {
 window.gm.navHere = function(to) {
     window.story.state.DngSY.prevLocation=window.gm.player.location;
     window.story.state.DngSY.nextLocation=to;
-    let room=to.replace(window.story.state.DngSY.dng+"_","");
     switch(window.story.state.DngSY.dng) { //add specific functions here
-        case "HC_Lvx": to=window.gm.navEvent_HC(room); break;
+        case "HC_Lvx": to=window.gm.navEvent_HC(to,window.story.state.DngSY.prevLocation); break;
         default: break;
     }
     if(to==="") to=window.story.state.DngSY.nextLocation;
     window.gm.addTime(15);
     window.story.show(to);
 }
-window.gm.navEvent_HC = function(room) {
-    let to = '';
-    let evt,evts = window.story.state.DngHC.tmp.evtEnter[room];
+window.gm.navEvent_HC = function(to,from) {
+    let _to = '',evt,evts;
+    let _from=from.replace(window.story.state.DngSY.dng+"_","");
+    let room=to.replace(window.story.state.DngSY.dng+"_","");
     //tick = timestamp  
     //state: 0-inactive  1-active  2-done 
+    evts = window.story.state.DngHC.tmp.doors[room];
+    if(evts) {
+        evt = evts[_from];
+        if(evt) {
+            if(evt.state===0) _to="HC_Door_Closed";
+            if(_to!=='') return(_to);
+        }
+    }
+    evts = window.story.state.DngHC.tmp.evtEnter[room];
     if(evts) {
         evt = evts["dog"];
         if(evt) {
-            if(evt.state===0) to="HC_Meet_Dog";
-        } else {}
+            if(evt.state===0) _to="HC_Meet_Dog";
+            if(_to!=='') return(_to);
+        }
     }
-    return(to);
+    return(_to);
 }
 window.gm.renderRoom= function(room){
     let msg="",deltaT,_evt,_evts= window.story.state.DngHC.tmp.evtSpawn[room];
@@ -66,7 +76,7 @@ window.gm.renderRoom= function(room){
     _evt=_evts["mushroom"];
     if(_evt && (_evt.state===0 || _evt.state===1)) {
         deltaT=window.gm.getDeltaTime(window.gm.getTime(),_evt.tick);
-        if(_evt.loot==="BrownMushroom" && deltaT>4800) {
+        if(_evt.loot==="BrownMushroom" && deltaT>4800) { //growth of...
             _evt.tick=window.gm.getTime();_evt.loot="RottenMushroom";
         } else if(_evt.loot==="ViolettMushroom" && deltaT>2400){
             _evt.tick=window.gm.getTime();_evt.loot="BrownMushroom";

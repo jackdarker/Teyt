@@ -113,6 +113,14 @@ window.gm.questDef = window.gm.questDef || {};
     quest.addMileStone(new QuestMilestone(100,"","Return 3 black candles to the altar. Maybe they are just stored away in a chest or so.",        NOP,hidden));
     quest.addMileStone(new QuestMilestone(200,"","You returned with the candles.",        NOP,hidden));
     window.gm.questDef[quest.id]= quest;
+}{
+    let NOP = (function(){  return (0)});
+    let hidden = (function(){return(window.gm.quests.getMilestoneState("qDoorControl").id<100);});
+    let quest = new Quest("qDoorControl","qDoorControl","qDoorControl",hidden );
+    quest.addMileStone(new QuestMilestone(1,"","",        NOP,hidden));
+    quest.addMileStone(new QuestMilestone(100,"","There is a room around here with some levers to open the gates. Find it and open the gate to east of here.",        NOP,hidden));
+    quest.addMileStone(new QuestMilestone(200,"","You opened the gate with the lever.",        NOP,hidden));
+    window.gm.questDef[quest.id]= quest;
 }{   // 
     let NOP = (function(){  return (0)});
     let hidden = (function(){return(window.gm.quests.getMilestoneState("qBondageKink").id<100);});

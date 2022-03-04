@@ -163,6 +163,47 @@ class CollarQuest extends Equipment {
     }
     canUnequip() {return({OK:false, msg:'This can only be removed by a magican!'});}
 }
+class Collar extends Equipment {
+    static factory(style) {let x = new Collar();x.style=style;return(x); }
+    constructor() {
+        super('Collar');
+        this.slotUse = ['Neck'];
+        this.lossOnRespawn = false;
+        this.style=0,this.lewd.slut = 1;
+    }
+    toJSON() {return window.storage.Generic_toJSON("Collar", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(Collar, value.data));}
+    usable(context) {return(this.canEquip(context));}
+    use(context) { //context here is inventory not outfit
+        if(this.parent.parent.Outfit.findItemSlot(this.id).length>0) {  
+            this.parent.parent.Outfit.removeItem(this.id); 
+            return( {OK:true, msg:'unequipped '+ this.name}); //todo
+        } else {
+            this.parent.parent.Outfit.addItem(this); 
+            return( {OK:true, msg:'equipped '+ this.name}); //todo
+        }
+    }
+    //canUnequip() {return({OK:false, msg:'This can only be removed by a magican!'});}
+    set style(style) { 
+        this._style = style; 
+        if(style===0) this.id=this.name='CollarPlain';
+        else if(style===10) this.id=this.name='CollarDog';
+        else if(style===20) this.id=this.name='CollarSpikes';
+        else throw new Error(this.id +' doesnt know '+style);
+    }
+    get style() {return this._style;}
+    get desc() { 
+        let msg ='a simple collar made from black frilly cloth';
+        switch(this._style) {
+            case 10:
+                msg=('This red leather collar has some white bone symbols imprinted. Might look fitting for a dog... ');break;
+            case 20:
+                msg=('A sturdy,black leather collar with shiny pointed metall spikes around it.');break;
+            default:
+        }
+        return(msg);
+    }
+}
 class PiercingClit extends Equipment {
     constructor() {
         super('PiercingClit');
@@ -679,6 +720,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(ChastityBelt);
     window.storage.registerConstructor(CockRing);
     window.storage.registerConstructor(CollarQuest);
+    window.storage.registerConstructor(Collar);
     window.storage.registerConstructor(DaggerSteel);
     window.storage.registerConstructor(HarnessRubber);
     window.storage.registerConstructor(Leggings);
@@ -708,6 +750,8 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['CockCage'] = function () { let x= new ChastityBelt();x.style=100;return(x); };
     ItemsLib['CockRing'] = function () { let x= new CockRing();x.style=0;return(x); };
     ItemsLib['CollarQuest'] = function () { return new CollarQuest();};
+    ItemsLib['CollarDog'] = function () {let x=new Collar();x.style=10;return(x);};
+    ItemsLib['CollarSpikes'] = function () {let x=new Collar();x.style=20;return(x);};
     ItemsLib['Leggings'] = function () { return new Leggings();};
     ItemsLib['Tank-shirt'] = function () { return new TankShirt(); };
     ItemsLib['Jeans'] = function () { return new Jeans();};
