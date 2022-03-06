@@ -255,14 +255,36 @@ class TattooGroin extends Equipment {
         return({OK:true, msg:'tattoed'});}
 }
 class RobesZealot extends Equipment {
+    static factory(style) {
+        let x = new RobesZealot();
+        x.style=style;
+        return(x);
+    }
     constructor() {
         super('RobesZealot');
         this.addTags(['cloth']);
-        this.slotUse = ['Breast','Stomach','Hips','Legs'];
-        this.slotCover = ['bBreast','uBreast','pNipples'];    
-        this.lossOnRespawn = true;
+        this.slotUse = ['Breast','Stomach'];//,'Hips','Legs'];
+        this.slotCover = ['bBreast','uBreast','pNipples','bPenis','bVulva','bBalls','bClit','bAnus','pPenis','pClit'];    
+        this.lossOnRespawn = true;this.style=0;
     }
     get desc() { return 'a robe made from coarse cloth';}
+    set style(style) { 
+        this._style = style; 
+        if(style===0) this.id='RobesZealot',this.name='zealot-robe';
+        else if(style===100) this.id='PrisonerCloths',this.name="prisoner rags";
+        else throw new Error(this.id +' doesnt know '+style);
+    }
+    get style() {return this._style;}
+    get desc() { 
+        let msg ='a robe made from coarse cloth';
+        switch(this._style) {
+            case 100:
+                msg=('a sack-like outfit of a unworthy');
+                break;
+            default:
+        }
+        return(msg);
+    }
     toJSON() {return window.storage.Generic_toJSON("RobesZealot", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(RobesZealot, value.data));}
 
@@ -280,15 +302,36 @@ class HarnessRubber extends Equipment {
     static fromJSON(value) {return(window.storage.Generic_fromJSON(HarnessRubber, value.data));}
 }
 class Briefs extends Equipment {
+    static factory(style) {
+        let x = new Briefs();
+        x.style=style;
+        return(x);
+    }
     constructor() {
         super('Briefs');
         this.addTags(['cloth']);
         this.slotUse = ['uHips'];
         this.slotCover = ['bPenis','bVulva','bBalls','bClit','bAnus','pPenis','pClit'];    
-        this.lossOnRespawn = true;
-        this.lewd.slut = 1;
+        this.lossOnRespawn = true;this.style=0;
     }
     get desc() { return 'plain briefs';}
+    set style(style) { 
+        this._style = style; 
+        if(style===0) this.id=this.name='Briefs';
+        else if(style===100) this.id=this.name='Knickers';
+        else throw new Error(this.id +' doesnt know '+style);
+    }
+    get style() {return this._style;}
+    get desc() { 
+        let msg ='plain briefs';
+        switch(this._style) {
+            case 100:
+                msg=('crude cotton knickers');
+                break;
+            default:
+        }
+        return(msg);
+    }
     toJSON() {return window.storage.Generic_toJSON("Briefs", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(Briefs, value.data));}
 }
@@ -438,8 +481,7 @@ class ShortsLeather extends Equipment {
         this.addTags(['cloth']);
         this.slotUse = ['Hips','Legs'];
         this.slotCover = ['bPenis','bVulva','bBalls','bClit','bAnus','pPenis','pClit'];   
-        this.lossOnRespawn = true;
-        this.style=0;
+        this.lossOnRespawn = true;this.style=0;
     }
     set style(style) { 
         this._style = style; 
@@ -452,7 +494,7 @@ class ShortsLeather extends Equipment {
         let msg ='short trousers made from leather';
         switch(this._style) {
             case 100:
-                msg=('a crude loincloth made from leather');
+                msg=('a crude loincloth made from rough cotton');
                 break;
             default:
         }
@@ -746,6 +788,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['BikiniBottomLeather'] = function () { return new BikiniBottomLeather();};
     ItemsLib['BikiniTopLeather'] = function () { return new BikiniTopLeather();};
     ItemsLib['Briefs'] = function () { return new Briefs();};
+    ItemsLib['Knickers'] = function () { let x= new Briefs();x.style=100;return(x); };
     ItemsLib['ChastityBelt'] = function () { let x= new ChastityBelt();x.style=0;return(x); };
     ItemsLib['CockCage'] = function () { let x= new ChastityBelt();x.style=100;return(x); };
     ItemsLib['CockRing'] = function () { let x= new CockRing();x.style=0;return(x); };
@@ -762,6 +805,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['TattooGroin'] = function () { return new TattooGroin();};
     ItemsLib['LewdMark'] = function () { let x= new TattooGroin();x.style=100;return(x); };
     ItemsLib['RobesZealot'] = function () { return new RobesZealot();};
+    ItemsLib['PrisonerCloths'] = function () { let x= new RobesZealot();x.style=100;return(x); };
     ItemsLib['WristCuffs'] = function () { return new WristCuffs();};
     ItemsLib['HarnessRubber'] = function () { return new HarnessRubber();};
     ItemsLib['BracerLeather'] = function () { let x= new BracerLeather();return(x); };

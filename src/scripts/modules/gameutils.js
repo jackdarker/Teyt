@@ -154,7 +154,7 @@ window.gm.initGameFlags = function(forceReset,NGP=null) {
   let s= window.story.state;
   if (forceReset) {  
     s.Settings=s.DngCV =s.DngDF = s.DngAM= s.DngSY=s.DngMN=s.DngAT=null; 
-    s.DngFM=s.DngSC=s.DngLB=s.DngHC=null;
+    s.DngFM=s.DngSC=s.DngLB=s.DngHC=s.DngPC=null;
   }
   let Settings = {
     showCombatPictures:true,
@@ -190,7 +190,11 @@ window.gm.initGameFlags = function(forceReset,NGP=null) {
   };
   let DngHC = {
     visitedTiles: [],mapReveal: [],
-    tmp:{} ,tasks:{}
+    tmp:{}
+  };
+  let DngPC = {
+    visitedTiles: [],mapReveal: [],
+    tmp:{}
   };
   let DngLB = {
     visitedTiles: [],mapReveal: [],
@@ -220,6 +224,7 @@ window.gm.initGameFlags = function(forceReset,NGP=null) {
   s.DngSC=window.gm.util.mergePlainObject(DngSC,s.DngSC);
   s.DngHC=window.gm.util.mergePlainObject(DngHC,s.DngHC);
   s.DngLB=window.gm.util.mergePlainObject(DngLB,s.DngLB);
+  s.DngPC=window.gm.util.mergePlainObject(DngPC,s.DngPC);
   //todo cleanout obsolete data ( filtering those not defined in template) 
 }
 
@@ -242,6 +247,7 @@ window.gm.getScenePic = function(id){
   if(id==='Garden' || id ==='Park')   return('assets/bg/bg_park.png');
   if(id==='Bedroom' || id==='Your Bedroom')   return('assets/bg/bg_bedroom.png');
   if(id.slice(0,7)==='AM_Lv2_') return('assets/bg/bg_dungeon_2.png');
+  if(id.slice(0,5)==='DngPC') return('assets/bg/bg_dungeon_2.png');
   if(id.slice(0,9)==='CV_Lv1_I3') return('assets/bg/bg_cave_4.png');
   if(id.slice(0,7)==='CV_Lv1_') return('assets/bg/bg_cave_2.png');
   return('assets/bg_park.png')//return('assets/bg/bg_VR_1.png');//todo placehodler
@@ -330,16 +336,21 @@ window.gm.respawn=function(conf={keepInventory:false}) {
   } else if([100,200,300].includes(window.gm.quests.getMilestoneState("qBondageKink").id)){
       window.story.show('YouDiedWithCursedGear');
   } else {*/
-    let robes = new window.storage.constructors['RobesZealot']();
-    window.gm.makeCursedItem(robes,{minItems:2,convert:'HarnessRubber'});
-    window.gm.player.Wardrobe.addItem(robes);
-    window.gm.player.Outfit.addItem(robes);
-    robes = new window.storage.constructors['Briefs']();
-    window.gm.player.Wardrobe.addItem(robes);
-    window.gm.player.Outfit.addItem(robes);
-    let staff = new window.storage.constructors['StaffWodden']();
+    let robes;
+    if(window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib.Breast)===null) {
+      robes = window.gm.ItemsLib['PrisonerCloths']();
+      window.gm.makeCursedItem(robes,{minItems:2,convert:'HarnessRubber'});
+      window.gm.player.Wardrobe.addItem(robes);
+      window.gm.player.Outfit.addItem(robes);
+    }
+    if(window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib.uHips)===null) {
+      robes = window.gm.ItemsLib['Knickers']();
+      window.gm.player.Wardrobe.addItem(robes);
+      window.gm.player.Outfit.addItem(robes);
+    }
+    /*let staff = new window.storage.constructors['StaffWodden']();
     window.gm.player.Inv.addItem(staff);
-    window.gm.player.Outfit.addItem(staff);
+    window.gm.player.Outfit.addItem(staff);*/
     window.story.show(window.story.state.vars.spawnAt);
   //}
 };
@@ -653,7 +664,7 @@ window.gm.printBodyDescription= function(whom,onlyvisible=false) {
   }
   for(el of wornIds) { //notice that an item is only pushed once even if has multiple slots
     let item=whom.Outfit.getItem(el);
-    if(item.slotUse.every(name => fcovered.includes(name))) ignore.push(item); //ignore those that are overed completely
+    if(item.slotUse.every(name => fcovered.includes(name))) ignore.push(item); //ignore those that are covered completely
     else if(item.slotUse.some(name => fignore.includes(name))) ignore.push(item);
     else if(item.slotUse.some(name => fbase.includes(name))) base.push(item);
     else if(item.slotUse.some(name => fhead.includes(name))) head.push(item);
@@ -668,6 +679,7 @@ window.gm.printBodyDescription= function(whom,onlyvisible=false) {
   //null is used to mark linebreaks
   let all = base.concat([null]).concat(head).concat([null]).concat(torso).concat([null]).concat(arms).concat([null]);
   all = all.concat(legs).concat([null]).concat(groin).concat([null]).concat(breast).concat([null]).concat(other);
+  //todo "considering the size of your manmeat you are hung like a horse"
   for(el of all){ msg+= (el!==null)?el.descLong(conv)+' ':'</br>';}
   let lewd = whom.Outfit.getLewdness();
   //msg +='</br>Total lewdness sluty:'+lewd.slut+' bondage:'+lewd.bondage+' sm:'+lewd.sm;

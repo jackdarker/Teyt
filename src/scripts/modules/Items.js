@@ -55,8 +55,7 @@ class Battery extends Item {
     static fromJSON(value) { return window.storage.Generic_fromJSON(Battery, value.data);};
 }
 /////////////////////////////////////////////////////////////////
-//VR-Items
-class Voucher extends Item {
+class Voucher extends Item { //token or coupon for ingame shop
     constructor() {
         super('Voucher');
         this.addTags([window.gm.ItemTags.Money]);this.price=this.basePrice=100;
@@ -66,19 +65,15 @@ class Voucher extends Item {
     static fromJSON(value) { return window.storage.Generic_fromJSON(Voucher, value.data);};
     set style(style) { 
         this._style = style; 
-        if(style===0) this.id='BronzeCoupon',this.name='BronzeCoupon';
-        else if(style===100) this.id='SilverCoupon',this.name='SilverCoupon';
+        if(style===0) this.id=this.name='VoucherIron';
+        else if(style===10) this.id=this.name='VoucherBronze';
+        else if(style===20) this.id=this.name='VoucherSilver';
+        else if(style===30) this.id=this.name='VoucherGold';
         else throw new Error(this.id +' doesnt know '+style);
     }
     get style() {return this._style;}
     get desc() { 
-        let msg ='bronze-voucher for ingame-shop';
-        switch(this._style) {
-            case 100:
-                msg=('silver-voucher for ingame-shop');
-                break;
-            default:
-        }
+        let msg ='a token with a certain value';
         return(msg);
     }
 };
@@ -508,7 +503,9 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['KeyRestraintA'] = function () { let x= new KeyRestraint();return(x);}; 
     ItemsLib['KeyRestraintB'] = function () { let x= new KeyRestraint();x.style=10;return(x);};
     //voucher
-    ItemsLib['VoucherBronze'] = function () { let x= new Voucher();return(x); };
-    ItemsLib['VoucherSilver'] = function () { let x= new Voucher();x.style=100;return(x);};
+    ItemsLib['VoucherIron'] = function () { let x= new Voucher();return(x); };
+    ItemsLib['VoucherBronze'] = function () { let x= new Voucher();x.style=10;return(x); };
+    ItemsLib['VoucherSilver'] = function () { let x= new Voucher();x.style=20;return(x);};
+    ItemsLib['VoucherGold'] = function () { let x= new Voucher();x.style=30;return(x);};
     return ItemsLib; 
 }(window.gm.ItemsLib || {}));

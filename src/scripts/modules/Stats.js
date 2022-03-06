@@ -465,24 +465,29 @@ class stFetish extends Stat {
         _stat.Calc();
     }
     static listFetish() {
-        let list = [/*
+        let list = [
         'ftZoophil',
         'ftDominant',
         'ftSubmissive',
         'ftAnalLover',
         'ftAnalSlut',
-        'ftVaginalLover',
-        'ftVaginalSlut',
+        'ftVaginalLover',//using someones cunt
+        'ftVaginalSlut',//getting your cunt used
         'ftOralLover',
         'ftOralSlut',
-        'ftSizeQueen',
+        'ftCockLover',//
+        'ftCockSlut', //controlled by your dick
+        'ftSizeQueen',//when penetrator is much larger then penetrated
         'ftCumSlurper',
+        'ftBreastLover',
         'ftEggSlut',
         'ftMasochist',
         'ftSadist',
         'ftBondage',
-        'ftExhibition'  */];
-        return(list);
+        'ftExhibition'];
+        return(list);  
+        //ftSizeKing    when penetrator is much smaller ??
+        //horseCockAddled
     }
     constructor() {   super();  }
     toJSON() {return window.storage.Generic_toJSON("stFetish", this); };

@@ -206,7 +206,7 @@ window.gm.getTime= function() {
   return(window.story.state._gm.time+2400*window.story.state._gm.day);
 }
 /*
-* calculates timedifference a-b for hhmm time format
+* calculates timedifference a-b for hhmm time format; retuns minutes ! 
 */
 window.gm.getDeltaTime = function(a,b){
   var m=a%100;         

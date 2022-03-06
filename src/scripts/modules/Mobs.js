@@ -174,7 +174,7 @@ class Lizan extends Mob {
     static factory(type) {
         let foe = new Lizan();
         if(type==='spearthrower') {
-            foe.Outfit.addItem(SpearWodden.factory(100));
+            foe.Outfit.addItem(window.gm.ItemsLib['SpearStone']());
         } else {
             foe.Outfit.addItem(new DaggerSteel());
         }
@@ -217,7 +217,7 @@ class Lapine extends Mob {
     static factory(type) {
         let foe = new Lapine();
         if(type==='spearthrower') {
-            foe.Outfit.addItem(SpearWodden.factory(100));
+            foe.Outfit.addItem(window.gm.ItemsLib['SpearStone']());
         } else {
             foe.Outfit.addItem(new DaggerSteel());
         }
@@ -257,7 +257,7 @@ class Huntress extends Mob {
     static factory(type) {
         let foe = new Huntress();
         if(type==='spearthrower') {
-            foe.Outfit.addItem(SpearWodden.factory(100));
+            foe.Outfit.addItem(window.gm.ItemsLib['SpearStone']());
         } else {
             foe.Outfit.addItem(new DaggerSteel());
         }

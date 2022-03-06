@@ -34,44 +34,68 @@ window.gm.printNav2=function(label,to) {
 window.gm.navHere = function(to) {
     window.story.state.DngSY.prevLocation=window.gm.player.location;
     window.story.state.DngSY.nextLocation=to;
-    switch(window.story.state.DngSY.dng) { //add specific functions here
-        case "HC_Lvx": to=window.gm.navEvent_HC(to,window.story.state.DngSY.prevLocation); break;
-        default: break;
-    }
+    to=window.gm.navEvent(to,window.story.state.DngSY.prevLocation);
     if(to==="") to=window.story.state.DngSY.nextLocation;
     window.gm.addTime(15);
     window.story.show(to);
 }
-window.gm.navEvent_HC = function(to,from) {
-    let _to = '',evt,evts;
-    let _from=from.replace(window.story.state.DngSY.dng+"_","");
-    let room=to.replace(window.story.state.DngSY.dng+"_","");
+window.gm.navEvent = function(to,from) {
+    let _to = '',evt,evts,dng=window.story.state.DngSY.dng;
+    let _from=from.replace(dng+"_","");
+    let _room=to.replace(dng+"_","");
     //tick = timestamp  
-    //state: 0-inactive  1-active  2-done 
-    evts = window.story.state.DngHC.tmp.doors[room];
-    if(evts) {
+    //state: 0-active  1-inactive  
+    evts = window.story.state[dng].tmp.doors[_room];
+    if(evts) { //door-check
         evt = evts[_from];
         if(evt) {
             if(evt.state===0) _to="HC_Door_Closed";
             if(_to!=='') return(_to);
         }
     }
-    evts = window.story.state.DngHC.tmp.evtEnter[room];
-    if(evts) {
+    evts = window.story.state[dng].tmp.evtEnter[_room];
+    if(evts) { //mobs
         evt = evts["dog"];
         if(evt) {
-            if(evt.state===0) _to="HC_Meet_Dog";
+            if(evt.state===0) _to=dng+"_Meet_Dog";
+            if(_to!=='') return(_to);
+        }
+        evt = evts["gas"];
+        if(evt) {
+            //if(evt.state===0) _to="HC_Trap_Gas";
             if(_to!=='') return(_to);
         }
     }
     return(_to);
 }
+window.gm.mobAI = function(mob){
+    function getRoomDirections(from) {
+        let rooms=window.story.state.DngSY.dngMap.grid
+        for(var i=rooms.length-1;i>=0;i--){
+            if(rooms[i].room===from) {
+                return(rooms[i].dirs)
+            }
+        }
+        return([]);
+    }
+    var _now=window.gm.getTime();
+    if(mob.state!==0 || mob.tick==='') {mob.tick=_now;return;}
+    if(window.gm.getDeltaTime(_now,mob.tick)>30) {
+        mob.tick=_now;
+        var _to = getRoomDirections(mob.pos).filter(el=> mob.path.includes(el));
+        if(_to.length>0) {
+            mob.pos=_to[_.random(0,_to.length-1)];
+            alert(mob.id+' now moving to '+mob.pos);
+        }
+    }
+}
+//dynamic room description 
 window.gm.renderRoom= function(room){
-    let msg="",deltaT,_evt,_evts= window.story.state.DngHC.tmp.evtSpawn[room];
+    let msg="",deltaT,dng=window.story.state.DngSY.dng,_evt,_evts= window.story.state[dng].tmp.evtSpawn[room];
     if(!_evts) return(msg);
     _evt=_evts["chest"];
     if(_evt && (_evt.state===0 || _evt.state===1)) {
-      msg+=window.story.render("HC_Lvx_Chest");
+      msg+=window.story.render(dng+"_Chest");
     }
     _evt=_evts["mushroom"];
     if(_evt && (_evt.state===0 || _evt.state===1)) {
@@ -81,15 +105,14 @@ window.gm.renderRoom= function(room){
         } else if(_evt.loot==="ViolettMushroom" && deltaT>2400){
             _evt.tick=window.gm.getTime();_evt.loot="BrownMushroom";
         }
-        msg+=window.story.render("HC_Lvx_Mushroom");
+        msg+=window.story.render(dng+"_Mushroom");
     }
     return(msg);
 }
 window.gm.randomTask = function() {
-    let tasks = window.story.state.DngHC.tasks;
+    let tasks;
     if(tasks==={}) { //init tasks
         //within 1 day gather 3 mushrooms
-        tasks.shrooms={state:0,finished:0,timeStart:window.gm.getTime()};
         //find 3 black candles
 
         //banish 2 hounds
@@ -104,5 +127,4 @@ window.gm.randomTask = function() {
         //wear a tail-plug for 3 days
 
     }
-    let currTask=tasks.shrooms;
 }
