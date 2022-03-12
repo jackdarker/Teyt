@@ -127,6 +127,7 @@ class Ingredient extends Item {
         else if(style===80) this.id=this.name='EmptyGlas';
         else if(style===90) this.id=this.name='CrystalWater';
         else if(style===100) this.id=this.name='BlackCandle';
+        else if(style===110) this.id=this.name='Beewax';
         else throw new Error(this.id +' doesnt know '+style);
     }
     get style() {return this._style;}
@@ -165,6 +166,9 @@ class Ingredient extends Item {
                 break;
             case 100:
                 msg='a black candle; most likely used for (un-)holy rituals.';
+                break;
+            case 110:
+                msg='wax produced from bees.';
                 break;
             default: throw new Error(this.id +' doesnt know '+style);
         }
@@ -306,7 +310,7 @@ class SimpleFood extends Item {
             context.removeItem(this.id);
             if(on instanceof Character){
                 on.addEffect(new effEnergized(),'Simple food:Energized');
-                on.Stats.increment("hunger",this.satiation);
+                on.Stats.increment("hunger",-1*this.satiation);
             return({OK:true, msg:on.name+' ate some plain foods.'});
             }
         } else throw new Error('context is invalid');
@@ -481,6 +485,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['Penilium'] = function () { let x= new RegenderPotion();x.style=10;return(x); };
     //Ingredient
     ItemsLib['SquishedLeech'] = function(){ let x=new Ingredient();x.style=30;return(x);};
+    ItemsLib['Beewax'] = function(){ let x=new Ingredient();x.style=110;return(x);};
     ItemsLib['BogBovus'] = function(){ let x=new Ingredient();x.style=20;return(x);};
     ItemsLib['PurpleBerry'] = function(){ let x=new Ingredient();x.style=10;return(x);};
     ItemsLib['WolfTooth'] = function(){ let x=new Ingredient();x.style=40;return(x);};

@@ -16,12 +16,33 @@ class Leggings extends Equipment {
         return({OK:true, msg:'unequipped'});}
 }
 class Jeans extends Equipment {
+    static factory(style) {
+        let x = new Jeans();
+        x.style=style;
+        return(x);
+    }
     constructor() {
         super('Jeans');
         this.addTags(['cloth']);
-        this.slotUse = ['Legs','Hips'];
+        this.slotUse = ['Legs','Hips'];this.lossOnRespawn = true;this.style=0;
     }
-    get desc() { return 'plain old blue jeans';    }
+    set style(style) { 
+        this._style = style; 
+        if(style===0) this.id='Jeans',this.name='blue jeans';
+        else if(style===100) this.id='Trousers',this.name="black trousers";
+        else throw new Error(this.id +' doesnt know '+style);
+    }
+    get style() {return this._style;}
+    get desc() { 
+        let msg ='plain old blue jeans';
+        switch(this._style) {
+            case 100:
+                msg=('mid-proced business trousers');
+                break;
+            default:
+        }
+        return(msg);
+    }
     toJSON() {return window.storage.Generic_toJSON("Jeans", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(Jeans, value.data));}
 }
@@ -267,7 +288,6 @@ class RobesZealot extends Equipment {
         this.slotCover = ['bBreast','uBreast','pNipples','bPenis','bVulva','bBalls','bClit','bAnus','pPenis','pClit'];    
         this.lossOnRespawn = true;this.style=0;
     }
-    get desc() { return 'a robe made from coarse cloth';}
     set style(style) { 
         this._style = style; 
         if(style===0) this.id='RobesZealot',this.name='zealot-robe';
@@ -798,6 +818,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['Leggings'] = function () { return new Leggings();};
     ItemsLib['Tank-shirt'] = function () { return new TankShirt(); };
     ItemsLib['Jeans'] = function () { return new Jeans();};
+    ItemsLib['Trousers'] = function () {let x=new Jeans();x.style=100;return(x);};
     ItemsLib['Sneakers'] = function () { return new Sneakers();};
     ItemsLib['Pullover'] = function () { return new Pullover();};
     ItemsLib['TailRibbon'] = function () { return new TailRibbon();};

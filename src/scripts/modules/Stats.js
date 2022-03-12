@@ -452,15 +452,15 @@ class stFetish extends Stat {
     static setup(context, base,max,name) { 
         let _stat = new stFetish();
         let _n = _stat.data;
-        _n.id=name+"_Max",_n.base=max, _n.value=max,_n.limits=[{max:100,min:-100}];
+        _n.hidden=4,_n.id=name+"_Max",_n.base=max, _n.value=max,_n.limits=[{max:100,min:-100}];
         context.addItem(_stat);
         _stat = new stFetish();
         _n = _stat.data;
-        _n.id=name+"_Min",_n.base=0, _n.value=0,_n.limits=[{max:100,min:-100}];
+        _n.hidden=4,_n.id=name+"_Min",_n.base=0, _n.value=0,_n.limits=[{max:100,min:-100}];
         context.addItem(_stat);
         _stat = new stFetish();
         _n = _stat.data;
-        _n.id=name,_n.base=base, _n.value=base,_n.limits=[{max:name+"_Max",min:name+"_Min"}];
+        _n.hidden=4,_n.id=name,_n.base=base, _n.value=base,_n.limits=[{max:name+"_Max",min:name+"_Min"}];
         context.addItem(_stat);
         _stat.Calc();
     }

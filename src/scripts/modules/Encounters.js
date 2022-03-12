@@ -226,6 +226,26 @@ window.gm.encounters.lapine = function(params) {
     window.gm.Encounter.scenePic = window.gm.getScenePic(window.gm.Encounter.Location);
     window.gm.Encounter.initCombat();
 }
+window.gm.encounters.anthrocat = function(params) {
+    var amount=(params&&params.amount)?params.amount:1, location=(params&&params.location)?params.location:window.passage.name;
+    window.gm.Encounter = new Encounter();
+    window.gm.Encounter.EnemyFunc = (function() { 
+        let mobs =[];
+        for(var i=amount;i>0;i-=1) {
+            let x = window.gm.Mobs.AnthroCat(); x.scaleLevel(window.gm.player.level);
+            x.name+='#'+i;mobs.push(x);
+        }
+        return(mobs);});
+    window.gm.Encounter.Location = location?location:window.passage.name;
+    window.gm.Encounter.onSubmit =window.gm.Encounter.onDefeat = function() {
+        return('Raked by a cat....</br>'+ window.gm.printPassageLink('Next','LapineDefeat'));
+    }
+    window.gm.Encounter.onVictory = function() {
+        return('The cat surrenders.</br>'+this.fetchLoot()+'</br>'+ window.gm.printPassageLink('Next','LapineVictory'));
+    }
+    window.gm.Encounter.scenePic = window.gm.getScenePic(window.gm.Encounter.Location);
+    window.gm.Encounter.initCombat();
+}
 window.gm.encounters.dryad = function(params) {
     var amount=(params&&params.amount)?params.amount:1, location=(params&&params.location)?params.location:window.passage.name;
     window.gm.Encounter = new Encounter();

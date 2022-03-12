@@ -76,15 +76,16 @@ function buildRooms() {
     }
     s.DngPC.tmp.mobs = [ //wandering mobs
     ];
-    s.DngPC.task = '',s.DngPC.rolledTask=[]; //active task
-    s.DngPC.tasks = [ //task list
-        {id:'bringIron',tick:'',done:0,cnt:0,min:0}
-        ,{id:'bringSilver',tick:'',done:0,cnt:0,min:2}
-        ,{id:'bringGold',tick:'',done:0,cnt:0,min:5}
-        ,{id:'findCursed',tick:'',done:0,cnt:0,min:3}
-        ,{id:'getPierced',tick:'',done:0,cnt:0,min:5}
+    s.DngPC.task = {},s.DngPC.rolledTask=[]; //active task
+    s.DngPC.tasks = { //task list
+        bringIron:{tick:'',done:0,cnt:0,min:1}
+        ,bringSilver:{tick:'',done:0,cnt:0,min:2}
+        ,bringGold:{tick:'',done:0,cnt:0,min:5}
+        ,bringMoney:{tick:'',done:0,cnt:0,min:0}
+        ,findCursed:{tick:'',done:0,cnt:0,min:3}
+        ,getEarsPierced:{tick:'',done:0,cnt:0,min:5}
         //,{id:'getTattoed',tick:'',done:0,cnt:0,min:8}
-        ,{id:'getVagina',tick:'',done:0,cnt:0,min:5}
+        ,getVagina:{tick:'',done:0,cnt:0,min:5}
         //,{id:'getBreast',tick:'',done:0,cnt:0,min:4}
         //,{id:'getPregnant',tick:'',done:0,cnt:0,min:7}
         //,{id:'walkNude',tick:'',done:0,cnt:0,min:4}
@@ -92,7 +93,7 @@ function buildRooms() {
         //,{id:'maidoutfit',tick:'',done:0,cnt:0,min:6}
         //,{id:'ponysuit',tick:'',done:0,cnt:0,min:7}
         //,{id:'bitchsuit',tick:'',done:0,cnt:0,min:9}
-    ];
+    };
 }
 buildRooms();
 </script>
@@ -158,13 +159,30 @@ function tick() {
     let here = window.gm.player.location,_d=window.story.state.DngPC.tmp;
     if(here===_d.tickPass) return;
     _d.tickPass=here;
+    let _t=_d.tier,_allChances=0,_choice=[];
     switch(here) {
-        case "DngPC_H4":window.gm.encounters.hornett({amount:1});window.gm.Encounter.initCombat();
+        case "DngPC_H4":_choice.push({id:'hornett', amount:1, chance:100});
+                        if(_t>1)_choice.push({id:'anthrocat', amount:1, chance:100});
+                        if(_t>3)_choice.push({id:'wolf', amount:1, chance:100});
             break;
-        case "DngPC_I4":window.gm.encounters.hornett({amount:2});window.gm.Encounter.initCombat();
+        case "DngPC_I4":_choice.push({id:'hornett', amount:2, chance:100});
+                        _choice.push({id:'leech', amount:1, chance:100});
+                        if(_t>1)_choice.push({id:'anthrocat', amount:1, chance:100});
+                        if(_t>3)_choice.push({id:'wolf', amount:2, chance:100});
             break;
         default:
     }  
+    _choice.forEach(x=>(_allChances+=x.chance));
+    if(_allChances>0.0) {//choose rnd enemy
+        var _rnd=_.random(0,_allChances-0.01);
+        for(var i = _choice.length-1;i>=0;i--) { 
+            if(_rnd<_allChances && _rnd>=(_allChances-_choice[i].chance)) {
+                window.gm.encounters[_choice[i].id]({amount:_choice[i].amount});window.gm.Encounter.initCombat();                
+                break;
+            }
+            _allChances-=_choice[i].chance;
+        }
+    }
 }
 tick();
 </script>
@@ -183,7 +201,7 @@ There is a stone altar with a large chest for donations.</br>
 Your current donation-tier is: <%=window.story.state.DngPC.tmp.tier%><a0 id='tier' onclick='(function($event){document.querySelector("#"+id+"~p").toggleAttribute("hidden");})(this);'>Hint</a>
 <p hidden> Every 5 tier, a gate toward freedom is unlocked and you can battle deeper into the dungeon.
 </p></br>
-To progress on your path to salvation you need to donate:<div id='choice'></div></br> todo within 20h 3 bronze vouchers;
+To progress on your path to salvation you need to donate:<div id='choice'></div></br>
 <a0 id='vouchers' onclick='(function($event){document.querySelector("#"+id+"~p").toggleAttribute("hidden");})(this);'>Hint</a>
 <p hidden> Where do I find...</br>
 IronVouchers: randomly found in loot; can be bought for money from vendor</br>
@@ -218,49 +236,57 @@ GoldVouchers: gained from solving tasks from shrine</br>
 <script>function getAvailableTasks() { 
     var _tasks=[],_d=window.story.state.DngPC,_t=_d.tmp.tier;
     var msg='choose a task:</br>';
-    function foo(id){
-        msg+=taskDescr(id)+window.gm.printLink("Choose this",'window.story.state.DngPC.task=\"'+id+'\"')+'</br></br>';
+    function foo(task){
+        msg+=taskDescr(task)+window.gm.printLink("Choose this",'window.story.state.DngPC.task={id:\"'+task.id+'\",data:\"'+task.data+'\"},window.story.show(window.passage.name)')+'</br></br>';
     }
+    window.gm.getSaveVersion();
     //if task in progress - show task-info instead
-    if(_d.task!=='') {
+    if(_d.task.id) {
         _d.rolledTask=[],msg='in progress: '+taskDescr(_d.task)+'</br>';
-        if(_d.tasks[_d.task].done>0)) { //task done
-            msg+=window.gm.printLink("Finish task",'window.story.state.DngPC.tasks[\"'+_d.task+'\""].cnt+=1,window.story.state.DngPC.tasks[\"'+_d.task+'\""].done=0,,window.story.state.DngPC.task=\"\"')+'</br>';
-        }//todo possibility to abort and reroll for SilverVoucher?
+        msg+=finishTask().msg;
+        //todo possibility to abort and reroll for SilverVoucher?
         window.gm.printOutput(msg,'#choice');return;  
     }
     if(_d.rolledTask.length>0) { //tasks got already rolled
         _d.rolledTask.forEach(x=>(foo(x)))
     } else {
-        var _allChances=0;
-        for(var i=_d.tasks.length-1;i>=0;i--) {
-            var _chance=100,_tk = _d.tasks[i];
+        var _allChances=0,_tns=Object.keys(_d.tasks);
+        for(var i=_tns.length-1;i>=0;i--) {
+            var _chance=100,_tk=_d.tasks[_tns[i]];
             if(_tk.tick!=='') { //reduce chance for recent tasks or done ones
                 var _dt=window.gm.getDeltaTime(window.gm.getTime(),_tk.tick);
                 if(_dt<1440 || _tk.cnt>7) _chance*=0.5;
                 else if(_dt<2880 || _tk.cnt>4) _chance*=0.3;
             }
-            switch(_tk.id) {
-                case 'getPierced': //only if piercing slot available  //_chance=0;
-                    _tasks.push({id:_tk.id,chance:_chance});
+            if(_tk.min>_d.tmp.tier)_chance=0;
+            switch(_tns[i]) {
+                case 'getEarsPierced': //only if piercing slot available
+                    _tasks.push({id:_tns[i],chance:_chance});
                     break;
                 case 'getVagina': //only if not present 
-                    _tasks.push({id:_tk.id,chance:_chance});
+                    _tasks.push({id:_tns[i],chance:_chance});
                     break;
-                case 'findCursed','bringIron','bringSilver','bringGold':
-                    _tasks.push({id:_tk.id,chance:_chance});
+                case 'findCursed'://how to know what was aquired?
+                    _tasks.push({id:_tns[i],chance:_chance});
+                    break;
+                case 'bringMoney':_tasks.push({id:_tns[i],chance:_chance, data:50*(1+_t)});
+                    break;
+                case 'bringIron':
+                case 'bringSilver':
+                case 'bringGold':
+                    _tasks.push({id:_tns[i],chance:_chance});
                     break;
                 default:
-                    throw new Error('unknown task'+_tk);
+                    throw new Error('unknown task'+_tns[i]);
             }
             _allChances+=_chance;
         }
-        //for(var i=1;i>0;i--) { //up to x tasks to choice from       todo remove task and recalc allchances
+        //for(var i=1;i>0;i--) { //up to x tasks to choose from       todo remove task and recalc allchances
             if(_allChances>0.0) {//choose rnd tasks
                 var _rnd=_.random(0,_allChances-0.01);
                 for(var i = _tasks.length-1;i>=0;i--) { 
                     if(_rnd<_allChances && _rnd>=(_allChances-_tasks[i].chance)) {
-                        _d.rolledTask.push(_tasks[i].id),foo(_tasks[i].id);                    
+                        _d.rolledTask.push(_tasks[i]),foo(_tasks[i]);                    
                         break;
                     }
                     _allChances-=_tasks[i].chance;
@@ -270,10 +296,37 @@ GoldVouchers: gained from solving tasks from shrine</br>
     }
     window.gm.printOutput(msg,'#choice');
 }
-function taskDescr(id){
+function finishTask(){
+    let task=window.story.state.DngPC.task,_res={OK:(task.done>0),msg:''};
+    switch(task.id) {
+        case 'getEarsPierced':
+            break;
+        case 'getVagina':
+            break;
+        case 'findCursed':
+            break;
+        case 'bringIron':
+            break;
+        case 'bringSilver':
+            break;
+        case 'bringGold':
+            break;
+        case 'bringMoney':if(window.gm.player.Inv.countItem('Money')>=task.data){ window.gm.player.Inv.removeItem('Money',task.data),_res.OK=true;}
+            else{ _res.OK=false,_res.msg='Not enough money.</br>'};
+            break;
+        default:
+            throw new Error('unknown task'+task.id);
+    }
+    if(_res.OK===true){
+        window.story.state.DngPC.tasks[task.id].cnt+=1,window.story.state.DngPC.tasks[task.id].done=0,window.story.state.DngPC.task={};//,window.story.show(window.passage.name);
+        window.story.state.DngPC.tmp.tier+=1;_res.msg='donation request fullfilled. Your tier is now: '+window.story.state.DngPC.tmp.tier+'</br>';
+    }
+    return(_res);
+}
+function taskDescr(task){
     var msg='';
-    switch(id) {
-        case 'getPierced':msg='Get something pierced. I can give you one right here.';
+    switch(task.id) {
+        case 'getEarsPierced':msg='Get your ears pierced.';
             break;
         case 'getVagina':msg='Swap that dick of yours against a fine cunt.';
             break;
@@ -285,8 +338,10 @@ function taskDescr(id){
             break;
         case 'bringGold':msg='Gain a gold-token with a special job.';
             break;
+        case 'bringMoney':msg='Some easy task here: get '+task.data+'$.';
+            break;
         default:
-            throw new Error('unknown task'+_tk);
+            throw new Error('unknown task'+task.id);
     }
     return(msg);
 }
@@ -334,7 +389,7 @@ You could rest here to recover health and energy.</br>
 <%} else {%>
 <a0 onclick='($("tw-passage").fadeOut(1000, function(){window.gm.player.sleep(700);window.story.show("DngPC_Sleep");}));'>Sleep Until Morning</a>
 <%}%>
-[[Shrine|DngPC_Shrine]] [[Vendor|DngPC_Shop]] [[Your Chest|GlobalChest]]</br>
+[[Shrine|DngPC_Shrine]] [[Vendor|DngPC_Shop]] [[Storage Chest|GlobalChest]]</br>
 <%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
 <%=window.story.render("DngPC_Encounters")%>
