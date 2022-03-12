@@ -86,14 +86,12 @@ You cant hold any longer and shoot your jizzm inside her.
 
 :: LapineVictory [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<div id='panel'></div><div id='choice'></div>
-</article><article id="LogPanel"></article></section>
+<div id='panel'></div><div id='choice'></div></article><article id="LogPanel"></article></section>
 <script>window.gm.sex.lapineOnPlayer({state:0, battleResult:'victory'});</script>
 
 :: LapineDefeat [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<div id='panel'></div><div id='choice'></div>
-</article><article id="LogPanel"></article></section>
+<div id='panel'></div><div id='choice'></div></article><article id="LogPanel"></article></section>
 <script>window.gm.sex.lapineOnPlayer({state:0, battleResult:'defeat'});</script>
 
 :: LizanVictory [_nosave_]

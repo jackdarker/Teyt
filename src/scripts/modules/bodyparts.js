@@ -480,7 +480,7 @@ class WeaponStinger extends BodyPart {
         let mod = new SkillMod();
         let _dmg =5;
         if(this.data.style==='wasplike' ) _dmg+=5;
-        mod.onHit = [{ target:target, eff: [effDamage.factory(_dmg,'pierce', this.parent.parent.name+' pokes its '+this.data.style+' stinger into '+target.name )]}];
+        mod.onHit = [{ target:target, eff: [effDamage.factory(_dmg,'pierce', this.parent.parent.name+' pokes its '+this.data.style+' stinger into '+target.name+'. ' )]}];
         return(mod);
     }
 }

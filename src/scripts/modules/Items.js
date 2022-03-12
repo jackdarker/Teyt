@@ -55,30 +55,25 @@ class Battery extends Item {
     static fromJSON(value) { return window.storage.Generic_fromJSON(Battery, value.data);};
 }
 /////////////////////////////////////////////////////////////////
-//VR-Items
-class GameVoucher extends Item {
+class Voucher extends Item { //token or coupon for ingame shop
     constructor() {
-        super('GameVoucher');
+        super('Voucher');
         this.addTags([window.gm.ItemTags.Money]);this.price=this.basePrice=100;
         this.style=0;this.lossOnRespawn = false;
     }
-    toJSON() {return window.storage.Generic_toJSON("GameVoucher", this); };
-    static fromJSON(value) { return window.storage.Generic_fromJSON(GameVoucher, value.data);};
+    toJSON() {return window.storage.Generic_toJSON("Voucher", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(Voucher, value.data);};
     set style(style) { 
         this._style = style; 
-        if(style===0) this.id='BronzeCoupon',this.name='BronzeCoupon';
-        else if(style===100) this.id='SilverCoupon',this.name='SilverCoupon';
+        if(style===0) this.id=this.name='VoucherIron';
+        else if(style===10) this.id=this.name='VoucherBronze';
+        else if(style===20) this.id=this.name='VoucherSilver';
+        else if(style===30) this.id=this.name='VoucherGold';
         else throw new Error(this.id +' doesnt know '+style);
     }
     get style() {return this._style;}
     get desc() { 
-        let msg ='bronze-voucher for ingame-shop';
-        switch(this._style) {
-            case 100:
-                msg=('silver-voucher for ingame-shop');
-                break;
-            default:
-        }
+        let msg ='a token with a certain value';
         return(msg);
     }
 };
@@ -131,6 +126,8 @@ class Ingredient extends Item {
         else if(style===70) this.id=this.name='GiantPlum';
         else if(style===80) this.id=this.name='EmptyGlas';
         else if(style===90) this.id=this.name='CrystalWater';
+        else if(style===100) this.id=this.name='BlackCandle';
+        else if(style===110) this.id=this.name='Beewax';
         else throw new Error(this.id +' doesnt know '+style);
     }
     get style() {return this._style;}
@@ -166,6 +163,12 @@ class Ingredient extends Item {
                 break;
             case 90:
                 msg='a glas filled with crystal clear water';
+                break;
+            case 100:
+                msg='a black candle; most likely used for (un-)holy rituals.';
+                break;
+            case 110:
+                msg='wax produced from bees.';
                 break;
             default: throw new Error(this.id +' doesnt know '+style);
         }
@@ -294,7 +297,7 @@ class CanOfCoffee extends Item {
     }
 };
 class SimpleFood extends Item {
-    constructor() {super('SimpleFood'); this.addTags([window.gm.ItemTags.Food]);this.price=this.basePrice=5;}
+    constructor() {super('SimpleFood'); this.addTags([window.gm.ItemTags.Food]);this.price=this.basePrice=5;this.style=0;}
     get desc() { return 'Something to eat.';    }
     toJSON() {return window.storage.Generic_toJSON("SimpleFood", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(SimpleFood, value.data);};
@@ -304,14 +307,23 @@ class SimpleFood extends Item {
         if(context instanceof Inventory) {
             if(on===null) on=context.parent;
             else _gaveAway=true;
-            context.removeItem('Simple food');
+            context.removeItem(this.id);
             if(on instanceof Character){
                 on.addEffect(new effEnergized(),'Simple food:Energized');
+                on.Stats.increment("hunger",-1*this.satiation);
             return({OK:true, msg:on.name+' ate some plain foods.'});
             }
         } else throw new Error('context is invalid');
-        
     }
+    set style(style) {
+        this._style = style; this.satiation=30;
+        if(style===0) this.id=this.name='SimpleFood',this.amount=10;
+        else if(style===10) this.id=this.name='ViolettMushroom',this.amount=20;
+        else if(style===20) this.id=this.name='BrownMushroom',this.amount=20;
+        else if(style===30) this.id=this.name='RottenMushroom',this.amount=20;
+        else throw new Error(this.id +' doesnt know '+style);
+    }
+    get style() {return this._style;}
 }
 class HealthPotion extends Item {
     constructor() { super('HealthPotion'); this.addTags([window.gm.ItemTags.Drink]); this.price=this.basePrice=5;this.style=0; }
@@ -433,7 +445,7 @@ window.gm.ItemTags = { //
 };
 window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(LighterDad);
-    window.storage.registerConstructor(GameVoucher);
+    window.storage.registerConstructor(Voucher);
     window.storage.registerConstructor(Money);
     window.storage.registerConstructor(LaptopPS);
     window.storage.registerConstructor(Battery);
@@ -450,7 +462,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(QuestItems);
     window.storage.registerConstructor(SoulGem);
     
-    //Some of those items are generics that need some setup; so I create a template-library here
+    //Some of those items are generics that need some setup;
     ItemsLib['Money'] = function () { return new Money();};
     ItemsLib['LighterDad'] = function () { return new LighterDad();};
     ItemsLib['LaptopPS'] = function () { return new LaptopPS();};
@@ -460,7 +472,10 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['Lube'] = function () { return new Lube();};
     ItemsLib['CanOfCoffee'] = function () { return new CanOfCoffee(); };
     ItemsLib['SimpleFood'] = function () { return new SimpleFood(); };
-    ItemsLib['FlashBang'] = function () { return new FlashBang(); };
+    ItemsLib['ViolettMushroom'] = function (){ let x=new SimpleFood();x.style=10;return(x);};
+    ItemsLib['BrownMushroom'] = function (){ let x=new SimpleFood();x.style=20;return(x);};
+    ItemsLib['RottenMushroom'] = function (){ let x=new SimpleFood();x.style=30;return(x);};
+    ItemsLib['FlashBang'] = function (){ return new FlashBang(); };
     //healthpotion
     ItemsLib['HealthPotion'] = function () { let x= new HealthPotion();return(x); };
     ItemsLib['HealthPotionSmall'] = function () { let x= new HealthPotion();x.style=10;return(x); };
@@ -470,6 +485,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['Penilium'] = function () { let x= new RegenderPotion();x.style=10;return(x); };
     //Ingredient
     ItemsLib['SquishedLeech'] = function(){ let x=new Ingredient();x.style=30;return(x);};
+    ItemsLib['Beewax'] = function(){ let x=new Ingredient();x.style=110;return(x);};
     ItemsLib['BogBovus'] = function(){ let x=new Ingredient();x.style=20;return(x);};
     ItemsLib['PurpleBerry'] = function(){ let x=new Ingredient();x.style=10;return(x);};
     ItemsLib['WolfTooth'] = function(){ let x=new Ingredient();x.style=40;return(x);};
@@ -479,6 +495,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['GiantPlum'] = function(){ let x=new Ingredient();x.style=70;return(x);};
     ItemsLib['EmptyGlas'] = function(){ let x=new Ingredient();x.style=80;return(x);};
     ItemsLib['CrystalWater'] = function(){ let x=new Ingredient();x.style=90;return(x);};
+    ItemsLib['BlackCandle'] = function(){ let x=new Ingredient();x.style=100;return(x);};
     //Questitems
     ItemsLib['IgneumPage'] = function(){ let x=new QuestItems();x.style=0;return(x);};
     ItemsLib['RedAnkh'] = function(){ let x=new QuestItems();x.style=10;return(x);};
@@ -491,7 +508,9 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['KeyRestraintA'] = function () { let x= new KeyRestraint();return(x);}; 
     ItemsLib['KeyRestraintB'] = function () { let x= new KeyRestraint();x.style=10;return(x);};
     //voucher
-    ItemsLib['GameVoucherBronze'] = function () { let x= new GameVoucher();return(x); };
-    ItemsLib['GameVoucherSilver'] = function () { let x= new GameVoucher();x.style=100;return(x);};
+    ItemsLib['VoucherIron'] = function () { let x= new Voucher();return(x); };
+    ItemsLib['VoucherBronze'] = function () { let x= new Voucher();x.style=10;return(x); };
+    ItemsLib['VoucherSilver'] = function () { let x= new Voucher();x.style=20;return(x);};
+    ItemsLib['VoucherGold'] = function () { let x= new Voucher();x.style=30;return(x);};
     return ItemsLib; 
 }(window.gm.ItemsLib || {}));

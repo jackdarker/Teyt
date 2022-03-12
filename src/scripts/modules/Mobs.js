@@ -11,6 +11,7 @@
 - werwolf
 - fungus/spore-pod
 - vile vine
+- mimic
 - lush orchid
 - slug
 - Giant-Snake
@@ -68,7 +69,7 @@ class Wolf extends Mob {
         this.name = this.id = 'Wolf';
         this.pic= "wolf3";//'assets/battlers/wolf3.svg';
         this.level_min =3;
-        this.loot= [{id:'WolfTooth',chance:25,amount:1}];
+        this.loot= [{id:'WolfTooth',chance:25,amount:1},{id:'Money',chance:25,amount:20}];
         this.Outfit.addItem(new BaseQuadruped());
         this.Outfit.addItem(SkinFur.factory('wolf','black'));
         this.Outfit.addItem(HandsPaw.factory('wolf'));
@@ -173,7 +174,7 @@ class Lizan extends Mob {
     static factory(type) {
         let foe = new Lizan();
         if(type==='spearthrower') {
-            foe.Outfit.addItem(SpearWodden.factory(100));
+            foe.Outfit.addItem(window.gm.ItemsLib['SpearStone']());
         } else {
             foe.Outfit.addItem(new DaggerSteel());
         }
@@ -212,11 +213,37 @@ class Lizan extends Mob {
         return(super.calcCombatMove(enemys,friends));
     }
 }
+class AnthroCat extends Mob {
+    static factory(type) {
+        let foe = new AnthroCat();
+        if(type==='spearthrower') {
+            foe.Outfit.addItem(window.gm.ItemsLib['SpearStone']());
+        } else {
+            foe.Outfit.addItem(new DaggerSteel());
+        }
+        return foe;
+    }
+    constructor() {
+        super();
+        this.name = this.id = 'AnthroCat';
+        this.pic= 'unknown';
+        this.Outfit.addItem(new BaseHumanoid());
+        this.Outfit.addItem(SkinFur.factory('cat'));
+        this.Outfit.addItem(HandsHuman.factory('cat'));
+        this.Outfit.addItem(BreastHuman.factory('cat'));
+        this.Outfit.addItem(FaceWolf.factory('cat'));
+        this.Outfit.addItem(AnusHuman.factory('cat'));
+        this.Outfit.addItem(TailWolf.factory('cat'));
+        this.Outfit.addItem(VulvaHuman.factory('cat'));
+        this.Outfit.addItem(ShortsLeather.factory(100));
+        //let sk = new SkillKick();this.Skills.addItem(sk);
+    }
+}
 class Lapine extends Mob {
     static factory(type) {
         let foe = new Lapine();
         if(type==='spearthrower') {
-            foe.Outfit.addItem(SpearWodden.factory(100));
+            foe.Outfit.addItem(window.gm.ItemsLib['SpearStone']());
         } else {
             foe.Outfit.addItem(new DaggerSteel());
         }
@@ -256,7 +283,7 @@ class Huntress extends Mob {
     static factory(type) {
         let foe = new Huntress();
         if(type==='spearthrower') {
-            foe.Outfit.addItem(SpearWodden.factory(100));
+            foe.Outfit.addItem(window.gm.ItemsLib['SpearStone']());
         } else {
             foe.Outfit.addItem(new DaggerSteel());
         }
@@ -494,6 +521,7 @@ class Hornett extends Mob {
         this.name = this.id = 'Hornett';
         this.pic= 'wasp1';
         this.level_min =1;
+        this.loot= [{id:'Beewax',chance:25,amount:1},{id:'Money',chance:50,amount:20}];
         this.Outfit.addItem(new BaseInsect());
         this.Outfit.addItem(new ArmorTorso('chitin'));
         this.Outfit.addItem(new FaceInsect('wasp'));
@@ -516,7 +544,7 @@ class Hornett extends Mob {
                 rnd = _.random(0,enemys.length-1);
                 result.action = skill;
                 result.target = [enemys[rnd]];
-                result.msg =this.fconv("$[I]$ thrust $[my]$ stinger at "+result.target[0].name+".</br>")+result.msg;
+                result.msg =/*this.fconv("$[I]$ thrust $[my]$ stinger at "+result.target[0].name+".</br>")+*/result.msg;
                 return(result);
             }
         } 
@@ -575,6 +603,7 @@ class Trent extends Mob {
 }
 //collection of mob-constructors
 window.gm.Mobs = (function (Mobs) {
+    Mobs.AnthroCat = function() { return function(param){return(AnthroCat.factory(param));}("AnthroCat")};
     Mobs.Lapine = Lapine.factory;
     Mobs.Mole = Mole.factory;
     Mobs.Squirrel = function() { return function(param){return(Mole.factory(param));}("Squirrel")};

@@ -91,9 +91,8 @@
         window.gm.pushLog(attr.Calc(this,id).msg); // todo show only for player
     }
 }
-//class for an Attribute
 /**
- * 
+ * class for an Attribute
  *
  * @class Stat
  */
@@ -108,8 +107,7 @@ class Stat {
     constructor() {
         this.data = Stat.dataPrototype();
     }
-    // Attention !!
-    //_parent will be added dynamical
+    // Attention !!_parent will be added dynamical
     get parent() {return this._parent?this._parent():null;}
     _relinkItems(parent){this._parent=window.gm.util.refToParent(parent);}
     get name() {return(this.data.id);}
@@ -254,11 +252,8 @@ class Effects extends Inventory {  //Todo ?
             window.story.state._gm.debug || (window.gm.player && (window.gm.player.id === this.parent.parent.id)));
     }
 }
-
 /////////////////////////////////////////////////////////////////////////
 /**
- *
- *
  * @class Effect
  */
 class Effect {  

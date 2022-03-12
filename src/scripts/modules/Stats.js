@@ -171,6 +171,43 @@ class stWillRegen extends Stat {
     toJSON() {return window.storage.Generic_toJSON("stWillRegen", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stWillRegen, value.data);};
 }
+class stHungerMax extends Stat {
+    static setup(context, max) {
+        var _stat = new stHungerMax();
+        var _n = _stat.data;
+        _n.id='hungerMax',_n.base=max, _n.value=max,_n.modifys=[{id:'hunger'}],_n.limits=[{max:99999,min:0}];
+        context.addItem(_stat);
+    }
+    constructor() {  super();    }
+    toJSON() {return window.storage.Generic_toJSON("stHungerMax", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(stHungerMax, value.data);};
+}
+class stHunger extends Stat { //high value==starving
+    static setup(context, base,max) {
+        stHungerMax.setup(context,max);
+        stHungerRegen.setup(context,10,100);
+        var _stat = new stHunger();
+        var _n = _stat.data;
+        _n.id='hunger',_n.base=base, _n.value=base,_n.limits=[{max:'hungerMax',min:0}];
+        context.addItem(_stat);
+        _stat.Calc();
+    }
+    constructor() { super();   }
+    toJSON() {return window.storage.Generic_toJSON("stHunger", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(stHunger, value.data);};
+}
+class stHungerRegen extends Stat {
+    static setup(context, base,max) {
+        var _stat = new stHungerRegen();
+        var _n = _stat.data;
+        _n.id='hungerRegen',_n.base=base, _n.value=base,_n.limits=[{max:max,min:-1*max}];
+        context.addItem(_stat);
+        _stat.Calc();
+    }
+    constructor() { super();}
+    toJSON() {return window.storage.Generic_toJSON("stHungerRegen", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(stHungerRegen, value.data);};
+}
 class stArousalMax extends Stat {
     static setup(context, max) {
         var _stat = new stArousalMax();
@@ -415,36 +452,42 @@ class stFetish extends Stat {
     static setup(context, base,max,name) { 
         let _stat = new stFetish();
         let _n = _stat.data;
-        _n.id=name+"_Max",_n.base=max, _n.value=max,_n.limits=[{max:100,min:-100}];
+        _n.hidden=4,_n.id=name+"_Max",_n.base=max, _n.value=max,_n.limits=[{max:100,min:-100}];
         context.addItem(_stat);
         _stat = new stFetish();
         _n = _stat.data;
-        _n.id=name+"_Min",_n.base=0, _n.value=0,_n.limits=[{max:100,min:-100}];
+        _n.hidden=4,_n.id=name+"_Min",_n.base=0, _n.value=0,_n.limits=[{max:100,min:-100}];
         context.addItem(_stat);
         _stat = new stFetish();
         _n = _stat.data;
-        _n.id=name,_n.base=base, _n.value=base,_n.limits=[{max:name+"_Max",min:name+"_Min"}];
+        _n.hidden=4,_n.id=name,_n.base=base, _n.value=base,_n.limits=[{max:name+"_Max",min:name+"_Min"}];
         context.addItem(_stat);
         _stat.Calc();
     }
     static listFetish() {
-        let list = [/*
+        let list = [
         'ftZoophil',
-        'ftBondage',
         'ftDominant',
         'ftSubmissive',
         'ftAnalLover',
         'ftAnalSlut',
-        'ftVaginalLover',
-        'ftVaginalSlut',
+        'ftVaginalLover',//using someones cunt
+        'ftVaginalSlut',//getting your cunt used
         'ftOralLover',
         'ftOralSlut',
+        'ftCockLover',//
+        'ftCockSlut', //controlled by your dick
+        'ftSizeQueen',//when penetrator is much larger then penetrated
         'ftCumSlurper',
+        'ftBreastLover',
         'ftEggSlut',
         'ftMasochist',
         'ftSadist',
-        'ftExhibition'  */];
-        return(list);
+        'ftBondage',
+        'ftExhibition'];
+        return(list);  
+        //ftSizeKing    when penetrator is much smaller ??
+        //horseCockAddled
     }
     constructor() {   super();  }
     toJSON() {return window.storage.Generic_toJSON("stFetish", this); };
@@ -554,6 +597,34 @@ class effTired extends Effect {
         }
         if(neweffect.name===this.data.name) {
             //just ignore
+            return(true);
+        }
+    }
+}
+class effHunger extends Effect {
+    constructor() {
+        super();
+        this.data.id = this.data.name= effHunger.name, this.data.duration = 60;
+    }
+    toJSON() {return window.storage.Generic_toJSON("effHunger", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(effHunger, value.data);};
+    get desc() {return(effHunger.name);}
+    onTimeChange(time) {
+        //- x Hunger per hour
+        var delta = window.gm.getDeltaTime(time,this.data.time);
+        if((this.data.duration-delta)<=0) { //trigger every ...
+            this.data.time = time;
+            this.data.duration =60;
+        } else delta=0;
+        this.parent.parent.Stats.increment('hunger',2*delta/60);
+        return(null);
+    }
+    onApply(){
+        this.data.time = window.gm.getTime();
+    }
+    merge(neweffect) {
+        if(neweffect.name===this.data.name) {
+            this.onApply(); //refresh 
             return(true);
         }
     }
@@ -1620,6 +1691,9 @@ window.gm.StatsLib = (function (StatsLib) {
     window.storage.registerConstructor(stWillMax);
     window.storage.registerConstructor(stWill);
     window.storage.registerConstructor(stWillRegen);
+    window.storage.registerConstructor(stHungerMax);
+    window.storage.registerConstructor(stHunger);
+    window.storage.registerConstructor(stHungerRegen);
     window.storage.registerConstructor(stArousalMax);
     window.storage.registerConstructor(stArousalMin);
     window.storage.registerConstructor(stArousal);
@@ -1634,6 +1708,7 @@ window.gm.StatsLib = (function (StatsLib) {
     window.storage.registerConstructor(effCombatRecovery);
     window.storage.registerConstructor(effDamage);
     window.storage.registerConstructor(effDetermined);
+    window.storage.registerConstructor(effHunger);
     window.storage.registerConstructor(effFlying);
     window.storage.registerConstructor(effBleed);
     window.storage.registerConstructor(effCombined);

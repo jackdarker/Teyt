@@ -1,15 +1,15 @@
-:: HC_Lvx_MAP [_back_]
+:: DngHC_MAP [_back_]
 <hr><div id='canvas'></div><div id='svgpopup'></div></br>
 <script> window.gm.printMap2(window.story.state.DngSY.dngMap,window.gm.player.location.replace(window.story.state.DngSY.dng+'_',''),
     window.story.state.DngHC.mapReveal,window.story.state.DngHC.visitedTiles);
 </script>
 
 
-:: HC_Entry
+:: DngHC_Entry
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
 You are trapped in this dungeon and need to find a way out of it.
-</br><p> [[Next|HC_Lvx_H3]] </br></p>
+</br><p> [[Next|DngHC_H3]] </br></p>
 </article><article id="LogPanel"></article></section>
 <script>
 function buildRooms() {
@@ -18,11 +18,11 @@ function buildRooms() {
         '|   |           |   |   | ',
         'F3  G3  H3  I3--J3--K3  L3',
         '    |   |   |           | ',
-        'F4--G4--H4--I4--J4--K4  L4',
+        'F4--G4--H4--I4  J4--K4  L4',
         '|   |           |       | ',
         'F5  G5--H5--I5--J5--K5--L5',
         '|       |           |     ',
-        'F6--G6--H6--I6--J6--K6--L6'];
+        'F6--G6--H6  I6--J6--K6--L6'];
     let grid =[
     {room:'F2', dirs:['G2','F3']},
     {room:'G2', dirs:['H2','G3']},
@@ -41,8 +41,8 @@ function buildRooms() {
     {room:'F4', dirs:['G4','F5']},
     {room:'G4', dirs:['F4','H4','G5']},
     {room:'H4', dirs:['H3','G4','I4']},
-    {room:'I4', dirs:['H4','I3','J4']},
-    {room:'J4', dirs:['I4','J5','K4']},
+    {room:'I4', dirs:['H4','I3']},
+    {room:'J4', dirs:['J5','K4']},
     {room:'K4', dirs:['J4']},
     {room:'L4', dirs:['L3','K5']},
     {room:'F5', dirs:['F4','F6']},
@@ -52,159 +52,298 @@ function buildRooms() {
     {room:'J5', dirs:['I5','K5','J4']},
     {room:'K5', dirs:['J5', 'K6','L5']},
     {room:'L5', dirs:['K5']},
-    {room:'G6', dirs:['F6','H6']},
-    {room:'F6', dirs:['F5']},
-    {room:'H6', dirs:['H5','I6']},
-    {room:'I6', dirs:['H6','J6']},
+    {room:'G6', dirs:['F6']}, //,'H6'
+    {room:'F6', dirs:['F5','G6']},
+    {room:'H6', dirs:['H5','G6']},
+    {room:'I6', dirs:['J6']},
     {room:'J6', dirs:['I6','K6']},
     {room:'K6', dirs:['K5','L6','J6']},
     {room:'L6', dirs:['K6']}];
     let dng={grid:grid,width:14,height:8,legend:'S=Panicroom  E=Portal'}
-    window.story.state.DngSY.dngMap=dng;
-    //window.story.state.DngFM.visitedTiles=[];
-}
     var s = window.story.state;
-    s.DngSY.dng='HC_Lvx';
-    s.vars.spawnAt="SY_Recover_Death";
-    var evt = { //events on tile-enter
-        G3: {dog:{tick:'',state:0 }}, 
+    s.DngSY.dngMap=dng;
+    s.DngSY.dng='DngHC';
+    s.vars.spawnAt="DngHC_H3";
+    s.DngHC.tmp={tickPass:''};
+    s.DngHC.tmp.evtEnter = { //events on tile-enter
+        G3: {dog:{tick:'',state:0 }},
+        I3: {dog:{tick:'',state:0 }}, 
         J4: {dog:{tick:'',state:0 }},
-        F4: {dog:{tick:'',state:0 }}
+        F4: {dog:{tick:'',state:0 }},
+        G4: {gas:{tick:'',state:0 }} 
     }
-    s.DngHC.tmp={bovus:[], tickPass:'',
-        evt: evt
-    };
+    s.DngHC.tmp.doors = { //doors
+        H5: {G5:{tick:'',state:0 }}, 
+        G5: {H5:{tick:'',state:0 }},
+        J4: {K4:{tick:'',state:0 }},
+    }
+    s.DngHC.tmp.evtSpawn = { //respawn evts 
+        DngHC_I3: {chest:{tick:window.gm.getTime(),state:0, loot:[{id:"Money",count:30}] },
+                    mushroom:{tick:window.gm.getTime(),state:0,loot:"BrownMushroom" }},
+        DngHC_H5: {mushroom:{tick:window.gm.getTime(),state:0,loot:"ViolettMushroom" }}
+    }
+    s.DngHC.tmp.mobs = [ //wandering mobs pos=current tile
+      //{id:"carlia", pos:"I5",state:1},
+      {id:"HornettI4",mob:"hornett",pos:"I4",path:["I4","H4","I3"],state:0,tick:'',aggro:0}
+    ]
+}
     buildRooms();
 </script>
 
 :: HC_Encounters
 <script>
 function tick() {
-    let here = window.passage.name,_d=window.story.state.DngHC.tmp;
+    let here = window.gm.player.location,_d=window.story.state.DngHC.tmp;
+    window.gm.randomTask();
     if(here===_d.tickPass) return;
     _d.tickPass=here;
-}
-function currRoom() {
-    return(window.story.state.DngSY.nextLocation.replace(window.story.state.DngSY.dng+"_",""));
-}
-function getRoomEvt(id){
-    return(window.story.state.DngHC.tmp.evt[currRoom()][id]);
+    for(var i=_d.mobs.length-1;i>=0;i--){
+      var mob=_d.mobs[i];
+      window.gm.mobAI(mob);
+      if(window.story.state.DngSY.dng+"_"+mob.pos===here) {
+        //if mob is at same position as player: trigger passage or just show note
+        if(mob.state===0) {
+          window.gm.encounters[mob.mob]();
+          var _oldVictory=window.gm.Encounter.onVictory.bind(window.gm.Encounter);
+          window.gm.Encounter.onVictory= function(){mob.state=1;return(_oldVictory());}
+          window.gm.Encounter.initCombat(); return;
+        }
+      }
+    }
 }
 function fightGuardian() {
     window.gm.encounters.wolf({amount:1, noStart:true});
     window.gm.Encounter.initCombat();
 }
 function dogEncounter() {
-    let _evt = getRoomEvt("dog");
+  let _evt = window.story.state.DngHC.tmp.evtEnter[window.story.state.DngSY.nextLocation.replace(window.story.state.DngSY.dng+"_","")]["dog"];
+  if(window.gm.player.Outfit.countItem("CollarDog")>0) {
     _evt.state=1;
-    window.gm.encounters.wolf({amount:1,type:"Guarddog", noStart:true, levelUp:5});
+    window.story.show("HC_Meet_Dog_Greet");
+  } else {
+    _evt.state=1;
+    window.gm.encounters.wolf({amount:1,type:"Guarddog", noStart:true, levelUp:10});
     window.gm.Encounter.initCombat();
+  }
 }
 tick();
 </script>
 
-:: HC_Meet_Dog
+:: DngHC_Meet_Dog [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-There is some kind of dog lurking in the dark in front of you. 
+There is some kind of dog lurking in the dark in front of you. </br>
 You may try your luck and <a0 onclick='dogEncounter();'>walk further</a> in its direction but maybe its wise to <a0 onclick='window.story.show(window.story.state.DngSY.prevLocation)'>retreat</a>. 
-
-A hound was waiting for you. It sensed your weakness and is now quickly running toward you...
-
+</br>todo A hound was waiting for you. It sensed your weakness and is now quickly running toward you...
 </article><article id="LogPanel"></article></section>
 <%=window.story.render("HC_Encounters")%>
 
-:: HC_Lvx_I2
+:: DngHC_Meet_Dog_Greet [_nosave_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+For some reason the dog doesnt oppose you as you try to walk past it. Might this be because of the collar you are wearing?</br>
+<div id='select1' >It could be quite possible to give it some head scratches. Maybe you could make a friend by doing so?</br>
+<a0 onclick='window.gm.printTalkLink("div#select1","div#choice1a")'>Why not</a></br>
+<a0 onclick='window.gm.printTalkLink("div#select1","div#choice1b")'>Just get away</a></br>
+</div><div id='choice1a' hidden></br> At first reserved but soon stronger you give the dog some good ruffling of its fur at his neck an back of the head.
+  <a0 onclick='window.story.show(window.gm.player.location);'>Next</a></div>
+<div id='choice1b' hidden></br>You press onward to leave the possible threat behind.</br>
+  <a0 onclick='window.story.show(window.gm.player.location);'>Next</a>
+</div> 
+</article><article id="LogPanel"></article></section>
+<%=window.story.render("HC_Encounters")%>
+
+
+:: DngHC_Door_Closed [_nosave_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+There is a gate in front of you but it is locked.</br>
+<a0 onclick='window.story.show(window.story.state.DngSY.prevLocation)'>Go back</a>. 
+</article><article id="LogPanel"></article></section>
+<%=window.story.render("HC_Encounters")%>
+
+:: DngHC_Mushroom
+</br><%if(window.story.state.DngHC.tmp.evtSpawn[window.passage.name]["mushroom"].state===0){%>There is a <%=window.story.state.DngHC.tmp.evtSpawn[window.passage.name]["mushroom"].loot%>. Do you collect it?
+<div id='select992' >
+<a0 onclick='var _evt=window.story.state.DngHC.tmp.evtSpawn[window.passage.name]["mushroom"];_evt.state=1;_evt.tick=window.gm.getTime();window.gm.player.changeInventory(window.gm.ItemsLib[_evt.loot](),1);window.gm.printTalkLink("div#select992","div#choice992a")'>Yes</a></br>
+</div><div id='choice992a' hidden></br> You collected some mushroom.
+</div>
+<%}else{%>
+No mushrooms growing here right now.
+<%}%>
+
+:: DngHC_Chest
+</br><%if(window.story.state.DngHC.tmp.evtSpawn[window.passage.name]["chest"].state===0){%>There is a chest. Do you dare open it?
+<a0 onclick='window.story.state.DngHC.tmp.evtSpawn[window.passage.name]["chest"].state=1;window.story.state.tmp.args[1]=70;window.story.state.tmp.args[2]=window.passage.name;window.story.show("DngHC_LootChest")'>Yes</a></br>
+<%}else{%>
+An empty chest sits over there.
+<%}%>
+
+:: DngHC_LootChest [_nosave_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+You open the chest and find...<div id='output'></div></br>
+<a0 onclick='foo()'>Next</a>
+</article><article id="LogPanel"></article></section>
+<script>
+var foo,msg='',Items=[];
+var rnd=window.story.state.tmp.args[1],next=window.story.state.tmp.args[2]; //see window.gm.cursedChest
+function addLoot() {
+  for(let el of Items) { msg+=el.name+", ";};
+  foo=function(){ window.story.state.tmp.args=[];
+    for(let el of Items) {window.gm.player.changeInventory(el,1);}
+    window.story.show(next); //adding to inventory only if player is leaving the passage, otherwise he could glitch if switching to status-pane and back
+  }
+}
+if(rnd<10) {
+  Items.push(window.gm.ItemsLib.HorsePotion());
+  addLoot();
+} else if(rnd>40) {
+  Items.push(window.gm.ItemsLib.HealthPotionSmall());
+  if(rnd>60) {
+    Items.push(window.gm.ItemsLib.HorsePotion());
+  }
+  addLoot();
+} else {
+  msg+='nothing !';foo=function(){window.story.show(next);};
+  /*foo=(function(){ window.story.state.tmp.args=[]; 
+    window.gm.fightArena("mole",{amount:2},[{id:"Money",count:30}],next);});*/
+}
+window.gm.printOutput(msg);
+</script>
+
+:: DngHC_HungerThirst [_isdeffered_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+You start to feel hungry. If you dont get something in your belly, you will get weaker by the time.
+---
+<a0 onclick= 'window.story.show("")'>Next</a><
+</article><article id="LogPanel"></article></section>
+<%=window.story.render("HC_Encounters")%>
+
+:: DngHC_Sleep
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+Wrapping yourself in that shaggy, old quilt, you try to get some rest.</br>
+</br><div id='output'></div>
+</br><a0 onclick='nap()'>Next</a></br>
+</article><article id="LogPanel"></article></section>
+<script>
+function nap() {
+  var _room,_evt,_evts=window.story.state.DngHC.tmp.evtEnter;
+  var _list = Object.keys(_evts);
+  for(var i=_list.length-1;i>=0;i--) { //respawn foes
+    _room = _evts[_list[i]];
+    if(_room['dog']) _room['dog'].state=0;
+  }
+  _list=window.story.state.DngHC.tmp.mobs;
+  for(var i=_list.length-1;i>=0;i--) { //respawn foes
+    _room = _list[i];
+    _room.state=0;
+  }
+  window.story.show(window.gm.player.location);
+}
+</script>
+
+:: DngHC_I2
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 There is a chest. Do you dare to <a0 onclick=''>open</a> it?
-<%=window.gm.printNav2()%>
+<%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
 <%=window.story.render("HC_Encounters")%>
 
 
-:: HC_Lvx_G3
+:: DngHC_G3
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 A little bit of water trickles down the wall. You could take a <a0 onclick=''>sip</a> to still your thirst.
-<%=window.gm.printNav2()%>
+<%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
 <%=window.story.render("HC_Encounters")%>
 
 
-:: HC_Lvx_H3
+:: DngHC_H3
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 This is a small cell with a bunk and a heavy door that can be locked from inside.</br>
-You could rest here to recover health and energy. 
-<a0 onclick='($("tw-passage").fadeOut(1000, function() {window.gm.addTime(60);window.story.show("Sleep");}));'>Nap 1hour</a>
+You could rest here to recover health and energy. However this would also give someone you got rid of a chance to crawl back from their hiding place.</br>
+<a0 onclick='($("tw-passage").fadeOut(1000, function() {window.gm.addTime(60);window.story.show("DngHC_Sleep");}));'>Nap 1hour</a>
 <%if(window.gm.getTimeStruct().hour<11) { %>
-<a0 onclick='($("tw-passage").fadeOut(1000, function() {window.gm.player.sleep(1800);window.story.show("Sleep");}));'>Sleep Until Evening</a> 
+<a0 onclick='($("tw-passage").fadeOut(1000, function() {window.gm.player.sleep(1800);window.story.show("DngHC_Sleep");}));'>Sleep Until Evening</a> 
 <%} else {%>
-<a0 onclick='($("tw-passage").fadeOut(1000, function() {window.gm.player.sleep(700);window.story.show("Sleep");}));'>Sleep Until Morning</a>
+<a0 onclick='($("tw-passage").fadeOut(1000, function() {window.gm.player.sleep(700);window.story.show("DngHC_Sleep");}));'>Sleep Until Morning</a>
 <%}%>
-<%=window.gm.printNav2()%>
+<%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
 <%=window.story.render("HC_Encounters")%>
 
 
-:: HC_Lvx_I3
+:: DngHC_I3
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
-Some mushrooms are growing here. They have a gray brown | bluish | dark violet color.
-You could <a0 onclick=''>gather</a> some of them.
-You remember that you found some mushrooms here in the past. Maybe they will regrow after some time. Would it be possible to hasten that grow somehow? 
-<%=window.gm.printNav2()%>
+<%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
 <%=window.story.render("HC_Encounters")%>
 
 
-:: HC_Lvx_J3
+:: DngHC_J3
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 A large symbol is imprinted in the floor resembling a star or pentagram. On a bookstand a tome is resting.
 Maybe someone used that place for some witchcraft?
 
-<%=window.gm.printNav2()%>
+<%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
 <%=window.story.render("HC_Encounters")%>
 
 
-:: HC_Lvx_F4
+:: DngHC_F4
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
-<%=window.gm.printNav2()%>
+<%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
 <%=window.story.render("HC_Encounters")%>
 
 
-:: HC_Lvx_G4
+:: DngHC_G4
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
-You find yourself standing in a large hall topped with a cross vault.
-<%=window.gm.printNav2()%>
+You find yourself standing in a large hall topped with a cross vault.</br>
+<a0 onclick='window.gm.cursedChest("DngHC_G4");window.story.show("DngHC_LootChest")'>Open chest</a>
+<%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
 <%=window.story.render("HC_Encounters")%>
 
 
-:: HC_Lvx_H4
-<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
-A corridor illuminated by some torches.
-<%=window.gm.printNav2()%>
-</article><article id="LogPanel"></article></section>
-<%=window.story.render("HC_Encounters")%>
-
-
-:: HC_Lvx_I4
+:: DngHC_H4
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 A corridor illuminated by some torches.
-<%=window.gm.printNav2()%>
+<%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
 <%=window.story.render("HC_Encounters")%>
 
 
-:: HC_Lvx_F5
+:: DngHC_I4
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
+A corridor illuminated by some torches.
+<%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
+</article><article id="LogPanel"></article></section>
+<%=window.story.render("HC_Encounters")%>
+
+:: DngHC_J4
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
+A corridor illuminated by some torches.
+<%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
+</article><article id="LogPanel"></article></section>
+<%=window.story.render("HC_Encounters")%>
+
+:: DngHC_K4
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
+A corridor illuminated by some torches.
+<%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
+</article><article id="LogPanel"></article></section>
+<%=window.story.render("HC_Encounters")%>
+
+:: DngHC_F5
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 Another hallway. Several passages to the small rooms are set into the wall. The doors are made of thick steel bars and give you the impression of prison cells.</br>
@@ -215,94 +354,157 @@ You peek into the darkness between the steel bars of the door. But there seems t
 Instinctively you take a big leap backwards. Fortunately the door withstands the onslaught and you take a glance at the attacker. Its some kind of dog and a large one of that. Short black fur covers its taut rump and head. The pointed ears and snarling snout makes it look like doberman. 
 
 As soon as you enter the room you notice that some of the cell-doors are standing a jar. Thats not good. Some of the inhabitants might have left their home and might now room the rest of the compound.
-<%=window.gm.printNav2()%>
+<%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
 <%=window.story.render("HC_Encounters")%>
 
-:: HC_Lvx_G5
+:: DngHC_G5
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
-The altar of the good deeds: A demure person might <a0 onclick='window.story.show(\"HC_Lvx_Altar\")'>pray</a> here to get a blessing or a penalty removed. But you might have a deed to fullfill to prove you are a worthy person. 
-<%=window.gm.printNav2()%>
+The altar of the good deeds: A demure person might <a0 onclick='window.story.show("DngHC_Altar")'>pray</a> here to get a blessing or a penalty removed. But you might have a deed to fullfill to prove you are a worthy person. 
+<%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
 <%=window.story.render("HC_Encounters")%>
 
-:: HC_Lvx_J5
+:: DngHC_H5
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
+<%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
+</article><article id="LogPanel"></article></section>
+<%=window.story.render("HC_Encounters")%>
+
+
+:: DngHC_I5
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
+todo
+<%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
+</article><article id="LogPanel"></article></section>
+<%=window.story.render("HC_Encounters")%>
+
+
+:: DngHC_J5
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 A contraption is installed in the middle of the room. 
 [[Check it out]] todo This seems to be a milking machinery, but who would make use of that here? Beeing locked in this device leaves you in no position to defend yourself.   
 
-<%=window.gm.printNav2()%>
+<%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
 <%=window.story.render("HC_Encounters")%>
 
 
-:: HC_Lvx_L5
+:: DngHC_L5
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 There is a opening in the northern wall. But its to high up and the wall is to smooth to climb. </br>
 A contraption is installed in the middle of the room.
-<%=window.gm.printNav2()%>
+<%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
 <%=window.story.render("HC_Encounters")%>
 
 
-:: HC_Lvx_F6
+:: DngHC_F6
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
-
-<%=window.gm.printNav2()%>
+<%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
 <%=window.story.render("HC_Encounters")%>
 
 
-:: HC_Lvx_G6
+:: DngHC_G6
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 On both side of this hallway, you spot several large levers. There are no inscriptions or symbols beside a single letter next to them. So you cant tell what each of them does.</br>
 They possibly open a door remotely or activate a mechanism. Opening a door sounds like a good idea - unless something nasty got relased by doing so.</br>  
-You could pull one of the levers: <a0 onclick=''>Lever A</a>
-<%=window.gm.printNav2()%>
+You could pull one of the levers: <a0 id='A' onclick='pullLever(this)'>Lever A</a> <a0 id='B' onclick='pullLever(this)'>Lever B</a>
+<div id='output'></div>
+<%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
+</article><article id="LogPanel"></article></section>
+<%=window.story.render("HC_Encounters")%>
+<script>function pullLever(evt){
+  var doors=window.story.state.DngHC.tmp.doors;
+  if(evt.id=='A'){
+    if(doors['H5']['G5'].state===0) {
+      doors['G5']['H5'].state=doors['H5']['G5'].state=1;
+      window.gm.printOutput('Some chains are rattling and you hear some clanking noises in the east.')
+    } else window.gm.printOutput('You pull the lever but nothing happens. Whatever the lever has triggered cannot be undone.');
+  }
+  if(evt.id=='B'){
+    if(doors['J4']['K4'].state===0) {
+      doors['J4']['K4'].state=1;
+      window.gm.printOutput('After the rusty old lever switched over, some mechanic works in the background for a bit of time.')
+    } else window.gm.printOutput('You pull the lever but nothing happens. Whatever the lever has triggered cannot be undone.');
+  }
+}
+</script>
+
+:: DngHC_H6
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
+Stone walls left right top bottom. I need air.</br>
+The tunnel towards west is leading downward and covered with some grime dripping out of the rotten pipes in the roof. It might be slippery, sending you sliding down on your rear, making it IMPOSIIBLE to return from that direction.</br>
+
+<%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
 <%=window.story.render("HC_Encounters")%>
 
-:: HC_Lvx_I6
+
+:: DngHC_I6
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 The area here is flooded with some murky water. You cant know how deep it is - or what else mmight be lurking below its surface.
-<%=window.gm.printNav2()%>
+<%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
 <%=window.story.render("HC_Encounters")%>
 
-:: HC_Lvx_J6
+:: DngHC_J6
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 The area here is flooded with some murky water. You cant know how deep it is - or what else mmight be lurking below its surface.
-<%=window.gm.printNav2()%>
+<%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
 <%=window.story.render("HC_Encounters")%>
 
-:: HC_Lvx_K6
+:: DngHC_K6
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 The area here is flooded with some murky water. You cant know how deep it is - or what else mmight be lurking below its surface.
-<%=window.gm.printNav2()%>
+<%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
 <%=window.story.render("HC_Encounters")%>
 
 
-:: HC_Lvx_Altar
+:: DngHC_Altar
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 "There is a portal hidden somewhere here but it is vamished and corrrupted. You need to resurrect its power to be able to flee from this place."</br>
 "No one will come here to help you. If you just stay in that cell, you will just starve to death or get insane.."</br>
 "To be able to help you, you have to help me first. "</br>
-<div id='select1' > "Find some black candles"
-<a0 onclick='window.gm.printTalkLink("div#select1","div#choice1a")'>click a</a></br>
-<a0 onclick='window.gm.printTalkLink("div#select1","div#choice1b")'>click b</a></br>
-</div><div id='choice1a' hidden></br>
+<% if(window.gm.quests.getMilestoneState("qDoorControl").id<100) { %>
+<div id='select1' > "You might have noticed that some of the gates are closed, keeping you trapped here. There is a room with controls that can open the doors remotely. Find it and open the door to the east."</br>
+"There might meat some ... guards on your travel. Sometimes they don't let you pass just easily. It usually helps if you wear some of those collars."</br>
+<a0 onclick='window.gm.player.Wardrobe.addItem(window.gm.ItemsLib.CollarDog());window.gm.quests.forceQuestMilestone("qDoorControl",100,1);window.gm.printTalkLink("div#select1","div#choice1a");'>Fine </a></br>
+</div><div id='choice1a' hidden></br> <p class="author">You've got a quest! Check your quest log.</p> 
+You got some collar. Its made from red leather and bones are imprinted on it all around. Its a dog collar obviously. </br>
+"Wear it and they should let you pass."</br> 
 </div>
-<div id='choice1b' hidden></br>
+<% }else if(window.gm.quests.getMilestoneState("qDoorControl").id===100) { %>
+ "Find the room where you can open the gate in the east."</br> Remember to outfit the collar if the guards give you to much trouble. 
+<% }else if(window.gm.quests.getMilestoneState("qDoorControl").id===200) { %>
+"The gate should now be open so that you can explore further down the path."</br>
+<% }else if(window.gm.quests.getMilestoneState("qBlackCandle").id<100) { %>
+<div id='select1' > "3 black candles were stolen. Someone could use them for a ritual. We need to secure them."</br>
+<a0 onclick='window.gm.quests.forceQuestMilestone("qBlackCandle",100,1);window.gm.printTalkLink("div#select1","div#choice1a");'>Fine </a></br>
+</div><div id='choice1a' hidden></br> <p class="author">You've got a quest! Check your quest log.</p>
 </div>
+<% }else if(window.gm.quests.getMilestoneState("qBlackCandle").id===100 && window.gm.player.Inv.countItem("BlackCandle")>=3) { %>
+<div id='select10' > "Did you get those candles?"</br>
+<a0 onclick='window.gm.player.Inv.removeItem("BlackCandle",3);window.gm.quests.forceQuestMilestone("qBlackCandle",200,100);window.gm.printTalkLink("div#select10","div#choice10a");'>Yes</a>
+</div><div id='choice10a' hidden>You hand over the candles.</br> "Now rest and return to me later."</br>
+</div>
+<% }else if(window.gm.quests.getMilestoneState("qBlackCandle").id===100 && window.gm.player.Inv.countItem("BlackCandle")<3) { %>
+"You need to find 3 black candles."</br>
+<% } %>
+</br>[[Leave|DngHC_G5]]
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("HC_Encounters")%>
+

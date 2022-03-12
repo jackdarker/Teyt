@@ -1,0 +1,422 @@
+:: DngPC_MAP [_back_]
+<hr><div id='canvas'></div><div id='svgpopup'></div></br>
+<script> window.gm.printMap2(window.story.state.DngSY.dngMap,window.gm.player.location.replace(window.story.state.DngSY.dng+'_',''),
+    window.story.state.DngPC.mapReveal,window.story.state.DngPC.visitedTiles);
+</script>
+
+
+:: DngPC_Entry
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+You where thrown into a contest where you have to fight different enemys.
+</br><p> [[Next|DngPC_G4]] </br></p>
+</article><article id="LogPanel"></article></section>
+<script>
+function buildRooms() {
+    const _m=[
+        'F2--G2--H2--I2--J2--K2--L2',
+        '|   |           |       | ',
+        'F3  G3--H3--I3--J3--K3  L3',
+        '                    |     ',
+        'F4  G4--H4--I4--J4--K4--L4',
+        '|               |         ',
+        'F5  G5--H5--I5  J5--K5--L5',
+        '|           |   |         ',
+        'F6--G6--H6--I6--J6--K6--L6'];
+    let grid =[
+    {room:'F2', dirs:['G2','F3']},
+    {room:'G2', dirs:['F2','H2','G3']},
+    {room:'H2', dirs:['I2','G2']},
+    {room:'I2', dirs:['J2','H2']},
+    {room:'J2', dirs:['I2','J3']},
+    {room:'K2', dirs:['L2','K3']},
+    {room:'L2', dirs:['K2','L3']},
+    {room:'F3', dirs:['F2']},
+    {room:'G3', dirs:['G2','G4']},
+    {room:'H3', dirs:['H4']},
+    {room:'I3', dirs:['I4','J3']},
+    {room:'J3', dirs:['I3','K3','J2']},
+    {room:'K3', dirs:['J3','K2']},
+    {room:'L2', dirs:['L2','L4']},
+    {room:'F4', dirs:['G4','F5']},
+    {room:'G4', dirs:['H4']         ,anno:['S']},
+    {room:'H4', dirs:['I4']},
+    {room:'I4', dirs:['J4']},
+    {room:'J4', dirs:['J5','K4']    ,anno:['B']},      
+    {room:'K4', dirs:['L4','K3']},
+    {room:'L4', dirs:['L3','K5']    ,anno:['B']},
+    {room:'F5', dirs:['F4','F6']},
+    {room:'G5', dirs:['G4','H5']},
+    {room:'H5', dirs:['G5','I5','H6']},
+    {room:'I5', dirs:['H5','J5']},
+    {room:'J5', dirs:['K5']},
+    {room:'K5', dirs:['J5', 'K6','L5']},
+    {room:'L5', dirs:['K5']},
+    {room:'G6', dirs:['F6']}, 
+    {room:'F6', dirs:['F5','G6']},
+    {room:'H6', dirs:['H5','G6']},
+    {room:'I6', dirs:['J6']},
+    {room:'J6', dirs:['I6','K6']},
+    {room:'K6', dirs:['K5','L6','J6']},
+    {room:'L6', dirs:['K6']}];
+    let dng={grid:grid,width:14,height:8,legend:'S=Start  B=Boss'}
+    var s = window.story.state;
+    s.DngSY.dngMap=dng; 
+    s.DngSY.dng='DngPC';
+    s.vars.spawnAt="DngPC_G4";
+    s.DngPC.tmp={tickPass:'', tier:0};
+    s.DngPC.tmp.evtEnter = { //events on tile-enter
+    }
+    s.DngPC.tmp.doors = { //doors
+    }
+    s.DngPC.tmp.evtSpawn = { //respawn evts 
+        DngPC_I4: {chest:{tick:window.gm.getTime(),state:0, loot:[{id:"Money",count:30}] },
+                    mushroom:{tick:window.gm.getTime(),state:0,loot:"BrownMushroom" }},
+        DngPC_K4: {mushroom:{tick:window.gm.getTime(),state:0,loot:"ViolettMushroom" }}
+    }
+    s.DngPC.tmp.mobs = [ //wandering mobs
+    ];
+    s.DngPC.task = {},s.DngPC.rolledTask=[]; //active task
+    s.DngPC.tasks = { //task list
+        bringIron:{tick:'',done:0,cnt:0,min:1}
+        ,bringSilver:{tick:'',done:0,cnt:0,min:2}
+        ,bringGold:{tick:'',done:0,cnt:0,min:5}
+        ,bringMoney:{tick:'',done:0,cnt:0,min:0}
+        ,findCursed:{tick:'',done:0,cnt:0,min:3}
+        ,getEarsPierced:{tick:'',done:0,cnt:0,min:5}
+        //,{id:'getTattoed',tick:'',done:0,cnt:0,min:8}
+        ,getVagina:{tick:'',done:0,cnt:0,min:5}
+        //,{id:'getBreast',tick:'',done:0,cnt:0,min:4}
+        //,{id:'getPregnant',tick:'',done:0,cnt:0,min:7}
+        //,{id:'walkNude',tick:'',done:0,cnt:0,min:4}
+        //,{id:'walkNude',tick:'',done:0,cnt:0,min:4}
+        //,{id:'maidoutfit',tick:'',done:0,cnt:0,min:6}
+        //,{id:'ponysuit',tick:'',done:0,cnt:0,min:7}
+        //,{id:'bitchsuit',tick:'',done:0,cnt:0,min:9}
+    };
+}
+buildRooms();
+</script>
+
+:: DngPC_Door_Closed [_nosave_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+There is a gate in front of you but it is locked.</br>
+<a0 onclick='window.story.show(window.story.state.DngSY.prevLocation)'>Go back</a>. 
+</article><article id="LogPanel"></article></section>
+<%=window.story.render("HC_Encounters")%>
+
+:: DngPC_Mushroom
+</br><%if(window.story.state.DngPC.tmp.evtSpawn[window.passage.name]["mushroom"].state===0){%>There is a <%=window.story.state.DngPC.tmp.evtSpawn[window.passage.name]["mushroom"].loot%>. Do you collect it?
+<div id='select992' >
+<a0 onclick='var _evt=window.story.state.DngPC.tmp.evtSpawn[window.passage.name]["mushroom"];_evt.state=1;_evt.tick=window.gm.getTime();window.gm.player.changeInventory(window.gm.ItemsLib[_evt.loot](),1);window.gm.printTalkLink("div#select992","div#choice992a")'>Yes</a></br>
+</div><div id='choice992a' hidden></br> You collected some mushroom.
+</div>
+<%}else{%>
+No mushrooms growing here right now.
+<%}%>
+
+:: DngPC_Chest
+</br><%if(window.story.state.DngPC.tmp.evtSpawn[window.passage.name]["chest"].state===0){%>There is a chest. Do you dare open it?
+<a0 onclick='window.story.state.DngPC.tmp.evtSpawn[window.passage.name]["chest"].state=1;window.story.state.tmp.args[1]=70;window.story.state.tmp.args[2]=window.passage.name;window.story.show("DngPC_LootChest")'>Yes</a></br>
+<%}else{%>
+An empty chest sits over there.
+<%}%>
+
+:: DngPC_LootChest [_nosave_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+You open the chest and find...<div id='output'></div></br>
+<a0 onclick='foo()'>Next</a>
+</article><article id="LogPanel"></article></section>
+<script>
+var foo,msg='',Items=[],rnd=window.story.state.tmp.args[1],next=window.story.state.tmp.args[2]; //see window.gm.cursedChest
+function addLoot() {
+  for(let el of Items) { msg+=el.name+", ";};
+  foo=function(){ window.story.state.tmp.args=[];
+    for(let el of Items) {window.gm.player.changeInventory(el,1);}
+    window.story.show(next); //adding to inventory only if player is leaving the passage, otherwise he could glitch if switching to status-pane and back
+  }
+}
+if(rnd<10) {
+  Items.push(window.gm.ItemsLib.HorsePotion());
+  addLoot();
+} else if(rnd>40) {
+  Items.push(window.gm.ItemsLib.HealthPotionSmall());
+  if(rnd>60) {
+    Items.push(window.gm.ItemsLib.HorsePotion());
+  }
+  addLoot();
+} else {
+  msg+='nothing !';foo=function(){window.story.show(next);};
+  /*foo=(function(){ window.story.state.tmp.args=[]; 
+    window.gm.fightArena("mole",{amount:2},[{id:"Money",count:30}],next);});*/
+}
+window.gm.printOutput(msg);
+</script>
+
+:: DngPC_Encounters
+<script>
+function tick() {
+    let here = window.gm.player.location,_d=window.story.state.DngPC.tmp;
+    if(here===_d.tickPass) return;
+    _d.tickPass=here;
+    let _t=_d.tier,_allChances=0,_choice=[];
+    switch(here) {
+        case "DngPC_H4":_choice.push({id:'hornett', amount:1, chance:100});
+                        if(_t>1)_choice.push({id:'anthrocat', amount:1, chance:100});
+                        if(_t>3)_choice.push({id:'wolf', amount:1, chance:100});
+            break;
+        case "DngPC_I4":_choice.push({id:'hornett', amount:2, chance:100});
+                        _choice.push({id:'leech', amount:1, chance:100});
+                        if(_t>1)_choice.push({id:'anthrocat', amount:1, chance:100});
+                        if(_t>3)_choice.push({id:'wolf', amount:2, chance:100});
+            break;
+        default:
+    }  
+    _choice.forEach(x=>(_allChances+=x.chance));
+    if(_allChances>0.0) {//choose rnd enemy
+        var _rnd=_.random(0,_allChances-0.01);
+        for(var i = _choice.length-1;i>=0;i--) { 
+            if(_rnd<_allChances && _rnd>=(_allChances-_choice[i].chance)) {
+                window.gm.encounters[_choice[i].id]({amount:_choice[i].amount});window.gm.Encounter.initCombat();                
+                break;
+            }
+            _allChances-=_choice[i].chance;
+        }
+    }
+}
+tick();
+</script>
+
+:: DngPC_Sleep
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+Wrapping yourself in that shaggy, old quilt, you try to get some rest.</br>
+</br><div id='output'></div>
+</br><a0 onclick='window.story.show("DngPC_G4")'>Next</a></br>
+</article><article id="LogPanel"></article></section>
+
+:: DngPC_Shrine [_nosave_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%></br>
+There is a stone altar with a large chest for donations.</br>
+Your current donation-tier is: <%=window.story.state.DngPC.tmp.tier%><a0 id='tier' onclick='(function($event){document.querySelector("#"+id+"~p").toggleAttribute("hidden");})(this);'>Hint</a>
+<p hidden> Every 5 tier, a gate toward freedom is unlocked and you can battle deeper into the dungeon.
+</p></br>
+To progress on your path to salvation you need to donate:<div id='choice'></div></br>
+<a0 id='vouchers' onclick='(function($event){document.querySelector("#"+id+"~p").toggleAttribute("hidden");})(this);'>Hint</a>
+<p hidden> Where do I find...</br>
+IronVouchers: randomly found in loot; can be bought for money from vendor</br>
+BronzeVouchers: loot from foes</br>
+SilverVouchers: loot from bosses</br>
+GoldVouchers: gained from solving tasks from shrine</br>
+<!--tasks:
+    get a bodypart transformed
+    defeat a boss with some handicap/cursed gear
+    find some cursed gear
+    gain a diseas or addiction 
+    get rid of a curse/diseas/addiction
+    improve a fetish to at least 40
+    get mounted by a beast
+    get your bum stretched to accomodate the alpha wolfs cock
+
+-->
+</p>
+<p>For a fee you can also get some helpful services:</br><!--
+    permanent gear: receive better gear on respawn
+    empower: temporary increase a stat
+    ward piercings and tattoos: 
+    learn skill: learn or train a skill, you might need to perform a task to do so
+    cure addiction/sickness: you might need to perform a task to do so
+  trade curse: get rid of a curse by trading it against a different one 
+  remove cursed gear: get rid of some unhealthy gear locked on you. There is a risk that the curse still remains on you. Only once every 3 days
+  remove curse: get rid of a curse, you might need to perform a task to do so
+  -->
+</p>
+<p>[[Back|DngPC_G4]]</p>
+</article><article id="LogPanel"></article></section>
+<script>function getAvailableTasks() { 
+    var _tasks=[],_d=window.story.state.DngPC,_t=_d.tmp.tier;
+    var msg='choose a task:</br>';
+    function foo(task){
+        msg+=taskDescr(task)+window.gm.printLink("Choose this",'window.story.state.DngPC.task={id:\"'+task.id+'\",data:\"'+task.data+'\"},window.story.show(window.passage.name)')+'</br></br>';
+    }
+    window.gm.getSaveVersion();
+    //if task in progress - show task-info instead
+    if(_d.task.id) {
+        _d.rolledTask=[],msg='in progress: '+taskDescr(_d.task)+'</br>';
+        msg+=finishTask().msg;
+        //todo possibility to abort and reroll for SilverVoucher?
+        window.gm.printOutput(msg,'#choice');return;  
+    }
+    if(_d.rolledTask.length>0) { //tasks got already rolled
+        _d.rolledTask.forEach(x=>(foo(x)))
+    } else {
+        var _allChances=0,_tns=Object.keys(_d.tasks);
+        for(var i=_tns.length-1;i>=0;i--) {
+            var _chance=100,_tk=_d.tasks[_tns[i]];
+            if(_tk.tick!=='') { //reduce chance for recent tasks or done ones
+                var _dt=window.gm.getDeltaTime(window.gm.getTime(),_tk.tick);
+                if(_dt<1440 || _tk.cnt>7) _chance*=0.5;
+                else if(_dt<2880 || _tk.cnt>4) _chance*=0.3;
+            }
+            if(_tk.min>_d.tmp.tier)_chance=0;
+            switch(_tns[i]) {
+                case 'getEarsPierced': //only if piercing slot available
+                    _tasks.push({id:_tns[i],chance:_chance});
+                    break;
+                case 'getVagina': //only if not present 
+                    _tasks.push({id:_tns[i],chance:_chance});
+                    break;
+                case 'findCursed'://how to know what was aquired?
+                    _tasks.push({id:_tns[i],chance:_chance});
+                    break;
+                case 'bringMoney':_tasks.push({id:_tns[i],chance:_chance, data:50*(1+_t)});
+                    break;
+                case 'bringIron':
+                case 'bringSilver':
+                case 'bringGold':
+                    _tasks.push({id:_tns[i],chance:_chance});
+                    break;
+                default:
+                    throw new Error('unknown task'+_tns[i]);
+            }
+            _allChances+=_chance;
+        }
+        //for(var i=1;i>0;i--) { //up to x tasks to choose from       todo remove task and recalc allchances
+            if(_allChances>0.0) {//choose rnd tasks
+                var _rnd=_.random(0,_allChances-0.01);
+                for(var i = _tasks.length-1;i>=0;i--) { 
+                    if(_rnd<_allChances && _rnd>=(_allChances-_tasks[i].chance)) {
+                        _d.rolledTask.push(_tasks[i]),foo(_tasks[i]);                    
+                        break;
+                    }
+                    _allChances-=_tasks[i].chance;
+                }
+            }
+        //}
+    }
+    window.gm.printOutput(msg,'#choice');
+}
+function finishTask(){
+    let task=window.story.state.DngPC.task,_res={OK:(task.done>0),msg:''};
+    switch(task.id) {
+        case 'getEarsPierced':
+            break;
+        case 'getVagina':
+            break;
+        case 'findCursed':
+            break;
+        case 'bringIron':
+            break;
+        case 'bringSilver':
+            break;
+        case 'bringGold':
+            break;
+        case 'bringMoney':if(window.gm.player.Inv.countItem('Money')>=task.data){ window.gm.player.Inv.removeItem('Money',task.data),_res.OK=true;}
+            else{ _res.OK=false,_res.msg='Not enough money.</br>'};
+            break;
+        default:
+            throw new Error('unknown task'+task.id);
+    }
+    if(_res.OK===true){
+        window.story.state.DngPC.tasks[task.id].cnt+=1,window.story.state.DngPC.tasks[task.id].done=0,window.story.state.DngPC.task={};//,window.story.show(window.passage.name);
+        window.story.state.DngPC.tmp.tier+=1;_res.msg='donation request fullfilled. Your tier is now: '+window.story.state.DngPC.tmp.tier+'</br>';
+    }
+    return(_res);
+}
+function taskDescr(task){
+    var msg='';
+    switch(task.id) {
+        case 'getEarsPierced':msg='Get your ears pierced.';
+            break;
+        case 'getVagina':msg='Swap that dick of yours against a fine cunt.';
+            break;
+        case 'findCursed':msg='The dungeon is spoiled with cursed gear. Do me a favor and find at least one.';
+            break;
+        case 'bringIron':msg='Gather some iron-tokens by looting the dungeon or trading from the vendor.';
+            break;
+        case 'bringSilver':msg='Loot a silver-token from a boss.';
+            break;
+        case 'bringGold':msg='Gain a gold-token with a special job.';
+            break;
+        case 'bringMoney':msg='Some easy task here: get '+task.data+'$.';
+            break;
+        default:
+            throw new Error('unknown task'+task.id);
+    }
+    return(msg);
+}
+getAvailableTasks()
+</script>
+
+:: DngPC_Vendor [_nosave_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
+A vendor sells some gear and might also buy some of your loot.<br> todo you need to  
+<p><!--
+    basic weapon
+    spell tome
+    potions
+    food
+    keys for chest and locked gear
+    surprise box
+    vouchers
+  -->
+</p>
+<p>[[Back|DngPC_G4]]</p>
+</article><article id="LogPanel"></article></section>
+
+:: DngPC_Retreat 
+<div><a0 id='retreat' onclick='(function($event){document.querySelector("#"+id+"~p").toggleAttribute("hidden");})(this);'>Retreat to sanctuary</a>
+<p hidden>Do you relly want to abort your run and return with what you have earned so far?<a0 onclick='window.gm.addTime(120),window.story.show("DngPC_G4")'> Yes </a></p></br></div>
+
+:: DngPC_G4
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
+You are now in a large hall with adjoining cells set into the walls. One of them is reserved as your private space.</br>
+<a0 id='howtoplay' onclick='(function($event){document.querySelector("#"+id+"~p").toggleAttribute("hidden");})(this);'>Hint</a>
+<p hidden>You were send to this dungeon to pay up for your crimes.</br>
+The dungeon consist of several arenas that you have to pass one after another.If you pass the test in the arena, you gain money and loot. </br>
+However, if you are defeated you will loose most of the things you carry with you (except money and "special" gear) and respawn in the starting zone.</br>
+There is a chest is your cell where you can store anything that you dont want to take with you on your trials.</br>
+Also the dungeons is somehow permeated with crude magic that might affect you.</br>
+You should weight the option to retreat and invest that money in better gear. That might give you better chances to survive the tougher fights at the cost of fighting the previous foes again.</br>
+By donating to the "shrine of jurisprudence" you pay off your surcharge. If you dont do so regulary, you might get some bonus punishment. There are also some services available for a fee.</br>
+</p>
+<%=window.gm.renderRoom(window.passage.name)%>
+You could rest here to recover health and energy.</br>
+<%if(window.gm.getTimeStruct().hour<11) { %>
+<a0 onclick='($("tw-passage").fadeOut(1000, function(){window.gm.player.sleep(1800);window.story.show("DngPC_Sleep");}));'>Sleep Until Evening</a> 
+<%} else {%>
+<a0 onclick='($("tw-passage").fadeOut(1000, function(){window.gm.player.sleep(700);window.story.show("DngPC_Sleep");}));'>Sleep Until Morning</a>
+<%}%>
+[[Shrine|DngPC_Shrine]] [[Vendor|DngPC_Shop]] [[Storage Chest|GlobalChest]]</br>
+<%=window.gm.printNav2()%>
+</article><article id="LogPanel"></article></section>
+<%=window.story.render("DngPC_Encounters")%>
+
+
+:: DngPC_H4
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
+Another Arena</br><%=window.story.render("DngPC_Retreat")%>
+<%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
+</article><article id="LogPanel"></article></section>
+<%=window.story.render("DngPC_Encounters")%>
+
+
+:: DngPC_I4
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
+Another Arena</br><%=window.story.render("DngPC_Retreat")%>
+<%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
+</article><article id="LogPanel"></article></section>
+<%=window.story.render("DngPC_Encounters")%>
+
+
+:: DngPC_I4
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
+Another Arena</br><%=window.story.render("DngPC_Retreat")%>
+<%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
+</article><article id="LogPanel"></article></section>
+<%=window.story.render("DngPC_Encounters")%>

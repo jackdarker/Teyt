@@ -95,6 +95,8 @@ window.gm.OutfitSlotLib = {
     pNose    :  "pNose",
     pEyes    :  "pEyes",
     pEars    :  "pEars",
+    pTongue    :  "pTongue",
+    pNavel    :  "pNavel",
     uArms    :  "uArms",
     uWrists  :  "uWrists",
     uLHand   :  "uLHand",
