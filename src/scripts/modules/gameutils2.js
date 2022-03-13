@@ -49,7 +49,7 @@ window.gm.navEvent = function(to,from) {
     if(evts) { //door-check
         evt = evts[_from];
         if(evt) {
-            if(evt.state===0) _to="HC_Door_Closed";
+            if(evt.state===0) _to=dng+"_Door_Closed";
             if(_to!=='') return(_to);
         }
     }
@@ -85,7 +85,7 @@ window.gm.mobAI = function(mob){
         var _to = getRoomDirections(mob.pos).filter(el=> mob.path.includes(el));
         if(_to.length>0) {
             mob.pos=_to[_.random(0,_to.length-1)];
-            alert(mob.id+' now moving to '+mob.pos);
+            //alert(mob.id+' now moving to '+mob.pos);
         }
     }
 }

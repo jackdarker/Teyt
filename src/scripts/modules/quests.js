@@ -106,20 +106,33 @@ window.gm.questDef = window.gm.questDef || {};
     quest.addMileStone(new QuestMilestone(500,"","",  NOP));
     window.gm.questDef[quest.id]= quest;
 }{
-    let NOP=(function(){ return (0)});
     let hidden = (function(){return(window.gm.quests.getMilestoneState("qBlackCandle").id<100);});
     let quest = new Quest("qBlackCandle","Black Candles","Black Candles",hidden );
-    quest.addMileStone(new QuestMilestone(1,"","",        NOP,hidden));
-    quest.addMileStone(new QuestMilestone(100,"","Return 3 black candles to the altar. Maybe they are just stored away in a chest or so.",        NOP,hidden));
-    quest.addMileStone(new QuestMilestone(200,"","You returned with the candles.",        NOP,hidden));
+    quest.addMileStone(new QuestMilestone(1,"","",QuestMilestone.NOP,hidden));
+    quest.addMileStone(new QuestMilestone(100,"","Return 3 black candles to the altar. Maybe they are just stored away in a chest or so.",QuestMilestone.NOP,hidden));
+    quest.addMileStone(new QuestMilestone(200,"","You returned with the candles.",QuestMilestone.DONE,hidden));
     window.gm.questDef[quest.id]= quest;
 }{
-    let NOP=(function(){ return (0)});
     let hidden = (function(){return(window.gm.quests.getMilestoneState("qDoorControl").id<100);});
     let quest = new Quest("qDoorControl","qDoorControl","qDoorControl",hidden );
-    quest.addMileStone(new QuestMilestone(1,"","",        NOP,hidden));
-    quest.addMileStone(new QuestMilestone(100,"","There is a room around here with some levers to open the gates. Find it and open the gate to east of here.",        NOP,hidden));
-    quest.addMileStone(new QuestMilestone(200,"","You opened the gate with the lever.",        NOP,hidden));
+    quest.addMileStone(new QuestMilestone(1,"","",QuestMilestone.NOP,hidden));
+    quest.addMileStone(new QuestMilestone(100,"","There is a room around here with some levers to open the gates. Find it and open the gate to east of here.",QuestMilestone.NOP,hidden));
+    quest.addMileStone(new QuestMilestone(200,"","You opened the gate with the lever.",QuestMilestone.DONE,hidden));
+    window.gm.questDef[quest.id]= quest;
+}{
+    let id='qSlimeRancher',hidden = (function(){return(window.gm.quests.getMilestoneState(id).id<100);});
+    let quest = new Quest(id,id,id,hidden);
+    quest.addMileStone(new QuestMilestone(1,"","",QuestMilestone.NOP,hidden));
+    quest.addMileStone(new QuestMilestone(100,"","Aquire some of those slime-cores.",QuestMilestone.NOP,hidden));
+    quest.addMileStone(new QuestMilestone(200,"","Donated some slime.",QuestMilestone.DONE,hidden));
+    window.gm.questDef[quest.id]= quest;
+}{
+    let id='qPagehunter',hidden = (function(){return(window.gm.quests.getMilestoneState(id).id<100);});
+    let quest = new Quest(id,id,id,hidden);
+    quest.addMileStone(new QuestMilestone(1,"","",QuestMilestone.NOP,hidden));
+    quest.addMileStone(new QuestMilestone(100,"","Return with 2 pages from the book Igneum.",QuestMilestone.NOP,hidden));
+    quest.addMileStone(new QuestMilestone(200,"","Another page needs to be found. A imp in the ",QuestMilestone.NOP,hidden));
+    quest.addMileStone(new QuestMilestone(500,"","The missing pages were returned.",QuestMilestone.DONE,hidden));
     window.gm.questDef[quest.id]= quest;
 }{   // 
     let NOP=(function(){ return (0)});

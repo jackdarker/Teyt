@@ -46,7 +46,7 @@ class Character {
         }
         stAgility.setup(this.Stats,10,100),stIntelligence.setup(this.Stats,10,100),stLuck.setup(this.Stats,10,100);
         stCharisma.setup(this.Stats,10,100),stPerception.setup(this.Stats,10,100),stStrength.setup(this.Stats,10,100),stEndurance.setup(this.Stats,10,100);
-        stSavageness.setup(this.Stats,0,5),stCorruption.setup(this.Stats,0,100),stArousal.setup(this.Stats,0,100);
+        stSavageness.setup(this.Stats,0,10),stCorruption.setup(this.Stats,0,100),stArousal.setup(this.Stats,0,100);
         for(let name of stFetish.listFetish()) {
             stFetish.setup(this.Stats,0,10,name);
         }         

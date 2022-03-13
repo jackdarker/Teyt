@@ -106,7 +106,7 @@ renderCombatScene() {
       list.push(list2[i]);
     }
   }
-  let _pos =[[0.25,0.50,1],[0.75,0.50,1],[0.50,0.40,1]];//sprite position & scale in % x,y,z
+  let _pos =[[0.25,0.60,1],[0.75,0.50,1],[0.50,0.40,1]];//sprite position & scale in % x,y,z
   if(list.length<=1) { //1 large centered sprite
     _pos =[[0.50,0.50,1]];
   } 

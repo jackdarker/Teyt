@@ -10,13 +10,15 @@
 <%=window.gm.util.bargraph(window.gm.player.energy().value,window.gm.player.energy().max,"yellow","Energy: ")%>
 <%=window.gm.util.bargraph(window.gm.player.will().value,window.gm.player.will().max,"green","Will: ")%>
 <%=window.gm.util.bargraph(window.gm.player.arousal().value,window.gm.player.arousal().max,"coral","Arousal: ")%>
+<%=window.gm.util.bargraph(window.gm.player.Stats.get("hunger").value,window.gm.player.Stats.get("hungerMax").value,"rosybrown","Hunger: ")%>
 <%=window.gm.util.bargraph(window.gm.player.Stats.get("savageness").value,window.gm.player.Stats.get("savagenessMax").value,"darkred","Savageness: ")%>
-<!--<div>Money: <%=window.gm.player.Inv.countItem('Money') %> </div>
-<div <%=window.gm.player.canLevelUp?"class=\"green\"":""%>>XP/Level: <%=window.gm.player._data.XP+"/"+window.gm.player._data.level%></div>-->
+<div>Money: <%=window.gm.player.Inv.countItem('Money') %> </div>
+<!--<div <%=window.gm.player.canLevelUp?"class=\"green\"":""%>>XP/Level: <%=window.gm.player._data.XP+"/"+window.gm.player._data.level%></div>-->
 <hr>
 <form>
 <button type="button" id="status">Status</button>
 <button type="button" id="inv">Inventory</button>
+<button type="button" id="outfit">Outfit</button>
 <button type="button" id="quests">Quests</button>
 <button type="button" id="dashboard">More</button>
 <!--<button type="button" id="wait" style="width: 100%">Rest 45min</button>-->
@@ -39,6 +41,7 @@ document.querySelector('#status').addEventListener('click', function(){window.st
 document.querySelector('#save').addEventListener('click', function(){window.gm.toggleDialog('#dialog_save');});
 document.querySelector('#help').addEventListener('click', function(){window.story.show('Help_Index');}); 
 document.querySelector('#settings').addEventListener('click', function(){window.story.show('Settings');}); 
+document.querySelector('#outfit').addEventListener('click', function(){window.story.show('Wardrobe');}); 
 </script>
 
 
@@ -132,7 +135,7 @@ function readFile(input) {
 </script>
 
 
-:: Inventory [_back_]
+:: Inventory [_back_ _nodeffered_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 [[Back|_back_]]</br>
 <%=window.gm.player.name%> inventory: </br></br>
@@ -149,7 +152,7 @@ for(var i=0;i<maxSlots;i++){
 </article><article id="LogPanel"></article></section>
 
 
-:: Relations [_back_]
+:: Relations [_back_ _nodeffered_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 [[Back|_back_]]</br>
 <%=window.gm.player.name%> relations: </br></br>
@@ -157,7 +160,7 @@ for(var i=0;i<maxSlots;i++){
 </article><article id="LogPanel"></article></section>
 
 
-:: Achievements [_back_]
+:: Achievements [_back_] 
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 [[Back|_back_]]</br>
 <%=window.gm.printAchievements()%>
@@ -184,16 +187,17 @@ Your party consist of <%=(function(){var msg=[];for(el of window.story.state._gm
 
 :: Mirror [_back_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
-Checking out <%=window.gm.player.name%>:   [[Back|_back_]]</br>
-<div id='output'><%=window.gm.printBodyDescription(window.gm.player)%><div>
+[[Back|_back_]]</br> Checking out <%=window.gm.player.name%>:</br>
+<div id='output'><%=window.gm.printBodyDescription(window.gm.player,true)%><div>
+[[Back|_back_]]</br>
 <!--todo: set height depending on browsersize-->
 <!--<div id='Canvas' style='height: 30em;background: url("assets/doll/doll_small_xcf-Skirt.png") no-repeat center,url("assets/doll/doll_small_xcf-Body.png") no-repeat center, url(<%=window.gm.getScenePic(window.gm.player.location)%>)no-repeat center;color:black;'></div>-->
 </article><article id="LogPanel"></article></section>
 
 
-:: Wardrobe [_back_]
+:: Wardrobe [_back_ _nodeffered_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
-[[Back|_back_]] (Tools and weapons can be changed via Inventory.)</br>
+<p>[[Back|_back_]] [[Mirror]]</p> (Tools and weapons can be changed via Inventory.)</br>
 <%=window.gm.player.name%> has equipped: <%=window.gm.printEquipmentSummary()%></br>
 <div id="choice"></div>
 </article><article id="LogPanel"></article></section>

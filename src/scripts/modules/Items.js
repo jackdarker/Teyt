@@ -128,6 +128,9 @@ class Ingredient extends Item {
         else if(style===90) this.id=this.name='CrystalWater';
         else if(style===100) this.id=this.name='BlackCandle';
         else if(style===110) this.id=this.name='Beewax';
+        else if(style===120) this.id=this.name='RedSlime';
+        else if(style===130) this.id=this.name='BlueSlime';
+        else if(style===140) this.id=this.name='GreenSlime';
         else throw new Error(this.id +' doesnt know '+style);
     }
     get style() {return this._style;}
@@ -165,10 +168,15 @@ class Ingredient extends Item {
                 msg='a glas filled with crystal clear water';
                 break;
             case 100:
-                msg='a black candle; most likely used for (un-)holy rituals.';
+                msg='a black candle; most likely used for (un-)holy rituals';
                 break;
             case 110:
-                msg='wax produced from bees.';
+                msg='wax produced by bees';
+                break;
+            case 120:
+            case 130:
+            case 140:
+                msg='glob of slime with a certain color';
                 break;
             default: throw new Error(this.id +' doesnt know '+style);
         }
@@ -303,27 +311,28 @@ class SimpleFood extends Item {
     static fromJSON(value) { return window.storage.Generic_fromJSON(SimpleFood, value.data);};
     usable(context,on=null) {return({OK:true, msg:'eat'});}
     use(context,on=null) { 
-        var _gaveAway=false;
         if(context instanceof Inventory) {
             if(on===null) on=context.parent;
-            else _gaveAway=true;
             context.removeItem(this.id);
             if(on instanceof Character){
                 on.addEffect(new effEnergized(),'Simple food:Energized');
                 on.Stats.increment("hunger",-1*this.satiation);
-            return({OK:true, msg:on.name+' ate some plain foods.'});
+                if(this._style===5) window.gm.MutationsLib.changeSavage(on,-5,0,100);
+                if(this._style===10) window.gm.MutationsLib.changeSavage(on,3,0,20);
+            return({OK:true, msg:on.name+' ate some food.'});
             }
         } else throw new Error('context is invalid');
     }
     set style(style) {
         this._style = style; this.satiation=30;
         if(style===0) this.id=this.name='SimpleFood',this.amount=10;
+        else if(style===5) this.id=this.name='Sandwich',this.amount=20;
         else if(style===10) this.id=this.name='ViolettMushroom',this.amount=20;
         else if(style===20) this.id=this.name='BrownMushroom',this.amount=20;
         else if(style===30) this.id=this.name='RottenMushroom',this.amount=20;
         else throw new Error(this.id +' doesnt know '+style);
     }
-    get style() {return this._style;}
+    get style() {return this.name;}
 }
 class HealthPotion extends Item {
     constructor() { super('HealthPotion'); this.addTags([window.gm.ItemTags.Drink]); this.price=this.basePrice=5;this.style=0; }
@@ -349,10 +358,7 @@ class HealthPotion extends Item {
         else throw new Error(this.id +' doesnt know '+style);
     }
     get style() {return this._style;}
-    get desc() { 
-        let msg =this.name;
-        return(msg);
-    }
+    get desc() {return(this.name); }
 }
 class HorsePotion extends Item {
     constructor() { super('HorsePotion'); this.addTags([window.gm.ItemTags.Drink]);this.price=this.basePrice=15;this.style=0;}
@@ -368,9 +374,9 @@ class HorsePotion extends Item {
             if(on instanceof Character){ 
                 if(on instanceof Character){
                     if(this.style===0) {
-                        on.addEffect(new effHorsePower(),'HorsePower');
+                        on.addEffect(new effHorsePower(),effHorsePower.name);
                     } else if(this.style===10) {
-                        on.addEffect(new effLapineSpeed(),'LapineSpeed');
+                        on.addEffect(new effLapineSpeed(),effLapineSpeed.name);
                     }
                     on.Stats.increment("health",80);on.Stats.increment("energy",40);
                 }
@@ -472,6 +478,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['Lube'] = function () { return new Lube();};
     ItemsLib['CanOfCoffee'] = function () { return new CanOfCoffee(); };
     ItemsLib['SimpleFood'] = function () { return new SimpleFood(); };
+    ItemsLib['Sandwich'] = function (){ let x=new SimpleFood();x.style=5;return(x);};
     ItemsLib['ViolettMushroom'] = function (){ let x=new SimpleFood();x.style=10;return(x);};
     ItemsLib['BrownMushroom'] = function (){ let x=new SimpleFood();x.style=20;return(x);};
     ItemsLib['RottenMushroom'] = function (){ let x=new SimpleFood();x.style=30;return(x);};
@@ -496,6 +503,9 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['EmptyGlas'] = function(){ let x=new Ingredient();x.style=80;return(x);};
     ItemsLib['CrystalWater'] = function(){ let x=new Ingredient();x.style=90;return(x);};
     ItemsLib['BlackCandle'] = function(){ let x=new Ingredient();x.style=100;return(x);};
+    ItemsLib['BlueSlime'] = function(){ let x=new Ingredient();x.style=110;return(x);};
+    ItemsLib['RedSlime'] = function(){ let x=new Ingredient();x.style=120;return(x);};
+    ItemsLib['GreenSlime'] = function(){ let x=new Ingredient();x.style=130;return(x);};
     //Questitems
     ItemsLib['IgneumPage'] = function(){ let x=new QuestItems();x.style=0;return(x);};
     ItemsLib['RedAnkh'] = function(){ let x=new QuestItems();x.style=10;return(x);};

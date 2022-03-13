@@ -58,7 +58,7 @@ class Wolf extends Mob {
         } else if(type==='Guarddog') {
             foe.name = foe.id = 'Guarddog';
             foe.Stats.increment('healthMax',-0.3*(foe.health().max));
-            foe.pic= 'wolf1';
+            foe.pic= 'hellhound1';
         } else {
             foe.Stats.increment('healthMax',-0.5*(foe.health().max));
         }
@@ -98,6 +98,67 @@ class Wolf extends Mob {
             result.msg =this.name+" howls to call its pack for support.</br>"+result.msg;
             return(result);
         }
+        return(super.calcCombatMove(enemys,friends));
+    }
+}
+/*class Dragon extends Mob {   //wyvern, quadrupped w/o wings, w/o horns, scales/fur
+    static factory(type) {
+        let foe = new Dragon();
+        if(type==='AlphaWolf') {
+        }
+        return foe;
+    }
+    constructor() {
+        super();
+        this.name = this.id = 'Dragon';
+        this.pic= "dragon1";
+        this.level_min =10;
+        this.loot= [{id:'Money',chance:25,amount:20}];
+        this.Outfit.addItem(new BaseQuadruped());
+        this.Outfit.addItem(SkinFur.factory('wolf','black'));
+        this.Outfit.addItem(HandsPaw.factory('wolf'));
+        this.Outfit.addItem(PenisHuman.factory('wolf'));
+        this.Outfit.addItem(AnusHuman.factory('wolf'));
+        this.Outfit.addItem(TailWolf.factory('wolf'));
+        this.Outfit.addItem(FaceWolf.factory('wolf'));
+        this.Stats.increment('arm_blunt',5);
+    }
+}*/
+class Slime extends Mob { 
+    static factory(type) {
+        let foe = new Slime();
+        foe.Outfit.addItem(WeaponSlobber.factory('slime'));
+        if(type ==='SlimeTentacled') {
+            //add tentacles and grappling
+            foe.loot= [{id:'BlueSlime',chance:25,amount:1},{id:'Money',chance:25,amount:20}];
+        } else {
+            foe.loot= [{id:'GreenSlime',chance:25,amount:1},{id:'Money',chance:25,amount:20}];
+        }
+        return foe;
+    }
+    constructor() {
+        super();
+        this.name = this.id = 'Slime';
+        this.pic= 'Blob4';
+        this.level_min =1;
+        this.Outfit.addItem(new BaseWorm());
+        this.Outfit.addItem(ArmorTorso.factory('slime'));
+    }
+    calcCombatMove(enemys,friends){
+        let result = {OK:true,msg:''};
+        let rnd = _.random(1,100);
+        //if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
+        result.action =result.target= null;
+        if(this.id === 'Slime') {
+            let skill= 'slime-slobber';
+            if(indow.story.state.combat.turnCount>2 && rnd>30 && this.Skills.getItem(skill).isEnabled().OK){
+                rnd = _.random(0,enemys.length-1);
+                result.action = skill;
+                result.target = [enemys[rnd]];
+                result.msg =/*this.fconv("$[I]$ thrust $[my]$ stinger at "+result.target[0].name+".</br>")+*/result.msg;
+                return(result);
+            }
+        } 
         return(super.calcCombatMove(enemys,friends));
     }
 }
@@ -216,7 +277,7 @@ class Lizan extends Mob {
 class AnthroCat extends Mob {
     static factory(type) {
         let foe = new AnthroCat();
-        if(type==='spearthrower') {
+        if(type==='Huntress') {
             foe.Outfit.addItem(window.gm.ItemsLib['SpearStone']());
         } else {
             foe.Outfit.addItem(new DaggerSteel());
@@ -274,50 +335,6 @@ class Lapine extends Mob {
             result.action = skill.name;
             result.target = [this];
             result.msg =this.name+" prepares for a powerful jump-kick.</br>"+result.msg;
-            return(result);
-        }
-        return(super.calcCombatMove(enemys,friends));
-    }
-}
-class Huntress extends Mob {
-    static factory(type) {
-        let foe = new Huntress();
-        if(type==='spearthrower') {
-            foe.Outfit.addItem(window.gm.ItemsLib['SpearStone']());
-        } else {
-            foe.Outfit.addItem(new DaggerSteel());
-        }
-        return foe;
-    }
-    constructor() {
-        super();
-        this.name = this.id = 'Huntress';
-        this.pic= 'unknown';
-        this.Outfit.addItem(new BaseHumanoid());
-        this.Outfit.addItem(new SkinHuman());
-        this.Outfit.addItem(HandsHuman.factory('cat'));
-        this.Outfit.addItem(BreastHuman.factory('cat'));
-        this.Outfit.addItem(FaceWolf.factory('cat'));
-        this.Outfit.addItem(AnusHuman.factory('cat'));
-        this.Outfit.addItem(VulvaHuman.factory('cat'));
-        this.Outfit.addItem(new BikiniBottomLeather());
-        this.Outfit.addItem(new BikiniTopLeather());
-        let sk = new SkillGuard();
-        sk.style=2;
-        this.Skills.addItem(sk);
-        this.levelUp(3);
-        this.autoLeveling();
-    }
-    calcCombatMove(enemys,friends){
-        let result = {OK:true,msg:''};
-        //if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
-        let rnd = _.random(1,100);
-        result.action =result.target= null;
-        //todo shoot arrow, pounce, throw net
-        if(window.story.state.combat.turnCount%2===0) {
-            result.action = "Guard";
-            result.target = [this];
-            result.msg =this.name+" retreats somewhat and moves into a defensive stance.</br>"+result.msg;
             return(result);
         }
         return(super.calcCombatMove(enemys,friends));
@@ -604,13 +621,14 @@ class Trent extends Mob {
 //collection of mob-constructors
 window.gm.Mobs = (function (Mobs) {
     Mobs.AnthroCat = function() { return function(param){return(AnthroCat.factory(param));}("AnthroCat")};
+    Mobs.Huntress = function() { return function(param){return(AnthroCat.factory(param));}("Huntress")};
     Mobs.Lapine = Lapine.factory;
     Mobs.Mole = Mole.factory;
     Mobs.Squirrel = function() { return function(param){return(Mole.factory(param));}("Squirrel")};
     Mobs.Hawk = function() { return function(param){return(Hawk.factory(param));}("Hawk")};
     Mobs.Hornett = function() { return function(param){return(Hornett.factory(param));}("Hornett")};
     Mobs.PillRoller = function() { return function(param){return(Hornett.factory(param));}("PillRoller")};
-    Mobs.Huntress = Huntress.factory;
+    Mobs.Slime = Slime.factory;
     Mobs.Lizan = Lizan.factory;
     Mobs.Wolf = Wolf.factory;
     Mobs.AlphaWolf = function() { return function(param){return(Wolf.factory(param));}(100)};

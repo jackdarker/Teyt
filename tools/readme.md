@@ -1,5 +1,6 @@
 svgtojs bundles svg-files into script-files that is placed in dist-directory.
 You need to edit src/head-content.html to add those scripts to html-header and call their load-function to get the data.
+Names of the svg must be compatible with javascribt-object-naming (avoid special- & whitespace-chars)
 
 For maps:
 - the game adds/removes classes from the svg-nodes; dont assign styles to the elements, only classes or this would conflict

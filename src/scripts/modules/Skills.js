@@ -199,6 +199,46 @@ class SkillSting extends SkillAttack {
         return(attack);
     }
 }
+//slobber your foe
+class SkillSlobber extends SkillAttack {
+    static dataPrototype() { return({style:''}); }
+    static factory(id) {
+        let obj =  new SkillSlobber();
+        obj.setStyle(id);
+        return(obj);
+    }
+    constructor() {
+        super();
+        this.id=this.name='Slobber';
+        this.data = SkillSlobber.dataPrototype();
+        this.msg = '';
+        this.cost.energy =25;
+    }
+    setStyle(id) {
+        this.data.style = id;
+        switch(id) {
+            case 'slime-slobber': 
+                this.id=this.name=id; this.data.weapon='bTailBase';
+                this.startDelay=0,this.defCoolDown=1;
+                break;
+            default:
+                throw new Error("unknown slobber-style "+id);
+        }
+    }
+    getStyle() { return this.data.style; }
+    toJSON() {return window.storage.Generic_toJSON("SkillSlobber", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillSlobber, value.data));}
+    get desc() { return("Use your "+this.name+" to drool all over your foe. "+this.getCost().asText());}
+    __estimateAttack(target) {
+        let attack =window.gm.combat.defaultAttackData();
+        let weapon=this.caster.Outfit.getItemForSlot(this.data.weapon);
+        attack.mod= new SkillMod();
+        if(weapon && weapon.attackMod) { //get damage info
+            attack.mod=weapon.attackMod(target);
+        }
+        return(attack);
+    }
+}
 //execute attack with Feet
 class SkillKick extends SkillAttack {
     constructor() {
@@ -522,15 +562,13 @@ class SkillSubmit extends Skill {
     }
 }
 class SkillGrapple extends Skill {
-    constructor() { 
-        super("Grapple");
-        this.msg = ''; }
+    constructor() { super("Grapple"); this.msg = ''; }
     toJSON() {return window.storage.Generic_toJSON("SkillGrapple", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillGrapple, value.data));}
     targetFilter(targets){
         return(this.targetFilterEnemy(this.targetFilterAlive(targets)));
     }
-    get desc() { return("Grapple the opponent to restrict his movement.");}
+    get desc() { return("Grapple the opponent to restrict its movement.");}
     previewCast(targets){
         var result = new SkillResult();
         this.msg = '';
@@ -805,6 +843,7 @@ window.gm.SkillsLib = (function (Lib) {
     window.storage.registerConstructor(SkillHeal);
     window.storage.registerConstructor(SkillInspect);
     window.storage.registerConstructor(SkillPoisonCloud);
+    window.storage.registerConstructor(SkillSlobber);
     window.storage.registerConstructor(SkillStrongHit);
     window.storage.registerConstructor(SkillStun);
     window.storage.registerConstructor(SkillSubmit);

@@ -21,7 +21,7 @@ function buildRooms() {
         'F4--G4--H4--I4  J4--K4  L4',
         '|   |           |       | ',
         'F5  G5--H5--I5--J5--K5--L5',
-        '|       |           |     ',
+        '|       |       |        ',
         'F6--G6--H6  I6--J6--K6--L6'];
     let grid =[
     {room:'F2', dirs:['G2','F3']},
@@ -49,23 +49,23 @@ function buildRooms() {
     {room:'G5', dirs:['G4','H5']},
     {room:'H5', dirs:['G5','I5','H6']},
     {room:'I5', dirs:['H5','J5']},
-    {room:'J5', dirs:['I5','K5','J4']},
-    {room:'K5', dirs:['J5', 'K6','L5']},
+    {room:'J5', dirs:['I5','J6','K5','J4']},
+    {room:'K5', dirs:['J5','L5']},
     {room:'L5', dirs:['K5']},
     {room:'G6', dirs:['F6']}, //,'H6'
     {room:'F6', dirs:['F5','G6']},
     {room:'H6', dirs:['H5','G6']},
     {room:'I6', dirs:['J6']},
-    {room:'J6', dirs:['I6','K6']},
-    {room:'K6', dirs:['K5','L6','J6']},
+    {room:'J6', dirs:['J5','I6','K6']},
+    {room:'K6', dirs:['L6','J6']},
     {room:'L6', dirs:['K6']}];
     let dng={grid:grid,width:14,height:8,legend:'S=Panicroom  E=Portal'}
     var s = window.story.state;
     s.DngSY.dngMap=dng;
     s.DngSY.dng='DngHC';
-    s.vars.spawnAt="DngHC_H3";
+    s.vars.spawnAt="DngHC_Respawn";
     s.DngHC.tmp={tickPass:''};
-    s.DngHC.tmp.evtEnter = { //events on tile-enter
+    s.DngHC.tmp.evtEnter = { //events on tile-enter               todo need to make sure this is rebuild on load but only if in dungeon
         G3: {dog:{tick:'',state:0 }},
         I3: {dog:{tick:'',state:0 }}, 
         J4: {dog:{tick:'',state:0 }},
@@ -78,9 +78,10 @@ function buildRooms() {
         J4: {K4:{tick:'',state:0 }},
     }
     s.DngHC.tmp.evtSpawn = { //respawn evts 
-        DngHC_I3: {chest:{tick:window.gm.getTime(),state:0, loot:[{id:"Money",count:30}] },
-                    mushroom:{tick:window.gm.getTime(),state:0,loot:"BrownMushroom" }},
-        DngHC_H5: {mushroom:{tick:window.gm.getTime(),state:0,loot:"ViolettMushroom" }}
+        DngHC_I3: {chest:{tick:window.gm.getTime(),state:0},
+                    mushroom:{tick:window.gm.getTime(),state:0,loot:"BrownMushroom" }}
+        ,DngHC_G4: {mushroom:{tick:window.gm.getTime(),state:0,loot:"ViolettMushroom" }}
+        ,DngHC_H5: {mushroom:{tick:window.gm.getTime(),state:0,loot:"ViolettMushroom" }}
     }
     s.DngHC.tmp.mobs = [ //wandering mobs pos=current tile
       //{id:"carlia", pos:"I5",state:1},
@@ -119,7 +120,7 @@ function dogEncounter() {
   let _evt = window.story.state.DngHC.tmp.evtEnter[window.story.state.DngSY.nextLocation.replace(window.story.state.DngSY.dng+"_","")]["dog"];
   if(window.gm.player.Outfit.countItem("CollarDog")>0) {
     _evt.state=1;
-    window.story.show("HC_Meet_Dog_Greet");
+    window.story.show("DngHC_Meet_Dog_Greet");
   } else {
     _evt.state=1;
     window.gm.encounters.wolf({amount:1,type:"Guarddog", noStart:true, levelUp:10});
@@ -144,9 +145,9 @@ For some reason the dog doesnt oppose you as you try to walk past it. Might this
 <a0 onclick='window.gm.printTalkLink("div#select1","div#choice1a")'>Why not</a></br>
 <a0 onclick='window.gm.printTalkLink("div#select1","div#choice1b")'>Just get away</a></br>
 </div><div id='choice1a' hidden></br> At first reserved but soon stronger you give the dog some good ruffling of its fur at his neck an back of the head.
-  <a0 onclick='window.story.show(window.gm.player.location);'>Next</a></div>
+  <a0 onclick='window.story.show(window.story.state.DngSY.nextLocation);'>Next</a></div>
 <div id='choice1b' hidden></br>You press onward to leave the possible threat behind.</br>
-  <a0 onclick='window.story.show(window.gm.player.location);'>Next</a>
+  <a0 onclick='window.story.show(window.story.state.DngSY.nextLocation);'>Next</a>
 </div> 
 </article><article id="LogPanel"></article></section>
 <%=window.story.render("HC_Encounters")%>
@@ -171,7 +172,7 @@ No mushrooms growing here right now.
 
 :: DngHC_Chest
 </br><%if(window.story.state.DngHC.tmp.evtSpawn[window.passage.name]["chest"].state===0){%>There is a chest. Do you dare open it?
-<a0 onclick='window.story.state.DngHC.tmp.evtSpawn[window.passage.name]["chest"].state=1;window.story.state.tmp.args[1]=70;window.story.state.tmp.args[2]=window.passage.name;window.story.show("DngHC_LootChest")'>Yes</a></br>
+<a0 onclick='//window.story.state.DngHC.tmp.evtSpawn[window.passage.name]["chest"].state=1;window.story.state.tmp.args[1]=70;window.story.state.tmp.args[2]=window.passage.name;window.story.show("DngHC_LootChest")'>Yes</a></br>
 <%}else{%>
 An empty chest sits over there.
 <%}%>
@@ -213,6 +214,14 @@ window.gm.printOutput(msg);
 You start to feel hungry. If you dont get something in your belly, you will get weaker by the time.
 ---
 <a0 onclick= 'window.story.show("")'>Next</a><
+</article><article id="LogPanel"></article></section>
+<%=window.story.render("HC_Encounters")%>
+
+:: DngHC_Respawn [_nosave_ _nodeffered_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+It's impossible to say how long you were passed out and how you ended up here. </br>
+But at least you are alive and - mostly - unharmed.</br>
+<a0 onclick= 'window.story.show("DngHC_H3")'>Next</a><
 </article><article id="LogPanel"></article></section>
 <%=window.story.render("HC_Encounters")%>
 
@@ -427,7 +436,8 @@ You could pull one of the levers: <a0 id='A' onclick='pullLever(this)'>Lever A</
   if(evt.id=='A'){
     if(doors['H5']['G5'].state===0) {
       doors['G5']['H5'].state=doors['H5']['G5'].state=1;
-      window.gm.printOutput('Some chains are rattling and you hear some clanking noises in the east.')
+      window.gm.printOutput('Some chains are rattling and you hear some clanking noises in the east.</br> That might be a opening gate. Lets just hope you didnt unleash anything else.');
+      window.story.state.DngHC.tmp.mobs.push({id:"SlimeG2",mob:"slime",pos:"G2",path:["G2","G3","G4"],state:0,tick:'',aggro:0});
     } else window.gm.printOutput('You pull the lever but nothing happens. Whatever the lever has triggered cannot be undone.');
   }
   if(evt.id=='B'){
@@ -477,34 +487,53 @@ The area here is flooded with some murky water. You cant know how deep it is - o
 
 :: DngHC_Altar
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-"There is a portal hidden somewhere here but it is vamished and corrrupted. You need to resurrect its power to be able to flee from this place."</br>
+<p class="tNPC1">"There is a portal hidden somewhere here but it is vamished and corrrupted. You need to resurrect its power to be able to flee from this place."</br>
 "No one will come here to help you. If you just stay in that cell, you will just starve to death or get insane.."</br>
-"To be able to help you, you have to help me first. "</br>
+"To be able to help you, you have to help me first. "</br></p>
 <% if(window.gm.quests.getMilestoneState("qDoorControl").id<100) { %>
-<div id='select1' > "You might have noticed that some of the gates are closed, keeping you trapped here. There is a room with controls that can open the doors remotely. Find it and open the door to the east."</br>
-"There might meat some ... guards on your travel. Sometimes they don't let you pass just easily. It usually helps if you wear some of those collars."</br>
-<a0 onclick='window.gm.player.Wardrobe.addItem(window.gm.ItemsLib.CollarDog());window.gm.quests.forceQuestMilestone("qDoorControl",100,1);window.gm.printTalkLink("div#select1","div#choice1a");'>Fine </a></br>
-</div><div id='choice1a' hidden></br> <p class="author">You've got a quest! Check your quest log.</p> 
-You got some collar. Its made from red leather and bones are imprinted on it all around. Its a dog collar obviously. </br>
-"Wear it and they should let you pass."</br> 
+<div id='select1' > <p class="tNPC1">"You might have noticed that some of the gates are closed, keeping you trapped here. There is a room with controls that can open the doors remotely. Find it and open the door to the east."</br>
+  "You might meet some ... guards on your travel. Sometimes they don't let you pass just easily. It usually helps if you wear some of those collars."</p>
+  <a0 onclick='window.gm.player.Wardrobe.addItem(window.gm.ItemsLib.CollarDog());window.gm.quests.forceQuestMilestone("qDoorControl",100,1);window.gm.printTalkLink("div#select1","div#choice1a");'>Accept </a></br>
+  </div><div id='choice1a' hidden>Some kind of collar is placed on the altar. why didnt you notice it before? Its made from red leather and bones are imprinted on it all around. Its a dog collar obviously. </br>
+  <p class="tNPC1">"Wear it and they should let you pass."</br></p>
+  <p class="author">You've got a quest! Check your quest log. You also got something that you can equip in your outfit.</p> 
 </div>
-<% }else if(window.gm.quests.getMilestoneState("qDoorControl").id===100) { %>
- "Find the room where you can open the gate in the east."</br> Remember to outfit the collar if the guards give you to much trouble. 
-<% }else if(window.gm.quests.getMilestoneState("qDoorControl").id===200) { %>
-"The gate should now be open so that you can explore further down the path."</br>
+<% }else if(window.gm.quests.getMilestoneState("qDoorControl").id===100 && window.story.state.DngHC.tmp.doors['H5']['G5'].state===0) { %>
+  <p class="tNPC1">"Find the room with some levers. It should be somewhere west of here. There you can open the gate in the east. Remember to outfit the collar if the guards give you to much trouble."</p>
+<% }else if(window.gm.quests.getMilestoneState("qDoorControl").id===100 && window.story.state.DngHC.tmp.doors['H5']['G5'].state===1) { 
+  window.gm.quests.forceQuestMilestone("qDoorControl",200,100);window.gm.player.Inv.addItem(window.gm.ItemsLib.Sandwich(),2);%>
+  <p class="tNPC1">"The gate should now be open so that you can explore further down the path."</br></br>"Take this food in case you feel hungry. There arent many things around that you could eat safely. But starving to death doesnt help either."</p>
+  <p class="author">That quest is finished. Use your inventory to check on your consumables.</p> 
+<!------------------------------------------------------------------------------->
 <% }else if(window.gm.quests.getMilestoneState("qBlackCandle").id<100) { %>
-<div id='select1' > "3 black candles were stolen. Someone could use them for a ritual. We need to secure them."</br>
-<a0 onclick='window.gm.quests.forceQuestMilestone("qBlackCandle",100,1);window.gm.printTalkLink("div#select1","div#choice1a");'>Fine </a></br>
-</div><div id='choice1a' hidden></br> <p class="author">You've got a quest! Check your quest log.</p>
-</div>
-<% }else if(window.gm.quests.getMilestoneState("qBlackCandle").id===100 && window.gm.player.Inv.countItem("BlackCandle")>=3) { %>
-<div id='select10' > "Did you get those candles?"</br>
-<a0 onclick='window.gm.player.Inv.removeItem("BlackCandle",3);window.gm.quests.forceQuestMilestone("qBlackCandle",200,100);window.gm.printTalkLink("div#select10","div#choice10a");'>Yes</a>
-</div><div id='choice10a' hidden>You hand over the candles.</br> "Now rest and return to me later."</br>
+<div id='select1' > <p class="tNPC1">"3 black candles were stolen. Someone could use them for a ritual. We need to secure them."</p>
+  <a0 onclick='window.gm.quests.forceQuestMilestone("qBlackCandle",100,1);window.gm.printTalkLink("div#select1","div#choice1a");'>Accept</a></br>
+</div><div id='choice1a' hidden></br>
 </div>
 <% }else if(window.gm.quests.getMilestoneState("qBlackCandle").id===100 && window.gm.player.Inv.countItem("BlackCandle")<3) { %>
-"You need to find 3 black candles."</br>
+  <p class="tNPC1">"You need to find 3 black candles."</p>
+<% }else if(window.gm.quests.getMilestoneState("qBlackCandle").id===100 && window.gm.player.Inv.countItem("BlackCandle")>=3) { %>
+<div id='select10' > <p class="tNPC1">"Did you get those candles?"</p>
+  <a0 onclick='window.gm.player.Inv.removeItem("BlackCandle",3);window.gm.quests.forceQuestMilestone("qBlackCandle",200,100);window.gm.printTalkLink("div#select10","div#choice10a");'>Yes</a>
+</div><div id='choice10a' hidden>You hand over the candles.</br> <p class="tNPC1">"Now rest and return to me later."</p>
+</div>
 <% } %>
 </br>[[Leave|DngHC_G5]]
 </article><article id="LogPanel"></article></section>
 
+
+:: DngHC_Vendor
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+There is a vendor that sells some wares.
+Steal - He sees to be sleeping most of the time, maybe you can pick something small when he closes his eyes
+      - that stolen goods where cursed; some kind of theft counter measures?
+</br>[[Leave|DngHC_G5]]
+</article><article id="LogPanel"></article></section>
+
+:: DngHC_Showcase
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+Some kind of lectern or stand is placed in an alcoven.
+Steal - He sees to be sleeping most of the time, maybe you can pick something small when he closes his eyes
+      - that stolen goods where cursed; some kind of theft counter measures?
+</br>[[Leave|DngHC_G5]]
+</article><article id="LogPanel"></article></section>

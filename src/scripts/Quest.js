@@ -3,6 +3,8 @@
  */
 ///////////////////////////////////////////////////////////////
 class QuestMilestone {
+    static NOP(){return(0);}
+    static DONE(){return(-1);}
     constructor(id,name,descr,CondCheckCB,HiddenCB=null) {
         this.id =id,this.name=name;
         this.HiddenCB = (HiddenCB===null)? (function(){return(false);}): HiddenCB;
@@ -142,7 +144,7 @@ class QuestManager {
         for (var i=0; i< this.questData.activeQuests.length; i++) {
             var qID = this.questData.activeQuests[i].id;
             var msID = this.questData.activeQuestsMS[i].id;
-            if(qID===questId && reqMileId===msID) {
+            if(qID===questId && (reqMileId===msID || reqMileId===-1)) {
                 this.questData.activeQuestsMS[i].id=mileId;
                 needsUpdate =true;
             }
@@ -163,9 +165,7 @@ class QuestManager {
             var mile = quest.getMileById(msID);
             //if (quest.finished ) continue;
             var Next = -1;
-            if(!mile) {
-                throw new Error("cant find mileId "+msID+" in "+quest.id);
-            } 
+            if(!mile) throw new Error("cant find mileId "+msID+" in "+quest.id);
             Next = mile.evaluateCondition();
             if (Next === -1) {
                 tmpfinishedQuest.push(i);

@@ -411,12 +411,3 @@ Another Arena</br><%=window.story.render("DngPC_Retreat")%>
 <%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
 <%=window.story.render("DngPC_Encounters")%>
-
-
-:: DngPC_I4
-<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
-Another Arena</br><%=window.story.render("DngPC_Retreat")%>
-<%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
-</article><article id="LogPanel"></article></section>
-<%=window.story.render("DngPC_Encounters")%>

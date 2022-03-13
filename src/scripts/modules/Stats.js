@@ -677,86 +677,11 @@ class effEnergyDrain extends Effect {
         }
     }
 }
-class effMutateCat extends Effect {
-    constructor() {
-        super();
-        this.data.id = this.data.name= effMutateCat.name, this.data.hidden=0;
-        this.data.duration = 60,this.data.cycles = 3, this.data.magnitude = 3;
-    }
-    toJSON() {return window.storage.Generic_toJSON("effMutateCat", this); };
-    static fromJSON(value) { return window.storage.Generic_fromJSON(effMutateCat, value.data);};
-    get desc() {return("cat-tastic");}
-
-    onTimeChange(time) {
-        //after some time you mutate a bit
-        this.data.duration-= window.gm.getDeltaTime(time,this.data.time);
-        this.data.time = time;
-        if(this.data.duration<=0) {
-            this.data.duration = 60;
-            return(function(me){
-                return (function(Effects){ 
-                    if(me.data.cycles<=0) { 
-                        Effects.removeItem(me.data.id);
-                    }
-                    window.gm.MutationsLib.mutateCat(me.parent.parent);
-                    //window.gm.pushDeferredEvent("CatHabit");
-                    Effects.removeItem(me.data.id);});
-                }(this));
-            }
-        return(null);
-    }
-    onApply(){
-        this.data.duration = 60,this.data.cycles = 3;
-        this.data.time = window.gm.getTime();
-    }
-    merge(neweffect) {
-        if(neweffect.name===this.data.name) {//dont refresh
-            return(true);
-        }
-    }
-}
-class effMutateWolf extends Effect {
-    constructor() {
-        super();
-        this.data.id = this.data.name= effMutateWolf.name, this.data.hidden=0;
-        this.data.duration = 60,this.data.cycles = 3, this.data.magnitude = 3;
-    }
-    toJSON() {return window.storage.Generic_toJSON("effMutateWolf", this); };
-    static fromJSON(value) { return window.storage.Generic_fromJSON(effMutateWolf, value.data);};
-    get desc() {return("wolf-tastic");}
-
-    onTimeChange(time) {
-        //after some time you mutate a bit
-        this.data.duration-= window.gm.getDeltaTime(time,this.data.time);
-        this.data.time = time;
-        if(this.data.duration<=0) {
-            this.data.duration = 60;
-            return(function(me){
-                return (function(Effects){ 
-                    if(me.data.cycles<=0) { 
-                        Effects.removeItem(me.data.id);
-                    }
-                    window.gm.MutationsLib.mutateWolf(me.parent.parent);
-                    Effects.removeItem(me.data.id);});
-                }(this));
-            }
-        return(null);
-    }
-    onApply(){
-        this.data.duration = 60,this.data.cycles = 3;
-        this.data.time = window.gm.getTime();
-    }
-    merge(neweffect) {
-        if(neweffect.name===this.data.name) {//dont refresh
-            return(true);
-        }
-    }
-}
 class effMutateHorse extends Effect {
     constructor() {
         super();
         this.data.id = this.data.name= effMutateHorse.name, this.data.hidden=0;
-        this.data.duration = 60,this.data.cycles = 3, this.data.magnitude = 3;
+        this.data.duration = 60,this.data.cycles = 3, this.data.magnitude = 1;
     }
     toJSON() {return window.storage.Generic_toJSON("effMutateHorse", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(effMutateHorse, value.data);};
@@ -769,11 +694,11 @@ class effMutateHorse extends Effect {
             this.data.duration = 60;
             return(function(me){
                 return (function(Effects){ 
-                    if(me.data.cycles<=0) { 
-                        Effects.removeItem(me.data.id);
-                    }
-                    this.__mutate();
-                    Effects.removeItem(me.data.id);});
+                    me.data.cycles-=1;
+                    me.data.magnitude=me.parent.parent.Stats.get("savageness").value; //=(x+Max)/2 ?? 
+                    me.__mutate();
+                    if(me.data.cycles<=0) {Effects.removeItem(me.data.id);}
+                });
                 }(this));
             }
         return(null);
@@ -788,9 +713,39 @@ class effMutateHorse extends Effect {
         }
     }
     __mutate() {
-        window.gm.MutationsLib.effMutateHorse(this.parent.parent);
+        window.gm.MutationsLib.mutateHorse(this.parent.parent,this.data.magnitude);
         //todo non-PC can be mutated (if receives timechange !) but the scene will assume its player?!
     }
+}
+class effMutateHuman extends effMutateHorse {
+    constructor() {
+        super();
+        this.data.id = this.data.name= effMutateHuman.name, this.data.hidden=0;
+        this.data.duration = 60,this.data.cycles = 3, this.data.magnitude = 3;
+    }
+    toJSON() {return window.storage.Generic_toJSON("effMutateHuman", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(effMutateHuman, value.data);};
+    __mutate() {window.gm.MutationsLib.mutateHuman(this.parent.parent,this.data.magnitude);}
+}
+class effMutateCat extends effMutateHorse {
+    constructor() {
+        super();
+        this.data.id = this.data.name= effMutateCat.name, this.data.hidden=0;
+        this.data.duration = 60,this.data.cycles = 3, this.data.magnitude = 3;
+    }
+    toJSON() {return window.storage.Generic_toJSON("effMutateCat", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(effMutateCat, value.data);};
+    __mutate() {window.gm.MutationsLib.mutateCat(this.parent.parent,this.data.magnitude);}
+}
+class effMutateWolf extends effMutateHorse {
+    constructor() {
+        super();
+        this.data.id = this.data.name= effMutateWolf.name, this.data.hidden=0;
+        this.data.duration = 60,this.data.cycles = 3, this.data.magnitude = 3;
+    }
+    toJSON() {return window.storage.Generic_toJSON("effMutateWolf", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(effMutateWolf, value.data);};
+    __mutate() {window.gm.MutationsLib.mutateWolf(this.parent.parent,this.data.magnitude);}
 }
 class effMutateBunny extends effMutateHorse {
     constructor() {
@@ -799,13 +754,13 @@ class effMutateBunny extends effMutateHorse {
     }
     toJSON() {return window.storage.Generic_toJSON("effMutateBunny", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(effMutateBunny, value.data);};
-    __mutate() { window.gm.MutationsLib.effMutateBunny(this.parent.parent); }
+    __mutate() { window.gm.MutationsLib.mutateBunny(this.parent.parent,this.data.magnitude); }
 }
 class effHorsePower extends Effect {
     constructor() {
         super();
         this.data.id = this.data.name= effHorsePower.name, this.data.hidden=0;
-        this.data.duration = 120,this.data.cycles = 3, this.data.magnitude = 1;
+        this.data.duration = 120,this.data.cycles = 1, this.data.magnitude = 1;
     }
     toJSON() {return window.storage.Generic_toJSON("effHorsePower", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(effHorsePower, value.data);};
@@ -821,31 +776,35 @@ class effHorsePower extends Effect {
             this.data.duration =0;
         }
         this.parent.parent.Stats.increment('energy',10*delta/60);
-        if(this.data.magnitude>2) {
-            let _i = this.parent.findItemSlot(this.data.id);
-            if(_i<0) { //todo extend if exist?
+        this.parent.parent.Stats.increment('health',10*delta/60);
+        this.parent.parent.Stats.increment('will',10*delta/60);        
+        if(this.data.duration<=0) { 
+            this.data.cycles-=1;
+            if(this.data.magnitude>=2) {
                 this.__trgMutation();
             }
-        }
-        if(this.data.duration<=0) { //remove yourself
-            return(function(me){
-                return function(Effects){ Effects.removeItem(me.data.id);}}(this));
+            if(this.data.cycles<=0) {//remove yourself
+                return(function(me){return function(Effects){ 
+                    Effects.removeItem(me.data.id);}
+                }(this));
+            }            
         }
         return(null);
     }
     __trgMutation() {
-        this.parent.parent.addEffect(new effMutateHorse(),effMutateHorse.name );
+        let _i = this.parent.findItemSlot(effMutateHorse.name);
+        if(_i===-1) { //todo extend if exist?
+            this.parent.parent.addEffect(new effMutateHorse(),effMutateHorse.name );
+        }
     }
     onApply(){
         this.data.duration = 120;
-        this.data.duration = 3;
         this.data.time = window.gm.getTime();
     }
     merge(neweffect) {
         if(neweffect.id===this.data.id) {
             this.onApply(); //refresh 
             this.data.magnitude +=1; //bonus effect triggers only if added multiple times
-            //window.gm.pushDeferredEvent("HorsePowerNotice",[this.data.magnitude]);
             return(true);
         }
     }
@@ -859,7 +818,10 @@ class effLapineSpeed extends effHorsePower{
     static fromJSON(value) { return window.storage.Generic_fromJSON(effLapineSpeed, value.data);};
     get desc() {return(effLapineSpeed.name);}
     __trgMutation() {
-        this.parent.parent.addEffect(new effMutateBunny(),effMutateBunny.name );
+        let _i = this.parent.findItemSlot(effMutateBunny.name);
+        if(_i===-1) { //todo extend if exist?
+            this.parent.parent.addEffect(new effMutateBunny(),effMutateBunny.name );
+        }
     }
 }
 class effGrowBreast extends Effect {
@@ -1180,7 +1142,6 @@ class effSpermDecay extends Effect {
     }
 }
 /////////////// combateffects /////////////////////////
-//todo transformSelf: replace the caster with a different class & regenerate energy  
 class effHeal extends CombatEffect {
     static factory(amount,duration=0) {
         let eff = new effHeal();
@@ -1651,7 +1612,7 @@ class effKamikaze extends CombatEffect { //if <10%health kill yourslef and damag
         this.data.item=item,this.data.faction=faction,this.data.amount=amount;
     }
 }
-
+//todo transformSelf: replace the caster with a different class & regenerate energy  
 
 //skills
 class skCooking extends Effect {
@@ -1732,6 +1693,7 @@ window.gm.StatsLib = (function (StatsLib) {
     window.storage.registerConstructor(effMutateHorse);
     window.storage.registerConstructor(effMutateWolf);
     window.storage.registerConstructor(effMutateCat); 
+    window.storage.registerConstructor(effMutateHuman);
     window.storage.registerConstructor(effGrowBreast);
     window.storage.registerConstructor(effGrowVulva);
     window.storage.registerConstructor(effLewdMark);

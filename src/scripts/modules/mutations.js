@@ -156,14 +156,14 @@ window.gm.MutationsLib['swapGender'] = function (char,genderItem) {
         window.gm.pushDeferredEvent("GenericDeffered",[msg]);
     }
 }
-window.gm.MutationsLib['mutateWolf'] = function (char) {
-    let _rnd =_.random(1,100);
+window.gm.MutationsLib['mutateWolf'] = function (char,magnitude=1) {
+    let _rnd =_.random(1,100),_thr=char.Stats.get("savageness").value;
     let msg='',_TF="TailWolf";
     if(char.Outfit.countItem(_TF)>0) {
         let item = char.Outfit.getItem("TailWolf");
         if(item.getStyle() !=='wolf') {
             item.setStyle('wolf');
-            msg=("Your tail is now a fuzzy bush like that of a wolf.</br>");
+            msg=("Your tail is now a fuzzy bush like of a wolf.</br>");
         } else {
             let growth = item.data.growth+0.25;
             let maxGrowth = item.maxGrowth;
@@ -196,7 +196,7 @@ window.gm.MutationsLib['mutateWolf'] = function (char) {
         window.gm.pushDeferredEvent("GenericDeffered",[msg]);
     }
 };
-window.gm.MutationsLib['mutateCat'] = function(char) {
+window.gm.MutationsLib['mutateCat'] = function(char,magnitude=1) {
     let msg='', _TF="TailWolf";
     if(char.Outfit.countItem(_TF)>0) {
         let item = char.Outfit.getItem(_TF);
@@ -225,23 +225,24 @@ window.gm.MutationsLib['mutateHorse'] = function(char,magnitude=1) {
     let msg='', bb=window.gm.OutfitSlotLib;
     let fconv =window.gm.util.descFixer(char);
     let base=char.Outfit.getItemForSlot(bb.bBase);//todo bodyparts depends also on feral or anthro body
-    let el,slots=[], cnt=0;
-    //which part can mutate?
-    [bb.bFace,bb.bSkin,bb.bTailBase,bb.bHands].forEach(
+    let el,slots=[], cnt=magnitude;
+    //mutate depending on magnitude; some TF requires more then others
+    // ears/eyes - fur - tail/legs/genitals (minor) - arms/head/genitals - quadruped/feral 
+    let thrs={};thrs[bb.bSkin]=8,thrs[bb.bTailBase]=16,thrs[bb.bHands]=32,thrs[bb.bFace]=32;
+    [bb.bFace,bb.bSkin,bb.bTailBase,bb.bHands].forEach( //todo legs,skin,genitals
         x=>{slots.push({"slot":x,"item":char.Outfit.getItemForSlot(x)})});
-    //select a part to mutate, repick if already mutated    
-    while(slots.length>0 && cnt<magnitude) {//todo legs,skin,genitals
-        el = slots.splice(_.random(0,slots.length-1),1)[0];
-        if(el.slot===bb.bTailBase) {
+    while(slots.length>0 && cnt>0) { 
+        el = slots.splice(_.random(0,slots.length-1),1)[0]; //select random part to mutate, repick if already mutated    
+        if(el.slot===bb.bTailBase && cnt>=thrs[bb.bTailBase]) {
             if(el.item===null) {
                 char.Outfit.addItem(window.storage.constructors['TailWolf'].factory('horse'),true);
                 msg+=fconv("$[I]$ $[have]$ grown a horse tail !</br>");
-                cnt++;
+                cnt-=thrs[bb.bTailBase];
             } else if(el.item.getStyle() !=='horse'|| el.item.id!=='TailWolf') {
                 char.Outfit.removeItem(el.item.id,true);
                 char.Outfit.addItem(window.storage.constructors['TailWolf'].factory('horse'),true);
                 msg+=fconv("$[My]$ tail reshapes itself to a be more horse-like.</br>");
-                cnt++;
+                cnt-=thrs[bb.bTailBase]/2;
             } else {
                 var growth = el.item.data.growth+0.25;
                 var maxGrowth = 2;//window.gm.player.Outfit.getItem("TailWolf").maxGrowth;
@@ -250,18 +251,18 @@ window.gm.MutationsLib['mutateHorse'] = function(char,magnitude=1) {
                 } else {
                     el.item.data.growth=growth;
                     msg+=fconv("$[My]$ tail must have grown and is now "+window.gm.util.formatNumber(growth*maxGrowth,1)+" meter long.</br>");
-                    cnt++;
+                    cnt-=thrs[bb.bTailBase]/4;
                 }
             }
-        } else if(el.slot===bb.bFace) {
+        } else if(el.slot===bb.bFace && cnt>=thrs[bb.bFace]) {
             if(el.item===null) { //grow no face?
             } else if(el.item.getStyle() !=='horse') {
                 char.Outfit.removeItem(el.item.id,true);
                 char.Outfit.addItem(window.storage.constructors['FaceHorse'].factory('horse'),true);
                 msg+=fconv("$[My]$ face transforms into a horse ones.</br>");
-                cnt++;
+                cnt-=thrs[bb.bTailBase];
             } 
-        } else if(el.slot===bb.bHands) {
+        } else if(el.slot===bb.bHands && cnt>=thrs[bb.bHands]) {
             if(el.item===null) { //grow no hands?
             } else if(el.item.getStyle() !=='horse') {
                 if(base.id==="BaseHumanoid") {
@@ -273,16 +274,64 @@ window.gm.MutationsLib['mutateHorse'] = function(char,magnitude=1) {
                     char.Outfit.addItem(window.storage.constructors['HandsHoof'].factory('horse'),true);
                     msg+=fconv("$[My]$ hands transforms into a horse-like hoves.</br>");
                 }
-                cnt++;
+                cnt-=thrs[bb.bHands];
             }
         }
     }
-    if(cnt<magnitude) msg=fconv("$[I]$ already changed to a horse as far as possible.</br>");
-    if(char===window.gm.player) {
-        window.gm.pushDeferredEvent("GenericDeffered",[msg]);
+    if(cnt>0){
+        msg+=fconv("$[I]$ already changed to a horse as far as possible right now.</br>");
+        window.gm.MutationsLib.changeSavage(char,cnt,0,50); //increase savage
     }
+    window.gm.MutationsLib.changeSavage(char,cnt,0,50);
+    if(char===window.gm.player) {window.gm.pushDeferredEvent("GenericDeffered",[msg]);}
 };
-window.gm.MutationsLib['mutateBunny'] = function(char) {
+window.gm.MutationsLib['mutateHuman'] = function(char,magnitude=1) {
+    let msg='', bb=window.gm.OutfitSlotLib;
+    let fconv =window.gm.util.descFixer(char);
+    let base=char.Outfit.getItemForSlot(bb.bBase);//todo bodyparts depends also on feral or anthro body
+    let el,slots=[], cnt=magnitude;
+    //mutate depending on magnitude; some TF requires more then others
+    // ears/eyes - fur - tail/legs/genitals (minor) - arms/head/genitals - quadruped/feral 
+    let thrs={};thrs[bb.bSkin]=8,thrs[bb.bTailBase]=16,thrs[bb.bHands]=16,thrs[bb.bFace]=16;
+    [bb.bFace,bb.bSkin,bb.bTailBase,bb.bHands].forEach( //todo legs,skin,genitals
+        x=>{slots.push({"slot":x,"item":char.Outfit.getItemForSlot(x)})});
+    while(slots.length>0 && cnt>0) { 
+        el = slots.splice(_.random(0,slots.length-1),1)[0]; //select random part to mutate, repick if already mutated    
+        if(el.slot===bb.bTailBase && cnt>=thrs[bb.bTailBase]) {
+            if(el.item!==null) {
+                char.Outfit.removeItem(el.item.id,true);
+                msg+=fconv("$[My]$ tail is gone.</br>");
+                cnt-=thrs[bb.bTailBase];
+            }
+        } else if(el.slot===bb.bFace && cnt>=thrs[bb.bFace]) {
+            if(el.item===null) { //grow no face?
+            } else if(el.item.getStyle() !=='human') {
+                char.Outfit.removeItem(el.item.id,true);
+                char.Outfit.addItem(window.storage.constructors['FaceHuman'].factory('human'),true);
+                msg+=fconv("$[My]$ face looks human now.</br>");
+                cnt-=thrs[bb.bTailBase];
+            } 
+        } else if(el.slot===bb.bHands && cnt>=thrs[bb.bHands]) {
+            if(el.item===null) { //grow no hands?
+            } else if(el.item.getStyle() !=='human') {
+                if(base.id==="BaseHumanoid") {
+                    char.Outfit.removeItem(el.item.id,true);
+                    char.Outfit.addItem(window.storage.constructors['HandsHuman'].factory('human'),true);
+                    msg+=fconv("$[My]$ hands now look like that of a plain human.</br>");
+                    cnt-=thrs[bb.bHands];
+                } else { //dont grow hands when walking on 4 legs?
+                    //msg+=fconv("$[My]$ hands transforms into a horse-like hoves.</br>");
+                }
+            }
+        }
+    }
+    if(cnt>0) { 
+        msg+=fconv("$[I]$ already changed to a human as far as possible right now.</br>");
+        window.gm.MutationsLib.changeSavage(char,-1*cnt,0,50); //decrease savage
+    }
+    if(char==window.gm.player) {window.gm.pushDeferredEvent("GenericDeffered",[msg]);}
+};
+window.gm.MutationsLib['mutateBunny'] = function(char,magnitude=1) {
     let msg='', _TF="TailWolf", style='bunny';
     if(char.Outfit.countItem(_TF)>0) {
         let item = char.Outfit.getItem(_TF);
@@ -307,7 +356,7 @@ window.gm.MutationsLib['mutateBunny'] = function(char) {
         window.gm.pushDeferredEvent("GenericDeffered",[msg]);
     }
 };
-window.gm.MutationsLib['growBreast'] = function(char) {
+window.gm.MutationsLib['growBreast'] = function(char,magnitude=1) {
     let msg='', _TF="BreastHuman";
     if(char.Outfit.countItem(_TF)>0) {
         let item = char.Outfit.getItem(_TF);
@@ -327,7 +376,7 @@ window.gm.MutationsLib['growBreast'] = function(char) {
         window.gm.pushDeferredEvent("GenericDeffered",[msg]);
     }
 };
-window.gm.MutationsLib['growVulva'] = function(char) {
+window.gm.MutationsLib['growVulva'] = function(char,magnitude=1) {
     let msg = 'Everything is ok, nothing unusual.</br>', _TF="VulvaHuman";
     if(char.Outfit.countItem(_TF)>0) {
         let item = char.Outfit.getItem(_TF);
@@ -342,6 +391,33 @@ window.gm.MutationsLib['growVulva'] = function(char) {
         msg += "</br>"+item.descLong(window.gm.util.descFixer(char))+"</br>";
     }
     if(char===window.gm.player) {
+        window.gm.pushDeferredEvent("GenericDeffered",[msg]);
+    }
+};
+window.gm.MutationsLib['changeSavage'] = function(char,value=1,min=0,max=10) {
+    let msg = '';
+    let _v=0,_x=char.Stats.get("savageness").base,_maxold=char.Stats.get("savagenessMax").base,_maxnew=_maxold;
+    if(value>0) {//increase savageness and also max up to a level
+        _maxnew = Math.min(max, _maxold+value)-_maxold;
+        _v = Math.max((_maxnew-_maxold),(_x+value))-_x;
+    } else { //decrease savageness but not max
+        _v= Math.max(0,_x+value)-_x;_maxnew=0;
+    }
+    if(_maxnew!==0) {
+        char.Stats.increment("savagenessMax",_maxnew);
+        msg+="You get the feeling that your mind would somehow accept getting more savage.</br>"
+    }
+    if(_v>0) {
+        char.Stats.increment("savageness",_v);
+        msg+="Your mind grows more restless and its more difficult to think straight.</br>"
+        if(_v-_maxnew>1) msg+="There is trouble ahead If you dont keep your wits together.</br>"
+    }
+    if(_v<0) {
+        char.Stats.increment("savageness",_v);
+        msg+="Lately, you feel a little bit more clear headed.</br>"
+    }
+    if(msg==='')msg = 'Everything is ok, nothing unusual.</br>';
+    if(char==window.gm.player) {
         window.gm.pushDeferredEvent("GenericDeffered",[msg]);
     }
 };

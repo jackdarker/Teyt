@@ -118,7 +118,7 @@ class FaceHuman extends BodyPart {
     toJSON() {return window.storage.Generic_toJSON("FaceHuman", this); };
     static fromJSON(value) {return(window.storage.Generic_fromJSON(FaceHuman, value.data));}
     descLong(fconv) {
-        return(fconv('$[My]$ face ressembles that of a human'));
+        return(fconv('$[My]$ face ressembles that of a human.'));
     }
 }
 class FaceWolf extends BodyPart {
@@ -436,8 +436,7 @@ class ArmorTorso extends BodyPart {
 class WeaponStinger extends BodyPart {
     static dataPrototype() { return({style:'wasplike', skill:''}); }
     static factory(id) {
-        let obj =  new WeaponStinger();
-        obj.setStyle(id);
+        let obj =  new WeaponStinger();obj.setStyle(id);
         return(obj);
     }
     constructor() {
@@ -481,6 +480,56 @@ class WeaponStinger extends BodyPart {
         let _dmg =5;
         if(this.data.style==='wasplike' ) _dmg+=5;
         mod.onHit = [{ target:target, eff: [effDamage.factory(_dmg,'pierce', this.parent.parent.name+' pokes its '+this.data.style+' stinger into '+target.name+'. ' )]}];
+        return(mod);
+    }
+}
+class WeaponSlobber extends BodyPart {
+    static dataPrototype() { return({style:'slime', skill:''}); }
+    static factory(id) {
+        let obj =  new WeaponSlobber();obj.setStyle(id);
+        return(obj);
+    }
+    constructor() {
+        super('WeaponSlobber');
+        this.addTags(['body']);
+        this.slotUse = ['bTailBase'];
+        this.data = WeaponSlobber.dataPrototype();
+    }
+    setStyle(id) {
+        this.data.style = id;
+        switch(id) {
+            case 'slime': 
+                this.data.skill = 'slime-slobber';
+                this.slotUse = ['bTailBase'];
+                break;
+            default:
+                throw new Error("unknown slobber-style "+id);
+        }
+    }
+    getStyle() { return this.data.style; }
+    get descShort() { return (this.desc);}
+    get desc() { 'A '+this.data.style+'  slobber.';}
+    toJSON() {return window.storage.Generic_toJSON("WeaponSlobber", this); };
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(WeaponSlobber, value.data));}
+    descLong(fconv) {
+        return(fconv('$[I]$ $[have]$ a '+this.data.style+' slobber.'));
+    }
+    onEquip(context) {
+        let old = context.parent.Skills.countItem(this.data.skill);
+        if(old>0) context.parent.Skills.removeItem(this.data.skill,old);
+        context.parent.Skills.addItem(SkillSlobber.factory(this.data.skill));
+        return({OK:true, msg:'shifted'});
+    }
+    onUnequip() {
+        let old = this.parent.parent.Skills.countItem(this.data.skill);
+        if(old>0) this.parent.parent.Skills.removeItem(this.data.skill,old);
+        return({OK:true, msg:'shifted'});
+    }
+    attackMod(target){
+        let mod = new SkillMod();
+        let _dmg =5;
+        if(this.data.style==='slime' ) _dmg+=5;
+        mod.onHit = [{ target:target, eff: [effDamage.factory(_dmg,'acid', this.parent.parent.name+' slobbers '+target.name+' with '+this.data.style+'.' )]}];
         return(mod);
     }
 }
@@ -1099,6 +1148,7 @@ class PenisHuman extends BodyPart {
 window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(AnusHuman);
     window.storage.registerConstructor(ArmorTorso);
+    window.storage.registerConstructor(WeaponSlobber);
     window.storage.registerConstructor(WeaponStinger);
     window.storage.registerConstructor(BaseBiped);
     window.storage.registerConstructor(BaseHumanoid);
