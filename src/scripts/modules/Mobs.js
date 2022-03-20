@@ -130,9 +130,9 @@ class Slime extends Mob {
         foe.Outfit.addItem(WeaponSlobber.factory('slime'));
         if(type ==='SlimeTentacled') {
             //add tentacles and grappling
-            foe.loot= [{id:'BlueSlime',chance:25,amount:1},{id:'Money',chance:25,amount:20}];
+            foe.loot= [{id:'BlueSlime',chance:55,amount:1},{id:'Money',chance:25,amount:20}];
         } else {
-            foe.loot= [{id:'GreenSlime',chance:25,amount:1},{id:'Money',chance:25,amount:20}];
+            foe.loot= [{id:'GreenSlime',chance:55,amount:1},{id:'Money',chance:25,amount:20}];
         }
         return foe;
     }
@@ -272,6 +272,31 @@ class Lizan extends Mob {
             return(result);
         }
         return(super.calcCombatMove(enemys,friends));
+    }
+}
+class AnthroFox extends Mob {
+    static factory(type) {
+        let foe = new AnthroFox();
+        if(type==='Huntress') {
+            foe.Outfit.addItem(window.gm.ItemsLib['SpearStone']());
+        } else {
+            foe.Outfit.addItem(new DaggerSteel());
+        }
+        return foe;
+    }
+    constructor() {
+        super();
+        this.name = this.id = 'AnthroFox';
+        this.pic= 'unknown';
+        this.Outfit.addItem(new BaseHumanoid());
+        this.Outfit.addItem(SkinFur.factory('fox'));
+        this.Outfit.addItem(HandsHuman.factory('fox'));
+        this.Outfit.addItem(BreastHuman.factory('fox'));
+        this.Outfit.addItem(FaceWolf.factory('fox'));
+        this.Outfit.addItem(AnusHuman.factory('fox'));
+        this.Outfit.addItem(TailWolf.factory('fox'));
+        this.Outfit.addItem(VulvaHuman.factory('fox'));
+        this.Outfit.addItem(ShortsLeather.factory(100));
     }
 }
 class AnthroCat extends Mob {
@@ -592,10 +617,19 @@ class Ruff extends Wolf {
     constructor() {
         super();
         this.name = this.id = 'Ruff';
-        this.pic= 'unknown';
         this.Outfit.addItem(AnusHuman.factory('wolf'));
         this.Outfit.addItem(PenisHuman.factory('wolf'));
-        this.levelUp(3);
+        this.levelUp(7);
+        this.autoLeveling();
+    }
+}
+class Clyde extends AnthroFox {
+    constructor() {
+        super();
+        this.name = this.id = 'Clyde';
+        this.Outfit.addItem(AnusHuman.factory('wolf'));
+        this.Outfit.addItem(PenisHuman.factory('wolf'));
+        this.levelUp(7);
         this.autoLeveling();
     }
 }
@@ -621,6 +655,7 @@ class Trent extends Mob {
 //collection of mob-constructors
 window.gm.Mobs = (function (Mobs) {
     Mobs.AnthroCat = function() { return function(param){return(AnthroCat.factory(param));}("AnthroCat")};
+    Mobs.AnthroFox = function() { return function(param){return(AnthroCat.factory(param));}("AnthroFox")};
     Mobs.Huntress = function() { return function(param){return(AnthroCat.factory(param));}("Huntress")};
     Mobs.Lapine = Lapine.factory;
     Mobs.Mole = Mole.factory;

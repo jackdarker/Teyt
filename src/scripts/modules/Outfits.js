@@ -225,13 +225,64 @@ class Collar extends Equipment {
         return(msg);
     }
 }
+class PiercingEars extends Equipment {
+    static factory(style) {let x = new PiercingEars();x.style=style;return(x); }
+    constructor() {
+        super('PiercingEars');
+        this.addTags(['piercing']);
+        this.slotUse = ['pEars'];    
+        this.style = 0;   
+        this.lossOnRespawn = false;
+    }
+    toJSON() {return window.storage.Generic_toJSON("PiercingEars", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(PiercingEars, value.data));}
+    set style(style) { 
+        this._style = style; 
+    }
+    get style() {return this._style;}
+    get desc() { 
+        if(this.style===10) return('green gemstone ear lobe piercing');
+        if(this.style===20) return('green gemstone ear lobe piercing');
+        if(this.style===30) return('large gold ear ring');
+        if(this.style===40) return('gemmed helix piering');
+        if(this.style===50) return('steel spiral piercing');
+        if(this.style===60) return('gold multi helix piercing');
+        return('small silver ear ring');
+    }
+}
+class PiercingNipples extends Equipment {
+    static factory(style) {let x = new PiercingNipples();x.style=style;return(x); }
+    constructor() {
+        super('PiercingNipples');
+        this.addTags(['piercing']);
+        this.slotUse = ['pNipples'];    
+        this.style = 0;   
+        this.lossOnRespawn = false;
+    }
+    toJSON() {return window.storage.Generic_toJSON("PiercingNipples", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(PiercingNipples, value.data));}
+    set style(style) { 
+        this._style = style; 
+    }
+    get style() {return this._style;}
+    get desc() { 
+        if(this.style===10) return('small steel hoop');
+        if(this.style===20) return('circular gold barbel');
+        if(this.style===30) return('thick gold hoop');
+        if(this.style===40) return('jade captive bead ring');
+        if(this.style===50) return('crossed double barbel ');
+        if(this.style===60) return('gold hoops connected with chain');
+        return('small steel barbel');
+    }
+}
 class PiercingClit extends Equipment {
+    static factory(style) {let x = new PiercingClit();x.style=style;return(x); }
     constructor() {
         super('PiercingClit');
         this.addTags(['piercing']);
         this.slotUse = ['pClit'];    
         this.style = 0;   
-        this.lossOnRespawn = true;
+        this.lossOnRespawn = false;
     }
     set style(style) { 
         this._style = style; 
@@ -795,6 +846,8 @@ window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(Shovel);
     window.storage.registerConstructor(TailRibbon);
     window.storage.registerConstructor(PiercingClit);
+    window.storage.registerConstructor(PiercingNipples);
+    window.storage.registerConstructor(PiercingEars);
     window.storage.registerConstructor(TattooGroin);
     window.storage.registerConstructor(RobesZealot);
     window.storage.registerConstructor(ShortsLeather);
@@ -823,6 +876,8 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['Pullover'] = function () { return new Pullover();};
     ItemsLib['TailRibbon'] = function () { return new TailRibbon();};
     ItemsLib['PiercingClit'] = function () { return new PiercingClit();};
+    ItemsLib['PiercingEars'] = function () { return new PiercingEars();};
+    ItemsLib['PiercingNipples'] = function () { return new PiercingNipples();};
     ItemsLib['TattooGroin'] = function () { return new TattooGroin();};
     ItemsLib['LewdMark'] = function () { let x= new TattooGroin();x.style=100;return(x); };
     ItemsLib['RobesZealot'] = function () { return new RobesZealot();};

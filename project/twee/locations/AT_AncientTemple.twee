@@ -1,15 +1,15 @@
-:: AT_Lv6_MAP [_back_]
+:: DngAT_MAP [_back_]
 <hr><div id='canvas'></div><div id='svgpopup'></div></br>
 <script> window.gm.printMap2(window.story.state.DngSY.dngMap,window.gm.player.location.replace(window.story.state.DngSY.dng+'_',''),
     window.story.state.DngAT.mapReveal,window.story.state.DngAT.visitedTiles);
 </script>
 
 
-:: AT_Entry
+:: DngAT_Entry
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
 TODO Through the portal you arrive at a dark and eerie underground location.
-</br><p> [[Next|AT_Lv6_J6]] </br></p>
+</br><p> [[Next|DngAT_J6]] </br></p>
 </article><article id="LogPanel"></article></section>
 <script>
 function buildRooms() {
@@ -55,20 +55,20 @@ function buildRooms() {
     let start = new window.GraphNode(grid[0]), end = new window.GraphNode(grid=[3]),path = window.astar.search(graph,start,end,null,{heuristic:(function(a,b){return(1);})});*/
 }
     var s = window.story.state;
-    s.DngSY.dng='AT_Lv6';
-    s.vars.spawnAt="SY_Recover_Death";
+    s.DngSY.dng='DngAT';
+    s.vars.spawnAt="DngSY_Recover_Death";
     s.DngAT.tmp.guard1Here=s.DngAT.tmp.guard2Here='';s.DngAT.tmp.gotRing=0;s.DngSY.dngLevel===6;
     s.DngAT.leverG4=false;
     buildRooms();
 </script>
 
-:: AT_Encounters
+:: DngAT_Encounters
 <script>
 function tick() {
     let here = window.passage.name,_d=window.story.state.DngAT.tmp;
     if(here===_d.tickPass) return;
     _d.tickPass=here;
-    if(here==='AT_Lv6_'+_d.guard1Here || here==='AT_Lv6_'+_d.guard2Here) {fightGuardian(); return;} 
+    if(here==='DngAT_'+_d.guard1Here || here==='DngAT_'+_d.guard2Here) {fightGuardian(); return;} 
     if(_d.guard1Here!=='') {
         var _go='I4';
         switch(_d.guard1Here) { //move guard
@@ -100,7 +100,7 @@ function tick() {
         _d.guard2Here=_go;
         document.getElementById('panel').textContent+="You hear strange noises from "+_go+".\n";
     }
-    if(here==='AT_Lv6_'+_d.guard1Here || here==='AT_Lv6_'+_d.guard2Here) {fightGuardian(); return;} 
+    if(here==='DngAT_'+_d.guard1Here || here==='DngAT_'+_d.guard2Here) {fightGuardian(); return;} 
 }
 function fightGuardian() {
     window.gm.encounters.mechanicguy({amount:1, noStart:true});
@@ -109,15 +109,15 @@ function fightGuardian() {
 tick();
 </script>
 
-:: AT_Lv6_H2
+:: DngAT_H2
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 A dark, eerie tunnel in an old temple. 
 </br><p><%=window.gm.printNav('Go north','north')%></br><%=window.gm.printNav('Go west','west')%><%=window.gm.printNav('Go east','east')%></br><%=window.gm.printNav('Go south','south')%></br></p>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("AT_Encounters")%>
+<%=window.story.render("DngAT_Encounters")%>
 
-:: AT_Lv6_I2
+:: DngAT_I2
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 <%if(window.story.state.DngAT.tmp.gotRing && window.story.state.DngAT.tmp.guard1Here===''){ window.story.state.DngAT.tmp.guard1Here='I4'; %>
@@ -130,25 +130,25 @@ A dark, eerie tunnel in an old temple.
 <%}%>
 </br><p> <%=window.gm.printNav('Go west','west')%><%=window.gm.printNav('Go east','east')%></br></p>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("AT_Encounters")%>
+<%=window.story.render("DngAT_Encounters")%>
 
-:: AT_Lv6_J2
+:: DngAT_J2
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 A dark, eerie tunnel in an old temple. 
 </br><p> <%=window.gm.printNav('Go north','north')%></br><%=window.gm.printNav('Go west','west')%><%=window.gm.printNav('Go east','east')%></br><%=window.gm.printNav('Go south','south')%></br></p>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("AT_Encounters")%>
+<%=window.story.render("DngAT_Encounters")%>
 
-:: AT_Lv6_H3
+:: DngAT_H3
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 A dark, eerie tunnel in an old temple. 
 </br><p> <%=window.gm.printNav('Go north','north')%></br><%=window.gm.printNav('Go south','south')%></br></p>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("AT_Encounters")%>
+<%=window.story.render("DngAT_Encounters")%>
 
-:: AT_Lv6_I3
+:: DngAT_I3
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 This has to be the central chaber of the temple.
@@ -168,7 +168,7 @@ This has to be the central chaber of the temple.
     </div><div id='choice2a' hidden>
     </br> Just now you notice that sound of stone sliding over stone.
     <p class="tPC">'Shit that door is closing! I need to get out of here.'</p>
-    [[Run|AT_Lv6_I3]]
+    [[Run|DngAT_I3]]
     </div>
     </div>
 <%}else{%>
@@ -177,9 +177,9 @@ This has to be the central chaber of the temple.
     </br><p> <%=window.gm.printNav('Go east','east')%></br></p>
 <%}%>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("AT_Encounters")%>
+<%=window.story.render("DngAT_Encounters")%>
 
-:: AT_Lv6_J3
+:: DngAT_J3
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 This is a crossroad.
@@ -190,9 +190,9 @@ This is a crossroad.
 </br><p> <%=window.gm.printNav('Go north','north')%></br><%=window.gm.printNav('Go west','west')%></br><%=window.gm.printNav('Go south','south')%></br></p>
 <%}%>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("AT_Encounters")%>
+<%=window.story.render("DngAT_Encounters")%>
 
-:: AT_Lv6_K3
+:: DngAT_K3
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 A dark, eerie tunnel in an old temple. </br>
@@ -200,9 +200,9 @@ There is a
 
 </br><p> <%=window.gm.printNav('Go north','north')%></br><%=window.gm.printNav('Go west','west')%><%=window.gm.printNav('Go east','east')%></br><%=window.gm.printNav('Go south','south')%></br></p>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("AT_Encounters")%>
+<%=window.story.render("DngAT_Encounters")%>
 
-:: AT_Lv6_G4
+:: DngAT_G4
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 This is a dead end, but there is a lever. Should you pull that?</br>
@@ -219,17 +219,17 @@ The lever is currently <%=(!window.story.state.DngAT.leverG4)?'not':''%> pulled.
 </div>
 </br><p> <%=window.gm.printNav('Go north','north')%></br><%=window.gm.printNav('Go west','west')%><%=window.gm.printNav('Go east','east')%></br><%=window.gm.printNav('Go south','south')%></br></p>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("AT_Encounters")%>
+<%=window.story.render("DngAT_Encounters")%>
 
-:: AT_Lv6_H4
+:: DngAT_H4
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 A dark, eerie tunnel in an old temple. 
 </br><p> <%=window.gm.printNav()%></br></p>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("AT_Encounters")%>
+<%=window.story.render("DngAT_Encounters")%>
 
-:: AT_Lv6_I4
+:: DngAT_I4
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 <%if(window.story.state.DngAT.tmp.gotRing===0){%>
@@ -239,25 +239,25 @@ The door into the chamber is closed shut.
 </br><p><%=window.gm.printNav('Go west','west')%></br></p>
 <%}%>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("AT_Encounters")%>
+<%=window.story.render("DngAT_Encounters")%>
 
-:: AT_Lv6_K4
+:: DngAT_K4
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 A dark, eerie tunnel in an old temple. 
 </br><p> <%=window.gm.printNav('Go north','north')%></br><%=window.gm.printNav('Go east','east')%></br><%=window.gm.printNav('Go south','south')%></br></p>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("AT_Encounters")%>
+<%=window.story.render("DngAT_Encounters")%>
 
-:: AT_Lv6_H5
+:: DngAT_H5
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 A dark, eerie tunnel in an old temple. 
 </br><p> <%=window.gm.printNav('Go north','north')%></br><%=window.gm.printNav('Go west','west')%><%=window.gm.printNav('Go east','east')%></br><%=window.gm.printNav('Go south','south')%></br></p>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("AT_Encounters")%>
+<%=window.story.render("DngAT_Encounters")%>
 
-:: AT_Lv6_I5
+:: DngAT_I5
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 A dark, eerie tunnel in an old temple. </br>
@@ -269,9 +269,9 @@ A dark, eerie tunnel in an old temple. </br>
     </br><p> <%=window.gm.printNav('Go west','west')%><%=window.gm.printNav('Go east','east')%></br></p>
 <%}%>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("AT_Encounters")%>
+<%=window.story.render("DngAT_Encounters")%>
 
-:: AT_Lv6_J5
+:: DngAT_J5
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 The tunnel opens up on one side to a large window. There is a bottomless abyss and beyond that you can spot the entry where you came from. 
@@ -283,49 +283,49 @@ The tunnel opens up on one side to a large window. There is a bottomless abyss a
 <%}%>
 </br><p> <%=window.gm.printNav('Go north','north')%></br><%=window.gm.printNav('Go west','west')%><%=window.gm.printNav('Go east','east')%></br><%=window.gm.printNav('Go south','south')%></br></p>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("AT_Encounters")%>
+<%=window.story.render("DngAT_Encounters")%>
 
-:: AT_Lv6_K5
+:: DngAT_K5
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 A dark, eerie tunnel in an old temple. 
 </br><p> <%=window.gm.printNav('Go north','north')%></br><%=window.gm.printNav('Go west','west')%><%=window.gm.printNav('Go east','east')%></br><%=window.gm.printNav('Go south','south')%></br></p>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("AT_Encounters")%>
+<%=window.story.render("DngAT_Encounters")%>
 
-:: AT_Lv6_L5
+:: DngAT_L5
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 A dark, eerie tunnel in an old temple. 
 </br><p> <%=window.gm.printNav('Go north','north')%></br><%=window.gm.printNav('Go west','west')%><%=window.gm.printNav('Go east','east')%></br><%=window.gm.printNav('Go south','south')%></br></p>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("AT_Encounters")%>
+<%=window.story.render("DngAT_Encounters")%>
 
-:: AT_Lv6_J6
+:: DngAT_J6
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 <%if(window.story.state.DngAT.tmp.gotRing===1){%>
     <p class="tPC">'Thank gods, there is the portal. I need to hurry.'</p>
-    <p>[[Into the portal|AT_Lv6_Success]] </br></p>
+    <p>[[Into the portal|DngAT_Success]] </br></p>
 <%}else{%>
     There is the usual stoneplate in the ground that marks the spot where the portal will appear after you finished your task.</br>
 <%}%> 
 </br><p><%=window.gm.printNav('Go north','north')%></br><%=window.gm.printNav('Go west','west')%><%=window.gm.printNav('Go east','east')%></br><%=window.gm.printNav('Go south','south')%></br></p>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("AT_Encounters")%>
+<%=window.story.render("DngAT_Encounters")%>
 
-:: AT_Lv6_K6
+:: DngAT_K6
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 A dark, eerie tunnel in an old temple. 
 </br><p> <%=window.gm.printNav('Go west','west')%><%=window.gm.printNav('Go east','east')%></br></p>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("AT_Encounters")%>
+<%=window.story.render("DngAT_Encounters")%>
 
-:: AT_Lv6_L6
+:: DngAT_L6
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 A dark, eerie tunnel in an old temple. 
 </br><p> <%=window.gm.printNav('Go north','north')%></br><%=window.gm.printNav('Go west','west')%><%=window.gm.printNav('Go east','east')%></br><%=window.gm.printNav('Go south','south')%></br></p>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("AT_Encounters")%>
+<%=window.story.render("DngAT_Encounters")%>

@@ -497,7 +497,7 @@ class stFetish extends Stat {
 class effEnergized extends Effect {
     constructor() {
         super();
-        this.data.id = this.data.name= effEnergized.name, this.data.duration = 120;
+        this.data.id = this.data.name= effEnergized.name, this.data.duration = 120,this.data.hidden=0;
     }
     toJSON() {return window.storage.Generic_toJSON("effEnergized", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(effEnergized, value.data);};
@@ -568,7 +568,7 @@ class effNotTired extends Effect {
 class effTired extends Effect {
     constructor() {
         super();
-        this.data.id = effTired.name, this.data.name="tired", this.data.duration = 0, this.data.hidden=0;
+        this.data.id = effTired.name, this.data.name="tired", this.data.duration = 0, this.data.hidden=4;
     }
     toJSON() {return window.storage.Generic_toJSON("effTired", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(effTired, value.data);};
@@ -604,7 +604,7 @@ class effTired extends Effect {
 class effHunger extends Effect {
     constructor() {
         super();
-        this.data.id = this.data.name= effHunger.name, this.data.duration = 60;
+        this.data.id = this.data.name= effHunger.name, this.data.duration = 60,this.data.hidden=4;
     }
     toJSON() {return window.storage.Generic_toJSON("effHunger", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(effHunger, value.data);};
@@ -940,7 +940,7 @@ class effLewdMark extends Effect {
 class effInHeat extends Effect {
     constructor() {
         super();
-        this.data.id = this.data.name= effInHeat.name, this.data.duration = 60, this.data.hidden=0;
+        this.data.id = this.data.name= effInHeat.name, this.data.duration = 60, this.data.hidden=3;
         this.data.cycles = 3, this.data.magnitude = 1;
     }
     toJSON() {return window.storage.Generic_toJSON("effInHeat", this); };
@@ -953,7 +953,7 @@ class effInHeat extends Effect {
 class effInRut extends Effect {
     constructor() {
         super();
-        this.data.id = this.data.name= effInRut.name, this.data.duration = 60, this.data.hidden=0;
+        this.data.id = this.data.name= effInRut.name, this.data.duration = 60, this.data.hidden=3;
         this.data.cycles = 3, this.data.magnitude = 1;
     }
     toJSON() {return window.storage.Generic_toJSON("effInRut", this); };
@@ -977,7 +977,7 @@ class effButtPlugged extends Effect {
     static get cycleDur() {return(60);}
     constructor() {
         super();
-        this.data.id = this.data.name= effButtPlugged.name, this.data.duration = effButtPlugged.cycleDur, this.data.hidden=0;
+        this.data.id = this.data.name= effButtPlugged.name, this.data.duration = effButtPlugged.cycleDur, this.data.hidden=3;
         this.data.cycles = 0, this.data.magnitude = 1;
     }
     toJSON() {return window.storage.Generic_toJSON("effButtPlugged", this); };
@@ -1010,7 +1010,7 @@ class effButtPlugged extends Effect {
 class effVaginalFertil extends Effect {
     constructor() {
         super();
-        this.data.id = this.data.name= effVaginalFertil.name, this.data.duration = 60, this.data.hidden=0;
+        this.data.id = this.data.name= effVaginalFertil.name, this.data.duration = 60, this.data.hidden=3;
         this.data.cycles = 3, this.data.magnitude = 1;
     }
     toJSON() {return window.storage.Generic_toJSON("effVaginalFertil", this); };
@@ -1036,7 +1036,7 @@ class effVaginalFertil extends Effect {
 class effVaginalPregnant extends Effect {
     constructor() {
         super();
-        this.data.id = this.data.name= effVaginalPregnant.name, this.data.duration = 60, this.data.hidden=0;
+        this.data.id = this.data.name= effVaginalPregnant.name, this.data.duration = 60, this.data.hidden=3;
         this.data.cycles = 3, this.data.magnitude = 1, this.data.type='';
     }
     toJSON() {return window.storage.Generic_toJSON("effVaginalPregnant", this); };
@@ -1076,7 +1076,7 @@ class effVaginalPregnant extends Effect {
 class effSpermDecay extends Effect {   
     constructor() {
         super();
-        this.data.id = this.data.name= effSpermDecay.name, this.data.duration = 60, this.data.hidden=0;
+        this.data.id = this.data.name= effSpermDecay.name, this.data.duration = 60, this.data.hidden=3;
         this.data.cycles = 1, this.data.magnitude = 2;
     }
     toJSON() {return window.storage.Generic_toJSON("effSpermDecay", this); };

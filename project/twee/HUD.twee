@@ -217,8 +217,9 @@ for(var i=0;i<_ids.length;i++){window.gm.printEquipment(whom,whom.Outfit.getItem
 Theme:
 <a href="javascript:window.styleSwitcher.setStyle('light');window.gm.refreshAllPanel();">light</a>
 <a href="javascript:window.styleSwitcher.setStyle('dark');window.gm.refreshAllPanel();">dark</a></br>
-show Combat-Pictures: <input type="checkbox" id='showNSFWPictures' onclick='toggleSetting(this);' name="showNSFWPictures" value="x"> (If false, lewd graphics are not shown/replaced with SFW.)</br>
-show Combat-Pictures: <input type="checkbox" id='showCombatPictures' onclick='toggleSetting(this);' name="showCombatPictures" value="x"> (Some graphics are large and take time to render, thus slowing down combat.)</br>
+show Lewd pictures: <input type="checkbox" id='showNSFWPictures' onclick='toggleSetting(this);' name="showNSFWPictures" value="x"> (If false, lewd graphics are not shown/replaced with SFW.)</br>
+show dungeon map: <input type="checkbox" id='showDungeonMap' onclick='toggleSetting(this);' name="showDungeonMap" value="x"> (If false, the dungeon map is not rendered.)</br>
+show Combat-pictures: <input type="checkbox" id='showCombatPictures' onclick='toggleSetting(this);' name="showCombatPictures" value="x"> (Some graphics are large and take time to render, thus slowing down combat.)</br>
 <!--TODO what settings ?
 *  Disable over-penetration </br>
 A lot of female are not happy about the fact that many erotic fiction or imagery picture the penetration of cervix because its pretty painful. You might disable this here therefore. </br>
@@ -234,8 +235,7 @@ function toggleSetting(elmt) {
   let toggle=window.story.state.Settings[elmt.id]=!window.story.state.Settings[elmt.id];
   elmt.checked=toggle;
 }
-document.querySelector("#showNSFWPictures").checked=window.story.state.Settings['showNSFWPictures'];
-document.querySelector("#showCombatPictures").checked=window.story.state.Settings['showCombatPictures'];
+['showNSFWPictures','showDungeonMap','showCombatPictures'].forEach(x=>(document.querySelector("#"+x).checked=window.story.state.Settings[x]));
 </script>
 
 :: Settings2 [_back_]

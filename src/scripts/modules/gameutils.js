@@ -1,4 +1,7 @@
 "use strict";
+window.gm.dbgHelper=function(){
+  window.gm.getSaveVersion();
+}
 /* bundles some utility operations*/
 window.gm.getSaveVersion= function(){return([0,0,1,0]);};
 // reimplement to setup the game
@@ -74,8 +77,10 @@ window.gm.initGame= function(forceReset,NGP=null) {
       s.Carlia = ch;
     }
     if (!s.Ruff||forceReset) {  //Ruff the wolf
-      let ch = new Ruff()
-      s.Ruff = ch;
+      s.Ruff = new Ruff()
+    }
+    if (!s.Clyde||forceReset) {  //Clyde the foxman
+      s.Clyde = new Clyde()
     }
     if (!s.Trent||forceReset) {  //the horse-bully from the bridge
       let ch = new Trent()
@@ -150,6 +155,7 @@ window.gm.initGame= function(forceReset,NGP=null) {
     if(NGP) { window.story.state.vars.crowBarLeft = NGP.crowBarLeft; }
     NGP=null; //release memory
 }
+//this initialises game-objects that are not class-based
 window.gm.initGameFlags = function(forceReset,NGP=null) {
   let s= window.story.state;
   if (forceReset) {  
@@ -158,7 +164,8 @@ window.gm.initGameFlags = function(forceReset,NGP=null) {
   }
   let Settings = {
     showCombatPictures:true,
-    showNSFWPictures:true
+    showNSFWPictures:true,
+    showDungeonMap:true
   };
   let DngSY = {
       remainingNights: 0,
@@ -227,7 +234,6 @@ window.gm.initGameFlags = function(forceReset,NGP=null) {
   s.DngPC=window.gm.util.mergePlainObject(DngPC,s.DngPC);
   //todo cleanout obsolete data ( filtering those not defined in template) 
 }
-
 // update non-class-objects of previous savegame
 let _origRebuildObjects = window.gm.rebuildObjects;
 window.gm.rebuildObjects= function(){ 
@@ -248,8 +254,8 @@ window.gm.getScenePic = function(id){
   if(id==='Bedroom' || id==='Your Bedroom')   return('assets/bg/bg_bedroom.png');
   if(id.slice(0,7)==='AM_Lv2_') return('assets/bg/bg_dungeon_2.png');
   if(id.slice(0,5)==='DngPC' || id.slice(0,5)==='DngHC') return('assets/bg/bg_dungeon_2.png');
-  if(id.slice(0,9)==='CV_Lv1_I3') return('assets/bg/bg_cave_4.png');
-  if(id.slice(0,7)==='CV_Lv1_') return('assets/bg/bg_cave_2.png');
+  if(id.slice(0,5)==='DngCV') return('assets/bg/bg_cave_4.png');
+  //if(id.slice(0,5)==='DngCV') return('assets/bg/bg_cave_2.png');
   return('assets/bg_park.png')//return('assets/bg/bg_VR_1.png');//todo placehodler
 }
 window.gm.enterVR=function() {
@@ -379,7 +385,7 @@ window.gm.moveHere = function(time=15){
 };
 /* used for the dungeons ..state.DngSY.dng. Creates links for adjoined tiles by adding the following code in passage: 
 * <%=window.gm.printNav('go west','west')%> OR <%=window.gm.printNav()%> for all directions
-* creates link for ('enter door', 'north'):  [[enter door| MN_Lv3_F2]]  - assuming you are in tile MN_Lv3_F3 in MN_Lv3 
+* creates link for ('enter door', 'north'):  [[enter door| DngMN_F2]]  - assuming you are in tile DngMN_F3 in DngMN_Lv3 
 * only creates the link if the passage with this name exist and the direction in the dngMap is specified 
 */
 window.gm.printNav=function(label,dir,args=null){
@@ -485,6 +491,7 @@ window.gm.printMap=function(MapName,playerTile,reveal,visitedTiles) {
 * constructs map from template and dng-data
 */
 window.gm.printMap2=function(dng,playerTile,reveal,visitedTiles) {
+  if(!window.story.state.Settings.showDungeonMap) return;
   var step=32, width=step*(dng.width||12),height=step*(dng.height||8);
   const X=['A','B','C','D','E','F','G','H','I','J','K','L','M','N'],Y=['0','1','2','3','4','5','6','7','8','9'];
   var mypopup = document.getElementById("svgpopup"); //todo popup-functions as parameters

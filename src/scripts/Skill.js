@@ -173,7 +173,7 @@ targetFilterSelf(targets){
         }
         return possibleTarget;
 }
-targetFilterAlly(targets){
+targetFilterAlly(targets){ //includes self
         var possibleTarget = [];
         for(var target of targets){
             var valid = true;

@@ -1,16 +1,16 @@
-:: MN_Lv3_MAP [_back_]
+:: DngMN_MAP [_back_]
 <hr><div id='canvas'></div><div id='svgpopup'></div></br>
 <script> window.gm.printMap2(window.story.state.DngSY.dngMap,window.gm.player.location.replace(window.story.state.DngSY.dng+'_',''),
     window.story.state.DngMN.mapReveal,window.story.state.DngMN.visitedTiles);
 </script>
 
-:: MN_Entry
+:: DngMN_Entry
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
 The other side of the portal exits on a large slab of rock. It is located at the upper end of a cliff.
 From here you have a great view of the lower valley and a large waterfall on the other side of the crevasse.</br> 
 The water thunders into a rushing river that meanders through the canyon.</br> 
-</br><p> [[Next|MN_Lv3_I3]] </br></p>
+</br><p> [[Next|DngMN_I3]] </br></p>
 </article><article id="LogPanel"></article></section>
 <script>
 function buildRooms() {
@@ -53,19 +53,19 @@ function buildRooms() {
     window.story.state.DngSY.dngMap={grid:grid,width:14,height:8};
 }
     var s = window.story.state;
-    s.vars.spawnAt="SY_Recover_Death";//might also set this in encounter
-    s.DngSY.dng='MN_Lv3';
+    s.vars.spawnAt="DngSY_Recover_Death";//might also set this in encounter
+    s.DngSY.dng='DngMN';
     s.DngMN.tmp={page:[], tickPass:''};
     buildRooms();
 </script>
 
-:: MN_Lv3_Encounters
+:: DngMN_Encounters
 <script>
 function tick() {
     let here = window.passage.name;
     if(here===window.story.state.DngMN.tmp.tickPass) return;
     window.story.state.DngMN.tmp.tickPass=here;
-    if(here==='MN_Lv3_J5' || here==='MN_Lv3_F2') {
+    if(here==='DngMN_J5' || here==='DngMN_F2') {
         window.gm.encounters.wolf({amount:1});
         window.gm.Encounter.initCombat();
     }
@@ -101,7 +101,7 @@ function explore() {
 tick();
 </script>
 
-:: MN_Lv3_Success
+:: DngMN_Success
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
 Finally, you got all the pages and can step through the portal.</br>
@@ -154,11 +154,11 @@ As you enter the hall, you notice Kumala and Leon already waiting there.
     window.gm.player.Inv.removeItem("IgneumPage",5);
     window.story.state.DngSY.dngLevel=4;
     window.story.state.DngSY.remainingNights=2;
-    window.story.show("SY_Your_Room");
+    window.story.show("DngSY_Your_Room");
 }
 </script>
 
-:: MN_Lv3_F1
+:: DngMN_F1
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%>
 A large nest is enthroned on a rocky peak that protrudes from the rock face a few dozen meters above you.
@@ -171,17 +171,17 @@ A large nest is enthroned on a rocky peak that protrudes from the rock face a fe
 </div>
 <%}else{%><%=window.gm.printNav()%><%}%>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("MN_Lv3_Encounters")%>
+<%=window.story.render("DngMN_Encounters")%>
 
-:: MN_Lv3_F2
+:: DngMN_F2
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%>
 
 <%=window.gm.printNav()%>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("MN_Lv3_Encounters")%>
+<%=window.story.render("DngMN_Encounters")%>
 
-:: MN_Lv3_G2
+:: DngMN_G2
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%>
 
@@ -189,23 +189,23 @@ A large nest is enthroned on a rocky peak that protrudes from the rock face a fe
 </article><article id="LogPanel"></article></section>
 
 
-:: MN_Lv3_H2
+:: DngMN_H2
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%>
 A wolf seems to follow you in your track. You should <a0 onclick='fightWolf();'>show it</a> that you want to be left alone. 
 <%=window.gm.printNav()%>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("MN_Lv3_Encounters")%>
+<%=window.story.render("DngMN_Encounters")%>
 
-:: MN_Lv3_I2
+:: DngMN_I2
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%>
 You wonder if you could <a0 onclick='explore()'>find</a> something useful here.</br>
 <%=window.gm.printNav()%>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("MN_Lv3_Encounters")%>
+<%=window.story.render("DngMN_Encounters")%>
 
-:: MN_Lv3_J2
+:: DngMN_J2
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%>
 
@@ -213,21 +213,21 @@ You wonder if you could <a0 onclick='explore()'>find</a> something useful here.<
 </article><article id="LogPanel"></article></section>
 
 
-:: MN_Lv3_I3
+:: DngMN_I3
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%>
 The portal is located near the edge of a deep canyon that has carved itself into the bottom of a valley surrounded by high mountains.
 From here you have a great view of the lower valley and a large waterfall on the other side of the crevasse.</br> 
 <%if(window.story.state.DngSY.dngLevel===3 && window.gm.player.Inv.countItem('IgneumPage')>=2){%>
     </br>The portal has opened, time for your return.</br>
-    <p>[[Into the portal|MN_Lv3_Success]]</p>
+    <p>[[Into the portal|DngMN_Success]]</p>
 <%}else{%>
     </br>Once you have at least 2 pages from a missing book, the portal should reapear opening your way back to the sanctuary.</br>
 <%}%> 
 <%=window.gm.printNav()%>
 </article><article id="LogPanel"></article></section>
 
-:: MN_Lv3_J3
+:: DngMN_J3
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%>
 
@@ -235,32 +235,32 @@ From here you have a great view of the lower valley and a large waterfall on the
 </article><article id="LogPanel"></article></section>
 
 
-:: MN_Lv3_K3
+:: DngMN_K3
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%>
 
 <%=window.gm.printNav()%>
 </article><article id="LogPanel"></article></section>
 
-:: MN_Lv3_K4
+:: DngMN_K4
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%>
 This rickety, wooden bridge has seen better days. Hopefully it won't fall into the canyon when you cross it.
 <%=window.gm.printNav()%>
 </article><article id="LogPanel"></article></section>
 
-:: MN_Lv3_H5
+:: DngMN_H5
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%>
 
 <%=window.gm.printNav()%>
 </article><article id="LogPanel"></article></section>
 
-:: MN_Lv3_I5
+:: DngMN_I5
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%>
 A log cabin stands in a clearing. A few sheds stand leaning askew against the trees. 
-<%if(!window.story.state.DngMN.tmp.page['MN_Lv3_I5']){%>
+<%if(!window.story.state.DngMN.tmp.page['DngMN_I5']){%>
 <p class="tPC">"Is that some sheet of paper flapping on the roof there?."</p>
 The house isn't really big but you would have to find a way to get on the roof.</br>
 A crooked pine tree grows near the hut. It would be easy enough to climb and then you could slide onto the roof.</br>
@@ -280,7 +280,7 @@ A crooked pine tree grows near the hut. It would be easy enough to climb and the
     A large man walks around the corner of the shed.
     <p class="tPC">"Sorry sir, I thought no one is around here. I just wanted to ask for a favor..."</p>
     <p class="tNPC4">"Favors? I dont know you and for sure dont owe you an favour, am I!"</p>
-    [[You need that paper|MN_Lv3_I5_TalkPaper]]
+    [[You need that paper|DngMN_I5_TalkPaper]]
     </div>
 </div>
 <div id='choice1b' hidden></br>
@@ -307,12 +307,12 @@ A crooked pine tree grows near the hut. It would be easy enough to climb and the
                 The man looks suspicious and rubs his chin as you tell him that story.
                 <p class="tNPC4">"Hmm,.. there aren't big enough eagles around here. but might be that griffin. You strange city dwellers can't even tell an eagle from a griffin."</p>
                 Did he really buy that? Netherless he is grabing you by his arms, pulling hard to get you from your unfortunate position.</br>
-                [[Explain him the situation|MN_Lv3_I5_TalkPaper]]
+                [[Explain him the situation|DngMN_I5_TalkPaper]]
             </div>
             <div id='choice12b' hidden></br>
                 <p class="tPC">"I tried to climb on the roof, because there is some kind of paper stuck there I need to gather. I know this sounds hilarious but I really need that."</p>
                 <p class="tNPC4">"Damit, I knew it. That shred is a bad omen I said. And now I have a broken roof."</p>
-                [[Ask for the paper|MN_Lv3_I5_TalkPaper]]
+                [[Ask for the paper|DngMN_I5_TalkPaper]]
             </div>
         </div>
     </div>
@@ -335,7 +335,7 @@ A crooked pine tree grows near the hut. It would be easy enough to climb and the
             With a practiced cut of the sharp blade he cuts the rope.
             <span class="tPC">"Ouch"</span> bouncing on the leaf covered floor dampens your impact, but your head is still spinning.</br>
             <p class="tNPC4">"You said you need help. Help with what? And what is in for me?"</p>
-            [[Explain him the situation|MN_Lv3_I5_TalkPaper]]
+            [[Explain him the situation|DngMN_I5_TalkPaper]]
         </div>
     </div>
 
@@ -346,27 +346,27 @@ A crooked pine tree grows near the hut. It would be easy enough to climb and the
 <%}%>
 </article><article id="LogPanel"></article></section>
 
-:: MN_Lv3_I5_TalkPaper
+:: DngMN_I5_TalkPaper
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
 Todo: 
 You explain him that your task is to get that scrap paper. You will get it if you help him fixing the roof. It was broken anyway and it is much easier to do it if 2 people work together.
 <div id='select5'>
-<a0 onclick='window.story.state.DngMN.tmp.page["MN_Lv3_I5"]=true;window.gm.player.Inv.addItem(new window.gm.ItemsLib["IgneumPage"]());window.gm.printTalkLink("div#select5","div#choice5a")'>Grab the page</a></br>
-</div><div id='choice5a' hidden> </br>You got a page.<p>[[Leave|MN_Lv3_J5]]</p>
+<a0 onclick='window.story.state.DngMN.tmp.page["DngMN_I5"]=true;window.gm.player.Inv.addItem(new window.gm.ItemsLib["IgneumPage"]());window.gm.printTalkLink("div#select5","div#choice5a")'>Grab the page</a></br>
+</div><div id='choice5a' hidden> </br>You got a page.<p>[[Leave|DngMN_J5]]</p>
 </div>
 </article><article id="LogPanel"></article></section>
 
 
-:: MN_Lv3_J5
+:: DngMN_J5
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%>
 
 <%=window.gm.printNav()%>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("MN_Lv3_Encounters")%>
+<%=window.story.render("DngMN_Encounters")%>
 
-:: MN_Lv3_K5
+:: DngMN_K5
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%>
 This seems to be a crossroad adorned by a roten signpost:
@@ -374,7 +374,7 @@ East:"Lowlands",North:"Highlands",West: you cant read that
 <%=window.gm.printNav()%>
 </article><article id="LogPanel"></article></section>
 
-:: MN_Lv3_L5
+:: DngMN_L5
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%>
 In eastern direction, the path winds further down the valley.

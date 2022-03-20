@@ -157,43 +157,71 @@ window.gm.MutationsLib['swapGender'] = function (char,genderItem) {
     }
 }
 window.gm.MutationsLib['mutateWolf'] = function (char,magnitude=1) {
-    let _rnd =_.random(1,100),_thr=char.Stats.get("savageness").value;
-    let msg='',_TF="TailWolf";
-    if(char.Outfit.countItem(_TF)>0) {
-        let item = char.Outfit.getItem("TailWolf");
-        if(item.getStyle() !=='wolf') {
-            item.setStyle('wolf');
-            msg=("Your tail is now a fuzzy bush like of a wolf.</br>");
-        } else {
-            let growth = item.data.growth+0.25;
-            let maxGrowth = item.maxGrowth;
-            if(growth >= 1) {
-                msg+="That tail didnt grow any further.</br>";
+    let msg='', bb=window.gm.OutfitSlotLib;
+    let fconv =window.gm.util.descFixer(char);
+    let base=char.Outfit.getItemForSlot(bb.bBase);//todo bodyparts depends also on feral or anthro body
+    let el,slots=[], cnt=magnitude;
+    //mutate depending on magnitude; some TF requires more then others
+    // ears/eyes - fur - tail/legs/genitals (minor) - arms/head/genitals - quadruped/feral 
+    let thrs={};thrs[bb.bSkin]=8,thrs[bb.bTailBase]=16,thrs[bb.bHands]=32,thrs[bb.bFace]=32;
+    [bb.bFace,bb.bSkin,bb.bTailBase,bb.bHands].forEach( //todo legs,skin,genitals
+        x=>{slots.push({"slot":x,"item":char.Outfit.getItemForSlot(x)})});
+    while(slots.length>0 && cnt>0) { 
+        el = slots.splice(_.random(0,slots.length-1),1)[0]; //select random part to mutate, repick if already mutated    
+        if(el.slot===bb.bTailBase && cnt>=thrs[bb.bTailBase]) {
+            if(el.item===null) {
+                char.Outfit.addItem(window.storage.constructors['TailWolf'].factory('horse'),true);
+                msg+=fconv("$[I]$ $[have]$ grown a bushy tail !</br>");
+                cnt-=thrs[bb.bTailBase];
+            } else if(el.item.getStyle() !=='wolf'|| el.item.id!=='TailWolf') {
+                char.Outfit.removeItem(el.item.id,true);
+                char.Outfit.addItem(window.storage.constructors['TailWolf'].factory('wolf'),true);
+                msg+=fconv("$[My]$ tail is now a fuzzy bush like of a wolf.</br>");
+                cnt-=thrs[bb.bTailBase]/2;
             } else {
-                item.data.growth=growth;
-                msg+="Your bushy tail must have grown and is now "+window.gm.util.formatNumber(growth*maxGrowth,1)+" meter long.</br>";
+                var growth = el.item.data.growth+0.25;
+                var maxGrowth = 1.5;
+                if(growth >= 1) {
+                    //msg=("You already changed to a horse as far as possible.</br>");
+                } else {
+                    el.item.data.growth=growth;
+                    msg+=fconv("$[My]$ tail must have grown and is now "+window.gm.util.formatNumber(growth*maxGrowth,1)+" meter long.</br>");
+                    cnt-=thrs[bb.bTailBase]/4;
+                }
+            }
+        } else if(el.slot===bb.bSkin && cnt>=thrs[bb.bFace]) {
+            if(el.item===null) { //grow no skin
+            } else if(el.item.getStyle() !=='wolf') {
+                char.Outfit.addItem(new window.storage.constructors['SkinFur'].factory('wolf'));
+                msg+= "A dense coat of fur spreads over your body.</br>";
+            }
+        } else if(el.slot===bb.bFace && cnt>=thrs[bb.bFace]) {
+            if(el.item===null) { //grow no face?
+            } else if(el.item.getStyle() !=='wolf') {
+                char.Outfit.removeItem(el.item.id,true);
+                char.Outfit.addItem(window.storage.constructors['FaceWolf'].factory('wolf'),true);
+                msg+=fconv("$[My]$ face transforms into a canine muzzle.</br>");
+                cnt-=thrs[bb.bTailBase];
+            } 
+        } else if(el.slot===bb.bHands && cnt>=thrs[bb.bHands]) {
+            if(el.item===null) { //grow no hands?
+            } else if(el.item.getStyle() !=='wolf') {
+                if(base.id==="BaseHumanoid") {
+                    char.Outfit.removeItem(el.item.id,true);
+                    char.Outfit.addItem(window.storage.constructors['HandsHuman'].factory('wolf'),true);
+                    msg+=fconv("$[My]$ hands now look like that of a human but with clawlike fingernails.</br>");
+                } else {
+                    char.Outfit.removeItem(el.item.id,true);
+                    char.Outfit.addItem(window.storage.constructors['HandsPaw'].factory('wolf'),true);
+                    msg+=fconv("$[My]$ hands transforms into paws that resembles those of a dog or wolf.</br>");
+                }
+                cnt-=thrs[bb.bHands];
             }
         }
-    } else {
-        char.Outfit.addItem(new window.storage.constructors[_TF].factory('wolf'));
-        msg+="You have grown a fuzzy tail !</br>";
     }
-    _TF = 'FaceWolf';
-    let face = char.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bFace);
-    let skin = char.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bSkin);
-    if(face ===null || face.id !==_TF) {
-        char.Outfit.addItem(new window.storage.constructors[_TF].factory('wolf'));
-        msg+= "Your face got transformed into a dog-like muzzle.</br>"; 
-    } else if(face.getStyle() !=='wolf') {
-        face.setStyle('wolf');
-        msg+= "Your not so human face got transformed into a dog-like muzzle.</br>"; 
-    } else if(skin===null || skin.id !="SkinFur") {
-        char.Outfit.addItem(new window.storage.constructors['SkinFur'].factory('wolf'));
-        msg+= "A dense coat of fur spreads over your body.</br>";
-    }
-    if(msg==='') msg= "Your anxiety goes by as you didnt get any more wolflike."
-    if(char===window.gm.player) {
-        window.gm.pushDeferredEvent("GenericDeffered",[msg]);
+    if(cnt>0){
+        msg+=fconv("$[My]$ anxiety goes by as you didnt get any more wolflike.</br>");
+        window.gm.MutationsLib.changeSavage(char,cnt,0,50); //increase savage
     }
 };
 window.gm.MutationsLib['mutateCat'] = function(char,magnitude=1) {

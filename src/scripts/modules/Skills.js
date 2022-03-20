@@ -842,6 +842,7 @@ window.gm.SkillsLib = (function (Lib) {
     window.storage.registerConstructor(SkillGuard);
     window.storage.registerConstructor(SkillHeal);
     window.storage.registerConstructor(SkillInspect);
+    window.storage.registerConstructor(SkillLeechHealth);
     window.storage.registerConstructor(SkillPoisonCloud);
     window.storage.registerConstructor(SkillSlobber);
     window.storage.registerConstructor(SkillStrongHit);

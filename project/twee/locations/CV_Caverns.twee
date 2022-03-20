@@ -1,15 +1,15 @@
-:: CV_Lv1_MAP [_back_]
+:: DngCV_MAP [_back_]
 <hr><div id='canvas'></div><div id='svgpopup'></div></br>
 <script> window.gm.printMap2(window.story.state.DngSY.dngMap,window.gm.player.location.replace(window.story.state.DngSY.dng+'_',''),
     window.story.state.DngCV.mapReveal,window.story.state.DngCV.visitedTiles);
 </script>
 
 
-:: CV_Entry
+:: DngCV_Entry
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
 You need a moment to orient yourself and meanwhile the gate disappears. You are now left alone in a dimly lit cave.
-</br><p> [[Next|CV_Lv1_G4]] </br></p>
+</br><p> [[Next|DngCV_G4]] </br></p>
 </article><article id="LogPanel"></article></section>
 <script>
 function buildRooms() {
@@ -32,15 +32,15 @@ function buildRooms() {
     window.story.state.DngCV.mapReveal=['I3'];
 }
     var s = window.story.state;
-    s.vars.spawnAt="SY_Recover_Death";//might also set this in encounter
-    s.DngSY.dng='CV_Lv1';
+    s.vars.spawnAt="DngSY_Recover_Death";//might also set this in encounter
+    s.DngSY.dng='DngCV';
     s.DngCV.visitedTiles=[];
     s.DngCV.tmp = {bathedInLake:0,
     water:[]};
     buildRooms();
 </script>
 
-:: CV_Lv1_Success
+:: DngCV_Success
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
 You step through the portal and are facing Cyril again.
@@ -56,12 +56,12 @@ You are kinda embarassed, like a child that did something stupid.
     window.gm.player.Inv.removeItem("CrystalWater",1);
     window.story.state.DngSY.dngLevel=2;
     window.story.state.DngSY.remainingNights=2;
-    window.story.show("CV_Lv1_Success2");
+    window.story.show("DngCV_Success2");
 }
 </script>
 
 
-:: CV_Lv1_Success2
+:: DngCV_Success2
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
 <p class='tPC'>"Here, Sir."</p>
@@ -90,20 +90,20 @@ You follow him suit behind.
 <p class='tPC'>"Sure. What will be my next task?"</p>
 <p class='tNPC2'>"This I will tell you before you leave. Dont worry, its not to difficult."</p>
 <p class='tPC'>'Great. I should prepare for the job but they dont tell me what the job is. Well, lets contemplate what I've learned: Caves a dark and water is wet. Done.'</p>
-With a sigh you return to your [[room|SY_Your_Room]].</br>
+With a sigh you return to your [[room|DngSY_Your_Room]].</br>
 </article><article id="LogPanel"></article></section>
 
-:: CV_Lv1_FallToDeath
+:: DngCV_FallToDeath
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
 <p class='tPC'>Its so damn dark, here.</p>
 Just as that thought crosses your mind, a gusty wind blows strong in your face.
 ...
 You fall into the abyss never to return. </br>
-<a0 onclick='window.story.state.vars.spawnAt="SY_Recover_Death",window.gm.respawn()'>Next</a>
+<a0 onclick='window.story.state.vars.spawnAt="DngSY_Recover_Death",window.gm.respawn()'>Next</a>
 </article><article id="LogPanel"></article></section>
 
-:: CV_Lv1_Encounters
+:: DngCV_Encounters
 <script>
 function fightPillRoller() {
     window.gm.encounters.pillRoller();
@@ -111,13 +111,13 @@ function fightPillRoller() {
 }
 </script>
 
-:: CV_Lv1_G4
+:: DngCV_G4
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%>
 Below a cave dome is a stone-plateu that has some kind of runes on it. 
 <%if(window.story.state.DngSY.dngLevel===1 && window.gm.player.Inv.countItem('CrystalWater')>=1){%>
     </br>The portal has opened, time for your return.
-    <p>[[Into the portal|CV_Lv1_Success]] </br></p>
+    <p>[[Into the portal|DngCV_Success]] </br></p>
 <%}else{%>
     </br>Once you have fullfilled your task, the portal should reapear opening your way back to the sanctuary.
     </br>Check your quest-log if you need a reminder on what to do.
@@ -125,7 +125,7 @@ Below a cave dome is a stone-plateu that has some kind of runes on it.
 <%=window.gm.printNav()%>
 </article><article id="LogPanel"></article></section>
 
-:: CV_Lv1_H2
+:: DngCV_H2
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%>
 You can see the crystal lake from here. 
@@ -133,7 +133,7 @@ You can see the crystal lake from here.
 </article><article id="LogPanel"></article></section>
 
 
-:: CV_Lv1_I2
+:: DngCV_I2
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%>
 You can see the crystal lake from here. Its a little steep downwards. 
@@ -141,7 +141,7 @@ You can see the crystal lake from here. Its a little steep downwards.
 </article><article id="LogPanel"></article></section>
 
 
-:: CV_Lv1_H3
+:: DngCV_H3
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%>
 The cave tunnel leads to a plateau inside a large hall. Only at second glance do you realize that there is a lake at the bottom of the hall. The water is so clear that you only notice it when you take a closer look. </br>
@@ -158,9 +158,9 @@ You hurry past the narrow to continue your way. As you look back, you cant see t
 <%=window.gm.printNav()%>
 </div> 
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("CV_Lv1_Encounters")%>
+<%=window.story.render("DngCV_Encounters")%>
 
-:: CV_Lv1_I3
+:: DngCV_I3
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%>
 <%if(!s.DngCV.tmp.water[window.gm.player.location]){%>
@@ -174,7 +174,7 @@ You look around and spot a larger one of those crystals growing from the wall to
 </div><div id='choice1a' hidden>
     <p class="tPC">'Lets get it over with. It shouldnt matter if there is some dirt in it.'</p>
     You fill the glas and try to keep most of the grime away. Still, you wouldnt say this is crystal clear.
-    Now its time to return to the entrance but for this you have to climb the steep <a0 onclick='window.gm.player.Inv.addItem(new window.gm.ItemsLib["CrystalWater"]()),window.story.state.DngCV.tmp.water[window.gm.player.location]=true,window.story.show("CV_Lv1_I3_SlopeUp")'>slope</a>.
+    Now its time to return to the entrance but for this you have to climb the steep <a0 onclick='window.gm.player.Inv.addItem(new window.gm.ItemsLib["CrystalWater"]()),window.story.state.DngCV.tmp.water[window.gm.player.location]=true,window.story.show("DngCV_I3_SlopeUp")'>slope</a>.
 </div>
 <div id='choice1b' hidden>
     You walk over to the crystal spike and hit it with your hand.
@@ -198,7 +198,7 @@ You look around and spot a larger one of those crystals growing from the wall to
         <p class="tPC">"Thats cold...brr"</p>
         You teeth rattle as you step out of the water and the previous shock subsides. Why dont you even have a torch to warm you.
         <p class="tPC">"Better get going before I catch a cold."</p>
-        Now its time to return to the entrance but for this you have to climb the steep <a0 onclick='window.gm.player.Inv.addItem(new window.gm.ItemsLib["CrystalWater"]()),window.story.state.DngCV.tmp.water[window.gm.player.location]=true,window.story.show("CV_Lv1_I3_SlopeUp")'>slope</a>.
+        Now its time to return to the entrance but for this you have to climb the steep <a0 onclick='window.gm.player.Inv.addItem(new window.gm.ItemsLib["CrystalWater"]()),window.story.state.DngCV.tmp.water[window.gm.player.location]=true,window.story.show("DngCV_I3_SlopeUp")'>slope</a>.
         </div>
     </div>
 </div>
@@ -208,18 +208,18 @@ You look around and spot a larger one of those crystals growing from the wall to
 </article><article id="LogPanel"></article></section>
 
 
-:: CV_Lv1_I3_SlopeUp
+:: DngCV_I3_SlopeUp
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
 The steep climb would not be a problem if you didn't have to carry the glas.
 ...
-</br><p> [[Go north|CV_Lv1_I2]] </br></p>
+</br><p> [[Go north|DngCV_I2]] </br></p>
 </article><article id="LogPanel"></article></section>
 
 
-:: CV_Lv1_H4
+:: DngCV_H4
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%>
-There are some candles on the floor. If you [[follow them north|CV_Lv1_H3]] , you should get to the crystal lake.</br>
-The portal should be in [[opposite direction|CV_Lv1_G4]]. There is also a pathway leading [[east|CV_Lv1_FallToDeath]], but it seems very dark there.</br>
+There are some candles on the floor. If you [[follow them north|DngCV_H3]] , you should get to the crystal lake.</br>
+The portal should be in [[opposite direction|DngCV_G4]]. There is also a pathway leading [[east|DngCV_FallToDeath]], but it seems very dark there.</br>
 </article><article id="LogPanel"></article></section>

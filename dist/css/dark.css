@@ -62,3 +62,6 @@ border-color:green;
   	color: deepskyblue;
 	border-color:deepskyblue;
 }
+.progressbar {
+	background-color: gray;
+}

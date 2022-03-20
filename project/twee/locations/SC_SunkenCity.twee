@@ -27,7 +27,7 @@ function buildRooms() {
 }
     var s = window.story.state;
     /*s.DngSY.dng='SC_Lvx';
-    s.vars.spawnAt="SY_Recover_Death";
+    s.vars.spawnAt="DngSY_Recover_Death";
     s.DngAT.leverG4=false;
     buildRooms();
 </script>

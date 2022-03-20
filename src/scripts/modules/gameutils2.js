@@ -40,33 +40,38 @@ window.gm.navHere = function(to) {
     window.story.show(to);
 }
 window.gm.navEvent = function(to,from) {
-    let _to = '',evt,evts,dng=window.story.state.DngSY.dng;
-    let _from=from.replace(dng+"_","");
+    let _targ = '',evt,evts,dng=window.story.state.DngSY.dng;
+    let _to=to.replace(dng+"_",""),_from=from.replace(dng+"_","");
     let _room=to.replace(dng+"_","");
     //tick = timestamp  
     //state: 0-active  1-inactive  
-    evts = window.story.state[dng].tmp.doors[_room];
+    var _now=window.gm.getTime(), _rnd=_.random(0,100);
+    evts = window.story.state[dng].tmp.doors[_from];
     if(evts) { //door-check
-        evt = evts[_from];
+        evt = evts[_to];
         if(evt) {
-            if(evt.state===0) _to=dng+"_Door_Closed";
-            if(_to!=='') return(_to);
+            if(evt.state===0) _targ=dng+"_Door_Closed";
+            if(_targ!=='') return(_targ);
         }
     }
     evts = window.story.state[dng].tmp.evtEnter[_room];
     if(evts) { //mobs
         evt = evts["dog"];
         if(evt) {
-            if(evt.state===0) _to=dng+"_Meet_Dog";
-            if(_to!=='') return(_to);
+            if(evt.state===0) _targ=dng+"_Meet_Dog";
+            if(_targ!=='') return(_targ);
         }
         evt = evts["gas"];
-        if(evt) {
-            //if(evt.state===0) _to="HC_Trap_Gas";
-            if(_to!=='') return(_to);
+        if(evt && _rnd>70 && window.gm.getDeltaTime(_now,evt.tick)>400) {//todo chance modifier
+            if(evt.state===0) evt.tick=_now,_targ=dng+"_Trap_Gas";
+            if(_targ!=='') return(_targ);
+        }evt = evts["tentacle"];
+        if(evt && _rnd>0 && window.gm.getDeltaTime(_now,evt.tick)>400) {//todo chance modifier
+            if(evt.state===0) evt.tick=_now,_targ=dng+"_Trap_Tentacle";
+            if(_targ!=='') return(_targ);
         }
     }
-    return(_to);
+    return(_targ);
 }
 window.gm.mobAI = function(mob){
     function getRoomDirections(from) {
@@ -106,6 +111,16 @@ window.gm.renderRoom= function(room){
             _evt.tick=window.gm.getTime();_evt.loot="BrownMushroom";
         }
         msg+=window.story.render(dng+"_Mushroom");
+    }
+    _evt=_evts["lectern"];
+    if(_evt && (_evt.state===0 || _evt.state===1)) {
+        deltaT=window.gm.getDeltaTime(window.gm.getTime(),_evt.tick);
+        if(deltaT>4000) { //respawn
+            _evt.tick=window.gm.getTime();_evt.state=0;
+        }
+    }
+    if(_evt && (_evt.state===0)) {
+        msg+=window.story.render(dng+"_Lectern");
     }
     return(msg);
 }

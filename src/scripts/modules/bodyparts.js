@@ -140,6 +140,7 @@ class FaceWolf extends BodyPart {
         switch(id) {
             case 'cat':
             case 'dog':
+            case 'fox':
             case 'wolf':
             case 'lizard':
                 break;
@@ -588,7 +589,9 @@ class SkinFur extends BodyPart {
         this.data.style = id; 
         this.data.color = color;
         switch(id) {
-            case 'cat','bunny':
+            case 'cat':
+            case 'bunny':
+            case 'fox':
                 this.data.pattern = 'fine';
                 break;
             case 'dog':
@@ -700,6 +703,7 @@ class TailWolf extends BodyPart {
         switch(id) {
             case 'cat':
             case 'dog':
+            case 'fox':
             case 'horse':
             case 'wolf':
             case 'lizard':  
@@ -755,6 +759,7 @@ class HandsPaw extends BodyPart { //paws of ferals
         switch(id) {
             case 'cat':
             case 'dog':
+            case 'fox':
             case 'wolf':
             case 'bunny':
             case 'lizard':
@@ -839,6 +844,7 @@ class HandsHuman extends BodyPart { //hands with digits to use tools
         this.data.style = id; 
         switch(id) {
             case 'dog':
+            case 'fox':
             case 'wolf':
             case 'horse':
             case 'bunny':
@@ -858,7 +864,7 @@ class HandsHuman extends BodyPart { //hands with digits to use tools
     toJSON() {return window.storage.Generic_toJSON("HandsHuman", this); };
     static fromJSON(value) {return(window.storage.Generic_fromJSON(HandsHuman, value.data));}
     descLong(fconv) { 
-        let msg = '$[My]$ hands consist of a palm and fingers.';
+        let msg = '$[My]$ hands look just like any humans.';
         msg += ['horse','deer'].includes(this.data.style)?(this.data.style+'-hoofes adorn the fingertips'):'';
         msg += ['dog','wolf','cat','bunny'].includes(this.data.style)?(this.data.style+'-claws adorn the fingertips'):'';
         msg += ['lizard'].includes(this.data.style)?('Large talons grow from their fingertips.'):'';
@@ -938,6 +944,7 @@ class BreastHuman extends BodyPart {
                 break;
             case 'cat':
             case 'dog':
+            case 'fox':
             case 'wolf':
             case 'bunny':
                 break;
@@ -978,6 +985,7 @@ class AnusHuman extends BodyPart {
             case 'bird':
             case 'cat':
             case 'dog':
+            case 'fox':
             case 'horse':
             case 'wolf':
             case 'bunny':
@@ -1037,6 +1045,7 @@ class VulvaHuman extends BodyPart {
             case 'bird':
             case 'cat':
             case 'dog':
+            case 'fox':
             case 'horse':
             case 'wolf':
             case 'bunny':
@@ -1109,6 +1118,7 @@ class PenisHuman extends BodyPart {
             case 'dog':
             case 'horse':
             case 'wolf':
+            case 'fox':
             case 'bunny':
                 break;
             case 'lizard':    

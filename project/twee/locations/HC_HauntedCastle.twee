@@ -69,8 +69,7 @@ function buildRooms() {
         G3: {dog:{tick:'',state:0 }},
         I3: {dog:{tick:'',state:0 }}, 
         J4: {dog:{tick:'',state:0 }},
-        F4: {dog:{tick:'',state:0 }},
-        G4: {gas:{tick:'',state:0 }} 
+        F4: {dog:{tick:'',state:0 }}
     }
     s.DngHC.tmp.doors = { //doors
         H5: {G5:{tick:'',state:0 }}, 
@@ -80,7 +79,8 @@ function buildRooms() {
     s.DngHC.tmp.evtSpawn = { //respawn evts 
         DngHC_I3: {chest:{tick:window.gm.getTime(),state:0},
                     mushroom:{tick:window.gm.getTime(),state:0,loot:"BrownMushroom" }}
-        ,DngHC_G4: {mushroom:{tick:window.gm.getTime(),state:0,loot:"ViolettMushroom" }}
+        ,DngHC_G3: {mushroom:{tick:window.gm.getTime(),state:0,loot:"ViolettMushroom" }}
+        ,DngHC_G4: {lectern:{tick:window.gm.getTime(),state:0,loot:1 }}
         ,DngHC_H5: {mushroom:{tick:window.gm.getTime(),state:0,loot:"ViolettMushroom" }}
     }
     s.DngHC.tmp.mobs = [ //wandering mobs pos=current tile
@@ -91,7 +91,7 @@ function buildRooms() {
     buildRooms();
 </script>
 
-:: HC_Encounters
+:: DngHC_Encounters
 <script>
 function tick() {
     let here = window.gm.player.location,_d=window.story.state.DngHC.tmp;
@@ -130,13 +130,54 @@ function dogEncounter() {
 tick();
 </script>
 
+:: DngHC_Lectern [_nosave_]
+<div id='select1'>Some kind of lectern or stand is placed in an alcoven.</br>Looks like some <b id='choice'></b> is placed on it.</br>It might be useful. On the other hand it could also be a trap. So, are you going to  
+<a0 onclick='grab();window.gm.printTalkLink("div#select1","div#choice1a")'>grab it</a>? Or just 
+<a0 onclick='window.gm.printTalkLink("div#select1","div#choice1b")'>ignore it</a></br>
+</div><div id='choice1a' hidden></br>
+</div>
+<div id='choice1b' hidden></br>
+  Might be a good decision to not touch that lectern and walk away.
+</div>
+<script> function grab() {
+  let item,msg='';
+  window.story.state.DngHC.tmp.evtSpawn[window.passage.name]["lectern"].state=1;
+  if(loot[1]==="") {
+    msg='You found a '+loot[0]+'. '+window.gm.printLink('Continue','window.story.show(window.gm.passage)');
+    window.gm.player.Wardrobe.addItem(window.gm.ItemsLib[loot[0]]());
+  } else if(loot[1]==='pierce') {
+    msg='As you take the item from the lectern, a bright flash stuns you. \"Its a trap damit..\"';
+    if(window.gm.player.Outfit.getItemForSlot("pEars")) {
+      msg+= '</br>But nothing happens after.'
+    } else {
+      item=window.gm.ItemsLib['PiercingEars']();window.gm.player.Wardrobe.addItem(item);window.gm.player.Outfit.addItem(item);
+      msg+= 'A short, sharp pain in both earlobes lets your hands immediately shoot up and check whats going on: ';
+      msg+= 'Your ears got some jewelery: '+item.desc;
+      msg+= '</br> Well, you have to live with that for now.'
+    }
+  }
+  window.gm.printOutput(msg,'div#choice1a');
+}
+function randomLoot(){
+  var rnd=_.random(0,100);
+  var trap=['arouse','pierce','ravage','drug','bound','cursed']
+  var chest=['Tank-shirt','HealthPotion','Sandwich']
+  loot.push("Tank-shirt");
+  loot.push("pierce");
+  window.gm.printOutput(loot[0],'b#choice');
+}
+var loot=[];
+randomLoot();
+</script>
+
+
 :: DngHC_Meet_Dog [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 There is some kind of dog lurking in the dark in front of you. </br>
 You may try your luck and <a0 onclick='dogEncounter();'>walk further</a> in its direction but maybe its wise to <a0 onclick='window.story.show(window.story.state.DngSY.prevLocation)'>retreat</a>. 
 </br>todo A hound was waiting for you. It sensed your weakness and is now quickly running toward you...
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("HC_Encounters")%>
+<%=window.story.render("DngHC_Encounters")%>
 
 :: DngHC_Meet_Dog_Greet [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
@@ -150,7 +191,7 @@ For some reason the dog doesnt oppose you as you try to walk past it. Might this
   <a0 onclick='window.story.show(window.story.state.DngSY.nextLocation);'>Next</a>
 </div> 
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("HC_Encounters")%>
+<%=window.story.render("DngHC_Encounters")%>
 
 
 :: DngHC_Door_Closed [_nosave_]
@@ -158,7 +199,7 @@ For some reason the dog doesnt oppose you as you try to walk past it. Might this
 There is a gate in front of you but it is locked.</br>
 <a0 onclick='window.story.show(window.story.state.DngSY.prevLocation)'>Go back</a>. 
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("HC_Encounters")%>
+<%=window.story.render("DngHC_Encounters")%>
 
 :: DngHC_Mushroom
 </br><%if(window.story.state.DngHC.tmp.evtSpawn[window.passage.name]["mushroom"].state===0){%>There is a <%=window.story.state.DngHC.tmp.evtSpawn[window.passage.name]["mushroom"].loot%>. Do you collect it?
@@ -172,7 +213,7 @@ No mushrooms growing here right now.
 
 :: DngHC_Chest
 </br><%if(window.story.state.DngHC.tmp.evtSpawn[window.passage.name]["chest"].state===0){%>There is a chest. Do you dare open it?
-<a0 onclick='//window.story.state.DngHC.tmp.evtSpawn[window.passage.name]["chest"].state=1;window.story.state.tmp.args[1]=70;window.story.state.tmp.args[2]=window.passage.name;window.story.show("DngHC_LootChest")'>Yes</a></br>
+<a0 onclick='window.story.state.DngHC.tmp.evtSpawn[window.passage.name]["chest"].state=1;window.story.state.tmp.args[1]=70;window.story.state.tmp.args[2]=window.passage.name;window.story.show("DngHC_LootChest")'>Yes</a></br>
 <%}else{%>
 An empty chest sits over there.
 <%}%>
@@ -215,7 +256,7 @@ You start to feel hungry. If you dont get something in your belly, you will get 
 ---
 <a0 onclick= 'window.story.show("")'>Next</a><
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("HC_Encounters")%>
+<%=window.story.render("DngHC_Encounters")%>
 
 :: DngHC_Respawn [_nosave_ _nodeffered_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
@@ -223,7 +264,7 @@ It's impossible to say how long you were passed out and how you ended up here. <
 But at least you are alive and - mostly - unharmed.</br>
 <a0 onclick= 'window.story.show("DngHC_H3")'>Next</a><
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("HC_Encounters")%>
+<%=window.story.render("DngHC_Encounters")%>
 
 :: DngHC_Sleep
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
@@ -251,10 +292,19 @@ function nap() {
 :: DngHC_I2
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
-There is a chest. Do you dare to <a0 onclick=''>open</a> it?
+
 <%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("HC_Encounters")%>
+<%=window.story.render("DngHC_Encounters")%>
+
+
+:: DngHC_H2
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
+The majority of floor of this room is a huge hole. There isnt enough light to see how deep it is. A plank is laid loosly about the hole . Someone hero enough might walk or crawl  
+<%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
+</article><article id="LogPanel"></article></section>
+<%=window.story.render("DngHC_Encounters")%>
 
 
 :: DngHC_G3
@@ -263,7 +313,7 @@ There is a chest. Do you dare to <a0 onclick=''>open</a> it?
 A little bit of water trickles down the wall. You could take a <a0 onclick=''>sip</a> to still your thirst.
 <%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("HC_Encounters")%>
+<%=window.story.render("DngHC_Encounters")%>
 
 
 :: DngHC_H3
@@ -279,7 +329,7 @@ You could rest here to recover health and energy. However this would also give s
 <%}%>
 <%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("HC_Encounters")%>
+<%=window.story.render("DngHC_Encounters")%>
 
 
 :: DngHC_I3
@@ -287,7 +337,7 @@ You could rest here to recover health and energy. However this would also give s
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 <%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("HC_Encounters")%>
+<%=window.story.render("DngHC_Encounters")%>
 
 
 :: DngHC_J3
@@ -298,7 +348,7 @@ Maybe someone used that place for some witchcraft?
 
 <%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("HC_Encounters")%>
+<%=window.story.render("DngHC_Encounters")%>
 
 
 :: DngHC_F4
@@ -306,7 +356,7 @@ Maybe someone used that place for some witchcraft?
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 <%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("HC_Encounters")%>
+<%=window.story.render("DngHC_Encounters")%>
 
 
 :: DngHC_G4
@@ -316,7 +366,7 @@ You find yourself standing in a large hall topped with a cross vault.</br>
 <a0 onclick='window.gm.cursedChest("DngHC_G4");window.story.show("DngHC_LootChest")'>Open chest</a>
 <%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("HC_Encounters")%>
+<%=window.story.render("DngHC_Encounters")%>
 
 
 :: DngHC_H4
@@ -325,7 +375,7 @@ You find yourself standing in a large hall topped with a cross vault.</br>
 A corridor illuminated by some torches.
 <%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("HC_Encounters")%>
+<%=window.story.render("DngHC_Encounters")%>
 
 
 :: DngHC_I4
@@ -334,7 +384,7 @@ A corridor illuminated by some torches.
 A corridor illuminated by some torches.
 <%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("HC_Encounters")%>
+<%=window.story.render("DngHC_Encounters")%>
 
 :: DngHC_J4
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
@@ -342,7 +392,7 @@ A corridor illuminated by some torches.
 A corridor illuminated by some torches.
 <%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("HC_Encounters")%>
+<%=window.story.render("DngHC_Encounters")%>
 
 :: DngHC_K4
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
@@ -350,7 +400,7 @@ A corridor illuminated by some torches.
 A corridor illuminated by some torches.
 <%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("HC_Encounters")%>
+<%=window.story.render("DngHC_Encounters")%>
 
 :: DngHC_F5
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
@@ -365,7 +415,7 @@ Instinctively you take a big leap backwards. Fortunately the door withstands the
 As soon as you enter the room you notice that some of the cell-doors are standing a jar. Thats not good. Some of the inhabitants might have left their home and might now room the rest of the compound.
 <%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("HC_Encounters")%>
+<%=window.story.render("DngHC_Encounters")%>
 
 :: DngHC_G5
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
@@ -373,14 +423,14 @@ As soon as you enter the room you notice that some of the cell-doors are standin
 The altar of the good deeds: A demure person might <a0 onclick='window.story.show("DngHC_Altar")'>pray</a> here to get a blessing or a penalty removed. But you might have a deed to fullfill to prove you are a worthy person. 
 <%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("HC_Encounters")%>
+<%=window.story.render("DngHC_Encounters")%>
 
 :: DngHC_H5
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 <%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("HC_Encounters")%>
+<%=window.story.render("DngHC_Encounters")%>
 
 
 :: DngHC_I5
@@ -389,7 +439,7 @@ The altar of the good deeds: A demure person might <a0 onclick='window.story.sho
 todo
 <%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("HC_Encounters")%>
+<%=window.story.render("DngHC_Encounters")%>
 
 
 :: DngHC_J5
@@ -400,7 +450,7 @@ A contraption is installed in the middle of the room.
 
 <%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("HC_Encounters")%>
+<%=window.story.render("DngHC_Encounters")%>
 
 
 :: DngHC_L5
@@ -410,7 +460,7 @@ There is a opening in the northern wall. But its to high up and the wall is to s
 A contraption is installed in the middle of the room.
 <%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("HC_Encounters")%>
+<%=window.story.render("DngHC_Encounters")%>
 
 
 :: DngHC_F6
@@ -418,7 +468,7 @@ A contraption is installed in the middle of the room.
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 <%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("HC_Encounters")%>
+<%=window.story.render("DngHC_Encounters")%>
 
 
 :: DngHC_G6
@@ -430,7 +480,7 @@ You could pull one of the levers: <a0 id='A' onclick='pullLever(this)'>Lever A</
 <div id='output'></div>
 <%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("HC_Encounters")%>
+<%=window.story.render("DngHC_Encounters")%>
 <script>function pullLever(evt){
   var doors=window.story.state.DngHC.tmp.doors;
   if(evt.id=='A'){
@@ -453,11 +503,11 @@ You could pull one of the levers: <a0 id='A' onclick='pullLever(this)'>Lever A</
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 Stone walls left right top bottom. I need air.</br>
-The tunnel towards west is leading downward and covered with some grime dripping out of the rotten pipes in the roof. It might be slippery, sending you sliding down on your rear, making it IMPOSIIBLE to return from that direction.</br>
+The tunnel towards west is leading downward and covered with some grime dripping out of the rotten pipes in the roof. It might be slippery, sending you sliding down on your rear, making it IMPOSSIBLE to return from that direction.</br>
 
 <%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("HC_Encounters")%>
+<%=window.story.render("DngHC_Encounters")%>
 
 
 :: DngHC_I6
@@ -466,7 +516,7 @@ The tunnel towards west is leading downward and covered with some grime dripping
 The area here is flooded with some murky water. You cant know how deep it is - or what else mmight be lurking below its surface.
 <%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("HC_Encounters")%>
+<%=window.story.render("DngHC_Encounters")%>
 
 :: DngHC_J6
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
@@ -474,7 +524,7 @@ The area here is flooded with some murky water. You cant know how deep it is - o
 The area here is flooded with some murky water. You cant know how deep it is - or what else mmight be lurking below its surface.
 <%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("HC_Encounters")%>
+<%=window.story.render("DngHC_Encounters")%>
 
 :: DngHC_K6
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
@@ -482,7 +532,7 @@ The area here is flooded with some murky water. You cant know how deep it is - o
 The area here is flooded with some murky water. You cant know how deep it is - or what else mmight be lurking below its surface.
 <%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("HC_Encounters")%>
+<%=window.story.render("DngHC_Encounters")%>
 
 
 :: DngHC_Altar
@@ -525,14 +575,6 @@ The area here is flooded with some murky water. You cant know how deep it is - o
 :: DngHC_Vendor
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 There is a vendor that sells some wares.
-Steal - He sees to be sleeping most of the time, maybe you can pick something small when he closes his eyes
-      - that stolen goods where cursed; some kind of theft counter measures?
-</br>[[Leave|DngHC_G5]]
-</article><article id="LogPanel"></article></section>
-
-:: DngHC_Showcase
-<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-Some kind of lectern or stand is placed in an alcoven.
 Steal - He sees to be sleeping most of the time, maybe you can pick something small when he closes his eyes
       - that stolen goods where cursed; some kind of theft counter measures?
 </br>[[Leave|DngHC_G5]]

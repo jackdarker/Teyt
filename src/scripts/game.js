@@ -52,7 +52,7 @@ window.gm.util.printLocationName=function(passage) {
 window.gm.util.bargraph=function(value,max,color,text="") {
   let msg ='';
   let rel = value/max*100;
-  msg ='<div class="progressbar"><div style="background-color:'+color+'; width: '+rel.toString()+'%;"><div style="width: max-content;">'+text+value.toString()+'/'+max.toString()+'</div></div></div>';
+  msg ='<div class="progressbar"><div style="background-color:'+color+'; width: '+rel.toString()+'%;"><div style="width: max-content;">'+text+window.gm.util.formatNumber(value,1)+'/'+max.toString()+'</div></div></div>';
   return(msg); //todo bargraph css-animation doesnt work because the whole page is reloaded instead of just width change
 }
 /* Uploads SVG files from local file system, based on file selected in input; https://github.com/fizzstudio/svg-load-save */
@@ -108,6 +108,7 @@ window.gm.util.mergePlainObject=function(...arg) {
 };
 //-------------------------------------------------
 // reimplement to setup the game !
+// debug notice: if you get "Cannot read properties of undefined" check the constructor dictionary if something is missing. This indicates an compiling error in those items (check in the sorting order of the script-files) 
 window.gm.initGame= function(forceReset,NGP=null) {
   window.gm.toasty= new Toasty();
     $(window).on('sm.passage.showing', function(event, eventObject) {

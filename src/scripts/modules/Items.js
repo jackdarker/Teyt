@@ -13,7 +13,6 @@ class Money extends Item {
     toJSON() {return window.storage.Generic_toJSON("Money", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(Money, value.data);};
 };
-
 class LaptopPS extends Item {
     constructor() {super('LaptopPS');this.addTags([window.gm.ItemTags.Quest]);}
     get desc() { return 'Power converter for laptop.';    }
@@ -87,20 +86,25 @@ class QuestItems extends Item { //ingredients you have to collect for quest
         if(style===0) this.id='IgneumPage',this.name='IgneumPage';
         else if(style===10) this.id=this.name='RedAnkh';
         else if(style===20) this.id=this.name='RingOfBurden';
+        else if(style===30) this.id=this.name='GemstoneRed';
+        else if(style===31) this.id=this.name='GemstoneGreen';
+        else if(style===32) this.id=this.name='GemstoneBlue';
         else throw new Error(this.id +' doesnt know '+style);
     }
     get style() {return this._style;}
     get desc() { 
         let msg ='';
         switch(this._style) {
-            case 0: 
-                msg ='Pages from the book Igneum Frigus Thalamum';
+            case 0: msg ='Pages from the book Igneum Frigus Thalamum';
                 break;
-            case 10:
-                msg='A pendant made from red crystal shaped like the famous Ankh.';
+            case 10: msg='A pendant made from red crystal shaped like the famous Ankh.';
                 break;
-            case 20:
-                msg='This ring is heavyer then it looks.';
+            case 20: msg='This ring is heavyer then it seems.';
+                break;
+            case 30:
+            case 31:
+            case 32: 
+                msg='A large gemstone of a certain color.';
                 break;
             default: throw new Error(this.id +' doesnt know '+style);
         }
@@ -335,9 +339,21 @@ class SimpleFood extends Item {
     get style() {return this.name;}
 }
 class HealthPotion extends Item {
-    constructor() { super('HealthPotion'); this.addTags([window.gm.ItemTags.Drink]); this.price=this.basePrice=5;this.style=0; }
+    static factory(style){
+        let x= new HealthPotion();
+        x.style=style;
+        return(x);
+    }
+    constructor() { super('HealthPotion'); this.addTags([window.gm.ItemTags.Drink]); this.price=this.basePrice=5;this._style=0; }
     toJSON() {return window.storage.Generic_toJSON("HealthPotion", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(HealthPotion, value.data);};
+    //context is the skillUseItem calling this
+    targetFilter(targets,context) {
+        if(!window.gm.combat.inCombat()) return([]);
+        //to use skill-targetfilter we need an instance of skill bound to the caster  - todo this is ugly
+        //let _sk = this.parent.parent.Skills.getItem('UseItem');//._parent=window.gm.util.refToParent(this.parent.parent.Skills); 
+        return(context.targetMultiple(context.target(context.targetFilterAlly(targets))));
+    }
     usable(context,on=null) {return({OK:true, msg:'drink'});}
     use(context,on=null) { 
         var _gaveAway=false;
@@ -346,8 +362,13 @@ class HealthPotion extends Item {
             else _gaveAway=true;
             context.removeItem(this.id);
             if(on instanceof Character){ 
-                on.Stats.increment("health",this.amount);
-                return({OK:true, msg:on.name+' drank a potion.'});
+                if(this.style<100) {
+                    on.Stats.increment("health",this.amount);
+                    return({OK:true, msg:on.name+' drank a potion and feels healthier.'});
+                } else if(this.style<200 && this.style>=100) {
+                    on.Stats.increment("savageness",-1*this.amount);
+                    return({OK:true, msg:on.name+' drank a potion and feels less savage.'});
+                }
             }
         } else throw new Error('context is invalid');
     }
@@ -355,10 +376,17 @@ class HealthPotion extends Item {
         this._style = style; 
         if(style===0) this.id=this.name='HealthPotion',this.amount=40;
         else if(style===10) this.id=this.name='HealthPotionSmall',this.amount=20;
+        else if(style===100) this.id=this.name='SerenityPotionSmall',this.amount=0;
         else throw new Error(this.id +' doesnt know '+style);
     }
-    get style() {return this._style;}
-    get desc() {return(this.name); }
+    get style() {return(this._style);}
+    get desc() {
+        let msg='restores some health ';
+        if(this.style<200 && this.style>=100) {
+            msg='cools down your savagness '
+        }
+        return(msg);
+    }
 }
 class HorsePotion extends Item {
     constructor() { super('HorsePotion'); this.addTags([window.gm.ItemTags.Drink]);this.price=this.basePrice=15;this.style=0;}
@@ -484,8 +512,9 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['RottenMushroom'] = function (){ let x=new SimpleFood();x.style=30;return(x);};
     ItemsLib['FlashBang'] = function (){ return new FlashBang(); };
     //healthpotion
-    ItemsLib['HealthPotion'] = function () { let x= new HealthPotion();return(x); };
-    ItemsLib['HealthPotionSmall'] = function () { let x= new HealthPotion();x.style=10;return(x); };
+    ItemsLib['HealthPotion'] = function() {return(HealthPotion.factory(0));};
+    ItemsLib['HealthPotionSmall'] = function() {return(HealthPotion.factory(10));};
+    ItemsLib['SerenityPotionSmall'] = function() {return(HealthPotion.factory(100));};
     ItemsLib['HorsePotion'] = function () { let x= new HorsePotion();return(x); }
     ItemsLib['CarrotJuice'] = function () { let x= new HorsePotion();x.style=10;return(x); }
     ItemsLib['Vaginarium'] = function () { let x= new RegenderPotion();return(x); };
@@ -510,6 +539,9 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['IgneumPage'] = function(){ let x=new QuestItems();x.style=0;return(x);};
     ItemsLib['RedAnkh'] = function(){ let x=new QuestItems();x.style=10;return(x);};
     ItemsLib['RingOfBurden'] = function(){ let x=new QuestItems();x.style=20;return(x);};
+    ItemsLib['GemstoneRed'] = function(){ let x=new QuestItems();x.style=30;return(x);};
+    ItemsLib['GemstoneGreen'] = function(){ let x=new QuestItems();x.style=31;return(x);};
+    ItemsLib['GemstoneBlue'] = function(){ let x=new QuestItems();x.style=32;return(x);};
     //soulgem
     ItemsLib['TinySoulGem'] = function () { let x= new SoulGem();return(x); };
     //keys

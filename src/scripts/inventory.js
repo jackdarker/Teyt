@@ -61,7 +61,7 @@ class Inventory {
         var _x = window.storage.Generic_fromJSON(Inventory, value.data);
         return(_x);
     }
-    _relinkItems() {  //call this after loading save data the reparent
+    _relinkItems() {  //call this after loading save data to reparent; if you get an error that the function is missing, you might have forgotten to window.storage.registerConstructor
         for(var i=0; i<this.list.length; i++) {
             if(this.list[i].item) this.list[i].item._relinkItems(this);
         }
