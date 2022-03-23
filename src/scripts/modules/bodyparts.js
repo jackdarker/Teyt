@@ -255,7 +255,7 @@ class FaceLeech extends BodyPart {
     attackMod(target){
         let mod = new SkillMod();
         if(this.data.style==='slug') {
-            mod.onHit = [{ target:target, eff: [effDamage.factory(5,'acid','The slug spits some acid that eats at '+target.name+' armor.')]}];
+            mod.onHit = [{ target:target, eff: [effDamage.factory(5,'acid',1,'The slug spits some acid that eats at '+target.name+' armor.')]}];
         } else {
             mod.onHit = [{ target:target, eff: [effDamage.factory(5,'acid')]}];
         }
@@ -478,9 +478,11 @@ class WeaponStinger extends BodyPart {
     }
     attackMod(target){
         let mod = new SkillMod();
-        let _dmg =5;
-        if(this.data.style==='wasplike' ) _dmg+=5;
-        mod.onHit = [{ target:target, eff: [effDamage.factory(_dmg,'pierce', this.parent.parent.name+' pokes its '+this.data.style+' stinger into '+target.name+'. ' )]}];
+        let _eff=[],_dmg =5,_poison=0;
+        if(this.data.style==='wasplike' ) _poison+=10;
+        _eff.push(effDamage.factory(_dmg,'pierce',1, this.parent.parent.name+' pokes its '+this.data.style+' stinger into '+target.name+'. ' ));
+        if(_poison>0)_eff.push(effDamage.factory(_poison,'poison',3,target.name+"got poisoned."));
+        mod.onHit = [{ target:target, eff: _eff}];
         return(mod);
     }
 }
@@ -530,7 +532,7 @@ class WeaponSlobber extends BodyPart {
         let mod = new SkillMod();
         let _dmg =5;
         if(this.data.style==='slime' ) _dmg+=5;
-        mod.onHit = [{ target:target, eff: [effDamage.factory(_dmg,'acid', this.parent.parent.name+' slobbers '+target.name+' with '+this.data.style+'.' )]}];
+        mod.onHit = [{ target:target, eff: [effDamage.factory(_dmg,'acid',2, this.parent.parent.name+' slobbers '+target.name+' with '+this.data.style+'.' )]}];
         return(mod);
     }
 }
@@ -1096,7 +1098,7 @@ class VulvaHuman extends BodyPart {
 }
 class PenisHuman extends BodyPart {
     static dataPrototype() {    
-        return({style:'human',maxGrowth:0.2,growth:0.4, virgin:true, wetgen:1,sheath:0, ballsize:2.3});
+        return({style:'human',maxGrowth:0.2,growth:0.4, virgin:true, wetgen:1,sheath:0, ballsize:0.01});
     }
     static factory(id) {
         let obj =  new PenisHuman();
@@ -1147,9 +1149,9 @@ class PenisHuman extends BodyPart {
     descLong(fconv) {
         let msg= "$[My]$ "+this.data.style+"-dong is around "+this.sizeString(this.data.growth*this.data.maxGrowth)+" long.";
         if(this.data.style==='lizard' || this.data.style==='bird') {
-            msg+= "The testicles are hidden inside the body but might be around "+this.data.ballsize+"cm.";
+            msg+= "The testicles are hidden inside the body but might be around "+this.sizeString(this.data.ballsize*this.data.maxGrowth)+" .";
         } else {
-            msg+= "A Ballsack dangles below it that measures around "+this.data.ballsize+"cm.";   
+            msg+= "A Ballsack dangles below it that measures around "+this.sizeString(this.data.ballsize*this.data.maxGrowth)+" .";   
         }
         return(fconv(msg));
     }

@@ -800,6 +800,9 @@ class effHorsePower extends Effect {
     onApply(){
         this.data.duration = 120;
         this.data.time = window.gm.getTime();
+        /*this.parent.parent.Stats.addModifier('rst_blunt',{id:'rst_blunt:Guard', bonus:this.data.weapResist});
+        this.parent.parent.Stats.addModifier('rst_slash',{id:'rst_slash:Guard', bonus:this.data.weapResist});
+        this.parent.parent.Stats.addModifier('rst_pierce',{id:'rst_pierce:Guard', bonus:this.data.weapResist});*/
     }
     merge(neweffect) {
         if(neweffect.id===this.data.id) {
@@ -902,7 +905,76 @@ class effGrowVulva extends Effect {
         }
     }
 }
+class effPillEffect extends Effect {
+    static factory(type) {
+        let eff = new effPillEffect();
+        eff.type = type;
+        eff.data.id=eff.data.name='eff'+type;
+        return(eff);
+    }
+    constructor() {
+        super();
+        this.data.id = this.data.name= effPillEffect.name, this.data.hidden=0;
+        this.data.duration = 120,this.data.cycles = 1, this.data.magnitude = 1;
+    }
+    toJSON() {return window.storage.Generic_toJSON("effPillEffect", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(effPillEffect, value.data);};
+    get desc() {return(this.data.name);}
 
+    onTimeChange(time) {
+        var delta = window.gm.getDeltaTime(time,this.data.time);
+        this.data.time = time;
+        this.data.duration-= delta;
+        if(this.data.duration<0) {
+            delta = delta+this.data.duration; // if delta is 20 but remaining duration is only 5, delta should be capped to 5
+            this.data.duration =0;
+        }
+        /*this.parent.parent.Stats.increment('energy',10*delta/60);
+        this.parent.parent.Stats.increment('health',10*delta/60);
+        this.parent.parent.Stats.increment('will',10*delta/60);    */    
+        if(this.data.duration<=0) { 
+            this.data.cycles-=1;
+            if(this.data.magnitude>=2) {
+                this.__trgMutation();
+            }
+            if(this.data.cycles<=0) {//remove yourself
+                return(function(me){return function(Effects){ 
+                    Effects.removeItem(me.data.id);}
+                }(this));
+            }            
+        }
+        return(null);
+    }
+    __trgMutation() {
+        let _i = this.parent.findItemSlot(effMutateHorse.name);
+        if(_i===-1) { //todo extend if exist?
+            this.parent.parent.addEffect(new effMutateHorse(),effMutateHorse.name );
+        }
+    }
+    onApply(){
+        this.data.duration = 120;
+        this.data.time = window.gm.getTime();
+        if(this.data.id='effBrownPill') {
+            this.parent.parent.Stats.addModifier('arm_poison',{id:'arm_poison:'+this.data.name, bonus:25});
+        }else if(this.data.id='effRedPill') {
+            this.parent.parent.Stats.addModifier('rst_blunt',{id:'rst_blunt:'+this.data.name, bonus:25});
+            this.parent.parent.Stats.addModifier('rst_slash',{id:'rst_slash:'+this.data.name, bonus:25});
+            this.parent.parent.Stats.addModifier('rst_pierce',{id:'rst_pierce:'+this.data.name, bonus:25});
+        }
+    }
+    onRemove(){
+        this.parent.parent.Stats.removeModifier('rst_blunt',{id:'rst_blunt:'+this.data.name});
+        this.parent.parent.Stats.removeModifier('rst_slash',{id:'rst_slash:'+this.data.name});
+        this.parent.parent.Stats.removeModifier('rst_pierce',{id:'rst_pierce:'+this.data.name});
+    }
+    merge(neweffect) {
+        if(neweffect.id===this.data.id) {
+            this.onApply(); //refresh 
+            this.data.magnitude +=1; //bonus effect triggers only if added multiple times
+            return(true);
+        }
+    }
+}
 /**
  * todo 
  * the mark indicates that you can bear soulgems; the stronger the mark, the better the gem
@@ -1279,9 +1351,9 @@ class effCombined extends CombatEffect {
     static fromJSON(value) { return window.storage.Generic_fromJSON(effCombined, value.data);};
 }
 class effDamage extends CombatEffect {
-    static factory(amount,type,msg='') {
+    static factory(amount,type,turns=1,msg='') {
         let eff = new effDamage();
-        eff.amount = amount;
+        eff.amount = amount,eff.data.duration=turns;
         eff.type=type;
         eff.castMsg=msg;
         return(eff);
@@ -1293,13 +1365,8 @@ class effDamage extends CombatEffect {
     }
     toJSON() {return window.storage.Generic_toJSON("effDamage", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(effDamage, value.data);};
-    /*??onCast(targets,caster) {
-        let result={OK:false,msg:''};
-        targets[0].
-        if(this.onHitCB) onHitCB(targets,caster);
-    }*/
     onApply(){
-        this.data.duration = 0;
+        //this.data.duration = 0;
         this.parent.parent.Stats.increment('health',-1*this.amount);
         if(this.data.duration<1) this.parent.removeItem(this.data.id);  
     }
@@ -1308,8 +1375,10 @@ class effDamage extends CombatEffect {
             return;
         }
     }
-    onTurnStart() { this.data.duration-=1; if(this.data.duration<=0) this.parent.removeItem(this.data.id); return({OK:true,msg:''}); return({OK:true,msg:''});  }
+    onTurnStart() { this.data.duration-=1; if(this.data.duration<=0) this.parent.removeItem(this.data.id); 
+        this.parent.parent.Stats.increment('health',-1*this.amount); return({OK:true,msg:''});}
 }
+//someone with this eff will gain arousal when hit
 class effMasochist extends CombatEffect {
     static factory(amount) {
         let eff = new effMasochist();
@@ -1678,6 +1747,7 @@ window.gm.StatsLib = (function (StatsLib) {
     window.storage.registerConstructor(effUngrappling);
     window.storage.registerConstructor(effEnergized);    
     window.storage.registerConstructor(effNotTired);
+    window.storage.registerConstructor(effPillEffect);
     window.storage.registerConstructor(effTeaseDamage);
     window.storage.registerConstructor(effTired);
     window.storage.registerConstructor(effStunned);

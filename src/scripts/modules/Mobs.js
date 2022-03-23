@@ -613,14 +613,54 @@ class Carlia extends Mob {
       this.autoLeveling();
   }
 }
-class Ruff extends Wolf {
+class Ruff extends Mob {
     constructor() {
         super();
         this.name = this.id = 'Ruff';
-        this.Outfit.addItem(AnusHuman.factory('wolf'));
+        this.Outfit.addItem(new BaseQuadruped());
+        this.Outfit.addItem(SkinFur.factory('wolf','black'));
+        this.Outfit.addItem(HandsPaw.factory('wolf'));
         this.Outfit.addItem(PenisHuman.factory('wolf'));
+        this.Outfit.addItem(AnusHuman.factory('wolf'));
+        this.Outfit.addItem(TailWolf.factory('wolf'));
+        this.Outfit.addItem(FaceWolf.factory('wolf'));
+        this.Stats.increment('arm_blunt',5);
         this.levelUp(7);
         this.autoLeveling();
+    }
+    get pic(){return('wolf3');}
+    toJSON() {return window.storage.Generic_toJSON("Ruff", this); }
+    static fromJSON(value) {
+        let _x=window.storage.Generic_fromJSON(Ruff, value.data);
+        _x.rebuildAfterLoad();
+        /*_x.Effects._relinkItems();
+        _x.Stats._relinkItems();
+        _x.Inv._relinkItems();
+        _x.Outfit._relinkItems();
+        _x.Wardrobe._relinkItems();
+        _x.Rel._relinkItems();
+        _x.Skills._relinkItems();*/
+        return(_x);}
+    calcCombatMove(enemys,friends){
+        let result = {OK:true,msg:''};//this._canAct();
+        let rnd = _.random(1,100);
+        let spawn="CallHelpWolf";
+        //if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
+        result.action =result.target= null;
+        if(window.story.state.combat.turnCount%2===0) {
+            rnd = _.random(0,enemys.length-1);
+            result.action = "Bite";
+            result.target = [enemys[rnd]];
+            result.msg =this.name+" snaps at "+result.target[0].name+".</br>"+result.msg;
+            return(result);
+        } else if(window.story.state.combat.turnCount>3 && this.Skills.countItem(spawn)>0 &&
+            this.Skills.getItem(spawn).isEnabled().OK) {
+            result.action = spawn;
+            result.target = [this];
+            result.msg =this.name+" howls to call its pack for support.</br>"+result.msg;
+            return(result);
+        }
+        return(super.calcCombatMove(enemys,friends));
     }
 }
 class Clyde extends AnthroFox {
@@ -654,6 +694,10 @@ class Trent extends Mob {
 }
 //collection of mob-constructors
 window.gm.Mobs = (function (Mobs) {
+    //unique chars that are in save-game need a constructor
+    window.storage.registerConstructor(Mob);//some characters derive from Mob
+    window.storage.registerConstructor(Ruff);
+    //
     Mobs.AnthroCat = function() { return function(param){return(AnthroCat.factory(param));}("AnthroCat")};
     Mobs.AnthroFox = function() { return function(param){return(AnthroCat.factory(param));}("AnthroFox")};
     Mobs.Huntress = function() { return function(param){return(AnthroCat.factory(param));}("Huntress")};

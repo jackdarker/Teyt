@@ -759,7 +759,7 @@ window.gm.combat.scaleEffect = function(attack) {
     for(var i=0; i<op.length;i++){
       target = op[i].target;
       for(el of op[i].eff) {
-        if(el.name===effDamage.name) {  //dmg = (attack-armor)*(100%-resistance) but min. 1pt
+        if(el.id==="effDamage") {  //dmg = (attack-armor)*(100%-resistance) but min. 1pt
           arm = target.Stats.getItem('arm_'+el.type).value;
           rst = target.Stats.getItem('rst_'+el.type).value;
           dmg = Math.max(1,(el.amount-arm)*(100-rst)/100);
@@ -768,7 +768,7 @@ window.gm.combat.scaleEffect = function(attack) {
             op[i].eff.push(effTeaseDamage.factory(dmg,'slut',{slut:1})); //todo lewd-calc
           }
         }
-        if(el.name===effTeaseDamage.name) {
+        if(el.id==="effTeaseDamage") {
           //todo no dmg if blinded, stunned,
           //todo vulnerable if inHeat, like/dislike attacker
           //bondage-fetish -> bonus for bond-gear

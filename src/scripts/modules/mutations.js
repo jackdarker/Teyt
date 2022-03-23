@@ -282,6 +282,14 @@ window.gm.MutationsLib['mutateHorse'] = function(char,magnitude=1) {
                     cnt-=thrs[bb.bTailBase]/4;
                 }
             }
+        } else if(el.slot===bb.bSkin && cnt>=thrs[bb.bSkin]) {
+            if(el.item===null) { //grow no face?
+            } else if(el.item.getStyle() !=='horse') {
+                char.Outfit.removeItem(el.item.id,true);
+                char.Outfit.addItem(window.storage.constructors['SkinFur'].factory('horse'),true);
+                msg+=fconv("$[My]$ skin prickles as suddenly a fine layer of fur sprouts all around your body, even in your face.</br>");
+                cnt-=thrs[bb.bTailBase];
+            } 
         } else if(el.slot===bb.bFace && cnt>=thrs[bb.bFace]) {
             if(el.item===null) { //grow no face?
             } else if(el.item.getStyle() !=='horse') {
@@ -307,7 +315,8 @@ window.gm.MutationsLib['mutateHorse'] = function(char,magnitude=1) {
         }
     }
     if(cnt>0){
-        msg+=fconv("$[I]$ already changed to a horse as far as possible right now.</br>");
+        if(msg==='') msg=fconv("$[I]$ cant shake the feeling that something odd might happen in near future.</br>");
+        else msg+=fconv("$[I]$ already changed to a horse as far as possible - for now.</br>");
         window.gm.MutationsLib.changeSavage(char,cnt,0,50); //increase savage
     }
     window.gm.MutationsLib.changeSavage(char,cnt,0,50);
@@ -415,6 +424,32 @@ window.gm.MutationsLib['growVulva'] = function(char,magnitude=1) {
         } else {
             item.data.clitsize+=0.5;
             msg+= "You arent quite sure but could it be possible that your clitoris is larger then before?</br>";
+        }
+        msg += "</br>"+item.descLong(window.gm.util.descFixer(char))+"</br>";
+    }
+    if(char===window.gm.player) {
+        window.gm.pushDeferredEvent("GenericDeffered",[msg]);
+    }
+};
+window.gm.MutationsLib['growPenis'] = function(char,magnitude=1) {
+    let msg = 'Everything is ok, nothing unusual.</br>', _TF="PenisHuman";
+    if(char.Outfit.countItem(_TF)>0) {
+        let item = char.Outfit.getItem(_TF);
+        msg ="An unusual feeling lets you move your hand down to your nethers.</br>"
+        if(magnitude>0) {//grow
+            if(item.data.growth>=1) {
+                msg+= "Your member is straining but your body doesnt seem to support a bigger one !</br>";
+            } else {
+                item.data.growth=Math.min(1.0,item.data.growth+0.25);
+                msg+= "Your member swell proudly an gains in girth and length?</br>";
+            }
+        } else { //shrink
+            if(item.data.growth<0.05) {
+                msg+= "You can feel some pressure around your tiny manmeat but nothing happens.</br>";
+            } else {
+                item.data.growth=Math.max(0.05,item.data.growth-0.25);
+                msg+= "You can feel some pressure engulfing your manmeat. With horror you can feel it shrinking down even further !</br>";
+            }
         }
         msg += "</br>"+item.descLong(window.gm.util.descFixer(char))+"</br>";
     }

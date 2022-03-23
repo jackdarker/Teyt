@@ -68,7 +68,7 @@ window.gm.startDominoCombat=function(stopCB, startCB){
             skill=player.skills[l];
             entry=document.createElement('button');
             entry.id=skill.id;
-            entry.textContent=skill.id+' '+skill.start+' -> '+skill.end+' hit:'+skill.hp+' cooldown:'+skill.cooldown;
+            entry.textContent=skill.id+' '+skill.start+' -> '+skill.end+' hits:'+skill.hp+' cooldown:'+skill.cooldown;
             if(skill.cooldown>0){
               entry.disabled=true;
             }else {
@@ -194,6 +194,267 @@ window.gm.startDominoCombat=function(stopCB, startCB){
     teams:[],
     team:0,
     player:'',
+    target:'',
+    stopCB: stopCB, //callback after user trigger 
+    startCB: startCB, //callback after start
+    start: start, //ref to start-function
+  }
+  return(data);
+}
+window.gm.startCounterChargeCombat=function(stopCB, startCB){
+  function start() { 
+    //setup teams,cards
+    data.teams=[];
+    let i,skills,defense,players,x=0;
+    for(i=0;i<=1;i++) { //teams
+      players=[];
+      for(var k=0;k<(i+1);k++) {
+        defense=[],skills=[];   //skills
+        if(x===0) {
+        skills.push({id:'skill#'+0,start:'blue',charge:'',hp:15,tick:0,cooldown:0});
+        skills.push({id:'skill#'+1,start:'red',charge:'',hp:5,tick:0,cooldown:0});
+        skills.push({id:'skill#'+2,start:'blue',charge:'blue',hp:25,tick:0,cooldown:0});
+        skills.push({id:'skill#'+3,start:'red',charge:'green',hp:25,tick:0,cooldown:0});
+        skills.push({id:'skill#'+4,start:'red',charge:'red',hp:25,tick:0,cooldown:0});
+        defense.push({id:'defense#'+1,start:'red',charge:'red',tick:0,cooldown:1})
+        defense.push({id:'defense#'+2,start:'blue',charge:'red',tick:0,cooldown:1})
+        } else if(x===1) {
+          skills.push({id:'skill#'+3,start:'red',charge:'red',hp:25,tick:0,cooldown:0});
+          skills.push({id:'skill#'+4,start:'blue',charge:'',hp:5,tick:0,cooldown:0});
+          defense.push({id:'defense#'+1,start:'red',charge:'red',tick:0,cooldown:1})
+          defense.push({id:'defense#'+2,start:'blue',charge:'red',tick:0,cooldown:1})
+        } else {
+          skills.push({id:'skill#'+0,start:'blue',charge:'red',hp:15,tick:0,cooldown:0});
+          skills.push({id:'skill#'+2,start:'red',charge:'',hp:5,tick:0,cooldown:0});
+          skills.push({id:'skill#'+3,start:'red',charge:'',hp:5,tick:0,cooldown:0});
+        }
+        players.push({id:'player#'+x,hp:100,charge:{blue:0,red:50,green:0},skills:skills,defenses:defense});
+        x+=1;
+      }
+      data.teams.push(players);
+    }   
+    data.run=true,data.phase=0;
+    newTurn();
+  }
+  function updateBoard() {
+    let player,skill;
+    let entry,panel=document.getElementById('panel')
+    for(var i=panel.childNodes.length-1;i>=0;i-- ) {
+      panel.removeChild(panel.childNodes[i]);
+    } 
+    //cleanout buttons
+    let choice=document.getElementById('choice')
+    for(var i=choice.childNodes.length-1;i>=0;i-- ) {
+      choice.removeChild(choice.childNodes[i]);
+    } 
+    //update players or remove them: list health and color of each player
+    for(var i=data.teams.length-1;i>=0;i--) {
+      for(var k=data.teams[i].length-1;k>=0;k--) {
+        player=data.teams[i][k];
+        entry=document.createElement('button');
+        entry.id=player.id;
+        if(player.hp>0) {
+          entry.textContent='Team'+i+' '+player.id+' hp:'+player.hp+' blue:'+player.charge.blue+' red:'+player.charge.red+' green:'+player.charge.green;
+        } else {
+          entry.textContent='Team'+i+' '+player.id+' is down';
+        }
+        if(data.team===i || player.hp<=0 || data.phase===1){  //phase1 -> defender selects defense
+          entry.disabled=true;
+        } else {
+          //bind click handler targetselect
+          entry.addEventListener("click",(function(target){return(selectTarget.bind(data,target));}(player.id))); 
+          data.target=player.id;
+        }
+        panel.appendChild(entry);
+        if(player.hp<=0){ //skip dead players
+          nextPlayer();return;
+        }
+        if(data.phase===0 && player.hp>0 && player.id===data.player){  //list skills of attacker
+          entry.style['border-block-color']='khaki',entry.style['border-block-width']='5px';
+            for(var l=player.skills.length-1;l>=0;l--){
+              skill=player.skills[l];
+              entry=document.createElement('button');
+              entry.id=skill.id;
+              entry.textContent=skill.id+' '+skill.start+' hits:'+skill.hp+((skill.charge!=='')?' requires:'+skill.charge:'')+' cooldown:'+skill.tick;
+              if(skill.tick>0 || (skill.charge!=='' && player.charge[skill.charge]<50)){
+                entry.disabled=true; //disable if cooldown or not enough charge
+              }else {
+                entry.addEventListener("click",(function(player,skill){return(selectSkill.bind(data,player,skill));}(player.id,skill.id)));  
+              }  
+              choice.appendChild(entry);
+            }   
+            entry=document.createElement('button');
+            entry.id=entry.textContent='skip';  
+            entry.addEventListener("click",nextPlayer);
+            choice.appendChild(entry);
+        } else if(data.phase===1 && player.hp>0 && player.id===data.target) { //list defense of target
+          for(var l=player.defenses.length-1;l>=0;l--){
+            skill=player.defenses[l];
+            entry=document.createElement('button');
+            entry.id=skill.id;
+            entry.textContent=skill.id+' '+skill.start+' charges:'+skill.charge+' cooldown:'+skill.tick;
+            if(skill.tick>0 || (data.skillcolor!==skill.start)){ //
+              entry.disabled=true; //disable if cooldown or color wrong
+            }else {
+              entry.addEventListener("click",(function(player,skill){return(selectDefense.bind(data,player,skill));}(player.id,skill.id)));  
+            }  
+            choice.appendChild(entry);
+          }
+          entry=document.createElement('button');
+          entry.id=entry.textContent='skip';  
+          entry.addEventListener("click",(function(player,skill){return(selectDefense.bind(data,player,skill));}(player.id,''))); 
+          choice.appendChild(entry);
+        }        
+      }
+      entry=document.createElement('hr');
+      panel.appendChild(entry);
+    } 
+    entry=document.createElement('p');
+    entry.textContent=(data.phase===0)?data.player+': select target and skill:':data.target+': select defense:';
+    choice.appendChild(entry);  
+  }
+  function newTurn(){
+    //check if any team is down
+    let teamDead,player,skill;
+    data.phase=0;
+    for(var i=data.teams.length-1;i>=0;i--) {
+      teamDead=true;
+      for(var k=data.teams[i].length-1;k>=0;k--) {
+        player=data.teams[i][k];
+        if(player.hp>0) teamDead=false;
+        for(var l=player.skills.length-1;l>=0;l--){ //tick skills
+          skill=player.skills[l];
+          skill.tick=Math.max(0,skill.tick-1);
+        }
+        for(var l=player.defenses.length-1;l>=0;l--){ //tick skills
+          skill=player.defenses[l];
+          skill.tick=Math.max(0,skill.tick-1);
+        }
+      }
+      if(teamDead) {
+        alert('team '+i+' is defeated')
+        stop();
+        break;
+      } else { //start new round with team0 - note that all for-loops are operated backwards
+        data.team=data.teams.length-1;
+        let x=data.teams[data.team].length-1;
+        data.player=data.teams[data.team][x].id;
+        updateBoard();
+      }
+    }
+  }
+  function nextPlayer(){
+    let player,_usethis;
+    data.phase=0;
+    //skip to next alive in team
+    _usethis=false;
+    for(var k=data.teams[data.team].length-1;k>=0;k--) {
+      player=data.teams[data.team][k];
+      if(_usethis===true) { //the previous player was the current - this is next 
+        data.player=player.id;
+        _usethis=false;
+        break;
+      }
+      if(player.id===data.player) {
+        _usethis=true;
+      }
+    }
+    if(_usethis===true){//no more players in team, switch to next
+      data.team-=1;
+      for(var i=data.team;(_usethis&&i>=0);i--) {
+        for(var k=data.teams[i].length-1;(_usethis&&k>=0);k--) {
+          player=data.teams[i][k];
+          if(player.hp>0) {
+            data.player=player.id;
+            _usethis=false;
+          }
+        }
+      }
+      if(_usethis===true) {
+        newTurn();//but if no one left... 
+        return;
+      }
+    }
+    updateBoard();
+  }
+  function selectTarget(id) {this.target=id; }
+  function selectDefense(playerId,skillId) {
+    let playerA,playerB,player,skill,skillA,defenseB;
+    let _log="div#output";
+    for(var i=data.teams.length-1;i>=0;i--) { //find players
+      for(var k=data.teams[i].length-1;k>=0;k--) {
+        player=data.teams[i][k];
+        if(player.id===data.target) {
+          playerB=player;
+          for(var l=player.defenses.length-1;l>=0;l--){ //get skill
+            skill=player.defenses[l];
+            if(skill.id===skillId){
+              defenseB=skill;
+            }
+          }
+        } 
+        if(player.id===data.player) {
+          playerA=player;
+          for(var l=player.skills.length-1;l>=0;l--){ //get skill
+            skill=player.skills[l];
+            if(skill.id===data.skill){
+              skillA=skill;
+            }
+          }
+        } 
+      }
+    }
+    
+    if(skillId==='' || skillA.start!==defenseB.start){ //full damage if no color match or nor defense selected
+      playerB.hp-=skillA.hp;
+      playerA.charge[skillA.start]+=10;
+      window.gm.printOutput(playerA.id+" dealt "+skillA.hp+" damage to "+playerB.id,_log)
+    } else { //if color matches, reduce damage & build charge on target
+      playerB.charge[defenseB.charge]+=20;
+      playerB.hp-=skillA.hp/2;
+      window.gm.printOutput(playerB.id+" defended against "+playerB.id+ ' and charged '+defenseB.charge,_log)
+    }
+    skillA.tick=skillA.cooldown;
+    if(skillA.charge!=='') {
+      playerA.charge[skillA.charge]-=50;
+    }
+    if(skillId!=='') {
+      defenseB.tick=defenseB.cooldown;
+    }
+    nextPlayer();
+  }
+  function selectSkill(playerId,skillId) {
+    let playerA,playerB,player,skill,skillA;
+    let _log="div#output";
+    for(var i=data.teams.length-1;i>=0;i--) { //find players
+      for(var k=data.teams[i].length-1;k>=0;k--) {
+        player=data.teams[i][k];
+        if(player.id===data.target) {
+          playerB=player;
+        } 
+        if(player.id===playerId){
+          playerA=player;
+          for(var l=player.skills.length-1;l>=0;l--){ //get skill
+            skill=player.skills[l];
+            if(skill.id===skillId){
+              skillA=skill;
+            }
+          }
+        }
+      }
+    }
+    window.gm.printOutput("",_log)
+    data.phase=1;
+    data.skill=skillA.id,data.skillcolor=skillA.start;
+    updateBoard();
+  }
+  function stop() { data.run=false;}
+  let data ={ //internal state of game
+    scoreBoard : document.getElementById(panel),
+    run:false, //game started?
+    teams:[],
+    team:0,
+    player:'',skill:'',skillcolor:'',
     target:'',
     stopCB: stopCB, //callback after user trigger 
     startCB: startCB, //callback after start

@@ -167,26 +167,35 @@ _game.setup=function(level) {
 _game.init(grid);
 </script>
 
-:: DominoCombat [_nosave_]
+:: CounterCombat [_nosave_]
 <div style='background-color:gray;'  id='canvas'>
 <div id="panel"></div></br>
 <div id='output'></div></br>
 <div id="choice"></div></br>
 <div id="choice2"></div></br>
-<p id='result'><p>The top 2 rows are the 2 teams. The button with the khaki border is the active player. Only the player-button from the other team is enabled and should be used to select the target for the player.
-Below those buttons are the skill-buttons of the active player. The first color should match targets and players color, the second color will be the end color. Disabled buttons are in cooldown. Execute one skill by pressing the button.Then the next player will get activated. Repeat until all players of one team are at 0hp. </p>
-<p>I tried different variants and only the last is implemented here.</p>
-<p>Variant 1: damage is only dealt if start color matches target and attacker. Also target color is only changed then. Attacker color is always changed.</p>
-<p>Problems: if only 1 player has a certain start-color and no one else has a fitting skill, the other players cannot attack her and the game would run forever.</p>
-<p>Variant 2: now there is a little bit of damage even if color doesnt match. The targets color stays unchanged.</p>
-<p>Problems: the game is now not running forever like before but it might take long. If the target uses skill with a "common" color, the game runs normal. </p>
-<a0 id='btStart'>Start</a>
+<p id='result'></p>
+<a0 id='btstartDominoCombat'>Start Domino-Combat</a><a0 id='startDominoCombat' onclick='(function($event){document.querySelector("#"+id+"~p").toggleAttribute("hidden");})(this);'>Hint</a>
+<p hidden>The top 2 rows are the 2 teams. The button with the khaki border is the active player. Only the player-button from the other team is enabled and should be used to select the target for the player.
+Below those buttons are the skill-buttons of the active player. The first color should match targets and players color, the second color will be the end color. Disabled buttons are in cooldown. Execute one skill by pressing the button.Then the next player will get activated. Repeat until all players of one team are at 0hp.</br>
+I tried different variants and only the last is implemented here.</br>
+Variant 1: damage is only dealt if start color matches target and attacker. Also target color is only changed then. Attacker color is always changed.</br>
+Problems: if only 1 player has a certain start-color and no one else has a fitting skill, the other players cannot attack her and the game would run forever.</br>
+Variant 2: now there is a little bit of damage even if color doesnt match. The targets color stays unchanged.</br>
+Problems: the game is now not running forever like before but it might take long. If the target uses skill with a "common" color, the game runs normal. </p>
+<a0 id='btstartCounterChargeCombat'>Start Counter-Charge ombat</a><a0 id='startCounterChargeCombat' onclick='(function($event){document.querySelector("#"+id+"~p").toggleAttribute("hidden");})(this);'>Hint</a>
+<p hidden>The top 2 rows are the 2 teams. The button with the khaki border is the active player.</br> 
+Phase0: Only the player-button from the other team is enabled and should be used to select the target for the player. Below those buttons are the skill-buttons of the active player. Disabled buttons are in cooldown or you dont have enough charge. Execute one skill by pressing the button. This will trigger phase1.</br>
+Phase1: The target may select a defense-skill with a mathing color. If this is possible the damage will be reduced and the charge of the target increases.</br>
+Then the next player will get activated. Repeat until all players of one team are at 0hp. </br>
+Note that sucessful attack will earn you little charge of your skill-color but a succesful defense supplys the defender with a bigger charge.</br>
+Todo: The player should see what defenses the target has available (ould also be "learned" by playing against the enemy multiple times.).</p>
 </div><script>
 function onStop(value) {
 document.getElementById('result').innerHTML='scored '+value;
 }
-var _game = window.gm.startDominoCombat();
-document.getElementById('btStart').addEventListener("click", _game.start);
+var _game = window.gm.startCounterChargeCombat(),_game2 = window.gm.startDominoCombat();
+document.getElementById('btstartCounterChargeCombat').addEventListener("click", _game.start);
+document.getElementById('btstartDominoCombat').addEventListener("click", _game2.start);
 </script>
 
 

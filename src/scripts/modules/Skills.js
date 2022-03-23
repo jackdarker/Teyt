@@ -873,6 +873,5 @@ Supraconductor: incoming ice-damage has chance to increase spark-damage output f
 
 BladeMace: deals slash or blunt-damage depending which would cause more damage
 
-PoisonCloud: small damage over time to lifing  
 
  */

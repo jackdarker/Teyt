@@ -276,8 +276,7 @@ class FlashBang extends Item {
             context.removeItem('FlashBang');
             if(context.parent instanceof Character){
                 if(on===null) on=context.parent;
-                if(on.length && on.length>0) { 
-                    //on can be several targets (array)
+                if(on.length && on.length>0) { //on can be several targets (array)
                 } else {
                     on = [on];  //..if not an array change it
                 }
@@ -352,14 +351,15 @@ class HealthPotion extends Item {
         if(!window.gm.combat.inCombat()) return([]);
         //to use skill-targetfilter we need an instance of skill bound to the caster  - todo this is ugly
         //let _sk = this.parent.parent.Skills.getItem('UseItem');//._parent=window.gm.util.refToParent(this.parent.parent.Skills); 
-        return(context.targetMultiple(context.target(context.targetFilterAlly(targets))));
+        return(context.targetMultiple(context.targetFilterAlly(targets)));
     }
     usable(context,on=null) {return({OK:true, msg:'drink'});}
     use(context,on=null) { 
-        var _gaveAway=false;
         if(context instanceof Inventory) {
             if(on===null) on=context.parent;
-            else _gaveAway=true;
+            if(on.length && on.length>0) { //on can be several targets (array)
+                on = on[0];
+            } 
             context.removeItem(this.id);
             if(on instanceof Character){ 
                 if(this.style<100) {
@@ -376,7 +376,7 @@ class HealthPotion extends Item {
         this._style = style; 
         if(style===0) this.id=this.name='HealthPotion',this.amount=40;
         else if(style===10) this.id=this.name='HealthPotionSmall',this.amount=20;
-        else if(style===100) this.id=this.name='SerenityPotionSmall',this.amount=0;
+        else if(style===100) this.id=this.name='SerenityPotionSmall',this.amount=10;
         else throw new Error(this.id +' doesnt know '+style);
     }
     get style() {return(this._style);}
@@ -400,14 +400,12 @@ class HorsePotion extends Item {
             else _gaveAway=true;
             context.removeItem(this.id);
             if(on instanceof Character){ 
-                if(on instanceof Character){
-                    if(this.style===0) {
-                        on.addEffect(new effHorsePower(),effHorsePower.name);
-                    } else if(this.style===10) {
-                        on.addEffect(new effLapineSpeed(),effLapineSpeed.name);
-                    }
-                    on.Stats.increment("health",80);on.Stats.increment("energy",40);
+                if(this.style===0) {
+                    on.addEffect(new effHorsePower(),effHorsePower.name);
+                } else if(this.style===10) {
+                    on.addEffect(new effLapineSpeed(),effLapineSpeed.name);
                 }
+                on.Stats.increment("health",80);on.Stats.increment("energy",40);
                 return({OK:true, msg:on.name+' drank a potion.'});
             }
         } else throw new Error('context is invalid');
@@ -416,6 +414,45 @@ class HorsePotion extends Item {
         this._style = style;
         if(style===0)  this.id=this.name='HorsePotion';
         else if(style===10) this.id=this.name='CarrotJuice';
+        else if(style===20) this.id=this.name='BrownPill';
+        else if(style===30) this.id=this.name='RedPill';
+        else if(style===40) this.id=this.name='GreenPill';
+        else if(style===50) this.id=this.name='BluePill';
+        else throw new Error(this.id +' doesnt know '+style); 
+    }
+    get style() {return this._style;}
+    get desc() { 
+        let msg =this.name;
+        return(msg);
+    }
+}
+class Pills extends Item {
+    constructor() { super('Pills'); this.addTags([window.gm.ItemTags.Drink]);this.price=this.basePrice=15;this.style=0;}
+    toJSON() {return window.storage.Generic_toJSON("Pills", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(Pills, value.data);};
+    usable(context,on=null) {return({OK:true, msg:'swallow'});}
+    use(context,on=null) { 
+        var _txt='';
+        if(context instanceof Inventory) {
+            if(on===null) on=context.parent;
+            context.removeItem(this.id);
+            if(on instanceof Character){ 
+                on.addEffect(effPillEffect.factory(this.id));
+                on.Stats.increment("health",80);on.Stats.increment("energy",40);
+                window.gm.MutationsLib['changeSavage'](on,3,0,20);
+                _txt=on.name+' swallowed a drug. ';
+                _txt+=((this.style===0)?'Physical resistance increased.':
+                (this.style===50)?'':'');
+                return({OK:true, msg:_txt});
+            }
+        } else throw new Error('context is invalid');
+    }
+    set style(style) {
+        this._style = style;
+        if(style===0) this.id=this.name='BrownPill';
+        else if(style===30) this.id=this.name='RedPill';
+        else if(style===40) this.id=this.name='GreenPill';
+        else if(style===50) this.id=this.name='BluePill';
         else throw new Error(this.id +' doesnt know '+style); 
     }
     get style() {return this._style;}
@@ -493,32 +530,37 @@ window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(HorsePotion);
     window.storage.registerConstructor(Ingredient);//only need constructor for base-ingredient
     window.storage.registerConstructor(FlashBang);
+    window.storage.registerConstructor(Pills);
     window.storage.registerConstructor(QuestItems);
     window.storage.registerConstructor(SoulGem);
     
     //Some of those items are generics that need some setup;
-    ItemsLib['Money'] = function () { return new Money();};
-    ItemsLib['LighterDad'] = function () { return new LighterDad();};
-    ItemsLib['LaptopPS'] = function () { return new LaptopPS();};
-    ItemsLib['Battery'] = function () { return new Battery();};
+    ItemsLib['Money'] = function(){ return new Money();};
+    ItemsLib['LighterDad'] = function(){ return new LighterDad();};
+    ItemsLib['LaptopPS'] = function(){ return new LaptopPS();};
+    ItemsLib['Battery'] = function(){ return new Battery();};
     ItemsLib['Dildo_small'] =function(){let x=new Dildo();return(x);};
     // consumables
-    ItemsLib['Lube'] = function () { return new Lube();};
-    ItemsLib['CanOfCoffee'] = function () { return new CanOfCoffee(); };
-    ItemsLib['SimpleFood'] = function () { return new SimpleFood(); };
-    ItemsLib['Sandwich'] = function (){ let x=new SimpleFood();x.style=5;return(x);};
-    ItemsLib['ViolettMushroom'] = function (){ let x=new SimpleFood();x.style=10;return(x);};
-    ItemsLib['BrownMushroom'] = function (){ let x=new SimpleFood();x.style=20;return(x);};
-    ItemsLib['RottenMushroom'] = function (){ let x=new SimpleFood();x.style=30;return(x);};
-    ItemsLib['FlashBang'] = function (){ return new FlashBang(); };
+    ItemsLib['Lube'] = function(){ return new Lube();};
+    ItemsLib['CanOfCoffee'] = function(){ return new CanOfCoffee(); };
+    ItemsLib['SimpleFood'] = function(){ return new SimpleFood(); };
+    ItemsLib['Sandwich'] = function(){ let x=new SimpleFood();x.style=5;return(x);};
+    ItemsLib['ViolettMushroom'] = function(){ let x=new SimpleFood();x.style=10;return(x);};
+    ItemsLib['BrownMushroom'] = function(){ let x=new SimpleFood();x.style=20;return(x);};
+    ItemsLib['RottenMushroom'] = function(){ let x=new SimpleFood();x.style=30;return(x);};
+    ItemsLib['FlashBang'] = function(){ return new FlashBang(); };
     //healthpotion
     ItemsLib['HealthPotion'] = function() {return(HealthPotion.factory(0));};
     ItemsLib['HealthPotionSmall'] = function() {return(HealthPotion.factory(10));};
     ItemsLib['SerenityPotionSmall'] = function() {return(HealthPotion.factory(100));};
-    ItemsLib['HorsePotion'] = function () { let x= new HorsePotion();return(x); }
-    ItemsLib['CarrotJuice'] = function () { let x= new HorsePotion();x.style=10;return(x); }
-    ItemsLib['Vaginarium'] = function () { let x= new RegenderPotion();return(x); };
-    ItemsLib['Penilium'] = function () { let x= new RegenderPotion();x.style=10;return(x); };
+    ItemsLib['HorsePotion'] = function (){ let x= new HorsePotion();return(x);}
+    ItemsLib['CarrotJuice'] = function (){ let x= new HorsePotion();x.style=10;return(x);}
+    ItemsLib['BrownPill'] = function (){ let x= new Pills();x.style=0;return(x);}
+    ItemsLib['RedPill'] = function (){ let x= new Pills();x.style=30;return(x);}
+    ItemsLib['GreenPill'] = function (){ let x= new Pills();x.style=40;return(x);}
+    ItemsLib['BluePill'] = function (){ let x= new Pills();x.style=50;return(x);}
+    ItemsLib['Vaginarium'] = function (){ let x= new RegenderPotion();return(x); };
+    ItemsLib['Penilium'] = function(){ let x= new RegenderPotion();x.style=10;return(x); };
     //Ingredient
     ItemsLib['SquishedLeech'] = function(){ let x=new Ingredient();x.style=30;return(x);};
     ItemsLib['Beewax'] = function(){ let x=new Ingredient();x.style=110;return(x);};
@@ -543,16 +585,16 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['GemstoneGreen'] = function(){ let x=new QuestItems();x.style=31;return(x);};
     ItemsLib['GemstoneBlue'] = function(){ let x=new QuestItems();x.style=32;return(x);};
     //soulgem
-    ItemsLib['TinySoulGem'] = function () { let x= new SoulGem();return(x); };
+    ItemsLib['TinySoulGem'] = function(){ let x= new SoulGem();return(x); };
     //keys
-    ItemsLib['Rope'] = function () { let x= new Rope();return(x);};
-    ItemsLib['RopeSturdy'] = function () { let x= new Rope();x.style=10;return(x);};
-    ItemsLib['KeyRestraintA'] = function () { let x= new KeyRestraint();return(x);}; 
-    ItemsLib['KeyRestraintB'] = function () { let x= new KeyRestraint();x.style=10;return(x);};
+    ItemsLib['Rope'] = function(){ let x= new Rope();return(x);};
+    ItemsLib['RopeSturdy'] = function(){ let x= new Rope();x.style=10;return(x);};
+    ItemsLib['KeyRestraintA'] = function(){ let x= new KeyRestraint();return(x);}; 
+    ItemsLib['KeyRestraintB'] = function(){ let x= new KeyRestraint();x.style=10;return(x);};
     //voucher
-    ItemsLib['VoucherIron'] = function () { let x= new Voucher();return(x); };
-    ItemsLib['VoucherBronze'] = function () { let x= new Voucher();x.style=10;return(x); };
-    ItemsLib['VoucherSilver'] = function () { let x= new Voucher();x.style=20;return(x);};
-    ItemsLib['VoucherGold'] = function () { let x= new Voucher();x.style=30;return(x);};
+    ItemsLib['VoucherIron'] = function(){ let x= new Voucher();return(x); };
+    ItemsLib['VoucherBronze'] = function(){ let x= new Voucher();x.style=10;return(x); };
+    ItemsLib['VoucherSilver'] = function(){ let x= new Voucher();x.style=20;return(x);};
+    ItemsLib['VoucherGold'] = function(){ let x= new Voucher();x.style=30;return(x);};
     return ItemsLib; 
 }(window.gm.ItemsLib || {}));

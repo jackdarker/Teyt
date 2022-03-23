@@ -7,9 +7,9 @@
 
 :: DngPC_Respawn [_nosave_ _nodeffered_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-It's impossible to say how long you were passed out and how you ended up here. </br>
+It's impossible to say how long you have passed out and how you ended up here. </br>
 But at least you are alive and - mostly - unharmed.</br>
-<a0 onclick= 'window.story.show("DngPC_G4")'>Next</a><
+<a0 onclick= 'window.story.show("DngPC_G4")'>Next</a>
 </article><article id="LogPanel"></article></section>
 <%=window.story.render("DngPC_Encounters")%>
 
@@ -303,7 +303,7 @@ Gold-Vouchers: gained after finishing a set of tasks</br>
     var _tasks=[],_d=window.story.state.DngPC,_t=_d.tmp.tier;
     var msg='choose a task:</br>';
     function foo(task){
-        msg+=taskDescr(task)+window.gm.printLink("Choose this",'window.story.state.DngPC.task={id:\"'+task.id+'\",data:\"'+task.data+'\"},window.story.show(window.passage.name)')+'</br></br>';
+        msg+=taskDescr(task)+window.gm.printLink("Choose this",'window.story.state.DngPC.task={id:\"'+task.id+'\",help:0,data:\"'+task.data+'\"},window.story.show(window.passage.name)')+'</br></br>';
     }
     //if task in progress - show task-info instead
     if(_d.task.id) {
@@ -334,7 +334,7 @@ Gold-Vouchers: gained after finishing a set of tasks</br>
                 case 'findCursed'://how to know what was aquired?
                     _tasks.push({id:_tns[i],chance:_chance});
                     break;
-                case 'bringMoney':_tasks.push({id:_tns[i],chance:_chance, data:30*(1+_t)});
+                case 'bringMoney':_tasks.push({id:_tns[i],chance:_chance,data:30*(1+_t)});
                     break;
                 case 'bringIron':
                 case 'bringSilver':
@@ -416,16 +416,18 @@ getAvailableTasks()
 
 :: DngPC_Shrine_Help [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<a0 onclick=''>Ask for some tips about your current task</a>
-<a0 onclick=''>Ask for some more general tips</a>
-<a0 onclick=''>Beg for some more direct help for your task</a>
+<p>[[Back|DngPC_Shrine]]</p>
+<a0 onclick=''>Ask for some tips about your current task</a></br>
+<a0 onclick=''>Ask for some more general tips</a></br>
+<%if(window.story.state.DngPC.task.help===0 && window.story.state.DngPC.task.id==='bringMoney'){%>
 <div id='select400' >
-<a0 onclick='window.gm.printTalkLink("div#select400","div#choice400a")'>click a</a></br>
-<a0 onclick='window.gm.printTalkLink("div#select400","div#choice400b")'>click b</a></br>
-</div><div id='choice400a' hidden></br>
+<a0 onclick='window.gm.player.Inv.addItem(window.gm.ItemsLib.BrownPill(),2),window.gm.printTalkLink("div#select400","div#choice400a")'>Beg for some more direct help for your task</a></br>
+</div><div id='choice400a' hidden></br> "Dont tell anyone, but I can give you <b>those pills</b>. They might just boost your strength enough to overthrow those beasts."</br>
+He places some pills on the desk and you quickly pocket them. Still you are unsure if it would be wise to use them.</br>
 </div>
-<div id='choice400b' hidden></br>
-</div><a0 onclick=''>Ask for an upgrade</a>
+<%}else{%>
+"Right now I cant help you with your task."</br>
+<%}%>
 <p>For a fee you can also get some helpful services:</br><!--
     permanent gear: receive better gear on respawn
     empower: temporary increase a stat
