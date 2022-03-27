@@ -37,6 +37,107 @@ window.gm.util.deepClone=function(obj){
   clone._relinkItems();
   return(clone);
 };
+// Adds key shortcut indicators to links in passage if there are less than 11 links in the passsage. see addShortKeyHandler.
+// Enables keyboard shortcuts if passage do not have the "_noshortkey_" tag and links dont have attribute "data-nokey"; 
+window.gm.util.updateLinks=function(Container){
+  let tags=window.story.passage(window.passage.name).tags;
+	if (!tags.includes("_noshortkey_")) {
+		var Links, i;
+		if (typeof Container === "undefined") {
+			Container = document;
+			Links = document.querySelector('tw-passage').querySelectorAll('a,button'); //all links within page    todo how about buttons
+		} else {
+			Links = Container.querySelectorAll('a,button');
+		}
+		if (Links.length > 0) {
+			for (i = 0; i < Links.length; i++) {
+				if ((Links[i].getAttribute("data-nokey") == "true") || (Links[i].parentElement.getAttribute("data-nokey") == "true")) {
+					Links.deleteAt(i);
+					i--;
+				}
+			}
+		}
+    if (Links.length >= 1 ){//&& Links.length <= 10) {
+			var n = 1;
+			for (i = 0; i < Links.length; i++) {
+				if (Links[i].id==="" && !Links[i].disabled){//!Links[i].id.includes("Link")) {
+					while (document.querySelector("#Link" + n)){//$(Container).find("#Link" + n).length) { //check for existing links
+						++n;
+						if (n > 10) {	break;	}
+					}
+          if (n < 10) { Links[i].innerHTML+="<sup>[" + n + "]</sup>";
+						//$("<sup>[" + n + "]</sup>").appendTo(Links[i]);
+						Links[i].id = "Link" + n;
+					} else if (n === 10) {
+						Links[i].innerHTML+="<sup>[" + 0 + "]</sup>";
+						Links[i].id = "Link0";
+						break;
+					} else {
+						break;
+					}
+				}
+			}
+		}
+	}
+};
+// registers keyup event handler for shortkey-mechanic; requires that updateLinks has assigned special id to buttons & href 
+// (this means it doesnt work for those that already have a different id assigned)
+// only call this one time or multiple events cause weird behaviour
+window.gm.util.addShortKeyHandler=function(){
+  document.addEventListener("keyup", function (e) {
+    if(window.story.state._gm && window.story.state._gm.nokeys===true) return; //if in dialog overlay, the shortkeys would still work for the panel; this flag surpresses it
+    var tags=window.story.passage(window.passage.name).tags;
+    
+    if (!tags.includes("_noshortkey_")) {
+      var el;
+      /*different way to dispatch events const event = new MouseEvent('click', {
+        view: window, bubbles: true, cancelable: true
+      });
+      //el.dispatchEvent(event);*/ 
+      
+      // Trigger link click on keys "0" through "9"
+      if ((e.keyCode > 47) && (e.keyCode < 58)) {
+        el=document.querySelector("#Link" + (e.keyCode - 48));
+        if(el) {
+          e.preventDefault();
+          //$("#Link" + (e.keyCode - 48)).trigger("click"); dont use jquery - click is not working if bound by addEventListener
+          el.click();
+        }
+      }
+      // Trigger link click on numpad keys "0" through "9"
+      if ((e.keyCode > 95) && (e.keyCode < 106)) {
+        el=document.querySelector("#Link" + (e.keyCode - 96));
+        if (el) {
+          e.preventDefault();
+          el.click();
+        }
+      }
+      if (["d","i","s","o","q"].indexOf(e.key)>=0) { //some special keys of hud
+        el=document.querySelector("#Link" + e.key.toUpperCase());
+        if (el) {
+          e.preventDefault();
+          el.click();
+        }
+      }
+      // Trigger random click on "." key
+      /*if (e.key == ".") {
+        e.preventDefault();
+        var Links = $("#passages a"), n, UsableLinks = [];
+        if (Links.length > 0) {
+          for (n = 0; n < Links.length; n++) {
+            if (!$(Links[n]).data("nokey")) {
+              UsableLinks.push(n);
+            }
+          }
+          if (UsableLinks.length > 0) {
+            n = random(UsableLinks.length - 1);
+            Links[UsableLinks[n]].click();
+          }
+        }
+      }*/
+    }
+  });
+}
 //create pretty name for passage; requires a tag (replace space with _ !) [name:"My_Room"]
 window.gm.util.printLocationName=function(passage) {
   let tags = window.story.passage(passage).tags;
@@ -110,7 +211,11 @@ window.gm.util.mergePlainObject=function(...arg) {
 // reimplement to setup the game !
 // debug notice: if you get "Cannot read properties of undefined" check the constructor dictionary if something is missing. This indicates an compiling error in those items (check in the sorting order of the script-files) 
 window.gm.initGame= function(forceReset,NGP=null) {
-  window.gm.toasty= new Toasty();
+  var s = window.story.state; //s in template is window.story.state from snowman!
+    if(!s._gm){
+      window.gm.toasty= new Toasty();
+      window.gm.util.addShortKeyHandler();
+    }
     $(window).on('sm.passage.showing', function(event, eventObject) {
         // Current Passage object
         $("tw-passage").fadeIn(500);  //fade in if was previously faded out
@@ -121,7 +226,7 @@ window.gm.initGame= function(forceReset,NGP=null) {
       window.gm.refreshSidePanel();
       window.gm.restorePage();
     });
-    var s = window.story.state; //s in template is window.story.state from snowman!
+    
     if (!window.gm.timeEvent||forceReset) {
       window.gm.timeEvent = window.gm.util.PubSub();  //subscribe to "change" event to receive time updates
       // !! make sure to reregister after load !
@@ -144,6 +249,7 @@ window.gm.initGame= function(forceReset,NGP=null) {
         day : 1,  //daycount
         activePlayer : '', //id of the character that the player controls currently
         nosave : false,
+        nokeys : false,
         playerParty: [],  //names of NPC in playerParty 
         debug : false,    //globally enables debug
         dbgShowCombatRoll : false,  //log combat calculation details
@@ -395,12 +501,15 @@ window.gm.popOnHold=function() {
 };
 //overriding show:
 //- to enable back-link
-//- todo to intercept with deffered events
+//- to intercept with deffered events
+//- add shortcut keys
+let KBIntervalID=0;
 let _origStoryShow = window.story.__proto__.show;
 window.story.__proto__.show = function(idOrName, noHistory = false) {
   let next = idOrName;
   let inGame = window.story.state.hasOwnProperty("_gm"); //the logic doesnt work if initGame not already done
   let tagsnext,namenext,nextp,namenow;
+  clearInterval(KBIntervalID);
   if(idOrName==='') tagsnext=[];
   else tagsnext = window.story.passage(idOrName).tags;
   if(inGame && window.story.state._gm.defferedStack.length>0 && //deffered event if allowed and requested
@@ -451,6 +560,10 @@ window.story.__proto__.show = function(idOrName, noHistory = false) {
   }
   noHistory = true; //the engines object causes problems with history, namely refToParent
   _origStoryShow.call(window.story,next, noHistory);
+  
+  window.gm.util.updateLinks();
+	// Search passages for links every x ms, just in case they get updated, and marks them for key clicks
+	//KBIntervalID = setInterval(window.gm.util.updateLinks,1000);  todo do we need this?
 };
 /* when returning from back-passage, restore view by hiding/unhiding programatical modified elements, see printTalkLink
 */
@@ -688,13 +801,13 @@ window.gm.printEquipment= function( whom,item) {
   } else if(whom.Outfit.countItem(item.id)<=0) {
     g.textContent='Equip';
     g.addEventListener("click",(function(whom,item){
-      return(function(){whom.Outfit.addItem(item);window.gm.refreshAllPanel();});})(whom,item));
+      return(function(){var _x=whom.Outfit.addItem(item).msg;window.gm.refreshAllPanel();window.gm.printOutput(_x)});})(whom,item)); //redraw page to update buttons, then print output
   } else {
     res = whom.Outfit.canUnequipItem(item.id,false);
     if(res.OK) {
       g.textContent='Unequip';
       g.addEventListener("click",(function(whom,item){
-        return(function(){whom.Outfit.removeItem(item.id);window.gm.refreshAllPanel();});})(whom,item));
+        return(function(){var _x=whom.Outfit.removeItem(item.id).msg;window.gm.refreshAllPanel();window.gm.printOutput(_x)});})(whom,item));
     } else {
       g.disabled =true; g.textContent=res.msg;
     }
@@ -785,7 +898,7 @@ window.gm.printEffectSummary= function(who='player',showstats=true,showfetish=fa
   ids.sort(); //Todo better sort
   for(var i=0;i<ids.length;i++){
       var data = window.story.state[who].Effects.get(ids[i]);
-      result+='<tr><td>'+data.id+':</td><td>'+data.desc+'</td></tr>';
+      result+='<tr><td>'+data.name+':</td><td>'+data.desc+'</td><td>'+data.data.duration+'h left</td></tr>';
   }
   result+='</table>';
   return(result);
@@ -798,6 +911,7 @@ window.gm.toggleDialog= function(id){
       pagebackground = document.querySelector('body');
   var div;
   if (!dialog.hasAttribute('open')) {
+      if(window.story.state._gm) window.story.state._gm.nokeys=true;
       // show the dialog 
       div = document.createElement('div');
       div.id = 'backdrop';
@@ -811,6 +925,7 @@ window.gm.toggleDialog= function(id){
       dialog.removeAttribute('open');  
       div = document.querySelector('#backdrop');
       div.parentNode.removeChild(div);
+      if(window.story.state._gm) window.story.state._gm.nokeys=false;
       //??lastFocus.focus();
   }
 };

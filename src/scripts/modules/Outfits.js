@@ -210,6 +210,10 @@ class Collar extends Equipment {
         if(style===0) this.id=this.name='CollarPlain';
         else if(style===10) this.id=this.name='CollarDog';
         else if(style===20) this.id=this.name='CollarSpikes';
+        else if(style===30) {
+            this.id=this.name='PendantLuck';
+            window.gm.makeBonusItem(this,{statBoost:'luck', statBonus:8})
+        }
         else throw new Error(this.id +' doesnt know '+style);
     }
     get style() {return this._style;}
@@ -220,10 +224,14 @@ class Collar extends Equipment {
                 msg=('This red leather collar has some white bone symbols imprinted. Might look fitting for a dog... ');break;
             case 20:
                 msg=('A sturdy,black leather collar with shiny pointed metall spikes around it.');break;
+            case 30:
+                msg=('A necklace with a lucky paw. Might increase someones luck.');break;
             default:
         }
         return(msg);
     }
+    unequipText() {return("You removed the gadget from your neck.");}
+    equipText() {return("That "+this.name+" will be a fine detail for your neck.");}
 }
 class PiercingEars extends Equipment {
     static factory(style) {let x = new PiercingEars();x.style=style;return(x); }
@@ -572,6 +580,43 @@ class ShortsLeather extends Equipment {
         return(msg);
     }
 }
+class Skirt extends Equipment {
+    toJSON() {return window.storage.Generic_toJSON("Skirt", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(Skirt, value.data));}
+    static factory(style) {
+        let x = new Skirt();
+        x.style=style;
+        return(x);
+    }
+    constructor() {
+        super();
+        this.addTags(['cloth']);
+        this.slotUse = ['Hips','Legs'];
+        this.slotCover = ['bPenis','bVulva','bBalls','bClit','bAnus','pPenis','pClit'];   
+        this.lossOnRespawn = true;this.style=0;
+    }
+    set style(style) { 
+        this._style = style; 
+        if(style===0) this.id=this.name='PlainSkirt';
+        if(style===10) this.id=this.name='MiniSkirt';
+        if(style===20) this.id=this.name='MicroSkirt';
+        else throw new Error(this.id +' doesnt know '+style);
+    }
+    get style() {return this._style;}
+    get desc() { 
+        let msg ='decent skirt from cloth';
+        switch(this._style) {
+            case 10:
+                msg=('a short skirt that covers someones thighs');
+                break;
+            case 20:
+                msg=('a very short skirt that barely covers someones crotch and ass');
+                break;
+            default:
+        }
+        return(msg);
+    }
+}
 //this is an Inventory-item, not wardrobe
 class Crowbar extends Weapon {
     constructor() {
@@ -625,19 +670,46 @@ class BowWodden extends Weapon {
     }
 }
 class DaggerSteel extends Weapon {
+    static factory(style) {
+        let x = new DaggerSteel();
+        x.style=style;
+        return(x);
+    }
     constructor() {
         super();this.id=this.name='DaggerSteel';
         this.slotUse = ['RHand'];
-        this.lossOnRespawn = true;;
+        this.lossOnRespawn = true;this.style=0;
     }
-    get desc() { return('A steel dagger.');}
+    set style(style) { 
+        this._style = style; 
+        if(style===0) this.id='DaggerSteel',this.name='Steel Dagger';
+        else if(style===10) this.id='Syringe',this.name="filled syringe";
+        else throw new Error(this.id +' doesnt know '+style);
+    }
+    get style() {return this._style;}
+    get desc() { 
+        let msg ='a steel dagger';
+        switch(this._style) {
+            case 10:
+                msg=('a syringe filled with mysterious liquid');
+                break;
+            default:
+        }
+        return(msg);
+    }
     toJSON() {return window.storage.Generic_toJSON("DaggerSteel", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(DaggerSteel, value.data));}
     attackMod(target){
         let mod = new SkillMod();
-        mod.onHit = [{ target:target, eff: [effDamage.factory(5,'slash')]}];
-        mod.critChance=50;
-        mod.onCrit = [{ target:target, eff: [effDamage.factory(5,'slash'),effDamage.factory(3,'pierce')]}];
+        if(this._style===0){
+            mod.onHit = [{ target:target, eff: [effDamage.factory(5,'slash')]}];
+            mod.critChance=50;
+            mod.onCrit = [{ target:target, eff: [effDamage.factory(5,'slash'),effDamage.factory(3,'pierce')]}];
+        } else if(this._style===10){
+            mod.onHit=[{target:target, eff:[effTeaseDamage.factory(10,'slut',{slut:2},target.name+" get turned on.")]}];
+            mod.critChance=50;
+            mod.onCrit=[{target:target, eff:[effTeaseDamage.factory(10*2,'slut',{slut:2},target.name+" get flushing hot.")]}];
+        }
         return(mod);
     }
 }
@@ -645,7 +717,7 @@ class WhipLeather extends Weapon {
     constructor() {
         super();this.id=this.name='WhipLeather';
         this.slotUse = ['RHand'];
-        this.lossOnRespawn = true;;
+        this.lossOnRespawn = true;
     }
     get desc() { return('a leather whip.');}
     toJSON() {return window.storage.Generic_toJSON("WhipLeather", this); }
@@ -868,6 +940,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['CollarQuest'] = function () { return new CollarQuest();};
     ItemsLib['CollarDog'] = function () {let x=new Collar();x.style=10;return(x);};
     ItemsLib['CollarSpikes'] = function () {let x=new Collar();x.style=20;return(x);};
+    ItemsLib['PendantLuck'] = function () {let x=new Collar();x.style=30;return(x);};
     ItemsLib['Leggings'] = function () { return new Leggings();};
     ItemsLib['Tank-shirt'] = function () { return new TankShirt(); };
     ItemsLib['Jeans'] = function () { return new Jeans();};
@@ -892,6 +965,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['StaffWodden']  = function () { return new StaffWodden();};
     ItemsLib['Handcuffs'] = function () { return new HandCuffs();};
     ItemsLib['DaggerSteel'] = function () { return new DaggerSteel();};
+    ItemsLib['Syringe'] = function () { let x= new DaggerSteel();x.style=10;return(x);};
     ItemsLib['ShieldBuckler'] = function () { let x= new ShieldSmall();x.style=0;return(x);};
     ItemsLib['ShieldWodden'] = function () { let x= new ShieldSmall();x.style=100;return(x);};
     ItemsLib['ShieldIron'] = function () { let x= new ShieldSmall();x.style=200;return(x);};

@@ -135,7 +135,7 @@ function fightHornet() {
     window.gm.Encounter.onVictory = (function(){
         window.story.state.DngDF.plum[window.gm.player.location]=true;
         window.gm.player.Inv.addItem(new window.gm.ItemsLib['GiantPlum']());
-        return('You defeated the angry hornet and earned that <b>juicy fruit</b>.</br> '+this.fetchLoot()+'</br>' + window.gm.printLink('Next','window.gm.postVictory()'));});
+        return('You defeated the angry hornet and earned that <b>juicy fruit</b>.</br> '+this.fetchLoot()+'</br>' + window.gm.printLink('Next','window.gm.postVictory({flee:false})'));});
     window.gm.Encounter.initCombat();
 }
 function fightLapine() {
@@ -304,7 +304,7 @@ No more plums are growing on the trees here.</br>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%>
 Several large trees grow here.</br>
 <div id='select1' >A small spring ripples out from between the roots.
-<a0 onclick='window.gm.player.Stats.increment("health",50);window.gm.printTalkLink("div#select1","div#choice1a"),window.gm.refreshAllPanel()'>Sipping</a> some of that clear water might give you back some energy.</br>
+<a0 onclick='window.gm.player.Stats.increment("health",50);window.gm.printTalkLink("div#select1","div#choice1a"),window.gm.refreshSidePanel()'>Sipping</a> some of that clear water might give you back some energy.</br>
 </div><div id='choice1a' hidden>You feel surprisingly refreshed after some gulps of that clear water.
 </div>
 <%=window.gm.printNav()%>

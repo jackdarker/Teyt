@@ -31,7 +31,7 @@ class Mob extends Character {
         } else {
             if(this.Skills.countItem('Guard')>0) {
                 result.action = "Guard";
-                result.target = this;
+                result.target = [this];
             }
             result.msg =this.name+" takes a defensive stance.</br>"+result.msg;
         }

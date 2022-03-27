@@ -481,7 +481,7 @@ class WeaponStinger extends BodyPart {
         let _eff=[],_dmg =5,_poison=0;
         if(this.data.style==='wasplike' ) _poison+=10;
         _eff.push(effDamage.factory(_dmg,'pierce',1, this.parent.parent.name+' pokes its '+this.data.style+' stinger into '+target.name+'. ' ));
-        if(_poison>0)_eff.push(effDamage.factory(_poison,'poison',3,target.name+"got poisoned."));
+        if(_poison>0)_eff.push(effDamage.factory(_poison,'poison',3,target.name+" got poisoned."));
         mod.onHit = [{ target:target, eff: _eff}];
         return(mod);
     }

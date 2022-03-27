@@ -3,8 +3,19 @@
 /*bunch of combat encounters are defined here */
 window.gm = window.gm || {};
 window.gm.encounters = window.gm.encounters || {};
-
+window.gm.encounters._setup= function(params){
+    let _params=params||{}
+    _params.amount=(params&&params.amount)?params.amount:1, _params.location=(params&&params.location)?params.location:window.passage.name;
+    _params.type =(params&&params.type)?params.type:0, _params.levelUp=(params&&params.levelUp)?params.levelUp:0;
+    _params.noStart = (params&&params.noStart)?params.noStart:false,_params.noFlee =(params&&params.noFlee)?params.noFlee:false;
+    window.gm.Encounter = new Encounter();
+    window.gm.Encounter.enableFlee=!_params.noFlee;
+    window.gm.Encounter.Location = _params.location;
+    window.gm.Encounter.scenePic = window.gm.getScenePic(window.gm.Encounter.Location);
+    return(_params)
+};
 //params = {location:window.passage.name, amount:1};
+//params={[{amount:1,type:"Wolf",sub:"AlphaWolf", location:"cave", levelUp:3}]} but how to assign submit/defeat??
 window.gm.encounters.mole = function(params) {
     var amount=(params&&params.amount)?params.amount:1, location=(params&&params.location)?params.location:window.passage.name;
     var type =(params&&params.type)?params.type:0, levelUp=(params&&params.levelUp)?params.levelUp:0;
@@ -86,19 +97,15 @@ window.gm.encounters.slugLeech = function(params) {
     window.gm.Encounter.initCombat();
 }
 window.gm.encounters.succubus = function(params) {
-    var amount=(params&&params.amount)?params.amount:1, location=(params&&params.location)?params.location:window.passage.name;
-    var type =(params&&params.type)?params.type:0, levelUp=(params&&params.levelUp)?params.levelUp:0;
-    window.gm.Encounter = new Encounter();
+    let _params=window.gm.encounters._setup(params);
     window.gm.Encounter.EnemyFunc = (function() { 
         let mobs =[];
-        for(var i=amount;i>0;i-=1) {
-            let x = window.gm.Mobs.Succubus(); x.scaleLevel(window.gm.player.level+levelUp);
+        for(var i=_params.amount;i>0;i-=1) {
+            let x = window.gm.Mobs.Succubus(_params.type); x.scaleLevel(window.gm.player.level+_params.levelUp);
             x.name+='#'+i;mobs.push(x);
         }
         return(mobs);});
-    window.gm.Encounter.Location = location;
-    window.gm.Encounter.scenePic = window.gm.getScenePic(window.gm.Encounter.Location);
-    window.gm.Encounter.initCombat();
+    if(!_params.noStart) window.gm.Encounter.initCombat();
 }
 window.gm.encounters.mechanicguy = function(params) {
     var amount=(params&&params.amount)?params.amount:1, location=(params&&params.location)?params.location:window.passage.name;
@@ -133,20 +140,29 @@ window.gm.encounters.hawk = function(params) {
     if(!noStart) window.gm.Encounter.initCombat();
 }
 window.gm.encounters.hornett = function(params) {
-    var amount=(params&&params.amount)?params.amount:1, location=(params&&params.location)?params.location:window.passage.name;
-    var type =(params&&params.type)?params.type:0, levelUp=(params&&params.levelUp)?params.levelUp:0;
-    var noStart = (params&&params.noStart)?true:false;
-    window.gm.Encounter = new Encounter();
+    let _params=window.gm.encounters._setup(params);
     window.gm.Encounter.EnemyFunc = (function() { 
         let mobs =[];
-        for(var i=amount;i>0;i-=1) {
-            let x = window.gm.Mobs.Hornett(); x.scaleLevel(window.gm.player.level+levelUp);
+        for(var i=_params.amount;i>0;i-=1) {
+            let x = window.gm.Mobs.Hornett(); x.scaleLevel(window.gm.player.level+_params.levelUp);
             x.name+='#'+i;mobs.push(x);
         }
         return(mobs);});
-    window.gm.Encounter.Location = location;
-    window.gm.Encounter.scenePic = window.gm.getScenePic(window.gm.Encounter.Location);
-    if(!noStart) window.gm.Encounter.initCombat();
+    if(!_params.noStart) window.gm.Encounter.initCombat();
+}
+window.gm.encounters.hornetthive = function(params) {
+    let _params=window.gm.encounters._setup(params);
+    window.gm.Encounter.EnemyFunc = (function() { 
+        let mobs =[];
+        for(var i=2;i>0;i-=1) {
+            let x;
+            if(i===2){  //spawns always hive and a hornett
+                x = window.gm.Mobs.HornettHive(); x.scaleLevel(window.gm.player.level+_params.levelUp);
+            } else { x = window.gm.Mobs.Hornett(); x.scaleLevel(window.gm.player.level+_params.levelUp);}
+            x.name+='#'+i;mobs.push(x);
+        }
+        return(mobs);});
+    if(!_params.noStart) window.gm.Encounter.initCombat();
 }
 window.gm.encounters.pillRoller = function(params) {
     var amount=(params&&params.amount)?params.amount:1, location=(params&&params.location)?params.location:window.passage.name;

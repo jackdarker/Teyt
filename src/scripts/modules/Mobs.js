@@ -368,7 +368,13 @@ class Lapine extends Mob {
 class Succubus extends Mob {
     static factory(type) {
         let foe = new Succubus();
-        foe.Outfit.addItem(new WhipLeather());
+        if(type==='succubus') {
+            foe.Outfit.addItem(window.gm.ItemsLib.WhipLeather());
+        } else if(type==="nurse") {
+            foe.name = foe.id = 'BNurse';
+            foe.pic= 'Nurse1';
+            foe.Outfit.addItem(new WhipLeather());
+        }
         return foe;
     }
     constructor() {
@@ -389,7 +395,8 @@ class Succubus extends Mob {
         this.Skills.addItem(sk);
         this.levelUp(4);
         this.autoLeveling();
-        this.Skills.getItem('Tease').level=3;
+        let x= new SkillTease();x.level=3;
+        this.Skills.addItem(x);
     }
     calcCombatMove(enemys,friends){
         let result = {OK:true,msg:''};
@@ -544,6 +551,49 @@ class Hawk extends Mob {
             }
         } 
         return(super.calcCombatMove(enemys,friends));
+    }
+}
+class Hive extends Mob {
+    static factory(type) {
+        let foe = new Hive();
+        if(type==='Hornett') {
+            foe.name = foe.id = 'HornettHive';
+            foe.pic= 'WaspHive';
+            foe.Stats.increment('arm_blunt',15);
+            foe.Stats.increment('arm_pierce',15);
+            foe.Stats.increment('arm_slash',15);
+            foe.Stats.increment('rst_fire',-50);
+            foe.Stats.increment('healthMax',-0.3*(foe.health().max));
+            foe.Skills.addItem(SkillCallHelp.factory('Hornett')); 
+        }
+        return foe;
+    }
+    constructor() {
+        super();
+        this.name = this.id = 'Hive';
+        this.pic= 'unknown';
+        this.level_min =1;this.loot= [];
+        this.Outfit.addItem(new BaseWorm());
+        this.cooldown=0;
+    }
+    calcCombatMove(enemys,friends){
+        let result = {OK:false,msg:''};
+        let rnd,spawn="CallHelpHornett";
+        //if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
+        result.action =result.target= null;
+        if(window.story.state.combat.turnCount>2 && this.Skills.countItem(spawn)>0 &&
+            this.Skills.getItem(spawn).isEnabled().OK) {
+                if(friends.length===1 || (friends.length<3 && this.cooldown<=0 ) ){
+                    result.action = spawn;
+                    result.target = [this];
+                    this.cooldown = 4;
+                    result.msg =this.name+" pops out another opponent.</br>"+result.msg;
+                } else {
+                    this.cooldown-=1;
+                }
+            return(result);
+        }
+        return(result);
     }
 }
 class Hornett extends Mob {
@@ -705,15 +755,17 @@ window.gm.Mobs = (function (Mobs) {
     Mobs.Mole = Mole.factory;
     Mobs.Squirrel = function() { return function(param){return(Mole.factory(param));}("Squirrel")};
     Mobs.Hawk = function() { return function(param){return(Hawk.factory(param));}("Hawk")};
+    Mobs.HornettHive = function() { return function(param){return(Hive.factory(param));}("Hornett")};
     Mobs.Hornett = function() { return function(param){return(Hornett.factory(param));}("Hornett")};
     Mobs.PillRoller = function() { return function(param){return(Hornett.factory(param));}("PillRoller")};
     Mobs.Slime = Slime.factory;
     Mobs.Lizan = Lizan.factory;
     Mobs.Wolf = Wolf.factory;
-    Mobs.AlphaWolf = function() { return function(param){return(Wolf.factory(param));}(100)};
+    //Mobs.AlphaWolf = function() { return function(param){return(Wolf.factory(param));}(100)};
     Mobs.Leech = Leech.factory;  
     Mobs.Slug = Slug.factory; 
     Mobs.Succubus = Succubus.factory;
+    //Mobs.BNurse = function() { return function(param){return(Succubus.factory(param));}(10)};
     Mobs.Dryad = Dryad.factory; 
     Mobs.Vine = Vine.factory; 
     Mobs.Mechanic = Mechanic.factory;

@@ -50,7 +50,7 @@ class Character {
         for(let name of stFetish.listFetish()) {
             stFetish.setup(this.Stats,0,10,name);
         }         
-        this.Skills.addItem(new SkillUseItem());this.Skills.addItem(new SkillStruggle());this.Skills.addItem(new SkillAttack());
+        this.Skills.addItem(new SkillAttack());this.Skills.addItem(new SkillUseItem());this.Skills.addItem(new SkillStruggle());
         this.Skills.addItem(new SkillFlee());    
         this.Effects.addItem(new effHunger());
         this.Effects.addItem(new effCombatRecovery());

@@ -453,6 +453,7 @@ class Pills extends Item {
         else if(style===30) this.id=this.name='RedPill';
         else if(style===40) this.id=this.name='GreenPill';
         else if(style===50) this.id=this.name='BluePill';
+        else if(style===50) this.id=this.name='WhitePill';
         else throw new Error(this.id +' doesnt know '+style); 
     }
     get style() {return this._style;}

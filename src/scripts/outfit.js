@@ -87,7 +87,7 @@ window.gm.OutfitSlotLib = {
     uChest   :  "uChest",   //bra
     uShoulders :"uShoulders",
     uWings   :  "uWings",
-    uNeck    :  "uNeck",
+    uNeck    :  "uNeck",    //necklace
     uHead    :  "uHead",    //
     uHeadHair:  "uHeadHair",
     uFace    :  "uFace",
@@ -156,18 +156,22 @@ class Equipment extends Item {
     }
     //call Outfit.addItem instead !
     onEquip(context) {
+        let res={OK:true, msg:'equipped'};
         for (el of this.bonus) {
             el.onEquip();
         }
-        return({OK:true, msg:'equipped'});
+        if(this.equipText) res.msg=this.equipText();
+        return(res)
     }
     onUnequip() {
         let res = {OK:true, msg:'unequipped'};
         for (el of this.bonus) {
             el.onUnequip();
         }
+        if(this.unequipText) res.msg=this.unequipText();
         return(res);
     }
+    //implement unequipText()/equipText() to return a msg for display
     onTimeChange(now) {
         for (el of this.bonus) {
             el.onTimeChange(now);
@@ -294,13 +298,12 @@ class Outfit { //extends Inventory{
     }
     //this will equip item if possible
     addItem(item, force) {
-        let _idx = this.findItemSlot(item.id);
-        if(_idx.length>0) return; //already equipped
+        let result = {OK: true, msg:''},_idx = this.findItemSlot(item.id);
+        if(_idx.length>0) return(result); //already equipped
         let _item = item;
         _idx = _item.slotUse;
         let _oldIDs = [];
         let _oldSlots = [];
-        let result = {OK: true, msg:''};
         //check if equipment is equipable
         result = item.canEquip(this);
         if(result.OK) {
@@ -319,7 +322,7 @@ class Outfit { //extends Inventory{
         }
         if(!result.OK) {
             this.postItemChange(_item.name,"equip_fail:",result.msg);
-            return;
+            return(result);
         }
         for(let m=0;m<_oldIDs.length;m++){
             this.getItem(_oldIDs[m]).onUnequip(this);
@@ -352,12 +355,12 @@ class Outfit { //extends Inventory{
         }
     }
     removeItem(id, force) {
-        let _idx = this.findItemSlot(id);
-        if(_idx.length===0) return; //already unequipped
-        let result =(force)?{OK:true,msg:''}:this.canUnequipItem(id);
+        let result ={OK:true,msg:''},_idx = this.findItemSlot(id);
+        if(_idx.length===0) return(result); //already unequipped
+        result =(force)?result:this.canUnequipItem(id);
         if(!result.OK) {
             this.postItemChange(id,"unequip_fail",result.msg);
-            return;
+            return(result);
         }
         let _item = this.getItem(id);
         result=_item.onUnequip(this);

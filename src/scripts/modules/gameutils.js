@@ -22,7 +22,7 @@ window.gm.initGame= function(forceReset,NGP=null) {
         s.vars = {
         inVR: false,
         spawnAt: 'ForestRespawnPodExit',
-        playerPartyVR:[],
+        playerPartyVR:[], //names of chars
         playerPartyRL:[],
         //flags for global states
         qDogSit : 0,   // see park
@@ -300,7 +300,7 @@ window.gm.cursedChest=function(next) {
 }
 //call this after onVictory/onFlee-scene to continue in dng or other location
 //this function is also used to restore after loading save !
-window.gm.postVictory=function() {
+window.gm.postVictory=function(params) {
   let reloadDng = (window.gm.dng===null);
   if(window.story.state.dng.id!=="") {
     if(reloadDng) window.gm.dng = window.gm.dngs[window.story.state.dng.id]();
@@ -314,15 +314,19 @@ window.gm.postVictory=function() {
 }
 //call this after your onDefeat/onSubmit-scene to respawn at respawn-point; cleansup dng-variables
 window.gm.postDefeat=function() { 
-  window.story.state.dng.id="";
-  window.gm.dng = null;
+  window.story.state.dng.id="";window.gm.dng = null;
   window.gm.respawn();
 }
 //after passing out: heal player and remove inventory {keepInventory=false,location=''}
 window.gm.respawn=function(conf={keepInventory:false}) {
+  for(var name of window.story.state._gm.playerParty){
+      let _x=window.story.state[name];
+      _x.Stats.increment("energy",9999);_x.Stats.increment("will",9999);_x.Stats.increment("health",9999);
+  }
   window.gm.player.Stats.increment("energy",9999);
   window.gm.player.Stats.increment("will",9999);
   window.gm.player.Stats.increment("health",9999);
+
   if(!conf.keepInventory) { //remove inentory and outfit that is not questitem, cursed or permanent
     for(let i =window.gm.player.Outfit.list.length-1;i>=0;i-=1) {
       let el = window.gm.player.Outfit.list[i];

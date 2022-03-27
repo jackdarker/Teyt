@@ -35,7 +35,7 @@ window.gm.shop.printShopBuyEntry= function(item,cost,cbCanBuy,cbPostBuy=null){
             entryBuy.addEventListener("click", foo, false);
         }
     }
-    entry.textContent=desc2;
+    entry.textContent=desc2+"    ";
     $("div#panel")[0].appendChild(entry);
     $("div#panel")[0].appendChild(entryBuy);
     $("div#panel")[0].appendChild(document.createElement('br'));

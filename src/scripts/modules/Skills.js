@@ -260,6 +260,44 @@ class SkillKick extends SkillAttack {
         return(attack);
     }
 }
+class SkillFireball extends SkillAttack {
+    constructor() {
+        super();
+        this.id=this.name='Fireball';
+        this.msg = '',this.style=0;
+        this.cost.energy=20,this.cost.will=20;
+    }
+    toJSON() {return window.storage.Generic_toJSON("SkillFireball", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillFireball, value.data));}
+    targetFilter(targets){
+        return(this.targetFilterEnemy(this.targetFilterAlive(targets)));
+    }
+    setStyle(id) {
+        this.data.style = id;
+        switch(id) {
+            case 'fireball': 
+                this.id=this.name=id;
+                //this.startDelay=0,this.defCoolDown=1;
+                break;
+            default:
+                throw new Error("unknown slobber-style "+id);
+        }
+    }
+    getStyle() { return this.data.style; }
+    get desc() { return("Cast a fireball. "+this.getCost().asText());}
+    __estimateAttack(target) {
+        let attack =window.gm.combat.defaultAttackData();
+        attack.mod = new SkillMod();
+        attack.mod.onHit = [{ target:target, eff: [effDamage.factory(5,'fire')]}];
+        attack.mod.onCrit = [{ target:target, eff: [effDamage.factory(10,'fire')]}];
+        /*let weapon=this.caster.Outfit.getItemForSlot(this.data.weapon);
+        attack.mod= new SkillMod();
+        if(weapon && weapon.attackMod) { //get damage info
+            attack.mod=weapon.attackMod(target);
+        }*/
+        return(attack);
+    }
+}
 class SkillChainLightning  extends Skill {
     constructor() {
         super('ChainLightning');
@@ -298,7 +336,7 @@ class SkillChainLightning  extends Skill {
                 if(secTarget2.length>=2) break;
             }
             //spark-dmg to secondary target
-            let result2 = window.gm.combat.calcTeaseAttack(this.caster,target,attack);
+            let result2 = window.gm.combat.calcAttack(this.caster,target,attack);
             this.msg+=result2.msg;
             result.effects = result.effects.concat(attack.effects); 
         }
@@ -359,6 +397,7 @@ class SkillTease extends Skill {
         return(this.msg);
     }
 }
+
 class SkillStun extends Skill {
     //execute stun attack
     constructor() {  super("Stun");  
@@ -506,6 +545,13 @@ class SkillFlee extends Skill {
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillFlee, value.data));}
     targetFilter(targets){
         return(this.targetFilterSelf(targets));
+    }
+    isEnabled() {
+        let res= super.isEnabled();
+        if(res.OK===false) return(res);
+        if(!window.gm.Encounter.enableFlee) 
+            return({OK:false,msg:'cant flee from this fight'});
+        return(res);
     }
     previewCast(targets){
         var result = new SkillResult()
@@ -828,7 +874,7 @@ class SkillCallHelp extends Skill {
         return result
     }
     getCastDescription(result) {
-        return("Calls some "+this.item+" as reinforcement.");
+        return(this.parent.parent.name+" calls some "+this.item+" as reinforcement.");
     }
 }
 window.gm.SkillsLib = (function (Lib) {
@@ -838,6 +884,7 @@ window.gm.SkillsLib = (function (Lib) {
     window.storage.registerConstructor(SkillDetermined);
     window.storage.registerConstructor(SkillGrapple);
     window.storage.registerConstructor(SkillFlee);
+    window.storage.registerConstructor(SkillFireball);
     window.storage.registerConstructor(SkillFly);
     window.storage.registerConstructor(SkillGuard);
     window.storage.registerConstructor(SkillHeal);

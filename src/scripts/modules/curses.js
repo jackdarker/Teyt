@@ -165,6 +165,7 @@ class CrsEffect {
     get desc() { return('');}
     apply(unapply) {} //override to do something!
 }
+//todo timed lock
 class CrsEffLock extends CrsEffect{
     constructor() { super(); this.key='KeyRestraintA';}
     toJSON() {return window.storage.Generic_toJSON("CrsEffLock", this); }
@@ -255,6 +256,7 @@ class CrsEffStatBonus extends CrsEffect{
     }
 }
 //todo wrap you in rubber; pony gear,
+// slaver harness - if you defeat a foe with higher level then you, you gain ftDomination, otherwise ftSubmission
 /**
  * adds a curse-function to an item
  */

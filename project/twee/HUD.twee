@@ -16,10 +16,10 @@
 <!--<div <%=window.gm.player.canLevelUp?"class=\"green\"":""%>>XP/Level: <%=window.gm.player._data.XP+"/"+window.gm.player._data.level%></div>-->
 <hr>
 <form>
-<button type="button" id="status">Status</button>
-<button type="button" id="inv">Inventory</button>
-<button type="button" id="outfit">Outfit</button>
-<button type="button" id="quests">Quests</button>
+<button type="button" id="LinkS">Status<sup>[s]</sup></button>
+<button type="button" id="LinkI">Inventory<sup>[i]</sup></button>
+<button type="button" id="LinkO">Outfit<sup>[o]</sup></button>
+<button type="button" id="LinkQ">Quests<sup>[q]</sup></button>
 <button type="button" id="dashboard">More</button>
 <!--<button type="button" id="wait" style="width: 100%">Rest 45min</button>-->
 <hr>
@@ -28,20 +28,20 @@
 <button type="button" id="settings" style="width: 80%">Settings</button>
 <button type="button" id="achievements" onclick='window.story.show("Achievements");' style="width: 80%">Achievements</button>
 <%if(s._gm.debug& 0x1>0){%>
-<button type="button" id="debug" style="width: 80%">Debug</button>
-<script>document.querySelector('#debug').addEventListener('click', function(){window.story.show('debug');});</script>
+<button type="button" id="LinkD" style="width: 80%">Debug<sup>[d]</sup></button>
+<script>document.querySelector('#LinkD').addEventListener('click', function(){window.story.show('debug');});</script>
 <%}%>
 </form>
 <script>
 //document.querySelector('#wait').addEventListener('click', function(){window.gm.addTime(45);window.gm.refreshAllPanel();}); 
-document.querySelector('#inv').addEventListener('click', function(){window.story.show('Inventory');});
-document.querySelector('#quests').addEventListener('click', function(){window.story.show('QuestList');});
+document.querySelector('#LinkI').addEventListener('click', function(){window.story.show('Inventory');});
+document.querySelector('#LinkQ').addEventListener('click', function(){window.story.show('QuestList');});
 document.querySelector('#dashboard').addEventListener('click', function(){window.story.show('Player_Dashboard');});
-document.querySelector('#status').addEventListener('click', function(){window.story.show('Status');});
+document.querySelector('#LinkS').addEventListener('click', function(){window.story.show('Status');});
 document.querySelector('#save').addEventListener('click', function(){window.gm.toggleDialog('#dialog_save');});
 document.querySelector('#help').addEventListener('click', function(){window.story.show('Help_Index');}); 
 document.querySelector('#settings').addEventListener('click', function(){window.story.show('Settings');}); 
-document.querySelector('#outfit').addEventListener('click', function(){window.story.show('Wardrobe');}); 
+document.querySelector('#LinkO').addEventListener('click', function(){window.story.show('Wardrobe');}); 
 </script>
 
 
@@ -198,7 +198,8 @@ Your party consist of <%=(function(){var msg=[];for(el of window.story.state._gm
 :: Wardrobe [_back_ _nodeffered_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 <p>[[Back|_back_]] [[Mirror]]</p> (Tools and weapons can be changed via Inventory.)</br>
-<%=window.gm.player.name%> has equipped: <%=window.gm.printEquipmentSummary()%></br>
+<%=window.gm.player.name%> has equipped: <%=window.gm.printEquipmentSummary()%></br></br>
+<div id="output"></div>
 <div id="choice"></div>
 </article><article id="LogPanel"></article></section>
 <script>

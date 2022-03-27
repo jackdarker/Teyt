@@ -55,7 +55,7 @@ But they just snicker and mock your opponent.</br>
 [[The winner takes it all]]
 <p class="tPC">"So horsie how about we go for a ride?"</p> 
 Trent looks up to you, he already knows what that means. | Trent looks up to you with lust in his eyes. You should be careful not to end under his muscular body. | The recent acitivties got him quite pent up. But not that much that he will get involved with you. Maybe if you know each other better...  
-<a0 onclick='window.gm.postVictory();'>Walk away</a>
+<a0 onclick='window.gm.postVictory({flee:false});'>Walk away</a>
 <%}%>
 </br></br>
 </article><article id="LogPanel"></article></section>

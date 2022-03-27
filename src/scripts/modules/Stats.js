@@ -963,9 +963,13 @@ class effPillEffect extends Effect {
         }
     }
     onRemove(){
-        this.parent.parent.Stats.removeModifier('rst_blunt',{id:'rst_blunt:'+this.data.name});
-        this.parent.parent.Stats.removeModifier('rst_slash',{id:'rst_slash:'+this.data.name});
-        this.parent.parent.Stats.removeModifier('rst_pierce',{id:'rst_pierce:'+this.data.name});
+        if(this.data.id='effBrownPill') {
+            this.parent.parent.Stats.addModifier('arm_poison',{id:'arm_poison:'+this.data.name, bonus:25});
+        }else if(this.data.id='effRedPill') {
+            this.parent.parent.Stats.addModifier('rst_blunt',{id:'rst_blunt:'+this.data.name, bonus:25});
+            this.parent.parent.Stats.addModifier('rst_slash',{id:'rst_slash:'+this.data.name, bonus:25});
+            this.parent.parent.Stats.addModifier('rst_pierce',{id:'rst_pierce:'+this.data.name, bonus:25});
+        }
     }
     merge(neweffect) {
         if(neweffect.id===this.data.id) {
@@ -1355,6 +1359,7 @@ class effDamage extends CombatEffect {
         let eff = new effDamage();
         eff.amount = amount,eff.data.duration=turns;
         eff.type=type;
+        eff.data.name=type+'-damage'
         eff.castMsg=msg;
         return(eff);
     }

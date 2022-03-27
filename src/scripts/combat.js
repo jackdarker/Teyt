@@ -6,6 +6,7 @@ window.gm.combat = window.gm.combat || {};
 
 class Encounter {
   constructor() {
+    this.enableFlee=true;
     this.EnemyFirst=false;
     this.EnemyFunc = null;  //a ctor of Mob
     this.Location = ''  //your actual location-name
@@ -15,10 +16,10 @@ class Encounter {
     //...endCombat is called after this and if you need to check on effects, you have to do this here !
     this.onDefeat = (function(){return('</br></br>You are defeated.</br>'+ window.gm.printLink('Next','window.gm.postDefeat()'));});
     this.onSubmit = (function(){return('</br></br>You submit to the foe.</br>'+ window.gm.printLink('Next','window.gm.postDefeat()'));});
-    this.onFlee = (function(){return('</br></br>You retreat hastily.</br>'+ window.gm.printLink('Next','window.gm.postVictory()'));});
+    this.onFlee = (function(){return('</br></br>You retreat hastily.</br>'+ window.gm.printLink('Next','window.gm.postVictory({flee:true})'));});
 
     //...dont forget to fetchLoot on victory
-    this.onVictory = (function(){return('</br></br>You defeated the foe.</br> '+this.fetchLoot()+'</br>'+ window.gm.printLink('Next','window.gm.postVictory()'));});
+    this.onVictory = (function(){return('</br></br>You defeated the foe.</br> '+this.fetchLoot()+'</br>'+ window.gm.printLink('Next','window.gm.postVictory({flee:false})'));});
 
     //if you override onMoveSelect (like the others), you can jump out of battle, show some scene and return to battle
     //- do not modify window.gm.player.location
@@ -62,13 +63,13 @@ initCombat() {
 spawnChar(item,party){
   let s=window.story.state;
   let mob = window.gm.Mobs[item]();
+  mob.scaleLevel(window.gm.player.level);//todo level equal to spawner?
   mob.faction = party,mob.despawn=true;
   let list = s.combat.enemyParty.concat(s.combat.playerParty);
   let uid=1;//need to build unique id
   for(el of list) {
     if(mob.__proto__.isPrototypeOf(el)) {
       //expecting Mole#2
-
       uid = Math.max(uid,parseInt(el.name.split('#')[1],10)+1);
     };
   }
@@ -209,32 +210,31 @@ printStats() {
 }
 //creates buttons for skills of current actor
 printSkillList() {
-  var s = window.story.state;
+  var res,item,entry,s = window.story.state;
   var canAct = s.combat.actor._canAct();
+  entry = document.createElement('button');
+  entry.addEventListener('click',(function(me){return(window.gm.Encounter._postSkillAbort.bind(me));}(this)));
+  entry.textContent="Do nothing";
+  $("div#choice")[0].appendChild(entry);
   if(canAct.OK===true) {
     var skillIds = s.combat.actor.Skills.getAllIds();
-    //todo how to sort the list in a useful manner?
+    skillIds.sort(function (a, b) { if (a < b) { return -1;} if (a > b) { return 1; } return 0;});//todo how to sort the list in a useful manner?
     for(var i=0; i<skillIds.length;i++) {
-      var entry = document.createElement('button');
-      var res;
+      entry = document.createElement('button');
+      item=s.combat.actor.Skills.getItem(skillIds[i]);
       //entry.href='javascript:void(0)';
       entry.addEventListener("click",(function(me,target){ 
         return(window.gm.Encounter._postSkillSelect.bind(me,target));}(this,skillIds[i])));
-      entry.textContent=s.combat.actor.Skills.getItem(skillIds[i]).name;
-      res = s.combat.actor.Skills.getItem(skillIds[i]).isEnabled();
+      entry.textContent=item.name;
+      res = item.isEnabled();
       entry.disabled=!res.OK; entry.title=res.msg;  //Todo use pointevent+toasty?
       $("div#choice")[0].appendChild(entry);      // <- requires this node in html
     }
   } else {  //cannot do a thing
-    var entry = document.createElement('p');
+    entry = document.createElement('p');
     entry.textContent=canAct.msg;
     $("div#choice")[0].appendChild(entry);
   }
-  var entry = document.createElement('button');
-  //entry.href='javascript:void(0)';
-  entry.addEventListener('click',(function(me){return(window.gm.Encounter._postSkillAbort.bind(me));}(this)));
-  entry.textContent="Do nothing";
-  $("div#choice")[0].appendChild(entry);
 }
 _postSkillAbort(){
   window.story.state.combat.action=null;
@@ -269,7 +269,6 @@ printTargetList() {
       return(window.gm.Encounter._postTargetSelect.bind(me,target));}(this,targets[i])));
     //if single-target, use name from mob, for multitarget we expect a name attribute to the list
     entry.textContent=(targets[i].length>1)?targets[i].name:targets[i][0].name;
-    //entry.disabled=this.buttons[y*5+x].disabled;
     $("div#choice")[0].appendChild(entry);      // <- requires this node in html
   }
   var entry = document.createElement('a');
@@ -369,6 +368,8 @@ fetchLoot(){ //if you are victorious: grant XP & transfer Loot to player
   for (el of s.combat.playerParty) {
     maxLevel = Math.max(maxLevel,el.level);
   }
+  let _x = window.gm.player.Stats.get('luck').value;
+  _rnd = _rnd- Math.max(-25,Math.min(25,_x)); //player luck capped
   for(el of s.combat.enemyParty) {
     for(var i = el.loot.length-1;i>=0;i--) {
       if(_rnd<=el.loot[i].chance) {

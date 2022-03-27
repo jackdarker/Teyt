@@ -45,7 +45,7 @@ class Item {
     //implement this for description
     get descShort() { return(this.name);}
     //context is the owner of item (parent of inventory), on is target (character)
-    usable(context,on=null) {return({OK:false, msg:'Cannot use.'});}
+    usable(context,on=null) {return({OK:false, msg:'Cannot use.'});}  //todo add 2.useslot?
     use(context,on=null) {return({OK:false, msg:'Cannot use.'});}
     onTimeChange(now) {};
 }

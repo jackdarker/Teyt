@@ -51,7 +51,6 @@ window.gm.shop.calculateSellPrice=function(item) {
     if(item.id==='Lube') cost.count=item.price,cost.for=4;
     else if(item.id==='Battery') cost.count=item.price,cost.for=3;
     else {//there might be items with random id
-        /*if(item instanceof BracerLeather)*/
         cost.count=item.price,cost.for=1; 
     }
     cost.count = Math.ceil(cost.count*0.25); //
@@ -62,6 +61,7 @@ window.gm.shop.calculateBuyPrice=function(item) {
     let cost={id:'Money',count:1, for:0};
     if(item.id==='Lube') cost.count=item.price,cost.for=4;
     else if(item.id==='Battery') cost.count=item.price,cost.for=3;
+    else if(item.id==='VoucherIron') cost.count=item.price,cost.for=1;
     else {//there might be items with random id
         cost.count=item.price,cost.for=1; 
     }

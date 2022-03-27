@@ -28,7 +28,7 @@ function buildRooms() {
         '|   |           |       | ',
         'F3  G3--H3--I3--J3--K3  L3',
         '                    |     ',
-        'F4  G4--H4--I4--J4--K4--L4',
+        'F4--G4--H4--I4--J4--K4--L4',
         '|               |         ',
         'F5  G5--H5--I5  J5--K5--L5',
         '|           |   |         ',
@@ -244,7 +244,7 @@ function tick() {
     _d.tickPass=here;
     let _t=_d.tier,_allChances=0,_choice=[];
     switch(here) {//foes; traps are handled in window.gm.navEvent
-        case "DngPC_H4":_choice.push({id:'hornett',levelUp:(-2+_t), amount:1, chance:100});
+        case "DngPC_H4":_choice.push({id:'hornetthive',type:"",levelUp:(-2+_t), amount:1, chance:100});//_choice.push({id:'succubus',type:"nurse",levelUp:(-2+_t), amount:1, chance:100});//_choice.push({id:'hornett',levelUp:(-2+_t), amount:1, chance:100});
                         if(_t>1)_choice.push({id:'anthrocat', amount:1, chance:100});
                         if(_t>3)_choice.push({id:'wolf', amount:1, chance:100});
             break;
@@ -262,7 +262,8 @@ function tick() {
         var _rnd=_.random(0,_allChances-0.01);
         for(var i = _choice.length-1;i>=0;i--) { 
             if(_rnd<_allChances && _rnd>=(_allChances-_choice[i].chance)) {
-                window.gm.encounters[_choice[i].id]({amount:_choice[i].amount});window.gm.Encounter.initCombat();                
+                window.gm.encounters[_choice[i].id]({type:_choice[i].type, amount:_choice[i].amount,levelUp:_choice[i].levelUp,noFlee:true});
+                window.gm.Encounter.initCombat();                
                 break;
             }
             _allChances-=_choice[i].chance;
@@ -275,6 +276,7 @@ tick();
 
 :: DngPC_Sleep
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+<% window.story.state.DngPC.task.help=0;%>
 Wrapping yourself in that shaggy, old quilt, you try to get some rest.</br>
 </br><div id='output'></div>
 </br><a0 onclick='window.story.show("DngPC_G4")'>Next</a></br>
@@ -288,7 +290,6 @@ Your current donation-tier is: <%=window.story.state.DngPC.tmp.tier%><a0 id='tie
 <p hidden> Gates need to be unlocked to gain access to the deeper areas of the dungeon. A gate of your choosing might be unlocked by donating a GoldVoucher. Those items are earned every 3 tiers. Tiers are gained by finishing tasks assigned by the shrine.
 </p></br></br>
 To progress on your path to salvation you need to donate:<div id='choice'></div></br>
-If you are a whimp, you might [[ask for help|DngPC_Shrine_Help]].</br>
 <a0 id='vouchers' onclick='(function($event){document.querySelector("#"+id+"~p").toggleAttribute("hidden");})(this);'>Hint</a>
 <p hidden> Where do I find...</br>
 Money: randomly found in loot, loot from foes</br>
@@ -296,7 +297,8 @@ Iron-Vouchers: randomly found in loot; can be bought for money from vendor</br>
 Bronze-Vouchers: loot from foes</br>
 Silver-Vouchers: loot from bosses</br>
 Gold-Vouchers: gained after finishing a set of tasks</br>
-</p>
+</p></br>
+If you are a whimp, you might [[ask for help|DngPC_Shrine_Help]].</br>
 <p>[[Back|DngPC_G4]]</p>
 </article><article id="LogPanel"></article></section>
 <script>function getAvailableTasks() { 
@@ -417,16 +419,23 @@ getAvailableTasks()
 :: DngPC_Shrine_Help [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <p>[[Back|DngPC_Shrine]]</p>
-<a0 onclick=''>Ask for some tips about your current task</a></br>
-<a0 onclick=''>Ask for some more general tips</a></br>
-<%if(window.story.state.DngPC.task.help===0 && window.story.state.DngPC.task.id==='bringMoney'){%>
+<a0 onclick='window.gm.player.Skills.addItem(new window.storage.constructors["SkillFireball"]());'>Learn fireball</a>
+<a0 onclick='window.story.show("NOP")'>Ask for some tips about your current task</a></br>
+<a0 onclick='randomHint()'>Ask for some more general tips</a><div id='output'></div></br>
+<%if(window.story.state.DngPC.task.help===0 && window.story.state.DngPC.tmp.tier<2 && window.story.state.DngPC.task.id==='bringMoney'){%>
 <div id='select400' >
-<a0 onclick='window.gm.player.Inv.addItem(window.gm.ItemsLib.BrownPill(),2),window.gm.printTalkLink("div#select400","div#choice400a")'>Beg for some more direct help for your task</a></br>
-</div><div id='choice400a' hidden></br> "Dont tell anyone, but I can give you <b>those pills</b>. They might just boost your strength enough to overthrow those beasts."</br>
-He places some pills on the desk and you quickly pocket them. Still you are unsure if it would be wise to use them.</br>
+<a0 onclick='window.story.state.DngPC.task.help=1,window.gm.player.Inv.addItem(window.gm.ItemsLib.BrownPill(),2),window.gm.printTalkLink("div#select400","div#choice400a")'>Beg for some more direct help for your task</a></br>
+</div><div id='choice400a' hidden></br> "Dont tell anyone, but I can give you <b>those pills</b>. The poison that the critters spray should then no longer harm you."</br>
+He places some pills on the desk and you quickly pocket them, even if you are unsure if it would be wise to use them.</br>
+</div>
+<%}else if(window.story.state.DngPC.task.help===0 && window.story.state.DngPC.tmp.tier>=1 && window.story.state.DngPC.task.id==='bringIron'){%>
+<div id='select400' >
+<a0 onclick='window.story.state.DngPC.task.help=1;var item=window.gm.ItemsLib["PendantLuck"]();window.gm.player.Wardrobe.addItem(item),window.gm.printTalkLink("div#select400","div#choice400a")'>Beg for some more direct help for your task</a></br>
+</div><div id='choice400a' hidden></br> "This <b>pendant</b>" he shows you some lucky paw attached to a leather thread "is rumored to increase someones luck. Might be helpful to find rare stuff."</br>
+It cant do any harm wearing it, right?</br>
 </div>
 <%}else{%>
-"Right now I cant help you with your task."</br>
+"Right now I cant help you with your task. Maybe tomorrow."</br>
 <%}%>
 <p>For a fee you can also get some helpful services:</br><!--
     permanent gear: receive better gear on respawn
@@ -441,6 +450,15 @@ He places some pills on the desk and you quickly pocket them. Still you are unsu
 </p>
 <p>[[Back|DngPC_Shrine]]</p>
 </article><article id="LogPanel"></article></section>
+<script> 
+var generalHints=["\"Hornetts have a strong poison. But I have some pills that could block that....\""
+,"\"The hives of the hornetts are sensitive to fire.\""
+,"\"Saving some money for better gear from the trader would be an idea.\""];
+function randomHint(){
+    var msg="</br>"+generalHints[_.random(0,generalHints.length-1)];
+    window.gm.printOutput(msg);
+}
+</script>
 
 :: DngPC_Vendor [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
@@ -470,13 +488,17 @@ function findWaresToBuy(){
     //window.gm.ItemsLib['Vaginarium'](),
     //window.gm.ItemsLib['Penilium']()
     ];
+    if(_t>=1){
+        list.push(window.gm.ItemsLib['VoucherIron']())
+    }
     if(_t>=2){
         item = new window.storage.constructors['BracerLeather']();
         item = window.gm.makeCursedItem(item,{minItems:2,convert:'GlovesRubber'});
         item = window.gm.makeBonusItem(item,{statBoost:'agility', statBonus:2});
         list.push(item);
+        list.push(window.gm.ItemsLib['VoucherIron']())
     }
-    for(var el of list) {
+    for(var el of list) {  //todo sort by tag - name
         let cost = window.gm.shop.calculateBuyPrice(el);
         if(cost) {
             list2.push({item:el,cost:cost});
@@ -547,7 +569,7 @@ Another Arena</br><%=window.story.render("DngPC_Retreat")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 Another Arena</br><%=window.story.render("DngPC_Retreat")%>
 <div id='select1' >Water ripples out from a tap into a scoop bassin.
-<a0 onclick='window.gm.player.Stats.increment("health",50);window.gm.printTalkLink("div#select1","div#choice1a")'>Sipping</a> some of that clear water might give you back some energy.</br>
+<a0 onclick='window.gm.player.Stats.increment("health",50);window.gm.printTalkLink("div#select1","div#choice1a"),window.gm.refreshAllPanel()'>Sipping</a> some of that clear water might give you back some energy.</br>
 </div><div id='choice1a' hidden>You feel surprisingly refreshed after some gulps of that clear water.
 </div>
 <%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>

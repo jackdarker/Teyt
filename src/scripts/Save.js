@@ -230,7 +230,7 @@ window.storage = {
       window.story.history = save.history;
       window.story.checkpointName = save.checkpointName;
       window.gm.rebuildObjects();  // this is for handling version-upgrades
-      window.gm.postVictory();//teleport into dng or other location   
+      window.gm.postVictory({flee:false});//teleport into dng or other location   
   },
   getAchievements: function() {
     var ahash = JSON.stringify({achievements : window.gm.achievements});
