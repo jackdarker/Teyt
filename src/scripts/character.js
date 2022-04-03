@@ -46,13 +46,13 @@ class Character {
         }
         stAgility.setup(this.Stats,10,100),stIntelligence.setup(this.Stats,10,100),stLuck.setup(this.Stats,10,100);
         stCharisma.setup(this.Stats,10,100),stPerception.setup(this.Stats,10,100),stStrength.setup(this.Stats,10,100),stEndurance.setup(this.Stats,10,100);
-        stSavageness.setup(this.Stats,0,10),stCorruption.setup(this.Stats,0,100),stArousal.setup(this.Stats,0,100);
+        stSavageness.setup(this.Stats,0,10),stCorruption.setup(this.Stats,0,100),stArousal.setup(this.Stats,0,50);
         for(let name of stFetish.listFetish()) {
             stFetish.setup(this.Stats,0,10,name);
         }         
         this.Skills.addItem(new SkillAttack());this.Skills.addItem(new SkillUseItem());this.Skills.addItem(new SkillStruggle());
         this.Skills.addItem(new SkillFlee());    
-        this.Effects.addItem(new effHunger());
+        this.Effects.addItem(new effHunger());this.Effects.addItem(new effSanity());this.Effects.addItem(new effLibido());
         this.Effects.addItem(new effCombatRecovery());
         this.Effects.addItem(new effSpermDecay());
         window.storage.registerConstructor(Character);
@@ -183,7 +183,7 @@ class Character {
             this.Effects.addItem(new effNotTired());
         } 
     }
-    addEffect(effect,id) {
+    addEffect(effect,id,who) {
         this.Effects.addItem(effect,id);
     }
     //helper function to change Relation 

@@ -11,7 +11,7 @@ class Leggings extends Equipment {
     onEquip(context) {
         context.parent.Stats.addModifier('agility',{id:'agility:Leggings', bonus:5});
         return({OK:true, msg:'equipped'});}
-    onUnequip() {
+    onUnequip(context) {
         this.parent.parent.Stats.removeModifier('agility',{id:'agility:Leggings'});
         return({OK:true, msg:'unequipped'});}
 }
@@ -447,13 +447,18 @@ class AnalPlug extends Equipment {
                 break;
             default:
         }
-        return(msg);
+        return(msg+this.bonusDesc());
     }
     onEquip(context) {
+        let res=super.onEquip(context);
+        if(res.OK){
         //if(this.style===100) {
             context.parent.addEffect(new window.storage.constructors['effButtPlugged'](),"effButtPlugged"); //only works for player since effects of NPC dont receive ticks!
-        //} 
-        return({OK:true, msg:'stuffed'});}
+        } 
+        return(res);}
+    onUnequip(context) {
+        super.onUnequip(context);
+        return({OK:true, msg:'unequipped'});}
 }
 class CockRing extends Equipment {
     static factory(style) {
@@ -731,12 +736,32 @@ class WhipLeather extends Weapon {
     }
 }
 class StaffWodden extends Weapon {
+    static factory(style) {
+        let x = new StaffWodden();
+        x.style=style;
+        return(x);
+    }
     constructor() {
-        super();this.id=this.name='StaffWodden';
+        super();this.style='StaffWodden';
         this.slotUse = ['RHand','LHand'];
         this.lossOnRespawn = true;
     }
-    get desc() { return('A staff made from wood.');}
+    set style(style) { 
+        if(style==='StaffWodden') this.name='wodden staff';
+        else throw new Error(this.id +' doesnt know '+style);
+        this.id=style;
+    }
+    get style() {return this.id;}
+    get desc() { 
+        let msg ='a large wodden staff for 2-hand combat';
+        switch(this._style) {
+            case 100:
+                msg=('a stone-triangle mounted on a long stick');
+                break;
+            default:
+        }
+        return(msg);
+    }
     toJSON() {return window.storage.Generic_toJSON("StaffWodden", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(StaffWodden, value.data));}
     onEquip(context) {
@@ -744,7 +769,7 @@ class StaffWodden extends Weapon {
         sk.weapon = this.id;
         this.parent.parent.Skills.addItem(sk);
         return({OK:true, msg:'equipped'});}
-    onUnequip() {
+    onUnequip(context) {
         this.parent.parent.Skills.removeItem('StrongAttack');
         return({OK:true, msg:'unequipped'});}
     attackMod(target){
@@ -787,11 +812,15 @@ class SpearWodden extends Weapon {
     toJSON() {return window.storage.Generic_toJSON("SpearWodden", this); }
     static fromJSON(value) {return(window.storage.Generic_fromJSON(SpearWodden, value.data));}
     onEquip(context) {
-        let sk = new SkillStrongHit();
-        sk.weapon = this.id;
-        this.parent.parent.Skills.addItem(sk);
-        return({OK:true, msg:'equipped'});}
-    onUnequip() {
+        let res=super.onEquip(context);
+        if(res.OK){
+            let sk = new SkillStrongHit();
+            sk.weapon = this.id;
+            this.parent.parent.Skills.addItem(sk);
+        }
+        return(res);}
+    onUnequip(context) {
+        super.onUnequip(context)
         this.parent.parent.Skills.removeItem('StrongAttack');
         return({OK:true, msg:'unequipped'});}
     attackMod(target){
@@ -848,14 +877,6 @@ class ShieldSmall extends Equipment {
             return( {OK:true, msg:'equipped '+ this.name}); //todo
         }
     }
-    onEquip(context) {
-        /*let sk = new SkillStrongHit();
-        sk.weapon = this.id;
-        this.parent.parent.Skills.addItem(sk);*/
-        return({OK:true, msg:'equipped'});}
-    onUnequip() {
-        //this.parent.parent.Skills.removeItem('Smash');
-        return({OK:true, msg:'unequipped'});}
 }
 class MaceSteel extends Weapon {
     constructor() {

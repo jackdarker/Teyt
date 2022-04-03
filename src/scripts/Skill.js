@@ -44,7 +44,6 @@ class SkillCost{
         Char.Stats.increment('energy',this.energy*-1);
     }
 }
-
 class SkillMod {
     constructor() {
         this.hitChance =100;
@@ -150,7 +149,7 @@ cast(target){
         result.msg = "";
         for(var X of result.effects) {// for each target
             for(var Y of X.eff) {//...multiple effects
-                    X.target.addEffect(Y,Y.id);
+                    X.target.addEffect(Y,Y.id,this.caster);
                     result.msg+=Y.castDesc();
             }
         }

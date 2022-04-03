@@ -126,7 +126,7 @@ class stEnergyRegen extends Stat {
     static setup(context, base,max) {
         var _stat = new stEnergyRegen();
         var _n = _stat.data;
-        _n.id='energyRegen',_n.base=base, _n.value=base,_n.limits=[{max:max,min:-1*max}];
+        _n.id='energyRegen',_n.base=base,_n.hidden=4, _n.value=base,_n.limits=[{max:max,min:-1*max}];
         context.addItem(_stat);
         _stat.Calc();
     }
@@ -163,7 +163,7 @@ class stWillRegen extends Stat {
     static setup(context, base,max) {
         var _stat = new stWillRegen();
         var _n = _stat.data;
-        _n.id='willRegen',_n.base=base, _n.value=base,_n.limits=[{max:max,min:-1*max}];
+        _n.id='willRegen',_n.base=base,_n.hidden=4,_n.value=base,_n.limits=[{max:max,min:-1*max}];
         context.addItem(_stat);
         _stat.Calc();
     }
@@ -182,13 +182,13 @@ class stHungerMax extends Stat {
     toJSON() {return window.storage.Generic_toJSON("stHungerMax", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stHungerMax, value.data);};
 }
-class stHunger extends Stat { //high value==starving
+class stHunger extends Stat { //high value==starving        todo
     static setup(context, base,max) {
         stHungerMax.setup(context,max);
-        stHungerRegen.setup(context,10,100);
+        stHungerRegen.setup(context,2,100);
         var _stat = new stHunger();
         var _n = _stat.data;
-        _n.id='hunger',_n.base=base, _n.value=base,_n.limits=[{max:'hungerMax',min:0}];
+        _n.id='hunger',_n.base=base,_n.hidden=4, _n.value=base,_n.limits=[{max:'hungerMax',min:0}];
         context.addItem(_stat);
         _stat.Calc();
     }
@@ -200,7 +200,7 @@ class stHungerRegen extends Stat {
     static setup(context, base,max) {
         var _stat = new stHungerRegen();
         var _n = _stat.data;
-        _n.id='hungerRegen',_n.base=base, _n.value=base,_n.limits=[{max:max,min:-1*max}];
+        _n.id='hungerRegen',_n.base=base,_n.hidden=4, _n.value=base,_n.limits=[{max:max,min:-1*max}];
         context.addItem(_stat);
         _stat.Calc();
     }
@@ -242,7 +242,7 @@ class stArousal extends Stat{
     static setup(context, base,max) {
         stArousalMax.setup(context,max);
         stArousalMin.setup(context,0);
-        stArousalRegen.setup(context,0,100);
+        stArousalRegen.setup(context,-1,100);
         var _stat = new stArousal();
         var _n = _stat.data;
         _n.id='arousal', _n.hidden=3,_n.base=base, _n.value=base,_n.limits=[{max:'arousalMax',min:'arousalMin'}];
@@ -260,7 +260,7 @@ class stArousalRegen extends Stat {
     static setup(context, base,max) {
         var _stat = new stArousalRegen();
         var _n = _stat.data;
-        _n.id='arousalRegen',_n.base=base, _n.value=base,_n.limits=[{max:max,min:-1*max}];
+        _n.id='arousalRegen',_n.hidden=4,_n.base=base, _n.value=base,_n.limits=[{max:max,min:-1*max}];
         context.addItem(_stat);
         _stat.Calc();
     }
@@ -434,6 +434,7 @@ class stSavagenessMax extends Stat {
 class stSavageness extends Stat {
     static setup(context, base,max) {
         stSavagenessMax.setup(context,max);
+        stSavagenessRegen.setup(context,-1,100);
         var _stat = new stSavageness();
         var _n = _stat.data;
         _n.id='savageness', _n.hidden=3,_n.base=base, _n.value=base,_n.limits=[{max:'savagenessMax',min:0}];
@@ -445,6 +446,18 @@ class stSavageness extends Stat {
     }
     toJSON() {return window.storage.Generic_toJSON("stSavageness", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(stSavageness, value.data);};
+}
+class stSavagenessRegen extends Stat {
+    static setup(context, base,max) {
+        var _stat = new stSavagenessRegen();
+        var _n = _stat.data;
+        _n.id='savagenessRegen',_n.hidden=4,_n.base=base, _n.value=base,_n.limits=[{max:max,min:-1*max}];
+        context.addItem(_stat);
+        _stat.Calc();
+    }
+    constructor() { super();}
+    toJSON() {return window.storage.Generic_toJSON("stSavagenessRegen", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(stSavagenessRegen, value.data);};
 }
 //Fetish
 // value >0 means character likes that fetish or <0 hates it  
@@ -608,7 +621,7 @@ class effHunger extends Effect {
     }
     toJSON() {return window.storage.Generic_toJSON("effHunger", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(effHunger, value.data);};
-    get desc() {return(effHunger.name);}
+    get desc() {return(this.data.name);}
     onTimeChange(time) {
         //- x Hunger per hour
         var delta = window.gm.getDeltaTime(time,this.data.time);
@@ -616,7 +629,7 @@ class effHunger extends Effect {
             this.data.time = time;
             this.data.duration =60;
         } else delta=0;
-        this.parent.parent.Stats.increment('hunger',2*delta/60);
+        this.parent.parent.Stats.increment('hunger',this.parent.parent.Stats.get("hungerRegen").value*delta/60);
         return(null);
     }
     onApply(){
@@ -627,6 +640,40 @@ class effHunger extends Effect {
             this.onApply(); //refresh 
             return(true);
         }
+    }
+}
+class effSanity extends effHunger {
+    constructor() {
+        super();this.data.id = this.data.name= effSanity.name, this.data.duration = 60,this.data.hidden=4;
+    }
+    toJSON() {return window.storage.Generic_toJSON("effSanity", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(effSanity, value.data);};
+    onTimeChange(time) {
+        // x Sanity per hour
+        var delta = window.gm.getDeltaTime(time,this.data.time);
+        if((this.data.duration-delta)<=0) { //trigger every ...
+            this.data.time = time;
+            this.data.duration =60;
+        } else delta=0;
+        this.parent.parent.Stats.increment('savageness',this.parent.parent.Stats.get("savagenessRegen").value*delta/60);
+        return(null);
+    }
+}
+class effLibido extends effHunger {
+    constructor() {
+        super();this.data.id = this.data.name= effLibido.name, this.data.duration = 60,this.data.hidden=4;
+    }
+    toJSON() {return window.storage.Generic_toJSON("effLibido", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(effLibido, value.data);};
+    onTimeChange(time) {
+        // x arousal per hour
+        var delta = window.gm.getDeltaTime(time,this.data.time);
+        if((this.data.duration-delta)<=0) { //trigger every ...
+            this.data.time = time;
+            this.data.duration =60;
+        } else delta=0;
+        this.parent.parent.Stats.increment('arousal',this.parent.parent.Stats.get("arousalRegen").value*delta/60);
+        return(null);
     }
 }
 class effCombatRecovery extends Effect {
@@ -1080,7 +1127,7 @@ class effButtPlugged extends Effect {
         }
     }
     __mutate() {
-        window.gm.MutationsLib.effMutateButt(this.parent.parent);
+        // todo window.gm.MutationsLib.effMutateButt(this.parent.parent);
     }
 }
 class effVaginalFertil extends Effect {
@@ -1737,6 +1784,7 @@ window.gm.StatsLib = (function (StatsLib) {
     window.storage.registerConstructor(stCorruption);
     window.storage.registerConstructor(stSavagenessMax);
     window.storage.registerConstructor(stSavageness);
+    window.storage.registerConstructor(stSavagenessRegen);
     window.storage.registerConstructor(stArmor);   
     //...effects
     window.storage.registerConstructor(effCallHelp);
@@ -1744,6 +1792,8 @@ window.gm.StatsLib = (function (StatsLib) {
     window.storage.registerConstructor(effDamage);
     window.storage.registerConstructor(effDetermined);
     window.storage.registerConstructor(effHunger);
+    window.storage.registerConstructor(effLibido);
+    window.storage.registerConstructor(effSanity);
     window.storage.registerConstructor(effFlying);
     window.storage.registerConstructor(effBleed);
     window.storage.registerConstructor(effCombined);
@@ -1775,6 +1825,7 @@ window.gm.StatsLib = (function (StatsLib) {
     window.storage.registerConstructor(effInHeat);
     window.storage.registerConstructor(effInRut);
     window.storage.registerConstructor(effSpermDecay);
+    window.storage.registerConstructor(effButtPlugged);
     window.storage.registerConstructor(effVaginalFertil);
     window.storage.registerConstructor(effVaginalPregnant);
     //

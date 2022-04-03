@@ -13,7 +13,8 @@ SanctumPortal
 		"_back_": "gray",
 		"_nosave_": "yellow",
 		"_nodeffered_": "yellow",
-		"_isdeffered_": "brown"
+		"_isdeffered_": "brown",
+		"_noshortkey_": "brown"
 	},
 	"zoom": 1
 }

@@ -12,6 +12,7 @@
 - fungus/spore-pod
 - vile vine
 - mimic
+- cursed tome of conjuring
 - lush orchid
 - slug
 - Giant-Snake
@@ -151,7 +152,7 @@ class Slime extends Mob {
         result.action =result.target= null;
         if(this.id === 'Slime') {
             let skill= 'slime-slobber';
-            if(indow.story.state.combat.turnCount>2 && rnd>30 && this.Skills.getItem(skill).isEnabled().OK){
+            if(window.story.state.combat.turnCount>2 && rnd>30 && this.Skills.getItem(skill).isEnabled().OK){
                 rnd = _.random(0,enemys.length-1);
                 result.action = skill;
                 result.target = [enemys[rnd]];
@@ -493,6 +494,40 @@ class Vine extends Mob {
         return(super.calcCombatMove(enemys,friends));
     } 
 }
+class Fungus extends Mob {
+    static factory(type) {
+        let foe = new Fungus();
+        return foe;
+    }
+    constructor() {
+        super();
+        this.name = this.id = 'Fungus';
+        this.pic= 'Fungi1';
+        this.tmp={hitBy:''};
+        this.Outfit.addItem(new BaseWorm());
+        this.Skills.addItem(new SkillPoisonCloud());
+    }
+    addEffect(effect,id,who){
+        super.addEffect(effect,id,who);
+        this.tmp.hitBy=(who)?who.id:'';
+    }
+    calcCombatMove(enemys,friends){
+        let result = {OK:true,msg:''};
+        let rnd = _.random(1,100);
+        if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
+        result.action =result.target= null;
+        if(this.id === 'Fungus') {
+            let skill= 'PoisonCloud';
+            if(this.tmp.hitBy!='' && this.Skills.getItem(skill).isEnabled().OK){
+                result.action = skill;
+                result.target = enemys.concat.friends; //affect all
+                result.msg =this.fconv("$[I]$ $[release]$ a cloud of toxic spores into the air.</br>")+result.msg;
+                return(result);
+            }
+        } 
+        return({OK:true,msg:'',action:null,target:null});
+    } 
+}
 class Mechanic extends Mob {
     static factory(type) {
         let foe = new Mechanic();
@@ -750,6 +785,7 @@ window.gm.Mobs = (function (Mobs) {
     //
     Mobs.AnthroCat = function() { return function(param){return(AnthroCat.factory(param));}("AnthroCat")};
     Mobs.AnthroFox = function() { return function(param){return(AnthroCat.factory(param));}("AnthroFox")};
+    Mobs.Fungus = Fungus.factory;
     Mobs.Huntress = function() { return function(param){return(AnthroCat.factory(param));}("Huntress")};
     Mobs.Lapine = Lapine.factory;
     Mobs.Mole = Mole.factory;

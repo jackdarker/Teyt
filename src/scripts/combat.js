@@ -334,15 +334,6 @@ printNextLink(nextState,label="Next") {
   entry.textContent=label;
   $("div#choice2")[0].appendChild(entry);
 }
-//executes a combat-cmd for player/enemy
-execCombatCmd(move) { 
-  var s = window.story.state;
-  var result = move(s.combat.actor,s.combat.target);
-  /*s.combat.enemyTurn =!s.combat.enemyTurn;  //toggle whos turn
-  if(!(s.combat.enemyTurn ^ s.combat.enemyFirst)) s.combat.newTurn = false;
-  */
-  return(result);
-}
 endCombat(){
   var s = window.story.state;
   s.combat.inCombat=false;
@@ -405,15 +396,25 @@ calcTurnOrder(){
 /////////////////////  State Machine /////////////////////
 //
 battleInit() {
-  let result = {OK:false, msg:''}, s = window.story.state;
+  let list,result = {OK:false, msg:''}, s = window.story.state;
   result.OK=true,result.msg = this.onStart();
-  let list = s.combat.enemyParty.concat(s.combat.playerParty);
-  //update combateffects
+  list=s.combat.enemyParty;
   for(let k=list.length-1; k>=0;k--){
     if(list[k].isKnockedOut()) {
       if(list[k].despawn===true) list.splice(k,1); //remove spawned chars - you will not get loot for them !
       continue;
     }
+  }
+  list=s.combat.playerParty;
+  for(let k=list.length-1; k>=0;k--){
+    if(list[k].isKnockedOut()) {
+      if(list[k].despawn===true) list.splice(k,1); //remove spawned chars - you will not get loot for them !
+      continue;
+    }
+  }
+  list = s.combat.enemyParty.concat(s.combat.playerParty);
+  //update combateffects
+  for(let k=list.length-1; k>=0;k--){
     let effects = list[k].Effects.getAllIds();
     for(let i=0; i<effects.length; i++) {
       let effect = list[k].Effects.get(effects[i]);
@@ -434,15 +435,25 @@ battleInit() {
 }
 preTurn() {
   let result = {OK:false, msg:''};
-  let s = window.story.state;
+  let s = window.story.state,list;
   s.combat.turnCount+=1;
-  let list = s.combat.enemyParty.concat(s.combat.playerParty);
-  //update combateffects
+  list=s.combat.enemyParty;
   for(let k=list.length-1; k>=0;k--){
     if(list[k].isKnockedOut()) {
       if(list[k].despawn===true) list.splice(k,1); //remove spawned chars - you will not get loot for them !
       continue;
     }
+  }
+  list=s.combat.playerParty;
+  for(let k=list.length-1; k>=0;k--){
+    if(list[k].isKnockedOut()) {
+      if(list[k].despawn===true) list.splice(k,1); //remove spawned chars - you will not get loot for them !
+      continue;
+    }
+  }
+  list = s.combat.enemyParty.concat(s.combat.playerParty);
+  //update combateffects
+  for(let k=list.length-1; k>=0;k--){
     let effects = list[k].Effects.getAllIds();
     for(let i=0; i<effects.length; i++) {
       let effect = list[k].Effects.get(effects[i]);

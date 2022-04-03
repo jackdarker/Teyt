@@ -255,6 +255,24 @@ class CrsEffStatBonus extends CrsEffect{
         }
     }
 }
+class CrsEffSkill extends CrsEffect{
+    constructor() {
+        super();
+        this.skillid =this.newskillid='';
+    }
+    toJSON() {return window.storage.Generic_toJSON("CrsEffSkill", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(CrsEffSkill, value.data));}
+    get desc() {return("gives skill "+this.newskillid)}
+    apply(unapply) {
+        if(unapply) {
+            this.parent.parent.parent.parent.Skills.removeItem(this.newskillid);
+        } else {
+            let sk = new window.storage.constructors[this.skillid]();
+            sk.id=sk.name=this.newskillid;
+            this.parent.parent.parent.parent.Skills.addItem(sk);
+        }
+    }
+}
 //todo wrap you in rubber; pony gear,
 // slaver harness - if you defeat a foe with higher level then you, you gain ftDomination, otherwise ftSubmission
 /**
@@ -311,6 +329,11 @@ window.gm.makeBonusItem = function(item, extra) {
         eff.statid=extra.statBoost, eff.statbonus=extra.statBonus;
         list.push(eff);
     }
+    if(extra.skillid) {
+        eff = new CrsEffSkill();
+        eff.skillid=extra.skillid,eff.newskillid=extra.skillname;
+        list.push(eff);
+    }
     curse.configureCurse(item,curse.trigger,list);
     return(item);
 }
@@ -323,5 +346,6 @@ window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(CrsEffSeal);
     window.storage.registerConstructor(CrsEffConvert);
     window.storage.registerConstructor(CrsEffEnergyDrain);
+    window.storage.registerConstructor(CrsEffSkill);
     window.storage.registerConstructor(CrsEffStatBonus);
 }(window.gm.ItemsLib || {}));

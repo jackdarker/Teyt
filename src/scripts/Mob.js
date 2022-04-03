@@ -18,7 +18,7 @@ class Mob extends Character {
     //OK = false if no action, else true
     //msg should contain a message formatted for view (move description )g 
     //this function should decide what actions the mob takes; 
-    //query _canAct to check if stunned or otherwise incapaciated, then run execCombatCmd(moveNOP) 
+    //query _canAct to check if stunned or otherwise incapaciated
     calcCombatMove(enemys,friends){
         let rnd = _.random(1,100);
         let result = {OK:true,msg:''};

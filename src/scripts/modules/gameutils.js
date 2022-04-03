@@ -10,6 +10,8 @@ window.gm.initGame= function(forceReset,NGP=null) {
   _origInitGame(forceReset,NGP);
   window.gm.images = imagesBattlers(window.gm.images||{});
   window.gm.images = imagesMaps(window.gm.images);
+  window.gm.images = imagesEquip(window.gm.images);
+  window.gm.images = imagesIcons(window.gm.images);
     var s = window.story.state;
     s._gm.timeRL= s._gm.timeVR = s._gm.time;
     s._gm.dayRL= s._gm.dayVR = s._gm.day;
@@ -157,9 +159,10 @@ window.gm.initGame= function(forceReset,NGP=null) {
 }
 //this initialises game-objects that are not class-based
 window.gm.initGameFlags = function(forceReset,NGP=null) {
-  let s= window.story.state;
+  let s= window.story.state,map,data;
+  function dataPrototype(){return({visitedTiles:[],mapReveal:[],tmp:{},version:0});}
   if (forceReset) {  
-    s.Settings=s.DngCV =s.DngDF = s.DngAM= s.DngSY=s.DngMN=s.DngAT=null; 
+    s.Settings=s.DngCV=s.DngDF=s.DngAM=s.DngSY=s.DngMN=s.DngAT=null; 
     s.DngFM=s.DngSC=s.DngLB=s.DngHC=s.DngPC=null;
   }
   let Settings = {
@@ -178,47 +181,22 @@ window.gm.initGameFlags = function(forceReset,NGP=null) {
       prevLocation:'', nextLocation:'', //used for nav-logic
       dngMap:{} //dungeon map info
   };
-  let DngAM = {
-      visitedTiles: [],mapReveal: []
-  };
-  let DngAT = {
-    visitedTiles: [],mapReveal: [],
-    tmp: {}
-  };
-  let DngDF = {
-    visitedTiles: [],mapReveal: [],
-    plum:{}, //which plums got collected
-    lapine:{},
-    tmp:{}
-  };
-  let DngFM = {
-    visitedTiles: [],mapReveal: [],
-    tmp: {}
-  };
-  let DngHC = {
-    visitedTiles: [],mapReveal: [],
-    tmp:{}
-  };
-  let DngPC = {
-    visitedTiles: [],mapReveal: [],
-    tmp:{}
-  };
-  let DngLB = {
-    visitedTiles: [],mapReveal: [],
-    tmp: {}
-  };
-  let DngSC = {
-    visitedTiles: [],mapReveal: [],
-    tmp: {}
-  };
-  let DngCV = {
-    visitedTiles: [],mapReveal: [],
-    tmp: {}
-  };
-  let DngMN = {
-    visitedTiles: [],mapReveal: [],
-    page:{} //which bookpages got collected
-  };
+  let DngAM = dataPrototype();
+  let DngAT = dataPrototype();
+  let DngDF = dataPrototype();
+  DngDF.plum={},//which plums got collected
+  DngDF.lapine={};
+  let DngFM = dataPrototype();
+  let DngHC = dataPrototype();
+  let DngPC = dataPrototype();
+  if(s.DngPC) { //update if exist
+    ({map,data}=window.gm.build_DngPC());
+    s.DngPC=window.gm.util.mergePlainObject(DngPC,s.DngPC);
+  }
+  let DngLB = dataPrototype();
+  let DngSC = dataPrototype();
+  let DngCV = dataPrototype();
+  let DngMN = dataPrototype();DngMN.page={}; //which bookpages got collected
   //see comment in rebuildFromSave why this is done
   s.Settings=window.gm.util.mergePlainObject(Settings,s.Settings);
   s.DngDF=window.gm.util.mergePlainObject(DngDF,s.DngDF);

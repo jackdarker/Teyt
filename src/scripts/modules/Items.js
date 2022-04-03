@@ -9,7 +9,7 @@ class LighterDad extends Item {
 };
 class Money extends Item {
     constructor() {super('Money'); this.addTags([window.gm.ItemTags.Money]);}
-    get desc() { return('shiny,clinky coin.');}
+    get desc() { return('shiny,clinky coin');}
     toJSON() {return window.storage.Generic_toJSON("Money", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(Money, value.data);};
 };

@@ -137,7 +137,7 @@ window.gm.util.addShortKeyHandler=function(){
       }*/
     }
   });
-}
+};
 //create pretty name for passage; requires a tag (replace space with _ !) [name:"My_Room"]
 window.gm.util.printLocationName=function(passage) {
   let tags = window.story.passage(passage).tags;
@@ -148,14 +148,19 @@ window.gm.util.printLocationName=function(passage) {
     }
   }
   return(passage);
-}
+};
 //prints a div with text "value/max" and bargraph-background
 window.gm.util.bargraph=function(value,max,color,text="") {
   let msg ='';
   let rel = value/max*100;
   msg ='<div class="progressbar"><div style="background-color:'+color+'; width: '+rel.toString()+'%;"><div style="width: max-content;">'+text+window.gm.util.formatNumber(value,1)+'/'+max.toString()+'</div></div></div>';
   return(msg); //todo bargraph css-animation doesnt work because the whole page is reloaded instead of just width change
-}
+};
+window.gm.util.statsbar=function(what, color){
+  var x=window.gm.player.Stats.get(what),y=window.gm.player.Stats.get(what+"Max");
+  if(x.hidden>=4) return("");
+  return(window.gm.util.bargraph(x.value,y.value,color,what+": "));
+};
 /* Uploads SVG files from local file system, based on file selected in input; https://github.com/fizzstudio/svg-load-save */
 window.gm.util.loadLocalSVG=function(event) {
     let file = event.target.files[0]; // FileList object
@@ -303,6 +308,7 @@ window.gm.newGamePlus = function() {
 //reimplement this to handle version upgrades on load !
 window.gm.rebuildObjects= function(){ 
   var s = window.story.state;
+  s._gm.nokeys=false;
   window.styleSwitcher.loadStyle(); //since style is loaded from savegame
   window.gm.quests.setQuestData(s.quests); //necessary for load support
   window.gm.switchPlayer(s._gm.activePlayer);
@@ -619,9 +625,10 @@ window.gm.refreshSidePanel = function(){
 ///////////////////////////////////////////////////////////////////////
 window.gm.pushLog=function(msg,Cond=true) {
   if(!Cond || msg==='') return;
+  const logsize=20;
   var log = window.story.state._gm.log;
   log.unshift(msg+'</br>');
-  if(log.length>10) {
+  if(log.length>logsize) {
       log.splice(log.length-1,1);
   }
 };
@@ -898,7 +905,9 @@ window.gm.printEffectSummary= function(who='player',showstats=true,showfetish=fa
   ids.sort(); //Todo better sort
   for(var i=0;i<ids.length;i++){
       var data = window.story.state[who].Effects.get(ids[i]);
-      result+='<tr><td>'+data.name+':</td><td>'+data.desc+'</td><td>'+data.data.duration+'h left</td></tr>';
+      if(data.hidden!==4) {
+      result+='<tr><td>'+((data.hidden & 0x1)?'???':data.name)+':</td><td>'+((data.hidden & 0x1)?'???':data.desc)+'</td><td>'+((data.hidden & 0x2)?'???':data.data.duration)+'h left</td></tr>';
+      }
   }
   result+='</table>';
   return(result);

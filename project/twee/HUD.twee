@@ -6,13 +6,9 @@
 <%=window.gm.getTimeString()%> </br> <%=window.gm.getDateString()%></br>
 <hr>
 <%=window.gm.player.name%></br></div>
-<%=window.gm.util.bargraph(window.gm.player.health().value,window.gm.player.health().max,"red","Health: ")%>  
-<%=window.gm.util.bargraph(window.gm.player.energy().value,window.gm.player.energy().max,"yellow","Energy: ")%>
-<%=window.gm.util.bargraph(window.gm.player.will().value,window.gm.player.will().max,"green","Will: ")%>
-<%=window.gm.util.bargraph(window.gm.player.arousal().value,window.gm.player.arousal().max,"coral","Arousal: ")%>
-<%=window.gm.util.bargraph(window.gm.player.Stats.get("hunger").value,window.gm.player.Stats.get("hungerMax").value,"rosybrown","Hunger: ")%>
-<%=window.gm.util.bargraph(window.gm.player.Stats.get("savageness").value,window.gm.player.Stats.get("savagenessMax").value,"darkred","Savageness: ")%>
-<div>Money: <%=window.gm.player.Inv.countItem('Money') %> </div>
+<%=window.gm.util.statsbar("health","red")%><%=window.gm.util.statsbar("energy","yellow")%><%=window.gm.util.statsbar("will","green")%>
+<%=window.gm.util.statsbar("arousal","coral")%><%=window.gm.util.statsbar("hunger","rosybrown")%><%=window.gm.util.statsbar("savageness","darkred")%>
+<div>Money: <%=window.gm.player.Inv.countItem('Money')%></div>
 <!--<div <%=window.gm.player.canLevelUp?"class=\"green\"":""%>>XP/Level: <%=window.gm.player._data.XP+"/"+window.gm.player._data.level%></div>-->
 <hr>
 <form>
@@ -64,7 +60,7 @@ function clearview(){
 }
 </script>
 
-:: SaveDialog
+:: SaveDialog [_noshortkey_]
 <dialog role="dialog" id='dialog_save' aria-labelledby="dialog-heading">
     <button id="close-dialog">Back</button> <div><%=(window.story.state._gm.nosave?"save disabled in this scene":"")%></div>
     <form>
@@ -211,7 +207,7 @@ _ids = whom.Outfit.getAllIds();
 for(var i=0;i<_ids.length;i++){window.gm.printEquipment(whom,whom.Outfit.getItem(_ids[i]));}
 </script>
 
-:: Settings [_back_]
+:: Settings [_back_ _noshortkey_]
 <section> <!--<aside id="sidebar"></aside>--><article><%=window.story.render("CenterDialogs") %>
 [[Back|_back_]]</br>
 <p class="author">settings are stored in save-game until I find a way to store them in cookies.</p>
@@ -275,7 +271,7 @@ window.gm.printOutput(window.gm.printEffectSummary(window.gm.player.id,true,fals
 </script>
 
 
-:: Levelup [_back_ _nosave_]
+:: Levelup [_back_ _nosave_ _noshortkey_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 [[Back|_back_]]</br>
 <% let char=window.gm.player;if(char.canLevelUp){%>

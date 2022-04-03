@@ -1,5 +1,5 @@
 
-:: debug_cheat [_back_]
+:: debug_cheat [_back_ _noshortkey_]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 Some things for debugging:</br>
@@ -10,7 +10,7 @@ Some things for debugging:</br>
 </article><article id="LogPanel"></article></section>
 
 
-:: debug [_back_]
+:: debug [_back_ _noshortkey_]
 <section> <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 [[Back|_back_]] [[DebugTransform]] [[Styletest]] [[Emergency-Wardrobe|Wardrobe]] [[DebugImages]] [[dont use!|debug_cheat]]</br>
 Cheat buttons: those are meant for debugging and might break your game</br>
@@ -60,7 +60,7 @@ function startfight() {
 </script>
 
 
-:: DebugTransform  [_back_]
+:: DebugTransform  [_back_ _noshortkey_]
 <section> <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 </br>[[Back|_back_]]</br>
 Test transformation events. Because they are deffered-events you need to return to story and move between rooms.</br>
@@ -76,7 +76,7 @@ Test transformation events. Because they are deffered-events you need to return 
 </article><article id="LogPanel"></article></section>
 
 
-:: DebugImages  [_back_]
+:: DebugImages  [_back_ _noshortkey_]
 <section> <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 </br>[[Back|_back_]]</br><div id='canvas'></div></br><div id='choice'></div></br>
 Test svg inlined in code.</br>
@@ -92,7 +92,7 @@ Theme:
 </br><hr>
 <div class="speech tNPC2"><span class="avatar"></span>NPCx<hr><br>"There you are"</div>
 <p class='tPC'>PC-talk</p><p class='tNPC1'>NPC1-talk</p><p class='tNPC2'>NPC2-talk</p><p class='tNPC3'>NPC3-talk</p><p class='tNPC4'>NPC4-talk</p>
-<p class='dev'>notes from developer.</p>
+<p class='dev'>notes from developer.<%=window.gm.images.ic_heart()%></p>
 <p class='author'>notes from author.</p>
 <form><ul style="list-style-type: none; padding-inline-start: 0px;" ><legend>List</legend>
 <button type="button" id="button1">Button1</button>
