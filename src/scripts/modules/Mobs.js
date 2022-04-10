@@ -383,10 +383,10 @@ class Succubus extends Mob {
         this.name = this.id = 'Succubus';
         this.pic= 'succubus1';
         this.Outfit.addItem(new BaseHumanoid());
-        this.Outfit.addItem(new SkinHuman());
+        this.Outfit.addItem(SkinHuman.factory("human"));
         this.Outfit.addItem(HandsHuman.factory('human'));
         this.Outfit.addItem(BreastHuman.factory('human'));
-        this.Outfit.addItem(new FaceHuman());
+        this.Outfit.addItem(FaceHuman.factory('human'));
         this.Outfit.addItem(AnusHuman.factory('human'));
         this.Outfit.addItem(VulvaHuman.factory('human'));
         this.Outfit.addItem(new BikiniBottomLeather());
@@ -431,10 +431,10 @@ class Dryad extends Mob {
         this.pic= 'unknown';
         this.loot= [{id:'DryadVine',chance:25,amount:1}];
         this.Outfit.addItem(new BaseHumanoid());
-        this.Outfit.addItem(new SkinHuman());
+        this.Outfit.addItem(SkinHuman.factory("human"));
         this.Outfit.addItem(HandsHuman.factory('human'));
         this.Outfit.addItem(BreastHuman.factory('human'));
-        this.Outfit.addItem(new FaceHuman());
+        this.Outfit.addItem(FaceHuman.factory('human'));
         this.Outfit.addItem(AnusHuman.factory('human'));
         this.Outfit.addItem(VulvaHuman.factory('human'));
         this.Outfit.addItem(new BikiniBottomLeather());

@@ -36,20 +36,14 @@ There is a gate in front of you but it is locked.</br>
 <a0 onclick='window.story.show(window.story.state.DngSY.prevLocation)'>Go back</a>. 
 </article><article id="LogPanel"></article></section>
 <script>function requiredKey(){
-    var msg='';
-    var door = window.story.state.DngSY.prevLocation+'-'+window.story.state.DngSY.nextLocation;
-    switch(door) {
-        case 'DngPC_K4-DngPC_K3':
-            msg='This door gets unlocked in tier6.';
-            break;
-        case 'DngPC_G4-DngPC_F4':
-            msg='This door gets unlocked in tier3.';
-            break;
-        case 'DngPC_J4-DngPC_J5':
-            msg='This door gets unlocked in tier9.';
-            break;
-        default:
-            msg='I dont know how to unlock door '+door;
+    var msg='',dng=window.story.state.DngSY.dng;
+    var x=window.story.state.DngSY.prevLocation.replace(dng+'_',''),y=window.story.state.DngSY.nextLocation.replace(dng+'_','');
+    var door = window.story.state.DngPC.tmp.doors[x];
+    window.gm.dbgHelper();
+    if(door && door[y]) {
+        msg='Someone with at least tier might be able to unlock this door.';
+    } else {
+        msg='I dont know how to unlock that door.';
     }
     window.gm.printOutput(msg+"</br>");
 }
@@ -76,7 +70,6 @@ While walking down the corridor you notice that on of the slabs you set a foot o
 </article><article id="LogPanel"></article></section>
 <%=window.story.render("DngPC_Encounters")%>
 <script>
-window.gm.dbgHelper();
 {var _triggered,_done,_x=window.gm.player.Stats.get("savagenessMax").value-window.gm.player.Stats.get("savageness").value;
 if(!_done) {
     _done=true;
@@ -102,7 +95,6 @@ You notice some odd gooey puddles on the floor and even on the walls. But you ha
 </article><article id="LogPanel"></article></section>
 <%=window.story.render("DngPC_Encounters")%>
 <script>
-window.gm.dbgHelper();
 {var _triggered,_done,_x=window.gm.player.Stats.get("savagenessMax").value-window.gm.player.Stats.get("savageness").value;
 if(!_done) {
     _done=true;
@@ -204,7 +196,6 @@ Wrapping yourself in that shaggy, old quilt, you try to get some rest.</br>
 </br><a0 onclick='window.story.show("DngPC_G4")'>Next</a></br>
 </article><article id="LogPanel"></article></section>
 
-
 :: DngPC_Shrine [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%></br>
@@ -222,9 +213,36 @@ Gold-Vouchers: gained after finishing a set of tasks</br>
 By taking over tasks you show a sense of responsibility and reduce your punishment. 
 <hr><div id='choice'></div></br><hr></br>
 If you are a whimp, you might [[ask for help|DngPC_Shrine_Help]].</br>
+Check out what doors you can [[unlock|DngPC_Shrine_Doors]].</br>
 <p>[[Back|DngPC_G4]]</p>
 </article><article id="LogPanel"></article></section>
 <script>window.gm.getAvailableTasks()</script>
+
+
+:: DngPC_Shrine_Doors [_nosave_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%></br>
+A certain tier and gold tokens are required to unlock a door.
+<div id='output'></div><p>[[Back|DngPC_G4]]</p>
+</article><article id="LogPanel"></article></section>
+<script>function list(){
+    window.gm.dbgHelper();
+    var msg='',door,doors2,tier=window.story.state.DngPC.tmp.tier,token=window.gm.player.Inv.countItem("VoucherGold"),doors=Object.keys(window.story.state.DngPC.tmp.doors);
+    for(var i=doors.length-1;i>=0;i--){
+        doors2=Object.keys(window.story.state.DngPC.tmp.doors[doors[i]]);
+        for(var k=doors2.length-1;k>=0;k--){
+            door=window.story.state.DngPC.tmp.doors[doors[i]][doors2[k]];
+            if(door.state<1){
+                if(door.token<=token && door.tier<=tier) msg+=window.gm.printLink("Unlock","window.gm.player.Inv.removeItem(\"VoucherSilver\","+door.token+"),window.story.state.DngPC.tmp.doors[\""+doors[i]+"\"][\""+doors2[k]+"\"].state=1;window.story.show(window.passage.name);");
+                else msg+="Unlock";
+                msg+=" door between "+doors[i]+"-"+doors2[k]+" for "+door.token+" tokens at tier "+door.tier+"</br>";
+            }
+        }
+    }
+    window.gm.printOutput(msg);
+}
+list();
+</script>
 
 
 :: DngPC_Shrine_Help [_nosave_]

@@ -321,5 +321,5 @@ window.gm.encounters.Ruff = function(params) {
     window.gm.Encounter.onVictory = function() {
         return('you dominated him.</br>'+ window.gm.printPassageLink('Next','RuffVictory'));
     }*/
-    if(noStart===false) window.gm.Encounter.initCombat();
+    if(!_params.noStart) window.gm.Encounter.initCombat();
 }

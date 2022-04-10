@@ -172,6 +172,7 @@ window.gm.finishTask=function(){
     if(_res.OK===true){
         window.story.state.DngPC.tasks[task.id].cnt+=1,window.story.state.DngPC.tasks[task.id].done=0,window.story.state.DngPC.task={};//,window.story.show(window.passage.name);
         window.story.state.DngPC.tmp.tier+=1;_res.msg='donation request fullfilled. Your tier is now: '+window.story.state.DngPC.tmp.tier+'</br>';
+        if(window.story.state.DngPC.tmp.tier%3===0) {_res.msg="A <b>golden token</b> is your price that you can use to open another door in the dungeon.</br>";window.gm.player.Inv.addItem(window.gm.ItemsLib.VoucherGold());}
     }
     window.gm.printOutput(_res.msg,'#choice');
 };
@@ -331,7 +332,7 @@ window.gm.build_DngPC=function() {
     {room:'L6', dirs:['K6']}];
     let data,map={grid:grid,width:14,height:8,legend:'S=Start  B=Boss'}
     var s = window.story.state;    
-    const version=1;                            // <== increment this if you change anything below
+    const version=2;                            // <== increment this if you change anything below
     if(s.DngPC && s.DngPC.version===version) {
         data=s.DngPC;
     } else {
@@ -341,12 +342,11 @@ window.gm.build_DngPC=function() {
             H4: {gas:{tick:window.gm.getTime(),state:0 }},
         }
         data.tmp.doors = { //doors
-            H4:{H3:{tick:'',state:0 }}
-            ,G4:{F4:{tick:'',state:0 }}
-            ,J4:{K4:{tick:'',state:0 }
-            ,J5:{tick:'',state:0 }}
-            ,K4:{K3:{tick:'',state:0 }}
-            ,H6:{I6:{tick:'',state:0 }}
+            H4:{H3:{tick:'',state:0,token:2,tier:6}}
+            ,G4:{F4:{tick:'',state:0,token:1,tier:3 }}
+            ,J4:{K4:{tick:'',state:0,token:1,tier:3 },J5:{tick:'',state:0,token:1,tier:3 }}
+            ,K4:{K3:{tick:'',state:0,token:1,tier:3 }}
+            ,H6:{I6:{tick:'',state:0,token:1,tier:3 }}
         }
         data.tmp.evtSpawn = { //respawn evts 
             DngPC_I4: {chest:{tick:window.gm.getTime(),state:0, loot:[{id:"Money",count:30}] },

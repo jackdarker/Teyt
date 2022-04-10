@@ -12,7 +12,7 @@ Some things for debugging:</br>
 
 :: debug [_back_ _noshortkey_]
 <section> <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
-[[Back|_back_]] [[DebugTransform]] [[Styletest]] [[Emergency-Wardrobe|Wardrobe]] [[DebugImages]] [[dont use!|debug_cheat]]</br>
+[[Back|_back_]] [[DebugTransform]] [[Styletest]] [[Emergency-Wardrobe|Wardrobe]] [[DebugImages]] [[DebugImages2]] [[dont use!|debug_cheat]]</br>
 Cheat buttons: those are meant for debugging and might break your game</br>
 <a0  onclick='window.gm.player.Inv.addItem(new window.storage.constructors["Money"](),200);window.gm.refreshAllPanel();'>Get 200$</a></br>
 </br>
@@ -83,6 +83,37 @@ Test svg inlined in code.</br>
 </article><article id="LogPanel"></article></section>
 <script>window.gm.listImages();</script>
 
+:: DebugImages2  [_back_ _noshortkey_]
+<section> <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+</br>[[Back|_back_]]</br><div id='canvas'></div></br><div id='choice'></div></br>
+<%=window.gm.images.daynight()%></p>
+<div>600 = 6:00 <input id="progress-value" type="number" placeholder="Enter value" min="0" max="2400" value="1200" />
+	<input type="button" value="Change" onclick="change()"/></div>
+</article><article id="LogPanel"></article></section>
+<script>
+var oldTime = 1200;
+function change(){
+  var menu = document.getElementById("progress-value");
+  var el = SVG("#wheel")//document.querySelector("#wheel")
+  var y,y2,x=el.node.ownerSVGElement.width.baseVal.value/2;//el.ownerSVGElement.width.baseVal.value/2;
+  y=(oldTime-1200)*360/2400;y2=(menu.value-oldTime)*360/2400;
+  if((menu.value-oldTime)<0){el.rotate(-360,x,x),y2+=360};
+  el.animate().rotate(y2,x,x);//use SVG.js
+  oldTime=menu.value;
+  //el.setAttribute('transform', "rotate("+y+","+x+","+x+")");
+  /*el.animate([{
+				transform: "rotate("+y+","+x+","+x+")"
+      }, {
+				transform: "rotate("+y2+","+x+","+x+")"
+      }
+      ], {
+			duration: 2000,
+			iterations: 1,
+			fill: 'forwards'
+		});*/
+}
+</script>
+
 :: Styletest [_back_]
 <section> <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <div></br>[[Back|_back_]]
@@ -123,10 +154,10 @@ Theme:
 </article><article id="LogPanel"></article></section>
 <script>
 function change(){
-				var selectedValue = document.querySelector("#progress-value").value;
-				document.querySelector("#bartest > div").textContent = selectedValue + "%";
-				document.querySelector("#bartest > div").style.width = selectedValue + "%";
-			}
+    var selectedValue = document.querySelector("#progress-value").value;
+    document.querySelector("#bartest > div").textContent = selectedValue + "%";
+    document.querySelector("#bartest > div").style.width = selectedValue + "%";
+  }
 </script>
 
 
