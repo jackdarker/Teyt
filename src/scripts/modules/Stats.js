@@ -679,7 +679,7 @@ class effLibido extends effHunger {
 class effCombatRecovery extends Effect {
     constructor() {
         super();
-        this.data.id = effCombatRecovery.name, this.data.name="recover", this.data.duration = 0, this.data.hidden=0;
+        this.data.id = effCombatRecovery.name, this.data.name="recover", this.data.duration = 0, this.data.hidden=4;
         this.eRecover=this.wRecover =10;
     }
     toJSON() {return window.storage.Generic_toJSON("effCombatRecovery", this); };
@@ -1607,6 +1607,11 @@ class effTeaseDamage extends CombatEffect {
     onTurnStart() { this.data.duration-=1; if(this.data.duration<=0) this.parent.removeItem(this.data.id); return({OK:true,msg:''});   }
 }
 class effStunned extends CombatEffect {
+    static factory(duration=2) {
+        let eff = new effStunned();
+        eff.startduration=duration;
+        return(eff);
+    }
     constructor() {
         super();
         this.data.id = this.data.name= effStunned.name, this.data.duration = 2;

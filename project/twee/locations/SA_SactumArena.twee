@@ -29,7 +29,7 @@ Because a high stonewall is surrounding the outer ring, you cant see what is bel
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
 Kumala is again at work in the lab.
-<p class="tPC">"Hello, good morning. I found your note."</p>
+<p class="tPC">"Good morning Kumala. I found your note."</p>
 <span class="tNPC1">"Yes the note, I should have told you yesterday when you were here. You were already in your room when I remeered and I didnt know if you were.. "</span>
 She makes a strange pause <span>"..busy or so."</span>
 <p class="tNPC1">"Please follow me."</p>

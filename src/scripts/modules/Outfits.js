@@ -22,7 +22,7 @@ class Jeans extends Equipment {
         return(x);
     }
     constructor() {
-        super('Jeans');
+        super();
         this.addTags(['cloth']);
         this.slotUse = ['Legs','Hips'];this.lossOnRespawn = true;this.style=0;
     }
@@ -571,6 +571,10 @@ class ShortsLeather extends Equipment {
         this._style = style; 
         if(style===0) this.id=this.name='ShortsLeather';
         else if(style===100) this.id=this.name='Loincloth';
+        else if(style===200) {
+            this.id=this.name='Chaps';
+            this.slotCover = [];
+        }
         else throw new Error(this.id +' doesnt know '+style);
     }
     get style() {return this._style;}
@@ -579,6 +583,9 @@ class ShortsLeather extends Equipment {
         switch(this._style) {
             case 100:
                 msg=('a crude loincloth made from rough cotton');
+                break;
+            case 100:
+                msg=('those pants are usually worn on top of normal pants. Because they dont cover front and back of your groin.');
                 break;
             default:
         }
@@ -916,7 +923,7 @@ class TailRibbon extends Equipment {
     }
 }
 //todo bow,blowpipe
-//todo vest,chaps,bikini top, greaves , jacket
+//todo vest, greaves , jacket
 window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(AnalPlug);
     window.storage.registerConstructor(BikiniBottomLeather);
@@ -976,6 +983,9 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['LewdMark'] = function () { let x= new TattooGroin();x.style=100;return(x); };
     ItemsLib['RobesZealot'] = function () { return new RobesZealot();};
     ItemsLib['PrisonerCloths'] = function () { let x= new RobesZealot();x.style=100;return(x); };
+    ItemsLib['ShortsLeather'] = function () { let x= new ShortsLeather();x.style=0;return(x); };
+    ItemsLib['LoinCloth'] = function () { let x= new ShortsLeather();x.style=100;return(x);};
+    ItemsLib['Chaps'] = function () { let x= new ShortsLeather();x.style=200;return(x);};
     ItemsLib['WristCuffs'] = function () { return new WristCuffs();};
     ItemsLib['HarnessRubber'] = function () { return new HarnessRubber();};
     ItemsLib['BracerLeather'] = function () { let x= new BracerLeather();return(x); };

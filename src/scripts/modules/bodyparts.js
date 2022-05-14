@@ -708,7 +708,6 @@ class TailWolf extends BodyPart {
             case 'fox':
             case 'horse':
             case 'wolf':
-            case 'lizard':  
                 this.data.growth = 0.10; //in %/100 maxGrowth
                 this.data.maxGrowth = 1.2; //in meter, todo depends on bodysize
                 break;
@@ -739,6 +738,63 @@ class TailWolf extends BodyPart {
     static fromJSON(value) {return(window.storage.Generic_fromJSON(TailWolf, value.data));}
     descLong(fconv) { 
         return(fconv('Some '+this.data.style+'-tail is attached to $[my]$ spine.'));
+    }
+}
+class TailSnake extends BodyPart {
+    static dataPrototype() {    
+        return({style:'snake',growth:0.2, maxGrowth: 2});    }
+    static factory(id) {
+        let obj =  new TailSnake();
+        obj.setStyle(id);
+        return(obj);
+    }
+    constructor() {
+        super('TailSnake');
+        this.addTags(['body']);
+        this.slotUse = ['bTailBase'];
+        this.data = TailSnake.dataPrototype();  
+    }
+    setStyle(id) {
+        this.data.style = id;
+        switch(id) {
+            case 'snake':
+            case 'naga':
+                this.data.growth = 0.10; //in %/100 maxGrowth
+                this.data.maxGrowth = 2.0; //in meter, todo depends on bodysize
+                break;
+            case 'lizard':  
+                this.data.growth = 0.10; //in %/100 maxGrowth
+                this.data.maxGrowth = 1.2; //in meter, todo depends on bodysize
+                break;
+            default:
+                throw new Error("unknown Tail-style "+id);
+        }
+    }
+    getStyle() { return this.data.style; }
+    get descShort() { return (this.desc);}
+    get desc() { 
+        var msg ='';
+        switch(this.data.style) {
+            case 'naga':
+                msg ='a meaty snake-like appendage.';
+            break;
+            default:
+                msg = this.data.style+'\'like tail.';
+        }
+        return(msg);
+    }
+    toJSON() {return window.storage.Generic_toJSON("TailSnake", this); };
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(TailSnake, value.data));}
+    descLong(fconv) { 
+        return(fconv('Some '+this.data.style+'-tail is attached to $[my]$ spine.'));
+    }
+    attackMod(target){
+        let mod = new SkillMod();
+        let _dmg =5;
+        if(this.data.style==='naga' ) _dmg+=5;
+        mod.onHit = [{ target:target, eff: [effDamage.factory(_dmg,'blunt')]}];
+        mod.onCrit = [{ target:target, eff: [effDamage.factory(_dmg,'blunt'),effStunned.factory()]}];
+        return(mod);
     }
 }
 class HandsPaw extends BodyPart { //paws of ferals
@@ -1181,6 +1237,7 @@ window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(SkinFur);
     window.storage.registerConstructor(SkinScales);
     window.storage.registerConstructor(TailWolf);
+    window.storage.registerConstructor(TailSnake);
     window.storage.registerConstructor(BreastHuman);
     window.storage.registerConstructor(PenisHuman);
     window.storage.registerConstructor(VulvaHuman);

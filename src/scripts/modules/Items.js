@@ -462,6 +462,38 @@ class Pills extends Item {
         return(msg);
     }
 }
+class SkillBook extends Item {   //todo
+    static factory(style){
+        let x= new SkillBook();
+        x.style=style;
+        return(x);
+    }
+    constructor() { super('SkillBook'); this.addTags([window.gm.ItemTags.Food]);this.price=this.basePrice=100;this.style=0;}
+    toJSON() {return window.storage.Generic_toJSON("SkillBook", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(SkillBook, value.data);};
+    usable(context,on=null) {return({OK:true, msg:'read'});}
+    use(context,on=null) { 
+        var _txt='';
+        if(context instanceof Inventory) {
+            if(on===null) on=context.parent;
+            //todo grant skill
+            context.removeItem(this.id);
+            if(on instanceof Character){ 
+                return({OK:true, msg:_txt});
+            }
+        } else throw new Error('context is invalid');
+    }
+    set style(style) {
+        this._style = style;
+        if(style===0) this.id=this.name='SkillbookMedicine';
+        else throw new Error(this.id +' doesnt know '+style); 
+    }
+    get style() {return this._style;}
+    get desc() { 
+        let msg =this.name;
+        return(msg);
+    }
+}
 class RegenderPotion extends Item {
     constructor() { super('RegenderPotion'); this.addTags([window.gm.ItemTags.Drink]);this.price=this.basePrice=500;this.style=0;}
     toJSON() {return window.storage.Generic_toJSON("RegenderPotion", this); };

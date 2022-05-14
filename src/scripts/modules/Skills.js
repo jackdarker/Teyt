@@ -289,6 +289,26 @@ class SkillKick extends SkillAttack {
         return(attack);
     }
 }
+class SkillTailWhip extends SkillAttack {
+    constructor() {
+        super();
+        this.id=this.name='Tailwhip'
+        this.msg = '';
+        this.cost.energy =20;
+    }
+    toJSON() {return window.storage.Generic_toJSON("SkillTailWhip", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillTailWhip, value.data));}
+    get desc() { return("Use your big tail as a weapon. "+this.getCost().asText());}
+    __estimateAttack(target) {
+        let attack =window.gm.combat.defaultAttackData();
+        let tail=this.caster.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bTailBase);
+        attack.mod= new SkillMod();
+        if(tail && tail.attackMod) { //get damage info
+            attack.mod=tail.attackMod(target);
+        }
+        return(attack);
+    }
+}
 class SkillFireball extends SkillAttack {
     static dataPrototype() { return({style:''}); }
     static factory(id) {
@@ -332,6 +352,47 @@ class SkillFireball extends SkillAttack {
         if(weapon && weapon.attackMod) { //get damage info
             attack.mod=weapon.attackMod(target);
         }*/
+        return(attack);
+    }
+}
+class SkillSpark extends SkillAttack {
+    static dataPrototype() { return({style:''}); }
+    static factory(id) {
+        let obj =  new SkillSpark();
+        obj.setStyle(id);
+        return(obj);
+    }
+    constructor() {
+        super();
+        this.id=this.name='Spark';
+        this.data = SkillSpark.dataPrototype();
+        this.msg = ''
+        this.cost.energy=20,this.cost.will=20;
+    }
+    toJSON() {return window.storage.Generic_toJSON("SkillSpark", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(SkillSpark, value.data));}
+    targetFilter(targets){
+        return(this.targetFilterEnemy(this.targetFilterAlive(targets)));
+    }
+    setStyle(id) {
+        this.data.style = id;
+        switch(id) {
+            case 'spark': 
+            case 0:
+                this.id=this.name="SkillSpark";
+                //this.startDelay=0,this.defCoolDown=1;
+                break;
+            default:
+                throw new Error("unknown "+id);
+        }
+    }
+    getStyle() { return this.data.style; }
+    get desc() { return("Cast a spark. "+this.getCost().asText());}
+    __estimateAttack(target) {
+        let attack =window.gm.combat.defaultAttackData();
+        attack.mod = new SkillMod();
+        attack.mod.onHit = [{ target:target, eff: [effDamage.factory(5,'spark')]}];
+        attack.mod.onCrit = [{ target:target, eff: [effDamage.factory(10,'spark')]}];
         return(attack);
     }
 }
@@ -921,10 +982,12 @@ window.gm.SkillsLib = (function (Lib) {
     window.storage.registerConstructor(SkillGrapple);
     window.storage.registerConstructor(SkillFlee);
     window.storage.registerConstructor(SkillFireball);
+    window.storage.registerConstructor(SkillSpark);
     window.storage.registerConstructor(SkillFly);
     window.storage.registerConstructor(SkillGuard);
     window.storage.registerConstructor(SkillHeal);
     window.storage.registerConstructor(SkillInspect);
+    window.storage.registerConstructor(SkillKick);
     window.storage.registerConstructor(SkillLeechHealth);
     window.storage.registerConstructor(SkillPoisonCloud);
     window.storage.registerConstructor(SkillShoot);
@@ -934,6 +997,7 @@ window.gm.SkillsLib = (function (Lib) {
     window.storage.registerConstructor(SkillSubmit);
     window.storage.registerConstructor(SkillSting);
     window.storage.registerConstructor(SkillStruggle);
+    window.storage.registerConstructor(SkillTailWhip);
     window.storage.registerConstructor(SkillTease);
     window.storage.registerConstructor(SkillUltraKill);
     window.storage.registerConstructor(SkillUseItem);

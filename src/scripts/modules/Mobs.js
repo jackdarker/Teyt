@@ -11,7 +11,7 @@
 - werwolf
 - fungus/spore-pod
 - vile vine
-- mimic
+- mimic, transportation trap
 - cursed tome of conjuring
 - lush orchid
 - slug
@@ -20,6 +20,7 @@
 - spider/tarantula
 - glyphid swarmers/ Brood hive
 - glyphid soldiers
+- vampire squid
 - cave leech
 - Naeodocyte shocker
 - raptor
@@ -120,7 +121,7 @@ class Wolf extends Mob {
         this.Outfit.addItem(HandsPaw.factory('wolf'));
         this.Outfit.addItem(PenisHuman.factory('wolf'));
         this.Outfit.addItem(AnusHuman.factory('wolf'));
-        this.Outfit.addItem(TailWolf.factory('wolf'));
+        this.Outfit.addItem(TailSnake.factory('dragon'));
         this.Outfit.addItem(FaceWolf.factory('wolf'));
         this.Stats.increment('arm_blunt',5);
     }
@@ -678,6 +679,46 @@ class Hornett extends Mob {
         return(super.calcCombatMove(enemys,friends));
     }
 }
+class Naga extends Mob {
+    static factory(type) {
+        let foe = new Naga();
+        if(type="Quetzal") {
+            this.name = this.id = type;
+            this.Outfit.addItem(Wings.factory('feathered'));
+        }
+        return foe;
+    }
+    constructor() {
+        super();
+        this.name = this.id = 'Naga';
+        this.pic= 'naga1';
+        this.level_min =1;
+        this.Outfit.addItem(new BaseWorm());
+        this.Outfit.addItem(new ArmorTorso('scales'));
+        this.Outfit.addItem(new SkinScales('lizard'));
+        this.Outfit.addItem(new FaceWolf('lizard'));
+        this.Outfit.addItem(TailSnake.factory('naga'));
+        this.Outfit.addItem(HandsHuman.factory('lizard'));
+        this.Outfit.addItem(PenisHuman.factory('lizard'));
+        this.Outfit.addItem(AnusHuman.factory('bird'));
+    }
+    calcCombatMove(enemys,friends){
+        let result = {OK:true,msg:''};
+        let rnd = _.random(1,100);
+        if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
+        result.action =result.target= null;
+        if(this.id === 'Quetzal') {
+            let skill= 'Fly';
+            if(this.Skills.getItem(skill).isEnabled().OK && !this.Skills.getItem(skill).isActive().OK){
+                result.action = skill;
+                result.target = [this];
+                result.msg =this.fconv(result.target[0].name + " starts flying.</br>")+result.msg;
+                return(result);
+            }
+        } 
+        return(super.calcCombatMove(enemys,friends));
+    }
+}
 /////////////////////////////////////////////////////////
 // special NPC
 class Carlia extends Mob {
@@ -789,6 +830,7 @@ window.gm.Mobs = (function (Mobs) {
     Mobs.Huntress = function() { return function(param){return(AnthroCat.factory(param));}("Huntress")};
     Mobs.Lapine = Lapine.factory;
     Mobs.Mole = Mole.factory;
+    Mobs.Naga = Naga.factory;
     Mobs.Squirrel = function() { return function(param){return(Mole.factory(param));}("Squirrel")};
     Mobs.Hawk = function() { return function(param){return(Hawk.factory(param));}("Hawk")};
     Mobs.HornettHive = function() { return function(param){return(Hive.factory(param));}("Hornett")};

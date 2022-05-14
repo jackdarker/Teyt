@@ -325,14 +325,14 @@ window.gm.build_DngPC=function() {
     {room:'E6', dirs:['D6','F6']},
     {room:'G6', dirs:['F6','H6']}, 
     {room:'F6', dirs:['E6','F5','G6']    ,anno:['B']},
-    {room:'H6', dirs:['H5','G6']},
+    {room:'H6', dirs:['I6','G6']},
     {room:'I6', dirs:['I5','H6','J6']},
     {room:'J6', dirs:['J5','I6','K6']},
     {room:'K6', dirs:['L6','J6']},
     {room:'L6', dirs:['K6']}];
     let data,map={grid:grid,width:14,height:8,legend:'S=Start  B=Boss'}
     var s = window.story.state;    
-    const version=2;                            // <== increment this if you change anything below
+    const version=3;                            // <== increment this if you change anything below
     if(s.DngPC && s.DngPC.version===version) {
         data=s.DngPC;
     } else {
@@ -349,9 +349,11 @@ window.gm.build_DngPC=function() {
             ,H6:{I6:{tick:'',state:0,token:1,tier:3 }}
         }
         data.tmp.evtSpawn = { //respawn evts 
-            DngPC_I4: {chest:{tick:window.gm.getTime(),state:0, loot:[{id:"Money",count:30}] },
-                        mushroom:{tick:window.gm.getTime(),state:0,loot:"BrownMushroom" }},
-            DngPC_K4: {mushroom:{tick:window.gm.getTime(),state:0,loot:"ViolettMushroom" }}
+            DngPC_I4: {chest:{tick:window.gm.getTime(),state:0, loot:[{id:"Money",count:30}]},
+                        mushroom:{tick:window.gm.getTime(),state:0,loot:"BrownMushroom" }}
+            ,DngPC_K4: {mushroom:{tick:window.gm.getTime(),state:0,loot:"ViolettMushroom" }}
+            ,DngPC_F5: {mushroom:{tick:window.gm.getTime(),state:0,loot:"ViolettMushroom" }}
+            ,DngPC_G6: {chest:{tick:window.gm.getTime(),state:0,loot:[{id:"Money",count:30}]}}
         }
         data.tmp.mobs = [ //wandering mobs
         ];

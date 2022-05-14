@@ -228,10 +228,20 @@ window.gm.getSidebarPic = function(){ //todo display doll ??
 }
 // lookup function for scene background ( 640x300 )
 window.gm.getScenePic = function(id){
+  let x='',y;
   if(id==='Garden' || id ==='Park')   return('assets/bg/bg_park.png');
   if(id==='Bedroom' || id==='Your Bedroom')   return('assets/bg/bg_bedroom.png');
   if(id.slice(0,7)==='AM_Lv2_') return('assets/bg/bg_dungeon_2.png');
-  if(id.slice(0,5)==='DngPC' || id.slice(0,5)==='DngHC') return('assets/bg/bg_dungeon_2.png');
+  if(id.slice(0,5)==='DngPC' || id.slice(0,5)==='DngHC'){
+    x=id.slice(6,8);
+    y=[{x:["H4","I4"],p:'assets/bg/bg_dungeon_2.png'}
+      ,{x:["I4","J4"],p:'assets/bg/bg_dungeon_4.png'}
+      ,{x:["F4","F5"],p:'assets/bg/bg_dungeon_3.png'} ]
+    for(var el of y){
+      if(el.x.indexOf(x)>=0) return el.p;
+    }
+    return('assets/bg/bg_dungeon_2.png');
+  }
   if(id.slice(0,5)==='DngCV') return('assets/bg/bg_cave_4.png');
   //if(id.slice(0,5)==='DngCV') return('assets/bg/bg_cave_2.png');
   return('assets/bg_park.png')//return('assets/bg/bg_VR_1.png');//todo placehodler

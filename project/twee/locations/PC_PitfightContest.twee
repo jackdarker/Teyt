@@ -148,26 +148,34 @@ window.gm.printOutput(msg);
 </script>
 
 :: DngPC_Encounters
-<script>
-function tick() {
+<script>function tick() {
     let here = window.gm.player.location,_d=window.story.state.DngPC.tmp;
     if(here===_d.tickPass) return;
     _d.tickPass=here;
     let _t=_d.tier,_allChances=0,_choice=[];
     switch(here) {//foes; traps are handled in window.gm.navEvent
-        case "DngPC_H4":_choice.push({id:'slime',levelUp:(-2+_t), amount:1, chance:100});
-                        if(_t>1)_choice.push({id:'anthrocat', amount:1, chance:100});
-                        if(_t>3)_choice.push({id:'wolf', amount:1, chance:100});
+        case "DngPC_H4":
+        case "DngPC_F4":
+        case "DngPC_F5":
+            _choice.push({id:'slime',levelUp:(-2+_t), amount:1, chance:100});
+            if(_t>1)_choice.push({id:'anthrocat', amount:1, chance:100});
+            if(_t>3)_choice.push({id:'wolf', amount:1, chance:100});
             break;
-        case "DngPC_I4":_choice.push({id:'hornett',levelUp:(-2+_t), amount:2, chance:100});
-                        _choice.push({id:'leech', amount:1,levelUp:(-2+_t), chance:100});
-                        if(_t>1)_choice.push({id:'anthrocat', amount:1, chance:100});
-                        if(_t>3)_choice.push({id:'wolf', amount:2, chance:100});
+        case "DngPC_I4": 
+        case "DngPC_H6":
+            _choice.push({id:'hornett',levelUp:(-2+_t), amount:2, chance:100});
+            _choice.push({id:'leech', amount:1,levelUp:(-2+_t), chance:100});
+            if(_t>1)_choice.push({id:'anthrocat', amount:1, chance:100});
+            if(_t>3)_choice.push({id:'wolf', amount:2, chance:100});
+            break;
+        case "DngPC_F6":_choice.push({id:'slug', amount:1,chance:100});//boss
             break;
         case "DngPC_J4":_choice.push({id:'Ruff', amount:1,chance:100});//boss
             break;
-        case "DngPC_K4":_choice.push({id:'hornetthive',type:"",levelUp:(-2+_t), amount:1, chance:100});//
-                        _choice.push({id:'succubus',type:"nurse",levelUp:(-2+_t), amount:1, chance:100});//
+        case "DngPC_K4":
+        case "DngPC_G6": 
+            _choice.push({id:'hornetthive',type:"",levelUp:(-2+_t), amount:1, chance:100});//
+            _choice.push({id:'succubus',type:"nurse",levelUp:(-2+_t), amount:1, chance:100});//
             break;
         default:
     }  
@@ -221,8 +229,9 @@ Check out what doors you can [[unlock|DngPC_Shrine_Doors]].</br>
 
 :: DngPC_Shrine_Doors [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%window.gm.player.location=window.passage.name;%></br>
-A certain tier and gold tokens are required to unlock a door.
+<%=window.story.render(window.story.state.DngSY.dng+"_MAP")%></br>
+A certain tier and gold tokens are required to unlock a door.</p><a0 id='map' onclick='(function($event){document.querySelector("#"+id+"~p").toggleAttribute("hidden");})(this);'>Hint</a>
+<p hidden> Hover over the map to display the coordinate of the rooms.</p>
 <div id='output'></div><p>[[Back|DngPC_G4]]</p>
 </article><article id="LogPanel"></article></section>
 <script>function list(){

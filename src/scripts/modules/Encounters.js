@@ -183,6 +183,17 @@ window.gm.encounters.lizan = function(params) {
         return(mobs);});
     if(!_params.noStart) window.gm.Encounter.initCombat();
 }
+window.gm.encounters.naga = function(params) {
+    let _params=window.gm.encounters._setup(params);
+    window.gm.Encounter.EnemyFunc = (function() { 
+        let mobs =[];
+        for(var i=_params.amount;i>0;i-=1) {
+            let x = window.gm.Mobs.naga(_params.type); x.scaleLevel(window.gm.player.level+_params.levelUp);
+            x.name+='#'+i;mobs.push(x);
+        }
+        return(mobs);});
+    if(!_params.noStart) window.gm.Encounter.initCombat();
+}
 /*------------------------*/
 window.gm.encounters.wolf = function(params) {
     let _params=window.gm.encounters._setup(params);

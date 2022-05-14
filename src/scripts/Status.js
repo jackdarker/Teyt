@@ -360,7 +360,7 @@ class CombatEffect extends Effect {
     /**
      * 
      */
-    onCombatStart(){}
+    onCombatStart(){return({OK:false,msg:''});}
     /**
      * called before targets turn
      *
