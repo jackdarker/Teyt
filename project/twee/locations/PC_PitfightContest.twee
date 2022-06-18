@@ -41,13 +41,36 @@ There is a gate in front of you but it is locked.</br>
     var door = window.story.state.DngPC.tmp.doors[x];
     window.gm.dbgHelper();
     if(door && door[y]) {
-        msg='Someone with at least tier might be able to unlock this door.';
+        msg='Someone with a high enough tier might be able to unlock this door.';
     } else {
         msg='I dont know how to unlock that door.';
     }
     window.gm.printOutput(msg+"</br>");
 }
 requiredKey()
+</script>
+
+
+:: DngPC_Trent [_nosave_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+TODO Meet horsy. </br>
+You may try your luck and <a0 onclick=''>sneak around</a> , boldly <a0 onclick=''>walk toward it</a> or rush and try to <a0 onclick='fight()'>strike first</a>. 
+</br>Safest option would be to retreat <a0 onclick='window.story.show(window.story.state.DngSY.prevLocation)'>retreat</a>.
+<div id='output'></div>
+</article><article id="LogPanel"></article></section>
+
+
+:: DngPC_wolf [_nosave_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+There is wolf resting on the ground. It might be sleeping. </br>
+You may try your luck and <a0 onclick=''>sneak around</a> , boldly <a0 onclick=''>walk toward it</a> or rush and try to <a0 onclick='fight()'>strike first</a>. 
+</br>Safest option would be to retreat <a0 onclick='window.story.show(window.story.state.DngSY.prevLocation)'>retreat</a>.
+<div id='output'></div>
+</article><article id="LogPanel"></article></section>
+<script>function fight(){
+  window.gm.encounters['wolf']({type:'AlphaWolf',noFlee:true});
+  window.gm.Encounter.initCombat();                
+}
 </script>
 
 
@@ -152,8 +175,21 @@ window.gm.printOutput(msg);
     let here = window.gm.player.location,_d=window.story.state.DngPC.tmp;
     if(here===_d.tickPass) return;
     _d.tickPass=here;
+    for(var i=_d.mobs.length-1;i>=0;i--){ //check persistent mobs
+      var mob=_d.mobs[i];
+      window.gm.mobAI(mob);
+      if(window.story.state.DngSY.dng+"_"+mob.pos===here) {
+        //if mob is at same position as player: trigger passage or just show note
+        if(mob.state===0) {
+          window.gm.encounters[mob.mob]();
+          var _oldVictory=window.gm.Encounter.onVictory.bind(window.gm.Encounter);
+          window.gm.Encounter.onVictory= function(){mob.state=1;return(_oldVictory());}
+          window.gm.Encounter.initCombat(); return;
+        }
+      }
+    }
     let _t=_d.tier,_allChances=0,_choice=[];
-    switch(here) {//foes; traps are handled in window.gm.navEvent
+    switch(here) {//foes; traps are handled in window.gm.navEvent, there might also be evtLeave added elsewhere
         case "DngPC_H4":
         case "DngPC_F4":
         case "DngPC_F5":
@@ -209,9 +245,9 @@ Wrapping yourself in that shaggy, old quilt, you try to get some rest.</br>
 <%window.gm.player.location=window.passage.name;%></br>
 The gatekeeper is waiting here to assign a task to anyone send here for punishment. There is a stone altar with a large chest for donations.</br></br>
 Your current donation-tier is: <%=window.story.state.DngPC.tmp.tier%><a0 id='tier' onclick='(function($event){document.querySelector("#"+id+"~p").toggleAttribute("hidden");})(this);'>Hint</a>
-<p hidden> Gates need to be unlocked to gain access to the deeper areas of the dungeon. A gate of your choosing might be unlocked by donating a GoldVoucher. Those items are earned every 3 tiers. Tiers are gained by finishing tasks assigned by the shrine.
+<p class='speech' hidden> Gates need to be unlocked to gain access to the deeper areas of the dungeon. A gate of your choosing might be unlocked by donating a GoldVoucher. Those items are earned every 3 tiers. Tiers are gained by finishing tasks assigned by the shrine.
 </p><a0 id='vouchers' onclick='(function($event){document.querySelector("#"+id+"~p").toggleAttribute("hidden");})(this);'>Hint</a>
-<p hidden> Where do I find...</br>
+<p class='speech' hidden> Where do I find...</br>
 Money: randomly found in loot, loot from foes</br>
 Iron-Vouchers: randomly found in loot; can be bought for money from vendor</br>
 Bronze-Vouchers: loot from foes</br>
@@ -274,7 +310,7 @@ It cant do any harm wearing it, right?</br>
 <%}else{%>
 "Right now I cant help you with your task. Maybe tomorrow."</br>
 <%}%>
-<p>For a fee you can also get some helpful services:</br><!--
+<p>For a fee you can also get some helpful services:TODO</br><!--
     permanent gear: receive better gear on respawn
     empower: temporary increase a stat
     ward piercings and tattoos: 
@@ -318,7 +354,7 @@ A vendor sells some gear and might also buy some of your loot.<br> Would you lik
 </article><article id="LogPanel"></article></section>
 <script>
 function findWaresToBuy(){
-    let item,list = [],list2 = [],_d=window.story.state.DngPC,_t=_d.tmp.tier;
+    let item,item2,list = [],list2 = [],_d=window.story.state.DngPC,_t=_d.tmp.tier;
     list=[window.gm.ItemsLib['HealthPotionSmall'](),window.gm.ItemsLib['HealthPotion']()
     ,window.gm.ItemsLib['SpearWodden']()
     ,window.gm.ItemsLib['DaggerSteel']()
@@ -327,16 +363,23 @@ function findWaresToBuy(){
     //window.gm.ItemsLib['Penilium']()
     ];
     if(_t>=1){
-        item = new window.storage.constructors['BracerLeather']();
+        item = window.gm.ItemsLib['BracerLeather']();
         item = window.gm.makeCursedItem(item,{minItems:2,convert:'GlovesRubber'});
         item = window.gm.makeBonusItem(item,{statBoost:'agility', statBonus:2});
         list.push(item);
         list.push(window.gm.ItemsLib['VoucherIron']())
     }
     if(_t>=0){
-        item = new window.gm.ItemsLib['AnalPlugSmall']();
-        item.name= "Plug of the fire spell"
-        item = window.gm.makeBonusItem(item,{skillid:"SkillFireball",skillname:'PlugFireBall'});
+        item = window.gm.ItemsLib['Box']();
+        item.addItem(window.gm.ItemsLib['SerenityPotionSmall'](),3)
+        item.name="Mysterious,grey Box"
+        list.push(item);
+        item2 = window.gm.ItemsLib['AnalPlugSmall'](); //todo how to wrap this in mysteriousBox
+        item2.name= "Plug of the fire spell"
+        item2 = window.gm.makeBonusItem(item2,{skillid:"SkillFireball",skillname:'PlugFireBall'});
+        item = window.gm.ItemsLib['Box']();
+        item.addItem(item2)
+        item.name="Mysterious,red Box"
         list.push(item);
     }
     for(var el of list) {  //todo sort by tag - name
@@ -379,7 +422,7 @@ You could rest here to recover health and energy. It might also be a good idea t
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 You are now in a large hall with adjoining cells set into the walls. One of them is reserved as your private space.</br>
 <a0 id='howtoplay' onclick='(function($event){document.querySelector("#"+id+"~p").toggleAttribute("hidden");})(this);'>Hint</a>
-<p hidden>You were send to this dungeon to pay up for your crimes.</br>
+<p class='speech' hidden>You were send to this dungeon to pay up for your crimes.</br>
 The dungeon consist of several arenas that you have to pass one after another.If you pass the test in the arena, you gain money and loot. </br>
 However, if you are defeated you will loose most of the things you carry with you (except money and "special" gear) and respawn in the starting zone.</br>
 There is a chest in your cell where you can store anything that you dont want to take with you on your trials.</br>
@@ -388,7 +431,7 @@ You should weight the option to retreat early and invest earned money in better 
 By donating to the "shrine of jurisprudence" you pay off your surcharge. If you dont do so regulary, you might get some bonus punishment. There are also some services available for a fee.</br>
 </p>
 <a0 id='howtoplay2' onclick='(function($event){document.querySelector("#"+id+"~p").toggleAttribute("hidden");})(this);'>Hint</a>
-<p hidden>Keep an eye on your savagness-stat.</br>
+<p class='speech' hidden>Keep an eye on your savagness-stat.</br>
 Its an indicator how - well - savage you get. It increases when experiencing ignoble situations. If the stat hits its maximum, bad end for you.</br>
 There are consumables and items to reduce the score and just having a good rest helps.</br>
 Notice that the maximum might increase in some situations, meaning you can experience more savageness. And thats a good thing, right? </br>
@@ -436,7 +479,7 @@ Another Arena</br><%=window.story.render("DngPC_Retreat")%>
 :: DngPC_I4
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
-Another Arena</br><%=window.story.render("DngPC_Retreat")%>
+Something tells you that a bigger threat then before awaits to the east.</br><%=window.story.render("DngPC_Retreat")%>
 <div id='select1' >Water ripples out from a tap into a scoop bassin.
 <a0 onclick='window.gm.player.Stats.increment("health",50);window.gm.printTalkLink("div#select1","div#choice1a"),window.gm.refreshSidePanel()'>Sipping</a> some of that clear water might give you back some energy.</br>
 </div><div id='choice1a' hidden>You feel surprisingly refreshed after some gulps of that clear water.

@@ -23,16 +23,20 @@ Or maybe find some portal elsewhere...</br>
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 <hr></br>
-For many activities you have to spend energy and time. F.e. walking into the city takes some time and effort.</br>
+For many activities you have to spend energy and time.</br>
 Energy can be recovered by sleeping. Also some activities, food or drugs can restore energy.</br>
 Use the sleep-option in your own bedroom to rest.</br>
-</br>Combat</br><hr></br>
+<hr></br>Navigating the dungeon</br>
+You press the links "go west" or something like this no move onward. But that doesnt guarantee to get you to the next location.
+Instead you might find something more or less troublesome.</br>The more you get familiar with a location the higher the chance to find your way.</br> 
+<hr></br>Combat</br>
 You defeat enemys by damaging their health. If you have the skill, you can tease them until they are to aroused to bother fighting.
 Postbattle scenes might differ if the victor is excited !
-For some actions you need energy, f.e. a heavy strike or blocking with shield. Energy is recovered slowly on each turn.
-Will can be used to cast magic.
+For some actions you need energy or will, f.e. a heavy strike or blocking with shield. Energy is recovered slowly on each turn.
 Be aware that running out of energy/will might get you in a weakened condition.</br>
-[[Back|_back_]]</br>
+<hr></br>Keyboardcontrols</br>
+Links that have [x] attached can be triggered by pressing key x on the keyboard.
+</br><hr></br>[[Back|_back_]]</br>
 </article><article id="LogPanel"></article></section>
 
 :: Help_backgroundold [_back_]
@@ -97,8 +101,8 @@ Then I might be abel to backtrack the error.</br>
 Credits:</br>
 
 Icons & Images:</br>
-https://game-icons.net/
-https://www.svgrepo.com/ </br>
+https://game-icons.net/</br>
+https://www.svgrepo.com/</br>
 https://www.hiclipart.com/</br>
 https://pixabay.com/de/</br>
 https://www.klipartz.com/</br>

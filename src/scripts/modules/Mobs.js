@@ -15,6 +15,7 @@
 - cursed tome of conjuring
 - lush orchid
 - slug
+- otter-bot - a otter controlling a mech
 - Giant-Snake
 - Giant wasp
 - spider/tarantula
@@ -813,8 +814,7 @@ class Trent extends Mob {
         this.Outfit.addItem(PenisHuman.factory('horse'));
         this.Outfit.addItem(new ShortsLeather());
         this.Outfit.addItem(new MaceSteel());
-        this.Stats.increment('strength',3);
-        this.levelUp(6);
+        this.levelUp(6);//this.Stats.increment('strength',3);
         this.autoLeveling();
     }
 }

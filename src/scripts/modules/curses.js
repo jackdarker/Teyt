@@ -16,6 +16,7 @@
  * - disable unequip/ locking
  * - replace the item with a different one
  * - add an effect
+ * - give a skill
  * 
  * use deffered event to show the triggerd curse
  * 
@@ -139,7 +140,7 @@ class CrsTrgOnEquip extends CrsTrigger {
 class CrsTrgDelayed extends CrsTrigger {
     constructor() {
         super();
-        this.timeToTrigger = 60*2;
+        this.timeToTrigger = 60*2; //in min
         this.timeStart=null;
     }
     onEquip() {
@@ -224,6 +225,7 @@ class CrsEffConvert extends CrsEffect{
         }
     }
 }
+//adds an effect that drains your energy
 class CrsEffEnergyDrain extends CrsEffect{
     constructor() {   super();  }
     toJSON() {return window.storage.Generic_toJSON("CrsEffEnergyDrain", this); }
@@ -238,6 +240,7 @@ class CrsEffEnergyDrain extends CrsEffect{
         }
     }
 }
+//modifies a stat
 class CrsEffStatBonus extends CrsEffect{
     constructor() {
         super();
@@ -255,6 +258,7 @@ class CrsEffStatBonus extends CrsEffect{
         }
     }
 }
+//gives you a skill
 class CrsEffSkill extends CrsEffect{
     constructor() {
         super();
@@ -270,6 +274,25 @@ class CrsEffSkill extends CrsEffect{
             let sk = new window.storage.constructors[this.skillid]();
             sk.id=sk.name=this.newskillid;
             this.parent.parent.parent.parent.Skills.addItem(sk);
+        }
+    }
+}
+//disables a skill
+class CrsEffSkillSeal extends CrsEffect{
+    constructor() {
+        super();
+        this.skillid='';
+    }
+    toJSON() {return window.storage.Generic_toJSON("CrsEffSkillSeal", this); }
+    static fromJSON(value) {return(window.storage.Generic_fromJSON(CrsEffSkillSeal, value.data));}
+    get desc() {return("mmakes it ipossible to use "+this.skillid)}
+    apply(unapply) {
+        if(this.parent.parent.parent.parent.Skills.findItemSlot(this.skillid)<0) return;
+        _item=this.parent.parent.parent.parent.Skills.getItem(this.skillid)
+        if(unapply) {
+            _item.seal=0; //#todo how handle multiple seals
+        } else {
+            _item.seal=1;
         }
     }
 }
@@ -299,8 +322,13 @@ window.gm.makeCursedItem = function(item, extra) {
         eff = new CrsEffLock();
         list.push(eff);
     }
-    if(extra.lock) {            //seal:1
+    if(extra.seal) {            //seal:1
         eff = new CrsEffSeal();
+        list.push(eff);
+    }
+    if(extra.sealSkill) {       //sealSkill:'SkillFireball'
+        eff = new CrsEffSkillSeal();
+        eff.skillid=extra.skillid
         list.push(eff);
     }
     if(extra.convert) {         //convert:'rubber'
@@ -347,5 +375,6 @@ window.gm.ItemsLib = (function (ItemsLib) {
     window.storage.registerConstructor(CrsEffConvert);
     window.storage.registerConstructor(CrsEffEnergyDrain);
     window.storage.registerConstructor(CrsEffSkill);
+    window.storage.registerConstructor(CrsEffSkillSeal);
     window.storage.registerConstructor(CrsEffStatBonus);
 }(window.gm.ItemsLib || {}));

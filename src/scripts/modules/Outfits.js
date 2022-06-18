@@ -449,6 +449,8 @@ class AnalPlug extends Equipment {
         }
         return(msg+this.bonusDesc());
     }
+    equipText(){ return("The plug slides smoothly into its place. ")}
+    //unequipText(context) {}
     onEquip(context) {
         let res=super.onEquip(context);
         if(res.OK){

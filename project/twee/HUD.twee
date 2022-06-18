@@ -138,7 +138,9 @@ var inv = window.gm.player.Inv;
 var maxSlots = inv.count(); 
 for(var i=0;i<maxSlots;i++){
   id=inv.getItemId(i);
-  %><%=window.gm.printItem(id,inv.countItem(id).toString()+'x '+inv.getItem(id).desc+' '+inv.getItem(id).usable(inv).msg,window.gm.player)%><%
+  %><%=window.gm.printItem(id,inv.countItem(id).toString()+'x '+inv.getItem(id).desc+' '
+    //+inv.getItem(id).usable(inv).msg
+    ,window.gm.player)%><%
 } 
 %>
 <div id='output'></div></br>
@@ -192,16 +194,14 @@ Your party consist of <%=(function(){var msg=[];for(el of window.story.state._gm
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 <p>[[Back|_back_]] [[Mirror]]</p> (Tools and weapons can be changed via Inventory.)</br>
 <%=window.gm.player.name%> has equipped: <%=window.gm.printEquipmentSummary()%></br></br>
-<div id="output"></div>
-<div id="choice"></div>
+<div id="output"></div><div id="choice"></div>
 </article><article id="LogPanel"></article></section>
 <script>
 var x = 0, id=''; 
-var whom = window.gm.player;
-var _ids = whom.Wardrobe.getAllIds(); 
+var whom = window.gm.player,_ids2 = whom.Outfit.getAllIds();;
+var _ids = whom.Wardrobe.getAllIds().filter(x=>{return(_ids2.indexOf(x)<0)}); //filter away already equipped ids 
 for(var i=0;i<_ids.length;i++){window.gm.printEquipment(whom,whom.Wardrobe.getItem(_ids[i]));}
-_ids = whom.Outfit.getAllIds(); 
-for(var i=0;i<_ids.length;i++){window.gm.printEquipment(whom,whom.Outfit.getItem(_ids[i]));}
+for(var i=0;i<_ids2.length;i++){window.gm.printEquipment(whom,whom.Outfit.getItem(_ids2[i]));}
 </script>
 
 :: Settings [_back_ _noshortkey_]

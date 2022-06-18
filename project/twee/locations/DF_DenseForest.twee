@@ -24,37 +24,38 @@ function buildRooms() {
         'A5--B5--C5--D5--E5--F5  G5--H5  I5--J5--K5--L5',
         '                    |   |                   |  ',
         'A6--B6--C6--D6--E6  F6--G6      I6--J6--K6--L6'];
+    function _d(dir){return({dir:dir,exp:0});};
     let grid =[
-    {room:'F2', dirs:['G2']             ,anno:['E']},
-    {room:'G2', dirs:['F2','H2','G3']},
-    {room:'H2', dirs:['G2','H3']},
-    {room:'I2', dirs:['J2']},
-    {room:'J2', dirs:['I2','J3']},
-    {room:'F3', dirs:['F4']},
-    {room:'G3', dirs:['G2','G4']},
-    {room:'H3', dirs:['H2','H4'],           },
-    {room:'I3', dirs:['I4','J3'],           },
-    {room:'J3', dirs:['I3','K3','J2']},
-    {room:'K3', dirs:['J3']},
-    {room:'F4', dirs:['F3','G4','F5']},
-    {room:'G4', dirs:['G3','F4','H4','G5']},
-    {room:'H4', dirs:['H3','G4']},
-    {room:'I4', dirs:['H4','I3','J4']},
-    {room:'J4', dirs:['I4','J5','K4']},
-    {room:'K4', dirs:['J4'],                },
-    {room:'F5', dirs:['F4','F6']},
-    {room:'G5', dirs:['G4','H5','G6']},
-    {room:'H5', dirs:['G5']},
-    {room:'I5', dirs:['J5']},
-    {room:'J5', dirs:['I5','K5','J4']},
-    {room:'K5', dirs:['J5', 'K6','L5']},
-    {room:'L5', dirs:['K5'],                },
-    {room:'F6', dirs:['F5','G6'],                },
-    {room:'G6', dirs:['F6','G5'],                },
-    {room:'I6', dirs:['J6'],           },
-    {room:'J6', dirs:['I6','K6']},
-    {room:'K6', dirs:['K5','L6','J6']},
-    {room:'L6', dirs:['K6']}];
+    {room:'F2', dirs:[_d('G2')]             ,anno:['E']},
+    {room:'G2', dirs:[_d('F2'),_d('H2'),_d('G3')]},
+    {room:'H2', dirs:[_d('G2'),_d('H3')]},
+    {room:'I2', dirs:[_d('J2')]},
+    {room:'J2', dirs:[_d('I2'),_d('J3')]},
+    {room:'F3', dirs:[_d('F4')]},
+    {room:'G3', dirs:[_d('G2'),_d('G4')]},
+    {room:'H3', dirs:[_d('H2'),_d('H4')],           },
+    {room:'I3', dirs:[_d('I4'),_d('J3')],           },
+    {room:'J3', dirs:[_d('I3'),_d('K3'),_d('J2')]},
+    {room:'K3', dirs:[_d('J3')]},
+    {room:'F4', dirs:[_d('F3'),_d('G4'),_d('F5')]},
+    {room:'G4', dirs:[_d('G3'),_d('F4'),_d('H4'),_d('G5')]},
+    {room:'H4', dirs:[_d('H3'),_d('G4')]},
+    {room:'I4', dirs:[_d('H4'),_d('I3'),_d('J4')]},
+    {room:'J4', dirs:[_d('I4'),_d('J5'),_d('K4')]},
+    {room:'K4', dirs:[_d('J4')],                },
+    {room:'F5', dirs:[_d('F4'),_d('F6')]},
+    {room:'G5', dirs:[_d('G4'),_d('H5'),_d('G6')]},
+    {room:'H5', dirs:[_d('G5')]},
+    {room:'I5', dirs:[_d('J5')]},
+    {room:'J5', dirs:[_d('I5'),_d('K5'),_d('J4')]},
+    {room:'K5', dirs:[_d('J5'),_d('K6'),_d('L5')]},
+    {room:'L5', dirs:[_d('K5')],                },
+    {room:'F6', dirs:[_d('F5'),_d('G6')],                },
+    {room:'G6', dirs:[_d('F6'),_d('G5')],                },
+    {room:'I6', dirs:[_d('J6')],           },
+    {room:'J6', dirs:[_d('I6'),_d('K6')]},
+    {room:'K6', dirs:[_d('K5'),_d('L6'),_d('J6')]},
+    {room:'L6', dirs:[_d('K6')]}];
     let dng={grid:grid,width:14,height:8}
     window.story.state.DngSY.dngMap=dng;
 }
@@ -223,7 +224,6 @@ As you make your way through the bushes, you here someone shout at you:
 High grass grows between sparse bushes.
 <%=window.gm.printNav()%>
 <%}%>
-<%=window.gm.printNav()%>
 </article><article id="LogPanel"></article></section>
 
 

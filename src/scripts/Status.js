@@ -163,7 +163,7 @@ class Stat {
  * @class Effects
  * @extends {Inventory}
  */
-class Effects extends Inventory {  //Todo ?
+class Effects extends Inventory {
     constructor(externlist) {
         super(externlist);
         window.storage.registerConstructor(Effects);
@@ -249,7 +249,7 @@ class Effects extends Inventory {  //Todo ?
     //override
     postItemChange(id,operation,msg) {
         window.gm.pushLog('Effects: '+operation+' '+id+' '+msg,
-            window.story.state._gm.debug || (window.gm.player && (window.gm.player.id === this.parent.parent.id)));
+            window.story.state._gm.debug || (window.gm.player && (window.gm.player.id === this.parent.id)));
     }
 }
 /////////////////////////////////////////////////////////////////////////

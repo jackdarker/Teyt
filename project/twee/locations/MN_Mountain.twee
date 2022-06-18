@@ -24,32 +24,33 @@ function buildRooms() {
     '                        K4    ',
     '                        |     ',
     '            H5--I5--J5--K5--L5'];
+    function _d(dir){return({dir:dir,exp:0});};
     let grid =[
-    {room:'F1', dirs:['F2']             },
-    {room:'F2', dirs:['F1','G2']             },
-    {room:'G2', dirs:['F2','H2']             },
-    {room:'H2', dirs:['G2','I2']             },
-    {room:'I2', dirs:['J2','H2']             },
-    {room:'J2', dirs:['I2','J3']        },
-    //{room:'F3', dirs:['F4']},
-    //{room:'G3', dirs:['G2','G4']},
-    //{room:'H3', dirs:['H2','H4'],           },
-    {room:'I3', dirs:['J3']             ,anno:['E']},
-    {room:'J3', dirs:['I3','K3','J2']   },
-    {room:'K3', dirs:['J3','K4']        },
-    //{room:'F4', dirs:['F3','G4','F5']},
-    //{room:'G4', dirs:['G3','F4','H4','G5']},
-    //{room:'H4', dirs:['H3','G4']},
-    //{room:'I4', dirs:['H4','I3','J4']},
-    //{room:'J4', dirs:['I4','J5','K4']},
-    {room:'K4', dirs:['K3','K5']         },
-    //{room:'F5', dirs:['F4','F6']},
-    //{room:'G5', dirs:['G4','H5','G6']},
-    {room:'H5', dirs:['I5']             },
-    {room:'I5', dirs:['H5','J5']        },
-    {room:'J5', dirs:['I5','K5']        },
-    {room:'K5', dirs:['J5', 'K4','L5']  },
-    {room:'L5', dirs:['K5']             }];
+    {room:'F1', dirs:[_d('F2')]             },
+    {room:'F2', dirs:[_d('F1'),_d('G2')]             },
+    {room:'G2', dirs:[_d('F2'),_d('H2')]             },
+    {room:'H2', dirs:[_d('G2'),_d('I2')]             },
+    {room:'I2', dirs:[_d('J2'),_d('H2')]             },
+    {room:'J2', dirs:[_d('I2'),_d('J3')]        },
+    //{room:'F3', dirs:['_d(F4')]},
+    //{room:'G3', dirs:['_d(G2'),_d('G4')]},
+    //{room:'H3', dirs:['_d(H2'),_d('H4')],           },
+    {room:'I3', dirs:[_d('J3')]             ,anno:['E']},
+    {room:'J3', dirs:[_d('I3'),_d('K3'),_d('J2')]   },
+    {room:'K3', dirs:[_d('J3'),_d('K4')]        },
+    //{room:'F4', dirs:['_d(F3'),_d('G4'),_d('F5')]},
+    //{room:'G4', dirs:['_d(G3'),_d('F4'),_d('H4'),_d('G5')]},
+    //{room:'H4', dirs:['_d(H3'),_d('G4')]},
+    //{room:'I4', dirs:['_d(H4'),_d('I3'),_d('J4')]},
+    //{room:'J4', dirs:['_d(I4'),_d('J5'),_d('K4')]},
+    {room:'K4', dirs:[_d('K3'),_d('K5')]         },
+    //{room:'F5', dirs:['_d(F4'),_d('F6')]},
+    //{room:'G5', dirs:['_d(G4'),_d('H5'),_d('G6')]},
+    {room:'H5', dirs:[_d('I5')]             },
+    {room:'I5', dirs:[_d('H5'),_d('J5')]        },
+    {room:'J5', dirs:[_d('I5'),_d('K5')]        },
+    {room:'K5', dirs:[_d('J5'),_d('K4'),_d('L5')]  },
+    {room:'L5', dirs:[_d('K5')]             }];
     window.story.state.DngSY.dngMap={grid:grid,width:14,height:8};
 }
     var s = window.story.state;
@@ -114,8 +115,8 @@ Handing him the pages you ask <p class="tPC">"Is something wrong?"</p>
 As you enter the hall, you notice Kumala and Leon already waiting there.
 <p class="tNPC2"></p>
 ...
-<div id='select5' > So what are you going to tell them?
-<a0 onclick='window.gm.printTalkLink("div#select5","div#choice5a")'>"For sure I am an acolythe."</a></br>
+<div id='select5' > So what are you going to tell them?</br>
+<a0 onclick='window.gm.printTalkLink("div#select5","div#choice5a")'>"For sure I am an acolythe."</a></br></br>
 <a0 onclick='window.gm.printTalkLink("div#select5","div#choice5b")'>"I touched some kind of idol and then I appeared here."</a></br>
 </div><div id='choice5a' hidden></br>
     Leon snorts <p class="tNPC1">"No way, you dont even know the simplest rites."</p>
@@ -135,15 +136,15 @@ As you enter the hall, you notice Kumala and Leon already waiting there.
     <p class="tPC">'Damit. I really hoped they send me back right away...'</p>
     <p class="tNPC2">The first option is to make you a poper member of the rite. You will have to serve your time here as usual. And then you might return - if we see fit.</p>
     Leon trys to object. Most likely because that isn't enough punishment in his eyes.</br>
-    But Cyril silence him with a wave of his hand.
+    But Cyril silences him with a wave of his hand.
     <p class="tNPC2">"The other option would be to banish you to the netherworld. There you would have to roam the wilderness amongst the beast. I doubt it would take long until you fall prey to some of them."</p>
     <p class="tNPC2">"What will you choose then?"</p>
     <div id='select15' > TODO
-        <p>That word "banish" didn't sound like "I will send you to garden eden". There might be a lot of nastier places then the mountain or forest you already visited. And even those might not be fun to live in without a roof over your head.
+        <p>That word "banish" didn't sound like "I will send you to garden eden". There might be nastier places then the mountain or forest whose you already visited. And even those might not be fun to live in without a roof over your head.
         Maybe becoming a member of this cult is the easier approach and there is still the possibility to find an escape route later.</p>
         <a0 onclick='window.gm.printTalkLink("div#select15","div#choice15a")'>choose to become a acolyte</a></br>
         [[choose to be banished]]
-        </div><div id='choice15a' hidden></br> <a0 onclick='lvl4()'>Go to your room</a>.
+        </div><div id='choice15a' hidden></br> <a0 onclick='lvl4()'>Go to your room  TODO initiating ritual?</a>.
         </div>
         <div id='choice15b' hidden></br>
         </div>

@@ -113,6 +113,60 @@ class QuestItems extends Item { //ingredients you have to collect for quest
     toJSON() {return window.storage.Generic_toJSON("QuestItems", this); };
     static fromJSON(value) { return window.storage.Generic_fromJSON(QuestItems, value.data);};
 }
+//this Present-Box has an Inventory to hold Presents; use it to ove those presents into carriers inventory and  
+class Box extends Item{
+    constructor() { super('Box');
+        //this.addTags([window.gm.ItemTags.Ingredient]); 
+        this.price=this.basePrice=10;   
+        this.style=0;this.lossOnRespawn = true;
+        this.inv = new Inventory()
+    }
+    _relinkItems(parent){super._relinkItems(this),
+        this.inv._parent = window.gm.util.refToParent(this); //does this work if parent is ITEM?
+    }
+    addItem(item,count=1){
+        this.inv.addItem(item,count)
+        this._updateId()//boxes should not stack if content differs
+    }
+    usable(context,on=null) {return({OK:true, msg:'unwrap'});}
+    use(context,on=null) { 
+        var msg="",_item,_count ,_ids =this.inv.getAllIds()
+        if(context instanceof Inventory) {
+            if(on===null) on=context.parent;
+            context.removeItem(this.id);
+            if(on instanceof Character){
+                for(var i=0;i<_ids.length;i++) {
+                    _item=this.inv.getItem(_ids[i]),_count=this.inv.countItem(_ids[i])
+                    msg+=_count+" x "+_item.name+", ";
+                    on.changeInventory(_item,_count)
+                }
+            return({OK:true, msg:'The mysterious box contained: '+msg});
+            }
+        } else throw new Error('context is invalid');
+    }
+    set style(style) { 
+        this._style = style; 
+        if(style===0) this.id='MysteriousBox',this.name='MysteriousBox';
+        else if(style===10) this.id=this.name='Surprise';
+        else throw new Error(this.id +' doesnt know '+style);
+    }
+    get style() {return this._style;}
+    get desc() { 
+        let msg ='';
+        switch(this._style) {
+            case 0: 
+                msg ='a mysterious box';
+                break;
+            case 10: 
+                msg ='a surprise present';
+                break;
+            default: throw new Error(this.id +' doesnt know '+style);
+        }
+        return(msg);
+    }
+    toJSON() {return window.storage.Generic_toJSON("Box", this); };
+    static fromJSON(value) { return window.storage.Generic_fromJSON(Box, value.data);};
+}
 class Ingredient extends Item {
     constructor() { super('Ingredient');
         this.addTags([window.gm.ItemTags.Ingredient]); this.price=this.basePrice=10;   
@@ -548,6 +602,7 @@ window.gm.ItemTags = { //
     Ranged  : "ranged" 
 };
 window.gm.ItemsLib = (function (ItemsLib) {
+    window.storage.registerConstructor(Box);
     window.storage.registerConstructor(LighterDad);
     window.storage.registerConstructor(Voucher);
     window.storage.registerConstructor(Money);
@@ -593,7 +648,9 @@ window.gm.ItemsLib = (function (ItemsLib) {
     ItemsLib['GreenPill'] = function (){ let x= new Pills();x.style=40;return(x);}
     ItemsLib['BluePill'] = function (){ let x= new Pills();x.style=50;return(x);}
     ItemsLib['Vaginarium'] = function (){ let x= new RegenderPotion();return(x); };
-    ItemsLib['Penilium'] = function(){ let x= new RegenderPotion();x.style=10;return(x); };
+    ItemsLib['Penilium'] = function(){ let x= new RegenderPotion();x.style=10;return(x)};
+    //Mysterious Box
+    ItemsLib['Box'] = function(){ let x= new Box();x.style=0;return(x)};
     //Ingredient
     ItemsLib['SquishedLeech'] = function(){ let x=new Ingredient();x.style=30;return(x);};
     ItemsLib['Beewax'] = function(){ let x=new Ingredient();x.style=110;return(x);};

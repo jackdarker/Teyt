@@ -19,13 +19,14 @@ function buildRooms() {
         '    H3  I3    ',
         '    |         ',
         'G4--H4        '];
+    function _d(dir){return({dir:dir,exp:0});}
     let grid =[
-    {room:'H2', dirs:['H3','I2']},
-    {room:'I2', dirs:['H2','I3']},
-    {room:'H3', dirs:['H2','H4']},
-    {room:'I3', dirs:['I2'],anno:['X']},
-    {room:'G4', dirs:['H4'],anno:['E']},
-    {room:'H4', dirs:['H3','G4']}];
+    {room:'H2', dirs:[_d('H3'),_d('I2')]},
+    {room:'I2', dirs:[_d('H2'),_d('I3')]},
+    {room:'H3', dirs:[_d('H2'),_d('H4')]},
+    {room:'I3', dirs:[_d('I2')],anno:['X']},
+    {room:'G4', dirs:[_d('H4')],anno:['E']},
+    {room:'H4', dirs:[_d('H3'),_d('G4')]}];
     let dng={grid:grid,width:14,height:8}
     window.story.state.DngSY.dngMap=dng;
     window.story.state.DngCV.visitedTiles=[],

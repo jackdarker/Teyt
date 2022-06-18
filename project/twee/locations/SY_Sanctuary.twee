@@ -21,7 +21,7 @@ This corridor connects the dorms with the [[Hallway|DngSY_Hall]]. Most of the do
 <%window.gm.player.location=window.passage.name;%>
 <%if(window.story.state.DngSY.remainingNights<=0){%>
     You better get equipped and ready for your next task.</br>
-    <p class="author">Now is a good point to save and and stow everything you don't want to lose in the trunk.</p>
+    <p class="author">Now is a good time to save and and stow everything you don't want to lose in the trunk.</p>
     <p><a0 onclick='window.story.show(nextDng());'>Seek the portal</a></p>
 <%}else{%>
     This is your own private room. You can <a href="javascript:void(0)" onclick='($("tw-passage").fadeOut(1000, function() {window.gm.player.sleep(700);window.story.state.DngSY.remainingNights-=1;window.story.show("DngSY_Your_Room_Sleep");}));'>sleep</a> here to regain health and energy.

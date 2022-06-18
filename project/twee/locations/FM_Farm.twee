@@ -23,33 +23,34 @@ function buildRooms() {
         'F5  G5--H5--I5--J5--K5--L5',
         '|       |           |     ',
         'F6      H6--I6--J6--K6--L6'];
+    function _d(dir){return({dir:dir,exp:0});};
     let grid =[
-    {room:'H2', dirs:['H3']},
-    {room:'I2', dirs:['J2']},
-    {room:'J2', dirs:['I2','J3']},
-    {room:'H3', dirs:['H2','H4'],           anno:['B']},
-    {room:'I3', dirs:['I4','J3'],           anno:['Q']},
-    {room:'J3', dirs:['I3','K3','J2']},
-    {room:'K3', dirs:['J3']},
-    {room:'F4', dirs:['G4','F5']},
-    {room:'G4', dirs:['F4','H4','G5']},
-    {room:'H4', dirs:['H3','G4','I4']},
-    {room:'I4', dirs:['H4','I3','J4']},
-    {room:'J4', dirs:['I4','J5','K4']},
-    {room:'K4', dirs:['J4'],                anno:['L']},
-    {room:'F5', dirs:['F4','F6']},
-    {room:'G5', dirs:['G4','H5']},
-    {room:'H5', dirs:['G5','I5','H6']},
-    {room:'I5', dirs:['H5','J5']},
-    {room:'J5', dirs:['I5','K5','J4']},
-    {room:'K5', dirs:['J5', 'K6','L5']},
-    {room:'L5', dirs:['K5'],                anno:['A']},
-    {room:'F6', dirs:['F5'],                anno:['E']},
-    {room:'H6', dirs:['H5','I6']},
-    {room:'I6', dirs:['H6','J6'],           anno:['S']},
-    {room:'J6', dirs:['I6','K6']},
-    {room:'K6', dirs:['K5','L6','J6']},
-    {room:'L6', dirs:['K6']}];
+    {room:'H2', dirs:[_d('H3')]},
+    {room:'I2', dirs:[_d('J2')]},
+    {room:'J2', dirs:[_d('I2'),_d('J3')]},
+    {room:'H3', dirs:[_d('H2'),_d('H4')],           anno:['B']},
+    {room:'I3', dirs:[_d('I4'),_d('J3')],           anno:['Q']},
+    {room:'J3', dirs:[_d('I3'),_d('K3'),_d('J2')]},
+    {room:'K3', dirs:[_d('J3')]},
+    {room:'F4', dirs:[_d('G4'),_d('F5')]},
+    {room:'G4', dirs:[_d('F4'),_d('H4'),_d('G5')]},
+    {room:'H4', dirs:[_d('H3'),_d('G4'),_d('I4')]},
+    {room:'I4', dirs:[_d('H4'),_d('I3'),_d('J4')]},
+    {room:'J4', dirs:[_d('I4'),_d('J5'),_d('K4')]},
+    {room:'K4', dirs:[_d('J4')],                anno:['L']},
+    {room:'F5', dirs:[_d('F4'),_d('F6')]},
+    {room:'G5', dirs:[_d('G4'),_d('H5')]},
+    {room:'H5', dirs:[_d('G5'),_d('I5'),_d('H6')]},
+    {room:'I5', dirs:[_d('H5'),_d('J5')]},
+    {room:'J5', dirs:[_d('I5'),_d('K5'),_d('J4')]},
+    {room:'K5', dirs:[_d('J5'),_d('K6'),_d('L5')]},
+    {room:'L5', dirs:[_d('K5')],                anno:['A']},
+    {room:'F6', dirs:[_d('F5')],                anno:['E']},
+    {room:'H6', dirs:[_d('H5'),_d('I6')]},
+    {room:'I6', dirs:[_d('H6'),_d('J6')],           anno:['S']},
+    {room:'J6', dirs:[_d('I6'),_d('K6')]},
+    {room:'K6', dirs:[_d('K5'),_d('L6'),_d('J6')]},
+    {room:'L6', dirs:[_d('K6')]}];
     let dng={grid:grid,width:14,height:8,legend:'E=Portal B=Beehives S=Stables L=Lake A=Plantation Q=Quarters '}
     window.story.state.DngSY.dngMap=dng;
     //window.story.state.DngFM.visitedTiles=[];
@@ -322,7 +323,7 @@ function check() {
         link.textContent ='Just as the bunny moves close enough for getting a good bite, to your big surprise the CABBAGE SWALLOWS IT WHOLE WTF !';
         panel.appendChild(link);
         link = document.createElement('p');link.classList.add('tNPC1');
-        link.textContent ='\"This is a special breeding success. It took some effort but but we have managed to provide cabbage with a mechanism for self-defense against its worst enemies.\"';
+        link.textContent ='\"This is a special breeding success. It took some effort but we have managed to provide cabbage with a mechanism for self-defense against its worst enemies.\"';
     } else if(_other===data.fox && _other===data.cabbage) { _fail=true;
         link.textContent ='The bunny is save in your boat. But you hear some shredding, munching noises behind you.';
         panel.appendChild(link);

@@ -15,8 +15,7 @@ window.gm.initGame= function(forceReset,NGP=null) {
     var s = window.story.state;
     s._gm.timeRL= s._gm.timeVR = s._gm.time;
     s._gm.dayRL= s._gm.dayVR = s._gm.day;
-    //TODO set debug to 0 for distribution !
-    s._gm.debug = 1,   
+    s._gm.debug = 0,   //TODO set debug to 0 for distribution !
     s._gm.dbgShowCombatRoll= true,
     s._gm.dbgShowQuestInfo= true;
     s._gm.dbgShowMoreInfo=true;
@@ -417,7 +416,7 @@ window.gm.printNav=function(label,dir,args=null){
   for(i=grid.length-1;i>=0;i--){
     if(grid[i].room===here){
       for(k=grid[i].dirs.length-1;k>=0;k--){
-        if(grid[i].dirs[k]===to) {found=true;break;}
+        if(grid[i].dirs[k].dir===to) {found=true;break;}
       }
       if(found) break;
     }
@@ -540,7 +539,7 @@ window.gm.printMap2=function(dng,playerTile,reveal,visitedTiles) {
       if(room.room===playerTile) {_rA.removeClass('roomFound').addClass('playerPosition');} else _rA.addClass('roomVisited');
       addAnno();
       for(k=room.dirs.length-1;k>=0;k--) {//foreach direction create path to next room
-        dir=room.dirs[k];
+        dir=room.dirs[k].dir;
         xyB=nameToXY(dir); dx=xyB.x-xy.x,dy=xyB.y-xy.y;
         lPath.polyline([[_rA.cx()+ox,_rA.cy()+oy],[_rA.cx()+ox+dx/2,_rA.cy()+oy+dy/2]]).addClass('pathFound');//.insertBefore(_rA)
       }

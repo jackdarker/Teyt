@@ -3,6 +3,7 @@ class Item {
     constructor(name) {
         this.id = this.name = name;  //id is unique in database(no whitespace !); name is for display
         this.tags = [];
+        this.bonus =[]; //Curse or Bonus assigned to item   //todo can ITEMS be cursed too?
         this.price=this.basePrice=10; //how much worth it is
     }
     get parent() {return this._parent?this._parent():null;}

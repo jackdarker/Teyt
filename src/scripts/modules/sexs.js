@@ -115,7 +115,7 @@ window.gm.sex.wolfOnPlayer=function(data) {
                     newdata.position = 'On all 4';
                     createButton(newdata.position,foo.bind(null,newdata));
                 }
-            } else entry.textContent ="You arent horny enough"; 
+            } else entry.textContent ="You have no idea what you could do with this pup."; 
 
             newdata = {},Object.assign(newdata,data);
             newdata.state=-1;

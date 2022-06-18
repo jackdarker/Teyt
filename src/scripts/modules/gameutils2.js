@@ -40,12 +40,38 @@ window.gm.navHere = function(to) {
     window.story.show(to);
 }
 window.gm.navEvent = function(to,from) {
-    let _targ = '',evt,evts,dng=window.story.state.DngSY.dng;
+    let _targ = '',dir,dirs,evt,evts,dng=window.story.state.DngSY.dng;
     let _to=to.replace(dng+"_",""),_from=from.replace(dng+"_","");
     let _room=to.replace(dng+"_","");
     //tick = timestamp  
     //state: 0-active  1-inactive  
-    var _now=window.gm.getTime(), _rnd=_.random(0,100);
+    let _leaveChance=0,_allChances=0,_now=window.gm.getTime(), _rnd=_.random(0,100);
+    evts = window.story.state[dng].tmp.evtLeave[_from+'_'+_to]; 
+    if(evts) { //leave-check
+        evts=evts.filter(x=>(x.state===0));
+        evts.forEach(x=>(_allChances+=x.chance));
+        dir=null,dirs=window.gm.getRoomDirections(_from);
+        for(var i=dirs.length-1;i>=0;i--){
+            if(dirs[i].dir===_to) {
+                dir=dirs[i];break;
+            }
+        }
+        if(dir){ //choose an event; the more you explored that direction, the higher the chance to find the exit
+            //0x: 0%    1x: 10%   5x: 50%    10x: 70%  100x: 90%  of OVERALL-chance
+            _leaveChance=(dir.exp>=5)?50.0:((dir.exp>=1)?10.0:(0));
+            _leaveChance=_leaveChance/100.0*_allChances;_allChances+=_leaveChance;
+            dir.exp+=1;//exp-count is updated
+            _rnd=_.random(0,_allChances-0.01);
+            for(var i = evts.length-1;i>=0;i--) { 
+                if(_rnd<_allChances && _rnd>=(_allChances-evts[i].chance)) {
+                    window.story.state.tmp.args=[evts[i],dng+'_'+_from,dng+'_'+_to];    //store [evt,from,to] for use in scene
+                    return(dng+'_'+evts[i].id); //->show(DngPC_wolf5);   
+                    //after the scene is finished it should continue window.story.state.DngSY.prevLocation 
+                }
+                _allChances-=evts[i].chance;
+            }//if no event rolled continue with door check 
+        }
+    }
     evts = window.story.state[dng].tmp.doors[_from];
     if(evts) { //door-check
         evt = evts[_to];
@@ -73,23 +99,23 @@ window.gm.navEvent = function(to,from) {
     }
     return(_targ);
 }
-window.gm.mobAI = function(mob){
-    function getRoomDirections(from) {
-        let rooms=window.story.state.DngSY.dngMap.grid
-        for(var i=rooms.length-1;i>=0;i--){
-            if(rooms[i].room===from) {
-                return(rooms[i].dirs)
-            }
+window.gm.getRoomDirections=function(from) {
+    let rooms=window.story.state.DngSY.dngMap.grid
+    for(var i=rooms.length-1;i>=0;i--){
+        if(rooms[i].room===from) {
+            return(rooms[i].dirs)
         }
-        return([]);
     }
+    return([]);
+};
+window.gm.mobAI = function(mob){
     var _now=window.gm.getTime();
     if(mob.state!==0 || mob.tick==='') {mob.tick=_now;return;}
     if(window.gm.getDeltaTime(_now,mob.tick)>30) {
         mob.tick=_now;
-        var _to = getRoomDirections(mob.pos).filter(el=> mob.path.includes(el));
+        var _to = getRoomDirections(mob.pos).filter(el=> mob.path.includes(el.dir));
         if(_to.length>0) {
-            mob.pos=_to[_.random(0,_to.length-1)];
+            mob.pos=_to[_.random(0,_to.length-1)].dir;
             //alert(mob.id+' now moving to '+mob.pos);
         }
     }
@@ -123,25 +149,6 @@ window.gm.renderRoom= function(room){
         msg+=window.story.render(dng+"_Lectern");
     }
     return(msg);
-}
-window.gm.randomTask = function() {
-    let tasks;
-    if(tasks==={}) { //init tasks
-        //within 1 day gather 3 mushrooms
-        //find 3 black candles
-
-        //banish 2 hounds
-        //open 4 containers within 3 days
-        //drink 3 mysterious potions 
-        //deliver 2l milk in 2 days
-        //help milikin the steeds and collect 2l cum
-        //get pierced
-        //recover your virginity within 5days
-        //
-        //walk around nude (except forced gear) for 3 days
-        //wear a tail-plug for 3 days
-
-    }
 }
 window.gm.finishTask=function(){
     let task=window.story.state.DngPC.task,_res={OK:(task.done>0),msg:''};
@@ -284,52 +291,53 @@ window.gm.build_DngPC=function() {
         'D5--E5  F5  G5--H5--I5  J5--K5--L5',
         '|       |           |   |         ',
         'D6--E6--F6--G6--H6--I6--J6--K6--L6'];
+    function _d(dir){return({dir:dir,exp:0});}
     let grid =[
-    {room:'D2', dirs:['E2']},
+    {room:'D2', dirs:[_d('E2')]},
     {room:'E2', dirs:[]},
-    {room:'F2', dirs:['G2','F3']},
-    {room:'G2', dirs:['F2','H2','G3']},
-    {room:'H2', dirs:['I2','G2']},
-    {room:'I2', dirs:['J2','H2']},
-    {room:'J2', dirs:['I2','J3']},
-    {room:'K2', dirs:['L2','K3']},
-    {room:'L2', dirs:['K2','L3']},
-    {room:'D3', dirs:['D2']},
-    {room:'E3', dirs:['D3','E4','F3']},
-    {room:'F3', dirs:['F2']},
-    {room:'G3', dirs:['G2','G4']},
-    {room:'H3', dirs:['H4']},
-    {room:'I3', dirs:['I4','J3']},
-    {room:'J3', dirs:['I3','K3','J2']},
-    {room:'K3', dirs:['J3','K2']},
-    {room:'L2', dirs:['L2','L4']},
+    {room:'F2', dirs:[_d('G2'),_d('F3')]},
+    {room:'G2', dirs:[_d('F2'),_d('H2'),_d('G3')]},
+    {room:'H2', dirs:[_d('I2'),_d('G2')]},
+    {room:'I2', dirs:[_d('J2'),_d('H2')]},
+    {room:'J2', dirs:[_d('I2'),_d('J3')]},
+    {room:'K2', dirs:[_d('L2'),_d('K3')]},
+    {room:'L2', dirs:[_d('K2'),_d('L3')]},
+    {room:'D3', dirs:[_d('D2')]},
+    {room:'E3', dirs:[_d('D3'),_d('E4'),_d('F3')]},
+    {room:'F3', dirs:[_d('F2')]},
+    {room:'G3', dirs:[_d('G2'),_d('G4')]},
+    {room:'H3', dirs:[_d('H4')]},
+    {room:'I3', dirs:[_d('I4'),_d('J3')]},
+    {room:'J3', dirs:[_d('I3'),_d('K3'),_d('J2')]},
+    {room:'K3', dirs:[_d('J3'),_d('K2')]},
+    {room:'L2', dirs:[_d('L2'),_d('L4')]},
     {room:'D4', dirs:[]},
-    {room:'E4', dirs:['D4']},
-    {room:'F4', dirs:['G4','F5']},
-    {room:'G4', dirs:['F4','H4','G5']    ,anno:['S']},
-    {room:'H4', dirs:['G4','I4','H3']},
-    {room:'I4', dirs:['H4','J4']},
-    {room:'J4', dirs:['I4','J5','K4']    ,anno:['B']},      
-    {room:'K4', dirs:['L4','K3']},
-    {room:'L4', dirs:['L3','K5']    ,anno:['B']},
-    {room:'D5', dirs:['D6','E5']},
-    {room:'E5', dirs:['E4','D5']},
-    {room:'F5', dirs:['F4','F6']},
-    {room:'G5', dirs:['G4','H5']},
-    {room:'H5', dirs:['G5','I5','H6']},
-    {room:'I5', dirs:['H5','J5']},
-    {room:'J5', dirs:['K5']},
-    {room:'K5', dirs:['J5', 'K6','L5']},
-    {room:'L5', dirs:['K5']},
-    {room:'D6', dirs:['D5','E6']},
-    {room:'E6', dirs:['D6','F6']},
-    {room:'G6', dirs:['F6','H6']}, 
-    {room:'F6', dirs:['E6','F5','G6']    ,anno:['B']},
-    {room:'H6', dirs:['I6','G6']},
-    {room:'I6', dirs:['I5','H6','J6']},
-    {room:'J6', dirs:['J5','I6','K6']},
-    {room:'K6', dirs:['L6','J6']},
-    {room:'L6', dirs:['K6']}];
+    {room:'E4', dirs:[_d('D4')]},
+    {room:'F4', dirs:[_d('G4'),_d('F5')]},
+    {room:'G4', dirs:[_d('F4'),_d('H4'),_d('G5')]    ,anno:['S']},
+    {room:'H4', dirs:[_d('G4'),_d('I4'),_d('H3')]},
+    {room:'I4', dirs:[_d('H4'),_d('J4')]},
+    {room:'J4', dirs:[_d('I4'),_d('J5'),_d('K4')]    ,anno:['B']},      
+    {room:'K4', dirs:[_d('L4'),_d('K3')]},
+    {room:'L4', dirs:[_d('L3'),_d('K5')]    ,anno:['B']},
+    {room:'D5', dirs:[_d('D6'),_d('E5')]},
+    {room:'E5', dirs:[_d('E4'),_d('D5')]},
+    {room:'F5', dirs:[_d('F4'),_d('F6')]},
+    {room:'G5', dirs:[_d('G4'),_d('H5')]},
+    {room:'H5', dirs:[_d('G5'),_d('I5'),_d('H6')]},
+    {room:'I5', dirs:[_d('H5'),_d('J5')]},
+    {room:'J5', dirs:[_d('K5')]},
+    {room:'K5', dirs:[_d('J5'),_d('K6'),_d('L5')]},
+    {room:'L5', dirs:[_d('K5')]},
+    {room:'D6', dirs:[_d('D5'),_d('E6')]},
+    {room:'E6', dirs:[_d('D6'),_d('F6')]},
+    {room:'G6', dirs:[_d('F6'),_d('H6')]}, 
+    {room:'F6', dirs:[_d('E6'),_d('F5'),_d('G6')]    ,anno:['B']},
+    {room:'H6', dirs:[_d('I6'),_d('G6')]},
+    {room:'I6', dirs:[_d('I5'),_d('H6'),_d('J6')]},
+    {room:'J6', dirs:[_d('J5'),_d('I6'),_d('K6')]},
+    {room:'K6', dirs:[_d('L6'),_d('J6')]},
+    {room:'L6', dirs:[_d('K6')]}];
     let data,map={grid:grid,width:14,height:8,legend:'S=Start  B=Boss'}
     var s = window.story.state;    
     const version=3;                            // <== increment this if you change anything below
@@ -338,6 +346,12 @@ window.gm.build_DngPC=function() {
     } else {
         data=s.DngPC,data.version=version;
         data.tmp={tickPass:'', tier:0};
+        data.tmp.evtLeave = { //events on tile-leave
+            H4_I4: [{id:"Trap_Gas",type:'encounter',instance:"",tick:window.gm.getTime(),state:0,chance:100 },
+                {id:"wolf",type:'encounter',instance:"Ruff",tick:window.gm.getTime(),state:0,chance:100 },
+                {id:"Trent",type:'encounter',instance:"Trent",tick:window.gm.getTime(),state:0,chance:100 }],
+            I4_H4: null
+        }
         data.tmp.evtEnter = { //events on tile-enter
             H4: {gas:{tick:window.gm.getTime(),state:0 }},
         }
@@ -355,8 +369,9 @@ window.gm.build_DngPC=function() {
             ,DngPC_F5: {mushroom:{tick:window.gm.getTime(),state:0,loot:"ViolettMushroom" }}
             ,DngPC_G6: {chest:{tick:window.gm.getTime(),state:0,loot:[{id:"Money",count:30}]}}
         }
-        data.tmp.mobs = [ //wandering mobs
-        ];
+        data.tmp.mobs = [ //wandering mobs pos=current tile
+            //{id:"HornettI4",mob:"hornett",pos:"I4",path:["I4","H4","I3"],state:0,tick:'',aggro:0}
+          ]
         data.task = {},data.rolledTask=[]; //active task
         data.tasks = { //task list  tick=timestamp last update  cnt=Number of finished task  min=minimum tierlevel   start=timestamp start
             bringIron:{tick:'',done:0,cnt:0,min:1}

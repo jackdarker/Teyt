@@ -723,16 +723,16 @@ window.gm.pickupAndClear=function(itemid, desc,itemleft,cbAfterPickup=null) {
 window.gm.printItem= function( id,descr,carrier,useOn=null ) {
   var elmt='';
   var s= window.story.state;
-  var _inv = window.gm.player.Inv;
-  var _count =_inv.countItem(id);
+  var _inv = window.gm.player.Inv; //todo only players? useOn isnt used!
+  var _item=_inv.getItem(id),_count =_inv.countItem(id);
   if(useOn===null) useOn=carrier;
-  elmt +=`<a0 id='${id}' onclick='(function($event){document.querySelector(\"div#${id}\").toggleAttribute(\"hidden\");})(this);'>${id} (x${_count})</a>`;
+  elmt +=`<a0 id='${id}' onclick='(function($event){document.querySelector(\"div#${id}\").toggleAttribute(\"hidden\");})(this);'>${_item.name} (x${_count})</a>`;
   var useable = _inv.usable(id);
   if(_count>0 && useable.OK) {
       elmt +=`<a0 id='${id}' onclick='(function($event){var _res=window.gm.player.Inv.use(\"${id}\"); window.gm.refreshAllPanel();window.gm.printOutput(_res.msg);}(this))'>${useable.msg}</a>`;
   }
   elmt +=`</br><div hidden id='${id}'>${descr}</div>`;
-  if(window.story.passage(id))  elmt +=''.concat("    [[Info|"+id+"]]");  //Todo add comands: drink,eat, use
+  if(window.story.passage(id))  elmt +=''.concat("    [[Info|"+id+"]]");  //adds a link to descriptive passage if there is one
       elmt +=''.concat("</br>");
       return(elmt);
 };
@@ -807,7 +807,7 @@ window.gm.printEquipment= function( whom,item) {
     g.textContent='';//cannot un-/equip tattoos & piercing 
   } else if(whom.Outfit.countItem(item.id)<=0) {
     g.textContent='Equip';
-    g.addEventListener("click",(function(whom,item){
+    g.addEventListener("click",(function(whom,item){  //todo should we display its own page instead oneliner?
       return(function(){var _x=whom.Outfit.addItem(item).msg;window.gm.refreshAllPanel();window.gm.printOutput(_x)});})(whom,item)); //redraw page to update buttons, then print output
   } else {
     res = whom.Outfit.canUnequipItem(item.id,false);
