@@ -6,9 +6,9 @@ Wie weit fortgeschritten sie ist, ist aber schwer einzuschätzen.
 
 :: MargaCursedItemsTalk [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<% if(!window.gm.quests.hasActiveQuest("???") || window.gm.quests.getMilestoneState("???").id<1) { 
+<% if(!window.gm.quests.hasActiveQuest("???") || window.gm.quests.getMilestoneState("???").id<1){ 
     window.story.render("AlchTalkStartPurpleBerry"); %>
-<% } else if(window.gm.quests.getMilestoneState("???").id===1 && window.gm.player.Inv.countItem("???")>=5) { 
+<% } else if(window.gm.quests.getMilestoneState("???").id===1 && window.gm.player.Inv.countItem("???")>=5){ 
     window.story.render("AlchTalkFinishPurpleBerry"); %>
 <% }  else {%> Margarethe seems busy right now. [[Back|SC_Library]] <%}%>>
 </article><article id="LogPanel"></article></section>

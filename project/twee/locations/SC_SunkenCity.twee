@@ -12,7 +12,7 @@ TODO Another scary, ruined dungeon..
 </br><p> [[Next|SC_Lvx_I4]] </br></p>
 </article><article id="LogPanel"></article></section>
 <script>
-function buildRooms() {
+function buildRooms(){
     const _m=[
         '    H2--I2--J2        ',//todo write parser for this
         '    |       |         ',

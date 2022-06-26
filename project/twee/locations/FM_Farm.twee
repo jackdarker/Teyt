@@ -12,7 +12,7 @@ TODO Appear at farm.
 </br><p> [[Next|DngFM_F6]] </br></p>
 </article><article id="LogPanel"></article></section>
 <script>
-function buildRooms() {
+function buildRooms(){
     const _m=[
         '        H2  I2--J2        ',
         '        |       |         ',
@@ -262,7 +262,7 @@ The large wooden buildings have to be the stables.
 :: DngFM_FoxBunnyCabbage
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
-<% if(!window.story.state.DngFM.tmp.FoxBunnyCabbage) {%>
+<% if(!window.story.state.DngFM.tmp.FoxBunnyCabbage){%>
 <span class="tNPC1">"See, I have some kind of problem here. I need to get those"</span> she points at 3 cages <span class="tNPC1">"over this river by using this boat."</span>
 </br> Each of the cages contains a single critter: the first one has a white furred bunny inside. The second one contains a scrawny looking fox that trys to hide itself behind its bushy tail. The third has a cabbage placed inside. Why would someone place a cabbage in a cage?
 <p class="tNPC1">"The boat isn't big enough to fit more then one of those inside and even then I have to leave the cages behind."</p>
@@ -277,7 +277,7 @@ For some reason there is a sign placed on the other side of the river showing "B
 </article><article id="LogPanel"></article></section>
 <script>
 var data={fox:'A',cabbage:'A',bunny:'A'},boat='A',done=false;
-function move() {
+function move(){
     let choice=$("div#choice")[0],panel=$("div#panel")[0];
     while(choice.firstChild) choice.removeChild(choice.firstChild);
     var link = document.createElement('p');
@@ -287,7 +287,7 @@ function move() {
     var _list = Object.keys(data);
     const _target = ((boat==='A')?'B':'A'); 
     for(el of _list){
-        if(data[el]===boat) {
+        if(data[el]===boat){
             const _critter=el;
             link = document.createElement('a'),link.href='javascript:void(0)',
             link.addEventListener("click", function(me){
@@ -303,7 +303,7 @@ function move() {
     link.textContent="dont take anything with you and row to "+_target;
     choice.appendChild(link);
 }
-function check() {
+function check(){
     let _other=((boat==='A')?'B':'A'), _sucess=false,_fail=false;
     let choice=$("div#choice")[0],panel=$("div#panel")[0];
     while(choice.firstChild) choice.removeChild(choice.firstChild);
@@ -314,9 +314,9 @@ function check() {
     panel.appendChild(link);
     link = document.createElement('p')
     link2.href='javascript:void(0)';
-    if('B'===data.bunny && data.bunny===data.fox && data.fox===data.cabbage) { _sucess=true;
+    if('B'===data.bunny && data.bunny===data.fox && data.fox===data.cabbage){ _sucess=true;
         link.classList.add('tNPC1');link.textContent ='\"You really did it, thats wonderful. Now I can bring them to the market. Thank you so much.\"';
-    } else if(_other===data.bunny && _other===data.cabbage) { _fail=true;
+    } else if(_other===data.bunny && _other===data.cabbage){ _fail=true;
         link.textContent ='To late you notice your mistake, leaving the bunny and the cabbage together behind. You turn back just in time to see how the bunny advances the juicy veggy.';
         panel.appendChild(link);
         link = document.createElement('p');
@@ -324,7 +324,7 @@ function check() {
         panel.appendChild(link);
         link = document.createElement('p');link.classList.add('tNPC1');
         link.textContent ='\"This is a special breeding success. It took some effort but we have managed to provide cabbage with a mechanism for self-defense against its worst enemies.\"';
-    } else if(_other===data.fox && _other===data.cabbage) { _fail=true;
+    } else if(_other===data.fox && _other===data.cabbage){ _fail=true;
         link.textContent ='The bunny is save in your boat. But you hear some shredding, munching noises behind you.';
         panel.appendChild(link);
         link = document.createElement('p');
@@ -332,20 +332,20 @@ function check() {
         panel.appendChild(link);
         link = document.createElement('p');link.classList.add('tNPC1');
         link.textContent ='\"That foxy is a weird one. I think some incident made him a vegetarian.\"';
-    } else if(_other===data.fox && _other===data.bunny) {
+    } else if(_other===data.fox && _other===data.bunny){
         link.textContent ='You have a bad feeling that you made an error. The bunny and the fox are left alone together.';
         panel.appendChild(link);
         link = document.createElement('p');
         link.textContent ='You look back to find the bunny starring at the fox but the fox simply ignoring it. Odd.';
     }
     panel.appendChild(link);
-    if(_fail) {
+    if(_fail){
         link2.textContent = 'You failed. Start again.';
         link2.addEventListener("click", function(me){
                 data={fox:'A',cabbage:'A',bunny:'A'},boat='A';
                 check();
             });
-    } else if(_sucess) {
+    } else if(_sucess){
         link2.textContent = 'Success !';
         link2.addEventListener("click", function(me){ 
             window.story.state.DngFM.tmp.FoxBunnyCabbage=true; window.story.show(window.gm.player.location);

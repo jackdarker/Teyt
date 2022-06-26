@@ -1,5 +1,5 @@
 :: _SuperSimpleStory_ {"position":"1200,125"}
-<%if(visited(window.passage.name)<=1) {%>
+<%if(visited(window.passage.name)<=1){%>
 Welcome to this short story.</br></br>
 <%}%>
 <mark>The previous part is an example how to conditional build the html output </br></mark>
@@ -47,9 +47,9 @@ video with integrated and separate controls:</br>
  
 <script>
   var song = document.getElementById('player');
-  document.getElementById('play').addEventListener('click', function() { song.play(); }, false);
-  document.getElementById('pause').addEventListener('click', function() { song.pause(); }, false);
-  document.getElementById('duration').addEventListener('click', function() { 
+  document.getElementById('play').addEventListener('click', function(){ song.play(); }, false);
+  document.getElementById('pause').addEventListener('click', function(){ song.pause(); }, false);
+  document.getElementById('duration').addEventListener('click', function(){ 
   document.getElementById('ausgabe').innerHTML = 'Die Dauer des Videos beträgt: '+ song.duration; +' Sekunden.'}, false);
 </script>
 [[Start]]
@@ -112,18 +112,18 @@ video with integrated and separate controls:</br>
 </form>
 <div id='output'></div>
 <script>
-function selectperson(elmnt) {
+function selectperson(elmnt){
 		var menu = document.getElementById(elmnt.id);
 		document.querySelector('div#output').innerHTML = menu.value +""+menu.options[menu.selectedIndex].label+" "+menu.options[menu.selectedIndex].value;		
 }
 /*class SelectionController extends EventTarget {
-    constructor(selectElement, datasource, parentNode = null) {
+    constructor(selectElement, datasource, parentNode = null){
         super(); // Pflicht: Konstruktor der Superklasse aufrufen
-        if (!(selectElement instanceof HTMLSelectElement)) {
+        if (!(selectElement instanceof HTMLSelectElement)){
             throw new Error(
                 "Controller-Objekt benötigt ein select Element als ersten Parameter");
         }
-        if (parentNode && !(parentNode instanceof SelectionController)) {
+        if (parentNode && !(parentNode instanceof SelectionController)){
             throw new Error(
                 "Controller-Objekt benötigt einen SelectionController als zweiten Parameter"
             );
@@ -132,26 +132,26 @@ function selectperson(elmnt) {
         this.parentNode = parentNode;
         this.dataSource = dataSource;
         this.selectElement.addEventListener("change", event => this._handleChangeEvent(event))
-        if (parentNode) {
+        if (parentNode){
             parentNode.addEventListener("change", event => this.mapData(event.selectedObject)); //?? event => this.mapData(event.selectedObject));
         }
     }
     // Ordnet dem select Element eine Datenquelle zu. 
     // dataSource ist ein Objekt, aus dem die getValueList die Daten für die
     // select-Optionen ermitteln kann, oder null, um das select-Element zu disablen
-    mapData(dataSource) {
+    mapData(dataSource){
         // Quelldaten-Objekt im Controller speichern.
         this.dataSource = dataSource;
         // Optionen nur anfassen, wenn eine getValueList Methode vorhanden ist.
         //  Andernfalls davon ausgehen, dass die options durch das HTML
         // bereitgestellt werden.
-        if (typeof this.getValueList == "function") {
+        if (typeof this.getValueList == "function"){
             // Existierende Optionen entfernen
             removeOptions(this.selectElement);
             // Wenn dataSource nicht null war, die neuen Optionen daraus beschaffen
             // Andernfalls das select-Element deaktivieren
             const options = dataSource && this.getValueList(dataSource(this.selectElement.id,this.selectElement.value))//??this.getValueList(dataSource);
-            if (!options || !options.length) {
+            if (!options || !options.length){
                 setToDisabled(this.selectElement)
             } else {
                 setToEnabled(this.selectElement, options);
@@ -161,26 +161,26 @@ function selectperson(elmnt) {
         // jeder weiß, dass hier etwas passiert ist
         this.selectElement.dispatchEvent(new Event("change"));
         // Helper: Entferne alle options aus einem select Element	
-        function removeOptions(selectElement) {
+        function removeOptions(selectElement){
                 while (selectElement.length > 0) selectElement.remove(0);
             }
             // Helper: select-Element auf disabled setzen und eine Dummy-Option 
             // eintragen. Eine Variante wäre: das selectElement auf hidden setzten
-        function setToDisabled(selectElement) {
+        function setToDisabled(selectElement){
                 addOption(selectElement, "", "------");
                 selectElement.disabled = true;
             }
             // Helper: disabled-Zustand vom select-Element entfernen und die
             // übergebenen Optionen eintragen. Vorweg eine Dummy-Option "Bitte wählen".
-        function setToEnabled(selectElement, options) {
+        function setToEnabled(selectElement, options){
                 addOption(selectElement, "", "Bitte wählen:");
-                for (var optionData of options) {
+                for (var optionData of options){
                     addOption(selectElement, optionData.value, optionData.text);
                 }
                 selectElement.disabled = false;
             }
             // Helper: Option-Element erzeugen, ausfüllen und im select-Element eintragen
-        function addOption(selectElement, value, text) {
+        function addOption(selectElement, value, text){
             let option = document.createElement("option");
             option.value = value;
             option.text = text
@@ -188,82 +188,82 @@ function selectperson(elmnt) {
         }
     }
     // Abstrakte Methode! Wird sie nicht überschrieben, wird der TypeError geworfen
-    getValue(key) {
+    getValue(key){
       this.datasource(this.selectElement.id,key);
         //throw new TypeError("Die abstrakte Methode 'getValue' wurde nicht implementiert!");
     }
     // Stellt den im select Element ausgewählten Optionswert zur Verfügung
-    get selectedKey() {
+    get selectedKey(){
         return this.selectElement.value;
     }
     // Liefert das Datenobjekt zum ausgewählten Optionswert
-    get selectedObject() {
+    get selectedObject(){
             return this.dataSource ? this.getValue(this.selectElement.value) : null;
     }
     // privat
     // Die Methode reagiert auf das change-Event des select-Elements
     // und stellt es als eigenes change-Event des Controllers zur Verfügung
-    _handleChangeEvent(event) {
+    _handleChangeEvent(event){
         let nodeChangeEvent = new Event("change");
         nodeChangeEvent.selectedObject = this.selectedObject;
         this.dispatchEvent(nodeChangeEvent);
     }
 }*/
 /*class ProfessorController extends SelectionController {
-  constructor(selectElement) {
+  constructor(selectElement){
     super(selectElement, null);
   }
-  getValue(quelle, profId) {
+  getValue(quelle, profId){
     return quelle.find(prof => prof.id == profId);
   }
 }
 class VorlesungController extends SelectionController {
-  constructor(selectElement, parentController) {
+  constructor(selectElement, parentController){
     super(selectElement, parentController);
   }
-  getValueList(professor) {
+  getValueList(professor){
     return professor.vorlesungen.map(vorlesung => ({
       value: vorlesung.nummer,
       text: vorlesung.thema
     }));
   }
-  getValue(professor, vorlesungNr) {
+  getValue(professor, vorlesungNr){
     return professor.vorlesungen.find(vorlesung => vorlesung.nummer ==
       vorlesungNr);
   }
 }
 class TerminController extends SelectionController {
-  constructor(selectElement, parentController) {
+  constructor(selectElement, parentController){
     super(selectElement, parentController);
   }
-  getValueList(vorlesung) {
+  getValueList(vorlesung){
     return vorlesung.termine.map(termin => ({
       value: termin.id,
       text: termin.zeit
     }));
   }
-  getValue(vorlesung, terminId) {
+  getValue(vorlesung, terminId){
     return vorlesung.termine.find(termin => termin.id == terminId);
   }
 }*/
-function datasource(category,key) {
-    if(category==="professor") {
+function datasource(category,key){
+    if(category==="professor"){
       return([{ value: "V1", text: "vorlesung1"}]);
-    } else if (category==="vorlesung") {
+    } else if (category==="vorlesung"){
       return([{ value: "T1", text: "termin11"}]);
     } else {
       return([{ value: "P1", text: "professor1"}]);
     }
 }/*
 //document.addEventListener('DOMContentLoaded', 
-(function () {
+(function (){
   const form = document.forms.terminauswahl;
   const profCtrl = new SelectionController(form.professor);
   const vorlesungCtrl = new SelectionController(form.vorlesung, profCtrl);
   const terminCtrl = new SelectionController(form.termin, vorlesungCtrl);
   terminCtrl.addEventListener("change", terminChanged)
   profCtrl.mapData(data)
-  function terminChanged(event) {
+  function terminChanged(event){
     let terminCtrl = event.target;
     let vorlesungCtrl = terminCtrl.parentNode;
     let profCtrl = vorlesungCtrl.parentNode;
@@ -324,7 +324,7 @@ function datasource(category,key) {
 </form>
 <div id='output'></div>
 <script>
-function selectperson(elmnt) {
+function selectperson(elmnt){
 		var menu = document.getElementById(elmnt.id);
 		document.querySelector('div#output').innerHTML = menu.value +""+menu.options[menu.selectedIndex].label+" "+menu.options[menu.selectedIndex].value;		
 }
@@ -571,13 +571,13 @@ var data = [
 	}
 ];
 class SelectionController extends EventTarget {
-    constructor(selectElement, parentNode = null) {
+    constructor(selectElement, parentNode = null){
         super(); // Pflicht: Konstruktor der Superklasse aufrufen
-        if (!(selectElement instanceof HTMLSelectElement)) {
+        if (!(selectElement instanceof HTMLSelectElement)){
             throw new Error(
                 "Controller-Objekt benötigt ein select Element als ersten Parameter");
         }
-        if (parentNode && !(parentNode instanceof SelectionController)) {
+        if (parentNode && !(parentNode instanceof SelectionController)){
             throw new Error(
                 "Controller-Objekt benötigt einen SelectionController als zweiten Parameter"
             );
@@ -586,26 +586,26 @@ class SelectionController extends EventTarget {
         this.parentNode = parentNode;
         this.selectElement.addEventListener("change", event => this._handleChangeEvent(
             event))
-        if (parentNode) {
+        if (parentNode){
             parentNode.addEventListener("change", event => this.mapData(event.selectedObject));
         }
     }
     // Ordnet dem select Element eine Datenquelle zu. 
     // dataSource ist ein Objekt, aus dem die getValueList die Daten für die
     // select-Optionen ermitteln kann, oder null, um das select-Element zu disablen
-    mapData(dataSource) {
+    mapData(dataSource){
         // Quelldaten-Objekt im Controller speichern.
         this.dataSource = dataSource;
         // Optionen nur anfassen, wenn eine getValueList Methode vorhanden ist.
         //  Andernfalls davon ausgehen, dass die options durch das HTML
         // bereitgestellt werden.
-        if (typeof this.getValueList == "function") {
+        if (typeof this.getValueList == "function"){
             // Existierende Optionen entfernen
             removeOptions(this.selectElement);
             // Wenn dataSource nicht null war, die neuen Optionen daraus beschaffen
             // Andernfalls das select-Element deaktivieren
             const options = dataSource && this.getValueList(dataSource);
-            if (!options || !options.length) {
+            if (!options || !options.length){
                 setToDisabled(this.selectElement)
             } else {
                 setToEnabled(this.selectElement, options);
@@ -615,26 +615,26 @@ class SelectionController extends EventTarget {
         // jeder weiß, dass hier etwas passiert ist
         this.selectElement.dispatchEvent(new Event("change"));
         // Helper: Entferne alle options aus einem select Element	
-        function removeOptions(selectElement) {
+        function removeOptions(selectElement){
                 while (selectElement.length > 0) selectElement.remove(0);
             }
             // Helper: select-Element auf disabled setzen und eine Dummy-Option 
             // eintragen. Eine Variante wäre: das selectElement auf hidden setzten
-        function setToDisabled(selectElement) {
+        function setToDisabled(selectElement){
                 addOption(selectElement, "", "------");
                 selectElement.disabled = true;
             }
             // Helper: disabled-Zustand vom select-Element entfernen und die
             // übergebenen Optionen eintragen. Vorweg eine Dummy-Option "Bitte wählen".
-        function setToEnabled(selectElement, options) {
+        function setToEnabled(selectElement, options){
                 addOption(selectElement, "", "Bitte wählen:");
-                for (var optionData of options) {
+                for (var optionData of options){
                     addOption(selectElement, optionData.value, optionData.text);
                 }
                 selectElement.disabled = false;
             }
             // Helper: Option-Element erzeugen, ausfüllen und im select-Element eintragen
-        function addOption(selectElement, value, text) {
+        function addOption(selectElement, value, text){
             let option = document.createElement("option");
             option.value = value;
             option.text = text
@@ -642,46 +642,46 @@ class SelectionController extends EventTarget {
         }
     }
     // Abstrakte Methode! Wird sie nicht überschrieben, wird der TypeError geworfen
-    getValue(key) {
+    getValue(key){
         throw new TypeError(
             "Die abstrakte Methode 'getValue' wurde nicht implementiert!");
     }
     // Stellt den im select Element ausgewählten Optionswert zur Verfügung
-    get selectedKey() {
+    get selectedKey(){
         return this.selectElement.value;
     }
     // Liefert das Datenobjekt zum ausgewählten Optionswert
-    get selectedObject() {
+    get selectedObject(){
             return this.dataSource ? this.getValue(this.dataSource, this.selectElement.value) : null;
     }
     // privat
     // Die Methode reagiert auf das change-Event des select-Elements
     // und stellt es als eigenes change-Event des Controllers zur Verfügung
-    _handleChangeEvent(event) {
+    _handleChangeEvent(event){
         let nodeChangeEvent = new Event("change");
         nodeChangeEvent.selectedObject = this.selectedObject;
         this.dispatchEvent(nodeChangeEvent);
     }
 }
 class ProfessorController extends SelectionController {
-  constructor(selectElement) {
+  constructor(selectElement){
     super(selectElement, null);
   }
-  getValue(quelle, profId) {
+  getValue(quelle, profId){
     return quelle.find(prof => prof.id == profId);
   }
 }
 class VorlesungController extends SelectionController {
-  constructor(selectElement, parentController) {
+  constructor(selectElement, parentController){
     super(selectElement, parentController);
   }
-  getValueList(professor) {
+  getValueList(professor){
     return professor.vorlesungen.map(vorlesung => ({
       value: vorlesung.nummer,
       text: vorlesung.thema
     }));
   }
-  getValue(professor, vorlesungNr) {
+  getValue(professor, vorlesungNr){
     return professor.vorlesungen.find(vorlesung => vorlesung.nummer ==
       vorlesungNr);
   }
@@ -689,7 +689,7 @@ class VorlesungController extends SelectionController {
 
 :: _VariablesAndScript_ {"position":"1075,25"}
 <script>
-function getBanana(elmnt,val) {
+function getBanana(elmnt,val){
     window.story.state.vars.bananas +=val;
     //window.story.show(window.passage.name); this would reload the passage but would overwrite the elmnt-replace
     elmnt.replaceWith("took bananas "+val); //replace the calling link with simple text to it a one-timer. But it will be restored if passage is reloaded 
@@ -699,13 +699,13 @@ function getBanana(elmnt,val) {
 //initialise game state
 //s is window.story.state from snowman!
 //create a vars-container and define startvalues for some variables
-if (!s.vars) { 
+if (!s.vars){ 
 	s.vars = {
     bananas : 0
   }; 
 }
 %>
-<% if(visited(window.passage.name)<=1) {
+<% if(visited(window.passage.name)<=1){
     s.vars.bananas+=2;}
 %>
 You have <%=s.vars.bananas%> bananas. </br>
@@ -715,7 +715,7 @@ You droped a banana and have now <%-window.gm.dropBanana()%>. </br>
 <mark>This is a empty link that is used to trigger a function that is defined in the page-script </br></mark>
 <a0 onclick=getBanana(this,5)>Get more banana</a> </br>
 <mark>or calling a anonymous function (take notice how alert-string is escaped):</br></mark>
-<a0 id='money' onclick='(function ( $event ) { alert("alert ".concat($event.id)); })(this);'>Get much money</a>
+<a0 id='money' onclick='(function ( $event ){ alert("alert ".concat($event.id)); })(this);'>Get much money</a>
 <mark>Press refreh to update page display </br></mark>
 [[Refresh|_VariablesAndScript_]] </br>
 [[Start]]

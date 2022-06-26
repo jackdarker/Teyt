@@ -67,7 +67,7 @@ Those are very present through the game and in the main-story (also check the se
 <p>The count sent his men after you because you were poaching in his woods. Therefore, you left your home and fled to this remote place. A roadhouse stands not far from the crossroads. Maybe you can find shelter there for the time being. </p>
 <p><a0 onclick='start();'>Walk into the inn</a></p><hr>
 </article>
-<script> function start() {
+<script> function start(){
     window.story.state.DngSY.remainingNights=0,window.story.state.DngSY.dngLevel=0;
     window.story.state.vars.spawnAt="KH_NextDay";
     window.gm.enterVR();
@@ -92,7 +92,7 @@ As you secure one shiny gadget, you trigger some magic anomaly... </br></p>
 <p><a0 onclick='startPC();'>That magic portal sucks you right in...wush</a></p><hr>
 There are also some options to make a fastforward (might behave oddly): </br>
 </article>
-<script> function startSY() {
+<script> function startSY(){
     window.story.state.DngSY.remainingNights=1;
     window.story.state.vars.spawnAt="DngSY_Your_Room";
     window.gm.enterVR();
@@ -100,7 +100,7 @@ There are also some options to make a fastforward (might behave oddly): </br>
     window.gm.player.levelUp(5);window.gm.player.autoLeveling();
     window.story.state.DngSY.dngLevel=1;//todo
 }
-function startHC() {
+function startHC(){
     window.story.state.DngSY.remainingNights=0,window.story.state.DngSY.dngLevel=0;
     window.story.state.vars.spawnAt="DngHC_Entry";
     window.gm.enterVR();
@@ -108,7 +108,7 @@ function startHC() {
     //['qGetPierced','qFindCursed'].foreach(x=>window.gm.quests.addQuest(x,1));
     window.gm.player.levelUp(5);window.gm.player.autoLeveling();
 }
-function startPC() {
+function startPC(){
     window.story.state.DngSY.remainingNights=0,window.story.state.DngSY.dngLevel=0;
     window.story.state.vars.spawnAt="DngPC_Entry";
     window.gm.enterVR();
@@ -121,7 +121,7 @@ function startPC() {
 This is for testing purpose with some configurable settings.
 <div></br>[[Back|Intro]] <a0 onclick='start();'>Start</a></br></div>
 </article><article id="LogPanel"></article></section>
-<script> function start() {
+<script> function start(){
     window.story.state.DngSY.remainingNights=1;
     window.story.state.vars.spawnAt="DngSY_Your_Room";
     window.gm.enterVR();
@@ -167,7 +167,7 @@ To divert yourself, you decide to check your emails.
 Start at the character creation screen in the VR-game.
 <div></br>[[Back|Intro]] <a0 onclick='start();window.story.show("CharacterEditor");'>Start</a></br></div>
 </article><article id="LogPanel"></article></section>
-<script> function start() {
+<script> function start(){
     window.gm.quests.addQuest("qDLCMain",1);
     window.gm.quests.addQuest("qDiedAgain",1);
     window.gm.quests.addQuest("qFixLaptop",1);
@@ -186,7 +186,7 @@ Start at the character creation screen in the VR-game.
 Start at forest with introductory quest done so far. Roam around and prepare to defeat bridge boss.
 <div></br>[[Back|Intro]] <a0 onclick='start();window.story.show("ForestSpawn");'>Start</a></br></div>
 </article><article id="LogPanel"></article></section>
-<script> function start() {
+<script> function start(){
     window.gm.quests.addQuest("qBeastKink",1);
     window.gm.quests.addQuest("qBondageKink",200);
     window.gm.quests.addQuest("qDLCMain",600);
@@ -204,7 +204,7 @@ Start at forest with introductory quest done so far. Roam around and prepare to 
 You can now pass the bridge and leave the forest.
 <div></br>[[Back|Intro]] <a0 onclick='start();window.story.show("ForestBridge");'>Start</a></br></div>
 </article><article id="LogPanel"></article></section>
-<script> function start() {
+<script> function start(){
     window.gm.quests.addQuest("qBeastKink",1);
     window.gm.quests.addQuest("qBondageKink",400);
     window.gm.quests.addQuest("qDLCMain",600);
@@ -222,7 +222,7 @@ You can now pass the bridge and leave the forest.
 <%window.gm.player.location=window.passage.name;%>
 <div></br>[[Back|Intro]] <a0 onclick='start();window.story.show("WolfVictory");'>Start</a></br></div>
 </article><article id="LogPanel"></article></section>
-<script> function start() {
+<script> function start(){
     window.gm.quests.addQuest("qBeastKink",1);
     window.gm.quests.addQuest("qBondageKink",400);
     window.gm.quests.addQuest("qDLCMain",600);
@@ -245,7 +245,7 @@ You can now pass the bridge and leave the forest.
 Enter the Grind-geon.
 <div></br>[[Back|Intro]] <a0 onclick='start();'>Start</a></br></div>
 </article><article id="LogPanel"></article></section>
-<script> function start() {
+<script> function start(){
     window.story.state.vars.spawnAt="AM_Lv2_Start";
     window.gm.enterVR();
     window.gm.player.levelUp(2);window.gm.player.autoLeveling();//todo else its to difficult against wolf

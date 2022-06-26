@@ -16,7 +16,7 @@ You are in the sanctum of spawn. Its located on top of the hill above the settle
 <div></br>[[Settlement|ForestBorder]]</br></div>
 </article><article id="LogPanel"></article></section>
 <script>
-function takeBracers() {
+function takeBracers(){
     let item = new window.storage.constructors['BracerLeather']();
     item = window.gm.makeCursedItem(item,{lock:true,energydrain:2});
     item = window.gm.makeBonusItem(item,{statBoost:'agility', statBonus:3});
@@ -24,7 +24,7 @@ function takeBracers() {
     window.gm.player.Outfit.addItem(item);
     this.disabled=true;
 }
-function takeBracers2() {
+function takeBracers2(){
     let item = new window.storage.constructors['BracerLeather']();
     item = window.gm.makeCursedItem(item,{minItems:2,convert:'GlovesRubber'});
     item = window.gm.makeBonusItem(item,{statBoost:'agility', statBonus:2});
@@ -44,19 +44,19 @@ One direction leads east, past a hut. The other direction follows the border of 
 <a0 onclick='enterMinoLair(); '>Enter Mino's Lair</a>
 <a0 onclick='enterBeehive(); '>Enter Beehive</a> <a0 onclick='enterShatteredCity();'>Enter Shattered City</a><a0 onclick='enterArena();'>Enter Arena</a></div>
 </article><article id="LogPanel"></article></section>
-<script> function enterBeehive() {
+<script> function enterBeehive(){
     window.gm.dng = window.gm.dngs.BeeHive();
     window.gm.dng.enterDungeon();
 }
-function enterMinoLair() {
+function enterMinoLair(){
     window.gm.dng = window.gm.dngs.MinoLair();
     window.gm.dng.enterDungeon();
 }
-function enterShatteredCity() {
+function enterShatteredCity(){
     window.gm.dng = window.gm.dngs.ShatteredCity();
     window.gm.dng.enterDungeon();
 }
-function enterArena() {
+function enterArena(){
     window.gm.dng = window.gm.dngs.ArenaTrialsNo1();
     window.gm.dng.enterDungeon();
 }
@@ -80,7 +80,7 @@ Unfortunatly you didnt find anything useful.</br>
 
 :: ForestWolfEncounter [_back_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<% window.gm.quests.addQuest("qWolfMate",1); if(window.gm.quests.getMilestoneState("qWolfMate").id<=1) {%>
+<% window.gm.quests.addQuest("qWolfMate",1); if(window.gm.quests.getMilestoneState("qWolfMate").id<=1){%>
 Distracted by rummaging around in the bushes, you just caught by surprise as you turn around.</br>
 A dog is staring into your face. Its looks very close to a wolf you think. But wolfs would stay away from humans.
 'Oh wait, I'm in a game. In games wolves are nether to shy to attack.'
@@ -116,23 +116,23 @@ The forest makes a friendly impression.</br> The trees are still light and are n
 Maybe you can <a0 onclick='explore(); '>explore</a> the surrounding woods and see if you can find anything useful.</br>
 <div></br>[[ForestBorder]] [[ForestCliff]] </br></div>
 </article><article id="LogPanel"></article></section>
-<script> function explore() {
+<script> function explore(){
     let rnd = _.random(0,100);
     window.gm.pushLog("rolled "+rnd);
     window.story.state.tmp.args = [];
-    if(window.gm.quests.getMilestoneState("qDiedAgain").id<=2 && window.gm.player.Inv.countItem('PurpleBerry')>=2) {
+    if(window.gm.quests.getMilestoneState("qDiedAgain").id<=2 && window.gm.player.Inv.countItem('PurpleBerry')>=2){
         window.story.state.tmp.args = ['PurpleBerry',0];window.story.show('ForestSearchAround'); //find nothing !
-    } else if(!window.gm.quests.hasActiveQuest("qCarlia") && window.gm.player.Inv.countItem('PurpleBerry')>=3) {
+    } else if(!window.gm.quests.hasActiveQuest("qCarlia") && window.gm.player.Inv.countItem('PurpleBerry')>=3){
         window.story.show('ForestMeetCarlia1');
-    } else if(window.gm.quests.getMilestoneState("qCarlia").id===100 && window.gm.player.Inv.countItem('PurpleBerry')>=4) {
+    } else if(window.gm.quests.getMilestoneState("qCarlia").id===100 && window.gm.player.Inv.countItem('PurpleBerry')>=4){
         window.story.show('ForestMeetCarlia2');
-    } else if(window.gm.quests.getMilestoneState("qCarlia").id===500 && window.gm.player.Inv.countItem('SquishedLeech')>=1) {
+    } else if(window.gm.quests.getMilestoneState("qCarlia").id===500 && window.gm.player.Inv.countItem('SquishedLeech')>=1){
         window.story.show('ForestMeetCarlia3');
-    } else if(rnd > 70 ) {
+    } else if(rnd > 70 ){
          window.story.show('ForestWolfEncounter');
-    } else if(rnd > 65 ) {
+    } else if(rnd > 65 ){
          window.story.show('ForestMudGlade');
-    }else if(rnd > 20) { //todo limit berys per day
+    }else if(rnd > 20){ //todo limit berys per day
         let find = ['PurpleBerry','PurpleBerry','ApocaFlower'];
         let rnd2 = _.random(0,find.length-1);
         window.story.state.tmp.args = [find[rnd2],1]
@@ -270,11 +270,11 @@ This area of the forest seems to be more watery and sludgy. Your feet sink into 
 <a0 onclick='explore();'>Searching around</a> might only get you wet and dirty.</br>
 <div></br>[[ForestEntrance]] </br></div>
 </article><article id="LogPanel"></article></section>
-<script> function explore() {
+<script> function explore(){
     let rnd = _.random(0,100);
     window.gm.pushLog("rolled "+rnd);
     window.story.state.tmp.args = [];
-    if(rnd > 0 ) {
+    if(rnd > 0 ){
          window.story.show('ForestLeechEncounter');
     } else {
         window.story.show('ForestSearchAround'); //nothing
@@ -284,7 +284,7 @@ This area of the forest seems to be more watery and sludgy. Your feet sink into 
 
 :: ForestLeechEncounter [_back_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<% if(true) {%>
+<% if(true){%>
 Some sludgy leeches are crawling up your legs, each easily long as a hand !</br>
 <a0 onclick='window.gm.encounters.leech(window.gm.player.location,_.random(1,3))'>Next</a>
 <%}%></br>
@@ -293,7 +293,7 @@ Some sludgy leeches are crawling up your legs, each easily long as a hand !</br>
 
 :: ForestDryadEncounter [_back_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<% if(true) {%>
+<% if(true){%>
 As you make your way through the trees, a strange woman-like figure steps out behind one of them !</br>
 <a0 onclick='window.gm.encounters.dryad(window.gm.player.location,_.random(1,3))'>Next</a>
 <%}%></br>
@@ -304,7 +304,7 @@ As you make your way through the trees, a strange woman-like figure steps out be
 :: ForestCliff
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.moveHere();%>
-<% if(window.gm.quests.getMilestoneState("qDiedAgain").id===2) { %>
+<% if(window.gm.quests.getMilestoneState("qDiedAgain").id===2){ %>
 You fight your way through the dense undergrowth and realize just in time that you have reached the edge of a cliff.</br> 
 <div id='select1' >
 <a0 onclick='window.gm.printTalkLink("div#select1","div#choice1a")'>Peak into the chasm</a>
@@ -327,7 +327,7 @@ At some point you see a massive rock coming onto you, reaching out with your han
 But of course its futile trying to catch that crushing weight. </br>  
 You dont feel any pain, everything is just going <a0 onclick='window.gm.respawn();'>black</a> as if pulling the cord from a TV.</br>  
 </div></div></div>
-<% } else if(window.gm.quests.getMilestoneState("qCarlia").id===200) { %>
+<% } else if(window.gm.quests.getMilestoneState("qCarlia").id===200){ %>
 Walking along the edge of the cliff, you check the ground. Maybe you can find some footprints or something that would help you track down the figure that stalked you.
 And really you can find one footprint in the muddy leftovers of a rain puddle. 
 <p class="tPC">'It looks like from a boot - is it my own? No, mine is not as broad but longer' </p>
@@ -344,7 +344,7 @@ Or you might just return to [[ForestEntrance]]. </br></div>
 :: ForestCliffCave
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.moveHere();%>
-<% if(window.gm.quests.getMilestoneState("qBondageKink").id<=1 && window.gm.quests.getMilestoneState("qCarlia").id===300) { %>
+<% if(window.gm.quests.getMilestoneState("qBondageKink").id<=1 && window.gm.quests.getMilestoneState("qCarlia").id===300){ %>
 At some point the small path leads further downward the cliff, makes a curve and ends in front of a cave.</br>
 The cave entrance is possibly 5m in width and around 3m at its heighest point. It tapers while it goes inside the cliff but maybe it doesnt end soon, its just to dark to see if it goes on. 
 Someone made himself a home here. There is a small fireplace with burned up charcoal and a sleeping mat.</br>
@@ -385,11 +385,11 @@ The leaf canopy is dense but in some places bundles of sun rays reach the forest
 </br> <a0 onclick='explore();'>Explore</a></br>
 <div>[[ForestMudGlade]]</br></div> 
 </article><article id="LogPanel"></article></section>
-<script> function explore() {
+<script> function explore(){
     let rnd = _.random(0,100);
     window.gm.pushLog("rolled "+rnd);
     window.story.state.tmp.args = [];
-    if(rnd > 0 ) {
+    if(rnd > 0 ){
          window.story.show('ForestDryadEncounter');
     } else {
         window.story.show('ForestSearchAround'); //nothing
@@ -404,7 +404,7 @@ The leaf canopy is dense but in some places bundles of sun rays reach the forest
 <%window.gm.moveHere();%>
 <!--todo--> Out of the dense undergrowth you step into a clearing. This would be an idyllic place if it weren't for this creepy stone circle.</br> 
 </br> 
-<% if(true) { %>
+<% if(true){ %>
 <div id='select1' >
 <a0 onclick='window.gm.printTalkLink("div#select1","div#choice1a")'>Inspect stone circle</a>
 </div>
@@ -426,7 +426,7 @@ Ansonsten gibt es hier nichts.</br>
 <p class="tPC"></p>'Puh, what a stink. I shouldnt stay here for long for I might suffocate'</p>
 <!--"About that cake we talked earlier - what kind of cake are we speaking about."<p class='tPC'>NOO CAKE !</p>-->
 <a0 onclick='window.gm.player.Inv.addItem(new window.gm.ItemsLib["KeyRestraintA"]());'>pickup small key</a>
-<% if(window.gm.quests.getMilestoneState("qPurpleBerry").id>=100) {%>
+<% if(window.gm.quests.getMilestoneState("qPurpleBerry").id>=100){%>
 <a0 onclick='window.gm.player.Inv.removeItem("PurpleBerry",5);window.gm.player.Inv.addItem(new window.gm.ItemsLib["HealthPotionSmall"](),1);window.gm.refreshAllPanel();' <%=(window.gm.player.Inv.countItem("PurpleBerry")>=5)?(""):("hidden")%>>Trade 5 purple berries for 1 health-potion</a></br>
 <a0 onclick='window.gm.player.Inv.removeItem("PurpleBerry",5);window.gm.player.Inv.addItem(new window.gm.ItemsLib["HorsePowerPotion"](),1);window.gm.refreshAllPanel();' <%=(true)?(""):("hidden")%>>Trade xxx for 1 HorsePower-Draft</a>
 <%}%>
@@ -437,10 +437,10 @@ Ansonsten gibt es hier nichts.</br>
 :: ForestBridge
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.moveHere();%>
-<% if(window.gm.quests.getMilestoneState("qBondageKink").id<100) { %>
+<% if(window.gm.quests.getMilestoneState("qBondageKink").id<100){ %>
 Somehow you cant go into this direction. Maybe this route unlocks later.
 [[Leave|ForestBorder]]
-<% } else if(window.gm.quests.getMilestoneState("qBondageKink").id<=200) { %>
+<% } else if(window.gm.quests.getMilestoneState("qBondageKink").id<=200){ %>
 <p class="tPC">'I guess this road leads to that town the alchemist mentioned.'</p>
 You follow the path until after a curve a wooden bridge comes into view.
 The bridge spans about the canyon,a deep chasm between the forest and the eastern area thereof.</br>
@@ -470,7 +470,7 @@ Squinching your eyes and slowing down your steps, you try to get a better view o
 While you scream at your offender, he bolts forward trying to knock you over.</br>
 You are in a <a0 onclick='window.gm.quests.forceQuestMilestone("qBondageKink",300,200);window.gm.encounters.Trent(window.gm.player.location)'>fight!</a></br>
 </div></div></div></div>
-<% } else if(window.gm.quests.getMilestoneState("qBondageKink").id<=300) { %>
+<% } else if(window.gm.quests.getMilestoneState("qBondageKink").id<=300){ %>
 Carefully approaching the bridge, you are scanning the surrounding.</br>
 Trent is over there, watching that no one passes the bridge without payment. </br>
 At least two other people are sitting around a firepit near the eastern end of the bridge.</br>

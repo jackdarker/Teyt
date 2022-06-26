@@ -17,12 +17,12 @@ Cheat buttons: those are meant for debugging and might break your game</br>
 <a0  onclick='window.gm.player.Inv.addItem(new window.storage.constructors["Money"](),200);window.gm.refreshAllPanel();'>Get 200$</a></br>
 </br>
 <a0  onclick='unhideStats();window.gm.refreshAllPanel();'>unhide player stats</a></br>
-<%if(window.story.state._gm.dbgShowCombatRoll) {%>
+<%if(window.story.state._gm.dbgShowCombatRoll){%>
 <a0  onclick='window.story.state._gm.dbgShowCombatRoll=false;window.gm.refreshAllPanel();'>disable combat debug</a>
 <%} else {%>
 <a0  onclick='window.story.state._gm.dbgShowCombatRoll=true;window.gm.refreshAllPanel();'>enable combat debug (log combat calculations)</a>
 <%}%>
-<%if(window.story.state._gm.dbgShowQuestInfo) {%>
+<%if(window.story.state._gm.dbgShowQuestInfo){%>
 <a0  onclick='window.story.state._gm.dbgShowQuestInfo=false;window.gm.refreshAllPanel();'>disable extended questinfo</a>
 <%} else {%>
 <a0  onclick='window.story.state._gm.dbgShowQuestInfo=true;window.gm.refreshAllPanel();'>enable ext. questinfo</a>
@@ -44,13 +44,13 @@ Crash if you enter wrong things below !</br>
 <a0  onclick='startfight()'>Go</a></br>
 (use Encounter-name, might sent you to certain events on defeat/victory. Might need extra params like {"amount":1} )</br>
 </article><article id="LogPanel"></article></section>
-<script> function unhideStats() {
+<script> function unhideStats(){
     var ids = window.gm.player.Stats.getAllIds();
-    for(var i=0; ids.length>i;i++) {
+    for(var i=0; ids.length>i;i++){
         window.gm.player.Stats.modifyHidden(ids[i],0);
     }
 }
-function startfight() {
+function startfight(){
   var _p=document.getElementById("startfight2").value||"{}";
   window.gm.getSaveVersion();
   _p=_p.replace(/“/g,'"').replace(/”/g,'"');

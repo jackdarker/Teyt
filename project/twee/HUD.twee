@@ -4,7 +4,7 @@
 <div><%=window.gm.util.printLocationName(window.gm.player.location)%></br><%=window.gm.getTimeString()%></br><%=window.gm.getDateString()%></br></div><hr>
 <div><%=window.gm.player.name%></br>
 <%=window.gm.util.statsbar("health","red")%><%=window.gm.util.statsbar("energy","yellow")%><%=window.gm.util.statsbar("will","green")%>
-<%=window.gm.util.statsbar("arousal","coral")%><%=window.gm.util.statsbar("hunger","rosybrown")%><%=window.gm.util.statsbar("savageness","darkred")%></div>
+<%=window.gm.util.statsbar("arousal","coral")%><%=window.gm.util.statsbar("satiation","rosybrown")%><%=window.gm.util.statsbar("savageness","darkred")%></div>
 <div>Money: <%=window.gm.player.Inv.countItem('Money')%></div>
 <!--<div <%=window.gm.player.canLevelUp?"class=\"green\"":""%>>XP/Level: <%=window.gm.player._data.XP+"/"+window.gm.player._data.level%></div>-->
 <hr>
@@ -88,7 +88,7 @@ function clearview(){
 var infodisp = 'dialog form label output'; //Url to output according nesting node classes; see structure of dialog below
 var x = 1; 
 var _slots = ['Auto','1','2','3','4','5','6','7','8']; //number saveslots available; has to fit save form
-for(var i=0; i< _slots.length;i++) {
+for(var i=0; i< _slots.length;i++){
   const _x = _slots[i];
   const slot = 'save'.concat(_x);
   document.querySelector('#save'.concat(_x)).addEventListener('click', function(){
@@ -119,7 +119,7 @@ function refresh(slot){
     var out = document.querySelector('dialog form output'.concat(slot));
     if(out) out.textContent = ok;
 }
-function readFile(input) {
+function readFile(input){
     var OK = window.storage.loadFile(input);  //TODO this runs asynchron
     if(!OK){ 
       return;
@@ -225,7 +225,7 @@ If you enable this your route to bad end by sex-related action is much shorter. 
 -->
 </article><article id="LogPanel"></article></section>
 <script>
-function toggleSetting(elmt) {
+function toggleSetting(elmt){
   let toggle=window.story.state.Settings[elmt.id]=!window.story.state.Settings[elmt.id];
   elmt.checked=toggle;
 }
@@ -236,19 +236,21 @@ function toggleSetting(elmt) {
 <!--just test-->
 <section><!--<aside id="sidebar"></aside>--><article><%=window.story.render("CenterDialogs") %>
 <div><canvas id="exampleCanvas" width="240" height="225">Your browser doesn't support the canvas tag.    </canvas></div>
+<svg height="200px" id="svg"><%=window.gm.images["CatGirl1"]()%></svg>
 <button onclick='window.gm.printCombatScreen()'>test a</button>
-<button onclick='onimage("assets/favicon.png")'>test b</button>
-    <script>
-      function onimage(imgsrc) {
-        var canvas = document.getElementById("exampleCanvas");
-        var ctx = canvas.getContext("2d");
-        //var img = document.getElementById("photo");
-var img = new Image(); // Create new img element
-img.src = imgsrc;//'https://twinery.org/homepage/img/logo.svg';   //todo the loading o image takes a while and it will not refreh automatically
-        ctx.drawImage(img, 0, 0);
-      };
-      onimage("assets/bird.gif");
-    </script>
+<button onclick='onimage("assets/favicon.png")'>test IMG</button>
+<button onclick='window.gm.util.fitSVGtoContent("svg")'>test SVG</button>
+<script>
+  function onimage(imgsrc){
+    var canvas = document.getElementById("exampleCanvas");
+    var ctx = canvas.getContext("2d");
+    //var img = document.getElementById("photo");
+    var img = new Image(); // Create new img element
+    img.src = imgsrc;//'https://twinery.org/homepage/img/logo.svg';   //todo the loading o image takes a while and it will not refreh automatically
+    ctx.drawImage(img, 0, 0);
+  };
+  onimage("assets/bird.gif");
+</script>
 [[Back|_back_]]</br>
 </article><article id="LogPanel"></article></section>
 
@@ -278,23 +280,23 @@ window.gm.printOutput(window.gm.printEffectSummary(window.gm.player.id,true,fals
 <% }%>
 <div id='output'></div>
 </article><article id="LogPanel"></article></section>
-<script>function levelUp(char) {
+<script>function levelUp(char){
   window.story.state[char].levelUp(1);
   window.gm.refreshAllPanel();
 }
-function statUp(statid,charname) {
+function statUp(statid,charname){
   let char =window.story.state[charname];
   char.Stats.increment(statid,1);
   char._data.unspentStat-=1; //todo ugly
   window.gm.refreshAllPanel();
 }
-function showStats(charname) {
+function showStats(charname){
   let char =window.story.state[charname];
   let _wheights = char.autolevelWheight();
   let msg='';
-  if(char._data.unspentStat>0) {
+  if(char._data.unspentStat>0){
     msg=char._data.unspentStat+' points can be distributed on stats:</br><table>';
-    for(el of _wheights) {
+    for(el of _wheights){
       msg+="<tr><td><a href=\"javascript:void(0)\" onclick='statUp(\""+el.id+"\",\""+char.id+"\")'>"+el.id+"</a></td><td>is "+char.Stats.getItem(el.id).base+"</td></tr>";
     }
     msg+='</table>';
@@ -313,7 +315,7 @@ and run renderToSelector("#panel", "listsell");
 -->
 <script>
 //define window.gm.shop.WaresToSell in your passage !
-for(var i=0;window.gm.shop.WaresToSell.length>i;i++) {
+for(var i=0;window.gm.shop.WaresToSell.length>i;i++){
     let item = window.gm.shop.WaresToSell[i].item;
     let _cost=window.gm.shop.WaresToSell[i].cost;
     window.gm.shop.printShopSellEntry(item,_cost,
@@ -331,7 +333,7 @@ and run renderToSelector("#panel", "listbuy");
 -->
 <script>
 //define window.gm.shop.WaresToBuy in your passage !
-for(var i=0;window.gm.shop.WaresToBuy.length>i;i++) {
+for(var i=0;window.gm.shop.WaresToBuy.length>i;i++){
     let item=window.gm.shop.WaresToBuy[i].item;
     let _cost=window.gm.shop.WaresToBuy[i].cost;
     window.gm.shop.printShopBuyEntry(item,_cost,

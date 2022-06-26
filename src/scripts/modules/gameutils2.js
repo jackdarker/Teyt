@@ -2,14 +2,14 @@
 "use strict";
 //used for pathfinding in map not using dungeon
 //grid = grid =[{room:'H2', dirs:['H3','I2']},...]
-window.gm.gridToGraph=function(grid) {
+window.gm.gridToGraph=function(grid){
   let _r,_rooms= new Map();
-  for(el of grid) {
+  for(el of grid){
       _rooms.set(el.room,{name:el.room, neighbours:[]});
   }
-  for(el of grid) {
+  for(el of grid){
       _r = _rooms.get(el.room);
-      for(var dir of el.dirs) {
+      for(var dir of el.dirs){
           _r.neighbours.push(_rooms.get(dir));
       }
       _rooms.set(el.room,_r);
@@ -17,7 +17,7 @@ window.gm.gridToGraph=function(grid) {
   let graph = new window.Graph(Array.from(_rooms.values( )));
   graph.neighbors=function(node){
       var dir,ret = [],dirs = node.origNode.neighbours;
-      for(dir of dirs) {
+      for(dir of dirs){
           var room = dir;
           var next=this.nodes.find((el)=>{return(el.origNode===room);})
           ret.push(next);
@@ -27,11 +27,11 @@ window.gm.gridToGraph=function(grid) {
   graph.areNodesEqual=function(nodeA,nodeB){return(nodeA.origNode.name===nodeB.origNode.name)};
   return(graph)
 }
-window.gm.printNav2=function(label,to) {
+window.gm.printNav2=function(label,to){
     let args = { func: function(to){return('window.gm.navHere(\"'+to+'\")');}};
     return(window.gm.printNav(label,to,args));
 }
-window.gm.navHere = function(to) {
+window.gm.navHere = function(to){
     window.story.state.DngSY.prevLocation=window.gm.player.location;
     window.story.state.DngSY.nextLocation=to;
     to=window.gm.navEvent(to,window.story.state.DngSY.prevLocation);
@@ -39,7 +39,7 @@ window.gm.navHere = function(to) {
     window.gm.addTime(15);
     window.story.show(to);
 }
-window.gm.navEvent = function(to,from) {
+window.gm.navEvent = function(to,from){
     let _targ = '',dir,dirs,evt,evts,dng=window.story.state.DngSY.dng;
     let _to=to.replace(dng+"_",""),_from=from.replace(dng+"_","");
     let _room=to.replace(dng+"_","");
@@ -47,12 +47,12 @@ window.gm.navEvent = function(to,from) {
     //state: 0-active  1-inactive  
     let _leaveChance=0,_allChances=0,_now=window.gm.getTime(), _rnd=_.random(0,100);
     evts = window.story.state[dng].tmp.evtLeave[_from+'_'+_to]; 
-    if(evts) { //leave-check
+    if(evts){ //leave-check
         evts=evts.filter(x=>(x.state===0));
         evts.forEach(x=>(_allChances+=x.chance));
         dir=null,dirs=window.gm.getRoomDirections(_from);
         for(var i=dirs.length-1;i>=0;i--){
-            if(dirs[i].dir===_to) {
+            if(dirs[i].dir===_to){
                 dir=dirs[i];break;
             }
         }
@@ -62,47 +62,48 @@ window.gm.navEvent = function(to,from) {
             _leaveChance=_leaveChance/100.0*_allChances;_allChances+=_leaveChance;
             dir.exp+=1;//exp-count is updated
             _rnd=_.random(0,_allChances-0.01);
-            for(var i = evts.length-1;i>=0;i--) { 
-                if(_rnd<_allChances && _rnd>=(_allChances-evts[i].chance)) {
+            for(var i = evts.length-1;i>=0;i--){ 
+                let _ch=evts[i].chance
+                if(_rnd<_allChances && _rnd>=(_allChances-_ch)){
                     window.story.state.tmp.args=[evts[i],dng+'_'+_from,dng+'_'+_to];    //store [evt,from,to] for use in scene
                     return(dng+'_'+evts[i].id); //->show(DngPC_wolf5);   
                     //after the scene is finished it should continue window.story.state.DngSY.prevLocation 
                 }
-                _allChances-=evts[i].chance;
+                _allChances-=_ch;
             }//if no event rolled continue with door check 
         }
     }
     evts = window.story.state[dng].tmp.doors[_from];
-    if(evts) { //door-check
+    if(evts){ //door-check
         evt = evts[_to];
-        if(evt) {
+        if(evt){
             if(evt.state===0) _targ=dng+"_Door_Closed";
             if(_targ!=='') return(_targ);
         }
     }
     evts = window.story.state[dng].tmp.evtEnter[_room];
-    if(evts) { //mobs
+    if(evts){ //mobs
         evt = evts["dog"];
-        if(evt) {
+        if(evt){
             if(evt.state===0) _targ=dng+"_Meet_Dog";
             if(_targ!=='') return(_targ);
         }
         evt = evts["gas"];
-        if(evt && _rnd>70 && window.gm.getDeltaTime(_now,evt.tick)>400) {//todo chance modifier
+        if(evt && _rnd>70 && window.gm.getDeltaTime(_now,evt.tick)>400){//todo chance modifier
             if(evt.state===0) evt.tick=_now,_targ=dng+"_Trap_Gas";
             if(_targ!=='') return(_targ);
         }evt = evts["tentacle"];
-        if(evt && _rnd>0 && window.gm.getDeltaTime(_now,evt.tick)>400) {//todo chance modifier
+        if(evt && _rnd>0 && window.gm.getDeltaTime(_now,evt.tick)>400){//todo chance modifier
             if(evt.state===0) evt.tick=_now,_targ=dng+"_Trap_Tentacle";
             if(_targ!=='') return(_targ);
         }
     }
     return(_targ);
 }
-window.gm.getRoomDirections=function(from) {
+window.gm.getRoomDirections=function(from){
     let rooms=window.story.state.DngSY.dngMap.grid
     for(var i=rooms.length-1;i>=0;i--){
-        if(rooms[i].room===from) {
+        if(rooms[i].room===from){
             return(rooms[i].dirs)
         }
     }
@@ -110,11 +111,11 @@ window.gm.getRoomDirections=function(from) {
 };
 window.gm.mobAI = function(mob){
     var _now=window.gm.getTime();
-    if(mob.state!==0 || mob.tick==='') {mob.tick=_now;return;}
-    if(window.gm.getDeltaTime(_now,mob.tick)>30) {
+    if(mob.state!==0 || mob.tick===''){mob.tick=_now;return;}
+    if(window.gm.getDeltaTime(_now,mob.tick)>30){
         mob.tick=_now;
         var _to = getRoomDirections(mob.pos).filter(el=> mob.path.includes(el.dir));
-        if(_to.length>0) {
+        if(_to.length>0){
             mob.pos=_to[_.random(0,_to.length-1)].dir;
             //alert(mob.id+' now moving to '+mob.pos);
         }
@@ -125,13 +126,13 @@ window.gm.renderRoom= function(room){
     let msg="",deltaT,dng=window.story.state.DngSY.dng,_evt,_evts= window.story.state[dng].tmp.evtSpawn[room];
     if(!_evts) return(msg);
     _evt=_evts["chest"];
-    if(_evt && (_evt.state===0 || _evt.state===1)) {
+    if(_evt && (_evt.state===0 || _evt.state===1)){
       msg+=window.story.render(dng+"_Chest");
     }
     _evt=_evts["mushroom"];
-    if(_evt && (_evt.state===0 || _evt.state===1)) {
+    if(_evt && (_evt.state===0 || _evt.state===1)){
         deltaT=window.gm.getDeltaTime(window.gm.getTime(),_evt.tick);
-        if(_evt.loot==="BrownMushroom" && deltaT>4800) { //growth of...
+        if(_evt.loot==="BrownMushroom" && deltaT>1200){ //growth of...
             _evt.tick=window.gm.getTime();_evt.loot="RottenMushroom";
         } else if(_evt.loot==="ViolettMushroom" && deltaT>2400){
             _evt.tick=window.gm.getTime();_evt.loot="BrownMushroom";
@@ -139,20 +140,20 @@ window.gm.renderRoom= function(room){
         msg+=window.story.render(dng+"_Mushroom");
     }
     _evt=_evts["lectern"];
-    if(_evt && (_evt.state===0 || _evt.state===1)) {
+    if(_evt && (_evt.state===0 || _evt.state===1)){
         deltaT=window.gm.getDeltaTime(window.gm.getTime(),_evt.tick);
-        if(deltaT>4000) { //respawn
+        if(deltaT>4000){ //respawn
             _evt.tick=window.gm.getTime();_evt.state=0;
         }
     }
-    if(_evt && (_evt.state===0)) {
+    if(_evt && (_evt.state===0)){
         msg+=window.story.render(dng+"_Lectern");
     }
     return(msg);
 }
 window.gm.finishTask=function(){
     let task=window.story.state.DngPC.task,_res={OK:(task.done>0),msg:''};
-    switch(task.id) {
+    switch(task.id){ //check if task is done
         case 'getEarsPierced':
             break;
         case 'getVagina':
@@ -170,6 +171,8 @@ window.gm.finishTask=function(){
             break;
         case 'bringGold':
             break;
+        case 'freeEnslaved':
+            break;
         case 'bringMoney':if(window.gm.player.Inv.countItem('Money')>=task.data){ window.gm.player.Inv.removeItem('Money',task.data),_res.OK=true;}
             else{ _res.OK=false,_res.msg='Not enough money.</br>'};
             break;
@@ -179,16 +182,16 @@ window.gm.finishTask=function(){
     if(_res.OK===true){
         window.story.state.DngPC.tasks[task.id].cnt+=1,window.story.state.DngPC.tasks[task.id].done=0,window.story.state.DngPC.task={};//,window.story.show(window.passage.name);
         window.story.state.DngPC.tmp.tier+=1;_res.msg='donation request fullfilled. Your tier is now: '+window.story.state.DngPC.tmp.tier+'</br>';
-        if(window.story.state.DngPC.tmp.tier%3===0) {_res.msg="A <b>golden token</b> is your price that you can use to open another door in the dungeon.</br>";window.gm.player.Inv.addItem(window.gm.ItemsLib.VoucherGold());}
+        if(window.story.state.DngPC.tmp.tier%3===0){_res.msg="A <b>golden token</b> is your price that you can use to open another door in the dungeon.</br>";window.gm.player.Inv.addItem(window.gm.ItemsLib.VoucherGold());}
     }
     window.gm.printOutput(_res.msg,'#choice');
 };
-window.gm.getAvailableTasks=function() { 
+window.gm.getAvailableTasks=function(){ 
     var _task,_tasks=[],_d=window.story.state.DngPC,_t=_d.tmp.tier;
     var msg='choose a task:</br>';
     function taskDescr(task){
         var msg='';
-        switch(task.id) {
+        switch(task.id){ //description of task
             case 'lootChest':msg='Find and loot '+task.data+' treasure chests.';
                 break;
             case 'getEarsPierced':msg='Get your ears pierced.';
@@ -203,6 +206,8 @@ window.gm.getAvailableTasks=function() {
                 break;
             case 'bringGold':msg='Gain a gold-token with a special job.';
                 break;
+            case 'freeEnslaved':msg='Free one of those who were overwhelmed and enslaved.';
+                break;
             case 'bringMoney':msg='Some easy task here: get '+task.data+'$.';
                 break;
             default:
@@ -216,20 +221,20 @@ window.gm.getAvailableTasks=function() {
     }
     function fooList(){_d.rolledTask.forEach(x=>(x.start=window.gm.getTime(),foo(x)));}
     //if task in progress - show task-info instead
-    if(_d.task.id) {
+    if(_d.task.id){
         _d.rolledTask=[],msg='in progress: '+taskDescr(_d.task)+'</br>';
         //msg+=finishTask().msg;
         msg+=window.gm.printLink("finish task","window.gm.finishTask()");
         //todo possibility to abort and reroll for SilverVoucher?
         window.gm.printOutput(msg,'#choice');return;  
     }
-    if(_d.rolledTask.length>0) { //tasks got already rolled
+    if(_d.rolledTask.length>0){ //tasks got already rolled
         fooList();
     } else {
         var _allChances=0,_tns=Object.keys(_d.tasks);
-        for(var i=_tns.length-1;i>=0;i--) {
+        for(var i=_tns.length-1;i>=0;i--){
             var _chance=100,_tk=_d.tasks[_tns[i]];
-            if(_tk.tick!=='') { //reduce chance for recent tasks or done ones
+            if(_tk.tick!==''){ //reduce chance for recent tasks or done ones
                 var _dt=window.gm.getDeltaTime(window.gm.getTime(),_tk.tick);
                 if(_dt<1440 || _tk.cnt>7) _chance*=0.5;
                 else if(_dt<2880 || _tk.cnt>4) _chance*=0.3;
@@ -237,7 +242,7 @@ window.gm.getAvailableTasks=function() {
             
             if(_tk.min>_d.tmp.tier)_chance=0;
             _task={id:_tns[i],chance:_chance,time:(2400),data:''}
-            switch(_tns[i]) {
+            switch(_tns[i]){ //scale here how much to deliver
                 case 'getEarsPierced': //only if piercing slot available
                     break;
                 case 'getVagina': //only if not present 
@@ -253,6 +258,7 @@ window.gm.getAvailableTasks=function() {
                     _task.data=1+Math.floor(_t/6);
                     break;
                 case 'bringGold':
+                case 'freeEnslaved':
                     _task.data=1;
                     break;
                 default:
@@ -261,11 +267,11 @@ window.gm.getAvailableTasks=function() {
             _tasks.push(_task);
             _allChances+=_chance;
         }
-        //for(var i=1;i>0;i--) { //up to x tasks to choose from       todo remove task and recalc allchances
-            if(_allChances>0.0) {//choose rnd tasks
+        //for(var i=1;i>0;i--){ //up to x tasks to choose from       todo remove task and recalc allchances
+            if(_allChances>0.0){//choose rnd tasks
                 var _rnd=_.random(0,_allChances-0.01);
-                for(var i = _tasks.length-1;i>=0;i--) { 
-                    if(_rnd<_allChances && _rnd>=(_allChances-_tasks[i].chance)) {
+                for(var i = _tasks.length-1;i>=0;i--){ 
+                    if(_rnd<_allChances && _rnd>=(_allChances-_tasks[i].chance)){
                         _d.rolledTask.push(_tasks[i]);                  
                         break;
                     }
@@ -278,7 +284,7 @@ window.gm.getAvailableTasks=function() {
     window.gm.printOutput(msg,'#choice');
 };
 //build the map and other data; if the dng is already initilized and has the correct version, the actual data is returned
-window.gm.build_DngPC=function() {
+window.gm.build_DngPC=function(){
     const _m=[
         'D1  E1  F1--G1--H1--I1--J1--K1--L1',
         '                                  ',
@@ -340,16 +346,16 @@ window.gm.build_DngPC=function() {
     {room:'L6', dirs:[_d('K6')]}];
     let data,map={grid:grid,width:14,height:8,legend:'S=Start  B=Boss'}
     var s = window.story.state;    
-    const version=3;                            // <== increment this if you change anything below
-    if(s.DngPC && s.DngPC.version===version) {
+    const version=3;                            // <== increment this if you change anything below - it will reinitialize data !
+    if(s.DngPC && s.DngPC.version===version){
         data=s.DngPC;
     } else {
         data=s.DngPC,data.version=version;
         data.tmp={tickPass:'', tier:0};
         data.tmp.evtLeave = { //events on tile-leave
-            H4_I4: [{id:"Trap_Gas",type:'encounter',instance:"",tick:window.gm.getTime(),state:0,chance:100 },
-                {id:"wolf",type:'encounter',instance:"Ruff",tick:window.gm.getTime(),state:0,chance:100 },
-                {id:"Trent",type:'encounter',instance:"Trent",tick:window.gm.getTime(),state:0,chance:100 }],
+            H4_I4: [{id:"Trap_Gas",type:'encounter',instance:"",tick:window.gm.getTime(),state:0,chance:100 }, //todo cannot assign chance-fct here
+                {id:"Box",type:'encounter',instance:"",tick:window.gm.getTime(),state:0,chance:100 },
+                {id:"Fungus",type:'encounter',instance:"",tick:window.gm.getTime(),state:0,chance:100 }],
             I4_H4: null
         }
         data.tmp.evtEnter = { //events on tile-enter
@@ -378,8 +384,9 @@ window.gm.build_DngPC=function() {
             ,bringSilver:{tick:'',done:0,cnt:0,min:3}
             ,bringGold:{tick:'',done:0,cnt:0,min:5}
             ,bringMoney:{tick:'',done:0,cnt:0,min:0}
-            ,lootChest:{tick:'',done:0,cnt:0,min:3}
+            ,lootChest:{tick:'',done:0,cnt:0,min:2}
             ,findCursed:{tick:'',done:0,cnt:0,min:3}
+            ,freeEnslaved:{tick:'',done:0,cnt:0,min:3}
             ,getEarsPierced:{tick:'',done:0,cnt:0,min:5}
             // open mysterious chests
             //,{id:'getTattoed',tick:'',done:0,cnt:0,min:8}

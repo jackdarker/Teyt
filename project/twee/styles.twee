@@ -48,14 +48,14 @@ svg:hover * { animation-play-state: running; }
           user-select: none;
 }
 
-@media only screen and (min-width: 768px) {
+@media only screen and (min-width: 768px){
   .main {
     width: 310px;
     height: 285px;
   }
 }
 
-@media only screen and (min-width: 1024px) {
+@media only screen and (min-width: 1024px){
   .main {
     width: 410px;
     height: 375px;
@@ -71,7 +71,7 @@ svg:hover * { animation-play-state: running; }
   margin: 10px 0 0 10px;
 }
 
-@media only screen and (min-width: 1024px) {
+@media only screen and (min-width: 1024px){
   .box {
     width: 70px;
     height: 70px;
@@ -101,12 +101,12 @@ img {
   color: white;
   font-size: 16px;
 }
-@media only screen and (min-width: 768px) {
+@media only screen and (min-width: 768px){
   #state {
     width: 290px;
   }
 }
-@media only screen and (min-width: 1024px) {
+@media only screen and (min-width: 1024px){
   #state {
     width: 390px;
     line-height: 35px;

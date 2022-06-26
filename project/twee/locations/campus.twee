@@ -60,7 +60,7 @@ todo You attend to lectures all morning.</br>
 <a0 onclick='work()'>You are done for today</a></br></div>
 </article><article id="LogPanel"></article></section>
 <script>
-function work() {
+function work(){
     window.gm.player.Stats.increment("energy",-40);
     window.gm.forwardTime(1300);
     window.story.show("Campus");

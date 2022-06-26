@@ -1,21 +1,21 @@
 "use strict";
 window.gm = window.gm || {};
 window.gm.startDominoCombat=function(stopCB, startCB){
-  function start() { 
+  function start(){ 
     //setup teams,cards
     data.teams=[];
     let i,skills,players,x=0;
-    for(i=0;i<=1;i++) { //teams
+    for(i=0;i<=1;i++){ //teams
       players=[];
-      for(var k=0;k<(i+1);k++) {
+      for(var k=0;k<(i+1);k++){
         skills=[];   //skills
-        if(x===0) {
+        if(x===0){
         skills.push({id:'skill#'+0,start:'blue',end:'red',hp:15,charge:1,cooldown:0});
         skills.push({id:'skill#'+1,start:'red',end:'blue',hp:5,charge:1,cooldown:0});
         skills.push({id:'skill#'+2,start:'blue',end:'blue',hp:25,charge:3,cooldown:0});
         skills.push({id:'skill#'+3,start:'red',end:'green',hp:25,charge:3,cooldown:0});
         skills.push({id:'skill#'+4,start:'red',end:'red',hp:25,charge:4,cooldown:0});
-        } else if(x===1) {
+        } else if(x===1){
           skills.push({id:'skill#'+3,start:'red',end:'red',hp:25,charge:3,cooldown:0});
           skills.push({id:'skill#'+4,start:'blue',end:'red',hp:25,charge:4,cooldown:0});
         } else {
@@ -31,25 +31,25 @@ window.gm.startDominoCombat=function(stopCB, startCB){
     data.run=true;
     newTurn();
   }
-  function updateBoard() {
+  function updateBoard(){
     let player,skill;
     //update players or remove them: list health and color of each player
     //check victory condition
     let entry,panel=document.getElementById('panel')
-    for(var i=panel.childNodes.length-1;i>=0;i-- ) {
+    for(var i=panel.childNodes.length-1;i>=0;i-- ){
       panel.removeChild(panel.childNodes[i]);
     } 
     //cleanout skill selection
     let choice=document.getElementById('choice')
-    for(var i=choice.childNodes.length-1;i>=0;i-- ) {
+    for(var i=choice.childNodes.length-1;i>=0;i-- ){
       choice.removeChild(choice.childNodes[i]);
     } 
-    for(var i=data.teams.length-1;i>=0;i--) {
-      for(var k=data.teams[i].length-1;k>=0;k--) {
+    for(var i=data.teams.length-1;i>=0;i--){
+      for(var k=data.teams[i].length-1;k>=0;k--){
         player=data.teams[i][k];
         entry=document.createElement('button');
         entry.id=player.id;entry.style['color']=player.color;
-        if(player.hp>0) {
+        if(player.hp>0){
           entry.textContent='Team'+i+' '+player.id+' hp:'+player.hp+' '+player.color;
         } else {
           entry.textContent='Team'+i+' '+player.id+' is down';
@@ -95,9 +95,9 @@ window.gm.startDominoCombat=function(stopCB, startCB){
   function newTurn(){
     //check if any team is down
     let teamDead,player,skill;
-    for(var i=data.teams.length-1;i>=0;i--) {
+    for(var i=data.teams.length-1;i>=0;i--){
       teamDead=true;
-      for(var k=data.teams[i].length-1;k>=0;k--) {
+      for(var k=data.teams[i].length-1;k>=0;k--){
         player=data.teams[i][k];
         if(player.hp>0) teamDead=false;
         for(var l=player.skills.length-1;l>=0;l--){ //tick skills
@@ -105,7 +105,7 @@ window.gm.startDominoCombat=function(stopCB, startCB){
           skill.cooldown=Math.max(0,skill.cooldown-1);
         }
       }
-      if(teamDead) {
+      if(teamDead){
         alert('team '+i+' is defeated')
         stop();
         break;
@@ -121,42 +121,42 @@ window.gm.startDominoCombat=function(stopCB, startCB){
     let player,_usethis;
     //skip to next alive in team
     _usethis=false;
-    for(var k=data.teams[data.team].length-1;k>=0;k--) {
+    for(var k=data.teams[data.team].length-1;k>=0;k--){
       player=data.teams[data.team][k];
-      if(_usethis===true) { //the previous player was the current - this is next 
+      if(_usethis===true){ //the previous player was the current - this is next 
         data.player=player.id;
         _usethis=false;
         break;
       }
-      if(player.id===data.player) {
+      if(player.id===data.player){
         _usethis=true;
       }
     }
     if(_usethis===true){//no more players in team, switch to next
       data.team-=1;
-      for(var i=data.team;(_usethis&&i>=0);i--) {
-        for(var k=data.teams[i].length-1;(_usethis&&k>=0);k--) {
+      for(var i=data.team;(_usethis&&i>=0);i--){
+        for(var k=data.teams[i].length-1;(_usethis&&k>=0);k--){
           player=data.teams[i][k];
-          if(player.hp>0) {
+          if(player.hp>0){
             data.player=player.id;
             _usethis=false;
           }
         }
       }
-      if(_usethis===true) {
+      if(_usethis===true){
         newTurn();//but if no one left... 
         return;
       }
     }
     updateBoard();
   }
-  function selectTarget(id) {this.target=id; }
-  function selectSkill(playerId,skillId) {
+  function selectTarget(id){this.target=id; }
+  function selectSkill(playerId,skillId){
     let playerA,playerB,player,skill,skillA;
-    for(var i=data.teams.length-1;i>=0;i--) { //find players
-      for(var k=data.teams[i].length-1;k>=0;k--) {
+    for(var i=data.teams.length-1;i>=0;i--){ //find players
+      for(var k=data.teams[i].length-1;k>=0;k--){
         player=data.teams[i][k];
-        if(player.id===data.target) {
+        if(player.id===data.target){
           playerB=player;
         } 
         if(player.id===playerId){
@@ -172,8 +172,8 @@ window.gm.startDominoCombat=function(stopCB, startCB){
     }
     //execute skill & print log
     let _log="div#output";
-    if(playerA.color===skillA.start) {
-      if(playerB.color===skillA.start) {
+    if(playerA.color===skillA.start){
+      if(playerB.color===skillA.start){
         playerB.hp-=skillA.hp;playerB.color=skillA.end;
         window.gm.printOutput(playerA.id+" dealt "+skillA.hp+" damage to "+playerB.id,_log)
       } else {
@@ -187,7 +187,7 @@ window.gm.startDominoCombat=function(stopCB, startCB){
     skillA.cooldown=skillA.charge;
     nextPlayer();
   }
-  function stop() { data.run=false;}
+  function stop(){ data.run=false;}
   let data ={ //internal state of game
     scoreBoard : document.getElementById(panel),
     run:false, //game started?
@@ -202,15 +202,15 @@ window.gm.startDominoCombat=function(stopCB, startCB){
   return(data);
 }
 window.gm.startCounterChargeCombat=function(stopCB, startCB){
-  function start() { 
+  function start(){ 
     //setup teams,cards
     data.teams=[];
     let i,skills,defense,players,x=0;
-    for(i=0;i<=1;i++) { //teams
+    for(i=0;i<=1;i++){ //teams
       players=[];
-      for(var k=0;k<(i+1);k++) {
+      for(var k=0;k<(i+1);k++){
         defense=[],skills=[];   //skills
-        if(x===0) {
+        if(x===0){
         skills.push({id:'skill#'+0,start:'blue',charge:'',hp:15,tick:0,cooldown:0});
         skills.push({id:'skill#'+1,start:'red',charge:'',hp:5,tick:0,cooldown:0});
         skills.push({id:'skill#'+2,start:'blue',charge:'blue',hp:25,tick:0,cooldown:0});
@@ -218,7 +218,7 @@ window.gm.startCounterChargeCombat=function(stopCB, startCB){
         skills.push({id:'skill#'+4,start:'red',charge:'red',hp:25,tick:0,cooldown:0});
         defense.push({id:'defense#'+1,start:'red',charge:'red',tick:0,cooldown:1})
         defense.push({id:'defense#'+2,start:'blue',charge:'red',tick:0,cooldown:1})
-        } else if(x===1) {
+        } else if(x===1){
           skills.push({id:'skill#'+3,start:'red',charge:'red',hp:25,tick:0,cooldown:0});
           skills.push({id:'skill#'+4,start:'blue',charge:'',hp:5,tick:0,cooldown:0});
           defense.push({id:'defense#'+1,start:'red',charge:'red',tick:0,cooldown:1})
@@ -236,24 +236,24 @@ window.gm.startCounterChargeCombat=function(stopCB, startCB){
     data.run=true,data.phase=0;
     newTurn();
   }
-  function updateBoard() {
+  function updateBoard(){
     let player,skill;
     let entry,panel=document.getElementById('panel')
-    for(var i=panel.childNodes.length-1;i>=0;i-- ) {
+    for(var i=panel.childNodes.length-1;i>=0;i-- ){
       panel.removeChild(panel.childNodes[i]);
     } 
     //cleanout buttons
     let choice=document.getElementById('choice')
-    for(var i=choice.childNodes.length-1;i>=0;i-- ) {
+    for(var i=choice.childNodes.length-1;i>=0;i-- ){
       choice.removeChild(choice.childNodes[i]);
     } 
     //update players or remove them: list health and color of each player
-    for(var i=data.teams.length-1;i>=0;i--) {
-      for(var k=data.teams[i].length-1;k>=0;k--) {
+    for(var i=data.teams.length-1;i>=0;i--){
+      for(var k=data.teams[i].length-1;k>=0;k--){
         player=data.teams[i][k];
         entry=document.createElement('button');
         entry.id=player.id;
-        if(player.hp>0) {
+        if(player.hp>0){
           entry.textContent='Team'+i+' '+player.id+' hp:'+player.hp+' blue:'+player.charge.blue+' red:'+player.charge.red+' green:'+player.charge.green;
         } else {
           entry.textContent='Team'+i+' '+player.id+' is down';
@@ -287,7 +287,7 @@ window.gm.startCounterChargeCombat=function(stopCB, startCB){
             entry.id=entry.textContent='skip';  
             entry.addEventListener("click",nextPlayer);
             choice.appendChild(entry);
-        } else if(data.phase===1 && player.hp>0 && player.id===data.target) { //list defense of target
+        } else if(data.phase===1 && player.hp>0 && player.id===data.target){ //list defense of target
           for(var l=player.defenses.length-1;l>=0;l--){
             skill=player.defenses[l];
             entry=document.createElement('button');
@@ -317,9 +317,9 @@ window.gm.startCounterChargeCombat=function(stopCB, startCB){
     //check if any team is down
     let teamDead,player,skill;
     data.phase=0;
-    for(var i=data.teams.length-1;i>=0;i--) {
+    for(var i=data.teams.length-1;i>=0;i--){
       teamDead=true;
-      for(var k=data.teams[i].length-1;k>=0;k--) {
+      for(var k=data.teams[i].length-1;k>=0;k--){
         player=data.teams[i][k];
         if(player.hp>0) teamDead=false;
         for(var l=player.skills.length-1;l>=0;l--){ //tick skills
@@ -331,7 +331,7 @@ window.gm.startCounterChargeCombat=function(stopCB, startCB){
           skill.tick=Math.max(0,skill.tick-1);
         }
       }
-      if(teamDead) {
+      if(teamDead){
         alert('team '+i+' is defeated')
         stop();
         break;
@@ -348,43 +348,43 @@ window.gm.startCounterChargeCombat=function(stopCB, startCB){
     data.phase=0;
     //skip to next alive in team
     _usethis=false;
-    for(var k=data.teams[data.team].length-1;k>=0;k--) {
+    for(var k=data.teams[data.team].length-1;k>=0;k--){
       player=data.teams[data.team][k];
-      if(_usethis===true) { //the previous player was the current - this is next 
+      if(_usethis===true){ //the previous player was the current - this is next 
         data.player=player.id;
         _usethis=false;
         break;
       }
-      if(player.id===data.player) {
+      if(player.id===data.player){
         _usethis=true;
       }
     }
     if(_usethis===true){//no more players in team, switch to next
       data.team-=1;
-      for(var i=data.team;(_usethis&&i>=0);i--) {
-        for(var k=data.teams[i].length-1;(_usethis&&k>=0);k--) {
+      for(var i=data.team;(_usethis&&i>=0);i--){
+        for(var k=data.teams[i].length-1;(_usethis&&k>=0);k--){
           player=data.teams[i][k];
-          if(player.hp>0) {
+          if(player.hp>0){
             data.player=player.id;
             _usethis=false;
           }
         }
       }
-      if(_usethis===true) {
+      if(_usethis===true){
         newTurn();//but if no one left... 
         return;
       }
     }
     updateBoard();
   }
-  function selectTarget(id) {this.target=id; }
-  function selectDefense(playerId,skillId) {
+  function selectTarget(id){this.target=id; }
+  function selectDefense(playerId,skillId){
     let playerA,playerB,player,skill,skillA,defenseB;
     let _log="div#output";
-    for(var i=data.teams.length-1;i>=0;i--) { //find players
-      for(var k=data.teams[i].length-1;k>=0;k--) {
+    for(var i=data.teams.length-1;i>=0;i--){ //find players
+      for(var k=data.teams[i].length-1;k>=0;k--){
         player=data.teams[i][k];
-        if(player.id===data.target) {
+        if(player.id===data.target){
           playerB=player;
           for(var l=player.defenses.length-1;l>=0;l--){ //get skill
             skill=player.defenses[l];
@@ -393,7 +393,7 @@ window.gm.startCounterChargeCombat=function(stopCB, startCB){
             }
           }
         } 
-        if(player.id===data.player) {
+        if(player.id===data.player){
           playerA=player;
           for(var l=player.skills.length-1;l>=0;l--){ //get skill
             skill=player.skills[l];
@@ -415,21 +415,21 @@ window.gm.startCounterChargeCombat=function(stopCB, startCB){
       window.gm.printOutput(playerB.id+" defended against "+playerB.id+ ' and charged '+defenseB.charge,_log)
     }
     skillA.tick=skillA.cooldown;
-    if(skillA.charge!=='') {
+    if(skillA.charge!==''){
       playerA.charge[skillA.charge]-=50;
     }
-    if(skillId!=='') {
+    if(skillId!==''){
       defenseB.tick=defenseB.cooldown;
     }
     nextPlayer();
   }
-  function selectSkill(playerId,skillId) {
+  function selectSkill(playerId,skillId){
     let playerA,playerB,player,skill,skillA;
     let _log="div#output";
-    for(var i=data.teams.length-1;i>=0;i--) { //find players
-      for(var k=data.teams[i].length-1;k>=0;k--) {
+    for(var i=data.teams.length-1;i>=0;i--){ //find players
+      for(var k=data.teams[i].length-1;k>=0;k--){
         player=data.teams[i][k];
-        if(player.id===data.target) {
+        if(player.id===data.target){
           playerB=player;
         } 
         if(player.id===playerId){
@@ -448,7 +448,7 @@ window.gm.startCounterChargeCombat=function(stopCB, startCB){
     data.skill=skillA.id,data.skillcolor=skillA.start;
     updateBoard();
   }
-  function stop() { data.run=false;}
+  function stop(){ data.run=false;}
   let data ={ //internal state of game
     scoreBoard : document.getElementById(panel),
     run:false, //game started?
@@ -474,22 +474,22 @@ window.gm.startBlockPuzzle=function(){
     var _puzzleWidth,_puzzleHeight,_gridwidth;
     var startX =0, startY= 0;
     // Goal is an array of gridfields that need to be completely covered with puzzle-pieces
-    var Goal = function(x,y,grid,parts) {
+    var Goal = function(x,y,grid,parts){
       let goal={x:x*grid,y:y*grid,parts:parts,grid:grid};
-      goal.render = function(ctx) {
+      goal.render = function(ctx){
           ctx.save();
           ctx.strokeStyle ='#000000';ctx.fillStyle = '#AAAAAA';
           ctx.setLineDash([5, 10]);
           ctx.beginPath();
-          for(var _r of this.parts) {
+          for(var _r of this.parts){
               ctx.rect(this.grid*_r[0]+this.x , this.grid*_r[1]+this.y , this.grid, this.grid);
           }
           ctx.fill();ctx.stroke();
           ctx.restore();
       };
-      goal.getGrid =function() {
+      goal.getGrid =function(){
           let grid=[];
-          for(var _r of this.parts) {
+          for(var _r of this.parts){
               var x=_r[0]*this.grid+this.x,y=_r[1]*this.grid+this.y;
               grid.push([x,y]);
           }
@@ -500,14 +500,14 @@ window.gm.startBlockPuzzle=function(){
     //Piece is a puzzle-piece which shape is defined by part-rects. 
     //Grid defines the size of the part-rects. x/y is specified in multiples of grid
     //parts is an array of arrays with 2 elements specifiying x,y of every part-rect; x/y is relativ to piece-x/y 
-    var Piece = function(x, y, grid, parts,design) {
+    var Piece = function(x, y, grid, parts,design){
       let piece={x:x*grid,y:y*grid,parts:parts,grid:grid,isDragging:false,
         fill:(design&&design.fill)?design.fill:'#2793ef',
         canRotate:(design&&design.canRotate)?design.canRotate:false};
         piece.oldX=piece.newX=piece.x;piece.oldY=piece.newY=piece.y;
-        piece.render = function(ctx) {
+        piece.render = function(ctx){
             ctx.save();
-            if(this.isDragging) {
+            if(this.isDragging){
                 ctx.globalAlpha = .4;
                 ctx.fillStyle = PUZZLE_HOVER_TINT;
             } else {
@@ -515,9 +515,9 @@ window.gm.startBlockPuzzle=function(){
             }
             ctx.strokeStyle ='#000000';
             ctx.beginPath();
-            for(var _r of this.parts) {
+            for(var _r of this.parts){
                 ctx.rect(this.grid*_r[0]+this.x , this.grid*_r[1]+this.y , this.grid, this.grid);
-                if(_r[0]===0 && _r[1]===0 && this.canRotate) { //mark rotation on part [0,0]
+                if(_r[0]===0 && _r[1]===0 && this.canRotate){ //mark rotation on part [0,0]
                   var _cx=this.grid*(_r[0]+0.5)+this.x,_cy=this.grid*(_r[1]+0.5)+this.y;
                   ctx.moveTo(_cx+this.grid*0.3,_cy); //if ..(_cx,_cy) there would be another line from circle to center
                   ctx.arc(_cx,_cy,this.grid*0.3,0,Math.PI*2);
@@ -526,15 +526,15 @@ window.gm.startBlockPuzzle=function(){
             ctx.fill();ctx.stroke();
             ctx.restore();
         };
-        piece.getGrid =function() {
+        piece.getGrid =function(){
             let grid=[];
-            for(var _r of this.parts) {
+            for(var _r of this.parts){
                 var x=_r[0]*this.grid+this.x,y=_r[1]*this.grid+this.y;
                 grid.push([x,y]);
             }
             return(grid);
         }
-        piece.rotate=function(angle) {
+        piece.rotate=function(angle){
           //rotate-Matrix 90°
           // 0 -1
           // 1  0
@@ -543,12 +543,12 @@ window.gm.startBlockPuzzle=function(){
             function(pt){ return([pt[1]*-1,pt[0]*1]);}
           );
         }
-        piece.isHit=function(x,y) {
-            for(var _r of this.parts) {
+        piece.isHit=function(x,y){
+            for(var _r of this.parts){
                 /*if (x > this.grid*_r[0]+this.x - this.grid * 0.5                && y > this.grid*_r[1]+this.y - this.grid * 0.5 && 
-                    x < this.grid*_r[0]+this.x + this.grid - this.grid * 0.5    && y < this.grid*_r[1]+this.y + this.grid - this.grid * 0.5) {*/
+                    x < this.grid*_r[0]+this.x + this.grid - this.grid * 0.5    && y < this.grid*_r[1]+this.y + this.grid - this.grid * 0.5){*/
                 if (x > this.grid*_r[0]+this.x              && y > this.grid*_r[1]+this.y && 
-                    x < this.grid*_r[0]+this.x + this.grid  && y < this.grid*_r[1]+this.y + this.grid ) {
+                    x < this.grid*_r[0]+this.x + this.grid  && y < this.grid*_r[1]+this.y + this.grid ){
                     return true;
                 }
             }
@@ -570,30 +570,30 @@ window.gm.startBlockPuzzle=function(){
     }
     //utility function to track touch & mouse movement
     var MouseTouchTracker = function(canvas, callback){
-        function processEvent(evt) {
+        function processEvent(evt){
             var rect = canvas.getBoundingClientRect();
             var offsetTop = rect.top;
             var offsetLeft = rect.left;
-            if (evt.touches) {return { x: evt.touches[0].clientX - offsetLeft, y: evt.touches[0].clientY - offsetTop }
+            if (evt.touches){return { x: evt.touches[0].clientX - offsetLeft, y: evt.touches[0].clientY - offsetTop }
             } else { return {x: evt.clientX - offsetLeft,y: evt.clientY - offsetTop }
             }
         }
-        function onDown(evt) {
+        function onDown(evt){
             evt.preventDefault();
             _canvas.focus(); //this is to make sure canvas can receive keyup; canvas also has to have tabindex set to be focusable!
             var coords = processEvent(evt);
             callback('down', coords.x, coords.y);
         }
-        function onUp(evt) { 
+        function onUp(evt){ 
             evt.preventDefault(); 
             callback('up');  
         }
-        function onMove(evt) {
+        function onMove(evt){
             evt.preventDefault();
             var coords = processEvent(evt);
             callback('move', coords.x, coords.y);
         }
-        function onKey(evt) {
+        function onKey(evt){
           evt.preventDefault();
           callback('key', evt.code);
       }
@@ -623,52 +623,52 @@ window.gm.startBlockPuzzle=function(){
     //draw canvas; called internally
     function redraw(){
         _stage.clearRect(0, 0, _canvas.width, _canvas.height);
-        for(el of _goals) {
+        for(el of _goals){
             el.render(_stage);
         }
-        for(el of _pieces) {
+        for(el of _pieces){
             el.render(_stage);
         }
     }
     //returns true if pieces collides with other piece or outside border; called internally
-    function collides(piece) { 
+    function collides(piece){ 
         var _a=piece.getGrid();
         //todo outside border
         for(var _p of _a){
             if(_p[0]<0 || _p[1]<0 || _p[0]>=_puzzleWidth || _p[1]>=_puzzleHeight) return(true);
         }
-        for(var _p of _pieces) {
+        for(var _p of _pieces){
             if(_p===piece) continue;
             var _b = _p.getGrid();
-            for(var i=_a.length-1;i>=0;i--) {
+            for(var i=_a.length-1;i>=0;i--){
                 if(_b.find(function(value,index){return((_a[i][0]===value[0])&&(_a[i][1]===value[1]))})) return(true);
             }
         }
         return(false);
     }
     //check if goals are completly covered (but pieces dont have to be completely inside goal); called internally
-    function checkWin() {
+    function checkWin(){
         let won=true;
         let a,allG=[],allP=[];
-        for(var _p of _pieces) {
+        for(var _p of _pieces){
             allP=allP.concat(_p.getGrid());
         }
         for(var _g of _goals){
             allG=allG.concat(_g.getGrid());
         }
-        for(var i=allG.length-1;i>=0;i--) {//check if no goal-part is uncovered
+        for(var i=allG.length-1;i>=0;i--){//check if no goal-part is uncovered
             if(allP.find(function(value,index){return((allG[i][0]===value[0])&&(allG[i][1]===value[1]))})){}
             else{won=false};
         }
         return(won);
     }
     //drag&drop operation; called internally
-    function dragPiece(evtType, x, y) {
-        switch(evtType) {
+    function dragPiece(evtType, x, y){
+        switch(evtType){
         case 'key':
-          if(x==='KeyR') {
-            for(el of _pieces) {
-              if (el.isDragging) {
+          if(x==='KeyR'){
+            for(el of _pieces){
+              if (el.isDragging){
                 el.rotate(90);
               }
             }
@@ -677,15 +677,15 @@ window.gm.startBlockPuzzle=function(){
         case 'down':
             startX = x;
             startY = y;
-            for(el of _pieces) {
-                if (!el.isDragging && el.isHit( x, y)) { 
+            for(el of _pieces){
+                if (!el.isDragging && el.isHit( x, y)){ 
                     el.isDragging = true; 
                     el.oldX=el.newX=el.x,el.oldY=el.newY=el.y;
                 }
             }
             break;
         case 'up':
-            for(el of _pieces) { 
+            for(el of _pieces){ 
                 el.isDragging = false;
                 if(collides(el)){ el.x =el.oldX,el.y=el.oldY;}
             }
@@ -693,8 +693,8 @@ window.gm.startBlockPuzzle=function(){
         case 'move':
             var dx = x - startX, dy = y - startY;
             startX = x;startY = y;
-            for(el of _pieces) {
-                if (el.isDragging) {
+            for(el of _pieces){
+                if (el.isDragging){
                     el.newX += dx, el.newY += dy; 
                     /*el.x=Math.floor(((el.newX-_gridwidth/2)/_gridwidth))*_gridwidth+_gridwidth/2;
                     el.y=Math.floor(((el.newY-_gridwidth/2)/_gridwidth))*_gridwidth+_gridwidth/2;*/
@@ -714,7 +714,7 @@ window.gm.startBlockPuzzle=function(){
         _pieces=[];_goals=[];
         data.level=level;
         var tmp=data.setup(level);
-        if(!tmp) {
+        if(!tmp){
           data.onFinish(level);
         } else {
           _goals=tmp.goals;
@@ -723,20 +723,20 @@ window.gm.startBlockPuzzle=function(){
         redraw();
     }
     //the setup-fct receives a level-No and has to return a object containing the goals and pieces of that level
-    function demoLevel(level) {
+    function demoLevel(level){
       return({goals:[new Goal(3,3,_gridwidth,[[0,0],[0,1],[1,0],[1,1],[1,2],[2,2],[2,3]])],
       pieces:[new Piece(0, 0, _gridwidth, [[0,0],[1,0],[1,1]],{fill:'#57535f'}),
           new Piece(4, 1, _gridwidth, [[0,0],[0,1],[1,0],[1,1]])
       ]})
     }
-    function demoWinGame(level) {
+    function demoWinGame(level){
       alert("You solved all puzzles");
     }
-    function demoWinLevel(level) {
+    function demoWinLevel(level){
       alert("You solved the puzzle-level "+level);
       this.start(level+1);
     }
-    function demoLossLevel(level) {
+    function demoLossLevel(level){
       alert("You failed to solve the puzzle");
     }
     return(data);
@@ -753,11 +753,11 @@ window.gm.startBlockPuzzle=function(){
 * speed is ms for one movement of the box from left to right 
 * area is a list of non-overlapping hit-areas like [{a:5,b:10, color:'orange'}]; 
 */
-window.gm.startReactTest=function(bar, speed, stopCB, startCB,areas) {
+window.gm.startReactTest=function(bar, speed, stopCB, startCB,areas){
     /**
      * starts the game
      */
-    function start() { //todo instead left-right also up-down should be possible
+    function start(){ //todo instead left-right also up-down should be possible
       ///////////////svg test ////////////////////
       var draw = SVG().addTo('#canvas').size(300, 300);
       var rect = draw.rect(100, 100).attr({ fill: '#f06' })
@@ -777,7 +777,7 @@ window.gm.startReactTest=function(bar, speed, stopCB, startCB,areas) {
     /**
      * this stops the game and returns the index of hit area; use click() instead !
      */
-    function stop() {
+    function stop(){
       var computedStyle = window.getComputedStyle(data.bargraph);
       var left = computedStyle.getPropertyValue('left');
       data.bargraph.style.left=left;
@@ -786,7 +786,7 @@ window.gm.startReactTest=function(bar, speed, stopCB, startCB,areas) {
       left =parseFloat(left.split('px')),total=parseFloat(total.split('px'));
       left = 100*left/total+data.barsize/2;
       var res =-1; //detect if area was hit or not
-      for(var i=data.areas.length-1; i>=0;i--) {
+      for(var i=data.areas.length-1; i>=0;i--){
         if(data.areas[i].a<=left && left<=data.areas[i].b) res=i; 
       }
       data.run=false;
@@ -795,7 +795,7 @@ window.gm.startReactTest=function(bar, speed, stopCB, startCB,areas) {
     /**
      * this can be bound to eventhandler for user input detection to trigger stop and will call stop-CB
      */
-    function click() {
+    function click(){
       var run = data.run;
       var res = data.stop();
       if(run && data.stopCB) data.stopCB(res);
@@ -814,7 +814,7 @@ window.gm.startReactTest=function(bar, speed, stopCB, startCB,areas) {
       click: click //ref to click-func
     }
     let gradient=''; 
-    for(el of data.areas) { //todo need to sort from left to right
+    for(el of data.areas){ //todo need to sort from left to right
       gradient += '#80808000 0 '+el.a+'%, '+el.color+' '+el.a+'%,'+el.color+' '+el.b+'%,#80808000 '+el.b+'%,';
     }
     data.bargraph.parentNode.style.backgroundImage='linear-gradient(to right,'+gradient.slice(0,-1)+')';
@@ -837,11 +837,11 @@ window.gm.startReactTest=function(bar, speed, stopCB, startCB,areas) {
    * @param {*} startCB 
    * @param {*} areas 
    */
-  window.gm.startReactTest2=function(bar, speed, stopCB, startCB,areas) {   //todo timeout starts after first click
+  window.gm.startReactTest2=function(bar, speed, stopCB, startCB,areas){   //todo timeout starts after first click
     /**
      * starts the game
      */
-    function start() { //todo instead left-right also up-down should be possible
+    function start(){ //todo instead left-right also up-down should be possible
       data.stop();
       data.run=true;
       data.bargraph.style.left = data.value+'%'; //dont start in between; speed would be slowed down to maintain transition time
@@ -859,7 +859,7 @@ window.gm.startReactTest=function(bar, speed, stopCB, startCB,areas) {
     /**
      * this stops the game and returns the index of hit area; use click() instead !
      */
-    function stop() {
+    function stop(){
       if(data.intervalID) window.clearInterval(data.intervalID);
       var computedStyle = window.getComputedStyle(data.bargraph);
       var left = computedStyle.getPropertyValue('left');
@@ -867,27 +867,27 @@ window.gm.startReactTest=function(bar, speed, stopCB, startCB,areas) {
       data.bargraph.style.transition = null; // disable transition AFTER fetching computed value !
       data.run=false;
     }
-    function tick() {
+    function tick(){
         data.value= Math.max(0,data.value-data.speed2);
         data.bargraph.style.left=data.value+'%';
       }
     /**
      * this can be bound to eventhandler for user input detection to trigger stop and will call stop-CB
      */
-    function click(evt) {
+    function click(evt){
       if(!data.run) return;
       let prevKey = data.lastKey;
-      if((prevKey !==evt.key && (evt.key==='a' || evt.key==='ArrowLeft' || evt.key==='d'|| evt.key==='ArrowRight'))) {
+      if((prevKey !==evt.key && (evt.key==='a' || evt.key==='ArrowLeft' || evt.key==='d'|| evt.key==='ArrowRight'))){
         data.lastKey=evt.key,data.value+=5;
         data.bargraph.style.left=data.value+'%';
       } 
       var left = data.value+data.barsize/2;
       var res =-1; //detect if area was hit or not
-      for(var i=data.areas.length-1; i>=0;i--) {
-        if(data.areas[i].a<=left && left<=data.areas[i].b) {
+      for(var i=data.areas.length-1; i>=0;i--){
+        if(data.areas[i].a<=left && left<=data.areas[i].b){
           res=i; data.speed2=(i+1)*2; } 
       }
-      if(res===data.areas.length-1) {
+      if(res===data.areas.length-1){
         stop();
         if(data.stopCB) data.stopCB(res); 
       }
@@ -909,7 +909,7 @@ window.gm.startReactTest=function(bar, speed, stopCB, startCB,areas) {
       lastKey: ''
     }
     let gradient=''; 
-    for(el of data.areas) { //todo need to sort from left to right
+    for(el of data.areas){ //todo need to sort from left to right
       gradient += '#80808000 0 '+el.a+'%, '+el.color+' '+el.a+'%,'+el.color+' '+el.b+'%,#80808000 '+el.b+'%,';
     }
     data.bargraph.parentNode.style.backgroundImage='linear-gradient(to right,'+gradient.slice(0,-1)+')';
@@ -970,7 +970,7 @@ window.gm.startReactTest=function(bar, speed, stopCB, startCB,areas) {
   // AI difficulty
   var difficulty = 2
   // update is called on every animation step
-  function update(dt) {
+  function update(dt){
     // move the ball by its velocity
     ball.dmove(vx*dt, vy*dt)
     // get position of ball
@@ -983,11 +983,11 @@ window.gm.startReactTest=function(bar, speed, stopCB, startCB,areas) {
     // constraint the move to the canvas area
     paddleLeft.cy(Math.max(paddleHeight/2, Math.min(height-paddleHeight/2, paddleLeftCy)))
     // check if we hit top/bottom borders
-    if ((vy < 0 && cy <= 0) || (vy > 0 && cy >= height)) { vy = -vy }
+    if ((vy < 0 && cy <= 0) || (vy > 0 && cy >= height)){ vy = -vy }
     var paddleLeftY = paddleLeft.y() , paddleRightY = paddleRight.y()
     // check if we hit the paddle
     if((vx < 0 && cx <= paddleWidth && cy > paddleLeftY && cy < paddleLeftY + paddleHeight) ||
-       (vx > 0 && cx >= width - paddleWidth && cy > paddleRightY && cy < paddleRightY + paddleHeight)) {
+       (vx > 0 && cx >= width - paddleWidth && cy > paddleRightY && cy < paddleRightY + paddleHeight)){
       // depending on where the ball hit we adjust y velocity
       // for more realistic control we would need a bit more math here
       // just keep it simple
@@ -996,9 +996,9 @@ window.gm.startReactTest=function(bar, speed, stopCB, startCB,areas) {
       vx = -vx * 1.05
     } else
     // check if we hit left/right borders
-    if ((vx < 0 && cx <= 0) || (vx > 0 && cx >= width)) {
+    if ((vx < 0 && cx <= 0) || (vx > 0 && cx >= width)){
       // when x-velocity is negative, it's a point for player 2, otherwise player 1
-      if(vx < 0) { ++playerRight }
+      if(vx < 0){ ++playerRight }
       else { ++playerLeft }
       reset()
       scoreLeft.text(playerLeft+'')
@@ -1006,9 +1006,9 @@ window.gm.startReactTest=function(bar, speed, stopCB, startCB,areas) {
     }  
     // move player paddle
     var playerPaddleY = paddleRight.y()
-    if (playerPaddleY <= 0 && paddleDirection == -1) {
+    if (playerPaddleY <= 0 && paddleDirection == -1){
       paddleRight.cy(paddleHeight/2)
-    } else if (playerPaddleY >= height-paddleHeight && paddleDirection == 1) {
+    } else if (playerPaddleY >= height-paddleHeight && paddleDirection == 1){
       paddleRight.y(height-paddleHeight)
     } else {
       paddleRight.dy(paddleDirection*paddleSpeed)
@@ -1017,10 +1017,10 @@ window.gm.startReactTest=function(bar, speed, stopCB, startCB,areas) {
     ball.fill(ballColor);//??.at(1/width*ball.x()))
   }
   var lastTime, animFrame
-  function callback(ms) {
+  function callback(ms){
     // we get passed a timestamp in milliseconds
     // we use it to determine how much time has passed since the last call
-    if (lastTime) {
+    if (lastTime){
       update((ms-lastTime)/1000) // call update and pass delta time in seconds
     }
     lastTime = ms
@@ -1028,21 +1028,21 @@ window.gm.startReactTest=function(bar, speed, stopCB, startCB,areas) {
   }
   callback()
   var paddleDirection = 0 , paddleSpeed = 5
-  SVG.on(document, 'keydown', function(e) {
+  SVG.on(document, 'keydown', function(e){
     paddleDirection = e.keyCode == 40 ? 1 : e.keyCode == 38 ? -1 : 0
     e.preventDefault()
   })
-  SVG.on(document, 'keyup', function(e) {
+  SVG.on(document, 'keyup', function(e){
     paddleDirection = 0
     e.preventDefault()
   })
-  draw.on('click', function() {
-    if(vx === 0 && vy === 0) {
+  draw.on('click', function(){
+    if(vx === 0 && vy === 0){
       vx = Math.random() * 500 - 150
       vy = Math.random() * 500 - 150
     }
   })
-  function reset() {
+  function reset(){
     // visualize boom
     boom()
     // reset speed values
@@ -1057,11 +1057,11 @@ window.gm.startReactTest=function(bar, speed, stopCB, startCB,areas) {
   var ballColor = new SVG.Color('#ff0066')
   //?? ballColor.morph('#00ff99')
   // show visual explosion 
-  function boom() {
+  function boom(){
     // detect winning player
     var paddle = ball.cx() > width/2 ? paddleLeft : paddleRight
     // create the gradient
-    var gradient = draw.gradient('radial', function(stop) {
+    var gradient = draw.gradient('radial', function(stop){
       stop.stop(0, paddle.attr('fill'))
       stop.stop(1, paddle.attr('fill'))
     })
@@ -1069,7 +1069,7 @@ window.gm.startReactTest=function(bar, speed, stopCB, startCB,areas) {
     var blast = draw.circle(300)
     blast.center(ball.cx(), ball.cy()).fill(gradient)
     // animate to invisibility
-    blast.animate(1000, '>').opacity(0).after(function() {
+    blast.animate(1000, '>').opacity(0).after(function(){
       blast.remove()
     })
   }

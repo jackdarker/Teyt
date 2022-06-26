@@ -12,7 +12,7 @@ You need a moment to orient yourself and meanwhile the gate disappears. You are 
 </br><p> [[Next|DngCV_G4]] </br></p>
 </article><article id="LogPanel"></article></section>
 <script>
-function buildRooms() {
+function buildRooms(){
     const _m=[
         '    H2--I2    ',
         '    |   |     ',
@@ -53,7 +53,7 @@ You are kinda embarassed, like a child that did something stupid.
 <%}%>
 </br><a0 onclick='lvl2()'>Hand</a> him the glas.
 </article><article id="LogPanel"></article></section>
-<script>function lvl2() {
+<script>function lvl2(){
     window.gm.player.Inv.removeItem("CrystalWater",1);
     window.story.state.DngSY.dngLevel=2;
     window.story.state.DngSY.remainingNights=2;
@@ -106,7 +106,7 @@ You fall into the abyss never to return. </br>
 
 :: DngCV_Encounters
 <script>
-function fightPillRoller() {
+function fightPillRoller(){
     window.gm.encounters.pillRoller();
     window.gm.Encounter.initCombat();
 }

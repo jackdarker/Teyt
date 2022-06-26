@@ -5,7 +5,7 @@ window.gm.questDef = window.gm.questDef || {};
     let mile1 = new QuestMilestone(1,"Find the garden","You heard rumors that there is a garden behind the house.Find it.",
         //each milestone should define a function that checks if the milestone is fullfilled or not or if no more milestones
         function(){ 
-          if(window.passage.name==="Garden") {
+          if(window.passage.name==="Garden"){
             return(100);
           }
           else return (0);

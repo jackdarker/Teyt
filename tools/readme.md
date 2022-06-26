@@ -2,6 +2,9 @@ svgtojs bundles svg-files into script-files that is placed in dist-directory.
 You need to edit src/head-content.html to add those scripts to html-header and call their load-function to get the data.
 Names of the svg must be compatible with javascribt-object-naming (avoid special- & whitespace-chars)
 
+General:
+- remove width/height attributes in inkscapes XMLEditor or you get strange scaling/viewbox effect
+
 For maps:
 - the game adds/removes classes from the svg-nodes; dont assign styles to the elements, only classes or this would conflict
 - following classes are used (see also gamecode):
@@ -12,6 +15,7 @@ roomNotFound: used together with data-reveal to hide parts of the map; should be
 - data-reveal: a hexcode ; the printMap-function can be called with a reveal-bitmask. Only parts of the map that have at least one matching bit or dont have the attribute will be revealed
 
 For battlers:
+- set the viewbox in a way that battlers properly appear on the screen: if you have a giant and a ant the ant should have enough empty room in the viewport
 - the game can hide nodes from the svg depending on battler-data
 - following attributes are used:
 data-male: if the attribute is present and the battler doesnt have a penis, the node is hidden

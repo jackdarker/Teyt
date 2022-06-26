@@ -64,7 +64,7 @@ Entering the required information you press Next and are presented a window with
 <a0 onclick='start()'>Close Browser</a>
 
 </article><article id="LogPanel"></article></section>
-<script> function start() {
+<script> function start(){
     window.gm.quests.addQuest("qDLCMain",100);
     window.gm.quests.addQuest("qDiedAgain",1);
     window.gm.quests.addQuest("qFixLaptop",1);

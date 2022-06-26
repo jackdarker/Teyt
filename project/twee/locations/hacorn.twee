@@ -83,7 +83,7 @@ The adress points to be somehwere around downtonw.</br>
 <a0 onclick='work()'>Finish the shift</a></br>
 </article><article id="LogPanel"></article></section>
 <script>
-function work() {
+function work(){
     window.gm.addTime(4*60);
     window.gm.player.Stats.increment("energy",-40);
     window.gm.quests.getQuestState("qFindAJob").flags+=1;

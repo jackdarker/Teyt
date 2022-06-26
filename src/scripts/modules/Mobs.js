@@ -9,6 +9,7 @@
 - cougar-girl/-mistress
 - grizzly
 - werwolf
+- latex-, pet-,pony-,cock-sleave-, milk-slave
 - fungus/spore-pod
 - vile vine
 - mimic, transportation trap
@@ -35,15 +36,15 @@
 ////////////////////////////////////////////////////////
 // normal foes
 class Mole extends Mob {
-    static factory(type) {
+    static factory(type){
         let foe = new Mole();
-        if(type==='Squirrel') {
+        if(type==='Squirrel'){
             foe.name = foe.id = 'Squirrel';
             this.pic= 'squirrel1';
         }
         return foe;
     }
-    constructor() {
+    constructor(){
         super();
         this.name = this.id = 'Mole';
         this.pic= 'squirrel1';//todo
@@ -51,14 +52,14 @@ class Mole extends Mob {
     }
 }
 class Wolf extends Mob {
-    static factory(type) {
+    static factory(type){
         let foe = new Wolf();
-        if(type==='AlphaWolf') {
+        if(type==='AlphaWolf'){
             foe.name = foe.id = 'AlphaWolf';
             foe.Stats.increment('healthMax',-0.3*(foe.health().max));
             foe.Skills.addItem(SkillCallHelp.factory('Wolf')); //todo chance to call?
             foe.pic= 'wolf3';
-        } else if(type==='Guarddog') {
+        } else if(type==='Guarddog'){
             foe.name = foe.id = 'Guarddog';
             foe.Stats.increment('healthMax',-0.3*(foe.health().max));
             foe.pic= 'hellhound1';
@@ -67,7 +68,7 @@ class Wolf extends Mob {
         }
         return foe;
     }
-    constructor() {
+    constructor(){
         super();
         this.name = this.id = 'Wolf';
         this.pic= "wolf3";//'assets/battlers/wolf3.svg';
@@ -88,14 +89,14 @@ class Wolf extends Mob {
         let spawn="CallHelpWolf";
         //if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
         result.action =result.target= null;
-        if(window.story.state.combat.turnCount%2===0) {
+        if(window.story.state.combat.turnCount%2===0){
             rnd = _.random(0,enemys.length-1);
             result.action = "Bite";
             result.target = [enemys[rnd]];
             result.msg =this.name+" snaps at "+result.target[0].name+".</br>"+result.msg;
             return(result);
         } else if(window.story.state.combat.turnCount>3 && this.Skills.countItem(spawn)>0 &&
-            this.Skills.getItem(spawn).isEnabled().OK) {
+            this.Skills.getItem(spawn).isEnabled().OK){
             result.action = spawn;
             result.target = [this];
             result.msg =this.name+" howls to call its pack for support.</br>"+result.msg;
@@ -105,13 +106,13 @@ class Wolf extends Mob {
     }
 }
 /*class Dragon extends Mob {   //wyvern, quadrupped w/o wings, w/o horns, scales/fur
-    static factory(type) {
+    static factory(type){
         let foe = new Dragon();
-        if(type==='AlphaWolf') {
+        if(type==='AlphaWolf'){
         }
         return foe;
     }
-    constructor() {
+    constructor(){
         super();
         this.name = this.id = 'Dragon';
         this.pic= "dragon1";
@@ -128,10 +129,10 @@ class Wolf extends Mob {
     }
 }*/
 class Slime extends Mob { 
-    static factory(type) {
+    static factory(type){
         let foe = new Slime();
         foe.Outfit.addItem(WeaponSlobber.factory('slime'));
-        if(type ==='SlimeTentacled') {
+        if(type ==='SlimeTentacled'){
             //add tentacles and grappling
             foe.loot= [{id:'BlueSlime',chance:55,amount:1},{id:'Money',chance:25,amount:20}];
         } else {
@@ -139,7 +140,7 @@ class Slime extends Mob {
         }
         return foe;
     }
-    constructor() {
+    constructor(){
         super();
         this.name = this.id = 'Slime';
         this.pic= 'Blob4';
@@ -152,7 +153,7 @@ class Slime extends Mob {
         let rnd = _.random(1,100);
         //if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
         result.action =result.target= null;
-        if(this.id === 'Slime') {
+        if(this.id === 'Slime'){
             let skill= 'slime-slobber';
             if(window.story.state.combat.turnCount>2 && rnd>30 && this.Skills.getItem(skill).isEnabled().OK){
                 rnd = _.random(0,enemys.length-1);
@@ -166,11 +167,11 @@ class Slime extends Mob {
     }
 }
 class Slug extends Mob { 
-    static factory(type) {
+    static factory(type){
         let foe = new Slug();
         return foe;
     }
-    constructor() {
+    constructor(){
         super();
         this.name = this.id = 'Slug';
         this.pic= 'slug2';
@@ -184,10 +185,10 @@ class Slug extends Mob {
         let rnd = _.random(1,100);
         //if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
         result.action =result.target= null;
-        if(this.Stats.countItem(effKamikaze.name)<=0) { //self-exploding
+        if(this.Stats.countItem(effKamikaze.name)<=0){ //self-exploding
             this.addEffect(new effKamikaze());
         }
-        if(window.story.state.combat.turnCount%2===0) {
+        if(window.story.state.combat.turnCount%2===0){
             rnd = _.random(0,enemys.length-1);
             result.action = "Bite";
             result.target = [enemys[rnd]];
@@ -198,11 +199,11 @@ class Slug extends Mob {
     }
 }
 class Leech extends Mob {
-    static factory(type) {
+    static factory(type){
         let foe = new Leech();
         return foe;
     }
-    constructor() {
+    constructor(){
         super();
         this.name = this.id = 'Leech';
         this.pic= 'leech2';
@@ -217,7 +218,7 @@ class Leech extends Mob {
         let rnd = _.random(1,100);
         if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
         result.action =result.target= null;
-        if(this.Effects.countItem(effGrappling.name)>0) {
+        if(this.Effects.countItem(effGrappling.name)>0){
             this.tmp.grappleCoolDown=2;
             result.msg =this.fconv(this.name +" sucks blood.</br>")+result.msg;
             return(result);
@@ -235,16 +236,16 @@ class Leech extends Mob {
     }
 }
 class Lizan extends Mob {
-    static factory(type) {
+    static factory(type){
         let foe = new Lizan();
-        if(type==='spearthrower') {
+        if(type==='spearthrower'){
             foe.Outfit.addItem(window.gm.ItemsLib['SpearStone']());
         } else {
             foe.Outfit.addItem(new DaggerSteel());
         }
         return foe;
     }
-    constructor() {
+    constructor(){
         super();
         this.name = this.id = 'Lizan';
         this.pic= 'lizan1';
@@ -268,7 +269,7 @@ class Lizan extends Mob {
         let rnd = _.random(1,100);
         result.action =result.target= null;
         //todo shoot arrow, pounce, throw net
-        if(window.story.state.combat.turnCount%2===0) {
+        if(window.story.state.combat.turnCount%2===0){
             result.action = "Guard";
             result.target = [this];
             result.msg =this.name+" croutches into a defensive stance.</br>"+result.msg;
@@ -278,16 +279,16 @@ class Lizan extends Mob {
     }
 }
 class AnthroFox extends Mob {
-    static factory(type) {
+    static factory(type){
         let foe = new AnthroFox();
-        if(type==='Huntress') {
+        if(type==='Huntress'){
             foe.Outfit.addItem(window.gm.ItemsLib['SpearStone']());
         } else {
             foe.Outfit.addItem(new DaggerSteel());
         }
         return foe;
     }
-    constructor() {
+    constructor(){
         super();
         this.name = this.id = 'AnthroFox';
         this.pic= 'unknown';
@@ -303,16 +304,16 @@ class AnthroFox extends Mob {
     }
 }
 class AnthroCat extends Mob {
-    static factory(type) {
+    static factory(type){
         let foe = new AnthroCat();
-        if(type==='Huntress') {
+        if(type==='Huntress'){
             foe.Outfit.addItem(window.gm.ItemsLib['SpearStone']());
         } else {
             foe.Outfit.addItem(new DaggerSteel());
         }
         return foe;
     }
-    constructor() {
+    constructor(){
         super();
         this.name = this.id = 'AnthroCat';
         this.pic= 'unknown';
@@ -329,16 +330,16 @@ class AnthroCat extends Mob {
     }
 }
 class Lapine extends Mob {
-    static factory(type) {
+    static factory(type){
         let foe = new Lapine();
-        if(type==='spearthrower') {
+        if(type==='spearthrower'){
             foe.Outfit.addItem(window.gm.ItemsLib['SpearStone']());
         } else {
             foe.Outfit.addItem(new DaggerSteel());
         }
         return foe;
     }
-    constructor() {
+    constructor(){
         super();
         this.name = this.id = 'Lapine';
         this.pic= 'Bunny1';
@@ -359,7 +360,7 @@ class Lapine extends Mob {
         let rnd = _.random(1,100);
         result.action =result.target= null;
         let skill = this.Skills.getItem("Kick");
-        if(window.story.state.combat.turnCount>2 && rnd>30 && skill.isEnabled().OK) {
+        if(window.story.state.combat.turnCount>2 && rnd>30 && skill.isEnabled().OK){
             result.action = skill.name;
             result.target = [this];
             result.msg =this.name+" prepares for a powerful jump-kick.</br>"+result.msg;
@@ -369,18 +370,18 @@ class Lapine extends Mob {
     }
 }
 class Succubus extends Mob {
-    static factory(type) {
+    static factory(type){
         let foe = new Succubus();
-        if(type==='succubus') {
+        if(type==='succubus'){
             foe.Outfit.addItem(window.gm.ItemsLib.WhipLeather());
-        } else if(type==="nurse") {
+        } else if(type==="nurse"){
             foe.name = foe.id = 'BNurse';
             foe.pic= 'Nurse1';
-            foe.Outfit.addItem(new WhipLeather());
+            foe.Outfit.addItem(window.gm.ItemsLib.WhipLeather());
         }
         return foe;
     }
-    constructor() {
+    constructor(){
         super();
         this.name = this.id = 'Succubus';
         this.pic= 'succubus1';
@@ -407,12 +408,12 @@ class Succubus extends Mob {
         let rnd = _.random(1,100);
         result.action =result.target= null;
         //todo whiplash, call tentacles
-        if(window.story.state.combat.turnCount %3 ===0) {
+        if(window.story.state.combat.turnCount %3 ===0){
             result.action = "Guard";
             result.target = [this];
             result.msg =this.name+" moves into a defensive stance.</br>"+result.msg;
             return(result);
-        } else if (window.story.state.combat.turnCount %4 ===0) {
+        } else if (window.story.state.combat.turnCount %4 ===0){
             rnd = _.random(0,enemys.length-1);
             result.action = "Tease";
             result.target = [enemys[rnd]];
@@ -423,11 +424,11 @@ class Succubus extends Mob {
     }
 }
 class Dryad extends Mob {
-    static factory(type) {
+    static factory(type){
         let foe = new Dryad();
         return foe;
     }
-    constructor() {
+    constructor(){
         super();
         this.name = this.id = 'Dryad';
         this.pic= 'unknown';
@@ -450,7 +451,7 @@ class Dryad extends Mob {
         let rnd = _.random(1,100);
         if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
         result.action =result.target= null;
-        if(this.tmp.vines<1) {
+        if(this.tmp.vines<1){
             this.tmp.vines+=1;
             result.msg =this.fconv(this.name +" starts to summon something...</br>")+result.msg;
             result.action='CallHelp';
@@ -462,11 +463,11 @@ class Dryad extends Mob {
     }
 }
 class Vine extends Mob {
-    static factory(type) {
+    static factory(type){
         let foe = new Vine();
         return foe;
     }
-    constructor() {
+    constructor(){
         super();
         this.name = this.id = 'Vine';
         this.pic= 'unknown';
@@ -479,7 +480,7 @@ class Vine extends Mob {
         let rnd = _.random(1,100);
         if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
         result.action =result.target= null;
-        if(this.Effects.countItem(effGrappling.name)>0) {
+        if(this.Effects.countItem(effGrappling.name)>0){
             this.tmp.grappleCoolDown=5;
             result.msg =this.fconv(this.name +" entwines its prey.</br>")+result.msg;
             return(result);
@@ -497,11 +498,11 @@ class Vine extends Mob {
     } 
 }
 class Fungus extends Mob {
-    static factory(type) {
+    static factory(type){
         let foe = new Fungus();
         return foe;
     }
-    constructor() {
+    constructor(){
         super();
         this.name = this.id = 'Fungus';
         this.pic= 'Fungi1';
@@ -518,11 +519,11 @@ class Fungus extends Mob {
         let rnd = _.random(1,100);
         if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
         result.action =result.target= null;
-        if(this.id === 'Fungus') {
+        if(this.id === 'Fungus'){
             let skill= 'PoisonCloud';
             if(this.tmp.hitBy!='' && this.Skills.getItem(skill).isEnabled().OK){
                 result.action = skill;
-                result.target = enemys.concat.friends; //affect all
+                result.target = enemys.concat(friends); //affect all
                 result.msg =this.fconv("$[I]$ $[release]$ a cloud of toxic spores into the air.</br>")+result.msg;
                 return(result);
             }
@@ -531,12 +532,12 @@ class Fungus extends Mob {
     } 
 }
 class Mechanic extends Mob {
-    static factory(type) {
+    static factory(type){
         let foe = new Mechanic();
         foe.Skills.addItem(new SkillStun());
         return foe;
     }
-    constructor() {
+    constructor(){
         super();
         this.name = this.id = 'Mechanical-Guy';
         this.pic= 'unknown';
@@ -545,7 +546,7 @@ class Mechanic extends Mob {
         let result = {OK:true,msg:''};
         let rnd = _.random(1,100);
         result.action =result.target= null;
-        if(window.story.state.combat.turnCount<3) {
+        if(window.story.state.combat.turnCount<3){
             rnd = _.random(0,enemys.length-1);
             result.action = "Stun";
             result.target = [enemys[rnd]];
@@ -556,11 +557,11 @@ class Mechanic extends Mob {
     }
 }
 class Hawk extends Mob {
-    static factory(type) {
+    static factory(type){
         let foe = new Hawk();
         return foe;
     }
-    constructor() {
+    constructor(){
         super();
         this.name = this.id = 'Hawk';
         this.pic= 'Hawk1';
@@ -578,7 +579,7 @@ class Hawk extends Mob {
         let rnd = _.random(1,100);
         if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
         result.action =result.target= null;
-        if(this.id === 'Hawk') {
+        if(this.id === 'Hawk'){
             let skill= 'Fly';
             if(this.Skills.getItem(skill).isEnabled().OK && !this.Skills.getItem(skill).isActive().OK){
                 result.action = skill;
@@ -591,9 +592,9 @@ class Hawk extends Mob {
     }
 }
 class Hive extends Mob {
-    static factory(type) {
+    static factory(type){
         let foe = new Hive();
-        if(type==='Hornett') {
+        if(type==='Hornett'){
             foe.name = foe.id = 'HornettHive';
             foe.pic= 'WaspHive';
             foe.Stats.increment('arm_blunt',15);
@@ -605,7 +606,7 @@ class Hive extends Mob {
         }
         return foe;
     }
-    constructor() {
+    constructor(){
         super();
         this.name = this.id = 'Hive';
         this.pic= 'unknown';
@@ -619,7 +620,7 @@ class Hive extends Mob {
         //if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
         result.action =result.target= null;
         if(window.story.state.combat.turnCount>2 && this.Skills.countItem(spawn)>0 &&
-            this.Skills.getItem(spawn).isEnabled().OK) {
+            this.Skills.getItem(spawn).isEnabled().OK){
                 if(friends.length===1 || (friends.length<3 && this.cooldown<=0 ) ){
                     result.action = spawn;
                     result.target = [this];
@@ -634,18 +635,18 @@ class Hive extends Mob {
     }
 }
 class Hornett extends Mob {
-    static factory(type) {
+    static factory(type){
         let foe = new Hornett();
-        if(type==='PillRoller') {
+        if(type==='PillRoller'){
             foe.name = foe.id = 'PillRoller';
             foe.pic= 'PillRoller1';
-        } else if(type==='Hornett') {
+        } else if(type==='Hornett'){
             foe.Outfit.addItem(WeaponStinger.factory('wasplike'));
             foe.Outfit.addItem(Wings.factory('chitinous'));
         }
         return foe;
     }
-    constructor() {
+    constructor(){
         super();
         this.name = this.id = 'Hornett';
         this.pic= 'wasp1';
@@ -660,7 +661,7 @@ class Hornett extends Mob {
         let rnd = _.random(1,100);
         if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
         result.action =result.target= null;
-        if(this.id === 'Hornett') {
+        if(this.id === 'Hornett'){
             let skill= 'Fly';
             if(this.Skills.getItem(skill).isEnabled().OK && !this.Skills.getItem(skill).isActive().OK){
                 result.action = skill;
@@ -681,15 +682,15 @@ class Hornett extends Mob {
     }
 }
 class Naga extends Mob {
-    static factory(type) {
+    static factory(type){
         let foe = new Naga();
-        if(type="Quetzal") {
+        if(type="Quetzal"){
             this.name = this.id = type;
             this.Outfit.addItem(Wings.factory('feathered'));
         }
         return foe;
     }
-    constructor() {
+    constructor(){
         super();
         this.name = this.id = 'Naga';
         this.pic= 'naga1';
@@ -708,7 +709,7 @@ class Naga extends Mob {
         let rnd = _.random(1,100);
         if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
         result.action =result.target= null;
-        if(this.id === 'Quetzal') {
+        if(this.id === 'Quetzal'){
             let skill= 'Fly';
             if(this.Skills.getItem(skill).isEnabled().OK && !this.Skills.getItem(skill).isActive().OK){
                 result.action = skill;
@@ -723,7 +724,7 @@ class Naga extends Mob {
 /////////////////////////////////////////////////////////
 // special NPC
 class Carlia extends Mob {
-  constructor() {
+  constructor(){
       super();
       this.name = this.id = 'Carlia';
       this.pic= 'unknown';
@@ -741,7 +742,7 @@ class Carlia extends Mob {
   }
 }
 class Ruff extends Mob {
-    constructor() {
+    constructor(){
         super();
         this.name = this.id = 'Ruff';
         this.Outfit.addItem(new BaseQuadruped());
@@ -756,8 +757,8 @@ class Ruff extends Mob {
         this.autoLeveling();
     }
     get pic(){return('wolf3');}
-    toJSON() {return window.storage.Generic_toJSON("Ruff", this); }
-    static fromJSON(value) {
+    toJSON(){return window.storage.Generic_toJSON("Ruff", this); }
+    static fromJSON(value){
         let _x=window.storage.Generic_fromJSON(Ruff, value.data);
         _x.rebuildAfterLoad();
         /*_x.Effects._relinkItems();
@@ -774,14 +775,14 @@ class Ruff extends Mob {
         let spawn="CallHelpWolf";
         //if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
         result.action =result.target= null;
-        if(window.story.state.combat.turnCount%2===0) {
+        if(window.story.state.combat.turnCount%2===0){
             rnd = _.random(0,enemys.length-1);
             result.action = "Bite";
             result.target = [enemys[rnd]];
             result.msg =this.name+" snaps at "+result.target[0].name+".</br>"+result.msg;
             return(result);
         } else if(window.story.state.combat.turnCount>3 && this.Skills.countItem(spawn)>0 &&
-            this.Skills.getItem(spawn).isEnabled().OK) {
+            this.Skills.getItem(spawn).isEnabled().OK){
             result.action = spawn;
             result.target = [this];
             result.msg =this.name+" howls to call its pack for support.</br>"+result.msg;
@@ -791,7 +792,7 @@ class Ruff extends Mob {
     }
 }
 class Clyde extends AnthroFox {
-    constructor() {
+    constructor(){
         super();
         this.name = this.id = 'Clyde';
         this.Outfit.addItem(AnusHuman.factory('wolf'));
@@ -801,7 +802,7 @@ class Clyde extends AnthroFox {
     }
 }
 class Trent extends Mob {
-    constructor() {
+    constructor(){
         super();
         this.name = this.id = 'Trent';
         this.pic= 'unknown';
@@ -819,31 +820,31 @@ class Trent extends Mob {
     }
 }
 //collection of mob-constructors
-window.gm.Mobs = (function (Mobs) {
+window.gm.Mobs = (function (Mobs){
     //unique chars that are in save-game need a constructor
     window.storage.registerConstructor(Mob);//some characters derive from Mob
     window.storage.registerConstructor(Ruff);
     //
-    Mobs.AnthroCat = function() { return function(param){return(AnthroCat.factory(param));}("AnthroCat")};
-    Mobs.AnthroFox = function() { return function(param){return(AnthroCat.factory(param));}("AnthroFox")};
+    Mobs.AnthroCat = function(){ return function(param){return(AnthroCat.factory(param));}("AnthroCat")};
+    Mobs.AnthroFox = function(){ return function(param){return(AnthroCat.factory(param));}("AnthroFox")};
     Mobs.Fungus = Fungus.factory;
-    Mobs.Huntress = function() { return function(param){return(AnthroCat.factory(param));}("Huntress")};
+    Mobs.Huntress = function(){ return function(param){return(AnthroCat.factory(param));}("Huntress")};
     Mobs.Lapine = Lapine.factory;
     Mobs.Mole = Mole.factory;
     Mobs.Naga = Naga.factory;
-    Mobs.Squirrel = function() { return function(param){return(Mole.factory(param));}("Squirrel")};
-    Mobs.Hawk = function() { return function(param){return(Hawk.factory(param));}("Hawk")};
-    Mobs.HornettHive = function() { return function(param){return(Hive.factory(param));}("Hornett")};
-    Mobs.Hornett = function() { return function(param){return(Hornett.factory(param));}("Hornett")};
-    Mobs.PillRoller = function() { return function(param){return(Hornett.factory(param));}("PillRoller")};
+    Mobs.Squirrel = function(){ return function(param){return(Mole.factory(param));}("Squirrel")};
+    Mobs.Hawk = function(){ return function(param){return(Hawk.factory(param));}("Hawk")};
+    Mobs.HornettHive = function(){ return function(param){return(Hive.factory(param));}("Hornett")};
+    Mobs.Hornett = function(){ return function(param){return(Hornett.factory(param));}("Hornett")};
+    Mobs.PillRoller = function(){ return function(param){return(Hornett.factory(param));}("PillRoller")};
     Mobs.Slime = Slime.factory;
     Mobs.Lizan = Lizan.factory;
     Mobs.Wolf = Wolf.factory;
-    //Mobs.AlphaWolf = function() { return function(param){return(Wolf.factory(param));}(100)};
+    //Mobs.AlphaWolf = function(){ return function(param){return(Wolf.factory(param));}(100)};
     Mobs.Leech = Leech.factory;  
     Mobs.Slug = Slug.factory; 
     Mobs.Succubus = Succubus.factory;
-    //Mobs.BNurse = function() { return function(param){return(Succubus.factory(param));}(10)};
+    //Mobs.BNurse = function(){ return function(param){return(Succubus.factory(param));}(10)};
     Mobs.Dryad = Dryad.factory; 
     Mobs.Vine = Vine.factory; 
     Mobs.Mechanic = Mechanic.factory;

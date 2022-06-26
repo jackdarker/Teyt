@@ -13,7 +13,7 @@ The portal drops you within a clearing of a beautiful, thriving forest.
 </br><p> [[Next|DngDF_F2]] </br></p>
 </article><article id="LogPanel"></article></section>
 <script>
-function buildRooms() {
+function buildRooms(){
     const _m=[
         'A2--B2--C2--D2--E2--F2--G2--H2  I2--J2  K2--L2 ',
         '                        |   |   |   |   |   |  ',
@@ -78,7 +78,7 @@ Balancing all those ripe plums, you step through the portal.
 <p class='tNPC2'>"I dont think so. Well, I cant be sure..."</p>
 Carrying your truckload of fruits toward the laboratory, you right away run into <a0 onclick='lvl3()'>Kumala</a>.
 </article><article id="LogPanel"></article></section>
-<script>function lvl3() {
+<script>function lvl3(){
     window.gm.player.Inv.removeItem("GiantPlum",5);
     window.story.state.DngSY.dngLevel=3;
     window.story.state.DngSY.remainingNights=2;
@@ -122,16 +122,16 @@ Carrying your truckload of fruits toward the laboratory, you right away run into
 
 :: DngDF_Encounters
 <script>
-function tick() {
+function tick(){
     let here = window.passage.name;
     if(here===window.story.state.DngDF.tmp.tickPass) return;
     window.story.state.DngDF.tmp.tickPass=here;
-    if(here==='DngMN_I2' || here==='DngMN_F2') { //todo
+    if(here==='DngMN_I2' || here==='DngMN_F2'){ //todo
         window.gm.encounters.wolf({amount:1});
         window.gm.Encounter.initCombat();
     }
 }
-function fightHornet() {
+function fightHornet(){
     window.gm.encounters.hornett({levelUp:-3, amount:(window.gm.player.Inv.countItem('GiantPlum')>=2)?2:1, noStart:true});
     window.gm.Encounter.onVictory = (function(){
         window.story.state.DngDF.plum[window.gm.player.location]=true;
@@ -139,22 +139,22 @@ function fightHornet() {
         return('You defeated the angry hornet and earned that <b>juicy fruit</b>.</br> '+this.fetchLoot()+'</br>' + window.gm.printLink('Next','window.gm.postVictory({flee:false})'));});
     window.gm.Encounter.initCombat();
 }
-function fightLapine() {
+function fightLapine(){
     window.gm.encounters.lapine({amount:1, noStart:true});
     window.story.state.DngDF.lapine.met=true;
     window.gm.Encounter.initCombat();
 }
-function fightWolf() {
+function fightWolf(){
     window.gm.encounters.wolf({amount:1, noStart:true});
     window.gm.Encounter.initCombat();
 }
-function explore() {
+function explore(){
     let rnd = _.random(0,100);
     window.gm.pushLog("rolled "+rnd);
     window.story.state.tmp.args = [];
-    if(rnd > 70 ) {
+    if(rnd > 70 ){
         window.gm.encounters.huntress();
-    }else if(rnd > 50) {
+    }else if(rnd > 50){
         let find = ['PurpleBerry','ApocaFlower'];
         let rnd2 = _.random(0,find.length-1);
         window.story.state.tmp.args = [find[rnd2],1]

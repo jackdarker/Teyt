@@ -1,12 +1,12 @@
 :: ForestAlchemistTalk [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<% if(!window.gm.quests.hasActiveQuest("qPurpleBerry") || window.gm.quests.getMilestoneState("qPurpleBerry").id<1) { %>
+<% if(!window.gm.quests.hasActiveQuest("qPurpleBerry") || window.gm.quests.getMilestoneState("qPurpleBerry").id<1){ %>
     <%=window.story.render("AlchTalkStartPurpleBerry"); %>
-<% } else if(window.gm.quests.getMilestoneState("qPurpleBerry").id===1 && window.gm.player.Inv.countItem("PurpleBerry")>=5) { %>
+<% } else if(window.gm.quests.getMilestoneState("qPurpleBerry").id===1 && window.gm.player.Inv.countItem("PurpleBerry")>=5){ %>
     <%=window.story.render("AlchTalkFinishPurpleBerry"); %>
-<% } else if(window.gm.quests.getMilestoneState("qBondageKink").id===300) {%>
+<% } else if(window.gm.quests.getMilestoneState("qBondageKink").id===300){%>
     <%=window.story.render("AlchTalkFinishPurpleBerry"); %>
-<% } else if(window.gm.quests.getMilestoneState("qCarlia").id===700) {%>
+<% } else if(window.gm.quests.getMilestoneState("qCarlia").id===700){%>
     <%=window.story.render("AlchTalkShelterCarlia"); %>
 <%} else {%> He seems busy right now. [[Back|ForestAlchemistHut]] <%}%>
 </article><article id="LogPanel"></article></section>
@@ -46,7 +46,7 @@ He shakes his head "Not that I know. Cant you sneak around them or trick them so
 "Very good. Like I said I will give you 2 potions for those."
 <a0 onclick='window.gm.refreshAllPanel();'>Next</a>
 </div><div id='choice1b' hidden></div>
-<% } else if(window.gm.quests.getMilestoneState("qBondageKink").id===100) {%>
+<% } else if(window.gm.quests.getMilestoneState("qBondageKink").id===100){%>
 <p class="tPC">"Hello. sorry to bother you again but can you take a look at this."</p>
 You tilt your head to a side and point at the choker.</br>
 "Fancy. You are in this sort of thing?"</br>

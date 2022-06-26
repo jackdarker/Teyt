@@ -54,7 +54,7 @@ But that damned thing is still there!</br>
 <p class='dev'>Some gear will stick to you. That doesnt need to be cursed one. In fact you can buy special gear that is bonded to you.</p>
 </br><a0 id='1' onclick='foo(this)'>This sucks</a> <a0 id='2' onclick='foo(this)'>Would have been to easy</a> <a0 id='3' onclick='foo(this)'>Its an incentive to not die</a></br>
 </article><article id="LogPanel"></article></section>
-<script> function foo(select) {
+<script> function foo(select){
     window.gm.quests.forceQuestMilestone("qDiedAgain",200,100);
     window.story.show("ServerDisconnected");
 }

@@ -24,7 +24,7 @@ This corridor connects the dorms with the [[Hallway|DngSY_Hall]]. Most of the do
     <p class="author">Now is a good time to save and and stow everything you don't want to lose in the trunk.</p>
     <p><a0 onclick='window.story.show(nextDng());'>Seek the portal</a></p>
 <%}else{%>
-    This is your own private room. You can <a href="javascript:void(0)" onclick='($("tw-passage").fadeOut(1000, function() {window.gm.player.sleep(700);window.story.state.DngSY.remainingNights-=1;window.story.show("DngSY_Your_Room_Sleep");}));'>sleep</a> here to regain health and energy.
+    This is your own private room. You can <a href="javascript:void(0)" onclick='($("tw-passage").fadeOut(1000, function(){window.gm.player.sleep(700);window.story.state.DngSY.remainingNights-=1;window.story.show("DngSY_Your_Room_Sleep");}));'>sleep</a> here to regain health and energy.
     </br>But maybe you shouldnt do that all day, even if you are tired. Look around in the sanctuary, maybe you can find someone to talk to or get some training.
     <p> You can sleep <b><%=window.story.state.DngSY.remainingNights%> more nights</b> before you have to start another adventure. So better use the time here for preping.</p>
     <p> <%=(window.story.state.DngSY.dildo & 0x1)?'[[Train your oral skills...|DngSA_Train_OralLv1]]':''%></p>
@@ -33,7 +33,7 @@ This corridor connects the dorms with the [[Hallway|DngSY_Hall]]. Most of the do
 </br>There is a [[trunk|GlobalChest]] to store anything you dont want to lose. You might also change your [[Wardrobe]] and take a closer look on yourself in the [[Mirror]].
 </article><article id="LogPanel"></article></section>
 <script>
-function nextDng() {return("DngSY_Lv"+window.story.state.DngSY.dngLevel.toString());}
+function nextDng(){return("DngSY_Lv"+window.story.state.DngSY.dngLevel.toString());}
 </script>
 
 :: DngSY_Your_Room_Sleep [_nosave_]

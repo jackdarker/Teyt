@@ -12,7 +12,7 @@ TODO Through the portal you arrive at a dark and eerie underground location.
 </br><p> [[Next|DngAT_J6]] </br></p>
 </article><article id="LogPanel"></article></section>
 <script>
-function buildRooms() {
+function buildRooms(){
     const _m=[
         '    H2--I2--J2        ',
         '    |       |         ',
@@ -64,14 +64,14 @@ function buildRooms() {
 
 :: DngAT_Encounters
 <script>
-function tick() {
+function tick(){
     let here = window.passage.name,_d=window.story.state.DngAT.tmp;
     if(here===_d.tickPass) return;
     _d.tickPass=here;
-    if(here==='DngAT_'+_d.guard1Here || here==='DngAT_'+_d.guard2Here) {fightGuardian(); return;} 
-    if(_d.guard1Here!=='') {
+    if(here==='DngAT_'+_d.guard1Here || here==='DngAT_'+_d.guard2Here){fightGuardian(); return;} 
+    if(_d.guard1Here!==''){
         var _go='I4';
-        switch(_d.guard1Here) { //move guard
+        switch(_d.guard1Here){ //move guard
             case 'I4':  _go='I3'; break;
             case 'I3':  _go='J3'; break;
             case 'J3':  _go='J2'; break;
@@ -87,9 +87,9 @@ function tick() {
         _d.guard1Here=_go;
         document.getElementById('panel').textContent+="You hear strange noises from "+_go+".\n";
     }
-    if(_d.guard2Here!=='') {
+    if(_d.guard2Here!==''){
         var _go='J6';
-        switch(_d.guard2Here) { //move guard
+        switch(_d.guard2Here){ //move guard
             case 'J6':  _go='K6'; break;
             case 'K6':  _go='L6'; break;
             case 'L6':  _go='L5'; break;
@@ -100,9 +100,9 @@ function tick() {
         _d.guard2Here=_go;
         document.getElementById('panel').textContent+="You hear strange noises from "+_go+".\n";
     }
-    if(here==='DngAT_'+_d.guard1Here || here==='DngAT_'+_d.guard2Here) {fightGuardian(); return;} 
+    if(here==='DngAT_'+_d.guard1Here || here==='DngAT_'+_d.guard2Here){fightGuardian(); return;} 
 }
-function fightGuardian() {
+function fightGuardian(){
     window.gm.encounters.mechanicguy({amount:1, noStart:true});
     window.gm.Encounter.initCombat();
 }

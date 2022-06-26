@@ -20,7 +20,7 @@ Releasing the pressure on your nubs, they just feel numb right now.
 </div>
 </article><article id="LogPanel"></article></section>
 <script>
-function fondlebreast(elmnt) {
+function fondlebreast(elmnt){
     elmnt.replaceWith("You nipple stiffens under this attention.");
     window.gm.player.addEffect(new window.storage.constructors['effGrowBreast'](),"effGrowBreast");
     window.gm.quests.forceQuestMilestone("qMyPleasure",100,1);
@@ -149,15 +149,15 @@ const grid=40;
 var _game = window.gm.startBlockPuzzle();
 document.getElementById('btStart').addEventListener("click", function(){_game.start(1);});
 //document.getElementById('clickHere').addEventListener("click", _game.click);
-_game.setup=function(level) {
-  if(level===2) {
+_game.setup=function(level){
+  if(level===2){
    return({goals:[ _game.createGoal(3,3 ,grid,[ [0,0],[0,1],[1,0],[1,1] ]),
              _game.createGoal(3 ,6 ,grid,[ [1,2],[2,2],[2,3] ])],
     pieces:[ _game.createPiece(2 , 0 , grid, [ [0,0],[-1,0],[0,1] ],{ fill:'#f08080'}),
              _game.createPiece(4 , 1 , grid, [ [0,0],[0,1],[1,0],[1,1] ]),
              _game.createPiece(2 , 4 , grid, [ [0,0],[-1,0],[0,1],[1,1],[2,1] ],{ canRotate:true,fill:'#f0f080'})
         ]})
-  } else if(level===1) {
+  } else if(level===1){
     return({goals:[ this.createGoal(3 ,3 ,grid,[ [0,0],[0,1],[1,0],[1,1],[1,2],[2,2],[2,3] ])],
     pieces:[ this.createPiece(0 , 0 , grid, [ [0,0],[1,0],[1,1] ],{canRotate:true,fill:'#f08080'}),
              this.createPiece(4 , 1 , grid, [ [0,0],[0,1],[1,0],[1,1] ])
@@ -190,7 +190,7 @@ Then the next player will get activated. Repeat until all players of one team ar
 Note that sucessful attack will earn you little charge of your skill-color but a succesful defense supplys the defender with a bigger charge.</br>
 Todo: The player should see what defenses the target has available (ould also be "learned" by playing against the enemy multiple times.).</p>
 </div><script>
-function onStop(value) {
+function onStop(value){
 document.getElementById('result').innerHTML='scored '+value;
 }
 var _game = window.gm.startCounterChargeCombat(),_game2 = window.gm.startDominoCombat();
@@ -210,7 +210,7 @@ document.getElementById('btstartDominoCombat').addEventListener("click", _game2.
 <div class="progressbar" id='clickHere' style='height:1em; width: 100%;'><div id='bar' style="position:relative; width:5%; height:100%; background-color:green;"></div></div>
 <a0 id='btStart'>Start</a><p id='result'></p>
 <script>
-function onStop(value) {
+function onStop(value){
 document.getElementById('result').innerHTML='scored '+value;
 }
 var _game = window.gm.startReactTest('bar',2000,onStop,null,[{a:40,b:60,color:'orange'},{a:90,b:100,color:'yellow'}]);
@@ -224,7 +224,7 @@ document.getElementById('clickHere').addEventListener("click", _game.click);
 <a0 id='btStart'>Start</a><p id='result'></p>
 <p><output id="losgelassen"><output></output></p>
 <script>
-function onStop(value) {
+function onStop(value){
   document.getElementById('result').innerHTML='scored '+value;
 }
 var _game = window.gm.startReactTest2('bar',100,onStop,null,[{a:40,b:60,color:'orange'},{a:90,b:100,color:'yellow'}]);
@@ -313,13 +313,13 @@ document.write('</div>');
 document.write('<div id="auto" style="position:absolute; left:0px; top:0px">');
 document.write('	<img width="50" id="imgkristall" height="50" src="'+bilderpfad+'/kristall0.gif" alt="" />');
 document.write('</div>');
-function move() {
+function move(){
 	spieler0 = new Image();
 	spieler0.src = bilderpfad+"/spieler0.gif";
 	spieler1 = new Image();
 	spieler1.src = bilderpfad+"/spieler1.gif";
 
-	if (life==1) {
+	if (life==1){
 	zaehler();
 	if (a>5) a=5;
 	document.getElementById('spieler').style.left = (a*50)+"px";
@@ -329,33 +329,33 @@ function move() {
 	document.getElementById('auto').style.left = (c*50)+"px";
 	hit();
 
-	if (d*z/200>300) {d=0; c=Math.round(Math.random()*5);} }
+	if (d*z/200>300){d=0; c=Math.round(Math.random()*5);} }
 	window.setTimeout ('move()', 10);
 }
 
-function keyleft(y) {
-	if (y==37) { left++; a-- }
+function keyleft(y){
+	if (y==37){ left++; a-- }
 }
 
-function keyright(y) {
-	if (y==39) { right++; a++ }
+function keyright(y){
+	if (y==39){ right++; a++ }
 }
 
-function hit() {
-	if (a==c && d*z/200>250 && life==1) {
+function hit(){
+	if (a==c && d*z/200>250 && life==1){
 		wechsel('imgplayer',spieler1);
 		alert("Getroffen!!!nDu hast " + (new Date()-starttime)/1000 + " Sekunden überlebt.");
 		life=0;
 	}
 }
 
-function zaehler() {
+function zaehler(){
 	z=z+1
 }
 
-function keycheck(e) {
+function keycheck(e){
 	y = (e) ? e.which : window.event.keyCode;
-	if ( y == 78 ) {
+	if ( y == 78 ){
 		restart();
 	}
 
@@ -365,13 +365,13 @@ function keycheck(e) {
 	if (b<0) b=0;
 }
 
-function restart() {
+function restart(){
 	a=0; b=0; c=Math.round(Math.random()*5);
 	d=0; z=0; life=1; starttime=new Date();
 	wechsel('imgplayer',spieler0);
 }
 
-function wechsel(Bildnr,Bildobjekt) {
+function wechsel(Bildnr,Bildobjekt){
 	document.getElementById(Bildnr).src = Bildobjekt.src;
 }
 document.onkeydown = keycheck;
@@ -515,20 +515,20 @@ var words = {
 };
 words.all = words.w3.concat(words.w4, words.w5, words.w6, words.w7, words.w8, words.w9, words.w10);
 getRandomWord();
-function getRandomWord() {
+function getRandomWord(){
   var randomWord = words.all[Math.floor(Math.random() * words.all.length)];
   $(".word").html("");
   console.log(randomWord);
   var randomWordSplitted = randomWord.split("");
-  randomWordSplitted.forEach(function (x) {
+  randomWordSplitted.forEach(function (x){
     $(".word").append("<span class='" + x + "'>" + x + "</span>");
   });
-  $(".alphabet span").on("click", function () {
+  $(".alphabet span").on("click", function (){
     var letter = $(this).text();
-    if (checkLetter(letter, randomWordSplitted)) {
+    if (checkLetter(letter, randomWordSplitted)){
       $(this).addClass("green");
       $("." + letter).addClass("found");
-      if (checkWin(randomWordSplitted.length)) {
+      if (checkWin(randomWordSplitted.length)){
         $(".alphabet").fadeOut();
         // setTimeout(function(){
         //   $(".word").hide(400);
@@ -541,23 +541,23 @@ function getRandomWord() {
     }
   });
 }
-$("button").on("click", function () {
+$("button").on("click", function (){
   gameReset();
 });
-function checkWin(length) {
-  if ($(".found").length === length) {
+function checkWin(length){
+  if ($(".found").length === length){
     return true;
   }
 }
-function checkLetter(letter, arr) {
-  if (arr.indexOf(letter) !== -1) {
+function checkLetter(letter, arr){
+  if (arr.indexOf(letter) !== -1){
     return true;
   }
   else {
     return false;
   }
 }
-function gameReset() {
+function gameReset(){
   $(".alphabet span").off().removeClass();
   $(".word span").removeClass("found");
   $(".alphabet, .word").fadeIn();
@@ -659,37 +659,37 @@ var preElt = document.querySelector("#pre"),
     finalElt = document.querySelector("#final"),
     againElt = document.querySelector("#again");
 // initiate the game with chosen theme
-themesElt.addEventListener("click", function(e) {
-  if (e.target.classList.contains("themes")) {
+themesElt.addEventListener("click", function(e){
+  if (e.target.classList.contains("themes")){
     activateTheme(e.target.id);
     preElt.classList.add("hidden");
   }
 });
-function activateTheme(theme) {
+function activateTheme(theme){
   // insert theme in images array
-  switch (theme) {
+  switch (theme){
     case "pokemon":
-      for (let i=0; i<20; i++) {images.push(library.pokemon[i]);}
+      for (let i=0; i<20; i++){images.push(library.pokemon[i]);}
       break;
     case "starwars":
-      for (let i=0; i<20; i++) {images.push(library.starwars[i]);}
+      for (let i=0; i<20; i++){images.push(library.starwars[i]);}
       break;
     case "lotr":
-      for (let i=0; i<20; i++) {images.push(library.lotr[i]);}
+      for (let i=0; i<20; i++){images.push(library.lotr[i]);}
       break;
     case "disney":
-      for (let i=0; i<20; i++) {images.push(library.disney[i]);}
+      for (let i=0; i<20; i++){images.push(library.disney[i]);}
       break;
     case "pixar":
-      for (let i=0; i<20; i++) {images.push(library.pixar[i]);}
+      for (let i=0; i<20; i++){images.push(library.pixar[i]);}
       break;
     case "harrypotter":
-      for (let i=0; i<20; i++) {images.push(library.harrypotter[i]);}
+      for (let i=0; i<20; i++){images.push(library.harrypotter[i]);}
       break;
   }
   preElt.classList.add("hidden");
   // insert images in memory game
-  for (let i=0; i<20; i++) {
+  for (let i=0; i<20; i++){
     var rand = Math.floor(Math.random() * (images.length-1));
     boxElts[i].innerHTML = "<img src='" + images[rand] + "' alt='image' class='hidden'>";
     images.splice(rand, 1);
@@ -697,16 +697,16 @@ function activateTheme(theme) {
 }
 // Handle the play
 mainElt.addEventListener("click", gameLogic);
-function gameLogic(e) {
+function gameLogic(e){
   // make sure the box is playable
-  if (e.target.classList.contains("play")) {
+  if (e.target.classList.contains("play")){
     e.target.firstChild.classList.remove("hidden");
     // first of two click
-    if (click < 1) {
+    if (click < 1){
       tempElt1 = e.target;
       // timer
-      if (click === -1) {
-        timer = setInterval(function() {
+      if (click === -1){
+        timer = setInterval(function(){
           time++;
           timeElt.innerHTML = time;
         }, 1000);
@@ -714,12 +714,12 @@ function gameLogic(e) {
       click = 1;
     }
     // second click
-    else if (e.target !== tempElt1) {
+    else if (e.target !== tempElt1){
       tempElt2 = e.target;
       // different images
-      if (tempElt1.firstChild.src !== tempElt2.firstChild.src) {
+      if (tempElt1.firstChild.src !== tempElt2.firstChild.src){
         mainElt.removeEventListener("click", gameLogic);
-        setTimeout( function() {
+        setTimeout( function(){
           tempElt1.firstChild.classList.add("hidden");
           tempElt2.firstChild.classList.add("hidden");
           mainElt.addEventListener("click", gameLogic);
@@ -739,7 +739,7 @@ function gameLogic(e) {
         tempElt2.classList.remove("play");
         scoreElt.innerHTML = score;
         // game won
-        if (win === 20) {
+        if (win === 20){
           clearTimeout(timer);
           finalElt.innerHTML = "You won " + score + " points <br> in " + time + " seconds";
           postElt.classList.remove("hidden");
@@ -750,7 +750,7 @@ function gameLogic(e) {
   }
 }
 againElt.addEventListener("click", resetGame);
-function resetGame() {
+function resetGame(){
   // reset game
   tempElt1 = "";
   tempElt2 = "";
@@ -760,7 +760,7 @@ function resetGame() {
   time = 0;
   postElt.classList.add("hidden");
   preElt.classList.remove("hidden");
-  for (let i=0; i<20; i++) {
+  for (let i=0; i<20; i++){
     boxElts[i].classList.add("play");
     boxElts[i].firstChild.classList.add("hidden");
   }
@@ -769,8 +769,8 @@ function resetGame() {
 }
 activateTheme("harrypotter");
 // handle focus of the page
-// function checkPageFocus() {
-//   if (document.hasFocus()) {
+// function checkPageFocus(){
+//   if (document.hasFocus()){
 //     preElt.classList.remove("hidden");
 //   }
 //   else {

@@ -2,7 +2,7 @@
 <!--called  to print status--->
 <li><label><input type="checkbox" name="y" value="x" readonly disabled>
 <%=function(){
-    if(s.vars.qLaptop==0) {
+    if(s.vars.qLaptop==0){
        return('Get a powerconverter for your laptop');
     } else {
         return('COMPLETED: Laptop working again');

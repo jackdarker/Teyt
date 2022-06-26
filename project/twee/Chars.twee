@@ -17,7 +17,7 @@ Cyril is here.</br>
 :: Info_Mom [_back_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 Your mom is here.</br>
-<% if(window.gm.player.Rel.get('Mom').value>10) { %>
+<% if(window.gm.player.Rel.get('Mom').value>10){ %>
 She gives you a hug.
 <% } else { %>
 You can see a disapproving look on her face.
@@ -36,7 +36,7 @@ You walk over to Trent. He is a horse-man.
 
 :: TrentVictory [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
-<% if(window.gm.quests.getMilestoneState("qBondageKink").id<=300) { window.gm.quests.forceQuestMilestone("qBondageKink",400,300);%>
+<% if(window.gm.quests.getMilestoneState("qBondageKink").id<=300){ window.gm.quests.forceQuestMilestone("qBondageKink",400,300);%>
 Finally you found a weak spot in the defense of the stud. Reluctantly he gives up fighting.  </br><!--todo-->
 <p class="dev">"Fine, you won...this time."</p> 
 You dont have any breath left to give him a quirky response. </br>
@@ -63,7 +63,7 @@ Trent looks up to you, he already knows what that means. | Trent looks up to you
 
 :: TrentSubmit [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
-<% if(window.gm.quests.getMilestoneState("qBondageKink").id<=300) { %>
+<% if(window.gm.quests.getMilestoneState("qBondageKink").id<=300){ %>
 <%} else {%>
 <%}%>
 That didnt went as planned. That bully delivered a though blow and knocked you out. It didnt felt that lethal but the game has decided that you earned your death. </br>

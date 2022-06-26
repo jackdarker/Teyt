@@ -15,11 +15,11 @@
  * growth = size of bodypart relative to maxGrowth; modified on mutation event
 */
 class BodyPart extends Equipment {
-    constructor(name) {super(name); }
+    constructor(name){super(name); }
     /*
     * converts a relative size to size in m or cm
     */
-    sizeString(size) {
+    sizeString(size){
         let base = this.parent.getItemForSlot(window.gm.OutfitSlotLib.bBase);
         let bodysize = base.data.maxGrowth*base.data.growth*size;
         if(bodysize<1) return(window.gm.util.formatNumber(bodysize*100,1)+"cm");
@@ -28,82 +28,82 @@ class BodyPart extends Equipment {
     }
 }
 class BaseBiped extends BodyPart {
-    constructor() {
+    constructor(){
         super('BaseBiped');
         this.data = {maxGrowth:1.8,growth:1};
         this.addTags(['body']);this.slotUse = ['bBase'];
     }
-    descLong(fconv) {return(fconv('$[I]$ $[have]$ two legs and $[walk]§ upright at a bodysize of around '+this.sizeString(1)+'.'));}
-    get descShort() {return this.desc;};
-    get desc() { return '';}
-    toJSON() {return window.storage.Generic_toJSON("BaseBiped", this); };
-    static fromJSON(value) {return(window.storage.Generic_fromJSON(BaseBiped, value.data));}
+    descLong(fconv){return(fconv('$[I]$ $[have]$ two legs and $[walk]§ upright at a bodysize of around '+this.sizeString(1)+'.'));}
+    get descShort(){return this.desc;};
+    get desc(){ return '';}
+    toJSON(){return window.storage.Generic_toJSON("BaseBiped", this); };
+    static fromJSON(value){return(window.storage.Generic_fromJSON(BaseBiped, value.data));}
 }
 class BaseHumanoid extends BaseBiped {
-    constructor() {
+    constructor(){
         super();
         this.id = this.name = 'BaseHumanoid';
         this.data = {maxGrowth:1.8,growth:1};
     }
-    descLong(fconv) {return(fconv('$[My]$ body is that of an human, around '+this.sizeString(1)+' in size.'));}
-    toJSON() {return window.storage.Generic_toJSON("BaseHumanoid", this); };
-    static fromJSON(value) {return(window.storage.Generic_fromJSON(BaseHumanoid, value.data));}
+    descLong(fconv){return(fconv('$[My]$ body is that of an human, around '+this.sizeString(1)+' in size.'));}
+    toJSON(){return window.storage.Generic_toJSON("BaseHumanoid", this); };
+    static fromJSON(value){return(window.storage.Generic_fromJSON(BaseHumanoid, value.data));}
 }
 class BaseQuadruped extends BodyPart {
-    constructor() {
+    constructor(){
         super('BaseQuadruped');
         this.data = {maxGrowth:1.5,growth:1};
         this.addTags(['body']);this.slotUse = ['bBase'];
     }
-    get descShort() {return this.desc;};
-    get desc() { return '';}
-    toJSON() {return window.storage.Generic_toJSON("BaseQuadruped", this); };
-    static fromJSON(value) {return(window.storage.Generic_fromJSON(BaseQuadruped, value.data));}
-    descLong(fconv) {return(fconv('$[I]$ $[am]$ walking on 4 legs like a feral mammal.'));}
+    get descShort(){return this.desc;};
+    get desc(){ return '';}
+    toJSON(){return window.storage.Generic_toJSON("BaseQuadruped", this); };
+    static fromJSON(value){return(window.storage.Generic_fromJSON(BaseQuadruped, value.data));}
+    descLong(fconv){return(fconv('$[I]$ $[am]$ walking on 4 legs like a feral mammal.'));}
 }
 class BaseWorm extends BodyPart {
-    constructor() {
+    constructor(){
         super('BaseWorm');
         this.data = {maxGrowth:0.3,growth:1};
         this.addTags(['body']);this.slotUse = ['bBase'];
     }
-    get descShort() {return this.desc;};
-    get desc() { return '';}
-    toJSON() {return window.storage.Generic_toJSON("BaseWorm", this); };
-    static fromJSON(value) {return(window.storage.Generic_fromJSON(BaseWorm, value.data));}
-    descLong(fconv) {return(fconv('$[I]$ $[am]$ wriggling around like a snake.'));}
+    get descShort(){return this.desc;};
+    get desc(){ return '';}
+    toJSON(){return window.storage.Generic_toJSON("BaseWorm", this); };
+    static fromJSON(value){return(window.storage.Generic_fromJSON(BaseWorm, value.data));}
+    descLong(fconv){return(fconv('$[I]$ $[am]$ wriggling around like a snake.'));}
 }
 class BaseInsect extends BodyPart {
-    constructor() {
+    constructor(){
         super('BaseInsect');
         this.data = {maxGrowth:0.3,growth:1};
         this.addTags(['body']);this.slotUse = ['bBase'];
     }
-    get descShort() {return this.desc;};
-    get desc() { return '';}
-    toJSON() {return window.storage.Generic_toJSON("BaseInsect", this); };
-    static fromJSON(value) {return(window.storage.Generic_fromJSON(BaseInsect, value.data));}
-    descLong(fconv) {return(fconv('$[My]$ body is like that of an insect.'));}
+    get descShort(){return this.desc;};
+    get desc(){ return '';}
+    toJSON(){return window.storage.Generic_toJSON("BaseInsect", this); };
+    static fromJSON(value){return(window.storage.Generic_fromJSON(BaseInsect, value.data));}
+    descLong(fconv){return(fconv('$[My]$ body is like that of an insect.'));}
 }
 class FaceHuman extends BodyPart {
-    static dataPrototype() {    
+    static dataPrototype(){    
         return({femininity:0.2,style:'human'});
         //1 = full female 0= male
     }
-    static factory(id) {
+    static factory(id){
         let obj =  new FaceHuman();
         obj.setStyle(id);
         return(obj);
     }
-    constructor() {
+    constructor(){
         super('FaceHuman');
         this.addTags(['body']);
         this.slotUse = ['bFace','bMouth'];
         this.data = FaceHuman.dataPrototype();   
     }
-    setStyle(id) {
+    setStyle(id){
         this.data.style = id;
-        switch(id) {
+        switch(id){
             case 'human':
                 break;
             case 'elve':
@@ -112,32 +112,32 @@ class FaceHuman extends BodyPart {
                 throw new Error("unknown Face-style "+id);
         }
     }
-    getStyle() { return this.data.style; }
-    get descShort() { return 'human face';}
-    get desc() { return 'hominid face';}
-    toJSON() {return window.storage.Generic_toJSON("FaceHuman", this); };
-    static fromJSON(value) {return(window.storage.Generic_fromJSON(FaceHuman, value.data));}
-    descLong(fconv) {
+    getStyle(){ return this.data.style; }
+    get descShort(){ return 'human face';}
+    get desc(){ return 'hominid face';}
+    toJSON(){return window.storage.Generic_toJSON("FaceHuman", this); };
+    static fromJSON(value){return(window.storage.Generic_fromJSON(FaceHuman, value.data));}
+    descLong(fconv){
         return(fconv('$[My]$ face ressembles that of a human.'));
     }
 }
 class FaceWolf extends BodyPart {
-    static dataPrototype() {    
+    static dataPrototype(){    
         return({style:'wolf',femininity:0.2});    }
-    static factory(id) {
+    static factory(id){
         let obj =  new FaceWolf();
         obj.setStyle(id);
         return(obj);
     }
-    constructor() {
+    constructor(){
         super('FaceWolf');
         this.addTags(['body']);
         this.slotUse = ['bFace','bMouth'];  //todo separate mouth-bodypart??
         this.data = FaceWolf.dataPrototype();   
     }
-    setStyle(id) {
+    setStyle(id){
         this.data.style = id;
-        switch(id) {
+        switch(id){
             case 'cat':
             case 'dog':
             case 'fox':
@@ -150,23 +150,23 @@ class FaceWolf extends BodyPart {
                 throw new Error("unknown Face-style "+id);
         }
     }
-    getStyle() { return this.data.style; }
-    get descShort() { return (this.desc);}
-    get desc() { return this.data.style+'\'like face.';}
-    toJSON() {return window.storage.Generic_toJSON("FaceWolf", this); }
-    static fromJSON(value) {return(window.storage.Generic_fromJSON(FaceWolf, value.data));}
-    onEquip(context) {
+    getStyle(){ return this.data.style; }
+    get descShort(){ return (this.desc);}
+    get desc(){ return this.data.style+'\'like face.';}
+    toJSON(){return window.storage.Generic_toJSON("FaceWolf", this); }
+    static fromJSON(value){return(window.storage.Generic_fromJSON(FaceWolf, value.data));}
+    onEquip(context){
         let old = context.parent.Skills.countItem(SkillBite.name);
         if(old>0) context.parent.Skills.removeItem(SkillBite.name,old);
         context.parent.Skills.addItem(new SkillBite());
         return({OK:true, msg:'shifted'});
     }
-    onUnequip() {
+    onUnequip(){
         let old = this.parent.parent.Skills.countItem(SkillBite.name);
         if(old>0) this.parent.parent.Skills.removeItem(SkillBite.name,old);
         return({OK:true, msg:'shifted'});
     }
-    descLong(fconv) {
+    descLong(fconv){
         return(fconv('$[I]$ $[have]$ a muzzle like a '+this.data.style+'.'));
     }
     attackMod(target){
@@ -176,20 +176,20 @@ class FaceWolf extends BodyPart {
     }
 }
 class FaceHorse extends BodyPart {
-    static dataPrototype() {    
+    static dataPrototype(){    
         return({femininity:0.2,style:'horse'});    }
-    static factory(id) {
+    static factory(id){
             return(new FaceHorse());
     }
-    constructor() {
+    constructor(){
         super('FaceHorse');
         this.addTags(['body']);
         this.slotUse = ['bFace','bMouth'];
         this.data = FaceHorse.dataPrototype();   
     }
-    setStyle(id) {
+    setStyle(id){
         this.data.style = id;
-        switch(id) {
+        switch(id){
             case 'bunny':
             case 'horse':
                 break;
@@ -199,32 +199,32 @@ class FaceHorse extends BodyPart {
                 throw new Error("unknown Face-style "+id);
         }
     }
-    getStyle() { return this.data.style; }
-    get descShort() { return this.data.style+' muzzle';}
-    get desc() { return this.descShort;}
-    toJSON() {return window.storage.Generic_toJSON("FaceHorse", this); };
-    static fromJSON(value) {return(window.storage.Generic_fromJSON(FaceHorse, value.data));}
-    descLong(fconv) {
+    getStyle(){ return this.data.style; }
+    get descShort(){ return this.data.style+' muzzle';}
+    get desc(){ return this.descShort;}
+    toJSON(){return window.storage.Generic_toJSON("FaceHorse", this); };
+    static fromJSON(value){return(window.storage.Generic_fromJSON(FaceHorse, value.data));}
+    descLong(fconv){
         return(fconv('$[I]$ $[have]$ a muzzle like a '+this.data.style));
     }
 }
 class FaceLeech extends BodyPart {
-    static dataPrototype() {    
+    static dataPrototype(){    
         return({style:'leech'});    }
-    static factory(id) {
+    static factory(id){
         let obj =  new FaceLeech();
         obj.setStyle(id);
         return(obj);
     }
-    constructor() {
+    constructor(){
         super('FaceLeech');
         this.addTags(['body']);
         this.slotUse = ['bFace','bMouth'];
         this.data = FaceLeech.dataPrototype();   
     }
-    setStyle(id) {
+    setStyle(id){
         this.data.style = id;
-        switch(id) {
+        switch(id){
             case 'slug':
                 break;
             case 'leech':
@@ -233,28 +233,28 @@ class FaceLeech extends BodyPart {
                 throw new Error("unknown Face-style "+id);
         }
     }
-    getStyle() { return this.data.style; }
-    get descShort() { return (this.desc);}
-    get desc() { return this.data.style+'\'like face.';}
-    toJSON() {return window.storage.Generic_toJSON("FaceLeech", this); }
-    static fromJSON(value) {return(window.storage.Generic_fromJSON(FaceLeech, value.data));}
-    onEquip(context) {
+    getStyle(){ return this.data.style; }
+    get descShort(){ return (this.desc);}
+    get desc(){ return this.data.style+'\'like face.';}
+    toJSON(){return window.storage.Generic_toJSON("FaceLeech", this); }
+    static fromJSON(value){return(window.storage.Generic_fromJSON(FaceLeech, value.data));}
+    onEquip(context){
         let old = context.parent.Skills.countItem(SkillBite.name);
         if(old>0) context.parent.Skills.removeItem(SkillBite.name,old);
         context.parent.Skills.addItem(new SkillBite());
         return({OK:true, msg:'shifted'});
     }
-    onUnequip() {
+    onUnequip(){
         let old = this.parent.parent.Skills.countItem(SkillBite.name);
         if(old>0) this.parent.parent.Skills.removeItem(SkillBite.name,old);
         return({OK:true, msg:'shifted'});
     }
-    descLong(fconv) {
+    descLong(fconv){
         return(fconv('$[I]$ $[have]$ a mouth like a '+this.data.style+'.'));
     }
     attackMod(target){
         let mod = new SkillMod();
-        if(this.data.style==='slug') {
+        if(this.data.style==='slug'){
             mod.onHit = [{ target:target, eff: [effDamage.factory(5,'acid',1,'The slug spits some acid that eats at '+target.name+' armor.')]}];
         } else {
             mod.onHit = [{ target:target, eff: [effDamage.factory(5,'acid')]}];
@@ -263,22 +263,22 @@ class FaceLeech extends BodyPart {
     }
 }
 class FaceInsect extends BodyPart {
-    static dataPrototype() {    
+    static dataPrototype(){    
         return({style:'wasp'});    }
-    static factory(id) {
+    static factory(id){
         let obj =  new FaceInsect();
         obj.setStyle(id);
         return(obj);
     }
-    constructor() {
+    constructor(){
         super('FaceInsect');
         this.addTags(['body']);
         this.slotUse = ['bFace','bMouth'];
         this.data = FaceInsect.dataPrototype();   
     }
-    setStyle(id) {
+    setStyle(id){
         this.data.style = id;
-        switch(id) {
+        switch(id){
             case 'wasp':
                 break;
             case 'bug':
@@ -287,23 +287,23 @@ class FaceInsect extends BodyPart {
                 throw new Error("unknown Face-style "+id);
         }
     }
-    getStyle() { return this.data.style; }
-    get descShort() { return (this.desc);}
-    get desc() { return this.data.style+'\'like face.';}
-    toJSON() {return window.storage.Generic_toJSON("FaceInsect", this); }
-    static fromJSON(value) {return(window.storage.Generic_fromJSON(FaceInsect, value.data));}
-    onEquip(context) {
+    getStyle(){ return this.data.style; }
+    get descShort(){ return (this.desc);}
+    get desc(){ return this.data.style+'\'like face.';}
+    toJSON(){return window.storage.Generic_toJSON("FaceInsect", this); }
+    static fromJSON(value){return(window.storage.Generic_fromJSON(FaceInsect, value.data));}
+    onEquip(context){
         let old = context.parent.Skills.countItem(SkillBite.name);
         if(old>0) context.parent.Skills.removeItem(SkillBite.name,old);
         context.parent.Skills.addItem(new SkillBite());
         return({OK:true, msg:'shifted'});
     }
-    onUnequip() {
+    onUnequip(){
         let old = this.parent.parent.Skills.countItem(SkillBite.name);
         if(old>0) this.parent.parent.Skills.removeItem(SkillBite.name,old);
         return({OK:true, msg:'shifted'});
     }
-    descLong(fconv) {
+    descLong(fconv){
         return(fconv('$[I]$ $[have]$ mandibles like a '+this.data.style+'.'));
     }
     attackMod(target){
@@ -313,22 +313,22 @@ class FaceInsect extends BodyPart {
     }
 }
 class FaceBird extends BodyPart {
-    static dataPrototype() {    
+    static dataPrototype(){    
         return({style:'hawk'});    }
-    static factory(id) {
+    static factory(id){
         let obj =  new FaceBird();
         obj.setStyle(id);
         return(obj);
     }
-    constructor() {
+    constructor(){
         super('FaceBird');
         this.addTags(['body']);
         this.slotUse = ['bFace','bMouth'];
         this.data = FaceBird.dataPrototype();   
     }
-    setStyle(id) {
+    setStyle(id){
         this.data.style = id;
-        switch(id) {
+        switch(id){
             case 'wasp':
                 break;
             case 'bug':
@@ -337,23 +337,23 @@ class FaceBird extends BodyPart {
                 throw new Error("unknown Face-style "+id);
         }
     }
-    getStyle() { return this.data.style; }
-    get descShort() { return (this.desc);}
-    get desc() { return this.data.style+'\'like face.';}
-    toJSON() {return window.storage.Generic_toJSON("FaceBird", this); }
-    static fromJSON(value) {return(window.storage.Generic_fromJSON(FaceBird, value.data));}
-    onEquip(context) {
+    getStyle(){ return this.data.style; }
+    get descShort(){ return (this.desc);}
+    get desc(){ return this.data.style+'\'like face.';}
+    toJSON(){return window.storage.Generic_toJSON("FaceBird", this); }
+    static fromJSON(value){return(window.storage.Generic_fromJSON(FaceBird, value.data));}
+    onEquip(context){
         let old = context.parent.Skills.countItem(SkillBite.name);
         if(old>0) context.parent.Skills.removeItem(SkillBite.name,old);
         context.parent.Skills.addItem(new SkillBite());
         return({OK:true, msg:'shifted'});
     }
-    onUnequip() {
+    onUnequip(){
         let old = this.parent.parent.Skills.countItem(SkillBite.name);
         if(old>0) this.parent.parent.Skills.removeItem(SkillBite.name,old);
         return({OK:true, msg:'shifted'});
     }
-    descLong(fconv) {
+    descLong(fconv){
         return(fconv('$[I]$ $[have]$ a beak like a '+this.data.style+'.'));
     }
     attackMod(target){
@@ -369,22 +369,22 @@ class FaceBird extends BodyPart {
  * @extends {BodyPart}
  */
 class ArmorTorso extends BodyPart {
-    static dataPrototype() {    
+    static dataPrototype(){    
         return({style:'scales'}); }
-    static factory(id) {
+    static factory(id){
         let obj =  new ArmorTorso();
         obj.setStyle(id);
         return(obj);
     }
-    constructor() {
+    constructor(){
         super('ArmorTorso');
         this.addTags(['body']);
         this.slotUse = ['Breast','Stomach'];
         this.data = ArmorTorso.dataPrototype();
     }
-    setStyle(id) {
+    setStyle(id){
         this.data.style = id;
-        switch(id) {
+        switch(id){
             case 'scales':
                 break;
             case 'slime':
@@ -399,25 +399,25 @@ class ArmorTorso extends BodyPart {
                 throw new Error("unknown Armor-style "+id);
         }
     }
-    getStyle() { return this.data.style; }
-    get descShort() { return (this.desc);}
-    get desc() { 'The '+this.data.style+' improves resistance.';}
-    toJSON() {return window.storage.Generic_toJSON("ArmorTorso", this); };
-    static fromJSON(value) {return(window.storage.Generic_fromJSON(ArmorTorso, value.data));}
-    descLong(fconv) {
+    getStyle(){ return this.data.style; }
+    get descShort(){ return (this.desc);}
+    get desc(){ 'The '+this.data.style+' improves resistance.';}
+    toJSON(){return window.storage.Generic_toJSON("ArmorTorso", this); };
+    static fromJSON(value){return(window.storage.Generic_fromJSON(ArmorTorso, value.data));}
+    descLong(fconv){
         return(fconv('$[My]$ body is covered with '+this.data.style+'.'));
     }
-    onEquip(context) {
+    onEquip(context){
         let arm,rst;
-        for(let el of window.gm.combat.TypesDamage) {
+        for(let el of window.gm.combat.TypesDamage){
             arm=rst=0;
-            if(this.data.style ==='slime') {
+            if(this.data.style ==='slime'){
                 if(el.id==='fire' || el.id==='poison' || el.id==='acid') arm=5,rst=70;
 
-            } else if(this.data.style ==='fur' || this.data.style ==='feathers') {
+            } else if(this.data.style ==='fur' || this.data.style ==='feathers'){
                 if(el.id==='ice') arm=5,rst=30;
                 if(el.id==='blunt') arm=5,rst=20;
-            } else if(this.data.style ==='scales' || this.data.style ==='chitin') {
+            } else if(this.data.style ==='scales' || this.data.style ==='chitin'){
                 if(el.id==='ice') rst=-30;
                 if(el.id==='slash') arm=5,rst=20;
             }
@@ -426,8 +426,8 @@ class ArmorTorso extends BodyPart {
         }
         return({OK:true, msg:'equipped'});
     }
-    onUnequip() {
-        for(let el of window.gm.combat.TypesDamage) {
+    onUnequip(){
+        for(let el of window.gm.combat.TypesDamage){
             context.parent.Stats.removeModifier('arm_'+el,{id:'arm_'+el+':'+this.id});
             context.parent.Stats.removeModifier('rst_'+el,{id:'rst_'+el+':'+this.id});
         }
@@ -435,20 +435,20 @@ class ArmorTorso extends BodyPart {
     }
 }
 class WeaponStinger extends BodyPart {
-    static dataPrototype() { return({style:'wasplike', skill:''}); }
-    static factory(id) {
+    static dataPrototype(){ return({style:'wasplike', skill:''}); }
+    static factory(id){
         let obj =  new WeaponStinger();obj.setStyle(id);
         return(obj);
     }
-    constructor() {
+    constructor(){
         super('WeaponStinger');
         this.addTags(['body']);
         this.slotUse = ['bTailBase'];
         this.data = WeaponStinger.dataPrototype();
     }
-    setStyle(id) {
+    setStyle(id){
         this.data.style = id;
-        switch(id) {
+        switch(id){
             case 'wasplike': 
                 this.data.skill = 'wasp-stinger';
                 this.slotUse = ['bTailBase'];
@@ -457,21 +457,21 @@ class WeaponStinger extends BodyPart {
                 throw new Error("unknown Stinger-style "+id);
         }
     }
-    getStyle() { return this.data.style; }
-    get descShort() { return (this.desc);}
-    get desc() { 'A '+this.data.style+' stinger.';}
-    toJSON() {return window.storage.Generic_toJSON("WeaponStinger", this); };
-    static fromJSON(value) {return(window.storage.Generic_fromJSON(WeaponStinger, value.data));}
-    descLong(fconv) {
+    getStyle(){ return this.data.style; }
+    get descShort(){ return (this.desc);}
+    get desc(){ 'A '+this.data.style+' stinger.';}
+    toJSON(){return window.storage.Generic_toJSON("WeaponStinger", this); };
+    static fromJSON(value){return(window.storage.Generic_fromJSON(WeaponStinger, value.data));}
+    descLong(fconv){
         return(fconv('$[I]$ $[have]$ a '+this.data.style+' sting.'));
     }
-    onEquip(context) {
+    onEquip(context){
         let old = context.parent.Skills.countItem(this.data.skill);
         if(old>0) context.parent.Skills.removeItem(this.data.skill,old);
         context.parent.Skills.addItem(SkillSting.factory(this.data.skill));
         return({OK:true, msg:'shifted'});
     }
-    onUnequip() {
+    onUnequip(){
         let old = this.parent.parent.Skills.countItem(this.data.skill);
         if(old>0) this.parent.parent.Skills.removeItem(this.data.skill,old);
         return({OK:true, msg:'shifted'});
@@ -487,20 +487,20 @@ class WeaponStinger extends BodyPart {
     }
 }
 class WeaponSlobber extends BodyPart {
-    static dataPrototype() { return({style:'slime', skill:''}); }
-    static factory(id) {
+    static dataPrototype(){ return({style:'slime', skill:''}); }
+    static factory(id){
         let obj =  new WeaponSlobber();obj.setStyle(id);
         return(obj);
     }
-    constructor() {
+    constructor(){
         super('WeaponSlobber');
         this.addTags(['body']);
         this.slotUse = ['bTailBase'];
         this.data = WeaponSlobber.dataPrototype();
     }
-    setStyle(id) {
+    setStyle(id){
         this.data.style = id;
-        switch(id) {
+        switch(id){
             case 'slime': 
                 this.data.skill = 'slime-slobber';
                 this.slotUse = ['bTailBase'];
@@ -509,21 +509,21 @@ class WeaponSlobber extends BodyPart {
                 throw new Error("unknown slobber-style "+id);
         }
     }
-    getStyle() { return this.data.style; }
-    get descShort() { return (this.desc);}
-    get desc() { 'A '+this.data.style+'  slobber.';}
-    toJSON() {return window.storage.Generic_toJSON("WeaponSlobber", this); };
-    static fromJSON(value) {return(window.storage.Generic_fromJSON(WeaponSlobber, value.data));}
-    descLong(fconv) {
+    getStyle(){ return this.data.style; }
+    get descShort(){ return (this.desc);}
+    get desc(){ 'A '+this.data.style+'  slobber.';}
+    toJSON(){return window.storage.Generic_toJSON("WeaponSlobber", this); };
+    static fromJSON(value){return(window.storage.Generic_fromJSON(WeaponSlobber, value.data));}
+    descLong(fconv){
         return(fconv('$[I]$ $[have]$ a '+this.data.style+' slobber.'));
     }
-    onEquip(context) {
+    onEquip(context){
         let old = context.parent.Skills.countItem(this.data.skill);
         if(old>0) context.parent.Skills.removeItem(this.data.skill,old);
         context.parent.Skills.addItem(SkillSlobber.factory(this.data.skill));
         return({OK:true, msg:'shifted'});
     }
-    onUnequip() {
+    onUnequip(){
         let old = this.parent.parent.Skills.countItem(this.data.skill);
         if(old>0) this.parent.parent.Skills.removeItem(this.data.skill,old);
         return({OK:true, msg:'shifted'});
@@ -537,23 +537,23 @@ class WeaponSlobber extends BodyPart {
     }
 }
 class SkinHuman extends BodyPart {
-    static dataPrototype() {    
+    static dataPrototype(){    
         return({style:'human', color:'olive', pattern: 'smooth'}); }
-    static factory(id) {
+    static factory(id){
         let obj =  new SkinHuman();
         obj.setStyle(id);
         return(obj);
     }
-    constructor() {
+    constructor(){
         super('SkinHuman');
         this.addTags(['body']);
         this.slotUse = ['bSkin'];
         this.data = SkinHuman.dataPrototype();
     }
-    setStyle(id,color='pale') {
+    setStyle(id,color='pale'){
         this.data.style = id; 
         this.data.color = color;
-        switch(id) {
+        switch(id){
             case 'human':
                 this.data.pattern = 'smooth';
                 break;
@@ -564,33 +564,33 @@ class SkinHuman extends BodyPart {
                 throw new Error("unknown Skin-style "+id);
         }
     }
-    getStyle() { return this.data.style; }
-    get descShort() { return (this.desc);}
-    get desc() { 'a smooth skin mostly bare of noticable hair.';}
-    toJSON() {return window.storage.Generic_toJSON("SkinHuman", this); };
-    static fromJSON(value) {return(window.storage.Generic_fromJSON(SkinHuman, value.data));}
-    descLong(fconv) {
+    getStyle(){ return this.data.style; }
+    get descShort(){ return (this.desc);}
+    get desc(){ 'a smooth skin mostly bare of noticable hair.';}
+    toJSON(){return window.storage.Generic_toJSON("SkinHuman", this); };
+    static fromJSON(value){return(window.storage.Generic_fromJSON(SkinHuman, value.data));}
+    descLong(fconv){
         return(fconv('$[My]$ body is covered with '+this.data.pattern+' '+this.data.color+' '+this.data.style+' skin.'));
     }
 }
 class SkinFur extends BodyPart {
-    static dataPrototype() {    
+    static dataPrototype(){    
         return({style:'wolf', color:'dark grey', pattern: 'dense'}); }
-    static factory(id) {
+    static factory(id){
         let obj =  new SkinFur();
         obj.setStyle(id);
         return(obj);
     }
-    constructor() {
+    constructor(){
         super('SkinFur');
         this.addTags(['body']);
         this.slotUse = ['bSkin'];
         this.data = SkinFur.dataPrototype();
     }
-    setStyle(id,color='dark grey') {
+    setStyle(id,color='dark grey'){
         this.data.style = id; 
         this.data.color = color;
-        switch(id) {
+        switch(id){
             case 'cat':
             case 'bunny':
             case 'fox':
@@ -609,33 +609,33 @@ class SkinFur extends BodyPart {
                 throw new Error("unknown Fur-style "+id);
         }
     }
-    getStyle() { return this.data.style; }
-    get descShort() { return (this.desc);}
-    get desc() { 'a dense fur covering the whole body.';}  //todo color
-    toJSON() {return window.storage.Generic_toJSON("SkinFur", this); };
-    static fromJSON(value) {return(window.storage.Generic_fromJSON(SkinFur, value.data));}
-    descLong(fconv) {
+    getStyle(){ return this.data.style; }
+    get descShort(){ return (this.desc);}
+    get desc(){ 'a dense fur covering the whole body.';}  //todo color
+    toJSON(){return window.storage.Generic_toJSON("SkinFur", this); };
+    static fromJSON(value){return(window.storage.Generic_fromJSON(SkinFur, value.data));}
+    descLong(fconv){
         return(fconv('A '+this.data.pattern+', '+this.data.color+' fur covers $[my]$ body.'));
     }
 }
 class SkinFeathers extends BodyPart {
-    static dataPrototype() {    
+    static dataPrototype(){    
         return({style:'bird', color:'dark grey', pattern: 'smooth'}); }
-    static factory(id) {
+    static factory(id){
         let obj =  new SkinFeathers();
         obj.setStyle(id);
         return(obj);
     }
-    constructor() {
+    constructor(){
         super('SkinFeathers');
         this.addTags(['body']);
         this.slotUse = ['bSkin'];
         this.data = SkinFeathers.dataPrototype();
     }
-    setStyle(id,color='dark grey') {
+    setStyle(id,color='dark grey'){
         this.data.style = id; 
         this.data.color = color;
-        switch(id) {
+        switch(id){
             case 'bird','hawk':
                 this.data.pattern = 'fine';
                 break;
@@ -643,33 +643,33 @@ class SkinFeathers extends BodyPart {
                 throw new Error("unknown Feather-style "+id);
         }
     }
-    getStyle() { return this.data.style; }
-    get descShort() { return (this.desc);}
-    get desc() { 'a fine coat of feathers cover the body.';} 
-    toJSON() {return window.storage.Generic_toJSON("SkinFeathers", this); };
-    static fromJSON(value) {return(window.storage.Generic_fromJSON(SkinFeathers, value.data));}
-    descLong(fconv) {
+    getStyle(){ return this.data.style; }
+    get descShort(){ return (this.desc);}
+    get desc(){ 'a fine coat of feathers cover the body.';} 
+    toJSON(){return window.storage.Generic_toJSON("SkinFeathers", this); };
+    static fromJSON(value){return(window.storage.Generic_fromJSON(SkinFeathers, value.data));}
+    descLong(fconv){
         return(fconv('A '+this.data.pattern+', '+this.data.color+' layer of feathers covers $[my]$ body.'));
     }
 }
 class SkinScales extends BodyPart {
-    static dataPrototype() {    
+    static dataPrototype(){    
         return({style:'lizard', color:'dark green', pattern: 'smooth'}); }
-    static factory(id) {
+    static factory(id){
         let obj =  new SkinScales();
         obj.setStyle(id);
         return(obj);
     }
-    constructor() {
+    constructor(){
         super('SkinScales');
         this.addTags(['body']);
         this.slotUse = ['bSkin'];
         this.data = SkinScales.dataPrototype();
     }
-    setStyle(id,color='dark grey') {
+    setStyle(id,color='dark grey'){
         this.data.style = id; 
         this.data.color = color;
-        switch(id) {
+        switch(id){
             case 'lizard':
                 this.data.pattern = 'smooth';
                 break;
@@ -677,32 +677,32 @@ class SkinScales extends BodyPart {
                 throw new Error("unknown Fur-style "+id);
         }
     }
-    getStyle() { return this.data.style; }
-    get descShort() { return (this.desc);}
-    get desc() { 'scales like a eptile.';}  //todo color
-    toJSON() {return window.storage.Generic_toJSON("SkinScales", this); };
-    static fromJSON(value) {return(window.storage.Generic_fromJSON(SkinScales, value.data));}
-    descLong(fconv) {
+    getStyle(){ return this.data.style; }
+    get descShort(){ return (this.desc);}
+    get desc(){ 'scales like a eptile.';}  //todo color
+    toJSON(){return window.storage.Generic_toJSON("SkinScales", this); };
+    static fromJSON(value){return(window.storage.Generic_fromJSON(SkinScales, value.data));}
+    descLong(fconv){
         return(fconv('$[My]$ body is covered in '+this.data.pattern+', '+this.data.color+' scales.'));
     }
 }
 class TailWolf extends BodyPart {
-    static dataPrototype() {    
+    static dataPrototype(){    
         return({style:'wolf',growth:0.1, maxGrowth: 1.5});    }
-    static factory(id) {
+    static factory(id){
         let obj =  new TailWolf();
         obj.setStyle(id);
         return(obj);
     }
-    constructor() {
+    constructor(){
         super('TailWolf');
         this.addTags(['body']);
         this.slotUse = ['bTailBase'];
         this.data = TailWolf.dataPrototype();  
     }
-    setStyle(id) {
+    setStyle(id){
         this.data.style = id;
-        switch(id) {
+        switch(id){
             case 'cat':
             case 'dog':
             case 'fox':
@@ -721,11 +721,11 @@ class TailWolf extends BodyPart {
                 throw new Error("unknown Tail-style "+id);
         }
     }
-    getStyle() { return this.data.style; }
-    get descShort() { return (this.desc);}
-    get desc() { 
+    getStyle(){ return this.data.style; }
+    get descShort(){ return (this.desc);}
+    get desc(){ 
         var msg ='';
-        switch(this.data.style) {
+        switch(this.data.style){
             case 'cat':
                 msg ='a flexible,furred tail like that of a cat.';
             break;
@@ -734,29 +734,29 @@ class TailWolf extends BodyPart {
         }
         return(msg);
     }
-    toJSON() {return window.storage.Generic_toJSON("TailWolf", this); };
-    static fromJSON(value) {return(window.storage.Generic_fromJSON(TailWolf, value.data));}
-    descLong(fconv) { 
+    toJSON(){return window.storage.Generic_toJSON("TailWolf", this); };
+    static fromJSON(value){return(window.storage.Generic_fromJSON(TailWolf, value.data));}
+    descLong(fconv){ 
         return(fconv('Some '+this.data.style+'-tail is attached to $[my]$ spine.'));
     }
 }
 class TailSnake extends BodyPart {
-    static dataPrototype() {    
+    static dataPrototype(){    
         return({style:'snake',growth:0.2, maxGrowth: 2});    }
-    static factory(id) {
+    static factory(id){
         let obj =  new TailSnake();
         obj.setStyle(id);
         return(obj);
     }
-    constructor() {
+    constructor(){
         super('TailSnake');
         this.addTags(['body']);
         this.slotUse = ['bTailBase'];
         this.data = TailSnake.dataPrototype();  
     }
-    setStyle(id) {
+    setStyle(id){
         this.data.style = id;
-        switch(id) {
+        switch(id){
             case 'snake':
             case 'naga':
                 this.data.growth = 0.10; //in %/100 maxGrowth
@@ -770,11 +770,11 @@ class TailSnake extends BodyPart {
                 throw new Error("unknown Tail-style "+id);
         }
     }
-    getStyle() { return this.data.style; }
-    get descShort() { return (this.desc);}
-    get desc() { 
+    getStyle(){ return this.data.style; }
+    get descShort(){ return (this.desc);}
+    get desc(){ 
         var msg ='';
-        switch(this.data.style) {
+        switch(this.data.style){
             case 'naga':
                 msg ='a meaty snake-like appendage.';
             break;
@@ -783,9 +783,9 @@ class TailSnake extends BodyPart {
         }
         return(msg);
     }
-    toJSON() {return window.storage.Generic_toJSON("TailSnake", this); };
-    static fromJSON(value) {return(window.storage.Generic_fromJSON(TailSnake, value.data));}
-    descLong(fconv) { 
+    toJSON(){return window.storage.Generic_toJSON("TailSnake", this); };
+    static fromJSON(value){return(window.storage.Generic_fromJSON(TailSnake, value.data));}
+    descLong(fconv){ 
         return(fconv('Some '+this.data.style+'-tail is attached to $[my]$ spine.'));
     }
     attackMod(target){
@@ -798,23 +798,23 @@ class TailSnake extends BodyPart {
     }
 }
 class HandsPaw extends BodyPart { //paws of ferals
-    static dataPrototype() {    
+    static dataPrototype(){    
         return({style:'wolf'});
     }
-    static factory(id) {
+    static factory(id){
         let obj =  new HandsPaw();
         obj.setStyle(id);
         return(obj);
     }
-    constructor() {
+    constructor(){
         super('HandsPaw');
         this.addTags(['body']);
         this.slotUse = ['bHands'];
         this.data = HandsPaw.dataPrototype();
     }
-    setStyle(id) {
+    setStyle(id){
         this.data.style = id; 
-        switch(id) {
+        switch(id){
             case 'cat':
             case 'dog':
             case 'fox':
@@ -826,12 +826,12 @@ class HandsPaw extends BodyPart { //paws of ferals
                 throw new Error("unknown HandsPaw-style "+id);
         }
     }
-    getStyle() { return this.data.style; }
-    get descShort() { return (this.desc);}
-    get desc() { return this.data.style+'\'like paws.';}
-    toJSON() {return window.storage.Generic_toJSON("HandsPaw", this); };
-    static fromJSON(value) {return(window.storage.Generic_fromJSON(HandsPaw, value.data));}
-    descLong(fconv) { 
+    getStyle(){ return this.data.style; }
+    get descShort(){ return (this.desc);}
+    get desc(){ return this.data.style+'\'like paws.';}
+    toJSON(){return window.storage.Generic_toJSON("HandsPaw", this); };
+    static fromJSON(value){return(window.storage.Generic_fromJSON(HandsPaw, value.data));}
+    descLong(fconv){ 
         return(fconv('$[I]$ $[have]$ paws like that of a '+this.data.style+'.'));
     }
     attackMod(target){
@@ -843,23 +843,23 @@ class HandsPaw extends BodyPart { //paws of ferals
     }
 }
 class HandsHoof extends BodyPart { //hoves of horse,...
-    static dataPrototype() {    
+    static dataPrototype(){    
         return({style:'horse'});
     }
-    static factory(id) {
+    static factory(id){
         let obj =  new HandsHoof();
         obj.setStyle(id);
         return(obj);
     }
-    constructor() {
+    constructor(){
         super('HandsHoof');
         this.addTags(['body']);
         this.slotUse = ['bHands'];
         this.data = HandsHoof.dataPrototype();
     }
-    setStyle(id) {
+    setStyle(id){
         this.data.style = id; 
-        switch(id) {
+        switch(id){
             case 'horse':
             case 'deer':
                 break;
@@ -867,12 +867,12 @@ class HandsHoof extends BodyPart { //hoves of horse,...
                 throw new Error("unknown HandsHoof-style "+id);
         }
     }
-    getStyle() { return this.data.style; }
-    get descShort() { return (this.desc);}
-    get desc() { return this.data.style+'\'like hoves.';}
-    toJSON() {return window.storage.Generic_toJSON("HandsHoof", this); };
-    static fromJSON(value) {return(window.storage.Generic_fromJSON(HandsHoof, value.data));}
-    descLong(fconv) { 
+    getStyle(){ return this.data.style; }
+    get descShort(){ return (this.desc);}
+    get desc(){ return this.data.style+'\'like hoves.';}
+    toJSON(){return window.storage.Generic_toJSON("HandsHoof", this); };
+    static fromJSON(value){return(window.storage.Generic_fromJSON(HandsHoof, value.data));}
+    descLong(fconv){ 
         return(fconv('$[I]$ $[have]$ hoves like that of a '+this.data.style+'.'));
     }
     attackMod(target){
@@ -884,23 +884,23 @@ class HandsHoof extends BodyPart { //hoves of horse,...
     }
 }
 class HandsHuman extends BodyPart { //hands with digits to use tools
-    static dataPrototype() {    
+    static dataPrototype(){    
         return({style:'human'});
     }
-    static factory(id) {
+    static factory(id){
         let obj =  new HandsHuman();
         obj.setStyle(id);
         return(obj);
     }
-    constructor() {
+    constructor(){
         super('HandsHuman');
         this.addTags(['body']);
         this.slotUse = ['bHands'];
         this.data = HandsHuman.dataPrototype();
     }
-    setStyle(id) {
+    setStyle(id){
         this.data.style = id; 
-        switch(id) {
+        switch(id){
             case 'dog':
             case 'fox':
             case 'wolf':
@@ -916,12 +916,12 @@ class HandsHuman extends BodyPart { //hands with digits to use tools
                 throw new Error("unknown Hands-style "+id);
         }
     }
-    getStyle() { return this.data.style; }
-    get descShort() { return (this.desc);}
-    get desc() { return ('human like hands.');}
-    toJSON() {return window.storage.Generic_toJSON("HandsHuman", this); };
-    static fromJSON(value) {return(window.storage.Generic_fromJSON(HandsHuman, value.data));}
-    descLong(fconv) { 
+    getStyle(){ return this.data.style; }
+    get descShort(){ return (this.desc);}
+    get desc(){ return ('human like hands.');}
+    toJSON(){return window.storage.Generic_toJSON("HandsHuman", this); };
+    static fromJSON(value){return(window.storage.Generic_fromJSON(HandsHuman, value.data));}
+    descLong(fconv){ 
         let msg = '$[My]$ hands look just like any humans.';
         msg += ['horse','deer'].includes(this.data.style)?(this.data.style+'-hoofes adorn the fingertips'):'';
         msg += ['dog','wolf','cat','bunny'].includes(this.data.style)?(this.data.style+'-claws adorn the fingertips'):'';
@@ -930,24 +930,24 @@ class HandsHuman extends BodyPart { //hands with digits to use tools
     }
 }
 class Wings extends BodyPart { //wings attached to back or as arms  <- todo
-    static dataPrototype() {    
+    static dataPrototype(){    
         return({style:'feathered', size:1}); 
         //todo flight-skill depends on wing-to-body-size; 1=can fly permanently, <0.5 cant fly, >1.5 can fly fast
     }
-    static factory(id) {
+    static factory(id){
         let obj =  new Wings();
         obj.setStyle(id);
         return(obj);
     }
-    constructor() {
+    constructor(){
         super('Wings');
         this.addTags(['body']);
         this.slotUse = ['bWings'];
         this.data = Wings.dataPrototype();
     }
-    setStyle(id) {
+    setStyle(id){
         this.data.style = id; 
-        switch(id) {
+        switch(id){
             case 'chitinous':
                 break;
             case 'leathery':
@@ -958,45 +958,45 @@ class Wings extends BodyPart { //wings attached to back or as arms  <- todo
                 throw new Error("unknown Wings-style "+id);
         }
     }
-    getStyle() { return this.data.style; }
-    get descShort() { return (this.desc);}
-    get desc() { return (this.data.style+' wings.');}
-    toJSON() {return window.storage.Generic_toJSON("Wings", this); };
-    static fromJSON(value) {return(window.storage.Generic_fromJSON(Wings, value.data));}
-    descLong(fconv) { 
+    getStyle(){ return this.data.style; }
+    get descShort(){ return (this.desc);}
+    get desc(){ return (this.data.style+' wings.');}
+    toJSON(){return window.storage.Generic_toJSON("Wings", this); };
+    static fromJSON(value){return(window.storage.Generic_fromJSON(Wings, value.data));}
+    descLong(fconv){ 
         let msg = 'A pair of '+this.data.style+' wings are located on $[my]$ back.';
         return(fconv(msg));
     }
-    onEquip(context) {
+    onEquip(context){
         let old = context.parent.Skills.countItem(SkillFly.name);
         if(old>0) context.parent.Skills.removeItem(SkillFly.name,old);
         context.parent.Skills.addItem(new SkillFly());
         return({OK:true, msg:'shifted'});
     }
-    onUnequip() {
+    onUnequip(){
         let old = this.parent.parent.Skills.countItem(SkillFly.name);
         if(old>0) this.parent.parent.Skills.removeItem(SkillFly.name,old);
         return({OK:true, msg:'shifted'});
     }
 }
 class BreastHuman extends BodyPart {
-    static dataPrototype() {    
+    static dataPrototype(){    
         return({style:'human',growth:0.1, maxGrowth: 1.5});
     }
-    static factory(id) {
+    static factory(id){
         let obj =  new BreastHuman();
         obj.setStyle(id);
         return(obj);
     }
-    constructor() {
+    constructor(){
         super('BreastHuman');
         this.addTags(['body']);
         this.slotUse = ['bBreast'];
         this.data = BreastHuman.dataPrototype();
     }
-    setStyle(id) {
+    setStyle(id){
         this.data.style = id;
-        switch(id) {
+        switch(id){
             case 'human':
             case 'horse':
                 break;
@@ -1012,33 +1012,33 @@ class BreastHuman extends BodyPart {
                 throw new Error("unknown breast-style "+id);
         }
     }
-    getStyle() { return this.data.style; }
-    get descShort() { return (this.desc);}
-    get desc() { return 'some '+this.data.style+' breasts.';}
-    toJSON() {return window.storage.Generic_toJSON("BreastHuman", this); };
-    static fromJSON(value) {return(window.storage.Generic_fromJSON(BreastHuman, value.data));}
-    descLong(fconv) { 
+    getStyle(){ return this.data.style; }
+    get descShort(){ return (this.desc);}
+    get desc(){ return 'some '+this.data.style+' breasts.';}
+    toJSON(){return window.storage.Generic_toJSON("BreastHuman", this); };
+    static fromJSON(value){return(window.storage.Generic_fromJSON(BreastHuman, value.data));}
+    descLong(fconv){ 
         return(fconv('$[My]$ breasts are small but perky.'));
     }
 }
 class AnusHuman extends BodyPart {
-    static dataPrototype() {    
+    static dataPrototype(){    
         return({virgin:true,wetgen:1, stretch:1,depth:1,spermtype:'',sperm:0});
     }
-    static factory(id) {
+    static factory(id){
         let obj =  new AnusHuman();
         obj.setStyle(id);
         return(obj);
     }
-    constructor() {
+    constructor(){
         super('AnusHuman');
         this.addTags(['body']);
         this.slotUse = ['bAnus'];
         this.data = AnusHuman.dataPrototype();
     }
-    setStyle(id) {
+    setStyle(id){
         this.data.style = id;
-        switch(id) {
+        switch(id){
             case 'human':
             case 'bird':
             case 'cat':
@@ -1053,52 +1053,52 @@ class AnusHuman extends BodyPart {
                 throw new Error("unknown anus-style "+id);
         }
     }
-    getStyle() { return this.data.style; }
-    get descShort() { return(this.data.style+' hole');}
-    get desc() { return 'tailhole';}
-    toJSON() {return window.storage.Generic_toJSON("AnusHuman", this); };
-    static fromJSON(value) {return(window.storage.Generic_fromJSON(AnusHuman, value.data));}
-    descLong(fconv) {
+    getStyle(){ return this.data.style; }
+    get descShort(){ return(this.data.style+' hole');}
+    get desc(){ return 'tailhole';}
+    toJSON(){return window.storage.Generic_toJSON("AnusHuman", this); };
+    static fromJSON(value){return(window.storage.Generic_fromJSON(AnusHuman, value.data));}
+    descLong(fconv){
         let msg= "$[My]$ anus can snuggly fit around "+this.data.stretch+"cm in diameter and "+this.data.depth+"cm in depth.";
-        if(this.data.spermtype!=='') {
+        if(this.data.spermtype!==''){
             msg+= this.data.sperm+"ml of sperm from a "+this.data.spermtype+" might be deposited in $[my]$ bum.";  
         }
         return(fconv(msg));
     }
-    addSperm(type,amount) {
-        if(amount>this.data.sperm || this.data.spermtype) {
+    addSperm(type,amount){
+        if(amount>this.data.sperm || this.data.spermtype){
             this.data.spermtype=type;
         }
         this.data.sperm+=amount;
     }
-    removeSperm(amount) {
-        if(amount>0) {
+    removeSperm(amount){
+        if(amount>0){
             this.data.sperm-=amount;
         } else this.data.sperm=0;
-        if(this.data.sperm<=0) {
+        if(this.data.sperm<=0){
             this.data.sperm=0;this.data.spermtype='';
         }
     }
 }
 //variation: snatch - cooch - slit - cunt - cooter - fuck-hole - 
 class VulvaHuman extends BodyPart {
-    static dataPrototype() {    
+    static dataPrototype(){    
         return({labia:0, virgin:true,wetgen:1, stretch:1,depth:1,clitsize:0.5, spermtype:'',sperm:0});
     }
-    static factory(id) {
+    static factory(id){
         let obj =  new VulvaHuman();
         obj.setStyle(id);
         return(obj);
     }
-    constructor() {
+    constructor(){
         super('VulvaHuman');
         this.addTags(['body']);
         this.slotUse = ['bVulva'];
         this.data = VulvaHuman.dataPrototype();
     }
-    setStyle(id) {
+    setStyle(id){
         this.data.style = id;
-        switch(id) {
+        switch(id){
             case 'human':
             case 'bird':
             case 'cat':
@@ -1113,15 +1113,15 @@ class VulvaHuman extends BodyPart {
                 throw new Error("unknown vulva-style "+id);
         }
     }
-    getStyle() { return this.data.style; }
-    get descShort() { return(this.data.style+' vagina');}
-    get desc() { return 'puffy cunt';}
-    toJSON() {return window.storage.Generic_toJSON("VulvaHuman", this); };
-    static fromJSON(value) {return(window.storage.Generic_fromJSON(VulvaHuman, value.data));}
-    descLong(fconv) {
+    getStyle(){ return this.data.style; }
+    get descShort(){ return(this.data.style+' vagina');}
+    get desc(){ return 'puffy cunt';}
+    toJSON(){return window.storage.Generic_toJSON("VulvaHuman", this); };
+    static fromJSON(value){return(window.storage.Generic_fromJSON(VulvaHuman, value.data));}
+    descLong(fconv){
         let msg= "$[My]$ vagina can snuggly fit around "+this.data.stretch+"cm in diameter and "+this.data.depth+"cm in depth.";
         msg+= "Its clit is of a size of around "+this.data.clitsize+"cm."; 
-        if(this.data.spermtype!=='') {
+        if(this.data.spermtype!==''){
             msg+= this.data.sperm+"ml of sperm from a "+this.data.spermtype+" might be deposited in $[my]$ womb.";  
         }
         return(fconv(msg));
@@ -1131,45 +1131,45 @@ class VulvaHuman extends BodyPart {
         context.parent.addEffect(new window.storage.constructors['effVaginalFertil'](),'effVaginalFertil');
         return({OK:true,msg:'equipped'});
     }
-    onUnequip(context) {
+    onUnequip(context){
         context.parent.Effects.removeItem('effVaginalFertil');
         context.parent.Effects.removeItem('effVaginalPregnant');
         //context.parent.Effects.removeItem('effSpermDecay');
         return({OK:true,msg:'unequipped'});
     }
-    addSperm(type,amount) {
-        if(amount>this.data.sperm || this.data.spermtype) {
+    addSperm(type,amount){
+        if(amount>this.data.sperm || this.data.spermtype){
             this.data.spermtype=type;
         }
         this.data.sperm+=amount;
     }
-    removeSperm(amount) {
-        if(amount>0) {
+    removeSperm(amount){
+        if(amount>0){
             this.data.sperm-=amount;
         } else this.data.sperm=0;
-        if(this.data.sperm<=0) {
+        if(this.data.sperm<=0){
             this.data.sperm=0;this.data.spermtype='';
         }
     }
 }
 class PenisHuman extends BodyPart {
-    static dataPrototype() {    
+    static dataPrototype(){    
         return({style:'human',maxGrowth:0.2,growth:0.4, virgin:true, wetgen:1,sheath:0, ballsize:0.01});
     }
-    static factory(id) {
+    static factory(id){
         let obj =  new PenisHuman();
         obj.setStyle(id);
         return(obj);
     }
-    constructor() {
+    constructor(){
         super('PenisHuman');
         this.addTags(['body']);
         this.slotUse = ['bPenis','bBalls'];
         this.data = PenisHuman.dataPrototype();   
     }
-    setStyle(id) {
+    setStyle(id){
         this.data.style = id;
-        switch(id) {
+        switch(id){
             case 'human':
             case 'bird':    //todo split this in different classes?
             case 'cat':
@@ -1185,11 +1185,11 @@ class PenisHuman extends BodyPart {
                 throw new Error("unknown penis-style "+id);
         }
     }
-    getStyle() { return this.data.style; }
-    get descShort() { return (this.desc);}
-    get desc() { 
+    getStyle(){ return this.data.style; }
+    get descShort(){ return (this.desc);}
+    get desc(){ 
         var msg ='';
-        switch(this.data.style) {
+        switch(this.data.style){
             case 'cat':
                 msg ='a slim but spiked cat-member.';
             break;
@@ -1198,13 +1198,13 @@ class PenisHuman extends BodyPart {
         }
         return(msg);
     }
-    toJSON() {return window.storage.Generic_toJSON("PenisHuman", this); };
-    static fromJSON(value) {return(window.storage.Generic_fromJSON(PenisHuman, value.data));}
-    canEquip(context) {return({OK:true, msg:'equipable'});}
-    canUnequip() {return({OK:true, msg:'unequipable'});}
-    descLong(fconv) {
+    toJSON(){return window.storage.Generic_toJSON("PenisHuman", this); };
+    static fromJSON(value){return(window.storage.Generic_fromJSON(PenisHuman, value.data));}
+    canEquip(context){return({OK:true, msg:'equipable'});}
+    canUnequip(){return({OK:true, msg:'unequipable'});}
+    descLong(fconv){
         let msg= "$[My]$ "+this.data.style+"-dong is around "+this.sizeString(this.data.growth*this.data.maxGrowth)+" long.";
-        if(this.data.style==='lizard' || this.data.style==='bird') {
+        if(this.data.style==='lizard' || this.data.style==='bird'){
             msg+= "The testicles are hidden inside the body but might be around "+this.sizeString(this.data.ballsize*this.data.maxGrowth)+" .";
         } else {
             msg+= "A Ballsack dangles below it that measures around "+this.sizeString(this.data.ballsize*this.data.maxGrowth)+" .";   
@@ -1213,7 +1213,7 @@ class PenisHuman extends BodyPart {
     }
 }
 //todo BodyPartLib ??
-window.gm.ItemsLib = (function (ItemsLib) {
+window.gm.ItemsLib = (function (ItemsLib){
     window.storage.registerConstructor(AnusHuman);
     window.storage.registerConstructor(ArmorTorso);
     window.storage.registerConstructor(WeaponSlobber);

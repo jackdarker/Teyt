@@ -19,7 +19,7 @@ var qDogSitLib = [ [0,'unknown'],
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 <% window.gm.player.location=window.passage.name;
-if(s.vars.qDogSit<0x200) { s.vars.qDogSit=0x100; %>
+if(s.vars.qDogSit<0x200){ s.vars.qDogSit=0x100; %>
     A closer look on the paper reveals that it is an advertisment for an agency where you can rent people for dog-sitting.</br>
     There is also a sidenote that new dog-sitters are hired and payed 20-100$ per hour.</br>
     That sounds like easy money. Maybe you should call them and see if this is something for you.</br>
@@ -59,9 +59,9 @@ Todo: explain job</br>
 [[Ignore the ad|<%=window.gm.player.location%>]]</br>
 </article><article id="LogPanel"></article></section>
 <script>
-function choice(elmt,replaceThis) {
+function choice(elmt,replaceThis){
 	var msg ='';
-	if(elmt.id==="yes") {
+	if(elmt.id==="yes"){
 	window.story.state.vars.qDogSit=0x300;
 	msg = "You aggreed to visit them.</br>";
 	} else {
@@ -76,7 +76,7 @@ function choice(elmt,replaceThis) {
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 <% window.gm.player.location=window.passage.name;
-if(s.vars.qDogSit<0x400) { s.vars.qDogSit=0x400; %>
+if(s.vars.qDogSit<0x400){ s.vars.qDogSit=0x400; %>
 <!--intro-->
 Walking down the street you finally find the dogsit-center. Its located in the ground floor of an old appartment.
 A small name plate showing the outline of a dog and a human states that you have found the dogsit-center.

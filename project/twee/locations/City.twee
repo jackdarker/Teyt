@@ -7,10 +7,10 @@ You are actually at [[<%=window.gm.player.location%>]].
 Where would you like to go from here?</br>
 <a0 onclick=window.gm.rollExploreCity()>Explore your surroundings</a> </br></br>
 [[Home]]
-<%  if(s.vars.qUnlockPark>0) {      %>[[Park]]
-<%}; if(s.vars.qUnlockMall>0) {     %>[[Mall]]
-<%}; if(s.vars.qUnlockDowntown>0) { %>[[Downtown]]
-<%}; if(s.vars.qUnlockBeach>0) {    %>[[Beach]]
+<%  if(s.vars.qUnlockPark>0){      %>[[Park]]
+<%}; if(s.vars.qUnlockMall>0){     %>[[Mall]]
+<%}; if(s.vars.qUnlockDowntown>0){ %>[[Downtown]]
+<%}; if(s.vars.qUnlockBeach>0){    %>[[Beach]]
 <%};%>
 </article><article id="LogPanel"></article></section>
 
@@ -18,15 +18,15 @@ Where would you like to go from here?</br>
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 <%window.gm.player.location=window.passage.name;
-if(s.vars.qUnlockMall==0) {s.vars.qUnlockMall=1;%>
+if(s.vars.qUnlockMall==0){s.vars.qUnlockMall=1;%>
 You found the <%=window.passage.name%> ! </br></br>
 <%}%>
 You are actually at [[<%=window.gm.player.location%>]].
 Where would you like to go from here?</br>
 <a0 onclick=window.gm.rollExploreCity()>Explore your surroundings</a> </br></br>
 [[Into the Mall|Mall 0F]]</br> [[Home]]</br>
-<%  if(s.vars.qUnlockPark>0) {      %>[[Park]]</br>
-<%}; if(s.vars.qUnlockBeach>0) {      %>[[Beach]]</br>
+<%  if(s.vars.qUnlockPark>0){      %>[[Park]]</br>
+<%}; if(s.vars.qUnlockBeach>0){      %>[[Beach]]</br>
 <%};%>
 </article><article id="LogPanel"></article></section>
 
@@ -34,35 +34,35 @@ Where would you like to go from here?</br>
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 <%window.gm.player.location=window.passage.name;
-if(s.vars.qUnlockPark==0) {s.vars.qUnlockPark=1;%>
+if(s.vars.qUnlockPark==0){s.vars.qUnlockPark=1;%>
 You found the <%=window.passage.name%> ! </br></br>
 <%}%>
 You are actually at [[<%=window.gm.player.location%>]].</br>
 People in sportswear are jogging around the paths or doing gymnastics on the grassfield. Maybe you should also do some [[sports|Park_Jogging]] </br> 
-<%if(s.vars.qDogSit===0 && visited(window.passage.name)>=5) {%>
+<%if(s.vars.qDogSit===0 && visited(window.passage.name)>=5){%>
     On a direction sign near the entrance of the park you spot a piece of paper that someone must have placed there.</br>
     Would you like to check whats up with the [[Sign|Park_DogsitAd]].
-<%} else if(s.vars.qDogSit>0) {%>
+<%} else if(s.vars.qDogSit>0){%>
     [[DogSit-ad|Park_DogsitAd]]
 <%}%>
 Where would you like to go from here?</br>
 <a0 onclick=window.gm.rollExploreCity()>Explore your surroundings</a> </br></br>
 [[Home]]</br>
-<%  if(s.vars.qUnlockMall>0) {      %>[[Mall]]</br>
+<%  if(s.vars.qUnlockMall>0){      %>[[Mall]]</br>
 <%};%>
 </article><article id="LogPanel"></article></section>
 
 :: Park_Jogging [_back_]
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
-<%if(window.gm.player.Stats.get('energy').value<=50) {%>
+<%if(window.gm.player.Stats.get('energy').value<=50){%>
 You feel you dont have enough energy left to do anything sporty. Maybe another time. </br>
 
 <%} else {%>
 After a quick warmup and stretching you take a fast pace jog around the outer paths of the park.</br>
 <p class='red'>Energy -50</p>
 <% window.gm.player.Stats.increment('energy',-50);
-  if(window.gm.player.Stats.get('endurance').value<=6 && visited(window.passage.name)%2) {%>
+  if(window.gm.player.Stats.get('endurance').value<=6 && visited(window.passage.name)%2){%>
     After several rounds you are exhausted. But happy.
     This really seems to improve your fitness.
     <p class='green'>Endurance +1</p>
@@ -77,7 +77,7 @@ After a quick warmup and stretching you take a fast pace jog around the outer pa
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 <%window.gm.player.location=window.passage.name;
-if(s.vars.qUnlockBeach==0) {s.vars.qUnlockBeach=1;%>
+if(s.vars.qUnlockBeach==0){s.vars.qUnlockBeach=1;%>
 You found the <%=window.passage.name%> ! </br></br>
 <%}%>
 You are actually at [[<%=window.gm.player.location%>]].</br></br>
@@ -88,7 +88,7 @@ You could wander at the shoreline. Maybe you find some jetsam.</br>
 Where would you like to go from here?</br>
 <a0 onclick=window.gm.rollExploreCity()>Explore your surroundings</a> </br></br>
 [[Home]]</br>
-<%  if(s.vars.qUnlockMall>0) {      %>[[Mall]]</br>
+<%  if(s.vars.qUnlockMall>0){      %>[[Mall]]</br>
 <%};%>
 </article><article id="LogPanel"></article></section>
 
@@ -97,14 +97,14 @@ Where would you like to go from here?</br>
 <section> 
 <aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 <%window.gm.player.location=window.passage.name;
-if(s.vars.qUnlockDowntown===0) {s.vars.qUnlockDowntown=1;%>
+if(s.vars.qUnlockDowntown===0){s.vars.qUnlockDowntown=1;%>
 You found the <%=window.passage.name%> ! </br></br>
 <%}%>
 You are actually at [[<%=window.gm.player.location%>]].
 Where would you like to go from here?</br>
 <a0 onclick=window.gm.rollExploreCity()>Explore your surroundings</a> </br></br>
 [[Home]]</br>
-<%  if(s.vars.qUnlockMall>0) {      %>[[Mall]]<%};%>
+<%  if(s.vars.qUnlockMall>0){      %>[[Mall]]<%};%>
 [[Harcon_Health]]
 </br>
 </article><article id="LogPanel"></article></section>
@@ -113,7 +113,7 @@ Where would you like to go from here?</br>
 :: Pawn shop [_back_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 <%window.gm.player.location=window.passage.name;%>
-<%if((s.vars.qUnlockDowntown & 0x2)===0) {s.vars.qUnlockDowntown|=0x2;%>
+<%if((s.vars.qUnlockDowntown & 0x2)===0){s.vars.qUnlockDowntown|=0x2;%>
 You found the <%=window.passage.name%> ! </br></br>
 <%}%>
 A sign denoting "quick money - no questions" sparks your interest. It leads you to a pawn shop where you can trade in your valuables to get some money.</br>
