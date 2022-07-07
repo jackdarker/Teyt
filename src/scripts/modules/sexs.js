@@ -75,9 +75,9 @@ window.gm.sex.updateScene=function(entry){
     //s.combat.playerParty  detect scene by available actors?
     let data = {state:0 , battleResul:battleResult, player:s._gm.activePlayer }; //data should not contain objects beause using object.assign!
     data.foes = [];
-    for(el of s.combat.enemyParty)
+    for(var n of s.combat.enemyParty)
     {
-        data.foes.push(String.toLowerCase(el.id));
+        data.foes.push(String.toLowerCase(n.id));
     }
     data.foes.sort();
 
@@ -192,7 +192,7 @@ window.gm.sex.wolfOnPlayer=function(data){
     window.gm.sex.updateScene(entry); 
 };
 window.gm.sex.succubusOnPlayer=function(data){ //todo
-    let foo = window.gm.sex.dryadOnPlayer;
+    let foo = window.gm.sex.succubusOnPlayer;
     let player = window.gm.player;
     let foe = window.story.state.combat.enemyParty[0]; //todo
     window.gm.sex.beginScene();
@@ -201,7 +201,7 @@ window.gm.sex.succubusOnPlayer=function(data){ //todo
     let newdata = {};//need a copy to create different data-values
     if(data.state<0){ //quit if scene is done
         if(data.battleResult==='victory') window.gm.postVictory(); 
-        else window.gm.postDefeat(); //todo flee, submit, defeat
+        else window.gm.postDefeat();
         return;
     } else if(data.state===0){ //start-menu
         if(data.battleResult==='victory'){
@@ -219,17 +219,37 @@ window.gm.sex.succubusOnPlayer=function(data){ //todo
             newdata.state=-1;
             createButton('Walk away',foo.bind(null,newdata));
         } else {
-            entry.textContent ="The succubus strides over to your defeated form.</br> \"Lets see what we have here...\"</br>";
-            data.state='plSubOrgasm';
-            createButton('Get Dommed',foo.bind(null,data));
+            entry.innerHTML ="The succubus strides over to your defeated form.</br> \"Lets see what we have here...\"</br>";
+            if(!player.hasEffect(effLewdMark.name)){
+                data.state='plLewdMark';
+                newdata = {},Object.assign(newdata,data);
+                createButton('Next',foo.bind(null,newdata));
+            } else {
+                data.state='plDone';
+                createButton('Next',foo.bind(null,data));
+            }
         }
-    } else if(data.state==='plSubOrgasm'){
-            entry.textContent ="serving the Succubus";
-            data.state=-1;
-            Object.assign(newdata,data);
-            createButton("Pass out",foo.bind(null,newdata));
-        }
-        window.gm.sex.updateScene(entry); 
+    } else if(data.state==='plLewdMark'){
+        entry.innerHTML ="\"Dont worry I not interested in your puny little soul. Instead I have a gift for you...\"</br>";
+        entry.innerHTML+="The strange woman speaks some words and blows a kiss at you.</br> Surprised by some heat developing below your belly button you open your garments to check on that.</br>"
+        entry.innerHTML+="Your skin is imprinted with some purple lines that form an odd heart-shapped tattoo!</br>"
+        data.state="plAcceptLewdMark";
+        Object.assign(newdata,data);
+        createButton("Next",foo.bind(null,newdata));
+    } else if(data.state==='plAcceptLewdMark'){
+        player.Outfit.addItem(new window.gm.ItemsLib["LewdMark"]());
+        entry.innerHTML = '<svg height="100px">'+window.gm.images["tattoo_womb_lewdsign"]()+"</svg>"
+        entry.innerHTML+="The lines fade away after some time but you can be sure that whatever magic she marked you with is still there.</br>"
+        data.state=-1;
+        Object.assign(newdata,data);
+        createButton("Pass out",foo.bind(null,newdata));
+    } else if(data.state==='plDone'){
+        entry.innerHTML ="She doesnt seem to have any more use of you and walks away.";
+        data.state=-1;
+        Object.assign(newdata,data);
+        createButton("Pass out",foo.bind(null,newdata));
+    }
+    window.gm.sex.updateScene(entry); 
     /**
      * 
      */

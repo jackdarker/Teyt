@@ -89,7 +89,7 @@ window.gm.util.addShortKeyHandler=function(){
     var tags=window.story.passage(window.passage.name).tags;
     
     if (!tags.includes("_noshortkey_")){
-      var el;
+      var n;
       /*different way to dispatch events const event = new MouseEvent('click', {
         view: window, bubbles: true, cancelable: true
       });
@@ -97,26 +97,26 @@ window.gm.util.addShortKeyHandler=function(){
       
       // Trigger link click on keys "0" through "9"
       if ((e.keyCode > 47) && (e.keyCode < 58)){
-        el=document.querySelector("#Link" + (e.keyCode - 48));
-        if(el){
+        n=document.querySelector("#Link" + (e.keyCode - 48));
+        if(n){
           e.preventDefault();
           //$("#Link" + (e.keyCode - 48)).trigger("click"); dont use jquery - click is not working if bound by addEventListener
-          el.click();
+          n.click();
         }
       }
       // Trigger link click on numpad keys "0" through "9"
       if ((e.keyCode > 95) && (e.keyCode < 106)){
-        el=document.querySelector("#Link" + (e.keyCode - 96));
-        if (el){
+        n=document.querySelector("#Link" + (e.keyCode - 96));
+        if (n){
           e.preventDefault();
-          el.click();
+          n.click();
         }
       }
       if (["d","i","s","o","q"].indexOf(e.key)>=0){ //some special keys of hud
-        el=document.querySelector("#Link" + e.key.toUpperCase());
-        if (el){
+        n=document.querySelector("#Link" + e.key.toUpperCase());
+        if (n){
           e.preventDefault();
-          el.click();
+          n.click();
         }
       }
       // Trigger random click on "." key
@@ -141,8 +141,8 @@ window.gm.util.addShortKeyHandler=function(){
 //create pretty name for passage; requires a tag (replace space with _ !) [name:"My_Room"]
 window.gm.util.printLocationName=function(passage){
   let tags = window.story.passage(passage).tags;
-  for(el of tags){
-    let ar = el.split(":");    
+  for(var n of tags){
+    let ar = n.split(":");    
     if(ar.length>1 && ar[0]==='name'){
       return(ar[1].split('_').join(' '));
     }
@@ -250,7 +250,10 @@ window.gm.initGame= function(forceReset,NGP=null){
       window.gm.refreshSidePanel();
       window.gm.restorePage();
     });
-    
+    $(window).on('sm.story.error', function(event, eventObject) {
+      // window.story
+        console.log(eventObject);
+    });
     if (!window.gm.timeEvent||forceReset){
       window.gm.timeEvent = window.gm.util.PubSub();  //subscribe to "change" event to receive time updates
       // !! make sure to reregister after load !
@@ -585,7 +588,7 @@ window.story.__proto__.show = function(idOrName, noHistory = false){
   }
   noHistory = true; //the engines object causes problems with history, namely refToParent
   _origStoryShow.call(window.story,next, noHistory);
-  
+  if(window.story.errorMessage!=='') return; //abort on error to not overwrite first error
   window.gm.util.updateLinks();
 	// Search passages for links every x ms, just in case they get updated, and marks them for key clicks
 	//KBIntervalID = setInterval(window.gm.util.updateLinks,1000);  todo do we need this?
@@ -765,11 +768,11 @@ window.gm.printItemTransfer = function(from,to,wardrobe){
   if(wardrobe) listFrom=from.Wardrobe.getAllIds(), listTo=to.Wardrobe.getAllIds(); 
   else listFrom=from.Inv.getAllIds(), listTo=to.Inv.getAllIds();
   let allIds = new Map();
-  for(let el of listTo){
-    allIds.set(el,{name:wardrobe?to.Wardrobe.getItem(el).name:to.Inv.getItem(el).name});
+  for(let n of listTo){
+    allIds.set(n,{name:wardrobe?to.Wardrobe.getItem(n).name:to.Inv.getItem(n).name});
   }
-  for(let el of listFrom){
-    allIds.set(el,{name:wardrobe?from.Wardrobe.getItem(el).name:from.Inv.getItem(el).name});
+  for(let n of listFrom){
+    allIds.set(n,{name:wardrobe?from.Wardrobe.getItem(n).name:from.Inv.getItem(n).name});
   }
   listFrom = Array.from(allIds.keys());listFrom.sort();
   function give(id,amount,charA,charB){

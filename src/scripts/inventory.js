@@ -41,6 +41,8 @@ class Item {
             if(!this.tags.includes(tags[i])) this.tags.push(tags[i]);
         }
     }
+    //returns the svg-piture name to display in inventory or wardrobe
+    get pictureInv(){return ("unknown")}
     //implement this for description
     get desc(){ return(this.descShort);}
     //implement this for description

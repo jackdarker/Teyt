@@ -35,8 +35,8 @@ initCombat(){
   let s=window.story.state;
   s.combat.enemyParty = this.EnemyFunc();
   s.combat.playerParty = [];
-  for(let el of s._gm.playerParty){
-    s.combat.playerParty.push(s[el]);
+  for(let n of s._gm.playerParty){
+    s.combat.playerParty.push(s[n]);
   }
   s.combat.turnStack = [];
   s.combat.actor = s.combat.target = s.combat.action = null;
@@ -60,25 +60,46 @@ initCombat(){
  * @return {*} 
  * @memberof Encounter
  */
-spawnChar(item,party){
+spawnChar(item,party,level){
   let s=window.story.state;
   let mob = window.gm.Mobs[item]();
-  mob.scaleLevel(window.gm.player.level);//todo level equal to spawner?
+  mob.scaleLevel(level);
   mob.faction = party,mob.despawn=true;
   let list = s.combat.enemyParty.concat(s.combat.playerParty);
   let uid=1;//need to build unique id
-  for(el of list){
-    if(mob.__proto__.isPrototypeOf(el)){
+  for(var n of list){
+    if(mob.__proto__.isPrototypeOf(n)){
       //expecting Mole#2
-      uid = Math.max(uid,parseInt(el.name.split('#')[1],10)+1);
+      uid = Math.max(uid,parseInt(n.name.split('#')[1],10)+1);
     };
   }
   mob.name = mob.name+"#"+uid.toString(); //need unique name !!
-  if(party === 'Player'){
+  if(mob.faction === 'Player'){
     mob.calcCombatMove=null; //hack to disable AI  todo
     s.combat.playerParty.push(mob);
   } else {
     s.combat.enemyParty.push(mob);
+  }
+  return(mob.name);
+}
+replaceChar(item,old){
+  let s=window.story.state;
+  let mob = window.gm.Mobs[item](); //todo needs sub-type
+  mob.scaleLevel(old.level);//todo level equal to old?
+  mob.faction = old.faction,mob.despawn=false;
+  let uid=parseInt(old.name.split('#')[1],10)
+  mob.name = mob.name+"#"+uid.toString(); //need unique name !!
+  let list
+  if(mob.faction === 'Player'){
+    mob.calcCombatMove=null; //hack to disable AI  todo
+    list=s.combat.playerParty
+  } else {
+    list=s.combat.enemyParty
+  }
+  for(var i=0;i< list.length;i++){
+    if(list[i].name===old.name){
+      list[i]=mob; break;
+    }
   }
   return(mob.name);
 }
@@ -101,7 +122,7 @@ renderCombatScene(){
   }
   holder=SVG().group({id:'holder'}).addTo(draw);
   //todo images flash when redrawing page; blitting backbuffer doesnt help: var draw2 = SVG(); -> draw2.addTo(draw);
-  let el,subnodes,i,list=[],list2 = window.story.state.combat.enemyParty;
+  let n,subnodes,i,list=[],list2 = window.story.state.combat.enemyParty;
   for(i=list2.length-1;i>=0;i--){
     if(!list2[i].isKnockedOut()){ //todo show deathsprite
       list.push(list2[i]);
@@ -127,14 +148,14 @@ renderCombatScene(){
         //hide parts of sprite
         var penis=(list[i].getPenis()!==null),vagina=(list[i].getVagina()!==null),arousal=list[i].arousal().value;
         subnodes= node.find('[data-male]');
-        for(el of subnodes){penis?el.show():el.hide(); }
+        for(n of subnodes){penis?n.show():n.hide(); }
         subnodes= node.find('[data-female]');
-        for(el of subnodes){vagina?el.show:el.hide(); }
+        for(n of subnodes){vagina?n.show:n.hide(); }
         subnodes= node.find('[data-arousal]');
-        for(el of subnodes){
-          var y = el.attr('data-arousal').split(',');
+        for(n of subnodes){
+          var y = n.attr('data-arousal').split(',');
           var x1= parseInt(y[0],10),x2= parseInt(y[1],10);
-          if(arousal<x1 ||arousal>x2 ) el.hide(); else el.show();
+          if(arousal<x1 ||arousal>x2 ) n.hide(); else n.show();
         }
       }
       node.addTo(holder);
@@ -255,8 +276,8 @@ printTargetList(){
   var skill = s.combat.actor.Skills.getItem(s.combat.action);
   var all = s.combat.playerParty.concat(s.combat.enemyParty);
   var targets = [];
-  for( el of all){
-    targets.push([el]); //need [[],[]]
+  for(var n of all){
+    targets.push([n]); //need [[],[]]
   }
   var info = document.createElement('p');
   info.textContent = skill.desc;
@@ -353,27 +374,26 @@ endCombat(){
  * call this onVictory to grab loot & XP from Mobs
  */
 fetchLoot(){ //if you are victorious: grant XP & transfer Loot to player 
-  let s=window.story.state;
-  let msg='';
-  let XP=0, maxLevel = 0, _rnd=_.random(0,100);
-  for (el of s.combat.playerParty){
-    maxLevel = Math.max(maxLevel,el.level);
+  let n,s=window.story.state;
+  let msg='',XP=0, maxLevel = 0, _rnd=_.random(0,100);
+  for (n of s.combat.playerParty){
+    maxLevel = Math.max(maxLevel,n.level);
   }
   let _x = window.gm.player.Stats.get('luck').value;
   _rnd = _rnd- Math.max(-25,Math.min(25,_x)); //player luck capped
-  for(el of s.combat.enemyParty){
-    for(var i = el.loot.length-1;i>=0;i--){
-      if(_rnd<=el.loot[i].chance){
-        msg+= el.loot[i].amount+'x '+el.loot[i].id+' ';
-        window.gm.player.changeInventory(window.gm.ItemsLib[el.loot[i].id](),el.loot[i].amount);
+  for(n of s.combat.enemyParty){
+    for(var i = n.loot.length-1;i>=0;i--){
+      if(_rnd<=n.loot[i].chance){
+        msg+= n.loot[i].amount+'x '+n.loot[i].id+' ';
+        window.gm.player.changeInventory(window.gm.ItemsLib[n.loot[i].id](),n.loot[i].amount);
       }
     }
     //XP reduced/increased if your level is bigger/smaller then foes by 25% per level
-    XP+=Math.floor(el.baseXPReward* Math.min(3,Math.max(0,1+(el.level-maxLevel)*0.25)));
+    XP+=Math.floor(n.baseXPReward* Math.min(3,Math.max(0,1+(n.level-maxLevel)*0.25)));
   }
   msg = '</br>You got some loot: '+window.gm.util.formatNumber(XP,0) +'XP '+msg+'</br>';
-  for (el of s.combat.playerParty){
-    el.addXP(XP);  //all get the same?
+  for (n of s.combat.playerParty){
+    n.addXP(XP);  //all get the same?
   }
   return(msg);
 }
@@ -711,13 +731,13 @@ window.gm.combat.calcAbsorb=function(attacker,defender, attack){
   let rnd = _.random(1,100);
   if(attack.mod.onCrit.length>0 && ((rnd<attack.mod.critChance) || attack.crit===true)){  //is critical
     attack.crit=true, result.msg = defender.name +' got critical hit by '+attacker.name+'. ';
-    for(el of attack.mod.onCrit){
-        attack.effects.push( {target:el.target, eff:el.eff}); //el.eff is []
+    for(var n of attack.mod.onCrit){
+        attack.effects.push( {target:n.target, eff:n.eff}); //n.eff is []
     }
   } else {
     result.msg = defender.name +' got hit by '+attacker.name+'.</br> ';
-    for(el of attack.mod.onHit){
-        attack.effects.push( {target:el.target, eff:el.eff});
+    for(var n of attack.mod.onHit){
+        attack.effects.push( {target:n.target, eff:n.eff});
     }
   }
   return(result);
@@ -770,25 +790,25 @@ window.gm.combat.scaleEffect = function(attack){
     let target,dmg,rst,arm=0;
     for(var i=0; i<op.length;i++){
       target = op[i].target;
-      for(el of op[i].eff){
-        if(el.id==="effDamage"){  //dmg = (attack-armor)*(100%-resistance) but min. 1pt
-          arm = target.Stats.getItem('arm_'+el.type).value;
-          rst = target.Stats.getItem('rst_'+el.type).value;
-          dmg = Math.max(1,(el.amount-arm)*(100-rst)/100);
-          el.amount=dmg;
+      for(var n of op[i].eff){
+        if(n.id==="effDamage"){  //dmg = (attack-armor)*(100%-resistance) but min. 1pt
+          arm = target.Stats.getItem('arm_'+n.type).value;
+          rst = target.Stats.getItem('rst_'+n.type).value;
+          dmg = Math.max(1,(n.amount-arm)*(100-rst)/100);
+          n.amount=dmg;
           if(target.Effects.findEffect("effMasochist").length>0){
             op[i].eff.push(effTeaseDamage.factory(dmg,'slut',{slut:1})); //todo lewd-calc
           }
         }
-        if(el.id==="effTeaseDamage"){
+        if(n.id==="effTeaseDamage"){
           //todo no dmg if blinded, stunned,
           //todo vulnerable if inHeat, like/dislike attacker
           //bondage-fetish -> bonus for bond-gear
-          el.amount *= 1+Math.sqrt(el.lewds.slut)/10; //bonus for slutty wear
+          n.amount *= 1+Math.sqrt(n.lewds.slut)/10; //bonus for slutty wear
           arm = target.Stats.getItem('arm_tease').value;
           rst = target.Stats.getItem('rst_tease').value;
-          dmg = Math.max(0,(el.amount-arm)*(100-rst)/100); //might cause 0 dmg
-          el.amount=dmg;
+          dmg = Math.max(0,(n.amount-arm)*(100-rst)/100); //might cause 0 dmg
+          n.amount=dmg;
         }
       }
     }

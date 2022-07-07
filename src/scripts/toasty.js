@@ -202,7 +202,7 @@
             fn = function (el, className){ return el.classList.contains(className); }
         } else {
             fn = function (el, className){
-                if (! el || ! el.className)
+                if (! n || ! el.className)
                     return false;
                 return el.className.match(classReg(className));
             }
@@ -223,7 +223,7 @@
     function addClass (el){
         var fn;
         var classNames = arguments;
-        if (classNames.length <= 1 || typeof el != 'object')
+        if (classNames.length <= 1 || typeof n != 'object')
             return false;
 
         if (document.documentElement.classList)
@@ -257,7 +257,7 @@
     function removeClass (el){
         var fn;
         var classNames = arguments;
-        if (classNames.length <= 1 || typeof el != 'object')
+        if (classNames.length <= 1 || typeof n != 'object')
             return false;
         
         if (document.documentElement.classList)
@@ -393,7 +393,7 @@
      */
     function whichTransitionEvent (){
         var t,
-            el = node('transitionElement');
+            n = node('transitionElement');
 
         var transitions = {
             WebkitTransition : 'webkitTransitionEnd',

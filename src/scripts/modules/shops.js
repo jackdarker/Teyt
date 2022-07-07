@@ -5,8 +5,8 @@ window.gm.shop.findWaresToSell = function(TagsAllowed,TagsNotAllowed=[window.gm.
     let whom =window.gm.player;
     var _ids=whom.Inv.getAllIds();
     var _ids2=whom.Wardrobe.getAllIds();
-    for (let el of _ids){
-        let item=whom.Inv.getItem(el);
+    for (let n of _ids){
+        let item=whom.Inv.getItem(n);
         if(!item.hasTag(TagsNotAllowed) && item.hasTag(TagsAllowed)){ //filter by tag
             let cost = window.gm.shop.calculateSellPrice(item);
             if(cost){
@@ -14,8 +14,8 @@ window.gm.shop.findWaresToSell = function(TagsAllowed,TagsNotAllowed=[window.gm.
             }
         }
     }
-    for (let el of _ids2){
-        let item=whom.Wardrobe.getItem(el);
+    for (let n of _ids2){
+        let item=whom.Wardrobe.getItem(n);
         if(!item.hasTag(TagsNotAllowed) && item.hasTag(TagsAllowed)){ //filter by tag
             let cost = window.gm.shop.calculateSellPrice(item);
             if(cost){
@@ -38,8 +38,8 @@ window.gm.shop.findWaresToBuy = function(shop){
         ];
     }
     let list2 = [];
-    for(el of list){
-        let cost = window.gm.shop.calculateBuyPrice(el);
+    for(var n of list){
+        let cost = window.gm.shop.calculateBuyPrice(n);
         if(cost){
             list2.push({item:el,cost:cost});
         }

@@ -409,27 +409,27 @@ class ArmorTorso extends BodyPart {
     }
     onEquip(context){
         let arm,rst;
-        for(let el of window.gm.combat.TypesDamage){
+        for(let n of window.gm.combat.TypesDamage){
             arm=rst=0;
             if(this.data.style ==='slime'){
-                if(el.id==='fire' || el.id==='poison' || el.id==='acid') arm=5,rst=70;
+                if(n.id==='fire' || n.id==='poison' || n.id==='acid') arm=5,rst=70;
 
             } else if(this.data.style ==='fur' || this.data.style ==='feathers'){
-                if(el.id==='ice') arm=5,rst=30;
-                if(el.id==='blunt') arm=5,rst=20;
+                if(n.id==='ice') arm=5,rst=30;
+                if(n.id==='blunt') arm=5,rst=20;
             } else if(this.data.style ==='scales' || this.data.style ==='chitin'){
-                if(el.id==='ice') rst=-30;
-                if(el.id==='slash') arm=5,rst=20;
+                if(n.id==='ice') rst=-30;
+                if(n.id==='slash') arm=5,rst=20;
             }
-            if(arm!==0) context.parent.Stats.addModifier('arm_'+el.id,{id:'arm_'+el.id+':'+this.id, bonus:arm});
-            if(rst!==0) context.parent.Stats.addModifier('rst_'+el.id,{id:'rst_'+el.id+':'+this.id, bonus:rst});
+            if(arm!==0) context.parent.Stats.addModifier('arm_'+n.id,{id:'arm_'+n.id+':'+this.id, bonus:arm});
+            if(rst!==0) context.parent.Stats.addModifier('rst_'+n.id,{id:'rst_'+n.id+':'+this.id, bonus:rst});
         }
         return({OK:true, msg:'equipped'});
     }
     onUnequip(){
-        for(let el of window.gm.combat.TypesDamage){
-            context.parent.Stats.removeModifier('arm_'+el,{id:'arm_'+el+':'+this.id});
-            context.parent.Stats.removeModifier('rst_'+el,{id:'rst_'+el+':'+this.id});
+        for(let n of window.gm.combat.TypesDamage){
+            context.parent.Stats.removeModifier('arm_'+n,{id:'arm_'+n+':'+this.id});
+            context.parent.Stats.removeModifier('rst_'+n,{id:'rst_'+el+':'+this.id});
         }
         return({OK:true, msg:'unequipped'});
     }

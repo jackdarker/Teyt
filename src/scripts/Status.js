@@ -79,7 +79,7 @@
         _stat.calc();   //trigger update of dependent stat
     }
     /**
-     *
+     * adds value to the stats value
      *
      * @param {*} id
      * @param {*} value
@@ -88,6 +88,18 @@
     increment( id, value){
         let attr = this.get(id);
         attr.data.base += value;
+        window.gm.pushLog(attr.Calc(this,id).msg); // todo show only for player
+    }
+    /**
+     * modifys stats value relative, f.e. 0.3 -> add 30% of stats value
+     *
+     * @param {*} id
+     * @param {*} value
+     * @memberof StatsDictionary
+     */
+    scaleValue(id,value){
+        let attr = this.get(id);
+        attr.data.base = attr.data.base*(1.0+value);
         window.gm.pushLog(attr.Calc(this,id).msg); // todo show only for player
     }
 }

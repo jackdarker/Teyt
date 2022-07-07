@@ -20,12 +20,12 @@ class SkillInspect extends Skill {
         if(this.isValidTarget(targets)){
             result.OK = true;
             this.msg = 'resistance of ';//window.gm.printBodyDescription(targets[0],true);
-            for(let el of window.gm.combat.TypesDamage){
-                this.msg += el.id+ ' '+ targets[0].Stats.getItem('rst_'+el.id).value +'%,'; 
+            for(let n of window.gm.combat.TypesDamage){
+                this.msg += n.id+ ' '+ targets[0].Stats.getItem('rst_'+n.id).value +'%,'; 
             }
             this.msg+= '</br>armor of ';
-            for(let el of window.gm.combat.TypesDamage){
-                this.msg += el.id+ ' '+ targets[0].Stats.getItem('arm_'+el.id).value +','; 
+            for(let n of window.gm.combat.TypesDamage){
+                this.msg += n.id+ ' '+ targets[0].Stats.getItem('arm_'+n.id).value +','; 
             }
             //todo display stats dependign on skill
             result.msg =this.msg;
@@ -505,11 +505,11 @@ class SkillStun extends Skill {
     targetFilter(targets){
         var possibletarget = this.targetFilterFighting(this.targetFilterEnemy(targets));
         //[[mole1],[mole2]]
-        var multi = [];
+        var n,multi = [];
         multi.name = "all";
-        for(var el of possibletarget){
-            if(el.length===1)   //dont stack multi-targets
-                multi.push(el[0]);
+        for(var n of possibletarget){
+            if(n.length===1)   //dont stack multi-targets
+                multi.push(n[0]);
         }
         if(multi.length>1) possibletarget.push(multi);  //if there is only [[mole]] we dont want [[mole],[mole]]
         return(possibletarget);//[[mole1],[mole2],[mole1,mole2]]
@@ -947,16 +947,12 @@ class SkillCallHelp extends Skill {
         return(sk);
     }
     constructor(){
-        super("CallHelp");
-        this.item='';
+        super("CallHelp");this.item='';
     }
     get desc(){ return("Summon "+this.item);}
     toJSON(){return window.storage.Generic_toJSON("SkillCallHelp", this); }
     static fromJSON(value){return(window.storage.Generic_fromJSON(SkillCallHelp, value.data));}
-    targetFilter(targets){
-        return(this.targetFilterSelf(targets));
-    }
-    targetFilter(targets){ return(this.targetFilterSelf(targets));}
+    targetFilter(targets){return(this.targetFilterSelf(targets));}
     previewCast(targets){
         var result = new SkillResult()
         result.skill =this,result.source = this.caster,result.targets = targets;
@@ -972,6 +968,39 @@ class SkillCallHelp extends Skill {
     }
     getCastDescription(result){
         return(this.parent.parent.name+" calls some "+this.item+" as reinforcement.");
+    }
+}
+//replaces a combatant with a different mob. item is [mob-class], see effTransformSelf
+class SkillTransformSelf extends Skill {
+    static factory(item,cooldown=3){
+        let sk = new SkillTransformSelf();
+        sk.item = item,sk.id+=item[0],sk.name+=' '+item[0];
+        sk.cost.will =25; 
+        //todo delay and cooldown
+        return(sk);
+    }
+    constructor(){
+        super("TransformSelf");this.item=[''];
+    }
+    get desc(){ return("Transform into "+this.item[0]);}
+    toJSON(){return window.storage.Generic_toJSON("SkillTransformSelf", this); }
+    static fromJSON(value){return(window.storage.Generic_fromJSON(SkillTransformSelf, value.data));}
+    targetFilter(targets){return(this.targetFilterSelf(targets));}
+    previewCast(targets){
+        var result = new SkillResult()
+        result.skill =this,result.source = this.caster,result.targets = targets;
+        if(this.isValidTarget(targets)){
+            result.OK = true;
+            for(var target of targets){
+                let eff = new effTransformSelf();
+                eff.configureSpawn(this.item);
+                result.effects.push( {target:target,eff:[eff]});
+            }
+        }
+        return result
+    }
+    getCastDescription(result){
+        return(this.parent.parent.name+" transforms into "+this.item[0]+((this.item.length>1)?" and some friends":"")+".");
     }
 }
 window.gm.SkillsLib = (function (Lib){

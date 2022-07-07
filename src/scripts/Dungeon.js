@@ -519,11 +519,11 @@ class DngDungeon	{
         },this);
         this.addButton(14, "Map", this.displayMap);//.hint("View the map of this dungeon.");
         bt = 0;
-        for(el of this.actualRoom.operations){
+        for(var n of this.actualRoom.operations){
             if(bt>4) break;
-            if(el===null) continue;
-            if(el.canTrigger()) this.addButton(bt, el.name, el.onTrigger);
-            else this.addButton(bt, el.name, "");
+            if(n===null) continue;
+            if(n.canTrigger()) this.addButton(bt, n.name, n.onTrigger);
+            else this.addButton(bt, n.name, "");
             bt+=1;
         }
         if(this.actualRoom.isDungeonExit){
@@ -843,9 +843,9 @@ class DngMapperSVG extends DngMapper {
     }
     nameToXY(name){
         let i,pos={x:0,y:0};
-        i=this.Y.findIndex((el)=>{return(el===name[1]);});
+        i=this.Y.findIndex((_x)=>{return(_x===name[1]);});
         pos.y=i*this.step;//if(i<0||i>=Y.length-1) return('');
-        i=this.X.findIndex((el)=>{return(el===name[0]);});
+        i=this.X.findIndex((_x)=>{return(_x===name[0]);});
         pos.x=i*this.step;//if(i<0||i>=Y.length-1) return('');
         return(pos);
     }  

@@ -3,23 +3,23 @@
 //used for pathfinding in map not using dungeon
 //grid = grid =[{room:'H2', dirs:['H3','I2']},...]
 window.gm.gridToGraph=function(grid){
-  let _r,_rooms= new Map();
-  for(el of grid){
-      _rooms.set(el.room,{name:el.room, neighbours:[]});
+  let _r,n,dir,_rooms= new Map();
+  for(n of grid){
+      _rooms.set(n.room,{name:n.room, neighbours:[]});
   }
-  for(el of grid){
-      _r = _rooms.get(el.room);
-      for(var dir of el.dirs){
+  for(n of grid){
+      _r = _rooms.get(n.room);
+      for(dir of n.dirs){
           _r.neighbours.push(_rooms.get(dir));
       }
-      _rooms.set(el.room,_r);
+      _rooms.set(n.room,_r);
   }
   let graph = new window.Graph(Array.from(_rooms.values( )));
   graph.neighbors=function(node){
       var dir,ret = [],dirs = node.origNode.neighbours;
       for(dir of dirs){
           var room = dir;
-          var next=this.nodes.find((el)=>{return(el.origNode===room);})
+          var next=this.nodes.find((_x)=>{return(_x.origNode===room);})
           ret.push(next);
       }
       return ret;
@@ -114,7 +114,7 @@ window.gm.mobAI = function(mob){
     if(mob.state!==0 || mob.tick===''){mob.tick=_now;return;}
     if(window.gm.getDeltaTime(_now,mob.tick)>30){
         mob.tick=_now;
-        var _to = getRoomDirections(mob.pos).filter(el=> mob.path.includes(el.dir));
+        var _to = getRoomDirections(mob.pos).filter(_x=> mob.path.includes(_x.dir));
         if(_to.length>0){
             mob.pos=_to[_.random(0,_to.length-1)].dir;
             //alert(mob.id+' now moving to '+mob.pos);
@@ -288,61 +288,61 @@ window.gm.build_DngPC=function(){
     const _m=[
         'D1  E1  F1--G1--H1--I1--J1--K1--L1',
         '                                  ',
-        'D2--E2  F2--G2--H2--I2--J2--K2--L2',
-        '|       |   |           |       | ',
-        'D3--E3--F3  G3--H3--I3--J3--K3  L3',
-        '    |   |       |           |     ',
-        'D4--E4  F4--G4--H4--I4--J4--K4--L4',
-        '    |   |   |           |         ',
-        'D5--E5  F5  G5--H5--I5  J5--K5--L5',
-        '|       |           |   |         ',
-        'D6--E6--F6--G6--H6--I6--J6--K6--L6'];
+        'D2--E2--F2  G2--H2--I2--J2  K2--L2',
+        '        |       |   |   |   |   | ',
+        'D3--E3--F3--G3--H3  I3  J3  K3  L3',
+        '            |       |       |     ',
+        'D4--E4--F4--G4--H4--I4--J4  K4--L4',
+        '    |       |                     ',
+        'D5--E5--F5  G5--H5--I5--J5  K5--L5',
+        '|       |   |           |         ',
+        'D6  E6--F6--G6--H6--I6--J6  K6--L6'];
     function _d(dir){return({dir:dir,exp:0});}
     let grid =[
     {room:'D2', dirs:[_d('E2')]},
-    {room:'E2', dirs:[]},
-    {room:'F2', dirs:[_d('G2'),_d('F3')]},
-    {room:'G2', dirs:[_d('F2'),_d('H2'),_d('G3')]},
-    {room:'H2', dirs:[_d('I2'),_d('G2')]},
-    {room:'I2', dirs:[_d('J2'),_d('H2')]},
+    {room:'E2', dirs:[_d('F2')]},
+    {room:'F2', dirs:[_d('E2'),_d('F3')]},
+    {room:'G2', dirs:[_d('H2')]},
+    {room:'H2', dirs:[_d('I2'),_d('H3')]},
+    {room:'I2', dirs:[_d('I3'),_d('J2'),_d('H2')]},
     {room:'J2', dirs:[_d('I2'),_d('J3')]},
     {room:'K2', dirs:[_d('L2'),_d('K3')]},
     {room:'L2', dirs:[_d('K2'),_d('L3')]},
-    {room:'D3', dirs:[_d('D2')]},
-    {room:'E3', dirs:[_d('D3'),_d('E4'),_d('F3')]},
-    {room:'F3', dirs:[_d('F2')]},
-    {room:'G3', dirs:[_d('G2'),_d('G4')]},
-    {room:'H3', dirs:[_d('H4')]},
-    {room:'I3', dirs:[_d('I4'),_d('J3')]},
-    {room:'J3', dirs:[_d('I3'),_d('K3'),_d('J2')]},
-    {room:'K3', dirs:[_d('J3'),_d('K2')]},
-    {room:'L2', dirs:[_d('L2'),_d('L4')]},
-    {room:'D4', dirs:[]},
-    {room:'E4', dirs:[_d('D4')]},
+    {room:'D3', dirs:[_d('E3')]},
+    {room:'E3', dirs:[_d('D3'),_d('F3')]},
+    {room:'F3', dirs:[_d('E3'),_d('G3'),_d('F2')]},
+    {room:'G3', dirs:[_d('F3'),_d('H3'),_d('G4')]},
+    {room:'H3', dirs:[_d('H2'),_d('G3')]},
+    {room:'I3', dirs:[_d('I4'),_d('I2')]},
+    {room:'J3', dirs:[_d('J2')]},
+    {room:'K3', dirs:[_d('K2'),_d('K4')]},
+    {room:'L3', dirs:[_d('L2')]},
+    {room:'D4', dirs:[_d('E4')]},
+    {room:'E4', dirs:[_d('F4'),_d('D4')]},
     {room:'F4', dirs:[_d('G4'),_d('F5')]},
     {room:'G4', dirs:[_d('F4'),_d('H4'),_d('G5')]    ,anno:['S']},
-    {room:'H4', dirs:[_d('G4'),_d('I4'),_d('H3')]},
-    {room:'I4', dirs:[_d('H4'),_d('J4')]},
+    {room:'H4', dirs:[_d('G4'),_d('I4')]},
+    {room:'I4', dirs:[_d('I3'),_d('H4'),_d('J4')]},
     {room:'J4', dirs:[_d('I4'),_d('J5'),_d('K4')]    ,anno:['B']},      
     {room:'K4', dirs:[_d('L4'),_d('K3')]},
     {room:'L4', dirs:[_d('L3'),_d('K5')]    ,anno:['B']},
     {room:'D5', dirs:[_d('D6'),_d('E5')]},
-    {room:'E5', dirs:[_d('E4'),_d('D5')]},
-    {room:'F5', dirs:[_d('F4'),_d('F6')]},
-    {room:'G5', dirs:[_d('G4'),_d('H5')]},
-    {room:'H5', dirs:[_d('G5'),_d('I5'),_d('H6')]},
+    {room:'E5', dirs:[_d('F5'),_d('E4'),_d('D5')]},
+    {room:'F5', dirs:[_d('E5'),_d('F6')]},
+    {room:'G5', dirs:[_d('G4'),_d('G6'),_d('H5')]},
+    {room:'H5', dirs:[_d('G5'),_d('I5')]},
     {room:'I5', dirs:[_d('H5'),_d('J5')]},
-    {room:'J5', dirs:[_d('K5')]},
-    {room:'K5', dirs:[_d('J5'),_d('K6'),_d('L5')]},
+    {room:'J5', dirs:[_d('J6')]},
+    {room:'K5', dirs:[_d('L5')]},
     {room:'L5', dirs:[_d('K5')]},
-    {room:'D6', dirs:[_d('D5'),_d('E6')]},
-    {room:'E6', dirs:[_d('D6'),_d('F6')]},
-    {room:'G6', dirs:[_d('F6'),_d('H6')]}, 
-    {room:'F6', dirs:[_d('E6'),_d('F5'),_d('G6')]    ,anno:['B']},
+    {room:'D6', dirs:[_d('D5')]},
+    {room:'E6', dirs:[_d('F6')]},
+    {room:'F6', dirs:[_d('E6'),_d('F5'),_d('G6')]},
+    {room:'G6', dirs:[_d('G5'),_d('F6'),_d('H6')]}, 
     {room:'H6', dirs:[_d('I6'),_d('G6')]},
-    {room:'I6', dirs:[_d('I5'),_d('H6'),_d('J6')]},
-    {room:'J6', dirs:[_d('J5'),_d('I6'),_d('K6')]},
-    {room:'K6', dirs:[_d('L6'),_d('J6')]},
+    {room:'I6', dirs:[_d('H6'),_d('J6')]},
+    {room:'J6', dirs:[_d('J5'),_d('I6')]},
+    {room:'K6', dirs:[_d('L6')]},
     {room:'L6', dirs:[_d('K6')]}];
     let data,map={grid:grid,width:14,height:8,legend:'S=Start  B=Boss'}
     var s = window.story.state;    
@@ -362,18 +362,26 @@ window.gm.build_DngPC=function(){
             H4: {gas:{tick:window.gm.getTime(),state:0 }},
         }
         data.tmp.doors = { //doors
-            H4:{H3:{tick:'',state:0,token:2,tier:6}}
-            ,G4:{F4:{tick:'',state:0,token:1,tier:3 }}
-            ,J4:{K4:{tick:'',state:0,token:1,tier:3 },J5:{tick:'',state:0,token:1,tier:3 }}
+            I2:{H2:{tick:'',state:0,token:1,tier:3 }}
+            ,F3:{F2:{tick:'',state:0,token:1,tier:5 }}
+            ,E4:{E5:{tick:'',state:0,token:1,tier:2 }}
+            ,H4:{H3:{tick:'',state:0,token:2,tier:6}}
+            ,G4:{F4:{tick:'',state:0,token:1,tier:1},G3:{tick:'',state:0,token:1,tier:4},G5:{tick:'',state:0,token:1,tier:5}}
+            ,I4:{I3:{tick:'',state:0,token:1,tier:3 }}
             ,K4:{K3:{tick:'',state:0,token:1,tier:3 }}
+            ,E5:{D5:{tick:'',state:0,token:1,tier:3 }}
+            ,G5:{G6:{tick:'',state:0,token:1,tier:4 },G4:{tick:'',state:0,token:1,tier:5 }}
+            ,I5:{J5:{tick:'',state:0,token:1,tier:7 }}
+            ,J5:{I5:{tick:'',state:0,token:1,tier:7 }}
+            ,G6:{G5:{tick:'',state:0,token:1,tier:4 }}
             ,H6:{I6:{tick:'',state:0,token:1,tier:3 }}
         }
         data.tmp.evtSpawn = { //respawn evts 
             DngPC_I4: {chest:{tick:window.gm.getTime(),state:0, loot:[{id:"Money",count:30}]},
                         mushroom:{tick:window.gm.getTime(),state:0,loot:"BrownMushroom" }}
-            ,DngPC_K4: {mushroom:{tick:window.gm.getTime(),state:0,loot:"ViolettMushroom" }}
+            ,DngPC_F4: {mushroom:{tick:window.gm.getTime(),state:0,loot:"ViolettMushroom" }}
             ,DngPC_F5: {mushroom:{tick:window.gm.getTime(),state:0,loot:"ViolettMushroom" }}
-            ,DngPC_G6: {chest:{tick:window.gm.getTime(),state:0,loot:[{id:"Money",count:30}]}}
+            ,DngPC_J4: {chest:{tick:window.gm.getTime(),state:0,loot:[{id:"Money",count:30}]}}
         }
         data.tmp.mobs = [ //wandering mobs pos=current tile
             //{id:"HornettI4",mob:"hornett",pos:"I4",path:["I4","H4","I3"],state:0,tick:'',aggro:0}
@@ -402,3 +410,10 @@ window.gm.build_DngPC=function(){
     }
     return({map:map,data:data});
 };
+
+window.gm.know = function(what){
+    let _n=window.story.state.Know[what];
+    if(_n===null || _n===undefined) {
+        window.story.state.Know[what]=1;
+    }
+}

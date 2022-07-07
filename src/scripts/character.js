@@ -40,9 +40,9 @@ class Character {
         //create basic stats
         stHealth.setup(this.Stats,10,10),stEnergy.setup(this.Stats,30,30),stWill.setup(this.Stats,0,0);
         stSatiation.setup(this.Stats,30,100);
-        for(let el of window.gm.combat.TypesDamage){
-            stResistance.setup(this.Stats,0,el.id);
-            stArmor.setup(this.Stats,0,el.id); 
+        for(let n of window.gm.combat.TypesDamage){
+            stResistance.setup(this.Stats,0,n.id);
+            stArmor.setup(this.Stats,0,n.id); 
         }
         stAgility.setup(this.Stats,10,100),stIntelligence.setup(this.Stats,10,100),stLuck.setup(this.Stats,10,100);
         stCharisma.setup(this.Stats,10,100),stPerception.setup(this.Stats,10,100),stStrength.setup(this.Stats,10,100),stEndurance.setup(this.Stats,10,100);
@@ -121,28 +121,28 @@ class Character {
     autolevelWheight(){return([{id:"strength",wgt:10},{id:"agility",wgt:11},{id:"intelligence",wgt:10},{id:"luck",wgt:8},{id:"charisma",wgt:8},{id:"perception",wgt:8},{id:"endurance",wgt:9}]);}
     // this is called for NPC to automatically spent XP and distribute stat-points according to autolevelWheight-property
     autoLeveling(){
-        let add = Character.calcXPToLevel(this._data.XP,this._data.level)-this._data.level;
+        let n,add = Character.calcXPToLevel(this._data.XP,this._data.level)-this._data.level;
         this.levelUp(add);
         let weight = this.autolevelWheight();        
         let sort = function(a,b){return(b.new-a.new);};
         while(this._data.unspentStat>0){
             //get the actual stats; immagine wgt as the goal-shape how the values are set at a certain level 
             let sumC =0, sumG = 0; 
-            for(el of weight){
-                el.value = this.Stats.get(el.id).base;
-                sumC += el.value, sumG +=el.wgt;
+            for(n of weight){
+                n.value = this.Stats.get(n.id).base;
+                sumC += n.value, sumG +=n.wgt;
             }
             //calculate the difference between current value and goal defined by playstyle
-            for(el of weight){ //new is the difference in points; +1 to force distribution if the current matches the goal
-                el.new = Math.ceil(((el.wgt/sumG) -(el.value/sumC))*sumC) +1 ;
-                if(el.new<=0) el.new =1;
+            for(n of weight){ //new is the difference in points; +1 to force distribution if the current matches the goal
+                n.new = Math.ceil(((n.wgt/sumG) -(n.value/sumC))*sumC) +1 ;
+                if(n.new<=0) n.new =1;
             }   
             //and distribute pt
             weight=weight.sort(sort);
-            for(el of weight){
-                let x = Math.floor(el.new);
+            for(n of weight){
+                let x = Math.floor(n.new);
                 x =  Math.min(this._data.unspentStat,2,x);
-                this.Stats.increment(el.id,x);
+                this.Stats.increment(n.id,x);
                 this._data.unspentStat-=x;
             }
         }
@@ -182,6 +182,9 @@ class Character {
         if(delta>360){
             this.Effects.addItem(new effNotTired());
         } 
+    }
+    hasEffect(id){
+        return(this.Effects.countItem(id)>0); //todo also check for magnitude
     }
     addEffect(effect,id,who){
         this.Effects.addItem(effect,id);

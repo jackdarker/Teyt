@@ -46,8 +46,8 @@ class Curse {
     _relinkItems(parent){
         this._parent = window.gm.util.refToParent(parent);
         this.trigger._parent=window.gm.util.refToParent(this);
-        for(el of this.list){
-            el._parent=window.gm.util.refToParent(this);
+        for(var n of this.list){
+            n._parent=window.gm.util.refToParent(this);
         }
     }
     configureCurse(item,trigger,curses){
@@ -69,8 +69,8 @@ class Curse {
     }
     canUnequip(){ //ask effects if allowed to unequip/not locked
         let res;
-        for(el of this.list){
-            res = el.canUnequip();
+        for(var n of this.list){
+            res = n.canUnequip();
             if(res.OK==false) return(res);
         }
         res = {OK:true, msg:'unequipable'};
@@ -81,8 +81,8 @@ class Curse {
     }
     apply(unapply){
         this.hidden=0; //reveal
-        for(el of this.list){
-            el.apply(unapply); //todo 3 effects would generate 3 defferedEvents; instead combine text into single event
+        for(var n of this.list){
+            n.apply(unapply); //todo 3 effects would generate 3 defferedEvents; instead combine text into single event
         }
     }
     get desc(){
@@ -93,8 +93,8 @@ class Curse {
             msg = 'unknown effect';
         } else if(this.hidden===0 ){
             msg = this.trigger.desc;
-            for(el of this.list){
-                msg += "; " + el.desc;
+            for(var n of this.list){
+                msg += "; " + n.desc;
             }
         }
         return(msg);
@@ -124,8 +124,8 @@ class CrsTrgOnEquip extends CrsTrigger {
         if(this.minItems<=0) return(true);
         let owner=this.parent.parent.parent.parent.Outfit,list = owner.getAllIds();
         let _c = 0;
-        for(el of list){
-            if(owner.getItem(el).hasTag(this.curseName)) _c+=1;
+        for(var n of list){
+            if(owner.getItem(n).hasTag(this.curseName)) _c+=1;
         }
         return(_c>=this.minItems);  
     }

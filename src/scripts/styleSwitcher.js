@@ -10,11 +10,11 @@ class StyleSwitcher {
     }
 switchStyle(s){
   if (!document.getElementsByTagName) return;
-  var el = document.getElementsByTagName("link");
-  for (var i = 0; i < el.length; i++ ){
-    if (el[i].getAttribute("rel").indexOf("style") != -1 && el[i].getAttribute("title")){
-      el[i].disabled = true;
-      if (el[i].getAttribute("title") == s) el[i].disabled = false;
+  var n = document.getElementsByTagName("link");
+  for (var i = 0; i < n.length; i++ ){
+    if (n[i].getAttribute("rel").indexOf("style") != -1 && n[i].getAttribute("title")){
+      n[i].disabled = true;
+      if (n[i].getAttribute("title") == s) n[i].disabled = false;
     }
   }
 }

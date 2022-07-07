@@ -281,8 +281,8 @@ class ShatteredCity extends DngDungeon{
             msg = 'You find:'+this.data.A1Chest.join(",")+'</br>';
             msg+= window.gm.printLink("Take all","window.gm.dng.renderNext(3)");
         } else if(evt.id===3){
-            for(el of this.data.A1Chest){
-                this._addItemToPlayer(el);
+            for(var n of this.data.A1Chest){
+                this._addItemToPlayer(n);
             }
             this.data.A1Chest = [];
             msg = 'You take everything from the chest.</br>';

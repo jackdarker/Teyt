@@ -167,7 +167,7 @@ for(var i=0;i<maxSlots;i++){
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 Here you can check and modify several options: </br>
 Your outfit can only be changed by using a wardrobe.</br>
-Your party consist of <%=(function(){var msg=[];for(el of window.story.state._gm.playerParty){msg.push(window.story.state[el].name);}return(msg);}()).join(',')%></br>
+Your party consist of <%=(function(){var msg=[];for(var n of window.story.state._gm.playerParty){msg.push(window.story.state[n].name);}return(msg);}()).join(',')%></br>
 [[Back|_back_]] [[Status]] [[Levelup]] [[View|Mirror]] [[Inventory]] [[Relations]] [[QuestList]]</br>
 </article><article id="LogPanel"></article></section>
 
@@ -210,6 +210,7 @@ for(var i=0;i<_ids2.length;i++){window.gm.printEquipment(whom,whom.Outfit.getIte
 <p class="author">settings are stored in save-game until I find a way to store them in cookies.</p>
 Theme:
 <a href="javascript:window.styleSwitcher.setStyle('light');window.gm.refreshAllPanel();">light</a>
+<a href="javascript:window.styleSwitcher.setStyle('gray');window.gm.refreshAllPanel();">gray</a>
 <a href="javascript:window.styleSwitcher.setStyle('dark');window.gm.refreshAllPanel();">dark</a></br>
 show Lewd pictures: <input type="checkbox" id='showNSFWPictures' onclick='toggleSetting(this);' name="showNSFWPictures" value="x"> (If false, lewd graphics are not shown/replaced with SFW.)</br>
 show dungeon map: <input type="checkbox" id='showDungeonMap' onclick='toggleSetting(this);' name="showDungeonMap" value="x"> (If false, the dungeon map is not rendered.)</br>
@@ -296,8 +297,8 @@ function showStats(charname){
   let msg='';
   if(char._data.unspentStat>0){
     msg=char._data.unspentStat+' points can be distributed on stats:</br><table>';
-    for(el of _wheights){
-      msg+="<tr><td><a href=\"javascript:void(0)\" onclick='statUp(\""+el.id+"\",\""+char.id+"\")'>"+el.id+"</a></td><td>is "+char.Stats.getItem(el.id).base+"</td></tr>";
+    for(var n of _wheights){
+      msg+="<tr><td><a href=\"javascript:void(0)\" onclick='statUp(\""+n.id+"\",\""+char.id+"\")'>"+n.id+"</a></td><td>is "+char.Stats.getItem(n.id).base+"</td></tr>";
     }
     msg+='</table>';
   }

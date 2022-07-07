@@ -1,3 +1,8 @@
+window.gm.FKnow = { //Flag-names what the player "knows"
+    LewdMark : "LewdMark",
+    Slime: "Slime"
+};
+
 //this holds the definition of all quests; but which quests/ms are active is stored in window.story.state.quests !
 window.gm.questDef = window.gm.questDef || {};
 {

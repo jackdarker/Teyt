@@ -160,58 +160,58 @@ window.gm.MutationsLib['mutateWolf'] = function (char,magnitude=1){
     let msg='', bb=window.gm.OutfitSlotLib;
     let fconv =window.gm.util.descFixer(char);
     let base=char.Outfit.getItemForSlot(bb.bBase);//todo bodyparts depends also on feral or anthro body
-    let el,slots=[], cnt=magnitude;
+    let n,slots=[], cnt=magnitude;
     //mutate depending on magnitude; some TF requires more then others
     // ears/eyes - fur - tail/legs/genitals (minor) - arms/head/genitals - quadruped/feral 
     let thrs={};thrs[bb.bSkin]=8,thrs[bb.bTailBase]=16,thrs[bb.bHands]=32,thrs[bb.bFace]=32;
     [bb.bFace,bb.bSkin,bb.bTailBase,bb.bHands].forEach( //todo legs,skin,genitals
         x=>{slots.push({"slot":x,"item":char.Outfit.getItemForSlot(x)})});
     while(slots.length>0 && cnt>0){ 
-        el = slots.splice(_.random(0,slots.length-1),1)[0]; //select random part to mutate, repick if already mutated    
-        if(el.slot===bb.bTailBase && cnt>=thrs[bb.bTailBase]){
-            if(el.item===null){
+        n = slots.splice(_.random(0,slots.length-1),1)[0]; //select random part to mutate, repick if already mutated    
+        if(n.slot===bb.bTailBase && cnt>=thrs[bb.bTailBase]){
+            if(n.item===null){
                 char.Outfit.addItem(window.storage.constructors['TailWolf'].factory('horse'),true);
                 msg+=fconv("$[I]$ $[have]$ grown a bushy tail !</br>");
                 cnt-=thrs[bb.bTailBase];
-            } else if(el.item.getStyle() !=='wolf'|| el.item.id!=='TailWolf'){
-                char.Outfit.removeItem(el.item.id,true);
+            } else if(n.item.getStyle() !=='wolf'|| n.item.id!=='TailWolf'){
+                char.Outfit.removeItem(n.item.id,true);
                 char.Outfit.addItem(window.storage.constructors['TailWolf'].factory('wolf'),true);
                 msg+=fconv("$[My]$ tail is now a fuzzy bush like of a wolf.</br>");
                 cnt-=thrs[bb.bTailBase]/2;
             } else {
-                var growth = el.item.data.growth+0.25;
+                var growth = n.item.data.growth+0.25;
                 var maxGrowth = 1.5;
                 if(growth >= 1){
                     //msg=("You already changed to a horse as far as possible.</br>");
                 } else {
-                    el.item.data.growth=growth;
+                    n.item.data.growth=growth;
                     msg+=fconv("$[My]$ tail must have grown and is now "+window.gm.util.formatNumber(growth*maxGrowth,1)+" meter long.</br>");
                     cnt-=thrs[bb.bTailBase]/4;
                 }
             }
-        } else if(el.slot===bb.bSkin && cnt>=thrs[bb.bFace]){
-            if(el.item===null){ //grow no skin
-            } else if(el.item.getStyle() !=='wolf'){
+        } else if(n.slot===bb.bSkin && cnt>=thrs[bb.bFace]){
+            if(n.item===null){ //grow no skin
+            } else if(n.item.getStyle() !=='wolf'){
                 char.Outfit.addItem(new window.storage.constructors['SkinFur'].factory('wolf'));
                 msg+= "A dense coat of fur spreads over your body.</br>";
             }
-        } else if(el.slot===bb.bFace && cnt>=thrs[bb.bFace]){
-            if(el.item===null){ //grow no face?
-            } else if(el.item.getStyle() !=='wolf'){
-                char.Outfit.removeItem(el.item.id,true);
+        } else if(n.slot===bb.bFace && cnt>=thrs[bb.bFace]){
+            if(n.item===null){ //grow no face?
+            } else if(n.item.getStyle() !=='wolf'){
+                char.Outfit.removeItem(n.item.id,true);
                 char.Outfit.addItem(window.storage.constructors['FaceWolf'].factory('wolf'),true);
                 msg+=fconv("$[My]$ face transforms into a canine muzzle.</br>");
                 cnt-=thrs[bb.bTailBase];
             } 
-        } else if(el.slot===bb.bHands && cnt>=thrs[bb.bHands]){
-            if(el.item===null){ //grow no hands?
-            } else if(el.item.getStyle() !=='wolf'){
+        } else if(n.slot===bb.bHands && cnt>=thrs[bb.bHands]){
+            if(n.item===null){ //grow no hands?
+            } else if(n.item.getStyle() !=='wolf'){
                 if(base.id==="BaseHumanoid"){
-                    char.Outfit.removeItem(el.item.id,true);
+                    char.Outfit.removeItem(n.item.id,true);
                     char.Outfit.addItem(window.storage.constructors['HandsHuman'].factory('wolf'),true);
                     msg+=fconv("$[My]$ hands now look like that of a human but with clawlike fingernails.</br>");
                 } else {
-                    char.Outfit.removeItem(el.item.id,true);
+                    char.Outfit.removeItem(n.item.id,true);
                     char.Outfit.addItem(window.storage.constructors['HandsPaw'].factory('wolf'),true);
                     msg+=fconv("$[My]$ hands transforms into paws that resembles those of a dog or wolf.</br>");
                 }
@@ -253,60 +253,60 @@ window.gm.MutationsLib['mutateHorse'] = function(char,magnitude=1){
     let msg='', bb=window.gm.OutfitSlotLib;
     let fconv =window.gm.util.descFixer(char);
     let base=char.Outfit.getItemForSlot(bb.bBase);//todo bodyparts depends also on feral or anthro body
-    let el,slots=[], cnt=magnitude;
+    let n,slots=[], cnt=magnitude;
     //mutate depending on magnitude; some TF requires more then others
     // ears/eyes - fur - tail/legs/genitals (minor) - arms/head/genitals - quadruped/feral 
     let thrs={};thrs[bb.bSkin]=8,thrs[bb.bTailBase]=16,thrs[bb.bHands]=32,thrs[bb.bFace]=32;
     [bb.bFace,bb.bSkin,bb.bTailBase,bb.bHands].forEach( //todo legs,skin,genitals
         x=>{slots.push({"slot":x,"item":char.Outfit.getItemForSlot(x)})});
     while(slots.length>0 && cnt>0){ 
-        el = slots.splice(_.random(0,slots.length-1),1)[0]; //select random part to mutate, repick if already mutated    
-        if(el.slot===bb.bTailBase && cnt>=thrs[bb.bTailBase]){
-            if(el.item===null){
+        n = slots.splice(_.random(0,slots.length-1),1)[0]; //select random part to mutate, repick if already mutated    
+        if(n.slot===bb.bTailBase && cnt>=thrs[bb.bTailBase]){
+            if(n.item===null){
                 char.Outfit.addItem(window.storage.constructors['TailWolf'].factory('horse'),true);
                 msg+=fconv("$[I]$ $[have]$ grown a horse tail !</br>");
                 cnt-=thrs[bb.bTailBase];
-            } else if(el.item.getStyle() !=='horse'|| el.item.id!=='TailWolf'){
-                char.Outfit.removeItem(el.item.id,true);
+            } else if(n.item.getStyle() !=='horse'|| n.item.id!=='TailWolf'){
+                char.Outfit.removeItem(n.item.id,true);
                 char.Outfit.addItem(window.storage.constructors['TailWolf'].factory('horse'),true);
                 msg+=fconv("$[My]$ tail reshapes itself to a be more horse-like.</br>");
                 cnt-=thrs[bb.bTailBase]/2;
             } else {
-                var growth = el.item.data.growth+0.25;
+                var growth = n.item.data.growth+0.25;
                 var maxGrowth = 2;//window.gm.player.Outfit.getItem("TailWolf").maxGrowth;
                 if(growth >= 1){
                     //msg=("You already changed to a horse as far as possible.</br>");
                 } else {
-                    el.item.data.growth=growth;
+                    n.item.data.growth=growth;
                     msg+=fconv("$[My]$ tail must have grown and is now "+window.gm.util.formatNumber(growth*maxGrowth,1)+" meter long.</br>");
                     cnt-=thrs[bb.bTailBase]/4;
                 }
             }
-        } else if(el.slot===bb.bSkin && cnt>=thrs[bb.bSkin]){
-            if(el.item===null){ //grow no face?
-            } else if(el.item.getStyle() !=='horse'){
-                char.Outfit.removeItem(el.item.id,true);
+        } else if(n.slot===bb.bSkin && cnt>=thrs[bb.bSkin]){
+            if(n.item===null){ //grow no face?
+            } else if(n.item.getStyle() !=='horse'){
+                char.Outfit.removeItem(n.item.id,true);
                 char.Outfit.addItem(window.storage.constructors['SkinFur'].factory('horse'),true);
                 msg+=fconv("$[My]$ skin prickles as suddenly a fine layer of fur sprouts all around your body, even in your face.</br>");
                 cnt-=thrs[bb.bTailBase];
             } 
-        } else if(el.slot===bb.bFace && cnt>=thrs[bb.bFace]){
-            if(el.item===null){ //grow no face?
-            } else if(el.item.getStyle() !=='horse'){
-                char.Outfit.removeItem(el.item.id,true);
+        } else if(n.slot===bb.bFace && cnt>=thrs[bb.bFace]){
+            if(n.item===null){ //grow no face?
+            } else if(n.item.getStyle() !=='horse'){
+                char.Outfit.removeItem(n.item.id,true);
                 char.Outfit.addItem(window.storage.constructors['FaceHorse'].factory('horse'),true);
                 msg+=fconv("$[My]$ face transforms into a horse ones.</br>");
                 cnt-=thrs[bb.bTailBase];
             } 
-        } else if(el.slot===bb.bHands && cnt>=thrs[bb.bHands]){
-            if(el.item===null){ //grow no hands?
-            } else if(el.item.getStyle() !=='horse'){
+        } else if(n.slot===bb.bHands && cnt>=thrs[bb.bHands]){
+            if(n.item===null){ //grow no hands?
+            } else if(n.item.getStyle() !=='horse'){
                 if(base.id==="BaseHumanoid"){
-                    char.Outfit.removeItem(el.item.id,true);
+                    char.Outfit.removeItem(n.item.id,true);
                     char.Outfit.addItem(window.storage.constructors['HandsHuman'].factory('horse'),true);
                     msg+=fconv("$[My]$ hands now look like that of a human but with thick fingernails.</br>");
                 } else {
-                    char.Outfit.removeItem(el.item.id,true);
+                    char.Outfit.removeItem(n.item.id,true);
                     char.Outfit.addItem(window.storage.constructors['HandsHoof'].factory('horse'),true);
                     msg+=fconv("$[My]$ hands transforms into a horse-like hoves.</br>");
                 }
@@ -326,33 +326,33 @@ window.gm.MutationsLib['mutateHuman'] = function(char,magnitude=1){
     let msg='', bb=window.gm.OutfitSlotLib;
     let fconv =window.gm.util.descFixer(char);
     let base=char.Outfit.getItemForSlot(bb.bBase);//todo bodyparts depends also on feral or anthro body
-    let el,slots=[], cnt=magnitude;
+    let n,slots=[], cnt=magnitude;
     //mutate depending on magnitude; some TF requires more then others
     // ears/eyes - fur - tail/legs/genitals (minor) - arms/head/genitals - quadruped/feral 
     let thrs={};thrs[bb.bSkin]=8,thrs[bb.bTailBase]=16,thrs[bb.bHands]=16,thrs[bb.bFace]=16;
     [bb.bFace,bb.bSkin,bb.bTailBase,bb.bHands].forEach( //todo legs,skin,genitals
         x=>{slots.push({"slot":x,"item":char.Outfit.getItemForSlot(x)})});
     while(slots.length>0 && cnt>0){ 
-        el = slots.splice(_.random(0,slots.length-1),1)[0]; //select random part to mutate, repick if already mutated    
-        if(el.slot===bb.bTailBase && cnt>=thrs[bb.bTailBase]){
-            if(el.item!==null){
-                char.Outfit.removeItem(el.item.id,true);
+        n = slots.splice(_.random(0,slots.length-1),1)[0]; //select random part to mutate, repick if already mutated    
+        if(n.slot===bb.bTailBase && cnt>=thrs[bb.bTailBase]){
+            if(n.item!==null){
+                char.Outfit.removeItem(n.item.id,true);
                 msg+=fconv("$[My]$ tail is gone.</br>");
                 cnt-=thrs[bb.bTailBase];
             }
-        } else if(el.slot===bb.bFace && cnt>=thrs[bb.bFace]){
-            if(el.item===null){ //grow no face?
-            } else if(el.item.getStyle() !=='human'){
-                char.Outfit.removeItem(el.item.id,true);
+        } else if(n.slot===bb.bFace && cnt>=thrs[bb.bFace]){
+            if(n.item===null){ //grow no face?
+            } else if(n.item.getStyle() !=='human'){
+                char.Outfit.removeItem(n.item.id,true);
                 char.Outfit.addItem(window.storage.constructors['FaceHuman'].factory('human'),true);
                 msg+=fconv("$[My]$ face looks human now.</br>");
                 cnt-=thrs[bb.bTailBase];
             } 
-        } else if(el.slot===bb.bHands && cnt>=thrs[bb.bHands]){
-            if(el.item===null){ //grow no hands?
-            } else if(el.item.getStyle() !=='human'){
+        } else if(n.slot===bb.bHands && cnt>=thrs[bb.bHands]){
+            if(n.item===null){ //grow no hands?
+            } else if(n.item.getStyle() !=='human'){
                 if(base.id==="BaseHumanoid"){
-                    char.Outfit.removeItem(el.item.id,true);
+                    char.Outfit.removeItem(n.item.id,true);
                     char.Outfit.addItem(window.storage.constructors['HandsHuman'].factory('human'),true);
                     msg+=fconv("$[My]$ hands now look like that of a plain human.</br>");
                     cnt-=thrs[bb.bHands];

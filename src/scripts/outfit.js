@@ -113,8 +113,8 @@ class Equipment extends Item {
     }
     _relinkItems(parent){  //call this after loading save data to reparent
         super._relinkItems(parent);
-        for(el of this.bonus){ 
-            el._relinkItems(this);
+        for(var n of this.bonus){ 
+            n._relinkItems(this);
         }
     }
     //for compatibility with item
@@ -136,8 +136,8 @@ class Equipment extends Item {
     get desc(){ return(this.descShort+ this.bonusDesc());}
     bonusDesc(){
         let msg='';
-        for(el of this.bonus){
-            msg+="\n"+el.desc; //</br> todo 
+        for(var n of this.bonus){
+            msg+="\n"+n.desc; //</br> todo 
         }
         return(msg);
     }
@@ -146,34 +146,34 @@ class Equipment extends Item {
         if(this.parent && this.parent.parent.Outfit.findItemSlot(this.id).length>0) return(this.canUnequip()); //if you try to equip the same outfit another time it should unequip 
         else return({OK:true, msg:'equipable'});}
     canUnequip(){
-        let res = {OK:true, msg:'unequipable'};
-        for (el of this.bonus){
-            res=el.canUnequip();
+        let n,res = {OK:true, msg:'unequipable'};
+        for (n of this.bonus){
+            res=n.canUnequip();
             if(res.OK===false) return(res);
         }
         return(res);
     }
     //call Outfit.addItem instead !
     onEquip(context){
-        let res={OK:true, msg:this.name+' equipped'};
-        for (el of this.bonus){
-            el.onEquip();
+        let n,res={OK:true, msg:this.name+' equipped'};
+        for (n of this.bonus){
+            n.onEquip();
         }
         if(this.equipText) res.msg=this.equipText(context);
         return(res)
     }
     onUnequip(){
-        let res = {OK:true, msg:this.name+' unequipped'};
-        for (el of this.bonus){
-            el.onUnequip();
+        let n,res = {OK:true, msg:this.name+' unequipped'};
+        for (n of this.bonus){
+            n.onUnequip();
         }
         if(this.unequipText) res.msg=this.unequipText(context);
         return(res);
     }
     //implement unequipText()/equipText() to return a msg for display
     onTimeChange(now){
-        for (el of this.bonus){
-            el.onTimeChange(now);
+        for (let n of this.bonus){
+            n.onTimeChange(now);
         }
     };
 }
@@ -226,9 +226,9 @@ class Outfit { //extends Inventory{
         window.gm.pushLog('Outfit: '+operation+' '+id+' '+msg);
     }
     _relinkItems(){  //call this after loading save data to reparent
-        for (el of this.list){
-            if(el.value.item){ 
-                el.value.item._relinkItems(this);
+        for (let n of this.list){
+            if(n.value.item){ 
+                n.value.item._relinkItems(this);
             }
         }
     }
@@ -248,9 +248,9 @@ class Outfit { //extends Inventory{
     }
     //detect which slots are used by a item
     findItemSlot(id){
-        let _idx =[];
-        for (el of this.list){
-            if(el.value.id===id) _idx.push(el.index);
+        let n,_idx =[];
+        for (n of this.list){
+            if(n.value.id===id) _idx.push(n.index);
         }
         return(_idx);
     }
@@ -266,10 +266,10 @@ class Outfit { //extends Inventory{
     }
     //returns all Item-Ids in list
     getAllIds(){   
-        let ids=[];
-        for (el of this.list){
-            if(el.value.item && ids.indexOf(el.value.item.id)<0){ //only unique items  
-                ids.push(el.value.item.id);
+        let n,ids=[];
+        for (n of this.list){
+            if(n.value.item && ids.indexOf(n.value.item.id)<0){ //only unique items  
+                ids.push(n.value.item.id);
             }
         }
         return(ids);
@@ -380,8 +380,8 @@ class Outfit { //extends Inventory{
     }
     updateTime(){
         let now =window.gm.getTime();
-        for(el of this.list){
-            let _eff = el.value.item;
+        for(var n of this.list){
+            let _eff = n.value.item;
             if(_eff) _eff.onTimeChange(now);   
         }
     }
@@ -415,9 +415,9 @@ class Outfit { //extends Inventory{
         for(var i=0;i<_keys.length;i++){
             item = lewd[_keys[i]];
             var _keys2 = Object.keys(item);
-            for(el of _keys2){
-                if(total.hasOwnProperty(el)) total[el] += item[el];
-                else total[el] = item[el];
+            for(var n of _keys2){
+                if(total.hasOwnProperty(n)) total[n] += item[n];
+                else total[n] = item[n];
             }
         }
         return(total);

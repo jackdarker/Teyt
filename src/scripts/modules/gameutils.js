@@ -12,6 +12,12 @@ window.gm.initGame= function(forceReset,NGP=null){
   window.gm.images = imagesMaps(window.gm.images);
   window.gm.images = imagesEquip(window.gm.images);
   window.gm.images = imagesIcons(window.gm.images);
+  //if svg have no size set, they use whole space, use this to force them to fit into a box
+  window.gm.images._sizeTo = function(_pic,width,height){ 
+    var node = SVG(_pic);
+    node.width(width),node.height(height)
+    return(node.node.outerHTML);
+  }
     var s = window.story.state;
     s._gm.timeRL= s._gm.timeVR = s._gm.time;
     s._gm.dayRL= s._gm.dayVR = s._gm.day;
@@ -144,9 +150,9 @@ window.gm.initGame= function(forceReset,NGP=null){
         s.PlayerRL=ch;
     }
     /*let dngs = [BeeHive,ShatteredCity]; //add your dngs here !
-    for(el of dngs){
-      if (!s.dng[el.name]||forceReset){ 
-        s.dng[el.name] = el.persistentDngDataTemplate();
+    for(var n of dngs){
+      if (!s.dng[n.name]||forceReset){ 
+        s.dng[n.name] = n.persistentDngDataTemplate();
       }
     } */   
     
@@ -156,6 +162,7 @@ window.gm.initGame= function(forceReset,NGP=null){
     if(NGP){ window.story.state.vars.crowBarLeft = NGP.crowBarLeft; }
     NGP=null; //release memory
 }
+
 //this initialises game-objects that are not class-based
 window.gm.initGameFlags = function(forceReset,NGP=null){
   let s= window.story.state,map,data;
@@ -163,7 +170,9 @@ window.gm.initGameFlags = function(forceReset,NGP=null){
   if (forceReset){  
     s.Settings=s.DngCV=s.DngDF=s.DngAM=s.DngSY=s.DngMN=s.DngAT=null; 
     s.DngFM=s.DngSC=s.DngLB=s.DngHC=s.DngPC=null;
+    s.Know = {}
   }
+  let Know = {};
   let Settings = {
     showCombatPictures:true,
     showNSFWPictures:true,
@@ -198,6 +207,7 @@ window.gm.initGameFlags = function(forceReset,NGP=null){
   let DngMN = dataPrototype();DngMN.page={}; //which bookpages got collected
   //see comment in rebuildFromSave why this is done
   s.Settings=window.gm.util.mergePlainObject(Settings,s.Settings);
+  s.Know=window.gm.util.mergePlainObject(Know,s.Know);
   s.DngDF=window.gm.util.mergePlainObject(DngDF,s.DngDF);
   s.DngAM=window.gm.util.mergePlainObject(DngAM,s.DngAM);
   s.DngSY=window.gm.util.mergePlainObject(DngSY,s.DngSY);
@@ -236,8 +246,8 @@ window.gm.getScenePic = function(id){
     y=[{x:["H4","I4"],p:'assets/bg/bg_dungeon_2.png'}
       ,{x:["I4","J4"],p:'assets/bg/bg_dungeon_4.png'}
       ,{x:["F4","F5"],p:'assets/bg/bg_dungeon_3.png'} ]
-    for(var el of y){
-      if(el.x.indexOf(x)>=0) return el.p;
+    for(var n of y){
+      if(n.x.indexOf(x)>=0) return n.p;
     }
     return('assets/bg/bg_dungeon_2.png');
   }
@@ -316,24 +326,24 @@ window.gm.respawn=function(conf={keepInventory:false}){
   let msg=''
   if(!conf.keepInventory){ //remove inentory and outfit that is not questitem, cursed or permanent
     for(let i =window.gm.player.Outfit.list.length-1;i>=0;i-=1){
-      let el = window.gm.player.Outfit.list[i];
-      if(el.item && el.item.lossOnRespawn ) {
-        window.gm.player.Outfit.removeItem(el.id,true);
-        msg+=el.item.name+', ';
+      let n = window.gm.player.Outfit.list[i];
+      if(n.item && n.item.lossOnRespawn ) {
+        window.gm.player.Outfit.removeItem(n.id,true);
+        msg+=n.item.name+', ';
       }
     }
     for(let i =window.gm.player.Wardrobe.list.length-1;i>=0;i-=1){
-      let el = window.gm.player.Wardrobe.list[0];
-      if(el.item.lossOnRespawn ) {
-        window.gm.player.Wardrobe.removeItem(el.id,el.count);
-        msg+=el.item.name+', ';
+      let n = window.gm.player.Wardrobe.list[0];
+      if(n.item.lossOnRespawn ) {
+        window.gm.player.Wardrobe.removeItem(n.id,n.count);
+        msg+=n.item.name+', ';
       }
     }
     for(let i =window.gm.player.Inv.list.length-1;i>=0;i-=1){
-      let el = window.gm.player.Inv.list[i];
-      if(el.item.lossOnRespawn ) {
-        window.gm.player.Inv.removeItem(el.id,el.count);
-        msg+=el.item.name+', ';
+      let n = window.gm.player.Inv.list[i];
+      if(n.item.lossOnRespawn ) {
+        window.gm.player.Inv.removeItem(n.id,n.count);
+        msg+=n.item.name+', ';
       }
     }
     if(msg.length>0) msg="You lost "+(msg.substr(0,msg.length-2));
@@ -402,22 +412,22 @@ window.gm.printNav=function(label,dir,args=null){
   const X=['A','B','C','D','E','F','G','H','I','J','K','L','M','N'],Y=['0','1','2','3','4','5','6','7','8','9'];
   switch(dir){
     case 'north':
-      i=Y.findIndex((el)=>{return(el===here[1]);});
+      i=Y.findIndex((_x)=>{return(_x===here[1]);});
       if(i<0||i<=0) return('');
       to = here[0]+Y[i-1];
       break;
     case 'south':
-      i=Y.findIndex((el)=>{return(el===here[1]);});
+      i=Y.findIndex((_x)=>{return(_x===here[1]);});
       if(i<0||i>=Y.length-1) return('');
       to = here[0]+Y[i+1];
       break;
     case 'east':
-      i=X.findIndex((el)=>{return(el===here[0]);});
+      i=X.findIndex((_x)=>{return(_x===here[0]);});
       if(i<0||i>=X.length-1) return('');
       to = X[i+1]+here[1];
       break;
     case 'west':
-      i=X.findIndex((el)=>{return(el===here[0]);});
+      i=X.findIndex((_x)=>{return(_x===here[0]);});
       if(i<0||i<=0) return('');
       to = X[i-1]+here[1];
       break;
@@ -475,14 +485,14 @@ window.gm.printMap=function(MapName,playerTile,reveal,visitedTiles){
     visitedTiles.push(playerTile);
   }
   //node.find("#AM_Lv2_A1")[0].addClass('roomNotFound');
-  var _n,el,list= node.find('[data-reveal]');
-  for(el of list){
-    var x= parseInt(el.attr('data-reveal'),16);
-    if((x&reveal)===0) el.addClass('roomNotFound');
+  var _n,n,list= node.find('[data-reveal]');
+  for(n of list){
+    var x= parseInt(n.attr('data-reveal'),16);
+    if((x&reveal)===0) n.addClass('roomNotFound');
   }
-  for(el of visitedTiles){
-    if(el===playerTile) continue;
-    _n= node.find('#'+el)[0];
+  for(n of visitedTiles){
+    if(n===playerTile) continue;
+    _n= node.find('#'+n)[0];
     if(_n){_n.removeClass('roomFound');_n.addClass('roomVisited');}
   }
   _n= node.find('#'+playerTile)[0];
@@ -509,9 +519,9 @@ window.gm.printMap2=function(dng,playerTile,reveal,visitedTiles){
   }
   function nameToXY(name){
     let i,pos={x:0,y:0};
-    i=Y.findIndex((el)=>{return(el===name[1]);});
+    i=Y.findIndex((_x)=>{return(_x===name[1]);});
     pos.y=i*step;//if(i<0||i>=Y.length-1) return('');
-    i=X.findIndex((el)=>{return(el===name[0]);});
+    i=X.findIndex((_x)=>{return(_x===name[0]);});
     pos.x=i*step;//if(i<0||i>=Y.length-1) return('');
     return(pos);
   }  
@@ -577,11 +587,11 @@ window.gm.listImages = function(){
   let list = Object.keys(window.gm.images);
   let g,entry = document.createElement('p');
   entry.textContent ="";
-  for(let el of list){
-    if(el==='strToBuf'||el==='cache') continue;
+  for(let n of list){
+    if(n==='strToBuf'||n==='cache') continue;
     g = document.createElement('a');
-    g.href='javascript:void(0)',g.textContent=el;
-    const x = window.gm.images[el]();
+    g.href='javascript:void(0)',g.textContent=n;
+    const x = window.gm.images[n]();
     g.addEventListener("click",window.gm.printSceneGraphic2.bind(this,"",x));
     entry.appendChild(g);entry.appendChild(document.createTextNode(' '));//add \s or no automatic linebreak
   };
@@ -651,7 +661,7 @@ window.gm.printQuestList= function(){
 };
 //prints a description of the chars-body
 window.gm.printBodyDescription= function(whom,onlyvisible=false){
-  let msg = "";
+  let n,msg2="",msg = "";
   let conv = window.gm.util.descFixer(whom);
   let wornIds =whom.Outfit.getAllIds(); //todo this returns wearables & bodyparts
   let base = [] , head = [], torso =[], arms =[],legs =[], groin=[], other=[],breast=[],ignore=[];
@@ -665,16 +675,16 @@ window.gm.printBodyDescription= function(whom,onlyvisible=false){
   fcovered=[];
   if(onlyvisible){// filter by visibility 
     let covered=[];
-    for(el of wornIds){ //notice that an item is only pushed once even if has multiple slots
-      let item=whom.Outfit.getItem(el);
+    for(n of wornIds){ //notice that an item is only pushed once even if has multiple slots
+      let item=whom.Outfit.getItem(n);
       covered = covered.concat(item.slotCover);
     }
-    for(el of covered){
-      if(!fcovered.includes(el)) fcovered.push(el);
+    for(n of covered){
+      if(!fcovered.includes(n)) fcovered.push(n);
     }
   }
-  for(el of wornIds){ //notice that an item is only pushed once even if has multiple slots
-    let item=whom.Outfit.getItem(el);
+  for(n of wornIds){ //notice that an item is only pushed once even if has multiple slots
+    let item=whom.Outfit.getItem(n);
     if(item.slotUse.every(name => fcovered.includes(name))) ignore.push(item); //ignore those that are covered completely
     else if(item.slotUse.some(name => fignore.includes(name))) ignore.push(item);
     else if(item.slotUse.some(name => fbase.includes(name))) base.push(item);
@@ -691,10 +701,14 @@ window.gm.printBodyDescription= function(whom,onlyvisible=false){
   let all = base.concat([null]).concat(head).concat([null]).concat(torso).concat([null]).concat(arms).concat([null]);
   all = all.concat(legs).concat([null]).concat(groin).concat([null]).concat(breast).concat([null]).concat(other);
   //todo "considering the size of your manmeat you are hung like a horse"
-  for(el of all){ msg+= (el!==null)?el.descLong(conv)+' ':'</br>';}
+  for(let item of all){ 
+    msg+= (item!==null)?item.descLong(conv)+
+      ((item!==null&&item.pictureInv!=='unknown')?'</br>'+window.gm.images._sizeTo(window.gm.images[item.pictureInv](),200,200)+'</br>':' '):'</br>';  
+    //msg2+=(item!==null&&item.pictureInv!=='unknown')?window.gm.images[item.pictureInv]():'';
+  }
   let lewd = whom.Outfit.getLewdness();
   //msg +='</br>Total lewdness sluty:'+lewd.slut+' bondage:'+lewd.bondage+' sm:'+lewd.sm;
-	return msg+"</br>";
+	return msg+"</br>"+msg2;
 };
 // returns singular pronoun for the char depending on gender
 window.gm.util.estimatePronoun= function(whom){
@@ -745,10 +759,10 @@ window.gm.util.descFixer = function(whom){
           }
         }
       }
-      for(el of repl){//replace bracket+bracketcontent,
-        el.new = window.gm.util.lookupWord(el.text,pron);
-        let bef = text.substring(0,el.start), aft = text.substr(el.end+1);
-        text= bef+el.new+aft;
+      for(var n of repl){//replace bracket+bracketcontent,
+        n.new = window.gm.util.lookupWord(n.text,pron);
+        let bef = text.substring(0,n.start), aft = text.substr(n.end+1);
+        text= bef+n.new+aft;
       }
       // $[I]$ $[have]$ some rough [hair] that needs a lot combing. He has some rough...
       // c. She buys those pants. 

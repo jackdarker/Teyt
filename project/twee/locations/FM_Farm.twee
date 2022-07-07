@@ -286,15 +286,15 @@ function move(){
     panel.appendChild(link);
     var _list = Object.keys(data);
     const _target = ((boat==='A')?'B':'A'); 
-    for(el of _list){
-        if(data[el]===boat){
+    for(var n of _list){
+        if(data[n]===boat){
             const _critter=el;
             link = document.createElement('a'),link.href='javascript:void(0)',
             link.addEventListener("click", function(me){
                 data[_critter]=_target;boat=_target;
                 check();
             });
-            link.textContent="place "+el+" in the boat and row to "+_target;
+            link.textContent="place "+n+" in the boat and row to "+_target;
             choice.appendChild(link);
         }
     }

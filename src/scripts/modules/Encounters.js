@@ -96,6 +96,9 @@ window.gm.encounters.succubus = function(params){
             x.name+='#'+i;mobs.push(x);
         }
         return(mobs);});
+    window.gm.Encounter.onSubmit =window.gm.Encounter.onDefeat = function(){
+        return('As you are defeated, the succubus steps up to you...</br>'+ window.gm.printPassageLink('Next','SuccubusSubmit'));
+    }
     if(!_params.noStart) window.gm.Encounter.initCombat();
 }
 window.gm.encounters.mechanicguy = function(params){

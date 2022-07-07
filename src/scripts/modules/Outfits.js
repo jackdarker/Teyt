@@ -363,6 +363,10 @@ class TattooGroin extends Equipment {
     set style(style){ 
         this._style = style; 
     }
+    get pictureInv(){
+        if(this.style===100) return('tattoo_womb_lewdsign');
+        else return('unknown');
+    }
     get style(){return this._style;}
     get desc(){ 
         if(this.style===100) return('a kind of lewd mark');
@@ -436,6 +440,7 @@ class Briefs extends Equipment {
         this.slotCover = ['bPenis','bVulva','bBalls','bClit','bAnus','pPenis','pClit'];    
         this.lossOnRespawn = true;this.style=0;
     }
+    get pictureInv(){return('Tunic_F_Med');}
     get desc(){ return 'plain briefs';}
     set style(style){ 
         this._style = style; 
@@ -1055,3 +1060,6 @@ window.gm.ItemsLib = (function (ItemsLib){
     ItemsLib['WhipLeather'] = function(){ let x= new WhipLeather();return(x);};
     return ItemsLib; 
 }(window.gm.ItemsLib || {}));
+
+//todo stained cloths
+//shredded cloths need to be stitched

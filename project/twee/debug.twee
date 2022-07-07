@@ -94,14 +94,14 @@ Test svg inlined in code.</br>
 var oldTime = 1200;
 function change(){
   var menu = document.getElementById("progress-value");
-  var el = SVG("#wheel")//document.querySelector("#wheel")
-  var y,y2,x=el.node.ownerSVGElement.width.baseVal.value/2;//el.ownerSVGElement.width.baseVal.value/2;
+  var n = SVG("#wheel")//document.querySelector("#wheel")
+  var y,y2,x=n.node.ownerSVGElement.width.baseVal.value/2;//n.ownerSVGElement.width.baseVal.value/2;
   y=(oldTime-1200)*360/2400;y2=(menu.value-oldTime)*360/2400;
-  if((menu.value-oldTime)<0){el.rotate(-360,x,x),y2+=360};
-  el.animate().rotate(y2,x,x);//use SVG.js
+  if((menu.value-oldTime)<0){n.rotate(-360,x,x),y2+=360};
+  n.animate().rotate(y2,x,x);//use SVG.js
   oldTime=menu.value;
-  //el.setAttribute('transform', "rotate("+y+","+x+","+x+")");
-  /*el.animate([{
+  //n.setAttribute('transform', "rotate("+y+","+x+","+x+")");
+  /*n.animate([{
 				transform: "rotate("+y+","+x+","+x+")"
       }, {
 				transform: "rotate("+y2+","+x+","+x+")"

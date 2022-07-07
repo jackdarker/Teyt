@@ -189,7 +189,7 @@
       if(dir!==null){
         if(dir.hasTag(['barrier'])) continue; //todo mobs cant pass through barrier and other?
         var room = dir.roomB;
-        var next=this.nodes.find((el)=>{return(el.origNode===room);})
+        var next=this.nodes.find((_x)=>{return(_x.origNode===room);})
         ret.push(next);
       }
     }

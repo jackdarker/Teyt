@@ -623,11 +623,11 @@ window.gm.startBlockPuzzle=function(){
     //draw canvas; called internally
     function redraw(){
         _stage.clearRect(0, 0, _canvas.width, _canvas.height);
-        for(el of _goals){
-            el.render(_stage);
+        for(var n of _goals){
+            n.render(_stage);
         }
-        for(el of _pieces){
-            el.render(_stage);
+        for(var n of _pieces){
+            n.render(_stage);
         }
     }
     //returns true if pieces collides with other piece or outside border; called internally
@@ -667,9 +667,9 @@ window.gm.startBlockPuzzle=function(){
         switch(evtType){
         case 'key':
           if(x==='KeyR'){
-            for(el of _pieces){
-              if (el.isDragging){
-                el.rotate(90);
+            for(var n of _pieces){
+              if (n.isDragging){
+                n.rotate(90);
               }
             }
           }
@@ -677,29 +677,29 @@ window.gm.startBlockPuzzle=function(){
         case 'down':
             startX = x;
             startY = y;
-            for(el of _pieces){
-                if (!el.isDragging && el.isHit( x, y)){ 
-                    el.isDragging = true; 
-                    el.oldX=el.newX=el.x,el.oldY=el.newY=el.y;
+            for(var n of _pieces){
+                if (!n.isDragging && n.isHit( x, y)){ 
+                    n.isDragging = true; 
+                    n.oldX=n.newX=n.x,n.oldY=n.newY=n.y;
                 }
             }
             break;
         case 'up':
-            for(el of _pieces){ 
-                el.isDragging = false;
-                if(collides(el)){ el.x =el.oldX,el.y=el.oldY;}
+            for(var n of _pieces){ 
+                n.isDragging = false;
+                if(collides(n)){ n.x =n.oldX,n.y=n.oldY;}
             }
             break;
         case 'move':
             var dx = x - startX, dy = y - startY;
             startX = x;startY = y;
-            for(el of _pieces){
-                if (el.isDragging){
-                    el.newX += dx, el.newY += dy; 
-                    /*el.x=Math.floor(((el.newX-_gridwidth/2)/_gridwidth))*_gridwidth+_gridwidth/2;
-                    el.y=Math.floor(((el.newY-_gridwidth/2)/_gridwidth))*_gridwidth+_gridwidth/2;*/
-                    el.x=Math.floor(((el.newX)/_gridwidth))*_gridwidth; //floor is used to snap to grid
-                    el.y=Math.floor(((el.newY)/_gridwidth))*_gridwidth;
+            for(var n of _pieces){
+                if (n.isDragging){
+                    n.newX += dx, n.newY += dy; 
+                    /*n.x=Math.floor(((n.newX-_gridwidth/2)/_gridwidth))*_gridwidth+_gridwidth/2;
+                    n.y=Math.floor(((n.newY-_gridwidth/2)/_gridwidth))*_gridwidth+_gridwidth/2;*/
+                    n.x=Math.floor(((n.newX)/_gridwidth))*_gridwidth; //floor is used to snap to grid
+                    n.y=Math.floor(((n.newY)/_gridwidth))*_gridwidth;
                 }
             }
             break;
@@ -814,8 +814,8 @@ window.gm.startReactTest=function(bar, speed, stopCB, startCB,areas){
       click: click //ref to click-func
     }
     let gradient=''; 
-    for(el of data.areas){ //todo need to sort from left to right
-      gradient += '#80808000 0 '+el.a+'%, '+el.color+' '+el.a+'%,'+el.color+' '+el.b+'%,#80808000 '+el.b+'%,';
+    for(var n of data.areas){ //todo need to sort from left to right
+      gradient += '#80808000 0 '+n.a+'%, '+n.color+' '+n.a+'%,'+n.color+' '+n.b+'%,#80808000 '+n.b+'%,';
     }
     data.bargraph.parentNode.style.backgroundImage='linear-gradient(to right,'+gradient.slice(0,-1)+')';
     /**
@@ -909,8 +909,8 @@ window.gm.startReactTest=function(bar, speed, stopCB, startCB,areas){
       lastKey: ''
     }
     let gradient=''; 
-    for(el of data.areas){ //todo need to sort from left to right
-      gradient += '#80808000 0 '+el.a+'%, '+el.color+' '+el.a+'%,'+el.color+' '+el.b+'%,#80808000 '+el.b+'%,';
+    for(var n of data.areas){ //todo need to sort from left to right
+      gradient += '#80808000 0 '+n.a+'%, '+n.color+' '+n.a+'%,'+n.color+' '+n.b+'%,#80808000 '+n.b+'%,';
     }
     data.bargraph.parentNode.style.backgroundImage='linear-gradient(to right,'+gradient.slice(0,-1)+')';
     /**

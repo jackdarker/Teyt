@@ -137,7 +137,7 @@ getName(){
 }
 getCastDescription(castPreview){
     //update msg after sucessful cast
-    return(this.caster.name +" uses "+ this.name +" on " + castPreview.targets[0].name+".");
+    return(this.caster.name +" uses "+ this.name +" on " + ((castPreview.targets[0].name===this.caster.name)?"self":castPreview.targets[0].name)+".");
 }
 previewCast(target){
     var result = new SkillResult();
@@ -238,9 +238,9 @@ targetMultiple(targets){
     //[[mole1],[mole2]]
     var multi = [];
     multi.name = "all"; //there has to be a name for display
-    for(var el of possibletarget){
-        if(el.length===1)   //dont stack multi-targets
-            multi.push(el[0]);
+    for(var n of possibletarget){
+        if(n.length===1)   //dont stack multi-targets
+            multi.push(n[0]);
     }
     if(multi.length>0) possibletarget.push(multi);
     //[[mole1],[mole2],[mole1,mole2]]

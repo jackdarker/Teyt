@@ -9,7 +9,9 @@
 - cougar-girl/-mistress
 - grizzly
 - werwolf
-- latex-, pet-,pony-,cock-sleave-, milk-slave
+- latex-, pet-,pony-,cock-sleave-, milk-slave and mmaster/mistress
+- enforcer/chastiser - makes sure you
+- body artist - gies you tattos/piercings
 - fungus/spore-pod
 - vile vine
 - mimic, transportation trap
@@ -132,11 +134,17 @@ class Slime extends Mob {
     static factory(type){
         let foe = new Slime();
         foe.Outfit.addItem(WeaponSlobber.factory('slime'));
+        foe.name = foe.id = ((type===undefined)?'Slime':type);
         if(type ==='SlimeTentacled'){
-            //add tentacles and grappling
+            //todo add tentacles and grappling
+            foe.pic='Blob3';
             foe.loot= [{id:'BlueSlime',chance:55,amount:1},{id:'Money',chance:25,amount:20}];
-        } else {
+        } else if(type ==='SlimeBig') {
+            foe.pic='Blob1';
+            foe.Skills.addItem(SkillTransformSelf.factory(['Slime','Slime']))
             foe.loot= [{id:'GreenSlime',chance:55,amount:1},{id:'Money',chance:25,amount:20}];
+        } else { //Slime
+            foe.loot= [{id:'RedSlime',chance:55,amount:1},{id:'Money',chance:25,amount:20}];
         }
         return foe;
     }
@@ -150,19 +158,24 @@ class Slime extends Mob {
     }
     calcCombatMove(enemys,friends){
         let result = {OK:true,msg:''};
-        let rnd = _.random(1,100);
+        let skill,rnd = _.random(1,100);
         //if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
         result.action =result.target= null;
-        if(this.id === 'Slime'){
-            let skill= 'slime-slobber';
-            if(window.story.state.combat.turnCount>2 && rnd>30 && this.Skills.getItem(skill).isEnabled().OK){
-                rnd = _.random(0,enemys.length-1);
-                result.action = skill;
-                result.target = [enemys[rnd]];
-                result.msg =/*this.fconv("$[I]$ thrust $[my]$ stinger at "+result.target[0].name+".</br>")+*/result.msg;
-                return(result);
-            }
-        } 
+        skill="TransformSelfSlime"
+        let health = this.health()
+        if(this.id === 'SlimeBig' && window.story.state.combat.turnCount>2 && (health.value/health.max)<0.6 && this.Skills.getItem(skill).isEnabled().OK){
+            result.action = skill;
+            result.target = [this];
+            return(result);
+        }
+        skill= 'slime-slobber';
+        if(window.story.state.combat.turnCount>2 && rnd>30 && this.Skills.getItem(skill).isEnabled().OK){
+            rnd = _.random(0,enemys.length-1);
+            result.action = skill;
+            result.target = [enemys[rnd]];
+            result.msg =/*this.fconv("$[I]$ thrust $[my]$ stinger at "+result.target[0].name+".</br>")+*/result.msg;
+            return(result);
+        }
         return(super.calcCombatMove(enemys,friends));
     }
 }
@@ -374,11 +387,11 @@ class Succubus extends Mob {
         let foe = new Succubus();
         if(type==='succubus'){
             foe.Outfit.addItem(window.gm.ItemsLib.WhipLeather());
-        } else if(type==="nurse"){
+        } else if(type==="Nurse"){
             foe.name = foe.id = 'BNurse';
             foe.pic= 'Nurse1';
-            foe.Outfit.addItem(window.gm.ItemsLib.WhipLeather());
-        }
+            foe.Outfit.addItem(window.gm.ItemsLib.Syringe());
+        } 
         return foe;
     }
     constructor(){
@@ -413,7 +426,7 @@ class Succubus extends Mob {
             result.target = [this];
             result.msg =this.name+" moves into a defensive stance.</br>"+result.msg;
             return(result);
-        } else if (window.story.state.combat.turnCount %4 ===0){
+        } else if (window.story.state.combat.turnCount %2 ===0){
             rnd = _.random(0,enemys.length-1);
             result.action = "Tease";
             result.target = [enemys[rnd]];

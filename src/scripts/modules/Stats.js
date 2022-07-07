@@ -886,7 +886,7 @@ class effPillEffect extends Effect {
 class effLewdMark extends Effect {
     constructor(){
         super();
-        this.data.id = this.data.name= effLewdMark.name, this.data.duration = 60, this.data.hidden=0;
+        this.data.id = effLewdMark.name, this.data.name='Lewdmark',this.data.duration = 60, this.data.hidden=0;
         this.data.cycles = 3, this.data.magnitude = 1;
     }
     toJSON(){return window.storage.Generic_toJSON("effLewdMark", this); };
@@ -899,6 +899,7 @@ class effLewdMark extends Effect {
     onApply(){
         this.data.duration = 60;
         this.data.time = window.gm.getTime();
+        window.gm.know(window.gm.FKnow.LewdMark);
     }
     merge(neweffect){
         if(neweffect.name===this.data.name){
@@ -1225,12 +1226,12 @@ class effCombined extends CombatEffect {
         super();
         this.effects = EffectsA.concat(EffectsB);
         this.data.id = this.data.name= effCombined.name, this.data.duration = 0, this.data.hidden=0;
-        for(el of this.effects){
-            el.onRemove = (function(me){
-                let _old = el.onRemove.bind(el); 
+        for(var n of this.effects){
+            n.onRemove = (function(me){
+                let _old = n.onRemove.bind(n); 
                 let foo = function(){
-                    _old.call(el); //override onRemove but call orignial fct
-                    let i = me.effects.indexOf(el);
+                    _old.call(n); //override onRemove but call orignial fct
+                    let i = me.effects.indexOf(n);
                     if(i>=0) me.effects.splice(i,1);
                     me.removeAll();
                 }
@@ -1239,8 +1240,8 @@ class effCombined extends CombatEffect {
         }
     }
     removeAll(){
-        for(el of this.effects){
-            if(el) el.parent.removeItem(el.id);
+        for(var n of this.effects){
+            if(n) n.parent.removeItem(n.id);
         }
         this.parent.removeItem(this.id);
     }
@@ -1536,7 +1537,7 @@ class effCallHelp extends CombatEffect {
     onTurnStart(){
         this.data.duration-=1;
         if(this.data.duration===0){ //spawn after delay
-            this.data.spawns.push(window.gm.Encounter.spawnChar(this.data.item,this.data.faction));
+            this.data.spawns.push(window.gm.Encounter.spawnChar(this.data.item,this.data.faction,this.parent.parent.level));
             
         } else if(this.data.spawns.length>0){
             //remove effect after spawns are killed
@@ -1551,6 +1552,49 @@ class effCallHelp extends CombatEffect {
     }
     configureSpawn(item,faction,amount=1){
         this.data.item=item,this.data.faction=faction,this.data.amount=amount;
+    }
+}
+//transform the mob into different mob
+class effTransformSelf extends CombatEffect {
+    constructor(){
+        super();
+        this.data.id = this.data.name= effTransformSelf.name, this.data.duration = 1;
+        this.data.spawns=[];
+    }
+    toJSON(){return window.storage.Generic_toJSON("effTransformSelf", this); };
+    static fromJSON(value){ return window.storage.Generic_fromJSON(effTransformSelf, value.data);};
+    get desc(){return(effTransformSelf.name);}
+    onApply(){
+        //this.data.duration = 0;
+    }
+    merge(neweffect){
+        if(neweffect.name===this.data.name){    //ignore
+            return(true);
+        }
+    }
+    get shortDesc(){
+        if(this.data.spawns.length>0) return("Transformed into"+this.data.item[0]);
+        else return("Transforms into "+this.data.item);
+    }
+    onTurnStart(){
+        this.data.duration-=1;
+        if(this.data.duration===0){ //spawn after delay
+            for(var i=0;i<this.data.item.length;i++) {   //todo how to transform into higher level
+                if(i===0){ this.data.spawns.push(window.gm.Encounter.replaceChar(this.data.item[i],this.parent.parent)); }
+                else {this.data.spawns.push(window.gm.Encounter.spawnChar(this.data.item[i],this.parent.parent.faction,this.parent.parent.level));}
+            }
+            let _h=this.parent.parent.health(); _h=-0.7; //_h=(_h.value/_h.max)-1
+            let mobs = window.story.state.combat.enemyParty.concat(window.story.state.combat.playerParty);
+            for(var i=mobs.length-1;i>=0;i--){
+                if(this.data.spawns.includes(mobs[i].name)) mobs[i].Stats.scaleValue('health',_h); //decrease new mobs health;
+            }            
+        } //todo reverse transformation after time,damage,energyloss...
+        return({OK:true,msg:''});
+    }
+    //items is a list of mob-ids; the first one will replace this mob, the others will be added 
+    configureSpawn(items){
+        if(items instanceof Array) this.data.item=items;
+        else this.data.item=[items];
     }
 }
 class effKamikaze extends CombatEffect { //if <10%health kill yourslef and damage all enemys
@@ -1572,8 +1616,8 @@ class effKamikaze extends CombatEffect { //if <10%health kill yourslef and damag
         let h = this.parent.parent.Stats.get('health').value, hmax= this.parent.parent.Stats.get('healthMax').value;
         if(h/hmax<0.5){ //if health is low trigger effect and kill yourself
             let targets= window.story.state.combat.playerParty; //todo +enemyParty?
-            for(let el of targets){
-                el.addEffect(effDamage.factory(10,'slash'));
+            for(let n of targets){
+                n.addEffect(effDamage.factory(10,'slash'));
             }
             this.parent.removeItem(this.data.id);
             this.parent.parent.Stats.increment("health",h*-1);
@@ -1645,6 +1689,7 @@ window.gm.StatsLib = (function (StatsLib){
     window.storage.registerConstructor(effTeaseDamage);
     window.storage.registerConstructor(effTired);
     window.storage.registerConstructor(effStunned);
+    window.storage.registerConstructor(effTransformSelf);
     window.storage.registerConstructor(effGuard);
     window.storage.registerConstructor(effHeal);
     window.storage.registerConstructor(effMasochist);
@@ -1667,6 +1712,5 @@ window.gm.StatsLib = (function (StatsLib){
     window.storage.registerConstructor(effVaginalPregnant);
     //
     window.storage.registerConstructor(skCooking);
-
     return(StatsLib); 
 }(window.gm.StatsLib || {}));

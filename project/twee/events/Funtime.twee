@@ -76,6 +76,14 @@ You cant hold any longer and shoot your jizzm inside her.
 <script>window.gm.sex.wolfOnPlayer({state:0, battleResult:'victory'});
 </script>
 
+:: SuccubusSubmit  [_nosave_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<div id='panel'></div><!--description is rendered here-->
+<div id='choice'></div> <!--choice is rendered here-->
+</article><article id="LogPanel"></article></section>
+<script>window.gm.sex.succubusOnPlayer({state:0, battleResult:'defeat'});
+</script>
+
 :: DryadVictory [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <div id='panel'></div><!--description is rendered here-->

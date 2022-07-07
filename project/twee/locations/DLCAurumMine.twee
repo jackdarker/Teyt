@@ -95,15 +95,15 @@ Are you really going to flee from battle?
 </article><article id="LogPanel"></article></section>
 <script>function leave(){
   var tmp=window.story.state.dng.arena;
-  for(let el of tmp.loot){
-    window.gm.player.changeInventory(window.gm.ItemsLib[el.id](),el.count);
+  for(let n of tmp.loot){
+    window.gm.player.changeInventory(window.gm.ItemsLib[n.id](),n.count);
   }
   window.story.show((tmp.enc==='')?'ForestBorder':'AM_Lv2_Start');
 }
 function showPrize(){
   let msg='', tmp=window.story.state.dng.arena;
-  for(let el of tmp.loot){
-    msg+=el.count+'x '+window.gm.ItemsLib[el.id]().name+'</br>';
+  for(let n of tmp.loot){
+    msg+=n.count+'x '+window.gm.ItemsLib[n.id]().name+'</br>';
   }
   return msg;
 }
@@ -284,9 +284,9 @@ You open the chest and find...<div id='output'></div></br>
 var foo,msg='',Items=[];
 var rnd=window.story.state.tmp.args[1],next=window.story.state.tmp.args[2];   
 function addLoot(){
-  for(let el of Items){ msg+=el.name+", ";};
+  for(let n of Items){ msg+=n.name+", ";};
   foo=function(){ window.story.state.tmp.args=[];
-    for(let el of Items){window.gm.player.changeInventory(el,1);}
+    for(let n of Items){window.gm.player.changeInventory(n,1);}
     window.story.show(next); //adding to inventory only if player is leaving the passage, otherwise he could glitch if switching to status-pane and back
   }
 }
