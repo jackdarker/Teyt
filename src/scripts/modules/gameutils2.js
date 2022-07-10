@@ -35,14 +35,15 @@ window.gm.navHere = function(to){
     window.story.state.DngSY.prevLocation=window.gm.player.location;
     window.story.state.DngSY.nextLocation=to;
     to=window.gm.navEvent(to,window.story.state.DngSY.prevLocation);
-    if(to==="") to=window.story.state.DngSY.nextLocation;
-    window.gm.addTime(15);
+    if(to==="") { to=window.story.state.DngSY.nextLocation; }
+    else{ window.gm.addTime(30);}
+    window.gm.addTime(30);
     window.story.show(to);
 }
 window.gm.navEvent = function(to,from){
     let _targ = '',dir,dirs,evt,evts,dng=window.story.state.DngSY.dng;
     let _to=to.replace(dng+"_",""),_from=from.replace(dng+"_","");
-    let _room=to.replace(dng+"_","");
+    let _addTime=0,_room=to.replace(dng+"_","");
     //tick = timestamp  
     //state: 0-active  1-inactive  
     let _leaveChance=0,_allChances=0,_now=window.gm.getTime(), _rnd=_.random(0,100);
@@ -361,20 +362,18 @@ window.gm.build_DngPC=function(){
         data.tmp.evtEnter = { //events on tile-enter
             H4: {gas:{tick:window.gm.getTime(),state:0 }},
         }
-        data.tmp.doors = { //doors
-            I2:{H2:{tick:'',state:0,token:1,tier:3 }}
-            ,F3:{F2:{tick:'',state:0,token:1,tier:5 }}
-            ,E4:{E5:{tick:'',state:0,token:1,tier:2 }}
-            ,H4:{H3:{tick:'',state:0,token:2,tier:6}}
-            ,G4:{F4:{tick:'',state:0,token:1,tier:1},G3:{tick:'',state:0,token:1,tier:4},G5:{tick:'',state:0,token:1,tier:5}}
-            ,I4:{I3:{tick:'',state:0,token:1,tier:3 }}
-            ,K4:{K3:{tick:'',state:0,token:1,tier:3 }}
-            ,E5:{D5:{tick:'',state:0,token:1,tier:3 }}
-            ,G5:{G6:{tick:'',state:0,token:1,tier:4 },G4:{tick:'',state:0,token:1,tier:5 }}
-            ,I5:{J5:{tick:'',state:0,token:1,tier:7 }}
-            ,J5:{I5:{tick:'',state:0,token:1,tier:7 }}
-            ,G6:{G5:{tick:'',state:0,token:1,tier:4 }}
-            ,H6:{I6:{tick:'',state:0,token:1,tier:3 }}
+        data.tmp.doors = { //doors 2way
+            I2:{H2:{state:0,token:1,tier:3 }}
+            ,F3:{F2:{state:0,token:1,tier:5 }}
+            ,E4:{E5:{state:0,token:1,tier:2 }}
+            ,H4:{H3:{state:0,token:2,tier:6}}
+            ,G4:{F4:{state:0,token:1,tier:1},G3:{state:0,token:1,tier:4}}
+            ,I4:{I3:{state:0,token:1,tier:3 }}
+            ,K4:{K3:{state:0,token:1,tier:3 }}
+            ,E5:{D5:{state:0,token:1,tier:3 }}
+            ,G5:{G6:{state:0,token:1,tier:4 },G4:{state:0,token:1,tier:5 }}
+            ,I5:{J5:{state:0,token:1,tier:7 }}
+            ,H6:{I6:{state:0,token:1,tier:3 }}
         }
         data.tmp.evtSpawn = { //respawn evts 
             DngPC_I4: {chest:{tick:window.gm.getTime(),state:0, loot:[{id:"Money",count:30}]},

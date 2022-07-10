@@ -211,6 +211,48 @@ class Slug extends Mob {
         return(super.calcCombatMove(enemys,friends));
     }
 }
+class Spider extends Mob { 
+    static factory(type){
+        let foe = new Spider();
+        foe.name = foe.id = ((type===undefined)?'Spider':type);
+        if(type ==='spiderswarm'){
+            foe.pic='spider3';
+            foe.Stats.increment('healthMax',-0.3*(foe.health().max));
+            foe.loot= [{id:'Cobwebs',chance:55,amount:2},{id:'Money',chance:25,amount:20}];
+        } else if(type ==='tarantula'){
+            foe.pic='spider2';
+            foe.loot= [{id:'Cobweb',chance:55,amount:1},{id:'Money',chance:25,amount:20}];
+        } else {
+            foe.pic='spider1';
+            foe.Stats.increment('healthMax',-0.5*(foe.health().max));
+            foe.loot= [{id:'Cobwebs',chance:55,amount:1},{id:'Money',chance:25,amount:20}];
+        }
+        return foe;
+    }
+    constructor(){
+        super();
+        this.name = this.id = 'Spider';
+        this.pic= 'unknown';
+        this.level_min =1;
+        this.Outfit.addItem(new BaseInsect());
+        this.Outfit.addItem(new ArmorTorso('chitin'));
+        this.Outfit.addItem(new FaceInsect('spider')); //todo legs
+    }
+    calcCombatMove(enemys,friends){
+        let result = {OK:true,msg:''};
+        let rnd = _.random(1,100);
+        //if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
+        result.action =result.target= null;
+        if(window.story.state.combat.turnCount%2===0){
+            rnd = _.random(0,enemys.length-1);
+            result.action = "Bite";
+            result.target = [enemys[rnd]];
+            result.msg =this.name+" snaps at "+result.target[0].name+".</br>"+result.msg;
+            return(result);
+        }
+        return(super.calcCombatMove(enemys,friends));
+    }
+}
 class Leech extends Mob {
     static factory(type){
         let foe = new Leech();
@@ -338,6 +380,33 @@ class AnthroCat extends Mob {
         this.Outfit.addItem(AnusHuman.factory('cat'));
         this.Outfit.addItem(TailWolf.factory('cat'));
         this.Outfit.addItem(VulvaHuman.factory('cat'));
+        this.Outfit.addItem(ShortsLeather.factory(100));
+        //let sk = new SkillKick();this.Skills.addItem(sk);
+    }
+}
+class AnthroWolf extends Mob {
+    static factory(type){
+        let foe = new AnthroWolf();
+        if(type==='Wolfman'){
+            foe.pic= 'WolfMan1'
+            foe.Outfit.addItem(window.gm.ItemsLib['SpearStone']());
+        } else {
+            foe.Outfit.addItem(new DaggerSteel());
+        }
+        return foe;
+    }
+    constructor(){
+        super();
+        this.name = this.id = 'AnthroWolf';
+        this.pic= 'unknown';
+        this.Outfit.addItem(new BaseHumanoid());
+        this.Outfit.addItem(SkinFur.factory('wolf'));
+        this.Outfit.addItem(HandsHuman.factory('wolf'));
+        this.Outfit.addItem(BreastHuman.factory('wolf'));
+        this.Outfit.addItem(FaceWolf.factory('wolf'));
+        this.Outfit.addItem(AnusHuman.factory('wolf'));
+        this.Outfit.addItem(TailWolf.factory('wolf'));
+        this.Outfit.addItem(VulvaHuman.factory('wolf'));
         this.Outfit.addItem(ShortsLeather.factory(100));
         //let sk = new SkillKick();this.Skills.addItem(sk);
     }
@@ -853,11 +922,11 @@ window.gm.Mobs = (function (Mobs){
     Mobs.Slime = Slime.factory;
     Mobs.Lizan = Lizan.factory;
     Mobs.Wolf = Wolf.factory;
-    //Mobs.AlphaWolf = function(){ return function(param){return(Wolf.factory(param));}(100)};
+    Mobs.AnthroWolf = AnthroWolf.factory;
     Mobs.Leech = Leech.factory;  
-    Mobs.Slug = Slug.factory; 
+    Mobs.Slug = Slug.factory;
+    Mobs.Spider = Spider.factory;
     Mobs.Succubus = Succubus.factory;
-    //Mobs.BNurse = function(){ return function(param){return(Succubus.factory(param));}(10)};
     Mobs.Dryad = Dryad.factory; 
     Mobs.Vine = Vine.factory; 
     Mobs.Mechanic = Mechanic.factory;

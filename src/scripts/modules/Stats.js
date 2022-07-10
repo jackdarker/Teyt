@@ -1574,7 +1574,7 @@ class effTransformSelf extends CombatEffect {
     }
     get shortDesc(){
         if(this.data.spawns.length>0) return("Transformed into"+this.data.item[0]);
-        else return("Transforms into "+this.data.item);
+        else return("Transforms into "+this.data.item[0]);
     }
     onTurnStart(){
         this.data.duration-=1;
@@ -1630,7 +1630,7 @@ class effKamikaze extends CombatEffect { //if <10%health kill yourslef and damag
     }
 }
 //todo transformSelf: replace the caster with a different class & regenerate energy  
-
+//restricted: stuck in cobwebs, goo
 //skills
 class skCooking extends Effect {
     constructor(){

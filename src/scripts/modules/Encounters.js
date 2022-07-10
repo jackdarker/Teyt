@@ -63,6 +63,17 @@ window.gm.encounters.slug = function(params){
         return(mobs);});
     if(!_params.noStart) window.gm.Encounter.initCombat();
 }
+window.gm.encounters.spider = function(params){
+    let _params=window.gm.encounters._setup(params);
+    window.gm.Encounter.EnemyFunc = (function(){ 
+        let mobs =[];
+        for(var i=_params.amount;i>0;i-=1){
+            let x = window.gm.Mobs.Spider(); x.scaleLevel(window.gm.player.level+_params.levelUp);
+            x.name+='#'+i;mobs.push(x);
+        }
+        return(mobs);});
+    if(!_params.noStart) window.gm.Encounter.initCombat();
+}
 window.gm.encounters.fungus = function(params){
     let _params=window.gm.encounters._setup(params);
     window.gm.Encounter.EnemyFunc = (function(){ 
@@ -192,7 +203,6 @@ window.gm.encounters.naga = function(params){
         return(mobs);});
     if(!_params.noStart) window.gm.Encounter.initCombat();
 }
-/*------------------------*/
 window.gm.encounters.wolf = function(params){
     let _params=window.gm.encounters._setup(params);
     window.gm.Encounter.EnemyFunc = (function(){ 
@@ -257,6 +267,25 @@ window.gm.encounters.anthrocat = function(params){
     }
     window.gm.Encounter.onVictory = function(){
         return('The cat surrenders.</br>'+this.fetchLoot()+'</br>'+ window.gm.printPassageLink('Next','LapineVictory'));
+    }
+    if(!_params.noStart) window.gm.Encounter.initCombat();
+}
+window.gm.encounters.anthrowolf = function(params){
+    let _params=window.gm.encounters._setup(params);
+    window.gm.Encounter.EnemyFunc = (function(){ 
+        let mobs =[];
+        for(var i=_params.amount;i>0;i-=1){
+            let x = window.gm.Mobs.AnthroWolf(); x.scaleLevel(window.gm.player.level+_params.levelUp);
+            x.name+='#'+i;mobs.push(x);
+        }
+        return(mobs);});
+    window.gm.Encounter.onSubmit =window.gm.Encounter.onDefeat = function(){
+        return('You cannot fight anymore and surrender to the beast.</br>'+ window.gm.printPassageLink('Next','WolfSubmit'));
+    }
+    window.gm.Encounter.onVictory = function(){
+        window.story.state.tmp.args=[(function(){ window.gm.sex.wolfOnPlayer({state:0, battleResult:'victory'});})];
+        return('Intimitated, the wolf rolls on its back, whimpering submissively and exposing its throat.</br>'+this.fetchLoot()+'</br>'+ window.gm.printPassageLink('Next','GenericPassage'));
+        //return('Intimitated, the wolf rolls on its back, whimpering submissively and exposing its throat.</br>'+this.fetchLoot()+'</br>'+ window.gm.printPassageLink('Next','WolfVictory'));
     }
     if(!_params.noStart) window.gm.Encounter.initCombat();
 }

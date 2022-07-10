@@ -283,6 +283,8 @@ class FaceInsect extends BodyPart {
                 break;
             case 'bug':
                 break;
+            case 'spider':
+                break;
             default:
                 throw new Error("unknown Face-style "+id);
         }

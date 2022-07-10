@@ -37,11 +37,11 @@ There is a gate in front of you but it is locked.</br>
 <a0 onclick='window.story.show(window.story.state.DngSY.prevLocation)'>Go back</a>. 
 </article><article id="LogPanel"></article></section>
 <script>function requiredKey(){
-    var msg='',dng=window.story.state.DngSY.dng;
+    var msg='',dng=window.story.state.DngSY.dng,doors=window.story.state.DngPC.tmp.doors;
     var x=window.story.state.DngSY.prevLocation.replace(dng+'_',''),y=window.story.state.DngSY.nextLocation.replace(dng+'_','');
-    var door = window.story.state.DngPC.tmp.doors[x];
+    var door = (doors[x]&&doors[x][y])||(doors[y]&&doors[y][x]);
     window.gm.dbgHelper();
-    if(door && door[y]){
+    if(door){
         msg='Someone with a high enough tier might be able to unlock this door.';
     } else {
         msg='I dont know how to unlock that door.';
@@ -215,17 +215,28 @@ window.gm.printOutput(msg);
     }
     let _t=_d.tier,_allChances=0,_choice=[];
     switch(here){//foes; traps are handled in window.gm.navEvent, there might also be evtLeave added elsewhere
+        case "DngPC_D4":_choice.push({id:'Ruff', amount:1,chance:100});//boss
+            break;
+        case "DngPC_E4": 
+            _choice.push({id:'succubus',type:"Succubus",levelUp:(-2+_t), amount:1, chance:100});
         case "DngPC_H4":
+        case "DngPC_I4": 
         case "DngPC_F4":
         case "DngPC_F5":
-            _choice.push({id:'slime',type:"Slime",levelUp:(-2+_t), amount:1, chance:100});
+            _choice.push({id:'lapine',levelUp:(-2+_t), amount:1, chance:50});
+            _choice.push({id:'slime',type:"Slime",levelUp:(-2+_t), amount:1, chance:50});
+            if(_t<=3)_choice.push({id:'spider',type:"spiderswarm",levelUp:(-2+_t), amount:1, chance:50});
             if(_t>1)_choice.push({id:'slime',type:"SlimeBig",levelUp:(-2+_t), amount:1, chance:100});
             if(_t>1)_choice.push({id:'anthrocat', amount:1, chance:100});
             if(_t>3)_choice.push({id:'wolf', amount:1, chance:100});
             break;
-        case "DngPC_I4": 
+        case "DngPC_J4":
+            _choice.push({id:'succubus',type:"Succubus",levelUp:(+2+_t), amount:1, chance:100});
+            break;
         case "DngPC_H5":
-            _choice.push({id:'succubus',type:"Succubus",levelUp:(-2+_t), amount:1, chance:100});
+            if(_t>1)_choice.push({id:'dryad', amount:1, chance:100});
+            if(_t>1)_choice.push({id:'anthrocat', amount:1, chance:100});
+            if(_t>3)_choice.push({id:'anthrocat', amount:2, chance:100});
             break;
         case "DngPC_H6":
             _choice.push({id:'hornett',levelUp:(-2+_t), amount:2, chance:100});
@@ -234,9 +245,7 @@ window.gm.printOutput(msg);
             if(_t>3)_choice.push({id:'wolf', amount:2, chance:100});
             break;
         case "DngPC_F6":_choice.push({id:'slug', amount:1,chance:100});//boss
-            break;
-        case "DngPC_J4":_choice.push({id:'Ruff', amount:1,chance:100});//boss
-            break;
+            break; 
         case "DngPC_K4":
         case "DngPC_G6": 
             _choice.push({id:'hornetthive',type:"",levelUp:(-2+_t), amount:1, chance:100});//
@@ -387,7 +396,7 @@ A vendor sells some gear and might also buy some of your loot.<br> Would you lik
 <p>[[Back|DngPC_G4]]</p>
 </article><article id="LogPanel"></article></section>
 <script>
-function findWaresToBuy(){
+function findWares(){
     let item,item2,list = [],list2 = [],_d=window.story.state.DngPC,_t=_d.tmp.tier;
     list=[window.gm.ItemsLib['HealthPotionSmall'](),window.gm.ItemsLib['HealthPotion']()
     ,window.gm.ItemsLib['SpearWodden']()
@@ -423,9 +432,10 @@ function findWaresToBuy(){
         }
     }
     window.gm.shop.WaresToBuy = list2;
+    window.gm.shop.findWaresToSell([window.gm.ItemTags.Ingredient]);
 }
-findWaresToBuy();
-renderToSelector("#panel", "listbuy");
+findWares();
+renderToSelector("#panel", "listbuy");renderToSelector("#panel", "listsell");
 </script> 
 
 </article><article id="LogPanel"></article></section>
@@ -546,59 +556,24 @@ Something tells you that a bigger threat then before awaits to the east.</br><%=
 <%=window.story.render("DngPC_Encounters")%>
 
 :: DngPC_F5
-<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
-Another Arena</br><%=window.story.render("DngPC_Retreat")%>
-<%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
-</article><article id="LogPanel"></article></section>
-<%=window.story.render("DngPC_Encounters")%>
+<%=window.story.render("DngPC_F4")%>
 
 :: DngPC_G5
-<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
-Another Arena</br><%=window.story.render("DngPC_Retreat")%>
-<%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
-</article><article id="LogPanel"></article></section>
-<%=window.story.render("DngPC_Encounters")%>
+<%=window.story.render("DngPC_F4")%>
 
 :: DngPC_H5
-<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
-Another Arena</br><%=window.story.render("DngPC_Retreat")%>
-<%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
-</article><article id="LogPanel"></article></section>
-<%=window.story.render("DngPC_Encounters")%>
+<%=window.story.render("DngPC_F4")%>
 
 :: DngPC_I5
-<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
-Another Arena</br><%=window.story.render("DngPC_Retreat")%>
-<%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
-</article><article id="LogPanel"></article></section>
-<%=window.story.render("DngPC_Encounters")%>
+<%=window.story.render("DngPC_F4")%>
 
 :: DngPC_F6
-<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
-Another Arena</br><%=window.story.render("DngPC_Retreat")%>
-<%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
-</article><article id="LogPanel"></article></section>
-<%=window.story.render("DngPC_Encounters")%>
+<%=window.story.render("DngPC_F4")%>
 
 
 :: DngPC_G6
-<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
-Another Arena</br><%=window.story.render("DngPC_Retreat")%>
-<%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
-</article><article id="LogPanel"></article></section>
-<%=window.story.render("DngPC_Encounters")%>
+<%=window.story.render("DngPC_F4")%>
 
 
 :: DngPC_H6
-<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
-Another Arena</br><%=window.story.render("DngPC_Retreat")%>
-<%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
-</article><article id="LogPanel"></article></section>
-<%=window.story.render("DngPC_Encounters")%>
+<%=window.story.render("DngPC_F4")%>

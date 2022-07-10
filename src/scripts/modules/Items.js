@@ -193,6 +193,7 @@ class Ingredient extends Item {
         else if(style===120) this.id=this.name='RedSlime';
         else if(style===130) this.id=this.name='BlueSlime';
         else if(style===140) this.id=this.name='GreenSlime';
+        else if(style===150) this.id=this.name='Cobweb';
         else throw new Error(this.id +' doesnt know '+style);
     }
     get style(){return this._style;}
@@ -239,6 +240,9 @@ class Ingredient extends Item {
             case 130:
             case 140:
                 msg='glob of slime with a certain color';
+                break;
+            case 150:
+                msg='a fuzz of cobwebs';
                 break;
             default: throw new Error(this.id +' doesnt know '+style);
         }
@@ -671,6 +675,7 @@ window.gm.ItemsLib = (function (ItemsLib){
     ItemsLib['BlueSlime'] = function(){ let x=new Ingredient();x.style=110;return(x);};
     ItemsLib['RedSlime'] = function(){ let x=new Ingredient();x.style=120;return(x);};
     ItemsLib['GreenSlime'] = function(){ let x=new Ingredient();x.style=130;return(x);};
+    ItemsLib['Cobwebs'] = function(){ let x=new Ingredient();x.style=150;return(x);};
     //Questitems
     ItemsLib['IgneumPage'] = function(){ let x=new QuestItems();x.style=0;return(x);};
     ItemsLib['RedAnkh'] = function(){ let x=new QuestItems();x.style=10;return(x);};
