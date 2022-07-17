@@ -67,12 +67,12 @@ function tick(){
     if(here===window.story.state.DngMN.tmp.tickPass) return;
     window.story.state.DngMN.tmp.tickPass=here;
     if(here==='DngMN_J5' || here==='DngMN_F2'){
-        window.gm.encounters.wolf({amount:1});
+        window.gm.encounters.wolf({levelUp:-3,amount:1});
         window.gm.Encounter.initCombat();
     }
 }
 function fightHawk(){
-    window.gm.encounters.hawk({amount:1, noStart:true});
+    window.gm.encounters.hawk({levelUp:-3,amount:1, noStart:true});
     window.gm.Encounter.onVictory = (function(){
         window.story.state.DngMN.tmp.page[window.gm.player.location]=true;
         window.gm.player.Inv.addItem(new window.gm.ItemsLib['IgneumPage']());

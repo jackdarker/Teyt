@@ -22,7 +22,7 @@ window.gm.encounters.mole = function(params){
         let mobs =[];
         for(var i=_params.amount;i>0;i-=1){
             let x = window.gm.Mobs.Mole(); x.scaleLevel(window.gm.player.level+_params.levelUp);
-            x.name+='#'+i;mobs.push(x);
+            x.name=x.baseName+'#'+i;mobs.push(x);
         }
         return(mobs);});
     window.gm.Encounter.onSubmit = function(){
@@ -36,7 +36,7 @@ window.gm.encounters.leech = function(params){
         let mobs =[];
         for(var i=_params.amount;i>0;i-=1){
             let x = window.gm.Mobs.Leech(); x.scaleLevel(window.gm.player.level+_params.levelUp);
-            x.name+='#'+i;mobs.push(x);
+            x.name=x.baseName+'#'+i;mobs.push(x);
         }
         return(mobs);});
         if(!_params.noStart) window.gm.Encounter.initCombat();
@@ -47,7 +47,7 @@ window.gm.encounters.slime = function(params){
         let mobs =[];
         for(var i=_params.amount;i>0;i-=1){
             let x = window.gm.Mobs.Slime(_params.type); x.scaleLevel(window.gm.player.level+_params.levelUp);
-            x.name+='#'+i;mobs.push(x);
+            x.name=x.baseName+'#'+i;mobs.push(x);
         }
         return(mobs);});
     if(!_params.noStart) window.gm.Encounter.initCombat();
@@ -58,7 +58,7 @@ window.gm.encounters.slug = function(params){
         let mobs =[];
         for(var i=_params.amount;i>0;i-=1){
             let x = window.gm.Mobs.Slug(); x.scaleLevel(window.gm.player.level+_params.levelUp);
-            x.name+='#'+i;mobs.push(x);
+            x.name=x.baseName+'#'+i;mobs.push(x);
         }
         return(mobs);});
     if(!_params.noStart) window.gm.Encounter.initCombat();
@@ -69,7 +69,7 @@ window.gm.encounters.spider = function(params){
         let mobs =[];
         for(var i=_params.amount;i>0;i-=1){
             let x = window.gm.Mobs.Spider(); x.scaleLevel(window.gm.player.level+_params.levelUp);
-            x.name+='#'+i;mobs.push(x);
+            x.name=x.baseName+'#'+i;mobs.push(x);
         }
         return(mobs);});
     if(!_params.noStart) window.gm.Encounter.initCombat();
@@ -80,7 +80,7 @@ window.gm.encounters.fungus = function(params){
         let mobs =[];
         for(var i=_params.amount;i>0;i-=1){
             let x = window.gm.Mobs.Fungus(_params.type); x.scaleLevel(window.gm.player.level+_params.levelUp);
-            x.name+='#'+i;mobs.push(x);
+            x.name=x.baseName+'#'+i;mobs.push(x);
         }
         return(mobs);});
     if(!_params.noStart) window.gm.Encounter.initCombat();
@@ -91,9 +91,9 @@ window.gm.encounters.slugLeech = function(params){
         let mobs =[];
         for(var i=_params.amount;i>0;i-=1){
             let x = window.gm.Mobs.Slug(); x.scaleLevel(window.gm.player.level+_params.levelUp);
-            x.name+='#'+i;mobs.push(x);
+            x.name=x.baseName+'#'+i;mobs.push(x);
             x = window.gm.Mobs.Leech(); x.scaleLevel(window.gm.player.level+_params.levelUp);
-            x.name+='#'+i;mobs.push(x);
+            x.name=x.baseName+'#'+i;mobs.push(x);
         }
         return(mobs);});
     if(!_params.noStart) window.gm.Encounter.initCombat();
@@ -104,11 +104,12 @@ window.gm.encounters.succubus = function(params){
         let mobs =[];
         for(var i=_params.amount;i>0;i-=1){
             let x = window.gm.Mobs.Succubus(_params.type); x.scaleLevel(window.gm.player.level+_params.levelUp);
-            x.name+='#'+i;mobs.push(x);
+            x.name=x.baseName+'#'+i;mobs.push(x);
         }
         return(mobs);});
     window.gm.Encounter.onSubmit =window.gm.Encounter.onDefeat = function(){
-        return('As you are defeated, the succubus steps up to you...</br>'+ window.gm.printPassageLink('Next','SuccubusSubmit'));
+        window.story.state.tmp.args=[(function(){window.gm.sex.succubusOnPlayer({state:0, battleResult:'defeat'});})]
+        return('As you are defeated, the succubus steps up to you...</br>'+ window.gm.printPassageLink('Next','PostCombatPassage'));
     }
     if(!_params.noStart) window.gm.Encounter.initCombat();
 }
@@ -118,7 +119,7 @@ window.gm.encounters.mechanicguy = function(params){
         let mobs =[];
         for(var i=_params.amount;i>0;i-=1){
             let x = window.gm.Mobs.Mechanic(); x.scaleLevel(window.gm.player.level+_params.levelUp);
-            x.name+='#'+i;mobs.push(x);
+            x.name=x.baseName+'#'+i;mobs.push(x);
         }
         return(mobs);});
     if(!_params.noStart) window.gm.Encounter.initCombat();
@@ -129,7 +130,7 @@ window.gm.encounters.hawk = function(params){
         let mobs =[];
         for(var i=_params.amount;i>0;i-=1){
             let x = window.gm.Mobs.Hawk(); x.scaleLevel(window.gm.player.level+_params.levelUp);
-            x.name+='#'+i;mobs.push(x);
+            x.name=x.baseName+'#'+i;mobs.push(x);
         }
         return(mobs);});
     if(!_params.noStart) window.gm.Encounter.initCombat();
@@ -140,7 +141,7 @@ window.gm.encounters.hornett = function(params){
         let mobs =[];
         for(var i=_params.amount;i>0;i-=1){
             let x = window.gm.Mobs.Hornett(); x.scaleLevel(window.gm.player.level+_params.levelUp);
-            x.name+='#'+i;mobs.push(x);
+            x.name=x.baseName+'#'+i;mobs.push(x);
         }
         return(mobs);});
     if(!_params.noStart) window.gm.Encounter.initCombat();
@@ -154,7 +155,7 @@ window.gm.encounters.hornetthive = function(params){
             if(i===2){  //spawns always hive and a hornett
                 x = window.gm.Mobs.HornettHive(); x.scaleLevel(window.gm.player.level+_params.levelUp);
             } else { x = window.gm.Mobs.Hornett(); x.scaleLevel(window.gm.player.level+_params.levelUp);}
-            x.name+='#'+i;mobs.push(x);
+            x.name=x.baseName+'#'+i;mobs.push(x);
         }
         return(mobs);});
     if(!_params.noStart) window.gm.Encounter.initCombat();
@@ -165,7 +166,7 @@ window.gm.encounters.pillRoller = function(params){
         let mobs =[];
         for(var i=_params.amount;i>0;i-=1){
             let x = window.gm.Mobs.PillRoller(); x.scaleLevel(window.gm.player.level+_params.levelUp);
-            x.name+='#'+i;mobs.push(x);
+            x.name=x.baseName+'#'+i;mobs.push(x);
         }
         return(mobs);});
     if(!_params.noStart) window.gm.Encounter.initCombat();
@@ -176,7 +177,7 @@ window.gm.encounters.huntress = function(params){
         let mobs =[];
         for(var i=_params.amount;i>0;i-=1){
             let x = window.gm.Mobs.Huntress(); x.scaleLevel(window.gm.player.level+_params.levelUp);
-            x.name+='#'+i;mobs.push(x);
+            x.name=x.baseName+'#'+i;mobs.push(x);
         }
         return(mobs);});
     if(!_params.noStart) window.gm.Encounter.initCombat();
@@ -187,7 +188,7 @@ window.gm.encounters.lizan = function(params){
         let mobs =[];
         for(var i=_params.amount;i>0;i-=1){
             let x = window.gm.Mobs.Lizan(); x.scaleLevel(window.gm.player.level+_params.levelUp);
-            x.name+='#'+i;mobs.push(x);
+            x.name=x.baseName+'#'+i;mobs.push(x);
         }
         return(mobs);});
     if(!_params.noStart) window.gm.Encounter.initCombat();
@@ -198,7 +199,7 @@ window.gm.encounters.naga = function(params){
         let mobs =[];
         for(var i=_params.amount;i>0;i-=1){
             let x = window.gm.Mobs.naga(_params.type); x.scaleLevel(window.gm.player.level+_params.levelUp);
-            x.name+='#'+i;mobs.push(x);
+            x.name=x.baseName+'#'+i;mobs.push(x);
         }
         return(mobs);});
     if(!_params.noStart) window.gm.Encounter.initCombat();
@@ -213,15 +214,16 @@ window.gm.encounters.wolf = function(params){
             if(_.random(1,100)>50){
                 window.gm.MutationsLib.swapGender(x,window.storage.constructors["VulvaHuman"]);
             } 
-            x.name+='#'+i;mobs.push(x);
+            x.name=x.baseName+'#'+i;mobs.push(x);
         }
         return(mobs);});
     window.gm.Encounter.onSubmit =window.gm.Encounter.onDefeat = function(){
-        return('You cannot fight anymore and surrender to the beast.</br>'+ window.gm.printPassageLink('Next','WolfSubmit'));
+        window.story.state.tmp.args=[(function(){window.gm.sex.wolfOnPlayer({state:0, battleResult:'defeat'});})]
+        return('You cannot fight anymore and surrender to the beast.</br>'+ window.gm.printPassageLink('Next','PostCombatPassage'));
     }
     window.gm.Encounter.onVictory = function(){
         window.story.state.tmp.args=[(function(){ window.gm.sex.wolfOnPlayer({state:0, battleResult:'victory'});})];
-        return('Intimitated, the wolf rolls on its back, whimpering submissively and exposing its throat.</br>'+this.fetchLoot()+'</br>'+ window.gm.printPassageLink('Next','GenericPassage'));
+        return('Intimitated, the wolf rolls on its back, whimpering submissively and exposing its throat.</br>'+this.fetchLoot()+'</br>'+ window.gm.printPassageLink('Next','PostCombatPassage'));
         //return('Intimitated, the wolf rolls on its back, whimpering submissively and exposing its throat.</br>'+this.fetchLoot()+'</br>'+ window.gm.printPassageLink('Next','WolfVictory'));
     }
     /*window.gm.Encounter.sceneDone=false; //attach flag to Encounter-Instance;
@@ -242,14 +244,16 @@ window.gm.encounters.lapine = function(params){
         let mobs =[];
         for(var i=_params.amount;i>0;i-=1){
             let x = window.gm.Mobs.Lapine(); x.scaleLevel(window.gm.player.level+_params.levelUp);
-            x.name+='#'+i;mobs.push(x);
+            x.name=x.baseName+'#'+i;mobs.push(x);
         }
         return(mobs);});
     window.gm.Encounter.onSubmit =window.gm.Encounter.onDefeat = function(){
-        return('That bunny literally kicked your ass.</br>'+ window.gm.printPassageLink('Next','LapineDefeat'));
+        window.story.state.tmp.args=[(function(){window.gm.sex.lapineOnPlayer({state:0, battleResult:'defeat'});})]
+        return('That bunny literally kicked your ass.</br>'+ window.gm.printPassageLink('Next','PostCombatPassage'));
     }
     window.gm.Encounter.onVictory = function(){
-        return('The bunny surrenders.</br>'+this.fetchLoot()+'</br>'+ window.gm.printPassageLink('Next','LapineVictory'));
+        window.story.state.tmp.args=[(function(){window.gm.sex.lapineOnPlayer({state:0, battleResult:'victory'});})]
+        return('The bunny surrenders.</br>'+this.fetchLoot()+'</br>'+ window.gm.printPassageLink('Next','PostCombatPassage'));
     }
     if(!_params.noStart) window.gm.Encounter.initCombat();
 }
@@ -259,14 +263,16 @@ window.gm.encounters.anthrocat = function(params){
         let mobs =[];
         for(var i=_params.amount;i>0;i-=1){
             let x = window.gm.Mobs.AnthroCat(); x.scaleLevel(window.gm.player.level+_params.levelUp);
-            x.name+='#'+i;mobs.push(x);
+            x.name=x.baseName+'#'+i;mobs.push(x);
         }
         return(mobs);});
     window.gm.Encounter.onSubmit =window.gm.Encounter.onDefeat = function(){
-        return('Raked by a cat....</br>'+ window.gm.printPassageLink('Next','LapineDefeat'));
+        window.story.state.tmp.args=[(function(){window.gm.sex.lapineOnPlayer({state:0, battleResult:'defeat'});})]//todo
+        return('Raked by a cat....</br>'+ window.gm.printPassageLink('Next','PostCombatPassage'));
     }
     window.gm.Encounter.onVictory = function(){
-        return('The cat surrenders.</br>'+this.fetchLoot()+'</br>'+ window.gm.printPassageLink('Next','LapineVictory'));
+        window.story.state.tmp.args=[(function(){window.gm.sex.lapineOnPlayer({state:0, battleResult:'victory'});})]//todo
+        return('The cat surrenders.</br>'+this.fetchLoot()+'</br>'+ window.gm.printPassageLink('Next','PostCombatPassage'));
     }
     if(!_params.noStart) window.gm.Encounter.initCombat();
 }
@@ -276,15 +282,16 @@ window.gm.encounters.anthrowolf = function(params){
         let mobs =[];
         for(var i=_params.amount;i>0;i-=1){
             let x = window.gm.Mobs.AnthroWolf(); x.scaleLevel(window.gm.player.level+_params.levelUp);
-            x.name+='#'+i;mobs.push(x);
+            x.name=x.baseName+'#'+i;mobs.push(x);
         }
         return(mobs);});
     window.gm.Encounter.onSubmit =window.gm.Encounter.onDefeat = function(){
-        return('You cannot fight anymore and surrender to the beast.</br>'+ window.gm.printPassageLink('Next','WolfSubmit'));
+        window.story.state.tmp.args=[(function(){ window.gm.sex.wolfOnPlayer({state:0, battleResult:'defeat'});})];
+        return('You cannot fight anymore and surrender to the beast.</br>'+ window.gm.printPassageLink('Next','PostCombatPassage'));
     }
     window.gm.Encounter.onVictory = function(){
         window.story.state.tmp.args=[(function(){ window.gm.sex.wolfOnPlayer({state:0, battleResult:'victory'});})];
-        return('Intimitated, the wolf rolls on its back, whimpering submissively and exposing its throat.</br>'+this.fetchLoot()+'</br>'+ window.gm.printPassageLink('Next','GenericPassage'));
+        return('Intimitated, the wolf rolls on its back, whimpering submissively and exposing its throat.</br>'+this.fetchLoot()+'</br>'+ window.gm.printPassageLink('Next','PostCombatPassage'));
         //return('Intimitated, the wolf rolls on its back, whimpering submissively and exposing its throat.</br>'+this.fetchLoot()+'</br>'+ window.gm.printPassageLink('Next','WolfVictory'));
     }
     if(!_params.noStart) window.gm.Encounter.initCombat();
@@ -295,14 +302,16 @@ window.gm.encounters.dryad = function(params){
         let mobs =[];
         for(var i=_params.amount;i>0;i-=1){
             let x = window.gm.Mobs.Dryad(); x.scaleLevel(window.gm.player.level+_params.levelUp);
-            x.name+='#'+i;mobs.push(x);
+            x.name=x.baseName+'#'+i;mobs.push(x);
         }
         return(mobs);});
     window.gm.Encounter.onSubmit =window.gm.Encounter.onDefeat = function(){
-        return('You cannot fight anymore and surrender to the strange woman.</br>'+ window.gm.printPassageLink('Next','DryadSubmit'));
+        window.story.state.tmp.args=[(function(){ window.gm.sex.dryadOnPlayer({state:0, battleResult:'defeat'});})];
+        return('You cannot fight anymore and surrender to the strange woman.</br>'+ window.gm.printPassageLink('Next','PostCombatPassage'));
     }
     window.gm.Encounter.onVictory = function(){
-        return('The dryad has run out of energy.</br>'+this.fetchLoot()+'</br>'+ window.gm.printPassageLink('Next','DryadVictory'));
+        window.story.state.tmp.args=[(function(){ window.gm.sex.dryadOnPlayer({state:0, battleResult:'victory'});})];
+        return('The dryad has run out of energy.</br>'+this.fetchLoot()+'</br>'+ window.gm.printPassageLink('Next','PostCombatPassage'));
     }
     if(!_params.noStart) window.gm.Encounter.initCombat();
 }
@@ -312,6 +321,7 @@ window.gm.encounters.Carlia = function(params){
     let _params=window.gm.encounters._setup(params);
     window.gm.Encounter.EnemyFunc = (function(){ 
         let x = window.story.state.Carlia;
+        x.name=x.baseName;
         x.Stats.increment("health",9999); x.Stats.increment("energy",9999);x.Stats.increment("will",9999);
         return([x]);});
     window.gm.Encounter.onSubmit =window.gm.Encounter.onDefeat = function(){
@@ -337,6 +347,7 @@ window.gm.encounters.Trent = function(params){
     let _params=window.gm.encounters._setup(params);
     window.gm.Encounter.EnemyFunc = (function(){ 
         let x = window.story.state.Trent; 
+        x.name=x.baseName;
         x.Stats.increment("health",9999); x.Stats.increment("energy",9999);x.Stats.increment("will",9999); 
         return([x]);});
     window.gm.Encounter.onSubmit =window.gm.Encounter.onDefeat = function(){
@@ -351,6 +362,7 @@ window.gm.encounters.Ruff = function(params){
     let _params=window.gm.encounters._setup(params);
     window.gm.Encounter.EnemyFunc = (function(){ 
         let x = window.story.state.Ruff; 
+        x.name=x.baseName;
         x.Stats.increment("health",9999); x.Stats.increment("energy",9999);x.Stats.increment("will",9999); 
         return([x]);});
     /*window.gm.Encounter.onSubmit =window.gm.Encounter.onDefeat = function(){

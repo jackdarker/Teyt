@@ -8,7 +8,7 @@
 :: DngDF_Entry
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
-The portal drops you within a clearing of a beautiful, thriving forest.
+The portal drops you within a clearing of a beautiful, thriving forest. Once you have fullfilled your task, the portal should reapear opening your way back to the sanctuary.
 <p class="tPC">"Wow, I expected some cave but not an open landscape. Let's look for a vantage point."</p>  
 </br><p> [[Next|DngDF_F2]] </br></p>
 </article><article id="LogPanel"></article></section>
@@ -132,7 +132,7 @@ function tick(){
     }
 }
 function fightHornet(){
-    window.gm.encounters.hornett({levelUp:-3, amount:(window.gm.player.Inv.countItem('GiantPlum')>=2)?2:1, noStart:true});
+    window.gm.encounters.hornett({levelUp:-5, amount:(window.gm.player.Inv.countItem('GiantPlum')>=2)?2:1, noStart:true});
     window.gm.Encounter.onVictory = (function(){
         window.story.state.DngDF.plum[window.gm.player.location]=true;
         window.gm.player.Inv.addItem(new window.gm.ItemsLib['GiantPlum']());

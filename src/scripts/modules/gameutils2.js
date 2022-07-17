@@ -74,14 +74,20 @@ window.gm.navEvent = function(to,from){
             }//if no event rolled continue with door check 
         }
     }
-    evts = window.story.state[dng].tmp.doors[_from];
-    if(evts){ //door-check
-        evt = evts[_to];
-        if(evt){
-            if(evt.state===0) _targ=dng+"_Door_Closed";
-            if(_targ!=='') return(_targ);
-        }
+    ///////  door-check
+    evt=null;
+    let doors=window.story.state[dng].tmp.doors[_from],doors2=window.story.state[dng].tmp.doors[_to];
+    if(doors) {
+        evt = doors[_to];
+    } 
+    if(doors2) {
+        evt = doors2[_from];
     }
+    if(evt){
+        if(evt.state===0) _targ=dng+"_Door_Closed";
+        if(_targ!=='') return(_targ);
+    }
+    //////
     evts = window.story.state[dng].tmp.evtEnter[_room];
     if(evts){ //mobs
         evt = evts["dog"];
@@ -125,6 +131,7 @@ window.gm.mobAI = function(mob){
 //dynamic room description 
 window.gm.renderRoom= function(room){
     let msg="",deltaT,dng=window.story.state.DngSY.dng,_evt,_evts= window.story.state[dng].tmp.evtSpawn[room];
+    let _rnd=_.random(0,100);
     if(!_evts) return(msg);
     _evt=_evts["chest"];
     if(_evt && (_evt.state===0 || _evt.state===1)){
@@ -143,12 +150,12 @@ window.gm.renderRoom= function(room){
     _evt=_evts["lectern"];
     if(_evt && (_evt.state===0 || _evt.state===1)){
         deltaT=window.gm.getDeltaTime(window.gm.getTime(),_evt.tick);
-        if(deltaT>4000){ //respawn
+        if(deltaT>2400){ //respawn
             _evt.tick=window.gm.getTime();_evt.state=0;
         }
     }
     if(_evt && (_evt.state===0)){
-        msg+=window.story.render(dng+"_Lectern");
+        msg+="</br>Was there something sparkling "+window.gm.printPassageLink("over there?",dng+"_Lectern");
     }
     return(msg);
 }
@@ -376,11 +383,12 @@ window.gm.build_DngPC=function(){
             ,H6:{I6:{state:0,token:1,tier:3 }}
         }
         data.tmp.evtSpawn = { //respawn evts 
-            DngPC_I4: {chest:{tick:window.gm.getTime(),state:0, loot:[{id:"Money",count:30}]},
+            DngPC_H4: {lectern:{tick:window.gm.getTime(),state:0}}
+            ,DngPC_I4: {chest:{tick:window.gm.getTime(),state:0, loot:[{id:"Money",count:30}]},
                         mushroom:{tick:window.gm.getTime(),state:0,loot:"BrownMushroom" }}
             ,DngPC_F4: {mushroom:{tick:window.gm.getTime(),state:0,loot:"ViolettMushroom" }}
             ,DngPC_F5: {mushroom:{tick:window.gm.getTime(),state:0,loot:"ViolettMushroom" }}
-            ,DngPC_J4: {chest:{tick:window.gm.getTime(),state:0,loot:[{id:"Money",count:30}]}}
+            ,DngPC_I2: {chest:{tick:window.gm.getTime(),state:0,loot:[{id:"Money",count:30}]}}
         }
         data.tmp.mobs = [ //wandering mobs pos=current tile
             //{id:"HornettI4",mob:"hornett",pos:"I4",path:["I4","H4","I3"],state:0,tick:'',aggro:0}
@@ -395,6 +403,7 @@ window.gm.build_DngPC=function(){
             ,findCursed:{tick:'',done:0,cnt:0,min:3}
             ,freeEnslaved:{tick:'',done:0,cnt:0,min:3}
             ,getEarsPierced:{tick:'',done:0,cnt:0,min:5}
+            //getSavageness
             // open mysterious chests
             //,{id:'getTattoed',tick:'',done:0,cnt:0,min:8}
             ,getVagina:{tick:'',done:0,cnt:0,min:5}

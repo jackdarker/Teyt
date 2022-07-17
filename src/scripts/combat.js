@@ -12,7 +12,7 @@ class Encounter {
     this.Location = ''  //your actual location-name
     this.scenePic = ''  //bg-image to use
     //the following function should get reassigned;they should return a message what will happen next and provide a link to passage to follow f.e. return to window.gm.player.location
-    this.onStart = (function(){return('A '+window.story.state.combat.enemyParty[0].name+' appears !'+ window.gm.printPassageLink('Engage','EncounterStartTurn'));});
+    this.onStart = (function(){return('A '+window.story.state.combat.enemyParty[0].baseName+' appears!'+(window.story.state.combat.enemyParty.length===1?"":"And it brought some backup. ")+ window.gm.printPassageLink('Engage','EncounterStartTurn'));});
     //...endCombat is called after this and if you need to check on effects, you have to do this here !
     this.onDefeat = (function(){return('</br></br>You are defeated.</br>'+ window.gm.printLink('Next','window.gm.postDefeat()'));});
     this.onSubmit = (function(){return('</br></br>You submit to the foe.</br>'+ window.gm.printLink('Next','window.gm.postDefeat()'));});
@@ -791,7 +791,7 @@ window.gm.combat.scaleEffect = function(attack){
     for(var i=0; i<op.length;i++){
       target = op[i].target;
       for(var n of op[i].eff){
-        if(n.id==="effDamage"){  //dmg = (attack-armor)*(100%-resistance) but min. 1pt
+        if(n instanceof effDamage){  //dmg = (attack-armor)*(100%-resistance) but min. 1pt
           arm = target.Stats.getItem('arm_'+n.type).value;
           rst = target.Stats.getItem('rst_'+n.type).value;
           dmg = Math.max(1,(n.amount-arm)*(100-rst)/100);
@@ -800,7 +800,7 @@ window.gm.combat.scaleEffect = function(attack){
             op[i].eff.push(effTeaseDamage.factory(dmg,'slut',{slut:1})); //todo lewd-calc
           }
         }
-        if(n.id==="effTeaseDamage"){
+        if(n instanceof effTeaseDamage){
           //todo no dmg if blinded, stunned,
           //todo vulnerable if inHeat, like/dislike attacker
           //bondage-fetish -> bonus for bond-gear

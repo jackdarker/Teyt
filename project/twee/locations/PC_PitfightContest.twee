@@ -18,8 +18,8 @@ But at least you are alive and - mostly - unharmed.</br>
 :: DngPC_Entry
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
-As punishment for your transgressions, you were put in prison.</br> But you arent going to sit around until your sentence is over. This is a kind of re-education camp to bring you back to the right path and reveal your hidden potential.</br>
-You must earn your release by taking on tasks and completing them on your own. </br>
+As punishment for your transgressions, you were put into a dungeon-like prison.</br> But you arent going to sit around until your sentence is over. This is a kind of re-education camp to bring you back to the right path and reveal your hidden potential.</br>
+You must earn your release by taking on tasks and completing them on your own.</br>
 </br><p> [[Next|DngPC_G4]] </br></p>
 </article><article id="LogPanel"></article></section>
 <script>
@@ -52,7 +52,7 @@ requiredKey()
 </script>
 
 
-:: DngPC_Fungus [_nosave_]
+:: DngPC_Fungus [_fragm_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 Some strange kind of fungi are growing here. They are rather large, raising up to your waistline. You would have to <a0 onclick='fight()'>push through</a> them to get forward or you just might <a0 onclick='window.story.show(window.story.state.DngSY.prevLocation)'>turn back</a>. </br>
 <div id='output'></div>
@@ -63,7 +63,7 @@ Some strange kind of fungi are growing here. They are rather large, raising up t
 }
 </script>
 
-:: DngPC_wolf [_nosave_]
+:: DngPC_wolf [_fragm_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 There is wolf resting on the ground. It might be sleeping. </br>
 You may try your luck and <a0 onclick=''>sneak around</a> , boldly <a0 onclick=''>walk toward it</a> or rush and try to <a0 onclick='fight()'>strike first</a>. 
@@ -77,7 +77,7 @@ You may try your luck and <a0 onclick=''>sneak around</a> , boldly <a0 onclick='
 </script>
 
 
-:: DngPC_Mushroom
+:: DngPC_Mushroom [_fragm_]
 </br><%if(window.story.state.DngPC.tmp.evtSpawn[window.passage.name]["mushroom"].state===0){%>There is a <%=window.story.state.DngPC.tmp.evtSpawn[window.passage.name]["mushroom"].loot%>. Do you collect it?
 <div id='select992' >
 <a0 onclick='var _evt=window.story.state.DngPC.tmp.evtSpawn[window.passage.name]["mushroom"];_evt.state=1;_evt.tick=window.gm.getTime();window.gm.player.changeInventory(window.gm.ItemsLib[_evt.loot](),1);window.gm.printTalkLink("div#select992","div#choice992a")'>Yes</a></br>
@@ -102,6 +102,7 @@ You spot a box right on your way. Maybe someone lost it but even more likely pla
     let rnd = _.random(0,100), rnd2=_.random(0,100);
     if(rnd>50){//bad
         window.gm.printOutput('As you open the box a pink smoke puffs out of it, surrounding you in a cloudy mist.</br>Unfortunatly you inhale some of it.')
+        window.gm.player.Stats.increment("arousal",4)
     } else {
         window.story.state.tmp.args[1]=rnd2;window.story.state.tmp.args[2]=window.gm.player.location;
         window.story.show("DngPC_LootChest")
@@ -109,6 +110,58 @@ You spot a box right on your way. Maybe someone lost it but even more likely pla
 }
 </script>
 
+:: DngPC_Lectern [_nosave_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<div id='select1'>Some kind of lectern or stand is placed in an alcoven.</br>Looks like some note is placed on it.</br>It might be useful. On the other hand it could also be a trap. So, are you going to  
+<a0 onclick='grab();window.gm.printTalkLink("div#select1","div#choice1a")'>take a look at</a> or just 
+<a0 onclick='loot=null,window.gm.printTalkLink("div#select1","div#choice1b")'>ignore it</a>?</br>
+</div><div id='choice1a' hidden></br></div>
+<div id='choice1b' hidden></br>
+  Might be a good decision to not touch that lectern and <a0 onclick='window.story.show(window.story.state.DngSY.nextLocation)'>walk away</a>.
+</div>
+</article><article id="LogPanel"></article></section>
+<script> function grab(){
+    let item,msg='',where=window.story.state.DngSY.nextLocation;
+    window.story.state.DngPC.tmp.evtSpawn[where]["lectern"].state=1;
+    if(loot[1]===""){
+        msg='You found a '+loot[0]+'. ';
+        window.gm.player.changeInventory(window.gm.ItemsLib[loot[0]](),1);
+    } else {
+    msg='As you try to decypher the scroll, a sudden shiver travels down your spine. ';
+        if(loot[1]==='pierce') {
+            msg+='\"Its a trap damit..\"</br>'
+            if(window.gm.player.Outfit.getItemForSlot("pEars")){
+                msg+= '</br>But nothing happens after.'
+            } else {
+                item=window.gm.ItemsLib['PiercingEars'](),window.gm.player.Wardrobe.addItem(item),window.gm.player.Outfit.addItem(item);
+                msg+= 'A short, sharp pain in both earlobes lets your hands immediately shoot up and check whats going on: ';
+                msg+= 'Your ears got some jewelery: '+item.desc;
+                msg+= '</br> Well, you have to live with that for now.'
+            }
+        } else if("strengthUp") {
+            msg+='You feel a little bit stronger then before.</br>'
+            window.gm.player.Stats.increment("Strength",2);
+        }
+    }
+    window.gm.printOutput(msg+'</br>'+window.gm.printLink('Continue','window.story.show(window.story.state.DngSY.nextLocation)'),'div#choice1a');
+}
+function randomLoot(){ //generate loot[0]= item , loot[1]= effect //see combinations above
+//loot depends on tier and present fetishs/gear
+  var rnd=_.random(0,100),rnd2=_.random(0,100);
+  var trap=['arouse','pierce','ravage','drug','bound','cursed']
+  var chest=['Scroll']
+  if(!loot){
+    loot=[];
+    loot.push("");//todo no loot?
+    if(rnd>50) {//good
+        loot.push("strengthUp");
+    } else {//bad
+        loot.push("pierce");
+    }
+  }
+}
+var loot;randomLoot();
+</script>
 
 :: DngPC_Trap_Gas [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
@@ -258,13 +311,16 @@ window.gm.printOutput(msg);
         var _rnd=_.random(0,_allChances-0.01);
         for(var i = _choice.length-1;i>=0;i--){ 
             if(_rnd<_allChances && _rnd>=(_allChances-_choice[i].chance)){
-                window.gm.encounters[_choice[i].id]({type:_choice[i].type, amount:_choice[i].amount,levelUp:_choice[i].levelUp,noFlee:true});
-                window.gm.Encounter.initCombat();                
+                if(false && ['_Lectern'].includes(_choice[i].id)){ //scene
+                    window.story.show(window.story.state.DngSY.dng+_choice[i].id);
+                } else { //foe
+                    window.gm.encounters[_choice[i].id]({type:_choice[i].type, amount:_choice[i].amount,levelUp:_choice[i].levelUp,noFlee:true});
+                    window.gm.Encounter.initCombat();      
+                }          
                 break;
             }
             _allChances-=_choice[i].chance;
         }
-        return;
     }
 }
 tick();
@@ -304,7 +360,7 @@ Check out what doors you can [[unlock|DngPC_Shrine_Doors]].</br>
 :: DngPC_Shrine_Doors [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%=window.story.render(window.story.state.DngSY.dng+"_MAP")%></br>
-A certain tier and gold tokens are required to unlock a door.</p><a0 id='map' onclick='(function($event){document.querySelector("#"+id+"~p").toggleAttribute("hidden");})(this);'>Hint</a>
+<p>A certain tier and gold tokens are required to unlock a door. But maybe those doors are locked for a reason...</p><a0 id='map' onclick='(function($event){document.querySelector("#"+id+"~p").toggleAttribute("hidden");})(this);'>Hint</a>
 <p hidden> Hover over the map to display the coordinate of the rooms.</p>
 <div id='output'></div><p>[[Back|DngPC_G4]]</p>
 </article><article id="LogPanel"></article></section>
@@ -380,7 +436,7 @@ function randomHint(){
 :: DngPC_Vendor [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
-A vendor sells some gear and might also buy some of your loot.<br> Would you like to buy something?</br>[[Back|DngPC_G4]]</br>
+A vendor sells some gear and might also buy some of your loot.<br> "Would you like to <a0 onclick="_sell=false;window.gm.refreshAllPanel()">buy</a> something or <a0 onclick="_sell=true;window.gm.refreshAllPanel()">sell</a>?"</br>[[Back|DngPC_G4]]</br>
 <div id="choice"></div></br></br>   <!--display buy message-->
 <div id="panel"></div></br></br>    <!--display wares list-->
 <p><!--
@@ -396,6 +452,7 @@ A vendor sells some gear and might also buy some of your loot.<br> Would you lik
 <p>[[Back|DngPC_G4]]</p>
 </article><article id="LogPanel"></article></section>
 <script>
+var _sell;
 function findWares(){
     let item,item2,list = [],list2 = [],_d=window.story.state.DngPC,_t=_d.tmp.tier;
     list=[window.gm.ItemsLib['HealthPotionSmall'](),window.gm.ItemsLib['HealthPotion']()
@@ -435,7 +492,7 @@ function findWares(){
     window.gm.shop.findWaresToSell([window.gm.ItemTags.Ingredient]);
 }
 findWares();
-renderToSelector("#panel", "listbuy");renderToSelector("#panel", "listsell");
+if(_sell){renderToSelector("#panel", "listsell") }else{ renderToSelector("#panel", "listbuy")};
 </script> 
 
 </article><article id="LogPanel"></article></section>
@@ -467,16 +524,16 @@ You could rest here to recover health and energy. It might also be a good idea t
 You are now in a large hall with adjoining cells set into the walls. One of them is reserved as your private space.</br>
 <a0 id='howtoplay' onclick='(function($event){document.querySelector("#"+id+"~p").toggleAttribute("hidden");})(this);'>Hint</a>
 <p class='speech' hidden>You were send to this dungeon to pay up for your crimes.</br>
-The dungeon consist of several arenas that you have to pass one after another.If you pass the test in the arena, you gain money and loot. </br>
+The dungeon consist of several onnected rooms that you have to pass one after another.If you pass the test in the arena, you gain money and loot. </br>
 However, if you are defeated you will loose most of the things you carry with you (except money and "special" gear) and respawn in the starting zone.</br>
 There is a chest in your cell where you can store anything that you dont want to take with you on your trials.</br>
-Also the dungeons is somehow permeated with crude magic that might affect you.</br>
+It might need several attempts to find your way to the next room. Occasional you might find something useful, but there could also be traps or crude magic.</br>
 You should weight the option to retreat early and invest earned money in better gear. That might give you better chances to survive the tougher fights at the cost of fighting the previous foes again.</br>
 By donating to the "shrine of jurisprudence" you pay off your surcharge. If you dont do so regulary, you might get some bonus punishment. There are also some services available for a fee.</br>
 </p>
 <a0 id='howtoplay2' onclick='(function($event){document.querySelector("#"+id+"~p").toggleAttribute("hidden");})(this);'>Hint</a>
 <p class='speech' hidden>Keep an eye on your savagness-stat.</br>
-Its an indicator how - well - savage you get. It increases when experiencing ignoble situations. If the stat hits its maximum, bad end for you.</br>
+It increases when experiencing ignoble situations. If the stat hits its maximum, bad end for you.</br>
 There are consumables and items to reduce the score and just having a good rest helps.</br>
 Notice that the maximum might increase in some situations, meaning you can experience more savageness. And thats a good thing, right? </br>
 </p>

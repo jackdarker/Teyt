@@ -481,7 +481,7 @@ class WeaponStinger extends BodyPart {
     attackMod(target){
         let mod = new SkillMod();
         let _eff=[],_dmg =4,_poison=0;
-        if(this.data.style==='wasplike' ) _poison+=8;
+        if(this.data.style==='wasplike' ) _poison+=4;
         _eff.push(effDamage.factory(_dmg,'pierce',1, this.parent.parent.name+' pokes its '+this.data.style+' stinger into '+target.name+'. ' ));
         if(_poison>0)_eff.push(effDamage.factory(_poison,'poison',3,target.name+" got poisoned."));
         mod.onHit = [{ target:target, eff: _eff}];
@@ -1025,7 +1025,7 @@ class BreastHuman extends BodyPart {
 }
 class AnusHuman extends BodyPart {
     static dataPrototype(){    
-        return({virgin:true,wetgen:1, stretch:1,depth:1,spermtype:'',sperm:0});
+        return({virgin:true,wetgen:1, stretch:1,depth:5,spermtype:'',sperm:0});
     }
     static factory(id){
         let obj =  new AnusHuman();
@@ -1085,7 +1085,7 @@ class AnusHuman extends BodyPart {
 //variation: snatch - cooch - slit - cunt - cooter - fuck-hole - 
 class VulvaHuman extends BodyPart {
     static dataPrototype(){    
-        return({labia:0, virgin:true,wetgen:1, stretch:1,depth:1,clitsize:0.5, spermtype:'',sperm:0});
+        return({labia:0, virgin:true,wetgen:1, stretch:1,depth:6,clitsize:0.5, spermtype:'',sperm:0});
     }
     static factory(id){
         let obj =  new VulvaHuman();
@@ -1156,7 +1156,7 @@ class VulvaHuman extends BodyPart {
 }
 class PenisHuman extends BodyPart {
     static dataPrototype(){    
-        return({style:'human',maxGrowth:0.2,growth:0.4, virgin:true, wetgen:1,sheath:0, ballsize:0.01});
+        return({style:'human',maxGrowth:0.2,growth:0.4, virgin:true, wetgen:1,sheath:0, ballsize:0.1});
     }
     static factory(id){
         let obj =  new PenisHuman();

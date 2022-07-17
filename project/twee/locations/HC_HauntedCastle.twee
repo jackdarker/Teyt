@@ -59,8 +59,8 @@ tick();
 </script>
 
 :: DngHC_Lectern [_nosave_]
-<div id='select1'>Some kind of lectern or stand is placed in an alcoven.</br>Looks like some <b id='choice'></b> is placed on it.</br>It might be useful. On the other hand it could also be a trap. So, are you going to  
-<a0 onclick='grab();window.gm.printTalkLink("div#select1","div#choice1a")'>grab it</a>? Or just 
+<div id='select1'>Some kind of lectern or stand is placed in an alcoven.</br>Looks like some scribbled note is placed on it.</br>It might be useful. On the other hand it could also be a trap. So, are you going to  
+<a0 onclick='grab();window.gm.printTalkLink("div#select1","div#choice1a")'>take a look at</a>? Or just 
 <a0 onclick='window.gm.printTalkLink("div#select1","div#choice1b")'>ignore it</a></br>
 </div><div id='choice1a' hidden></br></div>
 <div id='choice1b' hidden></br>

@@ -115,13 +115,16 @@ function fightPillRoller(){
 :: DngCV_G4
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%>
+It takes a moment until your eyes adjust to the dim light and you can see what is around you.</br>
 Below a cave dome is a stone-plateu that has some kind of runes on it. 
-<%if(window.story.state.DngSY.dngLevel===1 && window.gm.player.Inv.countItem('CrystalWater')>=1){%>
+<%if(window.story.state.DngSY.dngLevel>1){%>
+    <p>[[Into the portal|DngSY_Portal]]</br></p>
+<%}else if(window.story.state.DngSY.dngLevel===1 && window.gm.player.Inv.countItem('CrystalWater')>=1){%>
     </br>The portal has opened, time for your return.
-    <p>[[Into the portal|DngCV_Success]] </br></p>
+    <p>[[Into the portal|DngCV_Success]]</br></p>
 <%}else{%>
-    </br>Once you have fullfilled your task, the portal should reapear opening your way back to the sanctuary.
-    </br>Check your quest-log if you need a reminder on what to do.
+    </br>You are worried because the portal is gone. <p class="tPC">'He didn't say that the portal vanishs ! How should I get back then.'</p>
+    </br>The runes carved in the rock dont give you a clue. <p class="tPC">'Maybe it will open up after some time or I first need to get that water.'</p>
 <%}%> 
 <%=window.gm.printNav()%>
 </article><article id="LogPanel"></article></section>

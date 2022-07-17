@@ -9,6 +9,7 @@ class Mob extends Character {
         this.levelUp(1);
         this.autoLeveling();
         this.despawn=false;
+        this.baseName=""; //name might be Slime#1 but baseName is Slime
         this.fconv = null; //lazy init because descfixer depends on gm.player
     }
     toJSON(){return window.storage.Generic_toJSON("Mob", this); }

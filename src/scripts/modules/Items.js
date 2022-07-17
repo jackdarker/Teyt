@@ -425,10 +425,10 @@ class HealthPotion extends Item {
             context.removeItem(this.id);
             if(on instanceof Character){ 
                 if(this.style<100){
-                    on.Stats.increment("health",this.amount);
+                    on.Stats.increment("health",on.Stats.getItem("healthMax").value*this.amount/100);
                     return({OK:true, msg:on.name+' drank a potion and feels healthier.'});
                 } else if(this.style<200 && this.style>=100){
-                    on.Stats.increment("savageness",-1*this.amount);
+                    on.Stats.increment("savageness",-1*this.amount*on.Stats.getItem("savagenessMax").value);
                     return({OK:true, msg:on.name+' drank a potion and feels less savage.'});
                 }
             }
@@ -443,9 +443,9 @@ class HealthPotion extends Item {
     }
     get style(){return(this._style);}
     get desc(){
-        let msg='restores some health ';
+        let msg='restores '+this.amount+'% health ';
         if(this.style<200 && this.style>=100){
-            msg='cools down your savagness '
+            msg='cools down your savagness ('+this.amount+'%) '
         }
         return(msg);
     }
@@ -503,7 +503,7 @@ class Pills extends Item {
                 on.Stats.increment("health",80);on.Stats.increment("energy",40);
                 window.gm.MutationsLib['changeSavage'](on,3,0,20);
                 _txt=on.name+' swallowed a drug. ';
-                _txt+=((this.style===0)?'Physical resistance increased.':
+                _txt+=((this.style===0)?'Poison resistance increased.':
                 (this.style===50)?'':'');
                 return({OK:true, msg:_txt});
             }

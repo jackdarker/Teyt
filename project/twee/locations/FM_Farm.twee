@@ -24,6 +24,7 @@ function buildRooms(){
         '|       |           |     ',
         'F6      H6--I6--J6--K6--L6'];
     function _d(dir){return({dir:dir,exp:0});};
+    //Milker, breeding-stock/ dummy-mare, branding, Hufschmied, butterfass, Mühle/Laufrad
     let grid =[
     {room:'H2', dirs:[_d('H3')]},
     {room:'I2', dirs:[_d('J2')]},

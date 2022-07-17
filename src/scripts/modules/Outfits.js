@@ -974,6 +974,7 @@ class TailRibbon extends Equipment {
 }
 //todo bow,blowpipe
 //todo vest, greaves , jacket
+//fly swatter - good against small insects
 window.gm.ItemsLib = (function (ItemsLib){
     window.storage.registerConstructor(AnalPlug);
     window.storage.registerConstructor(BikiniBottomLeather);

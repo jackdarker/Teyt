@@ -12,7 +12,7 @@ Of course you dont want to stay here forever, so better get started making an es
 :: DngSY_Hallway_Dorms
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
-This corridor connects the dorms with the [[Hallway|DngSY_Hall]]. Most of the doors on both sides of the corridor seemm to lead to rooms for the guests here. One of them is assigned as [[Your room|DngSY_Your_Room]].</br>
+This corridor connects the dorms with the [[Hallway|DngSY_Hall]]. Most of the doors on both sides of the corridor seem to lead to rooms for the guests here. One of them is assigned as [[Your room|DngSY_Your_Room]].</br>
 </article><article id="LogPanel"></article></section>
 
 
@@ -66,28 +66,28 @@ You cant even remember what you exactly dreamed, and maybe thats a good thing.
 :: DngSY_Portal
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
-In the center of this round hall, a magic portal can be summoned. </br>
-So far, its the only exit you know from this fortress. 
-While you are not busy with other task, you could explore some of the areas that you already visited.</br>
-But why not stay in this cozy home?</br>
-The portal could you bring to the following places:</br>
 <div id='choice'></div> <!--choice is rendered here-->
 <p> [[Back|DngSY_Hall]]</p>
 </article><article id="LogPanel"></article></section>
 <script>
 var msg='',lvl=window.story.state.DngSY.dngLevel;
-msg+=(true)?'<p><a0 onclick=\'window.story.state.DngSY.dngOW=true;window.story.show(\"HC_Entry\");\'>Haunted Castle</a></p>':'';
+msg+=(lvl>=4)?'<p><a0 onclick=\'window.story.state.DngSY.dngOW=true;window.story.show(\"HC_Entry\");\'>Haunted Castle</a></p>':'';
 msg+=(lvl>=4)?'<p><a0 onclick=\'window.story.state.DngSY.dngOW=true;window.story.show(\"DngFM_Entry\");\'>Farm</a></p>':'';
 msg+=(lvl>=2)?'<p><a0 onclick=\'window.story.state.DngSY.dngOW=true;window.story.show(\"DngCV_Entry\");\'>Crystal Cave</a></p>':'';
-msg+=(lvl>=2)?'<p><a0 onclick=\'window.story.state.DngSY.dngOW=true;window.story.show(\"DngDF_Entry\");\'>Lush forest</a></p>':'';
-msg+=(lvl>=2)?'<p><a0 onclick=\'window.story.state.DngSY.dngOW=true;window.story.show(\"DngMN_Entry\");\'>Silver Mountains</a></p>':'';
-msg+=(lvl>=2||true)?'<p><a0 onclick=\'window.story.state.DngSY.dngOW=true;window.story.show(\"DngAT_Entry\");\'>Ancient Temple</a></p>':'';
+msg+=(lvl>=5)?'<p><a0 onclick=\'window.story.state.DngSY.dngOW=true;window.story.show(\"DngDF_Entry\");\'>Lush forest</a></p>':'';
+msg+=(lvl>=4)?'<p><a0 onclick=\'window.story.state.DngSY.dngOW=true;window.story.show(\"DngMN_Entry\");\'>Silver Mountains</a></p>':'';
+msg+=(lvl>=5)?'<p><a0 onclick=\'window.story.state.DngSY.dngOW=true;window.story.show(\"DngAT_Entry\");\'>Ancient Temple</a></p>':'';
 msg+=(false)?'<p><a0 onclick=\'window.story.state.DngSY.dngOW=true;window.story.show(\"DngLB_Entry\");\'>Smudgy Bog</a></p>':'';
 msg+=(false)?'<p><a0 onclick=\'window.story.state.DngSY.dngOW=true;window.story.show(\"SC_Entry\");\'>Sunken City</a></p>':'';
 msg+=(false)?'<p><a0 onclick=\'window.story.state.DngSY.dngOW=true;window.story.show(\"\");\'>Jungle Ruins</a></p>':'';
 msg+=(false)?'<p><a0 onclick=\'window.story.state.DngSY.dngOW=true;window.story.show(\"\");\'>Steam Glacier</a></p>':'';
 msg+=(false)?'<p><a0 onclick=\'window.story.state.DngSY.dngOW=true;window.story.show(\"\");\'>Savanah Rift</a></p>':'';
 msg+=(false)?'<p><a0 onclick=\'window.story.state.DngSY.dngOW=true;window.story.show(\"\");\'>Sky scrapers</a></p>':'';
+if(msg===''){
+    msg='Behind the heavy door, is a dome-like hall. There seem to be no other door beside the one you walked through.</br>';
+}else{
+    msg='In the center of this round hall, a magic portal can be summoned.</br>So far, its the only exit you know from this fortress. While you are not busy with other task, you could explore some of the areas that you already visited.</br>But why not stay in this cozy home?</br>The portal could you bring to the following places:</br>'+msg;
+}
 window.gm.printOutput(msg,'#choice');
 </script>
 
@@ -146,9 +146,9 @@ Would you like to [[offer|NOP]] something?</br>
 :: DngSY_Lab 
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
-This is Kumalas Laboratory. And Kitchen. </br>
+This is [[Kumalas|NOP]] Laboratory. And Kitchen. </br>
 As usual she is busy on some of the retorts, concentratin on reading some recipe book and stiring a pot with a spoon in her free hand.</br> 
-Maybe you an [[ask her|NOP]] about mixing up some potions or if she needs something.</br>
+Maybe you can [[ask her|NOP]] about mixing up some potions or if she needs something.</br>
 <p>[[Back|DngSY_Hall]]</p>
 </article><article id="LogPanel"></article></section>
 
@@ -157,7 +157,7 @@ Maybe you an [[ask her|NOP]] about mixing up some potions or if she needs someth
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <p class="tNPC2">"Your task is to take this glas and fill it with the water from the crystal lake and make your way back to the portal."</p>
 <p class="tPC">"Crystal lake? I dont know where that is. And where does that portal lead anyway?"</p>
-<p class="tNPC2">"The portal brings you into a cave system. Just follow the lights down the tunnels until you find a lake where you see large blue crystals growing in a underground lake."</p>
+<p class="tNPC2">"The portal brings you into a cave system. Just follow the lights down the tunnels until you find a cavern  where you see large blue crystals growing around an underground lake."</p>
 <p class="tPC">"And thats all? Go to the lake, fill that glas and walk back? Why does it have to be a glas, dont you have a bottle or waterskin?"</p>
 <p class="tNPC2">"No, it has to be the glass. The path should be lightened with candles but sometime they just go out."</p>
 You grab the glas.</br>
@@ -176,7 +176,11 @@ That somehow sounds like more dangers than falling into a hole might be waiting 
 <p class="tNPC2">"Feel free to collect more if you like."</p>
 Did he just snicker? 
 <p class="tPC">"Fine."</p>
-<p> <a0 onclick='window.story.state.DngSY.dngOW=false,window.story.show("DngDF_Entry");'>Lets go</a></p>
+<p class="tNPC2">"Wait, Kumala asked me to give you those "</p> He hands you some small brown pellets.
+<p class="tPC">"And those are ?..."</p>
+<p class="tNPC2">"Oh she said something about antitoxin or so. I guess its not really necessary to use them"</p> 
+Pocketing the pills you wonder what they are good for - if they have any use at all.
+<p> <a0 onclick='window.story.state.DngSY.dngOW=false,window.gm.player.Inv.addItem(window.gm.ItemsLib.BrownPill(),2),window.story.show("DngDF_Entry");'>Lets go</a></p>
 </article><article id="LogPanel"></article></section>
 
 
@@ -189,7 +193,8 @@ Your task would be to gather pages from a book called Igneum Frigus Thalamum. At
 <p class="tNPC2">"The other one is stuck on the roof of a hut. That one is part of a small settlement but I dont have a clue where this settlement is."</p>
 <p class="tPC">"Its still not clear to me how to find them, but whatever...."</p>
 ....
-<p> <a0 onclick='window.story.state.DngSY.dngOW=false,window.story.show("DngMN_Entry");'>Lets go</a></p>
+<p class="tNPC2">"Thats some rough territory. Take those potions, they might be handy if you get hurt"</p> 
+<p> <a0 onclick='window.story.state.DngSY.dngOW=false,window.gm.player.Inv.addItem(window.gm.ItemsLib.HealthPotionSmall(),3),window.story.show("DngMN_Entry");'>Lets go</a></p>
 </article><article id="LogPanel"></article></section>
 
 :: DngSY_Lv4

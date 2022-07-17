@@ -31,7 +31,7 @@ Because a high stonewall is surrounding the outer ring, you cant see what is bel
 Kumala is again at work in the lab.
 <p class="tPC">"Good morning Kumala. I found your note."</p>
 <span class="tNPC1">"Yes the note, I should have told you yesterday when you were here. You were already in your room when I remeered and I didnt know if you were.. "</span>
-She makes a strange pause <span>"..busy or so."</span>
+She makes a strange pause <span class="tNPC1">"..busy or so."</span>
 <p class="tNPC1">"Please follow me."</p>
 <div id='select5'> You fall into step 
 <a0 onclick='window.gm.printTalkLink("div#select5","div#choice5a")'>behind her</a> as she leaves the room.</br>
@@ -47,7 +47,7 @@ She makes a strange pause <span>"..busy or so."</span>
         </div><div id='choice7a' hidden></br>
             <p class="tPC">"Well, I had to talk my way out of some troubles in the past, or just be quick on the foot."</p>
             <p class="tNPC1">"Sure, but sooner or later you will have to stand your ground. Thatswhy we will do some training."</p>
-            <p class="tPC">"Like stabing some one in their back or shooting with a bow?"</p>
+            <p class="tPC">"Like stabbing some one in their back or shooting with a bow?"</p>
             <p class="tNPC1">"Physical combat is more Cyrils area of expertise. I'm more specialised in the non-combat related subjects."</p>
             <p class="tNPC1"> Today I want to introduce you to some technique that might be useful when violence is not the best choice."</p>
             <p class="tPC">"By blinding them or using some mirror trick?"</p>

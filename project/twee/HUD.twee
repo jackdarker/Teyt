@@ -4,7 +4,9 @@
 <div><%=window.gm.util.printLocationName(window.gm.player.location)%></br><%=window.gm.getTimeString()%></br><%=window.gm.getDateString()%></br></div><hr>
 <div><%=window.gm.player.name%></br>
 <%=window.gm.util.statsbar("health","red")%><%=window.gm.util.statsbar("energy","yellow")%><%=window.gm.util.statsbar("will","green")%>
+<%if(s._gm.debug& 0x1>0){%>
 <%=window.gm.util.statsbar("arousal","coral")%><%=window.gm.util.statsbar("satiation","rosybrown")%><%=window.gm.util.statsbar("savageness","darkred")%></div>
+<%}%>
 <div>Money: <%=window.gm.player.Inv.countItem('Money')%></div>
 <!--<div <%=window.gm.player.canLevelUp?"class=\"green\"":""%>>XP/Level: <%=window.gm.player._data.XP+"/"+window.gm.player._data.level%></div>-->
 <hr>
@@ -262,13 +264,13 @@ function toggleSetting(elmt){
 Status of <%=char.name%>:   [[Back|_back_]]</br>
 <a0 onclick='window.gm.printOutput(window.gm.printEffectSummary("<%=char.id%>",true,false,false));'>Stats</a>
 <a0 onclick='window.gm.printOutput(window.gm.printEffectSummary("<%=char.id%>",false,false,true));'>Resistance</a>
-<a0 onclick='window.gm.printOutput(window.gm.printEffectSummary("<%=char.id%>",false,true,false));'>Fetish</a>
+<a0 onclick='window.gm.printOutput(window.gm.printEffectSummary("<%=char.id%>",false,true,false));'>Preferences</a>
 </br><div id='output'></div></br>   <!--message is rendered here-->
+<a0 id='howtoplay' onclick='(function($event){document.querySelector("#"+id+"~p").toggleAttribute("hidden");})(this);'>Hint</a>
+<p hidden>Armor is a value that is substracted from incoming damage. Bigger is better.</br> The remaining damage will be multiplied with 100-Resistance to calculate effective damage. an increasing alue up to 100 scales the damage down but a negative value scales it up.</br></p>
 [[Back|_back_]]</br>
 </article><article id="LogPanel"></article></section>
-<script>
-window.gm.printOutput(window.gm.printEffectSummary(window.gm.player.id,true,false));
-</script>
+<script>window.gm.printOutput(window.gm.printEffectSummary(window.gm.player.id,true,false));</script>
 
 
 :: Levelup [_back_ _nosave_ _noshortkey_]

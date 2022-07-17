@@ -14,7 +14,8 @@ SanctumPortal
 		"_nosave_": "yellow",
 		"_nodeffered_": "yellow",
 		"_isdeffered_": "brown",
-		"_noshortkey_": "brown"
+		"_noshortkey_": "brown",
+		"_fragm_":"blue"
 	},
 	"zoom": 1
 }
@@ -30,7 +31,8 @@ SanctumPortal
 		"_back_": "gray",
 		"_nosave_": "yellow",
 		"_nodeffered_": "yellow",
-		"_isdeffered_": "brown"
+		"_isdeffered_": "brown",
+		"_fragm_":"blue"
 	},
 	"zoom": 1
 }

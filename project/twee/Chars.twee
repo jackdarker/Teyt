@@ -74,8 +74,8 @@ That didnt went as planned. That bully delivered a though blow and knocked you o
 :: Leon_Arrival
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 As you make your way back to your room, you run right into Cyril who is accompanied by another person.
-<p class="tNPC2">"Ah, there you are. Please welcome Leon, he is also an acolythe and I'm showing him around."</p>
-<p class="tPC">"Good afternoon Leon, I'm <%= window.gm.player.name%> and I'm seeing to work together."</p> 
+<p class="tNPC2">"Ah, there you are. Please welcome Leon, he is also an acolythe and just arrived here some hours ago."</p>
+<p class="tPC">"Good afternoon Leon, I'm <%= window.gm.player.name%> and I'm seeing forward to work together."</p> 
 Well, actually you dont know what work that will be but whatever...</br>
 He is around your age, maybe 1 or 2 years off and looks pretty self confident and pampered.</br>
 <p class="tNPC3">"Hello <%= window.gm.player.name%>. Master Cyril is showing me around this fabolous location. I feel chosen to be in such a magical place."</p>

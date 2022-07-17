@@ -840,7 +840,7 @@ class SkillStruggle extends Skill {
         return(this.msg);
     }
 }
-class SkillGuard extends Skill {
+class SkillGuard extends Skill { //todo guard improves defense and evade for some rounds (each hit has a chance to reduce duration)
     constructor(){ super("Guard"); this.style=0;}
     toJSON(){return window.storage.Generic_toJSON("SkillGuard", this); }
     static fromJSON(value){return(window.storage.Generic_fromJSON(SkillGuard, value.data));}
@@ -864,7 +864,8 @@ class SkillGuard extends Skill {
             result.OK = true;
             for(var target of targets){
                 result.effects.push( {target:target,
-                    eff:[effGuard.factory(10*(1+this.style),this.style*20,this.style)]});
+                    //weapResist,eRecover,duration
+                    eff:[effGuard.factory(10*Math.min(5,1+this.style),Math.min(5,this.style*20),this.style+1)]});
             }
         }
         return result

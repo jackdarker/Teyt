@@ -3,7 +3,7 @@ body {
   background-color: lightgray;
 }
 a {
-	color:royalblue;
+	color:navy;
     text-decoration-color: initial;
 }
 a:hover {
@@ -14,7 +14,7 @@ button {
   background-color: (rgb(239, 239, 239), rgb(59, 59, 59));
 }
 article {
-  background-color: #ffede0;
+  background-color: gray;
 }
 section {
   background-color:#ffffff;
@@ -23,7 +23,7 @@ section {
   background: #e4e4e4;
 }
 #sidebar {
-  background-color: #ffede0;
+  background-color: gray;
 }
 #sidebar p {
   color: black;

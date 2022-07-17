@@ -21,7 +21,7 @@ window.gm.initGame= function(forceReset,NGP=null){
     var s = window.story.state;
     s._gm.timeRL= s._gm.timeVR = s._gm.time;
     s._gm.dayRL= s._gm.dayVR = s._gm.day;
-    s._gm.debug = 1,   //TODO set debug to 0 for distribution !
+    s._gm.debug = 1,   //   <==    TODO set debug to 0 for distribution or 1 for debug!
     s._gm.dbgShowCombatRoll= true,
     s._gm.dbgShowQuestInfo= true;
     s._gm.dbgShowMoreInfo=true;
@@ -243,16 +243,22 @@ window.gm.getScenePic = function(id){
   if(id.slice(0,7)==='AM_Lv2_') return('assets/bg/bg_dungeon_2.png');
   if(id.slice(0,5)==='DngPC' || id.slice(0,5)==='DngHC'){
     x=id.slice(6,8);
-    y=[{x:["H4","I4"],p:'assets/bg/bg_dungeon_2.png'}
-      ,{x:["I4","J4"],p:'assets/bg/bg_dungeon_4.png'}
-      ,{x:["F4","F5"],p:'assets/bg/bg_dungeon_3.png'} ]
+    y=[{x:["H4","I4"],p:'bg_dungeon_2.png'}
+      ,{x:["I4","J4"],p:'bg_dungeon_4.png'}
+      ,{x:["F4","F5"],p:'bg_dungeon_3.png'} ]
     for(var n of y){
-      if(n.x.indexOf(x)>=0) return n.p;
+      if(n.x.indexOf(x)>=0) return 'assets/bg/'+n.p;
     }
     return('assets/bg/bg_dungeon_2.png');
   }
-  if(id.slice(0,5)==='DngCV') return('assets/bg/bg_cave_4.png');
-  //if(id.slice(0,5)==='DngCV') return('assets/bg/bg_cave_2.png');
+  if(id.slice(0,5)==='DngCV'){
+    x=id.slice(6,8);
+    y=[{x:["I3","I4"],p:'bg_cave_4.png'}]
+    for(var n of y){
+      if(n.x.indexOf(x)>=0) return 'assets/bg/'+n.p;
+    }
+    return('assets/bg/bg_cave_2.png');
+  }
   return('assets/bg_park.png')//return('assets/bg/bg_VR_1.png');//todo placehodler
 }
 window.gm.enterVR=function(){
