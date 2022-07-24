@@ -91,6 +91,7 @@ But the first thing you grab is a monk's robe drying on the line. That coarse cl
 As you secure one shiny gadget, you trigger some magic anomaly... </br></p>
 <p><a0 onclick='startSY();'>That magic portal sucks you right in...wush (start SanctumPortal story)</a></p><hr>
 <p><a0 onclick='startPC();'>start rougelite</a></p><hr>
+<p>[[OmeterCombat]]</p><hr>
 There are also some options to make a fastforward (might behave oddly): </br>
 </article>
 <script> function startSY(){

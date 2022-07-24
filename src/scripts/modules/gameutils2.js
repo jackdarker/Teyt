@@ -384,7 +384,7 @@ window.gm.build_DngPC=function(){
         }
         data.tmp.evtSpawn = { //respawn evts 
             DngPC_H4: {lectern:{tick:window.gm.getTime(),state:0}}
-            ,DngPC_I4: {chest:{tick:window.gm.getTime(),state:0, loot:[{id:"Money",count:30}]},
+            ,DngPC_I4: {chest:{tick:window.gm.getTime(),state:0, loot:[{id:"SpellRodSpark",count:1}]},
                         mushroom:{tick:window.gm.getTime(),state:0,loot:"BrownMushroom" }}
             ,DngPC_F4: {mushroom:{tick:window.gm.getTime(),state:0,loot:"ViolettMushroom" }}
             ,DngPC_F5: {mushroom:{tick:window.gm.getTime(),state:0,loot:"ViolettMushroom" }}

@@ -21,12 +21,13 @@ class SkillInspect extends Skill {
             result.OK = true;
             this.msg = 'resistance of ';//window.gm.printBodyDescription(targets[0],true);
             for(let n of window.gm.combat.TypesDamage){
-                this.msg += n.id+ ' '+ targets[0].Stats.getItem('rst_'+n.id).value +'%,'; 
+                this.msg += 'resist/armor '+n.id+ ' '+ targets[0].Stats.getItem('rst_'+n.id).value +'% / '+targets[0].Stats.getItem('arm_'+n.id).value+'</br>'; 
             }
-            this.msg+= '</br>armor of ';
-            for(let n of window.gm.combat.TypesDamage){
-                this.msg += n.id+ ' '+ targets[0].Stats.getItem('arm_'+n.id).value +','; 
+            this.msg+= '</br>';
+            for(let n of ['agility','charisma','endurance','intelligence','luck','perception','strength']){
+                this.msg += n+ ' '+ targets[0].Stats.getItem(n).value +', '; 
             }
+            this.msg+= '</br>';
             //todo display stats dependign on skill
             result.msg =this.msg;
         }
@@ -72,9 +73,9 @@ class SkillAttack extends Skill {
         let lHand=this.caster.Outfit.getItemForSlot(window.gm.OutfitSlotLib.LHand);
         let rHand=this.caster.Outfit.getItemForSlot(window.gm.OutfitSlotLib.RHand);
         attack.mod=null;
-        if(rHand){ //get weapon damage info
+        if(rHand && rHand.attackMod){ //get weapon damage info
             attack.mod=rHand.attackMod(target);
-        } else if(lHand){ //todo dual wield?
+        } else if(lHand && lHand.attackMod){ //todo dual wield?
             attack.mod=lHand.attackMod(target);
         }
         if(attack.mod===null){ //if has no weapon get claw damage, mouth damage, ??
@@ -84,7 +85,7 @@ class SkillAttack extends Skill {
             }
         }
         if(attack.mod===null){ //fallback??
-            let mod = new SkillMod();
+            let mod = new SkillMod();mod.msg='barehanded';
             mod.onHit = [{ target:target, eff:[effDamage.factory(3,'blunt')]}];
             attack.mod=mod;
         }
@@ -1051,5 +1052,15 @@ Supraconductor: incoming ice-damage has chance to increase spark-damage output f
 
 BladeMace: deals slash or blunt-damage depending which would cause more damage
 
+Charge: Anrempeln des Gegners bringt ihn aus dem Gleichgewicht oder wirft ihn um
+
+ShieldBoost: lädt ein Shield um 50% auf so lange es nicht komplett leer ist, cooldown=8
+
+ShieldRestore: wenn das Shield komplett leer ist kann es wiederhergestellt werden 33-75%; cd=99
+
+CoolDownReset: for any ally: if there are skills in cooldown, pick a random one and reset cooldown; cd=20
+
+Leader: an ally using this is marked as a leader; as long as he is ingame, all allys except him receive bonus armor/regeneration/damage
+        but if he is defeated, everyone gets mallus; can only be cast once per battle
 
  */

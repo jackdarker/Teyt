@@ -171,6 +171,93 @@ document.getElementById('btstartCounterChargeCombat').addEventListener("click", 
 document.getElementById('btstartDominoCombat').addEventListener("click", _game2.start);
 </script>
 
+:: OmeterCombat [_nosave_]
+<div style='background-color:gray;'  id='canvas'>
+<div id="panel2"></div></br>
+<div id="panel"></div></br>
+<div id='output'></div></br>
+<div id="choice"></div></br>
+<div id="choice2"></div></br>
+<p id='result'></p>
+ <label>foe:
+		<select id="Foe" onchange='selOption(this)'>
+			<option value="human" selected>human</option>
+      <option value="demon">demon</option>
+			<option value="fuckmachine">fuckmachine</option>
+		</select>
+</label><label>Foe-AI:
+		<select id="AI" onchange='selOption(this)'>
+			<option value="none" selected>None</option>
+			<option value="passive">passive</option>
+      <option value="virgin">virgin</option>
+      <option value="together">together</option>
+      <option value="selfish">selfish</option>
+      <option value="denial">mean</option>
+      <option value="cassanova">cassanova</option>
+      <option value="random">random</option>
+		</select>
+</label> <label>display:
+		<select id="Display" onchange='selOption(this)'>
+			<option value="all" selected>all</option>
+			<option value="minimum" >minimum</option>
+		</select>
+</label>
+<a0 id='btstartOmeterCombat'>Start Ometer-Combat</a><a0 id='startOmeterCombat' onclick='(function($event){document.querySelector("#"+id+"~p").toggleAttribute("hidden");})(this);'>Hint</a>
+<p hidden> </p>
+<script>
+function selOption(elmnt){
+		var msg='',menu = document.getElementById(elmnt.id);
+    if(elmnt.id==="AI") {
+      msg+='foes behavior= '+menu.value+' - ';
+      switch(menu.value) {
+        case 'none': msg+='control foe by player';break;
+        case 'passive': msg+='always passive, let you do all the work';break;
+        //case 'random': msg+='random';break;
+        //case 'virgin': msg+='foe trys to avoid own orgasm';break;
+        //case 'cassanova': msg+='foe trys to make you orgasm without own orgasm';break;
+        //case 'together': msg+='cooperative,foe trys to have you both orgasm at same time';break;
+        //case 'selfish': msg+='doesnt care about you and just wants a quickie';break;
+        //case 'denial': msg+='edging you but preventing your orgasm';break;
+        default:
+          msg+=' not implemented ! Dont use !'
+      }      
+    } else if(elmnt.id==="Display") {
+      msg+='display= '+menu.value+' - ';
+      switch(menu.value) {
+        case 'all': msg+='show all info & bars';break;
+        case 'minimum': msg+='show only bars normally visible';break;
+        default:
+          msg+=' not implemented ! Dont use !'
+      }      
+    } if(elmnt.id==="Foe") {
+      msg+='stats of foe= '+menu.value+' - ';
+      switch(menu.value) {
+        case 'human': msg+='equal to you';break;
+        case 'demon': msg+='bigger pleasure bar';break;
+        case 'fuckmachine': msg+='high stamina';break;
+        default:
+          msg+=' not implemented ! Dont use !'
+      }      
+    }
+    document.querySelector('div#output').innerHTML=msg;
+}
+function onStop(value){ document.getElementById('result').innerHTML='scored '+value;}
+var _game = window.gm.startOmeterCombat();
+document.getElementById('btstartOmeterCombat').addEventListener("click", 
+function(){
+  var foeDict={human:{ stamina:{min:0,max:100,exhausted:20,curr:80,regen:5},
+                      ometer:{min:0,denial:20,minor:60,gasm:85,max:100,curr:0}, 
+                      pleasure:{min:0,annoy:20,good:60,max:80,PNR:70,curr:10}}
+              ,demon:{ stamina:{min:0,max:100,exhausted:20,curr:80,regen:5},
+                      ometer:{min:0,denial:20,minor:60,gasm:85,max:100,curr:0},
+                      pleasure:{min:0,annoy:20,good:90,max:120,PNR:110,curr:10}}
+        ,fuckmachine:{ stamina:{min:0,max:150,exhausted:20,curr:120,regen:5},
+                      ometer:{min:0,denial:20,minor:60,gasm:85,max:100,curr:0},
+                      pleasure:{min:0,annoy:20,good:60,max:80,PNR:70,curr:10}}
+  }
+  _game.start([ [window.gm.util.deepCloneObj(foeDict['human'])],[window.gm.util.deepCloneObj(foeDict[document.getElementById('Foe').value])] ],
+    document.getElementById('AI').value,document.getElementById('Display').value);});
+</script>
 
 :: Pong
 <div id="pong"></div>

@@ -46,6 +46,7 @@ class SkillCost{
 }
 class SkillMod {
     constructor(){
+        this.msg='';
         this.hitChance =100;
         this.critChance =4;
         this.onHit = [];    // [{ target: 'target', eff: [combatEffect]]

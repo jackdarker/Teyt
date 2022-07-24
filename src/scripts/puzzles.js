@@ -1,5 +1,6 @@
 "use strict";
 window.gm = window.gm || {};
+///////////////////////////////////////////////////////////////////////
 window.gm.startDominoCombat=function(stopCB, startCB){
   function start(){ 
     //setup teams,cards
@@ -201,6 +202,7 @@ window.gm.startDominoCombat=function(stopCB, startCB){
   }
   return(data);
 }
+///////////////////////////////////////////////////////////////////////
 window.gm.startCounterChargeCombat=function(stopCB, startCB){
   function start(){ 
     //setup teams,cards
@@ -456,6 +458,330 @@ window.gm.startCounterChargeCombat=function(stopCB, startCB){
     team:0,
     player:'',skill:'',skillcolor:'',
     target:'',
+    stopCB: stopCB, //callback after user trigger 
+    startCB: startCB, //callback after start
+    start: start, //ref to start-function
+  }
+  return(data);
+}
+///////////////////////////////////////////////////////////////////////
+window.gm.startOmeterCombat=function(stopCB, startCB)
+{
+  function start(Teams,AI,Display){ 
+    //setup teams,cards
+    data.debug.display=Display,data.AI=AI,data.teams=[];
+    let i,playerid,skills,defense,players,x=-1;
+    for(i=0;i<=1;i++){ //teams
+      players=[];
+      for(var k=0;k<(1);k++){
+        x+=1,defense=[],skills=[];   //skills   //todo own lust also depends on foe-lustinput*factor
+        skills.push({id:'passive',stamina:20,lustself:0,lustother:-4,tick:0,cooldown:0});
+        skills.push({id:'tease',stamina:-10,lustself:1,lustother:5,tick:0,cooldown:0});
+        skills.push({id:'calm',stamina:-1,lustself:-3,lustother:0,tick:0,cooldown:0});
+        skills.push({id:'fuck',stamina:-10,lustself:5,lustother:5,tick:0,cooldown:0});    
+        playerid= ((i===0)?'player#':'foe#')+x;   
+        players.push({id:playerid,
+          skills:skills,defenses:defense,skill:'',target:''
+          ,stamina:Teams[i][k].stamina//{min:0,max:100,exhausted:20,curr:80,regen:5}
+          ,ometer:Teams[i][k].ometer//{min:0,denial:20,minor:60,gasm:85,max:100,curr:0}, //ostim=max
+          ,pleasure:Teams[i][k].pleasure//{min:0,annoy:20,good:60,max:80,PNR:70,curr:10}
+        });
+        _createBars(players[players.length-1],i,i===0&&k===0);
+      }
+      data.teams.push(players);
+    }   
+    data.run=true;
+    newTurn();
+  }
+  function _createBars(player,teamidx,firstcall) {
+    let box,box2,entry,entry2,panel=document.getElementById('panel2');
+      for(var i=panel.childNodes.length-1;firstcall && i>=0;i-- ){ 
+        panel.removeChild(panel.childNodes[i]);
+      } 
+    //create bargraphs with ids = player.id+'stamina'
+    //<div class="progressbar" id='clickHere' style='height:1em; width: 100%;'><div id='bar' style="position:relative; width:5%; height:100%; background-color:green;"></div></div>
+    box=document.createElement('p');
+    box.style['width']='25em';
+    box.textContent=player.id;
+    for(var el of ['ometer','pleasure','stamina']) {
+      box2=document.createElement('p');
+      box2.textContent=el;box2.hidden=(el==='stamina'&&data.debug.display!=='all'&&teamidx>0);
+      entry=document.createElement('div');
+      entry.className="progressbar",entry.style['height']='1em',entry.style['width']='100%';
+      entry2=document.createElement('div');
+      entry2.id=player.id+el;
+      entry2.style['height']='100%',entry2.style['width']='2%',entry2.style['position']='relative',entry2.style['background-color']='fuchsia';
+      entry.appendChild(entry2);
+      box2.appendChild(entry);
+      box.appendChild(box2)
+      entry2.style.transition = "left "+data.speed+"ms linear"; //configure css-transition for slider animation
+    }
+    panel.appendChild(box);
+  }
+  function _updateBars(player) {
+    let bar,value,gradient='',areas=[];
+    for(var el of ['ometer','pleasure','stamina']) {
+      bar=document.getElementById(player.id+el);
+      value=player[el].curr*100/(player[el].max-player[el].min);
+      bar.style.left=value+'%';
+      switch(el) {
+        case 'pleasure':
+          areas=[ {a:0,b:player[el].annoy*100/player[el].max,color:'steelblue'},
+                  {a:player[el].annoy*100/player[el].max,b:player[el].good*100/player[el].max,color:'white'},
+                  {a:player[el].good*100/player[el].max,b:player[el].PNR*100/player[el].max,color:'lightgreen'},
+                  {a:player[el].PNR*100/player[el].max,b:(player[el].PNR+2)*100/player[el].max,color:'crimson'},
+                  {a:(player[el].PNR+2*100/player[el].max),b:100,color:'lightgreen'}]
+          break;
+        case 'stamina':
+          areas=[ {a:0,b:player[el].exhausted*100/player[el].max,color:'crimson'},
+                  {a:player[el].exhausted*100/player[el].max,b:player[el].max*100/player[el].max,color:'white'}]
+          break;
+        case 'ometer':
+            areas=[ {a:0,b:player[el].denial*100/player[el].max,color:'steelblue'},
+                    {a:player[el].denial*100/player[el].max,b:player[el].minor*100/player[el].max,color:'lightpink'},
+                    {a:player[el].minor*100/player[el].max,b:player[el].gasm*100/player[el].max,color:'violet'},
+                    {a:player[el].gasm*100/player[el].max,b:100,color:'coral'}]
+            break;
+          default: throw new Error("unknown: "+el);
+            break;
+      }
+      gradient='';
+      for(var n of areas){ //todo need to sort from left to right
+        gradient += '#80808000 0 '+n.a+'%, '+n.color+' '+n.a+'%,'+n.color+' '+n.b+'%,#80808000 '+n.b+'%,';
+      }
+      bar.parentNode.style.backgroundImage='linear-gradient(to right,'+gradient.slice(0,-1)+')';
+    }
+  }
+  function updateBoard(){
+    let player,skill;
+    let entry,tooltip,panel=document.getElementById('panel');
+    for(var i=panel.childNodes.length-1;i>=0;i-- ){
+      panel.removeChild(panel.childNodes[i]);
+    } 
+    //cleanout buttons
+    let choice=document.getElementById('choice');
+    for(var i=choice.childNodes.length-1;i>=0;i-- ){
+      choice.removeChild(choice.childNodes[i]);
+    } 
+    //update players or remove them: list health and color of each player
+    for(var i=data.teams.length-1;i>=0;i--){
+      for(var k=data.teams[i].length-1;k>=0;k--){
+        player=data.teams[i][k];
+        _updateBars(player);
+        entry=document.createElement('button');
+        entry.id=player.id;
+        entry.textContent='Team'+i+' '+player.id+' stamina:'+player.stamina.curr+' pleasure:'+player.pleasure.curr+' ometer:'+player.ometer.curr;
+        if(player.stamina.curr<=player.stamina.exhausted){
+          entry.textContent+='   Exhausted !'
+        }
+        if(data.team===i ){
+          entry.disabled=true;
+        } else {
+          //button to select opponent
+          entry.addEventListener("click",(function(target){return(selectTarget.bind(data,target));}(player.id))); 
+          data.target=player.id;
+        }
+        panel.appendChild(entry);
+        if(player.id===data.player){   //list skills of attacker
+          if(data.team!==i && data.AI!=='none') { //select by AI
+            _AISolver();
+          }else {
+            entry.style['border-block-color']='khaki',entry.style['border-block-width']='5px';
+              for(var l=player.skills.length-1;l>=0;l--){
+                skill=player.skills[l];
+                entry=document.createElement('button');
+                entry.id=skill.id;entry.title=skill.id;
+                entry.textContent=skill.id+' (fatigue:'+skill.stamina+' lustself:'+skill.lustself+' lustother:'+skill.lustother+')'+' cooldown:'+skill.tick;
+                if(skill.tick>0 || (skill.stamina<0 && (player.stamina.curr-player.stamina.exhausted)<skill.stamina*-1)){
+                  entry.disabled=true; //disable if cooldown or not enough charge
+                }else {
+                  entry.addEventListener("click",(function(player,skill){return(selectSkill.bind(data,player,skill));}(player.id,skill.id)));  
+                }  
+                choice.appendChild(entry);
+              }   
+              //entry=document.createElement('button');
+              //entry.id=entry.textContent='skip';  
+              //entry.addEventListener("click",nextPlayer);
+              //choice.appendChild(entry);
+          }   
+        }     
+      }
+      entry=document.createElement('hr');
+      panel.appendChild(entry);
+    } 
+    entry=document.createElement('p');
+    entry.textContent=(data.phase===0)?data.player+': select target and skill:':data.target+': select defense:';
+    choice.appendChild(entry);  
+  }
+  function newTurn(){
+    //check if any team is down
+    let teamDead,player,skill;
+    data.phase=0;
+    teamDead=true;
+    for(var i=data.teams.length-1;i>=0;i--){
+      for(var k=data.teams[i].length-1;k>=0;k--){
+        player=data.teams[i][k];
+        if(player.stamina.curr>player.stamina.exhausted) teamDead=false; //battle continues until no one has stamina
+        for(var l=player.skills.length-1;l>=0;l--){ //tick skills
+          skill=player.skills[l];
+          skill.tick=Math.max(0,skill.tick-1);
+        }
+        for(var l=player.defenses.length-1;l>=0;l--){ //tick skills
+          skill=player.defenses[l];
+          skill.tick=Math.max(0,skill.tick-1);
+        }
+      }
+    }
+    if(teamDead){
+      alert('team '+i+' is defeated'),stop();
+    } else { //start new round with team0 - note that all for-loops are operated backwards
+      data.team=data.teams.length-1;
+      let x=data.teams[data.team].length-1;
+      data.player=data.teams[data.team][x].id;
+      updateBoard();
+    }
+  }
+  function nextPlayer(){
+    let player,_usethis;
+    data.phase=0;
+    //skip to next alive in team
+    _usethis=false;
+    for(var k=data.teams[data.team].length-1;k>=0;k--){
+      player=data.teams[data.team][k];
+      if(_usethis===true){ //the previous player was the current - this is next 
+        data.player=player.id;
+        _usethis=false;
+        break;
+      }
+      if(player.id===data.player){
+        _usethis=true;
+      }
+    }
+    if(_usethis===true){//no more players in team, switch to next
+      data.team-=1;
+      for(var i=data.team;(_usethis&&i>=0);i--){
+        for(var k=data.teams[i].length-1;(_usethis&&k>=0);k--){
+          player=data.teams[i][k];
+          if(true){//player.hp>0){
+            data.player=player.id;
+            _usethis=false;
+          }
+        }
+      }
+      if(_usethis===true){//but if no one left... 
+        calcDamage();
+        return;
+      }
+    }
+    updateBoard();
+  }
+  function selectTarget(id){this.target=id; }
+  function selectSkill(playerId,skillId){
+    let player,skill;
+    let _log="div#output";
+    for(var i=data.teams.length-1;i>=0;i--){ //find players
+      for(var k=data.teams[i].length-1;k>=0;k--){
+        player=data.teams[i][k];
+        if(player.id===playerId){
+          player.skill=_findSkill(player,skillId).id,player.target=data.target;
+        }
+      }
+    }
+    window.gm.printOutput('',_log)
+    nextPlayer();//updateBoard();
+  }
+  function _findSkill(player,id){
+    let skill;
+    for(var l=player.skills.length-1;l>=0;l--){ //get skill
+      skill=player.skills[l];
+      if(skill.id===id){ return(skill);}
+    }
+    return(null);
+  }
+  function _describeAction(player,target,skill,top){
+    let msg='';
+    if(top===true){
+      if(skill.id==='tease') {
+        msg+=player.id+' teases '+target.id+' ';
+      } else if(skill.id==='calm') {
+        msg+=player.id+' calms itself ';
+      } else if(skill.id==='fuck') {
+        msg+=player.id+' fucks '+target.id+' ';
+      } else {
+        msg+=player.id+' just waits ';
+      }
+    } else {
+      msg+='and '
+      if(skill.id==='tease') {
+        msg+=player.id+' teases '+target.id+' ';
+      } else if(skill.id==='calm') {
+        msg+=player.id+' calms itself ';
+      } else if(skill.id==='fuck') {
+        msg+=player.id+' fucks '+target.id+' ';
+      } else {
+        msg+=player.id+' just waits ';
+      }
+    }
+    return(msg);
+  }
+  function calcDamage() {
+    let entry,i,choice=document.getElementById('choice2');
+    data.turn+=1;
+    for(i=choice.childNodes.length-1;i>=5;i-- ){//cleanout log
+      choice.removeChild(choice.childNodes[i]);
+    } 
+    //build pairs of interacting players; playerA is Top
+    //right now we have only 1:1
+    let skill,skillA,skillB,target,actions=[[data.teams[0][0],data.teams[1][0]]];
+    for(var pair of actions){
+      i=-1;
+      for(var action of pair) {
+        i++;
+        skill=_findSkill(action,action.skill);
+        if(i===0) {
+          skillA=skill;target=pair[1];
+        } else {
+          skillB=skill;target=pair[0];
+        }
+        action.stamina.curr+=skill.stamina,
+        action.pleasure.curr+=skill.lustself,
+        target.pleasure.curr+=skill.lustother;
+        if(action.ometer.curr>action.ometer.gasm) { //ostim
+          action.pleasure.curr=action.pleasure.annoy/2;
+        }
+        if(action.pleasure.curr>action.pleasure.good) { //ometer
+          action.ometer.curr+=target.pleasure.curr/15;
+        } else if(action.pleasure.curr<action.pleasure.annoy) {
+          action.ometer.curr-=target.pleasure.curr/10;
+        } else {
+          action.ometer.curr-=target.pleasure.curr/20;
+        }
+      }
+      entry=document.createElement('p');
+      entry.textContent='turn:'+data.turn+' '+_describeAction(pair[0],pair[1],skillA,true)+_describeAction(pair[1],pair[0],skillB,false)+'</br>';
+      choice.insertBefore(entry,choice.firstChild); 
+    }
+    entry=document.createElement('hr');
+    choice.insertBefore(entry,choice.firstChild); 
+    //entry=document.createElement('button');
+    //entry.id=entry.textContent='next';  
+    newTurn();//entry.addEventListener("click",newTurn);
+    //choice.appendChild(entry);
+  }
+  function stop(){ data.run=false;}
+  let data ={ //internal state of game
+    scoreBoard : document.getElementById(panel),
+    run:false, //game started?
+    teams:[], //store data of team & players
+    team:0,
+    turn:0,
+    cost:{
+
+    },
+    AI:'none',
+    speed:300, //slider anim speed
+    debug:{display:'all'},
+    player:'',skill:'',target:'',
     stopCB: stopCB, //callback after user trigger 
     startCB: startCB, //callback after start
     start: start, //ref to start-function

@@ -37,6 +37,10 @@ window.gm.util.deepClone=function(obj){
   clone._relinkItems();
   return(clone);
 };
+// can be used to deepclone plain {}-objects; use deepClone for objects from classes !
+window.gm.util.deepCloneObj=function(obj){
+  return(JSON.parse(JSON.stringify(obj)));
+}
 // Adds key shortcut indicators to links in passage if there are less than 11 links in the passsage. see addShortKeyHandler.
 // Enables keyboard shortcuts if passage do not have the "_noshortkey_" tag and links dont have attribute "data-nokey"; 
 window.gm.util.updateLinks=function(Container){

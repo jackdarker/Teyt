@@ -785,7 +785,7 @@ class WhipLeather extends Weapon {
     toJSON(){return window.storage.Generic_toJSON("WhipLeather", this); }
     static fromJSON(value){return(window.storage.Generic_fromJSON(WhipLeather, value.data));}
     attackMod(target){
-        let mod = new SkillMod();
+        let mod = new SkillMod();mod.msg="with a whiplash"
         mod.onHit = [{ target:target, eff: [effDamage.factory(5,'slash')]}];
         mod.critChance=5;
         mod.onCrit = [{ target:target, eff: [effDamage.factory(10,'slash'),effMasochist.factory(1)]}];
@@ -888,6 +888,51 @@ class SpearWodden extends Weapon {
         mod.onCrit = [{ target:target, eff: [effDamage.factory(10+bonus*1.5,'pierce'), new effBleed(4)]}];
         return(mod);
     }
+}
+class SpellRod extends Equipment {
+    static factory(style){
+        let x = new SpellRod();
+        x.style=style;
+        return(x);
+    }
+    constructor(){
+        super();
+        this.slotUse = ['LHand'];
+        this.lossOnRespawn = true;
+        this.style=0;
+    }
+    set style(style){ 
+        this._style = style; 
+        if(style===0) this.id=this.name='SparkRod';
+        else if(style===100) this.id=this.name='FlameRod';
+        else throw new Error(this.id +' doesnt know '+style);
+    }
+    get style(){return this._style;}
+    get desc(){ 
+        let msg ='a mysterious twig that, if worn in left hand, lets even unexperienced user cast magic;';
+        switch(this._style){
+            case 0: msg+=('casts a electric spark');  
+            break;
+            case 100: msg+=('casts a fireball');  
+            break;
+            default:
+        }
+        return(msg);
+    }
+    toJSON(){return window.storage.Generic_toJSON("SpellRod", this); }
+    static fromJSON(value){return(window.storage.Generic_fromJSON(SpellRod, value.data));}
+    onEquip(context){
+        let res=super.onEquip(context);
+        if(res.OK){
+            let sk = new SkillSpark();
+            sk.weapon = this.id;
+            this.parent.parent.Skills.addItem(sk);
+        }
+        return(res);}
+    onUnequip(context){
+        super.onUnequip(context)
+        this.parent.parent.Skills.removeItem('Spark');
+        return({OK:true, msg:'unequipped'});}
 }
 class ShieldSmall extends Equipment {
     constructor(){
@@ -1005,6 +1050,7 @@ window.gm.ItemsLib = (function (ItemsLib){
     window.storage.registerConstructor(ShortsLeather);
     window.storage.registerConstructor(ShieldSmall);
     window.storage.registerConstructor(SpearWodden);
+    window.storage.registerConstructor(SpellRod);
     window.storage.registerConstructor(StaffWodden);
     window.storage.registerConstructor(WristCuffs);
     window.storage.registerConstructor(WhipLeather);
@@ -1058,9 +1104,12 @@ window.gm.ItemsLib = (function (ItemsLib){
     ItemsLib['ShieldIron'] = function(){ let x= new ShieldSmall();x.style=200;return(x);};
     ItemsLib['SpearWodden'] = function(){ let x= new SpearWodden();return(x);};
     ItemsLib['SpearStone'] = function(){ let x= new SpearWodden();x.style=100;return(x);};
+    ItemsLib['SpearWodden'] = function(){ let x= new SpellRod();return(x);};
+    ItemsLib['SpellRodSpark'] = function(){ return(SpellRod.factory(0))};
     ItemsLib['WhipLeather'] = function(){ let x= new WhipLeather();return(x);};
     return ItemsLib; 
 }(window.gm.ItemsLib || {}));
 
 //todo stained cloths
 //shredded cloths need to be stitched
+//nagel schere- stumpft klauen ab

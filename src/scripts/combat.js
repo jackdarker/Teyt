@@ -393,7 +393,7 @@ fetchLoot(){ //if you are victorious: grant XP & transfer Loot to player
   }
   msg = '</br>You got some loot: '+window.gm.util.formatNumber(XP,0) +'XP '+msg+'</br>';
   for (n of s.combat.playerParty){
-    n.addXP(XP);  //all get the same?
+    n.addXP(XP);  //todo all get the same?
   }
   return(msg);
 }
@@ -730,12 +730,12 @@ window.gm.combat.calcAbsorb=function(attacker,defender, attack){
   let result = {OK:true,msg:''}
   let rnd = _.random(1,100);
   if(attack.mod.onCrit.length>0 && ((rnd<attack.mod.critChance) || attack.crit===true)){  //is critical
-    attack.crit=true, result.msg = defender.name +' got critical hit by '+attacker.name+'. ';
+    attack.crit=true, result.msg = defender.name +' got critical hit by '+attacker.name+" "+attack.mod.msg+'. ';
     for(var n of attack.mod.onCrit){
         attack.effects.push( {target:n.target, eff:n.eff}); //n.eff is []
     }
   } else {
-    result.msg = defender.name +' got hit by '+attacker.name+'.</br> ';
+    result.msg = defender.name +' got hit by '+attacker.name+" "+attack.mod.msg+'.</br> ';
     for(var n of attack.mod.onHit){
         attack.effects.push( {target:n.target, eff:n.eff});
     }

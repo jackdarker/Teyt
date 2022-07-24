@@ -874,11 +874,17 @@ class effPillEffect extends Effect {
 }
 /**
  * todo 
- * the mark indicates that you can bear soulgems; the stronger the mark, the better the gem
- * 
- * with each birth, the mark grows stronger;
+ * on a female the mark indicates that you can bear soulgems; the stronger the mark, the better the gem but it will take longer and absorb more
+ * with each birth, the mark grows stronger ?
  * while pampering the gem, it sucks up your arcana if you dont have sex
  * chance to go into heat if you dont have a gem
+ * 
+ * on a male the mark encourage cum stud fetish
+ * makes host more submissive to females? shrinks cock if not used?
+ * there is a slight chance to add lewd mark to fucked female?
+ * chance to go into rut
+ * 
+ * if a male with lm fucks female with lm&gem, the gem will vanish and both gain a level; no effect otherwise
  *
  * @class effLewdMark
  * @extends {Effect}

@@ -31,10 +31,11 @@ anthro mammal
 - cougar-girl/-mistress
 - werwolf
 
-fetish zealots
+fetish zealots ; force an item on you if you loose or you can grab an item with a chance that it is Key/tool or a fetish-related item
 - latex-, pet-,pony-,cock-sleave-, milk-slave and master/mistress
 - enforcer/chastiser - makes sure you dont fuck around
 - body artist - gies you tattos/piercings
+- bondage
 
 feral insects
 - Giant wasp
@@ -497,7 +498,7 @@ class Succubus extends Mob {
         let foe = new Succubus();
         if(type==='succubus'){
             foe.Outfit.addItem(window.gm.ItemsLib.WhipLeather());
-        } else if(type==="Nurse"){
+        } else if(type==="nurse"){
             foe.baseName = foe.id = 'BNurse';
             foe.pic= 'Nurse1';
             foe.Outfit.addItem(window.gm.ItemsLib.Syringe());
