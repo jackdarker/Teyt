@@ -1173,52 +1173,63 @@ teams:[],team:0,player:'',skill:'',skillcolor:'',target:'',stopCB:stopCB,//callb
 startCB:startCB,//callback after start
 start:start//ref to start-function
 };return data;};///////////////////////////////////////////////////////////////////////
-window.gm.startOmeterCombat=function(stopCB,startCB){function start(Teams,AI,Display){//setup teams,cards
-data.debug.display=Display,data.AI=AI,data.teams=[];var i,playerid,skills,defense,players,x=-1;for(i=0;i<=1;i++){//teams
-players=[];for(var k=0;k<1;k++){x+=1,defense=[],skills=[];//skills
-skills.push({id:'passive',stamina:5,lustself:-4,lustother:-4,tick:0,cooldown:0});skills.push({id:'tease',stamina:-5,lustself:1,lustother:5,tick:0,cooldown:0});skills.push({id:'calm',stamina:-1,lustself:-3,lustother:0,tick:0,cooldown:0});skills.push({id:'fuck',stamina:-6,lustself:5,lustother:5,tick:0,cooldown:0});playerid=(i===0?'player#':'foe#')+x;players.push({id:playerid,skills:skills,defenses:defense,skill:'',target:'',stamina:Teams[i][k].stamina//{min:0,max:100,exhausted:20,curr:80,regen:5}
+window.gm.startOmeterCombat=function(stopCB,startCB){function start(Teams,AI,debug){//setup teams,cards
+data.debug.display=debug.display?'all':'minimum',data.teams=[];data.debug.staminaOff=debug.staminaOff;data.AI=[];var _iterator34=_createForOfIteratorHelper(AI),_step34;try{for(_iterator34.s();!(_step34=_iterator34.n()).done;){var _x=_step34.value;switch(_x){case'none':data.AI.push(null);break;case'passive':data.AI.push(AIpassive);break;case'selfish':data.AI.push(AIselfish);break;default:throw new Error("invalid AI "+_x);}}}catch(err){_iterator34.e(err);}finally{_iterator34.f();}var i,playerid,skills,defense,players,x=-1;for(i=0;i<=1;i++){//teams
+players=[];for(var k=0;k<1;k++){x+=1,defense=[],skills=[];//skills   // own lust also depends on foe-lustinput*FactorReceive
+skills.push({id:'tease',stamina:-10,fr:1.5,lustself:1,lustother:3,tick:0,cooldown:0});skills.push({id:'calm',stamina:-3,fr:0.5,lustself:-3,lustother:0,tick:0,cooldown:0});skills.push({id:'fuck',stamina:-10,fr:1.2,lustself:4,lustother:5,tick:0,cooldown:0});skills.push({id:'deny',stamina:-10,fr:0.5,lustself:-5,lustother:-5,tick:0,cooldown:0});skills.push({id:'passive',stamina:20,fr:1.0,lustself:-1,lustother:-1,tick:0,cooldown:0});playerid='player#'+x;players.push({id:playerid,skills:skills,defenses:defense,skill:'',target:'',essence:0,stamina:Teams[i][k].stamina//{min:0,max:100,exhausted:20,curr:80,regen:5}
 ,ometer:Teams[i][k].ometer//{min:0,denial:20,minor:60,gasm:85,max:100,curr:0}, //ostim=max
 ,pleasure:Teams[i][k].pleasure//{min:0,annoy:20,good:60,max:80,PNR:70,curr:10}
 });_createBars(players[players.length-1],i,i===0&&k===0);}data.teams.push(players);}data.run=true;newTurn();}function _createBars(player,teamidx,firstcall){var box,box2,entry,entry2,panel=document.getElementById('panel2');for(var i=panel.childNodes.length-1;firstcall&&i>=0;i--){panel.removeChild(panel.childNodes[i]);}//create bargraphs with ids = player.id+'stamina'
 //<div class="progressbar" id='clickHere' style='height:1em; width: 100%;'><div id='bar' style="position:relative; width:5%; height:100%; background-color:green;"></div></div>
-box=document.createElement('p');box.style['width']='25em';box.textContent=player.id;for(var _i5=0,_arr=['ometer','pleasure','stamina'];_i5<_arr.length;_i5++){var el=_arr[_i5];box2=document.createElement('p');box2.textContent=el;box2.hidden=el==='stamina'&&data.debug.display!=='all'&&teamidx>0;entry=document.createElement('div');entry.className="progressbar",entry.style['height']='1em',entry.style['width']='100%';entry2=document.createElement('div');entry2.id=player.id+el;entry2.style['height']='100%',entry2.style['width']='2%',entry2.style['position']='relative',entry2.style['background-color']='fuchsia';entry.appendChild(entry2);box2.appendChild(entry);box.appendChild(box2);entry2.style.transition="left "+data.speed+"ms linear";//configure css-transition for slider animation
-}panel.appendChild(box);}function _updateBars(player){var bar,value,gradient='',areas=[];for(var _i6=0,_arr2=['ometer','pleasure','stamina'];_i6<_arr2.length;_i6++){var el=_arr2[_i6];bar=document.getElementById(player.id+el);value=player[el].curr*100/(player[el].max-player[el].min);bar.style.left=value+'%';switch(el){case'pleasure':areas=[{a:0,b:player[el].annoy*100/player[el].max,color:'steelblue'},{a:player[el].annoy*100/player[el].max,b:player[el].good*100/player[el].max,color:'white'},{a:player[el].good*100/player[el].max,b:player[el].PNR*100/player[el].max,color:'lightgreen'},{a:player[el].PNR*100/player[el].max,b:(player[el].PNR+2)*100/player[el].max,color:'crimson'},{a:player[el].PNR+2*100/player[el].max,b:100,color:'lightgreen'}];break;case'stamina':areas=[{a:0,b:player[el].exhausted*100/player[el].max,color:'crimson'},{a:player[el].exhausted*100/player[el].max,b:player[el].max*100/player[el].max,color:'white'}];break;case'ometer':areas=[{a:0,b:player[el].denial*100/player[el].max,color:'steelblue'},{a:player[el].denial*100/player[el].max,b:player[el].minor*100/player[el].max,color:'lightpink'},{a:player[el].minor*100/player[el].max,b:player[el].gasm*100/player[el].max,color:'violet'},{a:player[el].gasm*100/player[el].max,b:100,color:'coral'}];break;default:throw new Error("unknown: "+el);break;}gradient='';var _iterator34=_createForOfIteratorHelper(areas),_step34;try{for(_iterator34.s();!(_step34=_iterator34.n()).done;){var n=_step34.value;//todo need to sort from left to right
-gradient+='#80808000 0 '+n.a+'%, '+n.color+' '+n.a+'%,'+n.color+' '+n.b+'%,#80808000 '+n.b+'%,';}}catch(err){_iterator34.e(err);}finally{_iterator34.f();}bar.parentNode.style.backgroundImage='linear-gradient(to right,'+gradient.slice(0,-1)+')';}}function updateBoard(){var player,skill;var entry,tooltip,panel=document.getElementById('panel');for(var i=panel.childNodes.length-1;i>=0;i--){panel.removeChild(panel.childNodes[i]);}//cleanout buttons
+box=document.createElement('p');//box.style['width']='25em';
+box.textContent=player.id,box.id=player.id;box2=document.createElement('span');box2.id=player.id+'essence';box.appendChild(box2);for(var _i5=0,_arr=['ometer','pleasure','stamina'];_i5<_arr.length;_i5++){var el=_arr[_i5];box2=document.createElement('p');box2.textContent=el;box2.hidden=el==='stamina'&&data.debug.display!=='all'&&teamidx>0;entry=document.createElement('div');entry.className="progressbar",entry.style['height']='1em',entry.style['width']='100%';entry2=document.createElement('div');entry2.id=player.id+el;entry2.style['height']='100%',entry2.style['width']='2%',entry2.style['position']='relative',entry2.style['background-color']='fuchsia';entry.appendChild(entry2);box2.appendChild(entry);box.appendChild(box2);entry2.style.transition="left "+data.speed+"ms linear";//configure css-transition for slider animation
+}panel.appendChild(box);}///
+var maxx=0,maxv=0;function _updateBars(player){var box,bar,value,gradient='',areas=[];box=document.getElementById(player.id+'essence');box.textContent=' essence:'+window.gm.util.formatNumber(player.essence,0);for(var i=0;i<=1;i++){//2 swipes
+for(var _i6=0,_arr2=['ometer','pleasure','stamina'];_i6<_arr2.length;_i6++){var el=_arr2[_i6];if(i===0){bar=document.getElementById(player.id+el);value=player[el].curr/(player[el].max-player[el].min);maxv=Math.max(value,maxv);maxx=Math.max(player[el].max-player[el].min,maxx);var rwidth,width=window.getComputedStyle(bar).getPropertyValue('width');var total=window.getComputedStyle(bar.parentNode).getPropertyValue('width');rwidth=100*parseFloat(width.split('px'))/parseFloat(total.split('px'));bar.style.left=value*100-rwidth+'%';//wouldnt
+switch(el){case'pleasure':areas=[{a:0,b:player[el].annoy*100/player[el].max,color:'steelblue'},{a:player[el].annoy*100/player[el].max,b:player[el].good*100/player[el].max,color:'white'},{a:player[el].good*100/player[el].max,b:player[el].PNR*100/player[el].max,color:'lightgreen'},{a:player[el].PNR*100/player[el].max,b:(player[el].PNR+2)*100/player[el].max,color:'crimson'},{a:(player[el].PNR+2)*100/player[el].max,b:100,color:'lightgreen'}];break;case'stamina':areas=[{a:0,b:player[el].exhausted*100/player[el].max,color:'crimson'},{a:player[el].exhausted*100/player[el].max,b:100,color:'white'}];break;case'ometer':areas=[{a:0,b:player[el].denial*100/player[el].max,color:'steelblue'},{a:player[el].denial*100/player[el].max,b:player[el].minor*100/player[el].max,color:'lightpink'},{a:player[el].minor*100/player[el].max,b:player[el].gasm*100/player[el].max,color:'violet'},{a:player[el].gasm*100/player[el].max,b:100,color:'coral'}];break;default:throw new Error("unknown: "+el);break;}gradient='';var _iterator35=_createForOfIteratorHelper(areas),_step35;try{for(_iterator35.s();!(_step35=_iterator35.n()).done;){var n=_step35.value;//todo need to sort from left to right
+gradient+='#80808000 0 '+n.a+'%, '+n.color+' '+n.a+'%,'+n.color+' '+n.b+'%,#80808000 '+n.b+'%,';}}catch(err){_iterator35.e(err);}finally{_iterator35.f();}bar.parentNode.style.backgroundImage='linear-gradient(to right,'+gradient.slice(0,-1)+')';}else{//on 2.pass adjust width of each bar relative to maxv
+bar=document.getElementById(player.id+el);bar.parentElement.style['width']=parseInt(40*(player[el].max-player[el].min)*maxv/maxx)+'em';}}}}///
+function updateBoard(){var player,skill;var entry,box,panel=document.getElementById('panel');for(var i=panel.childNodes.length-1;i>=0;i--){panel.removeChild(panel.childNodes[i]);}//cleanout buttons
 var choice=document.getElementById('choice');for(var i=choice.childNodes.length-1;i>=0;i--){choice.removeChild(choice.childNodes[i]);}//update players or remove them: list health and color of each player
-for(var i=data.teams.length-1;i>=0;i--){for(var k=data.teams[i].length-1;k>=0;k--){player=data.teams[i][k];_updateBars(player);entry=document.createElement('button');entry.id=player.id;entry.textContent='Team'+i+' '+player.id+' stamina:'+player.stamina.curr+' pleasure:'+player.pleasure.curr+' ometer:'+player.ometer.curr;if(player.stamina.curr<=player.stamina.exhausted){entry.textContent+='   Exhausted !';}if(data.team===i){entry.disabled=true;}else{//button to select opponent
-entry.addEventListener("click",function(target){return selectTarget.bind(data,target);}(player.id));data.target=player.id;}panel.appendChild(entry);if(player.id===data.player){//list skills of attacker
-if(data.team!==i&&data.AI!=='none'){//select by AI
-_AISolver();}else{entry.style['border-block-color']='khaki',entry.style['border-block-width']='5px';for(var l=player.skills.length-1;l>=0;l--){skill=player.skills[l];entry=document.createElement('button');entry.id=skill.id;entry.title=skill.id;entry.textContent=skill.id+' (fatigue:'+skill.stamina+' lustself:'+skill.lustself+' lustother:'+skill.lustother+')'+' cooldown:'+skill.tick;if(skill.tick>0||skill.stamina<0&&player.stamina.curr-player.stamina.exhausted<skill.stamina*-1){entry.disabled=true;//disable if cooldown or not enough charge
-}else{entry.addEventListener("click",function(player,skill){return selectSkill.bind(data,player,skill);}(player.id,skill.id));}choice.appendChild(entry);}//entry=document.createElement('button');
+for(var i=data.teams.length-1;i>=0;i--){for(var k=data.teams[i].length-1;k>=0;k--){player=data.teams[i][k];_updateBars(player);entry=document.createElement('button');entry.id=player.id;entry.textContent='Team'+i+' '+player.id+' stamina:'+window.gm.util.formatNumber(player.stamina.curr,0)+' pleasure:'+window.gm.util.formatNumber(player.pleasure.curr,0)+' ometer:'+window.gm.util.formatNumber(player.ometer.curr,0);if(player.stamina.curr<=player.stamina.exhausted){entry.textContent+='   Exhausted !';}box=document.getElementById(player.id);if(data.team===i||!data.run){entry.disabled=true;box.style["background-color"]="lightsteelblue";}else{box.style["background-color"]="unset";//button to select opponent
+entry.addEventListener("click",function(target){return selectTarget.bind(data,target);}(player.id));data.target=player.id;}panel.appendChild(entry);if(player.id===data.player.id&&data.run){//list skills of attacker
+if(data.AI[data.team]!==null){//select by AI
+//data.AI[data.team]();
+}else{entry.style['border-block-color']='khaki';for(var l=player.skills.length-1;l>=0;l--){skill=player.skills[l];entry=document.createElement('button');entry.id=skill.id;entry.title=skill.id;entry.textContent=skill.id+' (fatigue:'+skill.stamina+' lustself:'+skill.lustself+' lustother:'+skill.lustother+')'+' cooldown:'+skill.tick;if(skill.tick>0||skill.stamina<0&&player.stamina.curr-player.stamina.exhausted<skill.stamina*-1){entry.disabled=true;//disable if cooldown or not enough charge
+}else{entry.addEventListener("click",function(player,skill){return function(me){selectSkill.bind(me,player,skill)();};}(player.id,skill.id));//(function(player,skill){return(selectSkill.bind(data,player,skill));}(player.id,skill.id)));  
+}choice.appendChild(entry);}//entry=document.createElement('button');
 //entry.id=entry.textContent='skip';  
 //entry.addEventListener("click",nextPlayer);
 //choice.appendChild(entry);
-}}}entry=document.createElement('hr');panel.appendChild(entry);}entry=document.createElement('p');entry.textContent=data.phase===0?data.player+': select target and skill:':data.target+': select defense:';choice.appendChild(entry);}function newTurn(){//check if any team is down
+}}}entry=document.createElement('hr');panel.appendChild(entry);}if(data.run){entry=document.createElement('p');entry.style['color']='red';entry.textContent=data.phase===0?data.player.id+': select target and skill:':data.target+': select defense:';choice.appendChild(entry);if(data.AI[data.team]!==null){//select by AI
+clearTimeout(data.timer);//fire timer or get stackoverflow
+data.timer=setTimeout(data.AI[data.team],300);}}}function newTurn(){//check if any team is down
 var teamDead,player,skill;data.phase=0;teamDead=true;for(var i=data.teams.length-1;i>=0;i--){for(var k=data.teams[i].length-1;k>=0;k--){player=data.teams[i][k];if(player.stamina.curr>player.stamina.exhausted)teamDead=false;//battle continues until no one has stamina
 for(var l=player.skills.length-1;l>=0;l--){//tick skills
 skill=player.skills[l];skill.tick=Math.max(0,skill.tick-1);}for(var l=player.defenses.length-1;l>=0;l--){//tick skills
-skill=player.defenses[l];skill.tick=Math.max(0,skill.tick-1);}}}if(teamDead){alert('team '+i+' is defeated'),stop();}else{//start new round with team0 - note that all for-loops are operated backwards
-data.team=data.teams.length-1;var x=data.teams[data.team].length-1;data.player=data.teams[data.team][x].id;updateBoard();}}function nextPlayer(){var player,_usethis;data.phase=0;//skip to next alive in team
+skill=player.defenses[l];skill.tick=Math.max(0,skill.tick-1);}}}data.team=data.teams.length-1;var x=data.teams[data.team].length-1;data.player=data.teams[data.team][x];if(teamDead){stop(),updateBoard();alert('team '+i+' is defeated');}else{//start new round with team0 - note that all for-loops are operated backwards
+updateBoard();}}function nextPlayer(){var player,_usethis;data.phase=0;//skip to next alive in team
 _usethis=false;for(var k=data.teams[data.team].length-1;k>=0;k--){player=data.teams[data.team][k];if(_usethis===true){//the previous player was the current - this is next 
-data.player=player.id;_usethis=false;break;}if(player.id===data.player){_usethis=true;}}if(_usethis===true){//no more players in team, switch to next
+data.player=player;_usethis=false;break;}if(player===data.player){_usethis=true;}}if(_usethis===true){//no more players in team, switch to next
 data.team-=1;for(var i=data.team;_usethis&&i>=0;i--){for(var k=data.teams[i].length-1;_usethis&&k>=0;k--){player=data.teams[i][k];if(true){//player.hp>0){
-data.player=player.id;_usethis=false;}}}if(_usethis===true){//but if no one left... 
-calcDamage();return;}}updateBoard();}function selectTarget(id){this.target=id;}function selectSkill(playerId,skillId){var player,skill;var _log="div#output";for(var i=data.teams.length-1;i>=0;i--){//find players
-for(var k=data.teams[i].length-1;k>=0;k--){player=data.teams[i][k];if(player.id===playerId){player.skill=_findSkill(player,skillId).id,player.target=data.target;}}}window.gm.printOutput('',_log);nextPlayer();//updateBoard();
-}function _findSkill(player,id){var skill;for(var l=player.skills.length-1;l>=0;l--){//get skill
-skill=player.skills[l];if(skill.id===id){return skill;}}return null;}function _describeAction(player,target,skill,top){var msg='';if(top===true){if(skill.id==='tease'){msg+=player.id+' teases '+target.id+' ';}else if(skill.id==='calm'){msg+=player.id+' calms itself ';}else if(skill.id==='fuck'){msg+=player.id+' fucks '+target.id+' ';}else{msg+=player.id+' just waits ';}}else{msg+='and ';if(skill.id==='tease'){msg+=player.id+' teases '+target.id+' ';}else if(skill.id==='calm'){msg+=player.id+' calms itself ';}else if(skill.id==='fuck'){msg+=player.id+' fucks '+target.id+' ';}else{msg+=player.id+' just waits ';}}return msg;}function calcDamage(){var entry,i,choice=document.getElementById('choice2');data.turn+=1;for(i=choice.childNodes.length-1;i>=5;i--){//cleanout log
-choice.removeChild(choice.childNodes[i]);}//build pairs of interacting players; playerA is Top
+data.player=player;_usethis=false;}}}if(_usethis===true){//but if no one left... 
+calcDamage();return;}}updateBoard();}function selectTarget(id){this.target=id;}function selectSkill(playerId,skillId){var player,skill;var _log="div#output";if(this){var choice=this.target.parentNode;for(var i=choice.childNodes.length-1;i>=0;i--){//disable buttons
+choice.childNodes[i].disabled=true;}}for(var i=data.teams.length-1;i>=0;i--){//find players
+for(var k=data.teams[i].length-1;k>=0;k--){player=data.teams[i][k];if(player.id===playerId){player.skill=_findSkill(player,skillId),player.target=data.target;}}}window.gm.printOutput(playerId+' will use '+skillId+' on '+data.target,_log);nextPlayer();}function _findSkill(player,id){var skill;for(var l=player.skills.length-1;l>=0;l--){//get skill
+skill=player.skills[l];if(skill.id===id){return skill;}}throw new Error("unknown skillid: "+id);}function _describeAction(player,target,skill,top){var msg='';if(top===true){if(skill.id==='tease'){msg+=player.id+' teases '+target.id+' ';}else if(skill.id==='calm'){msg+=player.id+' calms itself ';}else if(skill.id==='fuck'){msg+=player.id+' fucks '+target.id+' ';}else{msg+=player.id+' just waits ';}}else{msg+='and ';if(skill.id==='tease'){msg+=player.id+' teases back ';}else if(skill.id==='calm'){msg+=player.id+' calms itself ';}else if(skill.id==='fuck'){msg+=player.id+' fucks '+target.id+' ';}else{msg+=player.id+' just takes it ';}}return msg;}function AIpassive(){selectSkill(data.player.id,'passive');}function AIselfish(){var player=data.player,skill=_findSkill(data.player,'fuck');if(skill.stamina<0&&player.stamina.curr-player.stamina.exhausted-5<skill.stamina*-1){selectSkill(data.player.id,'passive');}else{selectSkill(data.player.id,'fuck');}}function calcDamage(){var entry,i,choice=document.getElementById('choice2');data.turn+=1;for(i=choice.childNodes.length-1;i>=5;i--){//cleanout log
+choice.removeChild(choice.childNodes[i]);}//build pairs of interacting players; first is Top
 //right now we have only 1:1
-var skill,skillA,skillB,target,actions=[[data.teams[0][0],data.teams[1][0]]];for(var _i7=0,_actions=actions;_i7<_actions.length;_i7++){var pair=_actions[_i7];i=-1;var _iterator35=_createForOfIteratorHelper(pair),_step35;try{for(_iterator35.s();!(_step35=_iterator35.n()).done;){var action=_step35.value;i++;skill=_findSkill(action,action.skill);if(i===0){skillA=skill;target=pair[1];}else{skillB=skill;target=pair[0];}action.stamina.curr+=skill.stamina,action.pleasure.curr+=skill.lustself,target.pleasure.curr+=skill.lustother;if(action.ometer.curr>action.ometer.gasm){//ostim
-action.pleasure.curr=action.pleasure.annoy/2;}if(action.pleasure.curr>action.pleasure.good){//ometer
-action.ometer.curr+=target.pleasure.curr/15;}else if(action.pleasure.curr<action.pleasure.annoy){action.ometer.curr-=target.pleasure.curr/10;}else{action.ometer.curr-=target.pleasure.curr/20;}}}catch(err){_iterator35.e(err);}finally{_iterator35.f();}entry=document.createElement('p');entry.textContent='turn:'+data.turn+' '+_describeAction(pair[0],pair[1],skillA,true)+_describeAction(pair[1],pair[0],skillB,false)+'</br>';choice.insertBefore(entry,choice.firstChild);}entry=document.createElement('hr');choice.insertBefore(entry,choice.firstChild);//entry=document.createElement('button');
-//entry.id=entry.textContent='next';  
-newTurn();//entry.addEventListener("click",newTurn);
-//choice.appendChild(entry);
-}function stop(){data.run=false;}var data={//internal state of game
+var essence,action,target,actions=[[data.teams[0][0],data.teams[1][0]]];function fpl(player){//change of pleasure reduced in green range
+if(player.pleasure.curr>player.pleasure.minor){return 0.5;}return 1.0;}for(var _i7=0,_actions=actions;_i7<_actions.length;_i7++){var pair=_actions[_i7];entry=document.createElement('p');entry.textContent='turn:'+data.turn+' '+_describeAction(pair[0],pair[1],pair[0].skill,true)+_describeAction(pair[1],pair[0],pair[1].skill,false)+'</br>';choice.insertBefore(entry,choice.firstChild);for(i=pair.length-1;i>=0;i--){action=pair[i],target=pair[1-i];action.stamina.curr=Math.max(action.stamina.min,Math.min(action.stamina.curr+action.skill.stamina,action.stamina.max));if(data.debug.staminaOff)action.stamina.curr=50;action.pleasure.curr=Math.max(action.pleasure.min,Math.min(action.pleasure.curr+action.skill.lustself+target.skill.lustother*action.skill.fr*fpl(action),action.pleasure.max));if(action.ometer.curr>action.ometer.gasm){//ostim
+action.pleasure.curr=action.pleasure.annoy/2;}if(action.pleasure.curr>action.pleasure.good){//ometer gain
+action.ometer.curr=Math.max(action.ometer.min,Math.min(action.ometer.max,action.ometer.curr+action.pleasure.curr/5));}else if(action.pleasure.curr<action.pleasure.annoy){//annoy
+action.ometer.curr=Math.max(action.ometer.min,Math.min(action.ometer.max,action.ometer.curr-action.pleasure.curr/5));}else{action.ometer.curr=Math.max(action.ometer.min,Math.min(action.ometer.max,action.ometer.curr-action.pleasure.curr/15));}_updateBars(action);}}clearTimeout(data.timer);//update bars, then check if something triggered
+data.timer=setTimeout(calcDamage2,1000);}function calcDamage2(){var entry,entry2,i,choice=document.getElementById('choice2');var essence,action,target,actions=[[data.teams[0][0],data.teams[1][0]]];for(var _i8=0,_actions2=actions;_i8<_actions2.length;_i8++){var pair=_actions2[_i8];for(i=pair.length-1;i>=0;i--){action=pair[i],target=pair[1-i];if(action.pleasure.curr>action.pleasure.PNR){//ogasm
+essence=action.ometer.curr;if(action.ometer.curr<action.ometer.minor){essence=0;}action.ometer.curr=action.ometer.min,action.pleasure.curr=action.pleasure.annoy*1.2,action.stamina.curr=Math.max(action.stamina.min,Math.min(action.stamina.curr-action.stamina.max/2,action.stamina.max));action.essence+=essence;entry2=document.createElement('p');entry2.textContent=action.id+' came and created '+window.gm.util.formatNumber(essence,0)+' essence.</br>';choice.insertBefore(entry2,choice.firstChild);_updateBars(action);}}}entry=document.createElement('hr');choice.insertBefore(entry,choice.firstChild);newTurn();}function stop(){data.run=false;}var data={//internal state of game
 scoreBoard:document.getElementById(panel),run:false,//game started?
 teams:[],//store data of team & players
-team:0,turn:0,AI:'none',speed:300,//slider anim speed
+team:0,turn:0,cost:{},timer:0,//AI update timer
+AI:null,speed:300,//slider anim speed
 debug:{display:'all'},player:'',skill:'',target:'',stopCB:stopCB,//callback after user trigger 
 startCB:startCB,//callback after start
 start:start//ref to start-function
@@ -2437,7 +2448,7 @@ window.gm.dng.teleport(room);}else{window.story.show(window.gm.player.location);
 }};//call this after your onDefeat/onSubmit-scene to respawn at respawn-point; cleansup dng-variables
 window.gm.postDefeat=function(){window.story.state.dng.id="";window.gm.dng=null;window.gm.respawn();};//after passing out: heal player and remove inventory {keepInventory=false,location=''}
 window.gm.respawn=function(){var conf=arguments.length>0&&arguments[0]!==undefined?arguments[0]:{keepInventory:false};var _iterator80=_createForOfIteratorHelper(window.story.state._gm.playerParty),_step80;try{for(_iterator80.s();!(_step80=_iterator80.n()).done;){var name=_step80.value;var _x=window.story.state[name];_x.Stats.increment("energy",9999);_x.Stats.increment("will",9999);_x.Stats.increment("health",9999);}}catch(err){_iterator80.e(err);}finally{_iterator80.f();}window.gm.player.Stats.increment("energy",9999);window.gm.player.Stats.increment("will",9999);window.gm.player.Stats.increment("health",9999);var msg='';if(!conf.keepInventory){//remove inentory and outfit that is not questitem, cursed or permanent
-for(var i=window.gm.player.Outfit.list.length-1;i>=0;i-=1){var _n11=window.gm.player.Outfit.list[i];if(_n11.item&&_n11.item.lossOnRespawn){window.gm.player.Outfit.removeItem(_n11.id,true);msg+=_n11.item.name+', ';}}for(var _i8=window.gm.player.Wardrobe.list.length-1;_i8>=0;_i8-=1){var _n12=window.gm.player.Wardrobe.list[0];if(_n12.item.lossOnRespawn){window.gm.player.Wardrobe.removeItem(_n12.id,_n12.count);msg+=_n12.item.name+', ';}}for(var _i9=window.gm.player.Inv.list.length-1;_i9>=0;_i9-=1){var _n13=window.gm.player.Inv.list[_i9];if(_n13.item.lossOnRespawn){window.gm.player.Inv.removeItem(_n13.id,_n13.count);msg+=_n13.item.name+', ';}}if(msg.length>0)msg="You lost "+msg.substr(0,msg.length-2);}/*if(window.gm.quests.getMilestoneState("qDiedAgain").id===2){
+for(var i=window.gm.player.Outfit.list.length-1;i>=0;i-=1){var _n11=window.gm.player.Outfit.list[i];if(_n11.item&&_n11.item.lossOnRespawn){window.gm.player.Outfit.removeItem(_n11.id,true);msg+=_n11.item.name+', ';}}for(var _i9=window.gm.player.Wardrobe.list.length-1;_i9>=0;_i9-=1){var _n12=window.gm.player.Wardrobe.list[0];if(_n12.item.lossOnRespawn){window.gm.player.Wardrobe.removeItem(_n12.id,_n12.count);msg+=_n12.item.name+', ';}}for(var _i10=window.gm.player.Inv.list.length-1;_i10>=0;_i10-=1){var _n13=window.gm.player.Inv.list[_i10];if(_n13.item.lossOnRespawn){window.gm.player.Inv.removeItem(_n13.id,_n13.count);msg+=_n13.item.name+', ';}}if(msg.length>0)msg="You lost "+msg.substr(0,msg.length-2);}/*if(window.gm.quests.getMilestoneState("qDiedAgain").id===2){
     window.story.show('YouDiedOnce'); 
   } else if([100,200,300].includes(window.gm.quests.getMilestoneState("qBondageKink").id)){
       window.story.show('YouDiedWithCursedGear');
@@ -2483,14 +2494,14 @@ dir=room.dirs[k].dir;xyB=nameToXY(dir);dx=xyB.x-xy.x,dy=xyB.y-xy.y;lPath.polylin
 node.text(function(add){add.tspan(dng.legend||'');}).addClass('textLabel').ax(0).ay(0);node.addTo(draw);};//display svg
 window.gm.printSceneGraphic2=function(background,item){var width=600,height=300;var draw=document.querySelector("#canvas svg");if(!draw)draw=SVG().addTo('#canvas').size(width,height);else draw=SVG(draw);//recover svg document instead appending new one
 var background=draw.rect(width,height).attr({fill:'#303030'});draw.image(background);var node=SVG(item);if(node)node.addTo(draw);};//for debug: builds link-list to display svg
-window.gm.listImages=function(){var list=Object.keys(window.gm.images);var g,entry=document.createElement('p');entry.textContent="";for(var _i10=0,_list=list;_i10<_list.length;_i10++){var _n14=_list[_i10];if(_n14==='strToBuf'||_n14==='cache')continue;g=document.createElement('a');g.href='javascript:void(0)',g.textContent=_n14;var x=window.gm.images[_n14]();g.addEventListener("click",window.gm.printSceneGraphic2.bind(this,"",x));entry.appendChild(g);entry.appendChild(document.createTextNode(' '));//add \s or no automatic linebreak
+window.gm.listImages=function(){var list=Object.keys(window.gm.images);var g,entry=document.createElement('p');entry.textContent="";for(var _i11=0,_list=list;_i11<_list.length;_i11++){var _n14=_list[_i11];if(_n14==='strToBuf'||_n14==='cache')continue;g=document.createElement('a');g.href='javascript:void(0)',g.textContent=_n14;var x=window.gm.images[_n14]();g.addEventListener("click",window.gm.printSceneGraphic2.bind(this,"",x));entry.appendChild(g);entry.appendChild(document.createTextNode(' '));//add \s or no automatic linebreak
 };$("div#choice")[0].appendChild(entry);// <- requires this node in html
 };//print list of actions for actual day and hour
 window.gm.printSchedule=function(){var elmt='';var s=window.story.state;var now=window.gm.getTimeStruct();var jobs=Object.values(window.gm.jobs);for(var i=0;i<jobs.length;i++){var id=jobs[i].id;if(jobs[i].isHidden()===true){//NOP;
 }else if(jobs[i].isDisabled()===true){elmt+="<div>".concat(jobs[i].disabledReason(),"</div></br>");}else if(jobs[i].DoW.includes(now.DoW)&&s._gm.time>=jobs[i].startTimeMin&&s._gm.time<jobs[i].startTimeMax){if(window.gm.player.energy().value>=jobs[i].reqEnergy){elmt+="<a0 id='".concat(id,"' onclick='(function($event){window.story.show(\"").concat(id,"\");})(this);'>").concat(jobs[i].name," </a>");elmt+="</br><div>".concat(jobs[i].descr," It might require ").concat(jobs[i].reqTime," minutes of your time and around ").concat(jobs[i].reqEnergy," energy.</div></br>");}else{elmt+="<div>You are to tired to do ".concat(jobs[i].name,".</div></br>");}}else{var days="";for(var k=0;k<jobs[i].DoW.length;k++){days+=window.gm.DoWs[jobs[i].DoW[k]-1]+",";}elmt+="<div>".concat(jobs[i].name," is only available between ").concat((jobs[i].startTimeMin/100).toFixed(0)," and ").concat((jobs[i].startTimeMax/100).toFixed(0)," at ").concat(days,". </div></br>");}}return elmt;};//prints a list of quest
 window.gm.printQuestList=function(){var elmt='<hr><form><ul style=\"list-style-type: none; padding-inline-start: 0px;\" ><legend>In progress</legend>';var s=window.story.state;//elmt +="<li><label><input type=\"checkbox\" name=\"y\" value=\"x\" readonly disabled>always: keep the fridge filled</label></li>";
 for(var i=0;i<s.quests.activeQuests.length;i++){var qId=s.quests.activeQuests[i].id;var flags=s.quests.activeQuests[i].flags;var msId=s.quests.activeQuestsMS[i].id;var quest=window.gm.questDef[qId];var mile=quest.getMileById(msId);if(!quest.HiddenCB()||window.story.state._gm.dbgShowQuestInfo){elmt+="<li style=\"padding-bottom: 0.5em;\"><input type=\"checkbox\" name=\"y\" value=\"x\" readonly disabled><label>"+quest.name+(window.story.state._gm.dbgShowQuestInfo?" "+msId+" 0x"+flags.toString(16):"")+" : "+(mile.HiddenCB()===true?"???":mile.descr)+"</label></li>";//checked="checked"
-}}elmt+="</ul></form></br>";elmt+='<hr><form><ul style=\"list-style-type: none\" ><legend>Completed</legend>';for(var _i11=0;_i11<s.quests.finishedQuests.length;_i11++){var _qId=s.quests.finishedQuests[_i11].id;var _flags=s.quests.activeQuests[_i11].flags;var _msId=s.quests.finishedQuestsMS[_i11].id;var _quest=window.gm.questDef[_qId];var _mile=_quest.getMileById(_msId);if(!_quest.HiddenCB()||window.story.state._gm.dbgShowQuestInfo){elmt+="<li><input type=\"checkbox\" name=\"y\" value=\"x\" readonly disabled checked=\"checked\"><label>"+_quest.name+(window.story.state._gm.dbgShowQuestInfo?" "+_msId+" 0x"+_flags.toString(16):"")+" : "+_mile.descr+"</label></li>";}}elmt+="</ul></form></br>";return elmt;};//prints a description of the chars-body
+}}elmt+="</ul></form></br>";elmt+='<hr><form><ul style=\"list-style-type: none\" ><legend>Completed</legend>';for(var _i12=0;_i12<s.quests.finishedQuests.length;_i12++){var _qId=s.quests.finishedQuests[_i12].id;var _flags=s.quests.activeQuests[_i12].flags;var _msId=s.quests.finishedQuestsMS[_i12].id;var _quest=window.gm.questDef[_qId];var _mile=_quest.getMileById(_msId);if(!_quest.HiddenCB()||window.story.state._gm.dbgShowQuestInfo){elmt+="<li><input type=\"checkbox\" name=\"y\" value=\"x\" readonly disabled checked=\"checked\"><label>"+_quest.name+(window.story.state._gm.dbgShowQuestInfo?" "+_msId+" 0x"+_flags.toString(16):"")+" : "+_mile.descr+"</label></li>";}}elmt+="</ul></form></br>";return elmt;};//prints a description of the chars-body
 window.gm.printBodyDescription=function(whom){var onlyvisible=arguments.length>1&&arguments[1]!==undefined?arguments[1]:false;var n,msg2="",msg="";var conv=window.gm.util.descFixer(whom);var wornIds=whom.Outfit.getAllIds();//todo this returns wearables & bodyparts
 var base=[],head=[],torso=[],arms=[],legs=[],groin=[],other=[],breast=[],ignore=[];//sort the order: place Breast & Nipple-Piercing together 
 var fbase=['bBase','bSkin'],fhead=['bHeadHair','bFace','bEars','bEyes','bMouth','bTongue','Head','Mouth','Neck'],ftorso=['bTorso','bTailBase','bWings','Breast','Stomach','Hips'],farms=['bArms','bHands','Arms','Wrists','RHand','LHand'],flegs=['bLegs','bFeet','Feet','Thighs'],fbreast=['bBreast','pNipples'],fgroin=['bVulva','bPenis','pClit','bPubicHair','bHips','bAnus','Vulva','Clit','Anus','Penis','Balls'],fignore=[],fcovered=[];if(onlyvisible){// filter by visibility 
@@ -2515,7 +2526,7 @@ br-=1;if(br<0){//there was already closing but no opening bracket !
 //no bracket in bracket allowed; ignore previous bracket
 br=0;}else{found.start=i;found.text=text.slice(found.start+1,found.end);//text within brackets
 found.start-=1,found.end+=1;// inlude $ $
-repl.push(found);}}}for(var _i12=0,_repl=repl;_i12<_repl.length;_i12++){var n=_repl[_i12];//replace bracket+bracketcontent,
+repl.push(found);}}}for(var _i13=0,_repl=repl;_i13<_repl.length;_i13++){var n=_repl[_i13];//replace bracket+bracketcontent,
 n.new=window.gm.util.lookupWord(n.text,pron);var _bef=text.substring(0,n.start),_aft=text.substr(n.end+1);text=_bef+n.new+_aft;}// $[I]$ $[have]$ some rough [hair] that needs a lot combing. He has some rough...
 // c. She buys those pants. 
 // That hat [I] [wear] is ugly. That hat she wears is ugly.  
@@ -3108,12 +3119,12 @@ Take it all in slut. I hope you bear some big soulgems for me when I met you aga
 */"use strict";window.gm.shop.findWaresToSell=function(TagsAllowed){var TagsNotAllowed=arguments.length>1&&arguments[1]!==undefined?arguments[1]:[window.gm.ItemTags.Quest];window.gm.shop.WaresToSell=[];var whom=window.gm.player;var _ids=whom.Inv.getAllIds();var _ids2=whom.Wardrobe.getAllIds();var _iterator92=_createForOfIteratorHelper(_ids),_step92;try{for(_iterator92.s();!(_step92=_iterator92.n()).done;){var _n15=_step92.value;var item=whom.Inv.getItem(_n15);if(!item.hasTag(TagsNotAllowed)&&item.hasTag(TagsAllowed)){//filter by tag
 var cost=window.gm.shop.calculateSellPrice(item);if(cost){window.gm.shop.WaresToSell.push({item:item,cost:cost});}}}}catch(err){_iterator92.e(err);}finally{_iterator92.f();}var _iterator93=_createForOfIteratorHelper(_ids2),_step93;try{for(_iterator93.s();!(_step93=_iterator93.n()).done;){var _n16=_step93.value;var _item4=whom.Wardrobe.getItem(_n16);if(!_item4.hasTag(TagsNotAllowed)&&_item4.hasTag(TagsAllowed)){//filter by tag
 var _cost=window.gm.shop.calculateSellPrice(_item4);if(_cost){window.gm.shop.WaresToSell.push({item:_item4,cost:_cost});}}}}catch(err){_iterator93.e(err);}finally{_iterator93.f();}};// Todo depending on shop & gamestate, return list of buyables
-window.gm.shop.findWaresToBuy=function(shop){var list=[];if(shop==='Mall:GeneralStore'){list=[window.gm.ItemsLib['Lube'](),window.gm.ItemsLib['Battery']()];}else if("Arena:Shop"){list=[window.gm.ItemsLib['HealthPotionSmall'](),window.gm.ItemsLib['HealthPotion'](),window.gm.ItemsLib['SpearWodden'](),window.gm.ItemsLib['DaggerSteel'](),window.gm.ItemsLib['Vaginarium'](),window.gm.ItemsLib['Penilium']()];}var list2=[];for(var _i13=0,_list2=list;_i13<_list2.length;_i13++){var n=_list2[_i13];var cost=window.gm.shop.calculateBuyPrice(n);if(cost){list2.push({item:el,cost:cost});}}window.gm.shop.WaresToBuy=list2;};window.gm.shop.calculateSellPrice=function(item){var cost={id:'Money',count:1,for:0};if(item.id==='Lube')cost.count=item.price,cost.for=4;else if(item.id==='Battery')cost.count=item.price,cost.for=3;else{//there might be items with random id
+window.gm.shop.findWaresToBuy=function(shop){var list=[];if(shop==='Mall:GeneralStore'){list=[window.gm.ItemsLib['Lube'](),window.gm.ItemsLib['Battery']()];}else if("Arena:Shop"){list=[window.gm.ItemsLib['HealthPotionSmall'](),window.gm.ItemsLib['HealthPotion'](),window.gm.ItemsLib['SpearWodden'](),window.gm.ItemsLib['DaggerSteel'](),window.gm.ItemsLib['Vaginarium'](),window.gm.ItemsLib['Penilium']()];}var list2=[];for(var _i14=0,_list2=list;_i14<_list2.length;_i14++){var n=_list2[_i14];var cost=window.gm.shop.calculateBuyPrice(n);if(cost){list2.push({item:el,cost:cost});}}window.gm.shop.WaresToBuy=list2;};window.gm.shop.calculateSellPrice=function(item){var cost={id:'Money',count:1,for:0};if(item.id==='Lube')cost.count=item.price,cost.for=4;else if(item.id==='Battery')cost.count=item.price,cost.for=3;else{//there might be items with random id
 cost.count=item.price,cost.for=1;}cost.count=Math.ceil(cost.count*0.25);//
 if(cost.for===0)cost=null;return cost;};window.gm.shop.calculateBuyPrice=function(item){var cost={id:'Money',count:1,for:0};if(item.id==='Lube')cost.count=item.price,cost.for=4;else if(item.id==='Battery')cost.count=item.price,cost.for=3;else if(item.id==='VoucherIron')cost.count=item.price,cost.for=1;else{//there might be items with random id
 cost.count=item.price,cost.for=1;}cost.count=cost.count*2;//todo: special sales price reduction
 if(cost.for===0)cost=null;return cost;};"use strict";var SkillInspect=/*#__PURE__*/function(_Skill){_inherits(SkillInspect,_Skill);var _super132=_createSuper(SkillInspect);function SkillInspect(){var _this129;_classCallCheck(this,SkillInspect);_this129=_super132.call(this,"Inspect");_this129.msg='';return _this129;}_createClass(SkillInspect,[{key:"toJSON",value:function toJSON(){return window.storage.Generic_toJSON("SkillInspect",this);}},{key:"targetFilter",value:function targetFilter(targets){return this.targetFilterEnemy(this.targetFilterAlive(targets));}},{key:"previewCast",value:function previewCast(targets){var result=new SkillResult();result.skill=this;result.source=this.caster;result.targets=targets;this.msg='';if(this.isValidTarget(targets)){result.OK=true;this.msg='resistance of ';//window.gm.printBodyDescription(targets[0],true);
-var _iterator94=_createForOfIteratorHelper(window.gm.combat.TypesDamage),_step94;try{for(_iterator94.s();!(_step94=_iterator94.n()).done;){var _n18=_step94.value;this.msg+='resist/armor '+_n18.id+' '+targets[0].Stats.getItem('rst_'+_n18.id).value+'% / '+targets[0].Stats.getItem('arm_'+_n18.id).value+'</br>';}}catch(err){_iterator94.e(err);}finally{_iterator94.f();}this.msg+='</br>';for(var _i14=0,_arr3=['agility','charisma','endurance','intelligence','luck','perception','strength'];_i14<_arr3.length;_i14++){var _n17=_arr3[_i14];this.msg+=_n17+' '+targets[0].Stats.getItem(_n17).value+', ';}this.msg+='</br>';//todo display stats dependign on skill
+var _iterator94=_createForOfIteratorHelper(window.gm.combat.TypesDamage),_step94;try{for(_iterator94.s();!(_step94=_iterator94.n()).done;){var _n18=_step94.value;this.msg+='resist/armor '+_n18.id+' '+targets[0].Stats.getItem('rst_'+_n18.id).value+'% / '+targets[0].Stats.getItem('arm_'+_n18.id).value+'</br>';}}catch(err){_iterator94.e(err);}finally{_iterator94.f();}this.msg+='</br>';for(var _i15=0,_arr3=['agility','charisma','endurance','intelligence','luck','perception','strength'];_i15<_arr3.length;_i15++){var _n17=_arr3[_i15];this.msg+=_n17+' '+targets[0].Stats.getItem(_n17).value+', ';}this.msg+='</br>';//todo display stats dependign on skill
 result.msg=this.msg;}return result;}},{key:"getCastDescription",value:function getCastDescription(result){return this.msg;}},{key:"desc",get:function get(){return"Check out your foe.";}}],[{key:"fromJSON",value:function fromJSON(value){return window.storage.Generic_fromJSON(SkillInspect,value.data);}}]);return SkillInspect;}(Skill);//execute simple attack with active weapon or claws
 var SkillAttack=/*#__PURE__*/function(_Skill2){_inherits(SkillAttack,_Skill2);var _super133=_createSuper(SkillAttack);function SkillAttack(){var _this130;_classCallCheck(this,SkillAttack);_this130=_super133.call(this,"Attack");_this130.msg='';_this130.weapon='';_this130.cost.energy=10;return _this130;}_createClass(SkillAttack,[{key:"toJSON",value:function toJSON(){return window.storage.Generic_toJSON("SkillAttack",this);}},{key:"targetFilter",value:function targetFilter(targets){return this.targetFilterEnemy(this.targetFilterAlive(targets));}},{key:"previewCast",value:function previewCast(targets){var result=new SkillResult();result.skill=this;result.source=this.caster;result.targets=targets;this.msg='';if(this.isValidTarget(targets)){result.OK=true;var _iterator95=_createForOfIteratorHelper(targets),_step95;try{for(_iterator95.s();!(_step95=_iterator95.n()).done;){var target=_step95.value;var attack=this.__estimateAttack(target);var result2=window.gm.combat.calcAttack(this.caster,target,attack);this.msg+=result2.msg;result.effects=result.effects.concat(attack.effects);}}catch(err){_iterator95.e(err);}finally{_iterator95.f();}}return result;}},{key:"__estimateAttack",value:function __estimateAttack(target){var attack=window.gm.combat.defaultAttackData();var lHand=this.caster.Outfit.getItemForSlot(window.gm.OutfitSlotLib.LHand);var rHand=this.caster.Outfit.getItemForSlot(window.gm.OutfitSlotLib.RHand);attack.mod=null;if(rHand&&rHand.attackMod){//get weapon damage info
 attack.mod=rHand.attackMod(target);}else if(lHand&&lHand.attackMod){//todo dual wield?
@@ -5585,8 +5596,9 @@ document.getElementById(&#39;btstartDominoCombat&#39;).addEventListener(&quot;cl
       &lt;option value=&quot;demon&quot;&gt;demon&lt;/option&gt;
 			&lt;option value=&quot;fuckmachine&quot;&gt;fuckmachine&lt;/option&gt;
 		&lt;/select&gt;
-&lt;/label&gt;&lt;label&gt;Foe-AI:
-		&lt;select id=&quot;AI&quot; onchange=&#39;selOption(this)&#39;&gt;
+&lt;/label&gt;
+&lt;label&gt;Player#1-AI:
+		&lt;select id=&quot;AI1&quot; onchange=&#39;selOption(this)&#39;&gt;
 			&lt;option value=&quot;none&quot; selected&gt;None&lt;/option&gt;
 			&lt;option value=&quot;passive&quot;&gt;passive&lt;/option&gt;
       &lt;option value=&quot;virgin&quot;&gt;virgin&lt;/option&gt;
@@ -5596,42 +5608,65 @@ document.getElementById(&#39;btstartDominoCombat&#39;).addEventListener(&quot;cl
       &lt;option value=&quot;cassanova&quot;&gt;cassanova&lt;/option&gt;
       &lt;option value=&quot;random&quot;&gt;random&lt;/option&gt;
 		&lt;/select&gt;
-&lt;/label&gt; &lt;label&gt;display:
-		&lt;select id=&quot;Display&quot; onchange=&#39;selOption(this)&#39;&gt;
-			&lt;option value=&quot;all&quot; selected&gt;all&lt;/option&gt;
-			&lt;option value=&quot;minimum&quot; &gt;minimum&lt;/option&gt;
+&lt;/label&gt; &lt;label&gt;Player#2-AI:
+		&lt;select id=&quot;AI2&quot; onchange=&#39;selOption(this)&#39;&gt;
+			&lt;option value=&quot;none&quot; selected&gt;None&lt;/option&gt;
+			&lt;option value=&quot;passive&quot;&gt;passive&lt;/option&gt;
+      &lt;option value=&quot;virgin&quot;&gt;virgin&lt;/option&gt;
+      &lt;option value=&quot;together&quot;&gt;together&lt;/option&gt;
+      &lt;option value=&quot;selfish&quot;&gt;selfish&lt;/option&gt;
+      &lt;option value=&quot;denial&quot;&gt;mean&lt;/option&gt;
+      &lt;option value=&quot;cassanova&quot;&gt;cassanova&lt;/option&gt;
+      &lt;option value=&quot;random&quot;&gt;random&lt;/option&gt;
 		&lt;/select&gt;
-&lt;/label&gt;
+&lt;/label&gt; &lt;fieldset&gt; 
+	&lt;legend&gt;debug:&lt;/legend&gt; 
+	&lt;input type=&quot;checkbox&quot; name=&quot;debug&quot; value=&quot;ignoreStamina&quot; id=&quot;debug1&quot; onchange=&#39;selOption(this)&#39;&gt;
+	&lt;label for=&quot;debug1&quot;&gt;ignore Stamina&lt;/label&gt;
+	&lt;input type=&quot;checkbox&quot; name=&quot;debug&quot; value=&quot;displayAll&quot; id=&quot;debug2&quot; onchange=&#39;selOption(this)&#39; checked&gt;
+	&lt;label for=&quot;debug2&quot;&gt;display all&lt;/label&gt;
+&lt;/fieldset&gt;
 &lt;a0 id=&#39;btstartOmeterCombat&#39;&gt;Start Ometer-Combat&lt;/a&gt;&lt;a0 id=&#39;startOmeterCombat&#39; onclick=&#39;(function($event){document.querySelector(&quot;#&quot;+id+&quot;~p&quot;).toggleAttribute(&quot;hidden&quot;);})(this);&#39;&gt;Hint&lt;/a&gt;
-&lt;p hidden&gt; &lt;/p&gt;
+&lt;p hidden&gt;You are a succubus and need to feast on your victim by sexual drain. &lt;/br&gt;
+For this you need their orgasmmeter, which indicate their pent-up need, get into the pink area and then trigger their PointOfNoReturn. A fuller bar will gain you more essence.&lt;/br&gt;
+PNR is indicated red in the pleasure-bar. Oh and by the way, the orgasm-meter only fills if the pleasure is in the green range. Just be careful to not trigger PNR to early or you will receive only little essence, or nothing at all if ometer is in blue area.&lt;/br&gt;
+And if the ometer gets into the orange range, this means overstimulation which will cause pleasure to drop quickly to the blue range, indicating their annoyence. But if you can trigger PNR now, your essence gain will be much bigger.&lt;/br&gt;
+If they are annoyed, ometer will drain quickly, letting your efforts go to waste.&lt;/br&gt;
+Since actions need stamina, you need to be careful to not waste it and take a breather in between. Different actions result in different pleasure gains or losses on both sides and also affect the pleasure you gain from your opponent.&lt;/br&gt; 
+Stamina is also drained if you trigger PNR, so you better are not to lazy about it.&lt;/br&gt;
+The game ends if everyone exhaust their stamina (red range).&lt;/br&gt;
+As you can see, you have the same bars and the same rules apply for you.&lt;/br&gt;
+You can set some settings before you start.&lt;/br&gt;
+&lt;/p&gt;
 &lt;script&gt;
 function selOption(elmnt){
 		var msg=&#39;&#39;,menu = document.getElementById(elmnt.id);
-    if(elmnt.id===&quot;AI&quot;) {
-      msg+=&#39;foes behavior= &#39;+menu.value+&#39; - &#39;;
+    if(elmnt.id===&quot;AI1&quot;|| elmnt.id===&quot;AI2&quot;) {
+      msg+=&#39;behavior= &#39;+menu.value+&#39; - &#39;;
       switch(menu.value) {
-        case &#39;none&#39;: msg+=&#39;control foe by player&#39;;break;
+        case &#39;none&#39;: msg+=&#39;control participant by player&#39;;break;
         case &#39;passive&#39;: msg+=&#39;always passive, let you do all the work&#39;;break;
         //case &#39;random&#39;: msg+=&#39;random&#39;;break;
         //case &#39;virgin&#39;: msg+=&#39;foe trys to avoid own orgasm&#39;;break;
         //case &#39;cassanova&#39;: msg+=&#39;foe trys to make you orgasm without own orgasm&#39;;break;
         //case &#39;together&#39;: msg+=&#39;cooperative,foe trys to have you both orgasm at same time&#39;;break;
-        //case &#39;selfish&#39;: msg+=&#39;doesnt care about you and just wants a quickie&#39;;break;
+        case &#39;selfish&#39;: msg+=&#39;doesnt care about you and just wants a quickie&#39;;break;
         //case &#39;denial&#39;: msg+=&#39;edging you but preventing your orgasm&#39;;break;
         default:
           msg+=&#39; not implemented ! Dont use !&#39;
       }      
-    } else if(elmnt.id===&quot;Display&quot;) {
-      msg+=&#39;display= &#39;+menu.value+&#39; - &#39;;
+    } else if([&quot;debug1&quot;,&quot;debug2&quot;].includes(elmnt.id)) {
+      msg+=&#39;debug= &#39;+menu.value+&#39; - &#39;;
       switch(menu.value) {
-        case &#39;all&#39;: msg+=&#39;show all info &amp; bars&#39;;break;
-        case &#39;minimum&#39;: msg+=&#39;show only bars normally visible&#39;;break;
+        case &#39;displayAll&#39;: msg+=&#39;show all info &amp; bars&#39;;break;
+        case &#39;ignoreStamina&#39;: msg+=&#39;stamina is not evaluated&#39;;break;
         default:
           msg+=&#39; not implemented ! Dont use !&#39;
       }      
     } if(elmnt.id===&quot;Foe&quot;) {
-      msg+=&#39;stats of foe= &#39;+menu.value+&#39; - &#39;;
+      msg+=&#39;stats of second player= &#39;+menu.value+&#39; - &#39;;
       switch(menu.value) {
+        case &#39;hotshot&#39;: msg+=&#39;quick to fire&#39;;break;
         case &#39;human&#39;: msg+=&#39;equal to you&#39;;break;
         case &#39;demon&#39;: msg+=&#39;bigger pleasure bar&#39;;break;
         case &#39;fuckmachine&#39;: msg+=&#39;high stamina&#39;;break;
@@ -5646,8 +5681,11 @@ var _game = window.gm.startOmeterCombat();
 document.getElementById(&#39;btstartOmeterCombat&#39;).addEventListener(&quot;click&quot;, 
 function(){
   var foeDict={human:{ stamina:{min:0,max:100,exhausted:20,curr:80,regen:5},
-                      ometer:{min:0,denial:20,minor:60,gasm:85,max:100,curr:0}, 
-                      pleasure:{min:0,annoy:20,good:60,max:80,PNR:70,curr:10}}
+                      ometer:{min:0,denial:20,minor:40,gasm:85,max:100,curr:0}, 
+                      pleasure:{min:0,annoy:20,good:30,max:50,PNR:45,curr:10}}
+              ,hotshot:{ stamina:{min:0,max:100,exhausted:20,curr:80,regen:5},
+                      ometer:{min:0,denial:20,minor:25,gasm:65,max:70,curr:0}, 
+                      pleasure:{min:0,annoy:10,good:30,max:60,PNR:45,curr:10}}
               ,demon:{ stamina:{min:0,max:100,exhausted:20,curr:80,regen:5},
                       ometer:{min:0,denial:20,minor:60,gasm:85,max:100,curr:0},
                       pleasure:{min:0,annoy:20,good:90,max:120,PNR:110,curr:10}}
@@ -5656,7 +5694,8 @@ function(){
                       pleasure:{min:0,annoy:20,good:60,max:80,PNR:70,curr:10}}
   }
   _game.start([ [window.gm.util.deepCloneObj(foeDict[&#39;human&#39;])],[window.gm.util.deepCloneObj(foeDict[document.getElementById(&#39;Foe&#39;).value])] ],
-    document.getElementById(&#39;AI&#39;).value,document.getElementById(&#39;Display&#39;).value);});
+    [document.getElementById(&#39;AI1&#39;).value,document.getElementById(&#39;AI2&#39;).value],
+    {display:document.getElementById(&#39;debug2&#39;).checked,staminaOff:document.getElementById(&#39;debug1&#39;).checked});});
 &lt;/script&gt;</tw-passagedata><tw-passagedata pid="115" name="Pong" tags="" position="600,1475" size="100,100">&lt;div id=&quot;pong&quot;&gt;&lt;/div&gt;
 &lt;a0 id=&#39;btStart&#39;&gt;Start&lt;/a&gt;&lt;p id=&#39;result&#39;&gt;&lt;/p&gt;
 &lt;script&gt;window.gm.startPong();&lt;/script&gt;</tw-passagedata><tw-passagedata pid="116" name="ReactionTest" tags="" position="725,1475" size="100,100">&lt;p&gt;Click Start and then click somewhere on the bar to stop the green rectangle in the yellow hit-area.&lt;/p&gt;

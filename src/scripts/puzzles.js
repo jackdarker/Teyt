@@ -467,21 +467,33 @@ window.gm.startCounterChargeCombat=function(stopCB, startCB){
 ///////////////////////////////////////////////////////////////////////
 window.gm.startOmeterCombat=function(stopCB, startCB)
 {
-  function start(Teams,AI,Display){ 
+  function start(Teams,AI,debug){ 
     //setup teams,cards
-    data.debug.display=Display,data.AI=AI,data.teams=[];
+    data.debug.display=debug.display?'all':'minimum',data.teams=[];
+    data.debug.staminaOff=debug.staminaOff;
+    data.AI=[];
+    for(var _x of AI){
+      switch(_x) {
+        case 'none': data.AI.push(null);break;
+        case 'passive': data.AI.push(AIpassive);break;
+        case 'selfish': data.AI.push(AIselfish);break;
+        default: throw new Error("invalid AI "+_x);
+      }
+    }
+    
     let i,playerid,skills,defense,players,x=-1;
     for(i=0;i<=1;i++){ //teams
       players=[];
       for(var k=0;k<(1);k++){
-        x+=1,defense=[],skills=[];   //skills   //todo own lust also depends on foe-lustinput*factor
-        skills.push({id:'passive',stamina:20,lustself:0,lustother:-4,tick:0,cooldown:0});
-        skills.push({id:'tease',stamina:-10,lustself:1,lustother:5,tick:0,cooldown:0});
-        skills.push({id:'calm',stamina:-1,lustself:-3,lustother:0,tick:0,cooldown:0});
-        skills.push({id:'fuck',stamina:-10,lustself:5,lustother:5,tick:0,cooldown:0});    
-        playerid= ((i===0)?'player#':'foe#')+x;   
+        x+=1,defense=[],skills=[];   //skills   // own lust also depends on foe-lustinput*FactorReceive
+        skills.push({id:'tease',stamina:-10,fr:1.5,lustself:1,lustother:3,tick:0,cooldown:0});
+        skills.push({id:'calm',stamina:-3,fr:0.5,lustself:-3,lustother:0,tick:0,cooldown:0});
+        skills.push({id:'fuck',stamina:-10,fr:1.2,lustself:4,lustother:5,tick:0,cooldown:0});   
+        skills.push({id:'deny',stamina:-10,fr:0.5,lustself:-5,lustother:-5,tick:0,cooldown:0});
+        skills.push({id:'passive',stamina:20,fr:1.0,lustself:-1,lustother:-1,tick:0,cooldown:0}); 
+        playerid= 'player#'+x;   
         players.push({id:playerid,
-          skills:skills,defenses:defense,skill:'',target:''
+          skills:skills,defenses:defense,skill:'',target:'',essence:0
           ,stamina:Teams[i][k].stamina//{min:0,max:100,exhausted:20,curr:80,regen:5}
           ,ometer:Teams[i][k].ometer//{min:0,denial:20,minor:60,gasm:85,max:100,curr:0}, //ostim=max
           ,pleasure:Teams[i][k].pleasure//{min:0,annoy:20,good:60,max:80,PNR:70,curr:10}
@@ -501,8 +513,11 @@ window.gm.startOmeterCombat=function(stopCB, startCB)
     //create bargraphs with ids = player.id+'stamina'
     //<div class="progressbar" id='clickHere' style='height:1em; width: 100%;'><div id='bar' style="position:relative; width:5%; height:100%; background-color:green;"></div></div>
     box=document.createElement('p');
-    box.style['width']='25em';
-    box.textContent=player.id;
+    //box.style['width']='25em';
+    box.textContent=player.id,box.id=player.id;
+    box2=document.createElement('span');
+    box2.id=player.id+'essence';
+    box.appendChild(box2);
     for(var el of ['ometer','pleasure','stamina']) {
       box2=document.createElement('p');
       box2.textContent=el;box2.hidden=(el==='stamina'&&data.debug.display!=='all'&&teamidx>0);
@@ -518,43 +533,59 @@ window.gm.startOmeterCombat=function(stopCB, startCB)
     }
     panel.appendChild(box);
   }
+  ///
+  let maxx=0,maxv=0;
   function _updateBars(player) {
-    let bar,value,gradient='',areas=[];
-    for(var el of ['ometer','pleasure','stamina']) {
-      bar=document.getElementById(player.id+el);
-      value=player[el].curr*100/(player[el].max-player[el].min);
-      bar.style.left=value+'%';
-      switch(el) {
-        case 'pleasure':
-          areas=[ {a:0,b:player[el].annoy*100/player[el].max,color:'steelblue'},
-                  {a:player[el].annoy*100/player[el].max,b:player[el].good*100/player[el].max,color:'white'},
-                  {a:player[el].good*100/player[el].max,b:player[el].PNR*100/player[el].max,color:'lightgreen'},
-                  {a:player[el].PNR*100/player[el].max,b:(player[el].PNR+2)*100/player[el].max,color:'crimson'},
-                  {a:(player[el].PNR+2*100/player[el].max),b:100,color:'lightgreen'}]
-          break;
-        case 'stamina':
-          areas=[ {a:0,b:player[el].exhausted*100/player[el].max,color:'crimson'},
-                  {a:player[el].exhausted*100/player[el].max,b:player[el].max*100/player[el].max,color:'white'}]
-          break;
-        case 'ometer':
-            areas=[ {a:0,b:player[el].denial*100/player[el].max,color:'steelblue'},
-                    {a:player[el].denial*100/player[el].max,b:player[el].minor*100/player[el].max,color:'lightpink'},
-                    {a:player[el].minor*100/player[el].max,b:player[el].gasm*100/player[el].max,color:'violet'},
-                    {a:player[el].gasm*100/player[el].max,b:100,color:'coral'}]
-            break;
-          default: throw new Error("unknown: "+el);
-            break;
+    let box,bar,value,gradient='',areas=[];
+    box=document.getElementById(player.id+'essence');
+    box.textContent=' essence:'+window.gm.util.formatNumber(player.essence,0);
+    for(var i=0;i<=1;i++) { //2 swipes
+      for(var el of ['ometer','pleasure','stamina']) {
+        if(i===0){
+          bar=document.getElementById(player.id+el);
+          value=player[el].curr/(player[el].max-player[el].min);
+          maxv=Math.max(value,maxv);maxx=Math.max(player[el].max-player[el].min,maxx);
+          var rwidth,width =window.getComputedStyle(bar).getPropertyValue('width');
+          var total = window.getComputedStyle(bar.parentNode).getPropertyValue('width');
+          rwidth=100*parseFloat(width.split('px'))/parseFloat(total.split('px')); 
+          bar.style.left=(value*100-rwidth)+'%';//wouldnt
+          switch(el) {
+            case 'pleasure':
+              areas=[ {a:0,b:player[el].annoy*100/player[el].max,color:'steelblue'},
+                      {a:player[el].annoy*100/player[el].max,b:player[el].good*100/player[el].max,color:'white'},
+                      {a:player[el].good*100/player[el].max,b:player[el].PNR*100/player[el].max,color:'lightgreen'},
+                      {a:player[el].PNR*100/player[el].max,b:(player[el].PNR+2)*100/player[el].max,color:'crimson'},
+                      {a:(player[el].PNR+2)*100/player[el].max,b:100,color:'lightgreen'}]
+              break;
+            case 'stamina':
+              areas=[ {a:0,b:player[el].exhausted*100/player[el].max,color:'crimson'},
+                      {a:player[el].exhausted*100/player[el].max,b:100,color:'white'}]
+              break;
+            case 'ometer':
+                areas=[ {a:0,b:player[el].denial*100/player[el].max,color:'steelblue'},
+                        {a:player[el].denial*100/player[el].max,b:player[el].minor*100/player[el].max,color:'lightpink'},
+                        {a:player[el].minor*100/player[el].max,b:player[el].gasm*100/player[el].max,color:'violet'},
+                        {a:player[el].gasm*100/player[el].max,b:100,color:'coral'}]
+                break;
+              default: throw new Error("unknown: "+el);
+                break;
+          }
+          gradient='';
+          for(var n of areas){ //todo need to sort from left to right
+            gradient += '#80808000 0 '+n.a+'%, '+n.color+' '+n.a+'%,'+n.color+' '+n.b+'%,#80808000 '+n.b+'%,';
+          }
+          bar.parentNode.style.backgroundImage='linear-gradient(to right,'+gradient.slice(0,-1)+')';
+        } else{ //on 2.pass adjust width of each bar relative to maxv
+          bar=document.getElementById(player.id+el);
+          bar.parentElement.style['width']=parseInt(40*(player[el].max-player[el].min)*maxv/maxx)+'em';
+        }
       }
-      gradient='';
-      for(var n of areas){ //todo need to sort from left to right
-        gradient += '#80808000 0 '+n.a+'%, '+n.color+' '+n.a+'%,'+n.color+' '+n.b+'%,#80808000 '+n.b+'%,';
-      }
-      bar.parentNode.style.backgroundImage='linear-gradient(to right,'+gradient.slice(0,-1)+')';
     }
   }
+  ///
   function updateBoard(){
     let player,skill;
-    let entry,tooltip,panel=document.getElementById('panel');
+    let entry,box,panel=document.getElementById('panel');
     for(var i=panel.childNodes.length-1;i>=0;i-- ){
       panel.removeChild(panel.childNodes[i]);
     } 
@@ -570,23 +601,29 @@ window.gm.startOmeterCombat=function(stopCB, startCB)
         _updateBars(player);
         entry=document.createElement('button');
         entry.id=player.id;
-        entry.textContent='Team'+i+' '+player.id+' stamina:'+player.stamina.curr+' pleasure:'+player.pleasure.curr+' ometer:'+player.ometer.curr;
+        entry.textContent='Team'+i+' '+player.id+
+          ' stamina:'+window.gm.util.formatNumber(player.stamina.curr,0)+
+          ' pleasure:'+window.gm.util.formatNumber(player.pleasure.curr,0)+
+          ' ometer:'+window.gm.util.formatNumber(player.ometer.curr,0);
         if(player.stamina.curr<=player.stamina.exhausted){
           entry.textContent+='   Exhausted !'
         }
-        if(data.team===i ){
+        box=document.getElementById(player.id);
+        if(data.team===i || !data.run ){
           entry.disabled=true;
+          box.style["background-color"]="lightsteelblue";
         } else {
+          box.style["background-color"]="unset";
           //button to select opponent
           entry.addEventListener("click",(function(target){return(selectTarget.bind(data,target));}(player.id))); 
           data.target=player.id;
         }
         panel.appendChild(entry);
-        if(player.id===data.player){   //list skills of attacker
-          if(data.team!==i && data.AI!=='none') { //select by AI
-            _AISolver();
+        if(player.id===data.player.id && data.run){   //list skills of attacker
+          if(data.AI[data.team]!==null) { //select by AI
+            //data.AI[data.team]();
           }else {
-            entry.style['border-block-color']='khaki',entry.style['border-block-width']='5px';
+            entry.style['border-block-color']='khaki';
               for(var l=player.skills.length-1;l>=0;l--){
                 skill=player.skills[l];
                 entry=document.createElement('button');
@@ -595,7 +632,7 @@ window.gm.startOmeterCombat=function(stopCB, startCB)
                 if(skill.tick>0 || (skill.stamina<0 && (player.stamina.curr-player.stamina.exhausted)<skill.stamina*-1)){
                   entry.disabled=true; //disable if cooldown or not enough charge
                 }else {
-                  entry.addEventListener("click",(function(player,skill){return(selectSkill.bind(data,player,skill));}(player.id,skill.id)));  
+                  entry.addEventListener("click",(function(player,skill){return(function(me){selectSkill.bind(me,player,skill)();})}(player.id,skill.id)));//(function(player,skill){return(selectSkill.bind(data,player,skill));}(player.id,skill.id)));  
                 }  
                 choice.appendChild(entry);
               }   
@@ -608,10 +645,16 @@ window.gm.startOmeterCombat=function(stopCB, startCB)
       }
       entry=document.createElement('hr');
       panel.appendChild(entry);
-    } 
-    entry=document.createElement('p');
-    entry.textContent=(data.phase===0)?data.player+': select target and skill:':data.target+': select defense:';
-    choice.appendChild(entry);  
+    }
+    if(data.run) {
+      entry=document.createElement('p');entry.style['color']='red'
+      entry.textContent=(data.phase===0)?data.player.id+': select target and skill:':data.target+': select defense:';
+      choice.appendChild(entry);  
+      if(data.AI[data.team]!==null) { //select by AI
+        clearTimeout(data.timer); //fire timer or get stackoverflow
+        data.timer = setTimeout(data.AI[data.team], 300);
+      }
+    }
   }
   function newTurn(){
     //check if any team is down
@@ -632,12 +675,13 @@ window.gm.startOmeterCombat=function(stopCB, startCB)
         }
       }
     }
+    data.team=data.teams.length-1;
+    let x=data.teams[data.team].length-1;
+    data.player=data.teams[data.team][x];
     if(teamDead){
-      alert('team '+i+' is defeated'),stop();
+      stop(),updateBoard();
+      alert('team '+i+' is defeated');
     } else { //start new round with team0 - note that all for-loops are operated backwards
-      data.team=data.teams.length-1;
-      let x=data.teams[data.team].length-1;
-      data.player=data.teams[data.team][x].id;
       updateBoard();
     }
   }
@@ -649,11 +693,11 @@ window.gm.startOmeterCombat=function(stopCB, startCB)
     for(var k=data.teams[data.team].length-1;k>=0;k--){
       player=data.teams[data.team][k];
       if(_usethis===true){ //the previous player was the current - this is next 
-        data.player=player.id;
+        data.player=player;
         _usethis=false;
         break;
       }
-      if(player.id===data.player){
+      if(player===data.player){
         _usethis=true;
       }
     }
@@ -663,7 +707,7 @@ window.gm.startOmeterCombat=function(stopCB, startCB)
         for(var k=data.teams[i].length-1;(_usethis&&k>=0);k--){
           player=data.teams[i][k];
           if(true){//player.hp>0){
-            data.player=player.id;
+            data.player=player;
             _usethis=false;
           }
         }
@@ -679,16 +723,22 @@ window.gm.startOmeterCombat=function(stopCB, startCB)
   function selectSkill(playerId,skillId){
     let player,skill;
     let _log="div#output";
+    if(this) {
+      let choice=this.target.parentNode;
+      for(var i=choice.childNodes.length-1;i>=0;i-- ){//disable buttons
+        choice.childNodes[i].disabled=true;
+      }
+    }
     for(var i=data.teams.length-1;i>=0;i--){ //find players
       for(var k=data.teams[i].length-1;k>=0;k--){
         player=data.teams[i][k];
         if(player.id===playerId){
-          player.skill=_findSkill(player,skillId).id,player.target=data.target;
+          player.skill=_findSkill(player,skillId),player.target=data.target;
         }
       }
     }
-    window.gm.printOutput('',_log)
-    nextPlayer();//updateBoard();
+    window.gm.printOutput(playerId+' will use '+skillId+' on '+data.target,_log)
+    nextPlayer();
   }
   function _findSkill(player,id){
     let skill;
@@ -696,7 +746,7 @@ window.gm.startOmeterCombat=function(stopCB, startCB)
       skill=player.skills[l];
       if(skill.id===id){ return(skill);}
     }
-    return(null);
+    throw new Error("unknown skillid: "+id);
   }
   function _describeAction(player,target,skill,top){
     let msg='';
@@ -713,16 +763,28 @@ window.gm.startOmeterCombat=function(stopCB, startCB)
     } else {
       msg+='and '
       if(skill.id==='tease') {
-        msg+=player.id+' teases '+target.id+' ';
+        msg+=player.id+' teases back ';
       } else if(skill.id==='calm') {
         msg+=player.id+' calms itself ';
       } else if(skill.id==='fuck') {
         msg+=player.id+' fucks '+target.id+' ';
       } else {
-        msg+=player.id+' just waits ';
+        msg+=player.id+' just takes it ';
       }
     }
     return(msg);
+  }
+
+  function AIpassive() {
+    selectSkill(data.player.id,'passive')
+  }
+  function AIselfish() {
+    let player=data.player,skill = _findSkill(data.player,'fuck');
+    if((skill.stamina<0 && (player.stamina.curr-player.stamina.exhausted-5)<skill.stamina*-1)){
+      selectSkill(data.player.id,'passive');
+    } else {
+      selectSkill(data.player.id,'fuck');
+    }
   }
   function calcDamage() {
     let entry,i,choice=document.getElementById('choice2');
@@ -730,43 +792,67 @@ window.gm.startOmeterCombat=function(stopCB, startCB)
     for(i=choice.childNodes.length-1;i>=5;i-- ){//cleanout log
       choice.removeChild(choice.childNodes[i]);
     } 
-    //build pairs of interacting players; playerA is Top
+    //build pairs of interacting players; first is Top
     //right now we have only 1:1
-    let skill,skillA,skillB,target,actions=[[data.teams[0][0],data.teams[1][0]]];
+    let essence,action,target,actions=[[data.teams[0][0],data.teams[1][0]]];
+    function fpl(player){ //change of pleasure reduced in green range
+      if(player.pleasure.curr>player.pleasure.minor) {
+        return(0.5);
+      }
+      return(1.0);
+    }
     for(var pair of actions){
-      i=-1;
-      for(var action of pair) {
-        i++;
-        skill=_findSkill(action,action.skill);
-        if(i===0) {
-          skillA=skill;target=pair[1];
-        } else {
-          skillB=skill;target=pair[0];
-        }
-        action.stamina.curr+=skill.stamina,
-        action.pleasure.curr+=skill.lustself,
-        target.pleasure.curr+=skill.lustother;
+      entry=document.createElement('p');
+      entry.textContent='turn:'+data.turn+' '+_describeAction(pair[0],pair[1],pair[0].skill,true)+_describeAction(pair[1],pair[0],pair[1].skill,false)+'</br>';
+      choice.insertBefore(entry,choice.firstChild); 
+      for(i=pair.length-1;i>=0;i--) {
+        action=pair[i],target=pair[1-i];
+        action.stamina.curr=Math.max(action.stamina.min,Math.min(action.stamina.curr+action.skill.stamina,action.stamina.max));
+        if(data.debug.staminaOff) action.stamina.curr=50;
+        action.pleasure.curr=Math.max(action.pleasure.min,
+          Math.min(action.pleasure.curr+action.skill.lustself+(target.skill.lustother*action.skill.fr)*fpl(action),
+            action.pleasure.max));
         if(action.ometer.curr>action.ometer.gasm) { //ostim
           action.pleasure.curr=action.pleasure.annoy/2;
         }
-        if(action.pleasure.curr>action.pleasure.good) { //ometer
-          action.ometer.curr+=target.pleasure.curr/15;
-        } else if(action.pleasure.curr<action.pleasure.annoy) {
-          action.ometer.curr-=target.pleasure.curr/10;
+        if(action.pleasure.curr>action.pleasure.good) { //ometer gain
+          action.ometer.curr=Math.max(action.ometer.min,Math.min(action.ometer.max,action.ometer.curr+action.pleasure.curr/5));
+        } else if(action.pleasure.curr<action.pleasure.annoy) { //annoy
+          action.ometer.curr=Math.max(action.ometer.min,Math.min(action.ometer.max,action.ometer.curr-action.pleasure.curr/5));
         } else {
-          action.ometer.curr-=target.pleasure.curr/20;
+          action.ometer.curr=Math.max(action.ometer.min,Math.min(action.ometer.max,action.ometer.curr-action.pleasure.curr/15));
+        }
+        _updateBars(action);
+      }
+    }
+    
+    clearTimeout(data.timer); //update bars, then check if something triggered
+    data.timer = setTimeout(calcDamage2, 1000);
+  }
+  function calcDamage2() {
+    let entry,entry2,i,choice=document.getElementById('choice2');
+    let essence,action,target,actions=[[data.teams[0][0],data.teams[1][0]]];
+    for(var pair of actions){
+      for(i=pair.length-1;i>=0;i--) {
+        action=pair[i],target=pair[1-i];
+        if(action.pleasure.curr>action.pleasure.PNR){//ogasm
+          essence=action.ometer.curr;
+          if(action.ometer.curr<action.ometer.minor){
+            essence=0;
+          }
+          action.ometer.curr=action.ometer.min, action.pleasure.curr=action.pleasure.annoy*1.2, 
+          action.stamina.curr=Math.max(action.stamina.min,Math.min(action.stamina.curr-action.stamina.max/2,action.stamina.max));
+          action.essence+=essence;
+          entry2=document.createElement('p');
+          entry2.textContent=action.id+' came and created '+window.gm.util.formatNumber(essence,0)+' essence.</br>';
+          choice.insertBefore(entry2,choice.firstChild); 
+          _updateBars(action);
         }
       }
-      entry=document.createElement('p');
-      entry.textContent='turn:'+data.turn+' '+_describeAction(pair[0],pair[1],skillA,true)+_describeAction(pair[1],pair[0],skillB,false)+'</br>';
-      choice.insertBefore(entry,choice.firstChild); 
     }
     entry=document.createElement('hr');
     choice.insertBefore(entry,choice.firstChild); 
-    //entry=document.createElement('button');
-    //entry.id=entry.textContent='next';  
-    newTurn();//entry.addEventListener("click",newTurn);
-    //choice.appendChild(entry);
+    newTurn();
   }
   function stop(){ data.run=false;}
   let data ={ //internal state of game
@@ -778,7 +864,8 @@ window.gm.startOmeterCombat=function(stopCB, startCB)
     cost:{
 
     },
-    AI:'none',
+    timer:0, //AI update timer
+    AI:null,
     speed:300, //slider anim speed
     debug:{display:'all'},
     player:'',skill:'',target:'',
