@@ -52,6 +52,7 @@ class Character {
         }         
         this.Skills.addItem(new SkillAttack());this.Skills.addItem(new SkillUseItem());this.Skills.addItem(new SkillStruggle());
         this.Skills.addItem(new SkillFlee());    
+        this.Skills.addItem(new SkillFairyLight());    
         this.Effects.addItem(new effHunger());this.Effects.addItem(new effSanity());this.Effects.addItem(new effLibido());
         this.Effects.addItem(new effCombatRecovery());
         this.Effects.addItem(new effSpermDecay());

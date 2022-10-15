@@ -853,20 +853,45 @@ class SkillGuard extends Skill { //todo guard improves defense and evade for som
         //this.id=this.name="Guard Lv"+style;
     }
     get style(){return this._style;}
-    get desc(){ 
-        let msg ="Guard Lv"+style;
-        return(msg);
-    }
     get desc(){ return("Lv"+this.style+": Boosts your defense.");}  
     previewCast(targets){
         var result = new SkillResult()
         result.skill =this;result.source = this.caster; result.targets = targets;
+        result.OK = true;
+        for(var target of targets){
+            result.effects.push( {target:target,
+                //weapResist,eRecover,duration
+                eff:[effGuard.factory(10*Math.min(5,1+this.style),Math.min(5,this.style*20),this.style+1)]});
+        }
+        
+        return result
+    }
+}
+//cast light to repell dark
+class SkillFairyLight extends Skill { 
+    constructor(){ super("FairyLight"); this.style=0;this.cost.will =15;}
+    toJSON(){return window.storage.Generic_toJSON("SkillFairyLight", this); }
+    static fromJSON(value){return(window.storage.Generic_fromJSON(SkillFairyLight, value.data));}
+    targetFilter(targets){
+        let x=this.targetMultiple(this.targetFilterFighting(this.targetFilterEnemy(targets)));
+        if(x) return([x[x.length-1]]); //there should be "all" add end of collection
+        return(x);
+    }
+    set style(style){ //skilllevel
+        this._style = style;
+        //this.id=this.name="Guard Lv"+style;
+    }
+    get style(){return this._style;}
+    get desc(){ return("Creates a magic light that weakens or repell creatures of the dark. "+this.getCost().asText());}
+    previewCast(targets){
+        var result = new SkillResult()
+        result.skill =this;result.source = this.caster; result.targets = targets;
         if(this.isValidTarget(targets)){
-            result.OK = true;
+            result.OK=true;
             for(var target of targets){
                 result.effects.push( {target:target,
                     //weapResist,eRecover,duration
-                    eff:[effGuard.factory(10*Math.min(5,1+this.style),Math.min(5,this.style*20),this.style+1)]});
+                    eff:[effFairyLight.factory(this.style+1)]});
             }
         }
         return result
@@ -1011,6 +1036,7 @@ window.gm.SkillsLib = (function (Lib){
     window.storage.registerConstructor(SkillCallHelp);
     window.storage.registerConstructor(SkillDetermined);
     window.storage.registerConstructor(SkillGrapple);
+    window.storage.registerConstructor(SkillFairyLight);
     window.storage.registerConstructor(SkillFlee);
     window.storage.registerConstructor(SkillFireball);
     window.storage.registerConstructor(SkillSpark);
@@ -1060,7 +1086,35 @@ ShieldRestore: wenn das Shield komplett leer ist kann es wiederhergestellt werde
 
 CoolDownReset: for any ally: if there are skills in cooldown, pick a random one and reset cooldown; cd=20
 
+disarm: cant use primary weapon for some time; cd=99
+
 Leader: an ally using this is marked as a leader; as long as he is ingame, all allys except him receive bonus armor/regeneration/damage
         but if he is defeated, everyone gets mallus; can only be cast once per battle
 
- */
+Swift Drinker / Swift ...: you can, in one turn, drink a potion and then do something else. You can only do one swift action and have to choose it before the other action.
+Anger Point	9	Maxes Attack after taking a critical hit.
+Aura Break	2	Reduces power of Dark- and Fairy-type moves.
+Battle Armor	11	The Pokémon is protected against critical hits.
+Berserk	2	Raises Special Attack when HP drops below half.
+Big Pecks	14	Protects the Pokémon from Defense-lowering attacks.
+Blaze	28	Powers up Fire-type moves in a pinch.
+Fluffy	4	Halves damage from contact moves, but doubles damage from Fire-type moves.
+Friend Guard	8	Reduces damage done to allies.
+Gooey	5	Contact with the Pokémon lowers the attacker's Speed stat.
+Heatproof	3	Weakens the power of Fire-type moves.
+Immunity	3	Prevents the Pokémon from getting poisoned.
+Intimidate	37	Lowers the foe's Attack stat.
+Klutz	10	The Pokémon can't use any held items.
+Limber	14	The Pokémon is protected from paralysis.
+Merciless	2	The Pokémon's attacks become critical hits if the target is poisoned.
+Moxie	13	Boosts Attack after knocking out any Pokémon.
+Pickpocket	10	Steals an item when hit by another Pokémon.
+Poison Heal	3	Restores HP if the Pokémon is poisoned.
+Poison Touch	11	May poison targets when a Pokémon makes contact.
+Rattled	18	Bug, Ghost or Dark type moves scare it and boost its Speed.
+Rivalry	18	Deals more damage to a Pokémon of same gender.
+Scrappy	13	Enables moves to hit Ghost-type Pokémon.
+Soul-Heart	1	Raises Special Attack when an ally faints.
+Telepathy	26	Anticipates an ally's attack and dodges it.
+Unnerve	26	Makes the foe nervous and unable to eat Berries.
+*/

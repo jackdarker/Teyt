@@ -88,13 +88,6 @@ class stHealthRegen extends Stat {
 }
 class stEnergy extends Stat {
     static setup(context, base,max){
-        /*stEnergyMax.setup(context,max);
-        stEnergyRegen.setup(context,10,100);
-        var _stat = new stEnergy();
-        var _n = _stat.data;
-        _n.id='energy',_n.base=base, _n.value=base,_n.limits=[{max:'energyMax',min:0}];
-        context.addItem(_stat);
-        _stat.Calc();*/
         let stats=Stat.setupStatWithLimitAndRegen('energy',{base:base,regen:10,max:max});
         stats.forEach(x=>{context.addItem(x);}),stats.forEach(x=>{x.Calc();})
     }
@@ -104,13 +97,6 @@ class stEnergy extends Stat {
 }
 class stWill extends Stat {
     static setup(context, base,max){
-        /*stWillMax.setup(context,max);
-        stWillRegen.setup(context,10,100);
-        var _stat = new stWill();
-        var _n = _stat.data;
-        _n.id='will',_n.base=base, _n.value=base,_n.limits=[{max:'willMax',min:0}];
-        context.addItem(_stat);
-        _stat.Calc();*/
         let stats=Stat.setupStatWithLimitAndRegen('will',{base:base,regen:10,max:max});
         stats.forEach(x=>{context.addItem(x);}),stats.forEach(x=>{x.Calc();})
     }
@@ -120,13 +106,6 @@ class stWill extends Stat {
 }
 class stSatiation extends Stat { //high value==starving        todo
     static setup(context, base,max){
-        /*stSatiationMax.setup(context,max);
-        stSatiationRegen.setup(context,2,100);
-        var _stat = new stSatiation();
-        var _n = _stat.data;
-        _n.id='hunger',_n.base=base,_n.hidden=4, _n.value=base,_n.limits=[{max:'hungerMax',min:0}];
-        context.addItem(_stat);
-        _stat.Calc();*/
         let stats=Stat.setupStatWithLimitAndRegen('satiation',{base:base,regen:-2,max:max});
         stats.forEach(x=>{context.addItem(x);}),stats.forEach(x=>{x.Calc();})
     }
@@ -136,14 +115,6 @@ class stSatiation extends Stat { //high value==starving        todo
 }
 class stArousal extends Stat{
     static setup(context, base,max){
-        /*stArousalMax.setup(context,max);
-        stArousalMin.setup(context,0);
-        stArousalRegen.setup(context,-1,100);
-        var _stat = new stArousal();
-        var _n = _stat.data;
-        _n.id='arousal', _n.hidden=3,_n.base=base, _n.value=base,_n.limits=[{max:'arousalMax',min:'arousalMin'}];
-        context.addItem(_stat);
-        _stat.Calc();*/
         let stats=Stat.setupStatWithLimitAndRegen('arousal',{base:base,regen:-1,max:max,min:0});
         stats.forEach(x=>{context.addItem(x);}),stats.forEach(x=>{x.Calc();})
     }
@@ -546,7 +517,6 @@ class effCombatRecovery extends Effect {
         if(neweffect.name===this.data.name){return(true);}
     }
 }
-
 class effEnergyDrain extends Effect {
     constructor(){
         super();
@@ -570,6 +540,7 @@ class effEnergyDrain extends Effect {
         }
     }
 }
+//////////////   Mutations ////////////////////////
 class effMutateHorse extends Effect {
     constructor(){
         super();
@@ -1468,7 +1439,7 @@ class effStunned extends CombatEffect {
     }
     constructor(){
         super();
-        this.data.id = this.data.name= effStunned.name, this.data.duration = 2;
+        this.data.id = this.data.name= effStunned.name,this.data.duration=this.data.startduration = 2;
     }
     toJSON(){return window.storage.Generic_toJSON("effStunned", this); };
     static fromJSON(value){ return window.storage.Generic_fromJSON(effStunned, value.data);};
@@ -1477,7 +1448,7 @@ class effStunned extends CombatEffect {
         this.data.duration = 2;
     }
     merge(neweffect){
-        if(neweffect.name===this.data.name){    //extends stun
+        if(neweffect.name===this.data.name){    //extends duration
             this.onApply();
             return(true);
         }
@@ -1512,7 +1483,65 @@ class effFlying extends CombatEffect {
         if(this.data.duration<=0) this.parent.removeItem(this.data.id); //todo stop flying if no more stamina
         return({OK:true,msg:''});
     }
-} 
+}
+ class effFairyLight extends CombatEffect {
+    static factory(duration=2){
+        let eff = new effFairyLight();
+        eff.startduration=duration;
+        return(eff);
+    }
+    constructor(){
+        super();
+        this.data.id = this.data.name= effFairyLight.name,this.data.duration=this.data.startduration = 2;
+    }
+    toJSON(){return window.storage.Generic_toJSON("effFairyLight", this); };
+    static fromJSON(value){ return window.storage.Generic_fromJSON(effFairyLight, value.data);};
+    get desc(){return(this.data.name);}
+    onApply(){
+        this.data.duration = 6;
+    }
+    merge(neweffect){
+        if(neweffect.name===this.data.name){    //extends duration
+            this.onApply();
+            return(true);
+        }
+    }
+    onTurnStart(){
+        this.data.duration-=1;
+        if(this.parent.parent.Stats.get('rst_light').value<0) { //if vulnerable to light, the mob will guard instead of attack
+            this.parent.parent.addEffect(new effHesitant(),'FairyLight:Hesitant')
+        }
+        if(this.data.duration<=0) { 
+            this.parent.removeItem(this.data.id);
+        }
+        return({OK:true,msg:''});
+    }
+}
+class effHesitant extends CombatEffect {  //when active, the Mob should back away; needs to be handled in Mob-AI
+    constructor(){
+        super();
+        this.data.id = this.data.name= effHesitant.name, this.data.duration = 0;
+    }
+    toJSON(){return window.storage.Generic_toJSON("effHesitant", this); };
+    static fromJSON(value){ return window.storage.Generic_fromJSON(effHesitant, value.data);};
+    get desc(){return(this.data.name);}
+    onApply(){
+        this.data.duration = 6;
+    }
+    merge(neweffect){
+        if(neweffect.name===this.data.name){    //extends duration
+            this.onApply();
+            return(true);
+        }
+    }
+    onTurnStart(){
+        this.data.duration-=1;
+        if(this.data.duration<=0) { 
+            this.parent.removeItem(this.data.id);
+        }
+        return({OK:true,msg:''});
+    }
+}
 /**
  * this effect is usd as a marker to block spawning again while there is still a spawn
  *
@@ -1686,6 +1715,7 @@ window.gm.StatsLib = (function (StatsLib){
     window.storage.registerConstructor(effFlying);
     window.storage.registerConstructor(effBleed);
     window.storage.registerConstructor(effCombined);
+    window.storage.registerConstructor(effFairyLight);
     window.storage.registerConstructor(effGrappled);
     window.storage.registerConstructor(effGrappling);
     window.storage.registerConstructor(effUngrappling);

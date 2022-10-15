@@ -182,6 +182,7 @@ class Slime extends Mob {
         this.level_min =1;
         this.Outfit.addItem(new BaseWorm());
         this.Outfit.addItem(ArmorTorso.factory('slime'));
+        this.Stats.increment('rst_light',-20);
     }
     calcCombatMove(enemys,friends){
         let result = {OK:true,msg:''};
@@ -844,6 +845,39 @@ class Naga extends Mob {
         } 
         return(super.calcCombatMove(enemys,friends));
     }
+}
+class Wisp extends Mob {
+    static factory(type){
+        let foe = new Wisp();
+        return foe;
+    }
+    constructor(){
+        super();
+        this.baseName = this.id = 'Wisp';
+        this.pic= 'wisp1';
+        this.Outfit.addItem(new BaseWorm());
+    }
+    calcCombatMove(enemys,friends){
+        let result = {OK:true,msg:''};
+        let rnd = _.random(1,100);
+        if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
+        result.action =result.target= null;
+        if(this.Effects.countItem(effGrappling.name)>0){
+            this.tmp.grappleCoolDown=5;
+            result.msg =this.fconv(this.name +" entwines its prey.</br>")+result.msg;
+            return(result);
+        } else if(this.tmp.grappleCoolDown<=0){
+            this.tmp.grappleCoolDown=2;
+            rnd = _.random(0,enemys.length-1);
+            result.action = "Grapple";
+            result.target = [enemys[rnd]];
+            result.msg =this.fconv(this.name + " wraps itself around "+result.target[0].name+".</br>")+result.msg;
+            return(result);
+        } else {
+            this.tmp.grappleCoolDown-=1;
+        } 
+        return(super.calcCombatMove(enemys,friends));
+    } 
 }
 /////////////////////////////////////////////////////////
 // special NPC

@@ -243,7 +243,7 @@ targetMultiple(targets){
         if(n.length===1)   //dont stack multi-targets
             multi.push(n[0]);
     }
-    if(multi.length>0) possibletarget.push(multi);
+    if(multi.length>1) possibletarget.push(multi); //ignore if only 1
     //[[mole1],[mole2],[mole1,mole2]]
     return(possibletarget);
 }

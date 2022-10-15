@@ -186,7 +186,7 @@ document.getElementById('btstartDominoCombat').addEventListener("click", _game2.
 			<option value="fuckmachine">fuckmachine</option>
 		</select>
 </label>
-<label>Player#1-AI:
+<label>Player#0-AI:
 		<select id="AI1" onchange='selOption(this)'>
 			<option value="none" selected>None</option>
 			<option value="passive">passive</option>
@@ -197,7 +197,7 @@ document.getElementById('btstartDominoCombat').addEventListener("click", _game2.
       <option value="cassanova">cassanova</option>
       <option value="random">random</option>
 		</select>
-</label> <label>Player#2-AI:
+</label> <label>Player#1-AI:
 		<select id="AI2" onchange='selOption(this)'>
 			<option value="none" selected>None</option>
 			<option value="passive">passive</option>

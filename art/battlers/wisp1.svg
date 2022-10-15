@@ -2,9 +2,9 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="65.472908mm"
-   height="58.303951mm"
-   viewBox="0 0 65.472908 58.303951"
+   width="74.642685mm"
+   height="66.547585mm"
+   viewBox="0 0 74.642685 66.547585"
    version="1.1"
    id="svg5"
    inkscape:version="1.1 (c68e22c387, 2021-05-23)"
@@ -30,8 +30,8 @@
      fit-margin-right="4"
      fit-margin-left="4"
      inkscape:zoom="1.3416246"
-     inkscape:cx="7.0809675"
-     inkscape:cy="174.04273"
+     inkscape:cx="21.988267"
+     inkscape:cy="191.18612"
      inkscape:window-width="1920"
      inkscape:window-height="1017"
      inkscape:window-x="1912"
@@ -117,12 +117,31 @@
        r="14.984877"
        gradientTransform="matrix(0.64475842,0.0069773,-0.00848119,0.78372997,22.714513,24.664123)"
        gradientUnits="userSpaceOnUse" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient852"
+       id="radialGradient1973"
+       cx="83.026894"
+       cy="112.0637"
+       fx="83.026894"
+       fy="112.0637"
+       r="31.8496"
+       gradientTransform="matrix(1.0619195,0,0,0.90092885,-45.936146,29.638549)"
+       gradientUnits="userSpaceOnUse" />
   </defs>
   <g
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-48.810755,-81.20015)">
+     transform="translate(-44.91671,-76.620576)">
+    <ellipse
+       style="fill:url(#radialGradient1973);fill-opacity:1;stroke:none;stroke-width:0.272651;paint-order:stroke fill markers;stop-color:#000000"
+       id="path861"
+       cx="42.231735"
+       cy="130.59996"
+       rx="33.821712"
+       ry="28.694223"
+       transform="rotate(-18.889375)" />
     <path
        style="font-variation-settings:normal;opacity:1;vector-effect:none;fill:url(#radialGradient1104);fill-opacity:1;stroke:none;stroke-width:0.322003;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.766129;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
        d="m 100.97212,86.970118 c 2.49443,-0.0241 -10.153806,-3.308559 -20.065859,-0.868808 -10.982783,2.7033 -14.87752,4.38026 -19.376381,8.757255 -6.80096,6.616735 -11.216427,14.518385 -4.930278,19.918325 10.458778,8.98431 14.148243,0.97104 17.157371,-3.15538 6.282958,-8.61581 -4.49207,-11.20251 4.016862,-17.175288 8.551061,-6.002348 11.621739,-7.36426 23.198285,-7.476104 z"

@@ -2,7 +2,22 @@
 /* bundles some operations related to combat */
 window.gm = window.gm || {};
 window.gm.combat = window.gm.combat || {};
-
+/**
+ * damage types
+ */
+ window.gm.combat.TypesDamage = [
+  {id: 'blunt'},
+  {id: 'slash'},
+  {id: 'pierce'},
+  {id: 'tease'},
+  {id: 'spark'},
+  {id: 'ice'},
+  {id: 'fire'},
+  {id: 'poison'},
+  {id: 'acid'},
+  {id: 'light'},
+  {id: 'dark'}
+]
 
 class Encounter {
   constructor(){
@@ -742,20 +757,6 @@ window.gm.combat.calcAbsorb=function(attacker,defender, attack){
   }
   return(result);
 }
-/**
- * damage types
- */
-window.gm.combat.TypesDamage = [
-  {id: 'blunt'},
-  {id: 'slash'},
-  {id: 'pierce'},
-  {id: 'tease'},
-  {id: 'spark'},
-  {id: 'ice'},
-  {id: 'fire'},
-  {id: 'poison'},
-  {id: 'acid'}
-]
 
 //object to store attack-data
 window.gm.combat.defaultAttackData = function(){

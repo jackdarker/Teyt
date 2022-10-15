@@ -41,6 +41,13 @@ window.gm.util.deepClone=function(obj){
 window.gm.util.deepCloneObj=function(obj){
   return(JSON.parse(JSON.stringify(obj)));
 }
+//compare 2 arrays of basic datatype
+window.gm.util.arrayEquals=function(a, b) {
+  return Array.isArray(a) &&
+      Array.isArray(b) &&
+      a.length === b.length &&
+      a.every((val, index) => val === b[index]);
+};
 // Adds key shortcut indicators to links in passage if there are less than 11 links in the passsage. see addShortKeyHandler.
 // Enables keyboard shortcuts if passage do not have the "_noshortkey_" tag and links dont have attribute "data-nokey"; 
 window.gm.util.updateLinks=function(Container){

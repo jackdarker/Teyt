@@ -563,7 +563,7 @@ window.gm.startOmeterCombat=function(stopCB, startCB)
               break;
             case 'ometer':
                 areas=[ {a:0,b:player[el].denial*100/player[el].max,color:'steelblue'},
-                        {a:player[el].denial*100/player[el].max,b:player[el].minor*100/player[el].max,color:'lightpink'},
+                        {a:player[el].denial*100/player[el].max,b:player[el].minor*100/player[el].max,color:'white'},
                         {a:player[el].minor*100/player[el].max,b:player[el].gasm*100/player[el].max,color:'violet'},
                         {a:player[el].gasm*100/player[el].max,b:100,color:'coral'}]
                 break;
@@ -628,7 +628,7 @@ window.gm.startOmeterCombat=function(stopCB, startCB)
                 skill=player.skills[l];
                 entry=document.createElement('button');
                 entry.id=skill.id;entry.title=skill.id;
-                entry.textContent=skill.id+' (fatigue:'+skill.stamina+' lustself:'+skill.lustself+' lustother:'+skill.lustother+')'+' cooldown:'+skill.tick;
+                entry.textContent=skill.id+' (fatigue:'+skill.stamina+' lustself:'+skill.lustself+/*' lustother:'+skill.lustother+*/')'+' cooldown:'+skill.tick;
                 if(skill.tick>0 || (skill.stamina<0 && (player.stamina.curr-player.stamina.exhausted)<skill.stamina*-1)){
                   entry.disabled=true; //disable if cooldown or not enough charge
                 }else {
@@ -786,6 +786,37 @@ window.gm.startOmeterCombat=function(stopCB, startCB)
       selectSkill(data.player.id,'fuck');
     }
   }
+  let _dt=null;//what pleasure opponent receives
+  function _damt(skillid,other){
+    if(!_dt){ _dt={};
+    _dt["fuck-fuck"]=8,
+    _dt["fuck-tease"]=6,
+    _dt["fuck-passive"]=6,
+    _dt["fuck-calm"]=0,
+    _dt["fuck-deny"]=-2,
+    _dt["tease-fuck"]=5,
+    _dt["tease-tease"]=2,
+    _dt["tease-passive"]=2,
+    _dt["tease-calm"]=-2,
+    _dt["tease-deny"]=-4,
+    _dt["passive-fuck"]=0,
+    _dt["passive-tease"]=0,
+    _dt["passive-passive"]=-3,
+    _dt["passive-calm"]=-4,
+    _dt["passive-deny"]=-4,
+    _dt["calm-fuck"]=2,
+    _dt["calm-tease"]=0,
+    _dt["calm-passive"]=0,
+    _dt["calm-calm"]=-2,
+    _dt["calm-deny"]=-4,
+    _dt["deny-fuck"]=-4,
+    _dt["deny-tease"]=-4,
+    _dt["deny-passive"]=-4,
+    _dt["deny-calm"]=-4,
+    _dt["deny-deny"]=-10;
+    }
+    return(_dt[skillid+'-'+other]);
+  }
   function calcDamage() {
     let entry,i,choice=document.getElementById('choice2');
     data.turn+=1;
@@ -801,6 +832,12 @@ window.gm.startOmeterCombat=function(stopCB, startCB)
       }
       return(1.0);
     }
+    function fom(player){ //change of ometer reduced in green range
+      if(player.ometer.curr>player.ometer.minor) {
+        return(0.5);
+      }
+      return(1.0);
+    }
     for(var pair of actions){
       entry=document.createElement('p');
       entry.textContent='turn:'+data.turn+' '+_describeAction(pair[0],pair[1],pair[0].skill,true)+_describeAction(pair[1],pair[0],pair[1].skill,false)+'</br>';
@@ -810,22 +847,21 @@ window.gm.startOmeterCombat=function(stopCB, startCB)
         action.stamina.curr=Math.max(action.stamina.min,Math.min(action.stamina.curr+action.skill.stamina,action.stamina.max));
         if(data.debug.staminaOff) action.stamina.curr=50;
         action.pleasure.curr=Math.max(action.pleasure.min,
-          Math.min(action.pleasure.curr+action.skill.lustself+(target.skill.lustother*action.skill.fr)*fpl(action),
+          Math.min(action.pleasure.curr+action.skill.lustself+_damt(target.skill.id,action.skill.id),//(target.skill.lustother*action.skill.fr)*fpl(action),
             action.pleasure.max));
         if(action.ometer.curr>action.ometer.gasm) { //ostim
           action.pleasure.curr=action.pleasure.annoy/2;
         }
         if(action.pleasure.curr>action.pleasure.good) { //ometer gain
-          action.ometer.curr=Math.max(action.ometer.min,Math.min(action.ometer.max,action.ometer.curr+action.pleasure.curr/5));
+          action.ometer.curr=Math.max(action.ometer.min,Math.min(action.ometer.max,action.ometer.curr+5));//action.pleasure.curr/5));
         } else if(action.pleasure.curr<action.pleasure.annoy) { //annoy
-          action.ometer.curr=Math.max(action.ometer.min,Math.min(action.ometer.max,action.ometer.curr-action.pleasure.curr/5));
+          action.ometer.curr=Math.max(action.ometer.min,Math.min(action.ometer.max,action.ometer.curr-7));//action.pleasure.curr/5));
         } else {
-          action.ometer.curr=Math.max(action.ometer.min,Math.min(action.ometer.max,action.ometer.curr-action.pleasure.curr/15));
+          action.ometer.curr=Math.max(action.ometer.min,Math.min(action.ometer.max,action.ometer.curr-2));//action.pleasure.curr/15));
         }
         _updateBars(action);
       }
     }
-    
     clearTimeout(data.timer); //update bars, then check if something triggered
     data.timer = setTimeout(calcDamage2, 1000);
   }

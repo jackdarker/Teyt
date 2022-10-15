@@ -24,7 +24,7 @@ class Mob extends Character {
         let rnd = _.random(1,100);
         let result = {OK:true,msg:''};
         result.action =result.target= null;
-        if(rnd>20){  
+        if(rnd>80 || (rnd>20 && this.Effects.findEffect('effHesitant').length<=0)){  
             rnd = _.random(0,enemys.length-1);
             result.action = "Attack";
             result.target = [enemys[rnd]];

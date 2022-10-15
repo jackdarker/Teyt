@@ -231,7 +231,7 @@ function addLoot(){
     window.story.show(next); //adding to inventory only if player is leaving the passage, otherwise he could glitch if switching to status-pane and back
   }
 }
-if(true) { //todo how to randomize loot/loottable
+if(rnd.length>0) { //todo how to randomize loot/loottable
     for(var _itm of rnd){
         Items.push(window.gm.ItemsLib[_itm.id]());
     }
