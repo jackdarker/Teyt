@@ -167,9 +167,26 @@ window.gm.util.bargraph=function(value,max,color,text=""){
   msg ='<div class="progressbar"><div style="background-color:'+color+'; width: '+rel.toString()+'%;"><div style="width: max-content;">'+text+window.gm.util.formatNumber(value,1)+'/'+max.toString()+'</div></div></div>';
   return(msg); //todo bargraph css-animation doesnt work because the whole page is reloaded instead of just width change
 };
+//returns html colorcode for keyword: "health"-> red
+window.gm.util.colorFor=function(id){
+  let c='black';
+  switch(id) {
+    case 'health':c='lightcoral'; break;
+    case 'energy':c='lightyellow'; break;
+    case 'will':c='lightblue'; break;
+    case 'poise':c='darkgrey'; break;
+    case 'arousal':c='lightpink'; break;
+    case 'satiation':c='rosybrown'; break;
+    case 'savageness':c='darkred'; break;
+    default:
+      break;
+  }
+  return(c);
+}
 window.gm.util.statsbar=function(what, color){
   var x=window.gm.player.Stats.get(what),y=window.gm.player.Stats.get(what+"Max");
   if(x.hidden>=4) return("");
+  if(!color) color=window.gm.util.colorFor(what);
   return(window.gm.util.bargraph(x.value,y.value,color,what+": "));
 };
 /* Uploads SVG files from local file system, based on file selected in input; https://github.com/fizzstudio/svg-load-save */

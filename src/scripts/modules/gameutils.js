@@ -716,6 +716,8 @@ window.gm.printBodyDescription= function(whom,onlyvisible=false){
   //msg +='</br>Total lewdness sluty:'+lewd.slut+' bondage:'+lewd.bondage+' sm:'+lewd.sm;
 	return msg+"</br>"+msg2;
 };
+//see combat
+window.gm.printSfx=function(id,msg){};
 // returns singular pronoun for the char depending on gender
 window.gm.util.estimatePronoun= function(whom){
     let isplayer = (whom.name===window.gm.player.name);
@@ -735,8 +737,8 @@ window.gm.util.estimatePronoun= function(whom){
 };
 //returns a function that accept a text and fixes the word-phrases: let fixer = window.gm.util.descFixer(this.actor);msg=fixer('[I] [like] this shit.');
 window.gm.util.descFixer = function(whom){
-  let pron = window.gm.util.estimatePronoun(whom);
-  return(function(pron){ 
+  return(function(whom){ 
+    let char=whom,pron = window.gm.util.estimatePronoun(whom);
     return function(text){
       let repl = [],br = 0, aft,bef,found;
       //search brackets like $[dff]$ $[[sdff]]$ dont find [ ] or \[ \] ; 
@@ -766,7 +768,7 @@ window.gm.util.descFixer = function(whom){
         }
       }
       for(var n of repl){//replace bracket+bracketcontent,
-        n.new = window.gm.util.lookupWord(n.text,pron);
+        n.new = window.gm.util.lookupWord(n.text,pron,char);
         let bef = text.substring(0,n.start), aft = text.substr(n.end+1);
         text= bef+n.new+aft;
       }
@@ -776,7 +778,7 @@ window.gm.util.descFixer = function(whom){
       // A dense fur covers $[my]$ body. A dense fur covers your body.  
       return(text);
     }
-  }(pron))
+  }(whom))
 };
 // add irregular words here
 window.gm.util.wordlist = function buildWordList(list){
@@ -793,7 +795,7 @@ window.gm.util.wordlist = function buildWordList(list){
 }(window.gm.util.wordlist || {});
 
 //looks up a word in the wordlist and retourns the version fitting pronoun
-window.gm.util.lookupWord = function(word,pron){
+window.gm.util.lookupWord = function(word,pron,whom){
   let output = word;
   let x = word.toLowerCase();
   let repl =window.gm.util.wordlist[x];
@@ -803,9 +805,17 @@ window.gm.util.lookupWord = function(word,pron){
       output= output[0].toUpperCase()+output.substr(1);
     }
   } else {
-    if(pron==='he' || pron==='she'|| pron==='shi' ){  
-      output+='s';//wear -> wears
+    switch(x){
+      case 'name':
+          output=whom.name;
+        break;
+      default:
+        if(pron==='he' || pron==='she'|| pron==='shi' ){  
+          output+='s';//wear -> wears
+        }
+        break;
     }
+    
   }
   return(output);
 }

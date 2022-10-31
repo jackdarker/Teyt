@@ -58,6 +58,8 @@ class stArmor extends Stat {
     toJSON(){return window.storage.Generic_toJSON("stArmor", this); };
     static fromJSON(value){ return window.storage.Generic_fromJSON(stArmor, value.data);};
 }
+//TODO stBlock  //chances to block physical damage; cant block heavy attacks; after block, chance are halved
+//TODO stParry  //chance to parry physical attacks
 class stHealth extends Stat {
     static setup(context, base,max){
         /*stHealthMax.setup(context,max);
@@ -86,7 +88,7 @@ class stHealthRegen extends Stat {
     toJSON(){return window.storage.Generic_toJSON("stHealthRegen", this); };
     static fromJSON(value){ return window.storage.Generic_fromJSON(stHealthRegen, value.data);};
 }
-class stEnergy extends Stat {
+class stEnergy extends Stat { //physical reserves
     static setup(context, base,max){
         let stats=Stat.setupStatWithLimitAndRegen('energy',{base:base,regen:10,max:max});
         stats.forEach(x=>{context.addItem(x);}),stats.forEach(x=>{x.Calc();})
@@ -95,7 +97,7 @@ class stEnergy extends Stat {
     toJSON(){return window.storage.Generic_toJSON("stEnergy", this); };
     static fromJSON(value){ return window.storage.Generic_fromJSON(stEnergy, value.data);};
 }
-class stWill extends Stat {
+class stWill extends Stat { //mental reserves
     static setup(context, base,max){
         let stats=Stat.setupStatWithLimitAndRegen('will',{base:base,regen:10,max:max});
         stats.forEach(x=>{context.addItem(x);}),stats.forEach(x=>{x.Calc();})
@@ -104,7 +106,16 @@ class stWill extends Stat {
     toJSON(){return window.storage.Generic_toJSON("stWill", this); };
     static fromJSON(value){ return window.storage.Generic_fromJSON(stWill, value.data);};
 }
-class stSatiation extends Stat { //high value==starving        todo
+class stPoise extends Stat { //stability in combat
+    static setup(context, base,max){
+        let stats=Stat.setupStatWithLimitAndRegen('poise',{base:base,regen:4,max:max});
+        stats.forEach(x=>{context.addItem(x);}),stats.forEach(x=>{x.Calc();})
+    }
+    constructor(){ super();   }
+    toJSON(){return window.storage.Generic_toJSON("stPoise", this); };
+    static fromJSON(value){ return window.storage.Generic_fromJSON(stPoise, value.data);};
+}
+class stSatiation extends Stat { //low value==starving    
     static setup(context, base,max){
         let stats=Stat.setupStatWithLimitAndRegen('satiation',{base:base,regen:-2,max:max});
         stats.forEach(x=>{context.addItem(x);}),stats.forEach(x=>{x.Calc();})
@@ -506,7 +517,12 @@ class effCombatRecovery extends Effect {
     onApply(){
         this.data.time = window.gm.getTime();
     }
+    onCombatStart(){
+        this.parent.parent.Stats.increment("poise",9999); //TODO reset on start??
+        return({OK:false,msg:''});
+    }
     onTurnStart(){ //this is no combat effect but ticked in combat; dont remmove after combatend !
+        this.parent.parent.Stats.increment("poise",this.parent.parent.Stats.get('poiseRegen').value);
         this.parent.parent.Stats.increment("energy",this.parent.parent.Stats.get('energyRegen').value);
         this.parent.parent.Stats.increment("will",this.parent.parent.Stats.get('willRegen').value);
         this.parent.parent.Stats.increment("arousal",this.parent.parent.Stats.get('arousalRegen').value);
@@ -1107,6 +1123,7 @@ class effHeal extends CombatEffect {
     onApply(){
         this.data.duration=this.data.startduration;
         this.parent.parent.Stats.increment('health',this.amount);
+        this.castMsg=window.gm.util.descFixer(this.parent.parent)('$[Name]$ $[was]$ healed by +'+this.amount+'.');
     }
     merge(neweffect){
         if(neweffect.name===this.data.name){    //extends
@@ -1119,6 +1136,7 @@ class effHeal extends CombatEffect {
         if(this.data.duration<=0) this.parent.removeItem(this.data.id);
         else {
             this.parent.parent.Stats.increment('health',this.amount);
+            this.castMsg=window.gm.util.descFixer(this.parent.parent)('$[Name]$ recovered +'+this.amount+' health.');
         }
         return({OK:true,msg:''});
     }
@@ -1158,6 +1176,33 @@ class effGuard extends CombatEffect {
         this.parent.parent.Stats.removeModifier('rst_blunt',{id:'rst_blunt:Guard'});
         this.parent.parent.Stats.removeModifier('rst_slash',{id:'rst_slash:Guard'});
         this.parent.parent.Stats.removeModifier('rst_pierce',{id:'rst_pierce:Guard'});
+    }
+}
+class effChangeStance extends CombatEffect {
+    static factory(newStanceID){
+        let x = new effChangeStance();
+        x.data.newStanceID=newStanceID;
+        return x;
+    }
+    constructor(){
+        super();
+        this.data.id = this.data.name= effChangeStance.name, this.data.duration = 0, this.data.hidden=0;
+    }
+    toJSON(){return window.storage.Generic_toJSON("effChangeStance", this); };
+    static fromJSON(value){ return window.storage.Generic_fromJSON(effChangeStance, value.data);};
+    get desc(){return(this.data.newStanceID);}
+    onApply(){
+        this.parent.parent.changeStance(new window.gm.StanceLib[this.data.newStanceID]);
+    }
+    merge(neweffect){
+        if(neweffect.name===this.data.name) return(true);
+    }
+    onTurnStart(){
+        this.data.duration-=1;
+        if(this.data.duration<=0) this.parent.removeItem(this.data.id);
+        return({OK:true,msg:''});
+    }
+    onRemove(){
     }
 }
 /** todo
@@ -1226,7 +1271,7 @@ class effCombined extends CombatEffect {
     static fromJSON(value){ return window.storage.Generic_fromJSON(effCombined, value.data);};
 }
 class effDamage extends CombatEffect {
-    static factory(amount,type,turns=1,msg=''){
+    static factory(amount,type,turns=0,msg=''){
         let eff = new effDamage();
         eff.amount = amount,eff.data.duration=turns;
         eff.type=type;
@@ -1244,7 +1289,8 @@ class effDamage extends CombatEffect {
     onApply(){
         //this.data.duration = 0;
         this.parent.parent.Stats.increment('health',-1*this.amount);
-        if(this.data.duration<1) this.parent.removeItem(this.data.id);  
+        if(this.data.duration<1) this.parent.removeItem(this.data.id);
+        this.castMsg=window.gm.util.descFixer(this.parent.parent)(this.amount+' '+this.data.name+' '); //'$[Name]$ got hurt for '+  
     }
     merge(neweffect){
         if(neweffect.name===this.data.name){    //ignore
@@ -1254,6 +1300,73 @@ class effDamage extends CombatEffect {
     onTurnStart(){ this.data.duration-=1; 
         if(this.data.duration<=0) { this.parent.removeItem(this.data.id); }
         this.parent.parent.Stats.increment('health',-1*this.amount); return({OK:true,msg:''});}
+}
+/**
+ * type says which bonus is applied from lewds
+ * lewds is calculated tease bonus from gear
+ */
+ class effTeaseDamage extends CombatEffect {
+    static factory(amount,type,lewds,msg=''){
+        let eff = new effTeaseDamage();
+        eff.amount = amount;
+        eff.type = type;
+        eff.lewds = lewds;
+        eff.castMsg=msg;
+        return(eff);
+    }
+    constructor(amount){
+        super();
+        this.amount = amount;
+        this.data.id = this.data.name= effTeaseDamage.name, this.data.duration = 0, this.data.hidden=0;
+    }
+    toJSON(){return window.storage.Generic_toJSON("effTeaseDamage", this); };
+    static fromJSON(value){ return window.storage.Generic_fromJSON(effTeaseDamage, value.data);};
+    get desc(){return(effTeaseDamage.name);}
+    onApply(){
+        this.data.duration = 0;
+        this.parent.parent.Stats.increment('arousal',1*this.amount);
+        if(this.data.duration<1) this.parent.removeItem(this.data.id);  
+        this.castMsg=window.gm.util.descFixer(this.parent.parent)('$[Name]$ got aroused by '+this.amount+'.');  
+    }
+    merge(neweffect){
+        if(neweffect.name===this.data.name){    //ignore
+            //this.onApply();
+            return(false);
+        }
+    }
+    onTurnStart(){ this.data.duration-=1; if(this.data.duration<=0) this.parent.removeItem(this.data.id); return({OK:true,msg:''});   }
+}
+/**
+ * 
+ */
+ class effPoiseDamage extends CombatEffect {
+    static factory(amount,msg=''){
+        let eff = new effPoiseDamage();
+        eff.amount = amount;
+        eff.castMsg=msg;
+        return(eff);
+    }
+    constructor(amount){
+        super();
+        this.amount = amount;
+        this.data.id = this.data.name= effPoiseDamage.name, this.data.duration = 0, this.data.hidden=0;
+    }
+    toJSON(){return window.storage.Generic_toJSON("effPoiseDamage", this); };
+    static fromJSON(value){ return window.storage.Generic_fromJSON(effPoiseDamage, value.data);};
+    get desc(){return(effPoiseDamage.name);}
+    onApply(){
+        this.data.duration = 0;
+        this.parent.parent.Stats.increment('poise',-1*this.amount);
+        if(this.data.duration<1) this.parent.removeItem(this.data.id);  
+        this.castMsg=window.gm.util.descFixer(this.parent.parent)('$[Name]$ poise '+((this.amount>0)?'decreased':'increased')+' by '+this.amount+'.');  
+        this.parent.parent.updateStance();
+    }
+    merge(neweffect){
+        if(neweffect.name===this.data.name){    //ignore
+            return(false);
+        }
+    }
+    onTurnStart(){ this.data.duration-=1; if(this.data.duration<=0) this.parent.removeItem(this.data.id); return({OK:true,msg:''});   }
 }
 //someone with this eff will gain arousal when hit
 class effMasochist extends CombatEffect {
@@ -1397,40 +1510,7 @@ class effUngrappling extends CombatEffect {
     }
     onTurnStart(){ this.data.duration-=1; if(this.data.duration<=0) this.parent.removeItem(this.data.id); return({OK:true,msg:''});   }
 }
-/**
- * type says which bonus is applied from lewds
- * lewds is calculated tease bonus from gear
- */
-class effTeaseDamage extends CombatEffect {
-    static factory(amount,type,lewds,msg=''){
-        let eff = new effTeaseDamage();
-        eff.amount = amount;
-        eff.type = type;
-        eff.lewds = lewds;
-        eff.castMsg=msg;
-        return(eff);
-    }
-    constructor(amount){
-        super();
-        this.amount = amount;
-        this.data.id = this.data.name= effTeaseDamage.name, this.data.duration = 0, this.data.hidden=0;
-    }
-    toJSON(){return window.storage.Generic_toJSON("effTeaseDamage", this); };
-    static fromJSON(value){ return window.storage.Generic_fromJSON(effTeaseDamage, value.data);};
-    get desc(){return(effTeaseDamage.name);}
-    onApply(){
-        this.data.duration = 0;
-        this.parent.parent.Stats.increment('arousal',1*this.amount);
-        if(this.data.duration<1) this.parent.removeItem(this.data.id);  
-    }
-    merge(neweffect){
-        if(neweffect.name===this.data.name){    //ignore
-            //this.onApply();
-            return(false);
-        }
-    }
-    onTurnStart(){ this.data.duration-=1; if(this.data.duration<=0) this.parent.removeItem(this.data.id); return({OK:true,msg:''});   }
-}
+
 class effStunned extends CombatEffect {
     static factory(duration=2){
         let eff = new effStunned();
@@ -1548,7 +1628,7 @@ class effHesitant extends CombatEffect {  //when active, the Mob should back awa
  * @class effCallHelp
  * @extends {CombatEffect}
  */
-class effCallHelp extends CombatEffect {
+class effCallHelp extends CombatEffect { //summons someone
     constructor(){
         super();
         this.data.id = this.data.name= effCallHelp.name, this.data.duration = 2;
@@ -1704,6 +1784,7 @@ window.gm.StatsLib = (function (StatsLib){
     window.storage.registerConstructor(stCorruption);
     window.storage.registerConstructor(stSavageness);
     window.storage.registerConstructor(stArmor);   
+    window.storage.registerConstructor(stPoise);  
     //...effects
     window.storage.registerConstructor(effCallHelp);
     window.storage.registerConstructor(effCombatRecovery);
@@ -1722,6 +1803,7 @@ window.gm.StatsLib = (function (StatsLib){
     window.storage.registerConstructor(effEnergized);    
     window.storage.registerConstructor(effNotTired);
     window.storage.registerConstructor(effPillEffect);
+    window.storage.registerConstructor(effPoiseDamage);
     window.storage.registerConstructor(effTeaseDamage);
     window.storage.registerConstructor(effTired);
     window.storage.registerConstructor(effStunned);

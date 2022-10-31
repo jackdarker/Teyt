@@ -68,7 +68,6 @@ function tick(){
     window.story.state.DngMN.tmp.tickPass=here;
     if(here==='DngMN_J5' || here==='DngMN_F2'){
         window.gm.encounters.wolf({levelUp:-3,amount:1});
-        window.gm.Encounter.initCombat();
     }
 }
 function fightHawk(){

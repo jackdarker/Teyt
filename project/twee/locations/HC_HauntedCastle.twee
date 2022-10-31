@@ -32,7 +32,7 @@ function tick(){
       if(window.story.state.DngSY.dng+"_"+mob.pos===here){
         //if mob is at same position as player: trigger passage or just show note
         if(mob.state===0){
-          window.gm.encounters[mob.mob]();
+          window.gm.encounters[mob.mob]({noStart:true});
           var _oldVictory=window.gm.Encounter.onVictory.bind(window.gm.Encounter);
           window.gm.Encounter.onVictory= function(){mob.state=1;return(_oldVictory());}
           window.gm.Encounter.initCombat(); return;
@@ -114,8 +114,7 @@ You may try your luck and <a0 onclick=''>sneak around</a> , boldly <a0 onclick='
 <div id='output'></div>
 </article><article id="LogPanel"></article></section>
 <script>function fight(){
-  window.gm.encounters['wolf']({type:'AlphaWolf',noFlee:true});
-  window.gm.Encounter.initCombat();                
+  window.gm.encounters['wolf']({type:'AlphaWolf',noFlee:true});               
 }
 </script>
 

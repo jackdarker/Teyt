@@ -291,6 +291,10 @@ class Effects extends Inventory {
         window.gm.pushLog('Effects: '+operation+' '+id+' '+msg,
             window.story.state._gm.debug || (window.gm.player && (window.gm.player.id === this.parent.id)));
     }
+    sfx(id,msg){
+        this.parent.sfx()
+    }
+
 }
 /////////////////////////////////////////////////////////////////////////
 /**

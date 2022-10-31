@@ -99,7 +99,7 @@ class SkillStrongHit extends SkillAttack {
     constructor(){
         super();this.id=this.name='StrongAttack'
         this.msg = '';this.weapon='';
-        this.cost.energy =30;
+        this.cost.energy =30,this.cost.poise =10;
     }
     toJSON(){return window.storage.Generic_toJSON("SkillStrongHit", this); }
     static fromJSON(value){return(window.storage.Generic_fromJSON(SkillStrongHit, value.data));}
@@ -116,12 +116,22 @@ class SkillStrongHit extends SkillAttack {
                 //get data from weapon
                 attack.mod = this.parent.parent.Outfit.getItem(this.weapon).attackMod(target);
                 attack.mod.critChance=50,attack.mod.hitChance=70;
+                attack.mod.onHit[0].eff.push(effPoiseDamage.factory(15)); //TODO
+                attack.mod.onCrit[0].eff.push(effPoiseDamage.factory(25)); 
                 let result2 = window.gm.combat.calcAttack(this.caster,target,attack);
                 this.msg+=result2.msg;
                 result.effects = result.effects.concat(attack.effects); 
             }
         }
         return result;
+    }
+    isValidStance(){
+        let res=super.isValidStance();
+        if(!res.OK) return(res);
+        if(!(this.parent.parent.Stance instanceof StanceStanding)) {
+            res.OK=false,res.msg='wrong stance';
+        }
+        return(res);
     }
 }
 class SkillShoot extends SkillAttack {
@@ -275,18 +285,20 @@ class SkillKick extends SkillAttack {
         super();
         this.id=this.name='Kick'
         this.msg = '';
-        this.cost.energy =20;
+        this.cost.energy =25;
     }
     toJSON(){return window.storage.Generic_toJSON("SkillKick", this); }
     static fromJSON(value){return(window.storage.Generic_fromJSON(SkillKick, value.data));}
     get desc(){ return("Use your feet kungfu style. "+this.getCost().asText());}
     __estimateAttack(target){
         let attack =window.gm.combat.defaultAttackData();
-        let feet=this.caster.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bFeet);
+        let feet=this.caster.Outfit.getItemForSlot(window.gm.OutfitSlotLib.bHands); //TODO bFeet
         attack.mod= new SkillMod();
         if(feet && feet.attackMod){ //get feet damage info
             attack.mod=feet.attackMod(target);
         }
+        attack.mod.onHit[0].eff.push(effPoiseDamage.factory(25)); //TODO
+        attack.mod.onCrit[0].eff.push(effPoiseDamage.factory(35)); 
         return(attack);
     }
 }
@@ -535,7 +547,43 @@ class SkillStun extends Skill {
         return(this.caster.name +" stunned " + ((result.targets.length>1)?result.targets.name:result.targets[0].name)+".");
     }
 }
-
+class SkillStandup extends Skill {
+    constructor(){  super("Standup");  
+    this.cost.energy =10;
+    }
+    toJSON(){return window.storage.Generic_toJSON("SkillStandup", this); }
+    static fromJSON(value){return(window.storage.Generic_fromJSON(SkillStandup, value.data));}
+    targetFilter(targets){
+        return(this.targetFilterSelf(targets));
+    }
+    get desc(){ return("Standup. "+this.getCost().asText());}
+    previewCast(targets){
+        var result = new SkillResult()
+        result.skill =this;
+        result.source = this.caster;
+        result.targets = targets;
+        if(this.isValidTarget(targets)){
+            result.OK = true;
+            for(var target of targets){
+                result.effects.push( {target:target,
+                    eff:[effPoiseDamage.factory(-20),effChangeStance.factory("StanceStanding")]})
+                }
+        }
+        return result
+    }
+    getCastDescription(result){
+        //update msg after sucessful cast
+        return(result.targets[0].name+"Try to stand up.");
+    }
+    isValidStance(){
+        let res=super.isValidStance();
+        if(!res.OK) return(res);
+        if(!(this.parent.parent.Stance instanceof StanceQuadrup)) {
+            res.OK=false,res.msg='wrong stance';
+        }
+        return(res);
+    }
+}
 /**
  * 
  *
@@ -605,7 +653,7 @@ class SkillPoisonCloud extends Skill {
         return result
     }
     getCastDescription(result){
-        return(this.caster.name +" poisons " + result.targets.name+".");
+        return(this.caster.name +" puffs out a poisonous cloud that is affecting all around.");
     }
 }
 class SkillHeal extends Skill {
@@ -874,7 +922,7 @@ class SkillFairyLight extends Skill {
     static fromJSON(value){return(window.storage.Generic_fromJSON(SkillFairyLight, value.data));}
     targetFilter(targets){
         let x=this.targetMultiple(this.targetFilterFighting(this.targetFilterEnemy(targets)));
-        if(x) return([x[x.length-1]]); //there should be "all" add end of collection
+        if(x.length>1) return([x[x.length-1]]); //there should be "all" add end of collection
         return(x);
     }
     set style(style){ //skilllevel
@@ -1058,6 +1106,7 @@ window.gm.SkillsLib = (function (Lib){
     window.storage.registerConstructor(SkillTease);
     window.storage.registerConstructor(SkillUltraKill);
     window.storage.registerConstructor(SkillUseItem);
+    window.storage.registerConstructor(SkillStandup);
     //    Lib['SkillAttack'] = function (){ return new SkillAttack();};
     return Lib; 
 }(window.gm.SkillsLib || {}));

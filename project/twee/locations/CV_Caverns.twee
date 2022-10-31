@@ -108,7 +108,6 @@ You fall into the abyss never to return. </br>
 <script>
 function fightPillRoller(){
     window.gm.encounters.pillRoller();
-    window.gm.Encounter.initCombat();
 }
 </script>
 

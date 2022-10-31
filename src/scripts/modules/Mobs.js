@@ -117,7 +117,7 @@ class Wolf extends Mob {
         let result = {OK:true,msg:''};//this._canAct();
         let rnd = _.random(1,100);
         let spawn="CallHelpWolf";
-        //if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
+        if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
         result.action =result.target= null;
         if(window.story.state.combat.turnCount%2===0){
             rnd = _.random(0,enemys.length-1);
@@ -187,7 +187,7 @@ class Slime extends Mob {
     calcCombatMove(enemys,friends){
         let result = {OK:true,msg:''};
         let skill,rnd = _.random(1,100);
-        //if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
+        if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
         result.action =result.target= null;
         skill="TransformSelfSlime"
         let health = this.health()
@@ -224,7 +224,7 @@ class Slug extends Mob {
     calcCombatMove(enemys,friends){
         let result = {OK:true,msg:''};
         let rnd = _.random(1,100);
-        //if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
+        if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
         result.action =result.target= null;
         if(this.Stats.countItem(effKamikaze.name)<=0){ //self-exploding
             this.addEffect(new effKamikaze());
@@ -271,7 +271,7 @@ class Spider extends Mob {
     calcCombatMove(enemys,friends){
         let result = {OK:true,msg:''};
         let rnd = _.random(1,100), skWeb='Grapple';
-        //if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
+        if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
         result.action =result.target= null;
         if(window.story.state.combat.turnCount%2===0){
             rnd = _.random(0,enemys.length-1);
@@ -363,7 +363,7 @@ class Lizan extends Mob {
     }
     calcCombatMove(enemys,friends){
         let result = {OK:true,msg:''};
-        //if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
+        if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
         let rnd = _.random(1,100);
         result.action =result.target= null;
         //todo shoot arrow, pounce, throw net
@@ -481,13 +481,14 @@ class Lapine extends Mob {
     }
     calcCombatMove(enemys,friends){
         let result = {OK:true,msg:''};
-        //if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
+        if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
         let rnd = _.random(1,100);
         result.action =result.target= null;
         let skill = this.Skills.getItem("Kick");
-        if(window.story.state.combat.turnCount>2 && rnd>30 && skill.isEnabled().OK){
+        if(window.story.state.combat.turnCount>2 && rnd>50 && skill.isEnabled().OK){
             result.action = skill.name;
-            result.target = [this];
+            rnd = _.random(0,enemys.length-1);
+            result.target = [enemys[rnd]];
             result.msg =this.name+" prepares for a powerful jump-kick.</br>"+result.msg;
             return(result);
         }
@@ -529,7 +530,7 @@ class Succubus extends Mob {
     }
     calcCombatMove(enemys,friends){
         let result = {OK:true,msg:''};
-        //if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
+        if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
         let rnd = _.random(1,100);
         result.action =result.target= null;
         //todo whiplash, call tentacles
@@ -742,7 +743,7 @@ class Hive extends Mob {
     calcCombatMove(enemys,friends){
         let result = {OK:false,msg:''};
         let rnd,spawn="CallHelpHornett";
-        //if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
+        if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
         result.action =result.target= null;
         if(window.story.state.combat.turnCount>2 && this.Skills.countItem(spawn)>0 &&
             this.Skills.getItem(spawn).isEnabled().OK){
@@ -931,7 +932,7 @@ class Ruff extends Mob {
         let result = {OK:true,msg:''};//this._canAct();
         let rnd = _.random(1,100);
         let spawn="CallHelpWolf";
-        //if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
+        if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
         result.action =result.target= null;
         if(window.story.state.combat.turnCount%2===0){
             rnd = _.random(0,enemys.length-1);

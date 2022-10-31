@@ -58,8 +58,7 @@ Some strange kind of fungi are growing here. They are rather large, raising up t
 <div id='output'></div>
 </article><article id="LogPanel"></article></section>
 <script>function fight(){
-  window.gm.encounters['fungus']({noFlee:true});
-  window.gm.Encounter.initCombat();                
+  window.gm.encounters['fungus']({noFlee:true});              
 }
 </script>
 
@@ -71,8 +70,7 @@ You may try your luck and <a0 onclick=''>sneak around</a> , boldly <a0 onclick='
 <div id='output'></div>
 </article><article id="LogPanel"></article></section>
 <script>function fight(){
-  window.gm.encounters['wolf']({type:'AlphaWolf',noFlee:true});
-  window.gm.Encounter.initCombat();                
+  window.gm.encounters['wolf']({type:'AlphaWolf',noFlee:true});               
 }
 </script>
 
@@ -117,11 +115,11 @@ You spot a box right on your way. Maybe someone lost it but even more likely pla
 <a0 onclick='loot=null,window.gm.printTalkLink("div#select1","div#choice1b")'>ignore it</a>?</br>
 </div><div id='choice1a' hidden></br></div>
 <div id='choice1b' hidden></br>
-  Might be a good decision to not touch that lectern and <a0 onclick='window.story.show(window.story.state.DngSY.nextLocation)'>walk away</a>.
+  Might be a good decision to not touch that lectern and <a0 onclick='window.story.show(window.gm.player.location)'>walk away</a>.
 </div>
 </article><article id="LogPanel"></article></section>
 <script> function grab(){
-    let item,msg='',where=window.story.state.DngSY.nextLocation;
+    let item,msg='',where=window.gm.player.location;//window.story.state.DngSY.nextLocation;
     window.story.state.DngPC.tmp.evtSpawn[where]["lectern"].state=1;
     if(loot[1]===""){
         msg='You found a '+loot[0]+'. ';
@@ -143,7 +141,7 @@ You spot a box right on your way. Maybe someone lost it but even more likely pla
             window.gm.player.Stats.increment("strength",2);
         }
     }
-    window.gm.printOutput(msg+'</br>'+window.gm.printLink('Continue','window.story.show(window.story.state.DngSY.nextLocation)'),'div#choice1a');
+    window.gm.printOutput(msg+'</br>'+window.gm.printLink('Continue','window.story.show(window.gm.player.location)'),'div#choice1a');
 }
 function randomLoot(){ //generate loot[0]= item , loot[1]= effect //see combinations above
 //loot depends on tier and present fetishs/gear
@@ -264,7 +262,7 @@ window.gm.printOutput(msg);
       if(window.story.state.DngSY.dng+"_"+mob.pos===here){
         //if mob is at same position as player: trigger passage or just show note
         if(mob.state===0){
-          window.gm.encounters[mob.mob]();
+          window.gm.encounters[mob.mob]({noStart:true});
           var _oldVictory=window.gm.Encounter.onVictory.bind(window.gm.Encounter);
           window.gm.Encounter.onVictory= function(){mob.state=1;return(_oldVictory());}
           window.gm.Encounter.initCombat(); return;
@@ -319,8 +317,7 @@ window.gm.printOutput(msg);
                 if(false && ['_Lectern'].includes(_choice[i].id)){ //scene
                     window.story.show(window.story.state.DngSY.dng+_choice[i].id);
                 } else { //foe
-                    window.gm.encounters[_choice[i].id]({type:_choice[i].type, amount:_choice[i].amount,levelUp:_choice[i].levelUp,noFlee:true});
-                    window.gm.Encounter.initCombat();      
+                    window.gm.encounters[_choice[i].id]({type:_choice[i].type, amount:_choice[i].amount,levelUp:_choice[i].levelUp,noFlee:true});  
                 }          
                 break;
             }
@@ -597,12 +594,13 @@ Another Arena</br><%=window.story.render("DngPC_Retreat")%>
 :: DngPC_I4
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
-Something tells you that a bigger threat then before awaits to the east.</br><%=window.story.render("DngPC_Retreat")%>
+
 <div id='select1' >Water ripples out from a tap into a scoop bassin.
 <a0 onclick='window.gm.player.Stats.increment("health",50);window.gm.printTalkLink("div#select1","div#choice1a"),window.gm.refreshSidePanel()'>Sipping</a> some of that clear water might give you back some energy.</br>
 </div><div id='choice1a' hidden>You feel surprisingly refreshed after some gulps of that clear water.
 </div>
-<%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
+<%=window.gm.renderRoom(window.passage.name)%>
+Something tells you that a bigger threat then before awaits to the east.</br></br><%=window.story.render("DngPC_Retreat")%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
 <%=window.story.render("DngPC_Encounters")%>
 
