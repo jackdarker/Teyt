@@ -226,8 +226,8 @@ class Slug extends Mob {
         let rnd = _.random(1,100);
         if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
         result.action =result.target= null;
-        if(this.Stats.countItem(effKamikaze.name)<=0){ //self-exploding
-            this.addEffect(new effKamikaze());
+        if(this.Stats.countItem(effKamikaze.name)<=0 && this.Stats.get('health').rmax<0.5){ //self-exploding
+            this.addEffect(effKamikaze.factory(0));
         }
         if(window.story.state.combat.turnCount%2===0){
             rnd = _.random(0,enemys.length-1);
@@ -500,6 +500,7 @@ class Succubus extends Mob {
         let foe = new Succubus();
         if(type==='succubus'){
             foe.Outfit.addItem(window.gm.ItemsLib.WhipLeather());
+            foe.Skills.addItem(SkillCallHelp.factory('WispShield',4)); //todo chance to call?
         } else if(type==="nurse"){
             foe.baseName = foe.id = 'BNurse';
             foe.pic= 'Nurse1';
@@ -531,15 +532,15 @@ class Succubus extends Mob {
     calcCombatMove(enemys,friends){
         let result = {OK:true,msg:''};
         if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
-        let rnd = _.random(1,100);
+        let rnd = _.random(1,100),spawn='CallHelpWispShield';
         result.action =result.target= null;
         //todo whiplash, call tentacles
-        if(window.story.state.combat.turnCount %3 ===0){
-            result.action = "Guard";
+        if(this.Skills.countItem(spawn)>0 && this.Skills.getItem(spawn).isEnabled().OK){
+            result.action = spawn;
             result.target = [this];
-            result.msg =this.name+" moves into a defensive stance.</br>"+result.msg;
+            result.msg =this.name+" conjures some protective wisps.</br>";//+result.msg;
             return(result);
-        } else if (window.story.state.combat.turnCount %2 ===0){
+        }else if (window.story.state.combat.turnCount %2 ===0){
             rnd = _.random(0,enemys.length-1);
             result.action = "Tease";
             result.target = [enemys[rnd]];
@@ -850,6 +851,10 @@ class Naga extends Mob {
 class Wisp extends Mob {
     static factory(type){
         let foe = new Wisp();
+        if(type==='WispShield'){
+            foe.baseName = foe.id = 'WispShield';
+            foe.Skills.addItem(SkillProtect.factory(0));
+        } 
         return foe;
     }
     constructor(){
@@ -860,22 +865,16 @@ class Wisp extends Mob {
     }
     calcCombatMove(enemys,friends){
         let result = {OK:true,msg:''};
-        let rnd = _.random(1,100);
+        let rnd = _.random(1,100),skn='Protect',skill=null;
         if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
         result.action =result.target= null;
-        if(this.Effects.countItem(effGrappling.name)>0){
-            this.tmp.grappleCoolDown=5;
-            result.msg =this.fconv(this.name +" entwines its prey.</br>")+result.msg;
+        if(this.Skills.countItem(skn)>0 && (skill=this.Skills.getItem(skn),skill.isEnabled().OK)){
+            let _t=skill.targetFilter(friends.map(function(x){return([x])}));//need to priorize target?
+            if(_t.length<=0) return(super.calcCombatMove(enemys,friends));
+            result.action = skn;
+            result.target = _t[0];
+            result.msg =this.fconv(this.name + " will protect."+result.target[0].name+"</br>")+result.msg;
             return(result);
-        } else if(this.tmp.grappleCoolDown<=0){
-            this.tmp.grappleCoolDown=2;
-            rnd = _.random(0,enemys.length-1);
-            result.action = "Grapple";
-            result.target = [enemys[rnd]];
-            result.msg =this.fconv(this.name + " wraps itself around "+result.target[0].name+".</br>")+result.msg;
-            return(result);
-        } else {
-            this.tmp.grappleCoolDown-=1;
         } 
         return(super.calcCombatMove(enemys,friends));
     } 
@@ -1007,5 +1006,7 @@ window.gm.Mobs = (function (Mobs){
     Mobs.Dryad = Dryad.factory; 
     Mobs.Vine = Vine.factory; 
     Mobs.Mechanic = Mechanic.factory;
+    Mobs.Wisp = Wisp.factory;
+    Mobs.WispShield = function(){ return function(param){return(Wisp.factory(param));}("WispShield")};
     return Mobs; 
 }(window.gm.Mobs || {}));

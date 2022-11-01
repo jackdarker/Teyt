@@ -226,23 +226,23 @@ printStats(){
     if(i<players.length){
       elmt += this.statsline(players[i],s.combat.actor && s.combat.actor.name==players[i].name);
     } else {
-      elmt += "<td></td><td></td><td></td><td></td><td></td>";
+      elmt += "<td></td><td></td><td></td><td></td>";
     }
     if(i<enemys.length){
       elmt += "<td></td>"+this.statsline(enemys[i],s.combat.actor==enemys[i]);
     } else {
-      elmt += "<td></td><td></td><td></td><td></td><td></td><td></td>";
+      elmt += "<td></td><td></td><td></td><td></td><td></td>";
     }
     elmt += "</tr><tr>";
     if(i<players.length){ //effects as additional row
       elmt += "<td></td><td colspan='3' style=\"font-size:smaller\">"+players[i].Stance.id+" "+window.gm.Encounter.printCombatEffects(players[i])+"</td>";
     } else {
-      elmt += "<td></td><td></td><td></td><td></td><td></td>";
+      elmt += "<td></td><td></td><td></td><td></td>";
     }
     if(i<enemys.length){
       elmt += "<td></td><td></td><td colspan='3' style=\"font-size:smaller\">"+enemys[i].Stance.id+" "+window.gm.Encounter.printCombatEffects(enemys[i])+"</td>";
     } else {
-      elmt += "<td></td><td></td><td></td><td></td><td></td><td></td>";
+      elmt += "<td></td><td></td><td></td><td></td><td></td>";
     }
     elmt += "</tr>";
   }
@@ -387,7 +387,7 @@ endCombat(){
 //remove combateffects
   var list = s.combat.enemyParty.concat(s.combat.playerParty);
   for(var k=0; k<list.length;k++){
-    k.changeStance(new StanceStanding()); //TODO no restore?
+    list[k].changeStance(new StanceStanding()); //TODO no restore?
     var effects = list[k].Effects.getAllIds();
     for(var i=0; i<effects.length; i++){
       var effect = list[k].Effects.get(effects[i]);
@@ -587,10 +587,10 @@ selectMove(){
     return(result);
   } else {
     if(s.combat.actor.isAIenabled && s.combat.actor.calcCombatMove){ //selected by AI
-      result = s.combat.actor.calcCombatMove(this.targetFilterAlive(window.story.state.combat.playerParty),
-        this.targetFilterAlive(window.story.state.combat.enemyParty));
-      window.story.state.combat.action=result.action;
-      window.story.state.combat.target=result.target;
+      result = s.combat.actor.calcCombatMove(this.targetFilterAlive(s.combat.playerParty),
+        this.targetFilterAlive(s.combat.enemyParty));
+      s.combat.action=result.action;
+      s.combat.target=result.target;
       this.next=this.execMove; 
       //this.msg=result.msg,
       result.OK=false;
@@ -687,6 +687,11 @@ window.gm.combat.calcEvasion=function(attacker,target, attack){
   var result = {OK:true,msg:''}
   var rnd = _.random(0,100);
 
+  if(target.Effects.findItemSlot(effProtect.name)>=0 ){
+    result.OK = false; 
+    result.msg = target.name+' is protected by some magic. '
+    return(result);
+  }
   if(target.Effects.findItemSlot(effStunned.name)>=0 && rnd>50){ //todo chance to miss 
     //a stunned target cannot dodge
     result.OK = true; 

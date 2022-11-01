@@ -1178,6 +1178,34 @@ class effGuard extends CombatEffect {
         this.parent.parent.Stats.removeModifier('rst_pierce',{id:'rst_pierce:Guard'});
     }
 }
+class effProtect extends CombatEffect {
+    static factory(duration){  //TODO what to protect for, how much?
+        let x = new effProtect();
+        x.data.duration = duration;
+        return x;
+    }
+    constructor(){
+        super();
+        this.data.id = this.data.name= effProtect.name, this.data.duration = 0, this.data.hidden=0;
+    }
+    toJSON(){return window.storage.Generic_toJSON("effProtect", this); };
+    static fromJSON(value){ return window.storage.Generic_fromJSON(effProtect, value.data);};
+    get desc(){return(effProtect.name);}
+    onApply(){  //effect is handled in combat-sm
+        this.data.duration = 2;
+    }
+    merge(neweffect){
+        if(neweffect.name===this.data.name){
+            return(true);
+        }
+    }
+    onTurnStart(){
+        this.data.duration-=1;
+        if(this.data.duration<=0) this.parent.removeItem(this.data.id);
+        return({OK:true,msg:''});
+    }
+    onRemove(){    }
+}
 class effChangeStance extends CombatEffect {
     static factory(newStanceID){
         let x = new effChangeStance();
@@ -1712,14 +1740,23 @@ class effTransformSelf extends CombatEffect {
         else this.data.item=[items];
     }
 }
-class effKamikaze extends CombatEffect { //if <10%health kill yourslef and damage all enemys
+class effKamikaze extends CombatEffect { //kill yourslef and damage all enemys
+    static factory(style,duration=2){
+        let eff = new effKamikaze();
+        eff.data.duration=duration, eff.style=style;
+        return(eff);
+    }
     constructor(){
         super();
-        this.data.id = this.data.name= effKamikaze.name, this.data.duration = 0;
+        this.data.id = this.data.name= effKamikaze.name, this.data.duration = 0, this.style=0;
     }
     toJSON(){return window.storage.Generic_toJSON("effKamikaze", this); };
     static fromJSON(value){ return window.storage.Generic_fromJSON(effKamikaze, value.data);};
     get desc(){return(effKamikaze.name);}
+    set style(style){
+        this._style = style;
+    }
+    get style(){return this._style;}
     onApply(){    }
     merge(neweffect){
         if(neweffect.name===this.data.name){    //ignore
@@ -1727,17 +1764,21 @@ class effKamikaze extends CombatEffect { //if <10%health kill yourslef and damag
         }
     }
     onTurnStart(){
-        let result ={OK:true,msg:''};
-        let h = this.parent.parent.Stats.get('health').value, hmax= this.parent.parent.Stats.get('healthMax').value;
-        if(h/hmax<0.5){ //if health is low trigger effect and kill yourself
-            let targets= window.story.state.combat.playerParty; //todo +enemyParty?
+        let result ={OK:true,msg:''},s=window.story.state;
+        this.data.duration-=1;
+        if(this.data.duration<=0){
+            let targets= s.combat.playerParty.concat(s.combat.enemyParty)
             for(let n of targets){
-                n.addEffect(effDamage.factory(10,'slash'));
+                n.addEffect(effDamage.factory(10,'slash')); //TODO dmg = ?
             }
             this.parent.removeItem(this.data.id);
-            this.parent.parent.Stats.increment("health",h*-1);
+            this.parent.parent.Stats.increment("health",-1*h-1);
             result.msg= this.parent.parent.name+' decides to explode in a fiery mess. ';
         }
+        /*let h = this.parent.parent.Stats.get('health').value, hmax= this.parent.parent.Stats.get('healthMax').value;
+        if(h/hmax<0.5){ //if health is low trigger effect and kill yourself
+            
+        }*/
         return(result);
     }
     configureSpawn(item,faction,amount=1){
@@ -1809,6 +1850,7 @@ window.gm.StatsLib = (function (StatsLib){
     window.storage.registerConstructor(effStunned);
     window.storage.registerConstructor(effTransformSelf);
     window.storage.registerConstructor(effGuard);
+    window.storage.registerConstructor(effProtect);
     window.storage.registerConstructor(effHeal);
     window.storage.registerConstructor(effMasochist);
     window.storage.registerConstructor(effEnergyDrain);

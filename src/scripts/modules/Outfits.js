@@ -259,6 +259,7 @@ class Gag extends Equipment {
         if(style===0) this.id=this.name='FaceWrap',this.lewd.sm = 0;
         else if(style===10) this.id=this.name='LeatherMuzzle',this.lewd.sm = 3;
         else if(style===20) this.id=this.name='BallGag',this.lewd.sm = 3;
+        else if(style===30) this.id=this.name='GasMask',this.lewd.sm = 3;   //TODO effAirFilter
         else throw new Error(this.id +' doesnt know '+style);
     }
     get style(){return this._style;}
@@ -269,6 +270,8 @@ class Gag extends Equipment {
                 msg=('A adjustable muzzle fitting for a dog. ');break;
             case 20:
                 msg=('A red ball of rubber to be fixed with leatherstraps.');break;
+            case 30:
+                msg=('A a mask made of rubber with a airfilter. The filter makes breathing difficult but should help against some (but not all) harmful air pollutions.');break;
             default:
         }
         return(msg);
@@ -786,7 +789,7 @@ class WhipLeather extends Weapon {
     static fromJSON(value){return(window.storage.Generic_fromJSON(WhipLeather, value.data));}
     attackMod(target){
         let mod = new SkillMod();mod.msg="with a whiplash"
-        mod.onHit = [{ target:target, eff: [effDamage.factory(5,'slash')]}];
+        mod.onHit = [{ target:target, eff: [effDamage.factory(5,'slash'),effMasochist.factory(1)]}];
         mod.critChance=5;
         mod.onCrit = [{ target:target, eff: [effDamage.factory(10,'slash'),effMasochist.factory(1)]}];
         return(mod);

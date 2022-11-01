@@ -915,6 +915,37 @@ class SkillGuard extends Skill { //todo guard improves defense and evade for som
         return result
     }
 }
+class SkillProtect extends Skill { //todo target will be protected by caster
+    static factory(style){
+        let obj =  new SkillProtect();
+        obj.style=style;
+        return(obj);
+    }
+    constructor(){ super("Protect"); this.style=0;}
+    toJSON(){return window.storage.Generic_toJSON("SkillProtect", this); }
+    static fromJSON(value){return(window.storage.Generic_fromJSON(SkillProtect, value.data));}
+    targetFilter(targets){
+        let _target=this.targetFilterNotSelf(this.targetFilterAlly(targets));
+        _target=this.targetFilterEffect(_target,[[{id:'effProtect'}]],true); 
+        return(_target);
+    }
+    set style(style){ //skilllevel
+        this._style = style;
+        //this.id=this.name="Guard Lv"+style;
+    }
+    get style(){return this._style;}
+    get desc(){ return("Lv"+this.style+": Protect someone with your own live.");}  
+    previewCast(targets){
+        var result = new SkillResult()
+        result.skill =this;result.source = this.caster; result.targets = targets;
+        result.OK = true;
+        for(var target of targets){
+            result.effects.push( {target:target,
+                eff:[effProtect.factory(this.style+1)]});
+        }
+        return result
+    }
+}
 //cast light to repell dark
 class SkillFairyLight extends Skill { 
     constructor(){ super("FairyLight"); this.style=0;this.cost.will =15;}
@@ -1017,8 +1048,9 @@ class SkillCallHelp extends Skill {
     static factory(item,cooldown=3){
         let sk = new SkillCallHelp();
         sk.item = item,sk.id+=item,sk.name+=' '+item;
+        sk.defCoolDown=cooldown;
         sk.cost.will =25; 
-        //todo delay and cooldown
+        //todo delay,cost and cooldown
         return(sk);
     }
     constructor(){
@@ -1039,7 +1071,7 @@ class SkillCallHelp extends Skill {
                 result.effects.push( {target:target,eff:[eff]});
             }
         }
-        return result
+        return result;
     }
     getCastDescription(result){
         return(this.parent.parent.name+" calls some "+this.item+" as reinforcement.");
@@ -1095,6 +1127,7 @@ window.gm.SkillsLib = (function (Lib){
     window.storage.registerConstructor(SkillKick);
     window.storage.registerConstructor(SkillLeechHealth);
     window.storage.registerConstructor(SkillPoisonCloud);
+    window.storage.registerConstructor(SkillProtect)
     window.storage.registerConstructor(SkillShoot);
     window.storage.registerConstructor(SkillSlobber);
     window.storage.registerConstructor(SkillStrongHit);

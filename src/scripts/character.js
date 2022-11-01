@@ -190,8 +190,9 @@ class Character {
         stance._parent = window.gm.util.refToParent(this);
         res = stance.transitFrom(_old);
         this.Stance=stance;
-        if(_old) _old._parent=null;
-        window.gm.printSfx('',res.msg); //combat display
+        if(_old) { _old._parent=null;
+            window.gm.printSfx('',res.msg); //combat display but only if not spawning
+        }
     }
     updateStance(){ //TODO if poise is below stance-requirement
         let _new=this.Stance.checkStance();

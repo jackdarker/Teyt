@@ -175,17 +175,48 @@ cast(target){ //execute the skill on the targets
 }
 
 //some predefined filter; chain them to narrow down the targets
+// target = [[enemy#1], [you,me]]
 targetFilterSelf(targets){
         var possibleTarget = [];
         for(var target of targets){
             var valid = true;
             for(var targ of target){
-                if(this.caster != targ) valid=false;
+                if(this.caster !== targ) valid=false;
             }
             if(valid) possibleTarget.push(target);           
         }
         return possibleTarget;
 }
+targetFilterNotSelf(targets){ //all exclude self
+    var possibleTarget = [];
+    for(var target of targets){
+        var valid = true;
+        for(var targ of target){
+            if(this.caster === targ) valid=false;
+        }
+        if(valid) possibleTarget.push(target);           
+    }
+    return possibleTarget;
+}
+targetFilterEffect(targets,effects,Not=false){ //those with any one effect; effects= [[{id:'effBleed'}],[{id:'effStunned'},{id:'effFrozen'}]]
+    var possibleTarget = [];
+    if(effects.length===0) return(possibleTarget);
+    for(var target of targets){
+        var valid = true;
+        for(var targ of target){
+            for(var effs of effects) { 
+                var cnt=effs.length;
+                for(var eff of effs) {//TODO if empty ? 
+                    if(targ.Effects.countItem(eff.id)>0) cnt--;
+                }
+                if((cnt>0 && !Not)||(cnt<=0 && Not)) valid=false;
+            }
+        }
+        if(valid) possibleTarget.push(target);           
+    }
+    return possibleTarget;
+}
+
 targetFilterAlly(targets){ //includes self
         var possibleTarget = [];
         for(var target of targets){
