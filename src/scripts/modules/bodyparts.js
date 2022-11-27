@@ -532,8 +532,8 @@ class WeaponSlobber extends BodyPart {
     }
     attackMod(target){
         let mod = new SkillMod();
-        let _dmg =5;
-        if(this.data.style==='slime' ) _dmg+=5;
+        let _dmg =2;
+        if(this.data.style==='slime' ) _dmg+=2;
         mod.onHit = [{ target:target, eff: [effDamage.factory(_dmg,'acid',2, this.parent.parent.name+' slobbers '+target.name+' with '+this.data.style+'.' )]}];
         return(mod);
     }

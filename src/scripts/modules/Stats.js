@@ -1769,7 +1769,7 @@ class effKamikaze extends CombatEffect { //kill yourslef and damage all enemys
         if(this.data.duration<=0){
             let targets= s.combat.playerParty.concat(s.combat.enemyParty)
             for(let n of targets){
-                n.addEffect(effDamage.factory(10,'slash')); //TODO dmg = ?
+                n.addEffect(effDamage.factory(10,'slash')); //TODO dmg = ? should use calcAttack
             }
             this.parent.removeItem(this.data.id);
             this.parent.parent.Stats.increment("health",-1*h-1);

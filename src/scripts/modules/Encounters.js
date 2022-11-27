@@ -109,7 +109,7 @@ window.gm.encounters.succubus = function(params){
         return(mobs);});
     window.gm.Encounter.onSubmit =window.gm.Encounter.onDefeat = function(){
         window.story.state.tmp.args=[(function(){window.gm.sex.succubusOnPlayer({state:0, battleResult:'defeat'});})]
-        return('As you are defeated, the succubus steps up to you...</br>'+ window.gm.printPassageLink('Next','PostCombatPassage'));
+        return('</br>As you are defeated, the succubus steps up to you...</br>'+ window.gm.printPassageLink('Next','PostCombatPassage'));
     }
     if(!_params.noStart) window.gm.Encounter.initCombat();
 }

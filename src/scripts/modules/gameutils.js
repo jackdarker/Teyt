@@ -352,7 +352,7 @@ window.gm.respawn=function(conf={keepInventory:false}){
         msg+=n.item.name+', ';
       }
     }
-    if(msg.length>0) msg="You lost "+(msg.substr(0,msg.length-2));
+    if(msg.length>0) msg="</br>You lost "+(msg.substr(0,msg.length-2));
   }
   /*if(window.gm.quests.getMilestoneState("qDiedAgain").id===2){
     window.story.show('YouDiedOnce'); 

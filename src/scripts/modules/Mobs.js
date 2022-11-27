@@ -854,6 +854,11 @@ class Wisp extends Mob {
         if(type==='WispShield'){
             foe.baseName = foe.id = 'WispShield';
             foe.Skills.addItem(SkillProtect.factory(0));
+            foe.Stats.increment('rst_light',-20);
+            foe.Stats.increment('rst_spark',-20);
+            foe.Stats.increment('arm_slash',5);
+            foe.Stats.increment('arm_pierce',5);
+            foe.Stats.increment('arm_blunt',5);
         } 
         return foe;
     }
@@ -873,7 +878,7 @@ class Wisp extends Mob {
             if(_t.length<=0) return(super.calcCombatMove(enemys,friends));
             result.action = skn;
             result.target = _t[0];
-            result.msg =this.fconv(this.name + " will protect."+result.target[0].name+"</br>")+result.msg;
+            result.msg =/*this.fconv(this.name + " will protect."+result.target[0].name+"</br>")+*/ result.msg;
             return(result);
         } 
         return(super.calcCombatMove(enemys,friends));

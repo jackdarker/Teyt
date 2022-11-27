@@ -10,7 +10,7 @@
 It's impossible to say how long you have passed out and how you ended up here. </br>
 But at least you are alive and - mostly - unharmed.</br>
 <%=window.story.state.tmp.msg%>
-<a0 onclick= 'window.story.state.tmp.msg="",window.story.show("DngPC_G4")'>Next</a>
+</br><a0 onclick= 'window.story.state.tmp.msg="",window.story.show("DngPC_G4")'>Next</a>
 </article><article id="LogPanel"></article></section>
 <%=window.story.render("DngPC_Encounters")%>
 
