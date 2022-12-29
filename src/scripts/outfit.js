@@ -301,7 +301,7 @@ class Outfit { //extends Inventory{
         if(_idx.length>0) return(result); //already equipped
         let _item = item;
         _idx = _item.slotUse;
-        let _oldIDs = [];
+        let _oldIDs = [], _oldItem;
         let _oldSlots = [];
         //check if equipment is equipable
         result = item.canEquip(this);
@@ -324,12 +324,21 @@ class Outfit { //extends Inventory{
             return(result);
         }
         for(let m=0;m<_oldIDs.length;m++){
-            this.getItem(_oldIDs[m]).onUnequip(this);
+            this.removeItem(_oldIDs[m]);
+            /*_oldItem=this.getItem(_oldIDs[m]);
+            _oldItem.onUnequip(this);
+            this.parent.Inv.addItem(_oldItem);*/
         }
         for(let i=0; i<_oldSlots.length;i++){
             this.__clearSlot(_oldSlots[i]);
         }
-        for(let k=0; k<_idx.length;k++){
+        //if item is from wardrobe/Inventory, remove it there
+        if(item.parent && item.parent.removeItem){
+            item.parent.removeItem(item.id);
+            _item=window.gm.util.deepClone(item);
+        }
+        _item._parent = window.gm.util.refToParent(this);       //Todo currently we have 2 copies of equipment - 1 for wardrobe 1 for outfit otherwise this will not work
+        for(let k=0; k<_idx.length;k++){ //attach item to slots
             let _el = this.list[_idx[k]];
             if(!_el){
                 this.list[_idx[k]] = _el =  {id:'', item:null};
@@ -337,11 +346,6 @@ class Outfit { //extends Inventory{
             this.list[_idx[k]].id = _item.id;
             this.list[_idx[k]].item = _item;
         } 
-        //if item is from wardrobe/Inventory, remove it there
-        if(item.parent && item.parent.removeItem){
-            item.parent.removeItem(item.id);
-        }
-        _item._parent = window.gm.util.refToParent(this);       //Todo currently we have 2 copies of equipment - 1 for wardrobe 1 for outfit otherwise this will not work
         result=_item.onEquip(this);
         this.postItemChange(_item.name,"equipped",""/*result.msg*/);
         return(result);

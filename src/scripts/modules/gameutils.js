@@ -12,6 +12,7 @@ window.gm.initGame= function(forceReset,NGP=null){
   window.gm.images = imagesMaps(window.gm.images);
   window.gm.images = imagesEquip(window.gm.images);
   window.gm.images = imagesIcons(window.gm.images);
+  window.gm.images = imagesScene(window.gm.images);
   //if svg have no size set, they use whole space, use this to force them to fit into a box
   window.gm.images._sizeTo = function(_pic,width,height){ 
     var node = SVG(_pic);
@@ -47,13 +48,6 @@ window.gm.initGame= function(forceReset,NGP=null){
         wolfSubmit: 0,
         wolfVictory: 0
         }; 
-    }
-    
-    if (!window.gm.achievements||forceReset){  //outside of window.story !
-      window.gm.achievements= {
-        looseEnd: false //add your flags here
-      }
-      window.storage.loadAchivementsFromBrowser();
     }
     if (!s.mom||forceReset){
       s.mom = {
@@ -103,9 +97,14 @@ window.gm.initGame= function(forceReset,NGP=null){
       ch.Outfit.addItem(new BaseHumanoid());
       ch.Outfit.addItem(new SkinHuman());
       ch.Outfit.addItem(new FaceHuman());
+      ch.Outfit.addItem(HeadHairHuman.factory('smooth'));
       ch.Outfit.addItem(HandsHuman.factory('human'));
       ch.Outfit.addItem(AnusHuman.factory('human'));
       ch.Outfit.addItem(PenisHuman.factory('human'));
+      ch.Outfit.addItem(new Briefs());
+      ch.Outfit.addItem(window.gm.ItemsLib.ShortsDenim());
+      ch.Outfit.addItem(new Sneakers());
+      ch.Outfit.addItem(new TankShirt());
       if(s._gm.debug){
         ch.Skills.addItem(new SkillInspect());
         ch.Skills.addItem(new SkillUltraKill());
@@ -116,6 +115,7 @@ window.gm.initGame= function(forceReset,NGP=null){
         ch.Skills.addItem(new SkillTease());
         ch.Skills.addItem(new SkillSubmit());
       }
+      //ch.Effects.addItem(effMutator.factory("")); //Mutationlogic
       s.PlayerVR=ch;
     }
     if (!s.PlayerRL||forceReset){  
@@ -123,7 +123,7 @@ window.gm.initGame= function(forceReset,NGP=null){
         ch.id="PlayerRL";
         ch.name="Andrew";
         ch.faction="Player";
-        ch.Effects.addItem(new skCooking());
+        //ch.Effects.addItem(new skCooking());
         //add some basic inventory
         ch.Inv.addItem(new Money(),20);
         ch.Inv.addItem(new LighterDad());
@@ -161,8 +161,7 @@ window.gm.initGame= function(forceReset,NGP=null){
     //take over flags for newgameplus
     if(NGP){ window.story.state.vars.crowBarLeft = NGP.crowBarLeft; }
     NGP=null; //release memory
-}
-
+};
 //this initialises game-objects that are not class-based
 window.gm.initGameFlags = function(forceReset,NGP=null){
   let s= window.story.state,map,data;
@@ -220,21 +219,21 @@ window.gm.initGameFlags = function(forceReset,NGP=null){
   s.DngLB=window.gm.util.mergePlainObject(DngLB,s.DngLB);
   s.DngPC=window.gm.util.mergePlainObject(DngPC,s.DngPC);
   //todo cleanout obsolete data ( filtering those not defined in template) 
-}
+};
 // update non-class-objects of previous savegame
 let _origRebuildObjects = window.gm.rebuildObjects;
 window.gm.rebuildObjects= function(){ 
   var s = window.story.state;
   _origRebuildObjects();
   window.gm.initGameFlags(false,null);
-}
+};
 // lookup function for sidebar icon
 window.gm.getSidebarPic = function(){ //todo display doll ??
   if(window.story.state.vars.inVR){
     return("assets/icons/icon_swordspade.svg");
   }
   return('assets/icons/icon_cityskyline.svg');
-}
+};
 // lookup function for scene background ( 640x300 )
 window.gm.getScenePic = function(id){
   let x='',y;
@@ -260,7 +259,7 @@ window.gm.getScenePic = function(id){
     return('assets/bg/bg_cave_2.png');
   }
   return('assets/bg_park.png')//return('assets/bg/bg_VR_1.png');//todo placehodler
-}
+};
 window.gm.enterVR=function(){
   let s= window.story.state;
   if(s.vars.inVR) return;
@@ -273,7 +272,7 @@ window.gm.enterVR=function(){
   s._gm.time = s._gm.timeVR,s._gm.day = s._gm.dayVR;
   window.gm.addTime(0);
   window.gm.respawn({keepInventory:true});
-}
+};
 window.gm.leaveVR=function(){
   //todo update effects in VR but stop RL effects
   let s= window.story.state;
@@ -287,7 +286,7 @@ window.gm.leaveVR=function(){
   s._gm.time = s._gm.timeRL,s._gm.day = s._gm.dayRL;
   window.gm.addTime(60);
   //todo copy fetish-stats back to RLPlayer ?
-}
+};
 window.gm.fightArena=function(enc,params,prize,next){
   window.gm.encounters[enc](params);
   window.gm.Encounter.onVictory = function(){
@@ -296,11 +295,11 @@ window.gm.fightArena=function(enc,params,prize,next){
         window.gm.printPassageLink('Next',next));
     }
   window.gm.Encounter.onFlee = (function(){return('After your retreat you find your way back to start-position.</br>'+ window.gm.printLink('Next','window.gm.postDefeat()'));});
-}
+};
 window.gm.cursedChest=function(next){
   let rnd = _.random(0,100); //this is rolling the dice, then call Loot-paasage !
   window.story.state.tmp.args=[window.passage.name,rnd,next];
-}
+};
 //call this after onVictory/onFlee-scene to continue in dng or other location
 //this function is also used to restore after loading save !
 window.gm.postVictory=function(params){
@@ -314,12 +313,12 @@ window.gm.postVictory=function(params){
   } else {
     window.story.show(window.gm.player.location);//history disabled ! window.story.history[window.story.history.length - 1], true);   
   }
-}
+};
 //call this after your onDefeat/onSubmit-scene to respawn at respawn-point; cleansup dng-variables
 window.gm.postDefeat=function(){ 
   window.story.state.dng.id="";window.gm.dng = null;
   window.gm.respawn();
-}
+};
 //after passing out: heal player and remove inventory {keepInventory=false,location=''}
 window.gm.respawn=function(conf={keepInventory:false}){
   for(var name of window.story.state._gm.playerParty){
@@ -373,7 +372,7 @@ window.gm.respawn=function(conf={keepInventory:false}){
     }
     if(window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib.LHand)===null){
       let staff = new window.storage.constructors['StaffWodden']();
-      window.gm.player.Inv.addItem(staff);
+      //window.gm.player.Inv.addItem(staff);
       window.gm.player.Outfit.addItem(staff);
     }
     window.story.state.tmp.msg=msg; //msg for display
@@ -818,4 +817,4 @@ window.gm.util.lookupWord = function(word,pron,whom){
     
   }
   return(output);
-}
+};

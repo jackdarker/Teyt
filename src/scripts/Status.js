@@ -58,6 +58,15 @@
         if(_x>=0) _oldMods.splice(_x,1);
         window.gm.pushLog(_stat.Calc().msg);
     }
+    getModifier(toId,modId){
+        let modData=null,_stat = this.get(toId);
+        let _oldMods = _stat.data.modifier;
+        let _x=-1;
+        for(let i=0;i<_oldMods.length;i++){
+            if(_oldMods[i].id===modId) modData=_oldMods[i];
+        }
+        return(modData);
+    }
     //override
     postItemChange(id,operation,msg){
         window.gm.pushLog('Stats: '+operation+' '+id+' '+msg);

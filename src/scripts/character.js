@@ -37,8 +37,7 @@ class Character {
         this.Rel._parent = window.gm.util.refToParent(this);
         this.Skills = new Inventory(this._data.skills);
         this.Skills._parent = window.gm.util.refToParent(this);
-        this.changeStance(new StanceStanding());
-        //create basic stats
+        this.changeStance(new window.gm.StanceLib.StanceStanding()); //create basic statsStanceStand
         stHealth.setup(this.Stats,10,10),stEnergy.setup(this.Stats,30,30),stWill.setup(this.Stats,0,0),stPoise.setup(this.Stats,50,50);
         stSatiation.setup(this.Stats,30,100);
         for(let n of window.gm.combat.TypesDamage){

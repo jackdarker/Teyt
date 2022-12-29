@@ -1,4 +1,3 @@
-
 "use strict";
 //used for pathfinding in map not using dungeon
 //grid = grid =[{room:'H2', dirs:['H3','I2']},...]

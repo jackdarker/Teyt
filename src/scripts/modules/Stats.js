@@ -1788,15 +1788,62 @@ class effKamikaze extends CombatEffect { //kill yourslef and damage all enemys
 //todo transformSelf: replace the caster with a different class & regenerate energy  
 //restricted: stuck in cobwebs, goo
 //skills
-class skCooking extends Effect {
-    constructor(){
-        super();
-        this.data.id = this.data.name= skCooking.name;
+//////////////--   abilities   --///////////////////////
+// an ability (cooking, climbing) is a stat ? always present, represented by number, can be modified by effects
+// or an effect ? might not be present, has a cooldown
+class Ability extends Stat { //double check if ability is present !
+    static setup(context, base,kind){   
+        let _stat = new Ability();
+        let _n = _stat.data;
+        _n.id="sk_"+kind,_n.base=base, _n.value=base,_n.limits=[{max:1000,min:-1000}];
+        context.addItem(_stat);
+        _stat.Calc();
     }
-    toJSON(){return window.storage.Generic_toJSON("skCooking", this); };
-    static fromJSON(value){ return window.storage.Generic_fromJSON(skCooking, value.data);};
-
-    get desc(){return(skCooking.name);}
+    static info(id) {return(id);}
+    constructor(){   super();  }
+    toJSON(){return window.storage.Generic_toJSON("Ability", this); };
+    static fromJSON(value){ return window.storage.Generic_fromJSON(Ability, value.data);};
+    get desc() {
+        let msg="";
+        switch(id){
+            case "sk_Cooking":
+                msg="You know how to cook a tasty meal. Improving this skill increases your chance to get extra-meals and allows to cook more difficult meals."
+                break;
+            case "sk_Diving":
+                msg="You are more comfortable to dive in deep water. You might still require the proper tools like diver googles and scuba gear."
+                break;
+            case "sk_Swimming":
+                msg="You are confident in your ability to swim larger distance. Big waves and dangerous currents are still a threat. You require less energy with each rank."
+                break;
+            case "sk_Climbing":
+                msg="Beeing able to climb rocks and walls, as long as they are not to smooth. You might still require the proper tools like rope and pick."
+                break;
+            case "sk_Fishing":
+                msg="Finding got spots for fishing and making use of net and fishing rod to catch them."
+                break;
+            case "sk_Herbalist": //Funguist/Insectoist
+                msg="Its easier to you to identify all kind of plants. Increases chances to find more rare plants or to give extra resources."
+                break;
+            case "sk_Looter": //Scrapper
+                msg="Increases chance to find lootable containers or loot."
+                break;
+            case "sk_Scrapper":
+                msg="Salvaging more craftmaterials from breaking down things."
+                break;
+            case "sk_WoodWorker": //SteelWorker, StoneWorker
+                msg="Creating useful things from wood like tools and furniture is your speciality."
+                break;
+            case "sk_Stitching":
+                msg="Fixing cloths or creating new one is possible for you."
+                break;
+            default:
+                throw new Error(this.id +' is unknown');
+        }
+        return(msg);
+    }
+    get name() {
+        return(this.data.id);
+    }
 }
 /*skAlchemist
  * Lv1 - can create potions from 1 ingredient
@@ -1870,7 +1917,8 @@ window.gm.StatsLib = (function (StatsLib){
     window.storage.registerConstructor(effButtPlugged);
     window.storage.registerConstructor(effVaginalFertil);
     window.storage.registerConstructor(effVaginalPregnant);
-    //
-    window.storage.registerConstructor(skCooking);
+    //non-combat skills
+    window.storage.registerConstructor(Ability);
+    StatsLib.Ability=Ability;
     return(StatsLib); 
 }(window.gm.StatsLib || {}));
