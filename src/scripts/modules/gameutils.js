@@ -168,7 +168,7 @@ window.gm.initGameFlags = function(forceReset,NGP=null){
   function dataPrototype(){return({visitedTiles:[],mapReveal:[],tmp:{},version:0});}
   if (forceReset){  
     s.Settings=s.DngCV=s.DngDF=s.DngAM=s.DngSY=s.DngMN=s.DngAT=null; 
-    s.DngFM=s.DngSC=s.DngLB=s.DngHC=s.DngPC=null;
+    s.DngFM=s.DngSC=s.DngLB=s.DngHC=s.DngPC=s.DngLT=null;
     s.Know = {}
   }
   let Know = {};
@@ -183,6 +183,9 @@ window.gm.initGameFlags = function(forceReset,NGP=null){
       dngOW: false, //if this flag is set while in dng, player is here for some freeplay (no quest)  
       dildo:0, //1 small oraltraining,
       pussy:0,
+      //for Latec
+      qBabble:0,
+      //////////////////////////
       visitedTiles: [],mapReveal: [],
       dng:'', //current dungeon name
       prevLocation:'', nextLocation:'', //used for nav-logic
@@ -199,6 +202,11 @@ window.gm.initGameFlags = function(forceReset,NGP=null){
   if(s.DngPC){ //update if exist
     ({map,data}=window.gm.build_DngPC());
     s.DngPC=window.gm.util.mergePlainObject(DngPC,s.DngPC);
+  }
+  let DngLT = dataPrototype();
+  if(s.DngLT){ //update if exist
+    ({map,data}=window.gm.build_DngLT());
+    s.DngLT=window.gm.util.mergePlainObject(DngLT,s.DngLT);
   }
   let DngLB = dataPrototype();
   let DngSC = dataPrototype();
@@ -218,6 +226,7 @@ window.gm.initGameFlags = function(forceReset,NGP=null){
   s.DngHC=window.gm.util.mergePlainObject(DngHC,s.DngHC);
   s.DngLB=window.gm.util.mergePlainObject(DngLB,s.DngLB);
   s.DngPC=window.gm.util.mergePlainObject(DngPC,s.DngPC);
+  s.DngLT=window.gm.util.mergePlainObject(DngLT,s.DngLT);
   //todo cleanout obsolete data ( filtering those not defined in template) 
 };
 // update non-class-objects of previous savegame

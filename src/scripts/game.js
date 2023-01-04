@@ -412,8 +412,8 @@ window.gm.addTime= function(min){
     window.story.state._gm.day += 1;
   }
   window.gm.timeEvent.publish("change",min);
-  window.gm.player.Effects.updateTime(); //todo not happy with that; see PubSub-comment
-  window.gm.player.Outfit.updateTime();
+  if(window.gm.player.Effects) window.gm.player.Effects.updateTime(); //todo not happy with that; see PubSub-comment
+  if(window.gm.player.Outfit) window.gm.player.Outfit.updateTime();
   // updating all existing chars might not be wise (some could be dead)
   // but what if I have to update other chars too?
   //

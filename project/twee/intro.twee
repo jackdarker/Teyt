@@ -76,8 +76,24 @@ Those are very present through the game and in the main-story (also check the se
 }
 </script>
 
-
 :: Intro
+<article><%window.gm.initGame();window.gm.player.location=window.passage.name;%>
+<p class='author'>Note that there is no back-button implemented. Pressing the back button of your browser will get your game aborted.</br>
+You might see a lot of links that are formated red-strikethrough. Those are currently broken and you shouldnt use them.</p>
+<p class='author'>Loading of savegame is only possible in game. Saving might be disabled in some locations.</p>
+<p class='author'>[[Fetishes ! (spoiler alert)|List_Fetish]]</p></br></br><hr>
+<p>Finding yourself in a futuristic bunker, you need to make your escape... </br></p>
+<p><a0 onclick='start();'>Escape from the pod...</a></p><hr>
+</article>
+<script> function start(){
+    window.story.state.DngSY.remainingNights=0,window.story.state.DngSY.dngLevel=0;
+    window.story.state.vars.spawnAt="DngLT_Entry";
+    window.gm.enterVR();
+    window.gm.player.levelUp(5);window.gm.player.autoLeveling();
+    window.gm.player.Outfit.removeItem("StaffWodden");
+}
+
+:: Intro_SY
 <article><%window.gm.initGame();window.gm.player.location=window.passage.name;%>
 <p class='author'>Note that there is no back-button implemented. Pressing the back button of your browser will get your game aborted.</br>
 You might see a lot of links that are formated red-strikethrough. Those are currently broken and you shouldnt use them.</p>
