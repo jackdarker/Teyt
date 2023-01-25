@@ -90,7 +90,7 @@ You might see a lot of links that are formated red-strikethrough. Those are curr
     window.story.state.vars.spawnAt="DngLT_Entry";
     window.gm.enterVR();
     window.gm.player.levelUp(5);window.gm.player.autoLeveling();
-    window.gm.player.Outfit.removeItem("StaffWodden");
+    window.gm.player.Outfit.removeItem("StaffWodden");window.gm.player.Inv.removeItem("StaffWodden");
 }
 
 :: Intro_SY

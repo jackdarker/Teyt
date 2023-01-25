@@ -78,27 +78,35 @@ window.gm.navEvent = function(to,from){
     let doors=window.story.state[dng].tmp.doors[_from],doors2=window.story.state[dng].tmp.doors[_to];
     if(doors) {
         evt = doors[_to];
-    } 
-    if(doors2) {
+    } else if(doors2) {
         evt = doors2[_from];
     }
     if(evt){
-        if(evt.state===0) _targ=dng+"_Door_Closed";
+        if(evt.state===0) {
+            _targ=dng+"_"+from+to;//"_Door_Closed";
+            if(window.story.passage(_targ)===null) _targ=dng+"_"+to+from;
+        }
         if(_targ!=='') return(_targ);
     }
-    //////
+    //////enter
     evts = window.story.state[dng].tmp.evtEnter[_room];
-    if(evts){ //mobs
+    if(evts){
         evt = evts["dog"];
         if(evt){
             if(evt.state===0) _targ=dng+"_Meet_Dog";
+            if(_targ!=='') return(_targ);
+        }
+        evt = evts["sbot"];
+        if(evt){//&& window.gm.getDeltaTime(_now,evt.tick)>400){
+            if(evt.state===0) evt.tick=_now,_targ=dng+"_Spider",window.story.state.tmp.args=[evt,dng+'_'+_from,dng+'_'+_to];
             if(_targ!=='') return(_targ);
         }
         evt = evts["gas"];
         if(evt && _rnd>70 && window.gm.getDeltaTime(_now,evt.tick)>400){//todo chance modifier
             if(evt.state===0) evt.tick=_now,_targ=dng+"_Trap_Gas";
             if(_targ!=='') return(_targ);
-        }evt = evts["tentacle"];
+        }
+        evt = evts["tentacle"];
         if(evt && _rnd>0 && window.gm.getDeltaTime(_now,evt.tick)>400){//todo chance modifier
             if(evt.state===0) evt.tick=_now,_targ=dng+"_Trap_Tentacle";
             if(_targ!=='') return(_targ);
@@ -296,6 +304,14 @@ window.gm.know = function(what){
         window.story.state.Know[what]=1;
     }
 }
+//overrides for Latec
+window.gm.printBodyDescription = function() {
+    let msg="",v=window.story.state.vars;
+    msg = "You have short brown hair.</br>";
+    if(v.qBabble===1){ msg+= "A datapad is in your possession."; }
+    if(v.qBabble===2){msg+= "The babble companion is talking by an in-ear speaker to you.";}
+    return msg+"</br>"
+}
 //build the map and other data; if the dng is already initilized and has the correct version, the actual data is returned
 window.gm.build_DngPC=function(){
     const _m=[
@@ -439,7 +455,7 @@ window.gm.build_DngLT=function(){
     function _d(dir){return({dir:dir,exp:0});}
     let grid =[
     {room:'D2', dirs:[_d('E2')]},
-    {room:'E2', dirs:[_d('F2')]},
+    {room:'E2', dirs:[_d('D2'),_d('F2')]},
     {room:'F2', dirs:[_d('E2'),_d('F3')]},
     {room:'G2', dirs:[_d('H2')]},
     {room:'H2', dirs:[_d('I2'),_d('H3')]},
@@ -456,10 +472,10 @@ window.gm.build_DngLT=function(){
     {room:'J3', dirs:[_d('J2')]},
     {room:'K3', dirs:[_d('K2'),_d('K4')]},
     {room:'L3', dirs:[_d('L2')]},
-    {room:'D4', dirs:[_d('E4')]},
-    {room:'E4', dirs:[_d('F4'),_d('D4')]},
-    {room:'F4', dirs:[_d('G4'),_d('F5')]},
-    {room:'G4', dirs:[_d('F4'),_d('H4'),_d('G5')]    ,anno:['S']},
+    {room:'D4', dirs:[_d('E4')]                 ,anno:['S']},
+    {room:'E4', dirs:[_d('F4'),_d('D4'),_d('E5')]},
+    {room:'F4', dirs:[_d('G4'),_d('E4')]},
+    {room:'G4', dirs:[_d('G3'),_d('F4'),_d('H4'),_d('G5')]},
     {room:'H4', dirs:[_d('G4'),_d('I4')]},
     {room:'I4', dirs:[_d('I3'),_d('H4'),_d('J4')]},
     {room:'J4', dirs:[_d('I4'),_d('J5'),_d('K4')]    ,anno:['B']},      
@@ -490,17 +506,26 @@ window.gm.build_DngLT=function(){
         data=s.DngLT;
     } else {
         data=s.DngLT,data.version=version;
-        data.tmp={tickPass:'', tier:0};
+        data.tmp={tickPass:'', tier:0
+            ,passFail:0
+            ,powerLevel:0
+            ,doorLock:0
+        };
         data.tmp.evtLeave = { //events on tile-leave
-            H4_I4: [{id:"Trap_Gas",type:'encounter',instance:"",tick:window.gm.getTime(),state:0,chance:100 }, //todo cannot assign chance-fct here
+            A1_I4: [{id:"Trap_Gas",type:'encounter',instance:"",tick:window.gm.getTime(),state:0,chance:100 }, //todo cannot assign chance-fct here
                 {id:"Box",type:'encounter',instance:"",tick:window.gm.getTime(),state:0,chance:100 },
                 {id:"Fungus",type:'encounter',instance:"",tick:window.gm.getTime(),state:0,chance:100 }],
             I4_H4: null
         }
         data.tmp.evtEnter = { //events on tile-enter
-            H4: {gas:{tick:window.gm.getTime(),state:0 }},
+             F4: {sbot:{tick:window.gm.getTime(),state:0 }}
+            ,H4: {gas:{tick:window.gm.getTime(),state:0 }}
         }
         data.tmp.doors = { //doors 2way
+            E4:{E5:{state:0 }},
+            G4:{G3:{state:0 },G5:{state:0 }},
+            H4:{I4:{state:0 }},
+            E5:{F5:{state:0 }},
         }
         data.tmp.evtSpawn = { //respawn evts 
         }
@@ -513,3 +538,15 @@ window.gm.build_DngLT=function(){
     }
     return({map:map,data:data});
 };
+
+window.gm.canOpenDoor=function(from,to) {
+    let s=window.story.state,res={OK:false,msg:''};
+    if(from==='E4' && to==='E5') {
+        if(s.DngSY.qKeyBlue!==0) { res.OK=true; 
+            s.DngLT.tmp.doors[from][to].state=1;
+            res.msg= "</br>With the blue keycard in your possesion, you can open the door.";
+        } else res.msg= "</br>There is a sl.";
+    }
+    return(res);
+};
+

@@ -587,7 +587,11 @@ window.story.__proto__.show = function(idOrName, noHistory = false){
   let tagsnext,namenext,nextp,namenow;
   clearInterval(KBIntervalID);
   if(idOrName==='') tagsnext=[];
-  else tagsnext = window.story.passage(idOrName).tags;
+  else {
+    nextp = window.story.passage(idOrName);
+    if(nextp) tagsnext = window.story.passage(idOrName).tags;
+    else throw new Error("no such passage: "+idOrName);
+  }
   if(inGame && window.story.state._gm.defferedStack.length>0 && //deffered event if allowed and requested
     //tagsnext.indexOf('_back_')<0 &&
     tagsnext.indexOf('_nosave_')<0 && tagsnext.indexOf('_nodeffered_')<0 ){ 
