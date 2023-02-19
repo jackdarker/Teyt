@@ -1,0 +1,236 @@
+:: DngLT_Meet_Dog [_nosave_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+There is some kind of robot shuffling around. </br>
+It looks like some of those robotic pet dogs you saw in a science show. It just looks a little bigger, around half a meter. And its movements are much more fluid and natural.</br></br>
+
+<%if(s.DngLT.tmp.qLatex===0){%>
+    Ignoring your presence it just continues its duty of patrolling the corridors. You hurry <a0 onclick='window.story.show(window.story.state.DngSY.nextLocation)'>onward</a>.    
+<%}else if(true){%>
+    As the robot notices you, it shows some kind of interest in you and trots over. </br>
+    <div id='select10' >
+    <a0 onclick='window.gm.printTalkLink("div#select10","div#choice10a")'>Push it away</a></br>
+    </div><div id='choice10a' hidden></br> That might have been an error as your behaviour earned you a growl. <a0 onclick='dogEncounter();'>You might have to defend yourself.</a>
+    </div> 
+<%}else if(true){%>
+    The apparatus seems not interested in you and you <a0 onclick='window.story.show(window.story.state.DngSY.nextLocation)'>might pass</a> or walk back where you <a0 onclick='window.story.show(window.story.state.DngSY.prevLocation)'>came from</a>.
+<%}else{%>
+    As you are in no position to start a quarrel, you just halt your movement as the mechanic creature checks up on you. </br>
+    <%if(true){%>
+        With your legs and arms bound you just keep your quaddrupped stance and wait what will happen. </br>
+        <a0 onclick='dogSex();'>Shiver in fear</a>
+    <%}else{%>
+
+    <%}%> 
+<%}%>
+You may try your luck and <a0 onclick='dogEncounter();'>walk further</a> in its direction but maybe its wise to  
+</article><article id="LogPanel"></article></section>
+<%=window.story.render("DngHC_Encounters")%>
+
+
+:: DngLT_Sleep
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+Get some rest on that bunk.</br>
+</br><div id='output'></div>
+</br><a0 onclick='window.story.show("DngLT_D4")'>Next</a></br>
+</article><article id="LogPanel"></article></section>
+
+:: DngLT_Trap_Dehair [_nosave_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+Scanner triggers and laser turret shots.</br> You just triggered a trap! </br>
+<div id='select10' hidden></div>
+<div id='choice10a' hidden></br>Your attempt to evade the ray failed. As your upper gets hit, you can feel the heat on your back. Checking on yourself after you have rolled into cover, you find your upper clothing beeing damaged.</br>
+The <%=("...")%> that covers your body now is <%=("slightly")%> damaged.
+</div>
+<div id='choice10b' hidden></br>Gladly, you could evade the ray and and escape unscathed.</br>
+</div>
+<div id='choice10c' hidden></br>Your upper clothing vanishs in a puff of smoke, leaving your chest exposed! </br>
+</div>
+<a0 onclick='_done=false,window.story.show(window.story.state.DngSY.prevLocation)'>retreat</a>.
+</article><article id="LogPanel"></article></section>
+<script>
+{var _triggered,_done,_item;
+    if(!_done){ _done=true;
+        _item=window.gm.player.Outfit.getItemForSlot("Breast");
+        if(_item){
+            _item.HP=_item.HP-25;
+            if(_item.HP<=0) {
+                window.gm.printTalkLink("div#select10","div#choice10c");
+            } else {
+                window.gm.printTalkLink("div#select10","div#choice10a");
+            }
+        } else {
+            window.gm.printTalkLink("div#select10","div#choice10b");
+        }
+    }
+}
+</script>
+
+:: InspectPlayer [_back_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+[[Back|_back_]]</br> Checking on yourself you find..</br>
+<div id='output'><%=window.gm.InspectSelf(window.gm.player,true)%><div>
+</br>[[Back|_back_]]</br>
+<!--todo: set height depending on browsersize-->
+<!--<div id='Canvas' style='height: 30em;background: url("assets/doll/doll_small_xcf-Skirt.png") no-repeat center,url("assets/doll/doll_small_xcf-Body.png") no-repeat center, url(<%=window.gm.getScenePic(window.gm.player.location)%>)no-repeat center;color:black;'></div>-->
+</article><article id="LogPanel"></article></section>
+
+
+:: DngLT_Spider [_nosave_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+<%if(true){%>
+    Hearing something clicking and clacking, you look around in the new room to find its source.</br>
+    Its caused by a small bot with spider like appearance. Its as big as 2 hands.
+    <p class="tPC">'Im just glad that this is not a real spider.</p> Even someone without explicit fear of spiders wouldnt like to handle something of that size.
+    As you try to sneak by, the bot whirls around - you have its attention.
+    <div id='select10' >
+    <a0 onclick='window.gm.printTalkLink("div#select10","div#choice10a"),window.story.show("DngLT_SpiderFight")'>Stomp it.</a></br>
+    <a0 onclick='window.gm.printTalkLink("div#select10","div#choice10b"),window.story.show(window.story.state.DngSY.nextLocation)'>Try to avoid it.</a></br>
+    </div><div id='choice10a' hidden></br>
+    </div>
+    <div id='choice10b' hidden></br>
+    </div>
+<%}else{%>
+    Another of those spider bots is busy here. Lets see what you can do about that.
+    </br><a0 onclick='window.story.show("DngLT_SpiderFight")'>Smash it</a>
+<%}%>
+</article><article id="LogPanel"></article></section>
+
+
+:: DngLT_F3_Screen
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+Your babble companion translates the symbols on the screen.
+<%if()%>
+<p class="tNPC1">"main power interrupted ; switchover to spare relais failed du to electrical failure in switchboard SS+02"</p>
+<p class="tPC">'Maybe there is a problem in one of those cabinets?'</p>
+<a0 onclick='window.story.show(window.story.state.DngSY.prevLocation)'>retreat</a>.
+</article><article id="LogPanel"></article></section>
+
+:: DngLT_E5_Switch [_nosave_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+With the help of your companion you decypher the display on the switch box.</br>
+<%if(window.story.state.DngLT.tmp.qPowRoute===0){%>
+<p class="tNPC1">"Constructor unit Cro-4E5D in maintenance mode. Reason: power conservation due to power failure."</p>
+Some options are listed, maybe you can activate the constructor.
+<div id='select10' >
+<a0 onclick='window.story.state.DngLT.tmp.qPowRoute=1;window.gm.printTalkLink("div#select10","div#choice10a")'>Disable maintenance mode</a></br>
+</div><div id='choice10a' hidden></br>
+    <p class="tNPC1">"Rerouting power to constructor. Warning: power level low. Switching to operation mode."</p>
+    Well that seems to work. But if its rerouting the power from somewhere, maybe other things are not working. At least until you find a way to fix the powersupply in general.
+
+</div>
+<%}else{%>
+    The display shows nothing.
+<%}%>
+
+<a0 onclick='window.story.show(window.gm.player.location)'>leave</a>.
+</article><article id="LogPanel"></article></section>
+
+
+:: DngLT_ChangeBooth [_nosave_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+Your AI-companion decyphers the symbols on the panel:
+<p>"Devices disabled for maintenance. Normal operation requires disabling of maintenance mode."</p>
+"There should be a maintenance terminal somewhere, just look around."
+The booth seems to be made from one piece of plastic. There are no panels to unscrew. But some thick wires seem to go into the wall, right next to that hatch.</br>
+----------
+<p>"Operational"</p>
+Seems the booth is working again.
+<a0 onclick='window.story.show("DngLT_ChangeBoothFitID")'>Inspect the booth</a>.
+<a0 onclick='window.story.show("DngLT_ChangeBoothShop")'>Step into the booth</a>.
+
+<a0 onclick='window.story.show(window.gm.player.location)'>leave</a>.
+</article><article id="LogPanel"></article></section>
+
+
+:: DngLT_ChangeBoothFitID [_nosave_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+The door of the booth swishes closed after you have stepped inside.
+"Scanning - please adjust position to markings" 
+
+"Warning: ID detection failed. Select how to proceede:"
+"a) terminate process"
+"b) reassign ID"
+
+"Please select an option for the reassigning process:"
+"a) temporary ID-token"
+"b) permanent ID-token"
+"Huh, whats the difference?"
+'Permanent somehow sounds -permanent. Better choose temporary.'
+
+"I choose the temporary token."
+As soon as you say that the robotical voice confirms with "request accepted". 
+"Um, do I need to stay in that position while I wait?"
+"Please attach your temporary ID-token to your neck." A hatch in front of you slides open and presents you a</br>
+...collar?
+Its made from shiny black material with a metalic clasp.
+<p class="tPC">"Oh no, thats not what I expected. Dont you have some badge with a neckband or clip?"</p>
+<p class="tNPC2">"Attach temporary ID-token to your neck."</p>
+<div id='select30' >
+<a0 onclick='window.gm.player.Outfit.addItem(new window.gm.ItemsLib["CollarID"]());window.gm.printTalkLink("div#select30","div#choice30a")'>Do as ordered</a></br>
+<a0 onclick='window.gm.player.Outfit.addItem(new window.gm.ItemsLib["CollarID"]());window.gm.printTalkLink("div#select30","div#choice30b")'>reject</a></br>
+</div><div id='choice30a' hidden></br>
+    "Dam it, thats tight." You fiddle around with your fingers to find the clasp and unlock this thing. But you cant find a clue how to do so.
+    "OK, no problem its only temporary whatever it means. Maybe I can cut it through with some knife."
+    <a0 onclick='window.story.show("DngLT_ChangeBooth")'>Next</a>.
+</div>
+<div id='choice30b' hidden></br>
+    <a0 onclick='window.story.show("DngLT_ChangeBooth")'>Next</a>.
+</div>
+
+</article><article id="LogPanel"></article></section>
+
+
+:: DngLT_ChangeBoothShop [_nosave_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+The door of the booth swishes closed after you have stepped inside.
+"Scanning - please adjust position to markings" 
+
+"Coat contamination detected"
+Get Latexitus removed. with coverall
+
+"Select option:"
+
+"Warning: construction material depleted. Please provide provisions."
+"I guess we will need to get some of those materials or I will end up running around naked."
+
+[[DngLT_ChangeBooth]]
+</article><article id="LogPanel"></article></section>
+
+
+:: PowerupIntro
+<p class="tPC">"That was awesome ! How did I do that?"</p>
+<p class="tNPC1">"Its in the technology of those attachements."</p>
+<p class="tNPC1">"Most of those are prototypes, so they might have a flaw or two. And they need lots of energy."</p>
+<p class="tPC">"So I have to carry lots of batteries with me?"</p>
+<p class="tNPC1">"Yes keep those batteries charged. Some of the gadgets also require sophiasted components to operate. Its called matter."</p>
+<p class="tPC">"What do you mean with matter?"</p>
+<p class="tNPC1">"They have developed different semi-organic materials with unique capabilitys. Only with those sophiasted components, all this tech can be created and maintained."</p>
+<p class="tNPC1">"This also means you can get some of the required matter from those drones."</p>
+<p class="tPC">"So I just need to scrap some of those metall guys to get the stuff."</p>
+<p class="tNPC1">"That I would not recommend. It could alert maintenance supervisors if they detect some uncommon loss of bots. But if you cut off a little bit here and there, it might go unnoticed."</p>
+<p class="tNPC1">"Lets see what kind of ways we can get by."</p>
+</br>
+
+
+:: MaintenanceIntro
+<p class="tNPC1">"Your augments got damaged and need to be repaired. There are service stations all around."</p>
+<p class="tPC">"Wont they recognize me as human?"</p>
+<p class="tNPC1">"Maybe. But they will just try to repair your broken mechanic. There could be a diiferent issue." </p>
+<p class="tNPC1">"Well, its sometimes cheaper to scrap a damaged machine and build it anew instead of trying to patch it up. So if your maintenance is expensive, it might cost you extra."</p>
+<p class="tPC">"But I have no money with me."</p>
+<p class="tNPC1">"Guess what, payment is done with matter. Matter is the new money."</p>
+<p class="tPC">"And if I dont have the matter?"</p>
+<p class="tNPC1">"If you are a \"good, helpful drone\", the repair-AI might give a maintenace for free. ;)"</p>
+<p class="tPC">"That wink was kinda unsettling. What do you mean with good and helpful?"</p>
+<p class="tNPC1">"I will explain later. Lets get going and get you fixed."</p>
+
+
+:: RepairDroneDestroyer
+"Hey, someone has repaired those controls."
+"Yes. May I remember you about those small bots all around. Its their job to fix things."
+"I cant be at multiple places at the same time. So how can we make stop them repairing it."
+"Multiple approaches possible:"
+"a) damage enough of those drones. But that might alert supervisors"
+"b) alter their work parameters. It might not be possible to make them stop repairing things completely. But if they get a bit lazzy no one should note immediatly."
+Destroyed bots regrow, so you have to act quickly. More fight-drids appear.
+Altering programm requires terminal access, requires security, requires restraints?

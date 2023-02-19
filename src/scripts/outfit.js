@@ -133,6 +133,12 @@ class Equipment extends Item {
         }
         return(fconv(msg));
     }
+    get HP() {return((this._HP)?this._HP:100.0);}
+    set HP(hp){ //add this line to style-setter if you want to use hp:  if(this._HP) this.HP=this._HP;
+        //todo if multiple items edited ??
+        this._HP=hp;
+        this._updateId();this.name=this.baseId+" "+hp.toString();
+    } 
     get desc(){ return(this.descShort+ this.bonusDesc());}
     bonusDesc(){
         let msg='';
@@ -227,6 +233,8 @@ class Outfit { //extends Inventory{
     }
     _relinkItems(){  //call this after loading save data to reparent
         for (let n of this.list){
+    Todo multiple slots may point to same item; load creates different items for each slot! we need to fix that here.
+    //Other option would be to save in a different way  listOfItems=[{item:itemx, slots:["Breast"]}]
             if(n.value.item){ 
                 n.value.item._relinkItems(this);
             }

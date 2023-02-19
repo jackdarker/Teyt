@@ -187,10 +187,6 @@ window.gm.initGameFlags = function(forceReset,NGP=null){
       dngOW: false, //if this flag is set while in dng, player is here for some freeplay (no quest)  
       dildo:0, //1 small oraltraining,
       pussy:0,
-      //for Latec
-      qBabble:0,
-      qKeyBlue:0,
-      qLatex:0,
       //////////////////////////
       visitedTiles: [],mapReveal: [],
       dng:'', //current dungeon name
@@ -210,6 +206,7 @@ window.gm.initGameFlags = function(forceReset,NGP=null){
     s.DngPC=window.gm.util.mergePlainObject(DngPC,s.DngPC);
   }
   let DngLT = dataPrototype();
+  DngLT
   if(s.DngLT){ //update if exist
     ({map,data}=window.gm.build_DngLT());
     s.DngLT=window.gm.util.mergePlainObject(DngLT,s.DngLT);

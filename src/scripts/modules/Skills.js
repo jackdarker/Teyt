@@ -1164,6 +1164,8 @@ Charge: Anrempeln des Gegners bringt ihn aus dem Gleichgewicht oder wirft ihn um
 
 ShieldBoost: lädt ein Shield um 50% auf so lange es nicht komplett leer ist, cooldown=8
 
+VampireShield: wenn das Schild unter 30% fällt aber >1% zieht es 5% von gegnerischem Schild ab für 4Turns; 10 turn cooldown aktiviert automatisch
+
 ShieldRestore: wenn das Shield komplett leer ist kann es wiederhergestellt werden 33-75%; cd=99
 
 CoolDownReset: for any ally: if there are skills in cooldown, pick a random one and reset cooldown; cd=20

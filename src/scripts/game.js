@@ -645,8 +645,8 @@ window.story.__proto__.show = function(idOrName, noHistory = false){
 	// Search passages for links every x ms, just in case they get updated, and marks them for key clicks
 	//KBIntervalID = setInterval(window.gm.util.updateLinks,1000);  todo do we need this?
 };
-/* when returning from back-passage, restore view by hiding/unhiding programatical modified elements, see printTalkLink
-*/
+
+/* when returning from back-passage, restore view by hiding/unhiding programatical modified elements, see printTalkLink*/
 window.gm.restorePage=function(){
   if(window.story.state.tmp){
     let elmts =Object.keys(window.story.state.tmp.flags);

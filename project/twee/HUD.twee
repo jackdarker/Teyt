@@ -1,4 +1,4 @@
-:: sidebar {"position":"375,500"}
+:: sidebar_old {"position":"375,500"}
 <h3><%=window.story.name%> V<%=window.gm.getSaveVersion().toString().replaceAll(",",".")%></h3>
 <img src='<%=window.gm.getSidebarPic()%>' width="256" height="256">
 <div><%=window.gm.util.printLocationName(window.gm.player.location)%></br><%=window.gm.getTimeString()%></br><%=window.gm.getDateString()%></br></div><hr>
@@ -39,6 +39,30 @@ document.querySelector('#settings').addEventListener('click', function(){window.
 document.querySelector('#LinkO').addEventListener('click', function(){window.story.show('Wardrobe');}); 
 </script>
 
+:: sidebar
+<h3><%=window.story.name%> V<%=window.gm.getSaveVersion().toString().replaceAll(",",".")%></h3>
+<img src='<%=window.gm.getSidebarPic()%>' width="256" height="256">
+<div><%=window.gm.util.printLocationName(window.gm.player.location)%></br><%=window.gm.getTimeString()%></br><%=window.gm.getDateString()%></br></div><hr>
+<div><%=window.gm.player.name%></br>
+<%=window.gm.util.statsbar("health")%><%=window.gm.util.statsbar("energy")%><%=window.gm.util.statsbar("will")%>
+<%if(s._gm.debug& 0x1>0){%>
+<%=window.gm.util.statsbar("arousal")%><%=window.gm.util.statsbar("satiation")%><%=window.gm.util.statsbar("savageness")%></div>
+<%}%>
+<div></div>
+<!--<div <%=window.gm.player.canLevelUp?"class=\"green\"":""%>>XP/Level: <%=window.gm.player._data.XP+"/"+window.gm.player._data.level%></div>-->
+<hr>
+<form>
+<button type="button" id="LinkS" onclick='window.story.show("InspectPlayer");'>Status<sup>[s]</sup></button>
+<button type="button" id="LinkI" onclick='window.story.show("Inventory");'>Inventory<sup>[i]</sup></button>
+<hr>
+<button type="button" id="save" onclick='window.gm.toggleDialog("#dialog_save");' style="width: 80%">Save/load</button>
+<button type="button" id="help" onclick='window.story.show("Help_Index");' style="width: 80%">Help</button>
+<button type="button" id="settings" onclick='window.story.show("Settings");' style="width: 80%">Settings</button>
+<button type="button" id="achievements" onclick='window.story.show("Achievements");' style="width: 80%">Achievements</button>
+<%if(s._gm.debug& 0x1>0){%>
+<button type="button" id="LinkD" onclick='window.story.show("debug");' style="width: 80%">Debug<sup>[d]</sup></button>
+<%}%>
+</form>
 
 :: CenterDialogs
 <!--called to include important dialogs; mainly the save-Dialog because of special behaviour-->
@@ -169,7 +193,9 @@ for(var i=0;i<maxSlots;i++){
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 Here you can check and modify several options: </br>
 Your outfit can only be changed by using a wardrobe.</br>
-Your party consist of <%=(function(){var msg=[];for(var n of window.story.state._gm.playerParty){msg.push(window.story.state[n].name);}return(msg);}()).join(',')%></br>
+<%if(window.story.state._gm.playerParty.length>1){%>
+  Your party consist of <%=(function(){var msg=[];for(var n of window.story.state._gm.playerParty){msg.push(window.story.state[n].name);}return(msg);}()).join(',')%></br>
+<%}%>
 [[Back|_back_]] [[Status]] [[Levelup]] [[View|Mirror]] [[Inventory]] [[Relations]] [[QuestList]]</br>
 </article><article id="LogPanel"></article></section>
 
