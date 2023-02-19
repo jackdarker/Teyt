@@ -53,7 +53,7 @@ The <%=("...")%> that covers your body now is <%=("slightly")%> damaged.
         _item=window.gm.player.Outfit.getItemForSlot("Breast");
         if(_item){
             _item.HP=_item.HP-25;
-            if(_item.HP<=0) {
+            if(_item.HP<=0) { window.gm.player.Outfit.removeItem(_item.id);
                 window.gm.printTalkLink("div#select10","div#choice10c");
             } else {
                 window.gm.printTalkLink("div#select10","div#choice10a");
