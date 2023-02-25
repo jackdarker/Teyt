@@ -138,7 +138,7 @@ class Equipment extends Item {
         //todo if multiple items edited ??
         //todo unequip on 0hp?
         this._HP=hp;
-        this._updateId();this.name=this.baseId+" "+hp.toString();
+        this._updateId();this.name=this.baseId+" "+hp.toString()+"%"; //todo "damaged shirt"
     } 
     get desc(){ return(this.descShort+ this.bonusDesc());}
     bonusDesc(){

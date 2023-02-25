@@ -124,12 +124,13 @@ class CraftMaterial extends Item {
     }
     set style(style){ 
         this._style = style; 
-        if(style===0) this.id='Jlorb',this.name='Jlorb';
-        else if(style===5) this.id='Shlack',this.name='Shlack';
-        else if(style===10) this.id="Glib",this.name='Glib';
-        else if(style===20) this.id="Gorb",this.name='Gorb';
-        else if(style===30) this.id="Igent",this.name='Igent';
-        else if(style===40) this.id="Remk",this.name='Remk';
+        if(style===0) this.id=this.name='Jlorb';
+        else if(style===5) this.id=this.name='Shlack';
+        else if(style===10) this.id=this.name='Glib';
+        else if(style===20) this.id=this.name='Gorb';
+        else if(style===30) this.id=this.name='Igent';
+        else if(style===40) this.id=this.name='Remk';
+        else if(style===50) this.id=this.name='Murk';
         else throw new Error(this.id +' doesnt know '+style);
     }
     get style(){return this._style;}
@@ -141,6 +142,8 @@ class CraftMaterial extends Item {
             case 10: 
             case 20: 
             case 30: 
+            case 40:
+            case 50:
                 msg ='some strange material';
                 break;
             default: throw new Error(this.id +' doesnt know '+style);
@@ -151,14 +154,80 @@ class CraftMaterial extends Item {
     static fromJSON(value){ return window.storage.Generic_fromJSON(CraftMaterial, value.data);};
 }
 
+class Gun extends Weapon {
+    static factory(style){
+        let x = new Gun();
+        x.style=style;
+        return(x);
+    }
+    constructor(){
+        super();
+        this.slotUse = ['RHand'];
+        this.style=0;
+    }
+    set style(style){ 
+        this._style = style; 
+        if(style===0) this.id=this.name='Taser';
+        else if(style===100) this.id=this.name='Blaster';
+        else if(style===105) this.id=this.name='BlasterMK2';
+        else if(style===120) this.id=this.name='Cryonizer';
+        else throw new Error(this.id +' doesnt know '+style);
+    }
+    get style(){return this._style;}
+    get desc(){ 
+        let msg ='';
+        switch(this._style){
+            case 0: msg+=(' pistol-like plastic tool that shocks someone with 30kV');  
+            break;
+            case 100: msg+=('scifi-revolver that fires a plasma-fireball');  
+            break;
+            case 105: msg+=('scifi-revolver that fires a bigger plasma-fireball');  
+            break;
+            case 120: msg+=('looks like a hair-dryer but can deep freeze something on short distance');  
+            break;
+            default:
+        }
+        return(msg);
+    }
+    toJSON(){return window.storage.Generic_toJSON("Gun", this); }
+    static fromJSON(value){return(window.storage.Generic_fromJSON(Gun, value.data));}
+    onEquip(context){
+        let res=super.onEquip(context);
+        if(res.OK){
+            let sk = new SkillSpark();
+            sk.weapon = this.id;
+            this.parent.parent.Skills.addItem(sk);  //todo
+        }
+        return(res);
+    }
+    onUnequip(context){
+        super.onUnequip(context)
+        this.parent.parent.Skills.removeItem('Spark');
+        return({OK:true, msg:'unequipped'});
+    }
+    /*attackMod(target){  //todo
+        let mod = new SkillMod();
+        mod.onHit = [{ target:target, eff: [effDamage.factory(11,'blunt')]}];
+        mod.critChance=5;
+        mod.onCrit = [{ target:target, eff: [effDamage.factory(11,'blunt'), new effStunned()]}];
+        return(mod);
+    }*/
+}
+
 window.gm.ItemsLib = (function (ItemsLib){
     window.storage.registerConstructor(CraftMaterial);
-ItemsLib['Jlorb'] = function(){ let x= new CraftMaterial();x.style=0;return(x);}
-ItemsLib['Shlack'] = function(){ let x= new CraftMaterial();x.style=5;return(x);}
-ItemsLib['Glib'] = function(){ let x= new CraftMaterial();x.style=10;return(x);}
-ItemsLib['Gorb'] = function(){ let x= new CraftMaterial();x.style=20;return(x);}
-ItemsLib['Igent'] = function(){ let x= new CraftMaterial();x.style=30;return(x);}
-ItemsLib['Remk'] = function(){ let x= new CraftMaterial();x.style=40;return(x);}
+    window.storage.registerConstructor(Gun);
+    ItemsLib['Jlorb'] = function(){ let x= new CraftMaterial();x.style=0;return(x);}
+    ItemsLib['Shlack'] = function(){ let x= new CraftMaterial();x.style=5;return(x);}
+    ItemsLib['Glib'] = function(){ let x= new CraftMaterial();x.style=10;return(x);}
+    ItemsLib['Gorb'] = function(){ let x= new CraftMaterial();x.style=20;return(x);}
+    ItemsLib['Igent'] = function(){ let x= new CraftMaterial();x.style=30;return(x);}
+    ItemsLib['Remk'] = function(){ let x= new CraftMaterial();x.style=40;return(x);}
+    ItemsLib['Murk'] = function(){ let x= new CraftMaterial();x.style=50;return(x);}
+    ItemsLib['Taser'] = function(){ let x= new Gun();x.style=0;return(x);}
+    ItemsLib['Blaster'] = function(){ let x= new Gun();x.style=100;return(x);}
+    ItemsLib['BlasterMK2'] = function(){ let x= new Gun();x.style=105;return(x);}
+    ItemsLib['Cryonizer'] = function(){ let x= new Gun();x.style=120;return(x);}
 return ItemsLib; 
 }(window.gm.ItemsLib || {}));
 
