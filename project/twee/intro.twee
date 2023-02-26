@@ -76,6 +76,7 @@ Those are very present through the game and in the main-story (also check the se
 }
 </script>
 
+
 :: Intro
 <article><%window.gm.initGame();window.gm.player.location=window.passage.name;%>
 <p class='author'>Note that there is no back-button implemented. Pressing the back button of your browser will get your game aborted.</br>
@@ -92,6 +93,7 @@ You might see a lot of links that are formated red-strikethrough. Those are curr
     window.gm.player.autoLeveling();
     window.gm.player.Outfit.removeItem("StaffWodden");window.gm.player.Inv.removeItem("StaffWodden");
 }
+
 
 :: Intro_SY
 <article><%window.gm.initGame();window.gm.player.location=window.passage.name;%>

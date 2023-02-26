@@ -1172,6 +1172,8 @@ CoolDownReset: for any ally: if there are skills in cooldown, pick a random one 
 
 disarm: cant use primary weapon for some time; cd=99
 
+critical eye: 50% chance einen Schwachpunkt zu erkennen der dann 3 turns effektiv angegriffen werden kann
+
 Leader: an ally using this is marked as a leader; as long as he is ingame, all allys except him receive bonus armor/regeneration/damage
         but if he is defeated, everyone gets mallus; can only be cast once per battle
 

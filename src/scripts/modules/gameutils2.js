@@ -443,6 +443,17 @@ window.gm.build_DngPC=function(){
             //,{id:'bitchsuit',tick:'',done:0,cnt:0,min:9}
         };
     }
+    //install function to calculate chance of evtLeave
+    window.gm.encounterChance=function(evt){
+        let res=100.0,s=window.story.state,dng=window.story.state.DngSY.dng;
+        res*=evt.chance/100.0;
+        if(evt.id==='Trap_Dehair'){ //Dehair if nude and hair
+            //if(window.gm.player.clothLevel()==='naked') {res*=2;}
+            if(window.gm.getDeltaTime(window.gm.getTime(),evt.tick)>200) res*=2;
+            else res=0;
+        }
+        return(res);
+    }
     return({map:map,data:data});
 };
 

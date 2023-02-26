@@ -243,6 +243,7 @@ Theme:
 show Lewd pictures: <input type="checkbox" id='showNSFWPictures' onclick='toggleSetting(this);' name="showNSFWPictures" value="x"> (If false, lewd graphics are not shown/replaced with SFW.)</br>
 show dungeon map: <input type="checkbox" id='showDungeonMap' onclick='toggleSetting(this);' name="showDungeonMap" value="x"> (If false, the dungeon map is not rendered.)</br>
 show Combat-pictures: <input type="checkbox" id='showCombatPictures' onclick='toggleSetting(this);' name="showCombatPictures" value="x"> (Some graphics are large and take time to render, thus slowing down combat.)</br>
+non-metric measurement: <input type="checkbox" id='nonMetric' onclick='toggleSetting(this);' name="nonMetric" value="x" disabled> (NOT IMPLEMENTED! Use inch/galllons instead of metric units)</br>
 <!--TODO what settings ?
 *  Disable over-penetration </br>
 A lot of female are not happy about the fact that many erotic fiction or imagery picture the penetration of cervix because its pretty painful. You might disable this here therefore. </br>
@@ -258,7 +259,7 @@ function toggleSetting(elmt){
   let toggle=window.story.state.Settings[elmt.id]=!window.story.state.Settings[elmt.id];
   elmt.checked=toggle;
 }
-['showNSFWPictures','showDungeonMap','showCombatPictures'].forEach(x=>(document.querySelector("#"+x).checked=window.story.state.Settings[x]));
+['showNSFWPictures','showDungeonMap','showCombatPictures','nonMetric'].forEach(x=>(document.querySelector("#"+x).checked=window.story.state.Settings[x]));
 </script>
 
 :: Settings2 [_back_]
@@ -295,9 +296,7 @@ Status of <%=char.name%>:   [[Back|_back_]]</br>
 </br><div id='output'></div></br>   <!--message is rendered here-->
 [[Back|_back_]]</br>
 </article><article id="LogPanel"></article></section>
-<script>
-window.gm.printOutput(window.gm.printEffectSummary(window.gm.player.id,{showstats:true}));
-</script>
+<script>window.gm.printOutput(window.gm.printEffectSummary(window.gm.player.id,{showstats:true}));</script>
 
 
 :: Levelup [_back_ _nosave_ _noshortkey_]

@@ -500,8 +500,7 @@ if(_sell){renderToSelector("#panel", "listsell") }else{ renderToSelector("#panel
 </article><article id="LogPanel"></article></section>
 
 :: DngPC_Retreat 
-<div><a0 id='retreat' onclick='(function($event){document.querySelector("#"+id+"~p").toggleAttribute("hidden");})(this);'>Retreat to sanctuary</a>
-<p hidden>Do you relly want to abort your run and return with what you have earned so far?<a0 onclick='window.gm.addTime(120),window.story.show("DngPC_G4")'> Yes </a></p></br></div>
+<div><a href="javascript:void(0)" id='retreat' onclick='(function($event){document.querySelector("#"+id+"~p").toggleAttribute("hidden");})(this);'>Retreat to sanctuary</a><p hidden>Do you relly want to abort your run and return with what you have earned so far?<a0 onclick='window.gm.addTime(120),window.story.show("DngPC_G4")'> Yes </a></p></br></div>
 
 
 :: DngPC_Cell

@@ -175,7 +175,8 @@ window.gm.initGameFlags = function(forceReset,NGP=null){
   let Settings = {
     showCombatPictures:true,
     showNSFWPictures:true,
-    showDungeonMap:true
+    showDungeonMap:true,
+    nonMetric:false  //TODO
   };
   if(!window.gm.achievements){//||forceReset) { 
     window.gm.resetAchievements();
