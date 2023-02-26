@@ -587,7 +587,11 @@ window.story.__proto__.show = function(idOrName, noHistory = false){
   let tagsnext,namenext,nextp,namenow;
   clearInterval(KBIntervalID);
   if(idOrName==='') tagsnext=[];
-  else tagsnext = window.story.passage(idOrName).tags;
+  else {
+    nextp = window.story.passage(idOrName);
+    if(nextp) tagsnext = window.story.passage(idOrName).tags;
+    else throw new Error("no such passage: "+idOrName);
+  }
   if(inGame && window.story.state._gm.defferedStack.length>0 && //deffered event if allowed and requested
     //tagsnext.indexOf('_back_')<0 &&
     tagsnext.indexOf('_nosave_')<0 && tagsnext.indexOf('_nodeffered_')<0 ){ 
@@ -641,8 +645,8 @@ window.story.__proto__.show = function(idOrName, noHistory = false){
 	// Search passages for links every x ms, just in case they get updated, and marks them for key clicks
 	//KBIntervalID = setInterval(window.gm.util.updateLinks,1000);  todo do we need this?
 };
-/* when returning from back-passage, restore view by hiding/unhiding programatical modified elements, see printTalkLink
-*/
+
+/* when returning from back-passage, restore view by hiding/unhiding programatical modified elements, see printTalkLink*/
 window.gm.restorePage=function(){
   if(window.story.state.tmp){
     let elmts =Object.keys(window.story.state.tmp.flags);

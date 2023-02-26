@@ -1164,11 +1164,15 @@ Charge: Anrempeln des Gegners bringt ihn aus dem Gleichgewicht oder wirft ihn um
 
 ShieldBoost: lädt ein Shield um 50% auf so lange es nicht komplett leer ist, cooldown=8
 
+VampireShield: wenn das Schild unter 30% fällt aber >1% zieht es 5% von gegnerischem Schild ab für 4Turns; 10 turn cooldown aktiviert automatisch
+
 ShieldRestore: wenn das Shield komplett leer ist kann es wiederhergestellt werden 33-75%; cd=99
 
 CoolDownReset: for any ally: if there are skills in cooldown, pick a random one and reset cooldown; cd=20
 
 disarm: cant use primary weapon for some time; cd=99
+
+critical eye: 50% chance einen Schwachpunkt zu erkennen der dann 3 turns effektiv angegriffen werden kann
 
 Leader: an ally using this is marked as a leader; as long as he is ingame, all allys except him receive bonus armor/regeneration/damage
         but if he is defeated, everyone gets mallus; can only be cast once per battle

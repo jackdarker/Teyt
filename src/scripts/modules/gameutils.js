@@ -175,16 +175,19 @@ window.gm.initGameFlags = function(forceReset,NGP=null){
   let Settings = {
     showCombatPictures:true,
     showNSFWPictures:true,
-    showDungeonMap:true
+    showDungeonMap:true,
+    nonMetric:false  //TODO
   };
+  if(!window.gm.achievements){//||forceReset) { 
+    window.gm.resetAchievements();
+  }
+  window.storage.loadAchivementsFromBrowser();
   let DngSY = {
       remainingNights: 0,
       dngLevel: 1, //tracks the mainquest you have finished
       dngOW: false, //if this flag is set while in dng, player is here for some freeplay (no quest)  
       dildo:0, //1 small oraltraining,
       pussy:0,
-      //for Latec
-      qBabble:0,
       //////////////////////////
       visitedTiles: [],mapReveal: [],
       dng:'', //current dungeon name
@@ -204,6 +207,7 @@ window.gm.initGameFlags = function(forceReset,NGP=null){
     s.DngPC=window.gm.util.mergePlainObject(DngPC,s.DngPC);
   }
   let DngLT = dataPrototype();
+  DngLT
   if(s.DngLT){ //update if exist
     ({map,data}=window.gm.build_DngLT());
     s.DngLT=window.gm.util.mergePlainObject(DngLT,s.DngLT);
@@ -229,6 +233,15 @@ window.gm.initGameFlags = function(forceReset,NGP=null){
   s.DngLT=window.gm.util.mergePlainObject(DngLT,s.DngLT);
   //todo cleanout obsolete data ( filtering those not defined in template) 
 };
+window.gm.resetAchievements = function() { //declare achievements here
+  window.gm.achievements={
+      looseEnd: 0 
+    }
+    window.gm.achievementsInfo={ //this is kept separate to not bloat savegame
+        //hidden bitmask: 0= all visisble, 1= Name ???, 2= Todo ???
+        looseEnd: {set:1, hidden:3, name:"loose end", descToDo:"Find a loose end.",descDone:"Found a link without target. Gained a NGPtoken."} //
+    }
+}
 // update non-class-objects of previous savegame
 let _origRebuildObjects = window.gm.rebuildObjects;
 window.gm.rebuildObjects= function(){ 
