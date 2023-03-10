@@ -75,7 +75,7 @@ window.gm.navEvent = function(to,from){
                 if(_rnd<_allChances && _rnd>=(_allChances-_ch)){
                     evts[i].tick=_now;
                     window.story.state.tmp.args=[evts[i],dng+'_'+_from,dng+'_'+_to];    //store [evt,from,to] for use in scene
-                    return(dng+'_'+evts[i].id); //->show(DngLT_wolf5);   
+                    return(dng+'_'+evts[i].id); //->show(DngNG_wolf5);   
                     //after the scene is finished it should continue window.story.state.DngSY.prevLocation 
                 }
                 _allChances-=_ch;

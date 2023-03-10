@@ -1,18 +1,18 @@
-:: DngLT_SpiderFight [_nosave_]
+:: DngNG_SpiderFight [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 You are facing one of  those spider bots.
 Try to hit it with your <a0 onclick='window.story.show(window.story.state.combat.tmp.inst+"Melee")'>bare hands</a> 
 or <a0 onclick='window.story.show(window.story.state.combat.tmp.inst+"Flee")'>run away</a>?
 </article><article id="LogPanel"></article></section>
 <script>function initCombat(){
-    window.gm.simpleCombatInit("DngLT_Spider");
+    window.gm.simpleCombatInit("DngNG_Spider");
     var tmp=window.story.state.combat.tmp;
     tmp.npc={hp:1};
 }
 initCombat();
 </script>
 
-:: DngLT_SpiderMelee [_nosave_]
+:: DngNG_SpiderMelee [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 <div id='select10' >
 </div><div id='choice10a' hidden></br> The bot was to slow to evade your fist. You didnt deal much damage but at least the bot seems to be intimidated and scurrys off.
@@ -40,7 +40,7 @@ foo();
 </script>
 
 
-:: DngLT_SpiderFlee [_nosave_]
+:: DngNG_SpiderFlee [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 <div id='select10' >
 </div><div id='choice10a' hidden></br> Making a dash back where you came from, you <a0 onclick="leave();">leave</a> the bot behind.
@@ -68,7 +68,7 @@ foo();
 </script>
 
 
-:: DngLT_SpiderLoss [_nosave_]
+:: DngNG_SpiderLoss [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 <div id='select10' >
 </div><div id='choice10a' hidden></br>
@@ -92,7 +92,7 @@ foo();
 </script>
 
 
-:: DngLT_SpiderVictory [_nosave_]
+:: DngNG_SpiderVictory [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 <div id='select10' >
 </div><div id='choice10a' hidden></br> As the bot hurries away, you notice it lost some SCRUB that you collect as your prize.

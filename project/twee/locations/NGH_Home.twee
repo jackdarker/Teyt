@@ -1,0 +1,30 @@
+:: Help_background [_back_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+TODO</br>
+</br>[[Back|_back_]]</br>
+</article><article id="LogPanel"></article></section>
+
+:: Help_Basics [_back_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+<hr></br>
+For many activities you have to spend energy and time.</br>
+Energy can be recovered by sleeping. Also some activities like resting, food or drugs can restore energy.</br>
+<hr></br>Navigating the dungeon</br>
+<hr></br>Combat</br>
+TODO</br>
+<hr></br>Keyboardcontrols</br>
+Links that have [x] attached can be triggered by pressing key x on the keyboard.
+</br><hr></br>[[Back|_back_]]</br>
+</article><article id="LogPanel"></article></section>
+
+:: DngNG_Home
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%></br>
+This is the main hall. Where would you like to go?</br>
+[[Shop]]  [[Crafting]]
+[[Check on your comrades]] [[Manage Items]]
+Or get some rest before your [[next trial|DngNG_Respawn]] starts.
+
+</br><a0 id='map' onclick='(function($event){document.querySelector("#"+id+"~p").toggleAttribute("hidden");})(this);'>Hint</a>
+<p hidden> Mot.</p>
+</article><article id="LogPanel"></article></section>

@@ -1,9 +1,9 @@
-:: DngLT_Meet_Dog [_nosave_]
+:: DngNG_Meet_Dog [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 There is some kind of robot shuffling around. </br>
 It looks like some of those robotic pet dogs you saw in a science show. It just looks a little bigger, around half a meter. And its movements are much more fluid and natural.</br></br>
 
-<%if(s.DngLT.tmp.qLatex===0){%>
+<%if(s.DngNG.tmp.qLatex===0){%>
     Ignoring your presence it just continues its duty of patrolling the corridors. You hurry <a0 onclick='window.story.show(window.story.state.DngSY.nextLocation)'>onward</a>.    
 <%}else if(true){%>
     As the robot notices you, it shows some kind of interest in you and trots over. </br>
@@ -27,14 +27,14 @@ You may try your luck and <a0 onclick='dogEncounter();'>walk further</a> in its 
 <%=window.story.render("DngHC_Encounters")%>
 
 
-:: DngLT_Sleep
+:: DngNG_Sleep
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 Get some rest on that bunk.</br>
 </br><div id='output'></div>
-</br><a0 onclick='window.story.show("DngLT_D4")'>Next</a></br>
+</br><a0 onclick='window.story.show("DngNG_D4")'>Next</a></br>
 </article><article id="LogPanel"></article></section>
 
-:: DngLT_Trap_Dehair [_nosave_]
+:: DngNG_Trap_Dehair [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 Scanner triggers and laser turret shots.</br> You just triggered a trap! </br>
 <div id='select10' hidden></div>
@@ -75,7 +75,7 @@ The <%=("...")%> that covers your body now is <%=("slightly")%> damaged.
 </article><article id="LogPanel"></article></section>
 
 
-:: DngLT_Spider [_nosave_]
+:: DngNG_Spider [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 <%if(true){%>
     Hearing something clicking and clacking, you look around in the new room to find its source.</br>
@@ -83,7 +83,7 @@ The <%=("...")%> that covers your body now is <%=("slightly")%> damaged.
     <p class="tPC">'Im just glad that this is not a real spider.</p> Even someone without explicit fear of spiders wouldnt like to handle something of that size.
     As you try to sneak by, the bot whirls around - you have its attention.
     <div id='select10' >
-    <a0 onclick='window.gm.printTalkLink("div#select10","div#choice10a"),window.story.show("DngLT_SpiderFight")'>Stomp it.</a></br>
+    <a0 onclick='window.gm.printTalkLink("div#select10","div#choice10a"),window.story.show("DngNG_SpiderFight")'>Stomp it.</a></br>
     <a0 onclick='window.gm.printTalkLink("div#select10","div#choice10b"),window.story.show(window.story.state.DngSY.nextLocation)'>Try to avoid it.</a></br>
     </div><div id='choice10a' hidden></br>
     </div>
@@ -91,12 +91,12 @@ The <%=("...")%> that covers your body now is <%=("slightly")%> damaged.
     </div>
 <%}else{%>
     Another of those spider bots is busy here. Lets see what you can do about that.
-    </br><a0 onclick='window.story.show("DngLT_SpiderFight")'>Smash it</a>
+    </br><a0 onclick='window.story.show("DngNG_SpiderFight")'>Smash it</a>
 <%}%>
 </article><article id="LogPanel"></article></section>
 
 
-:: DngLT_F3_Screen
+:: DngNG_F3_Screen
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 Your babble companion translates the symbols on the screen.
 <%if()%>
@@ -105,14 +105,14 @@ Your babble companion translates the symbols on the screen.
 <a0 onclick='window.story.show(window.story.state.DngSY.prevLocation)'>retreat</a>.
 </article><article id="LogPanel"></article></section>
 
-:: DngLT_E5_Switch [_nosave_]
+:: DngNG_E5_Switch [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 With the help of your companion you decypher the display on the switch box.</br>
-<%if(window.story.state.DngLT.tmp.qPowRoute===0){%>
+<%if(window.story.state.DngNG.tmp.qPowRoute===0){%>
 <p class="tNPC1">"Constructor unit Cro-4E5D in maintenance mode. Reason: power conservation due to power failure."</p>
 Some options are listed, maybe you can activate the constructor.
 <div id='select10' >
-<a0 onclick='window.story.state.DngLT.tmp.qPowRoute=1;window.gm.printTalkLink("div#select10","div#choice10a")'>Disable maintenance mode</a></br>
+<a0 onclick='window.story.state.DngNG.tmp.qPowRoute=1;window.gm.printTalkLink("div#select10","div#choice10a")'>Disable maintenance mode</a></br>
 </div><div id='choice10a' hidden></br>
     <p class="tNPC1">"Rerouting power to constructor. Warning: power level low. Switching to operation mode."</p>
     Well that seems to work. But if its rerouting the power from somewhere, maybe other things are not working. At least until you find a way to fix the powersupply in general.
@@ -126,7 +126,7 @@ Some options are listed, maybe you can activate the constructor.
 </article><article id="LogPanel"></article></section>
 
 
-:: DngLT_ChangeBooth [_nosave_]
+:: DngNG_ChangeBooth [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 Your AI-companion decyphers the symbols on the panel:
 <p>"Devices disabled for maintenance. Normal operation requires disabling of maintenance mode."</p>
@@ -135,14 +135,14 @@ The booth seems to be made from one piece of plastic. There are no panels to uns
 ----------
 <p>"Operational"</p>
 Seems the booth is working again.
-<a0 onclick='window.story.show("DngLT_ChangeBoothFitID")'>Inspect the booth</a>.
-<a0 onclick='window.story.show("DngLT_ChangeBoothShop")'>Step into the booth</a>.
+<a0 onclick='window.story.show("DngNG_ChangeBoothFitID")'>Inspect the booth</a>.
+<a0 onclick='window.story.show("DngNG_ChangeBoothShop")'>Step into the booth</a>.
 
 <a0 onclick='window.story.show(window.gm.player.location)'>leave</a>.
 </article><article id="LogPanel"></article></section>
 
 
-:: DngLT_ChangeBoothFitID [_nosave_]
+:: DngNG_ChangeBoothFitID [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 The door of the booth swishes closed after you have stepped inside.
 "Scanning - please adjust position to markings" 
@@ -171,16 +171,16 @@ Its made from shiny black material with a metalic clasp.
 </div><div id='choice30a' hidden></br>
     "Dam it, thats tight." You fiddle around with your fingers to find the clasp and unlock this thing. But you cant find a clue how to do so.
     "OK, no problem its only temporary whatever it means. Maybe I can cut it through with some knife."
-    <a0 onclick='window.story.show("DngLT_ChangeBooth")'>Next</a>.
+    <a0 onclick='window.story.show("DngNG_ChangeBooth")'>Next</a>.
 </div>
 <div id='choice30b' hidden></br>
-    <a0 onclick='window.story.show("DngLT_ChangeBooth")'>Next</a>.
+    <a0 onclick='window.story.show("DngNG_ChangeBooth")'>Next</a>.
 </div>
 
 </article><article id="LogPanel"></article></section>
 
 
-:: DngLT_ChangeBoothShop [_nosave_]
+:: DngNG_ChangeBoothShop [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 The door of the booth swishes closed after you have stepped inside.
 "Scanning - please adjust position to markings" 
@@ -193,7 +193,7 @@ Get Latexitus removed. with coverall
 "Warning: construction material depleted. Please provide provisions."
 "I guess we will need to get some of those materials or I will end up running around naked."
 
-[[DngLT_ChangeBooth]]
+[[DngNG_ChangeBooth]]
 </article><article id="LogPanel"></article></section>
 
 

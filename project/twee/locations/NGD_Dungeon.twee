@@ -1,0 +1,128 @@
+:: DngNG_MAP [_back_]
+<hr><div id='canvas'></div><div id='svgpopup'></div></br>
+<script> window.gm.printMap2(window.story.state.DngSY.dngMap,window.gm.player.location.replace(window.story.state.DngSY.dng+'_',''),
+    window.story.state.DngNG.mapReveal,window.story.state.DngNG.visitedTiles);
+</script>
+
+:: DngNG_Action
+[[place snare trap]]  [[hide]]
+
+:: DngNG_Respawn [_nosave_ _nodeffered_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+You find yourself in the middle of a facility. </br>
+Walk aroound an keep a watchful eye for anyone that pounce you. Or pounce them and try to make them submit.</br>
+When the clock reaches 7AM, the game ends and the ranking will be calculated depending on your performance:
+</br>- how many underwear you were able to steal (minus the one you lost)  
+</br>- how many foes you subdued
+</br>- if you fullfilled the special task  
+
+Depending on your ranking you receive some prize - or punishment:
+</br>- money from the pot. First gets 40%, second 20%, third 10% and the others have to share the rest.  
+</br>- every combatant gets their participation bonus
+</br>- the first can select a punishment for any partipicant except himself
+</br>- the second can select a punishment for the last one
+
+</br></br><a0 onclick= 'window.story.state.tmp.msg="",window.story.show("DngNG_F3")'>Get hunting</a>
+</article><article id="LogPanel"></article></section>
+<script>
+    var s = window.story.state,map,data;
+    ({map,data}=window.gm.build_DngNG());
+    s.DngNG=data;
+    s.DngSY.dngMap=map;s.DngSY.dng='DngNG';
+    s.vars.spawnAt="DngNG_Respawn";
+</script>
+
+:: DngNG_Encounters
+<script>function tick(){
+    let here = window.gm.player.location,_d=window.story.state.DngNG.tmp;
+    if(here===_d.tickPass) return;
+    _d.tickPass=here;
+    for(var i=_d.mobs.length-1;i>=0;i--){ //check persistent mobs
+      var mob=_d.mobs[i];
+      window.gm.mobAI(mob);
+      if(window.story.state.DngSY.dng+"_"+mob.pos===here){
+        //if mob is at same position as player: trigger passage or just show note
+        if(mob.state===0){
+          window.gm.encounters[mob.mob]({noStart:true});
+          var _oldVictory=window.gm.Encounter.onVictory.bind(window.gm.Encounter);
+          window.gm.Encounter.onVictory= function(){mob.state=1;return(_oldVictory());}
+          window.gm.Encounter.initCombat(); return;
+        }
+      }
+    }
+    let _t=_d.tier,_allChances=0,_choice=[];
+    switch(here){//foes; traps are handled in window.gm.navEvent, there might also be evtLeave added elsewhere
+        default:
+    }  
+    _choice.forEach(x=>(_allChances+=x.chance));
+    if(_allChances>0){//choose rnd enemy
+        var _rnd=_.random(0,_allChances-0.01);
+        for(var i = _choice.length-1;i>=0;i--){ 
+            if(_rnd<_allChances && _rnd>=(_allChances-_choice[i].chance)){
+                if(false && ['_Lectern'].includes(_choice[i].id)){ //scene
+                    window.story.show(window.story.state.DngSY.dng+_choice[i].id);
+                } else { //foe
+                    window.gm.encounters[_choice[i].id]({type:_choice[i].type, amount:_choice[i].amount,levelUp:_choice[i].levelUp,noFlee:true});  
+                }          
+                break;
+            }
+            _allChances-=_choice[i].chance;
+        }
+    }
+}
+tick();
+</script>
+
+
+:: DngNG_A1
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
+Somewhere in the dungeon.</br>
+<%=window.gm.renderRoom(window.passage.name)%></br><%=window.story.render('DngNG_Action')%></br><%=window.gm.printNav2()%>
+</article><article id="LogPanel"></article></section>
+<%=window.story.render("DngNG_Encounters")%>
+
+:: DngNG_F2
+<%=window.story.render("DngNG_A1")%>
+
+:: DngNG_G2
+<%=window.story.render("DngNG_A1")%>
+
+:: DngNG_H2
+<%=window.story.render("DngNG_A1")%>
+
+:: DngNG_I2
+<%=window.story.render("DngNG_A1")%>
+
+:: DngNG_J2
+<%=window.story.render("DngNG_A1")%>
+
+:: DngNG_F3
+<%=window.story.render("DngNG_A1")%>
+
+:: DngNG_G3
+<%=window.story.render("DngNG_A1")%>
+
+:: DngNG_H3
+<%=window.story.render("DngNG_A1")%>
+
+:: DngNG_I3
+<%=window.story.render("DngNG_A1")%>
+
+:: DngNG_J3
+<%=window.story.render("DngNG_A1")%>
+
+:: DngNG_F4
+<%=window.story.render("DngNG_A1")%>
+
+:: DngNG_G4
+<%=window.story.render("DngNG_A1")%>
+
+:: DngNG_H4
+<%=window.story.render("DngNG_A1")%>
+
+:: DngNG_I4
+<%=window.story.render("DngNG_A1")%>
+
+:: DngNG_J4
+<%=window.story.render("DngNG_A1")%>

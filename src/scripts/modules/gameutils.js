@@ -168,7 +168,7 @@ window.gm.initGameFlags = function(forceReset,NGP=null){
   function dataPrototype(){return({visitedTiles:[],mapReveal:[],tmp:{},version:0});}
   if (forceReset){  
     s.Settings=s.DngCV=s.DngDF=s.DngAM=s.DngSY=s.DngMN=s.DngAT=null; 
-    s.DngFM=s.DngSC=s.DngLB=s.DngHC=s.DngPC=s.DngLT=null;
+    s.DngFM=s.DngSC=s.DngLB=s.DngHC=s.DngPC=s.DngNG=null;
     s.Know = {}
   }
   let Know = {};
@@ -206,11 +206,11 @@ window.gm.initGameFlags = function(forceReset,NGP=null){
     ({map,data}=window.gm.build_DngPC());
     s.DngPC=window.gm.util.mergePlainObject(DngPC,s.DngPC);
   }
-  let DngLT = dataPrototype();
-  DngLT
-  if(s.DngLT){ //update if exist
-    ({map,data}=window.gm.build_DngLT());
-    s.DngLT=window.gm.util.mergePlainObject(DngLT,s.DngLT);
+  let DngNG = dataPrototype();
+  DngNG
+  if(s.DngNG){ //update if exist
+    ({map,data}=window.gm.build_DngNG());
+    s.DngNG=window.gm.util.mergePlainObject(DngNG,s.DngNG);
   }
   let DngLB = dataPrototype();
   let DngSC = dataPrototype();
@@ -230,7 +230,7 @@ window.gm.initGameFlags = function(forceReset,NGP=null){
   s.DngHC=window.gm.util.mergePlainObject(DngHC,s.DngHC);
   s.DngLB=window.gm.util.mergePlainObject(DngLB,s.DngLB);
   s.DngPC=window.gm.util.mergePlainObject(DngPC,s.DngPC);
-  s.DngLT=window.gm.util.mergePlainObject(DngLT,s.DngLT);
+  s.DngNG=window.gm.util.mergePlainObject(DngNG,s.DngNG);
   //todo cleanout obsolete data ( filtering those not defined in template) 
 };
 window.gm.resetAchievements = function() { //declare achievements here
