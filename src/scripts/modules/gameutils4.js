@@ -68,9 +68,10 @@ window.gm.build_DngLT=function(){
     } else {
         data=s.DngLT,data.version=version;
         data.tmp={tickPass:'', tier:0
-            ,passFail:0
-            ,powerLevel:0
-            ,doorLock:0
+            ,qPassFail:0
+            ,qPowerLevel:0
+            ,qDoorLock:0
+            ,qFixConsole:0
             ,qBabble:0
             ,qKeyBlue:0
             ,qPowRoute:0
@@ -84,18 +85,20 @@ window.gm.build_DngLT=function(){
             I4_H4: null
         }
         data.tmp.evtEnter = { //events on tile-enter
-             F4: {sbot:{tick:window.gm.getTime(),state:0 }}
-            ,H4: {gas:{tick:window.gm.getTime(),state:0 }}
+             F4: {spiderbot:{tick:window.gm.getTime(),state:0 }}
+            //,H4: {gas:{tick:window.gm.getTime(),state:0 }}
         }
         data.tmp.doors = { //doors 2way
             E4:{E5:{state:0 }},
             G4:{G3:{state:0 },G5:{state:0 }},
             H4:{I4:{state:0 }},
             E5:{F5:{state:0 }},
+            G5:{G6:{state:0 }},
+            F6:{E6:{state:0 }}
         }
         data.tmp.evtSpawn = { //respawn evts 
         }
-        data.tmp.mobs = [ //wandering mobs pos=current tile
+        data.tmp.mobs = [ //wandering mobs see DngLT_Encounters; pos=current tile
             //{id:"HornettI4",mob:"hornett",pos:"I4",path:["I4","H4","I3"],state:0,tick:'',aggro:0}
           ]
         data.task = {},data.rolledTask=[]; //active task
@@ -232,11 +235,11 @@ return ItemsLib;
 }(window.gm.ItemsLib || {}));
 
 window.gm.simpleCombatInit=function(instance) {
-    var s = window.story.state;
-    s.combat.tmp={};
-    var tmp=s.combat.tmp;
-    tmp.inst=instance;
+    var tmp,s = window.story.state;
+    tmp=s.combat.tmp={};
+    tmp.inst=instance;  //start-passage "DngLT_Spider"
     tmp.now="";
+    tmp.rollResult="";  //calculated roll on player choice
 }
 window.gm.simpleCombatCleanup=function() {
     var s = window.story.state,tmp=s.combat.tmp;

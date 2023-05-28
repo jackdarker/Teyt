@@ -13,6 +13,7 @@ window.gm.initGame= function(forceReset,NGP=null){
   window.gm.images = imagesEquip(window.gm.images);
   window.gm.images = imagesIcons(window.gm.images);
   window.gm.images = imagesScene(window.gm.images);
+  window.gm.images = imagesItems(window.gm.images);
   //if svg have no size set, they use whole space, use this to force them to fit into a box
   window.gm.images._sizeTo = function(_pic,width,height){ 
     var node = SVG(_pic);

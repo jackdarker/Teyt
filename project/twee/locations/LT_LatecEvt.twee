@@ -96,6 +96,56 @@ The <%=("...")%> that covers your body now is <%=("slightly")%> damaged.
 </article><article id="LogPanel"></article></section>
 
 
+:: DngLT_FixCables [_back_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+<div id='select10' >    
+    <p class="tPC">'Lets see. There are some loose wires and a number of Terminals that seem to miss connection. I guess I need to connect those colored cables to the terminals to fix this.'</p>
+    <div id='output'></div><div id='choice'></div>
+    <div id='choice10c' ></br>Not having the nerve to keep on trying, <a0 onclick='_done=false,window.story.show("_back_")'>you give up</a></br></div>
+</div>
+    <div id='choice10b' hidden></br><a0 onclick='_done=false,window.story.show("_back_")'>You did it!</a></br>
+</article><article id="LogPanel"></article></section>
+<script>{ 
+    window.gm.dbgHelper();
+    var _done,_items,_idx,_cables,_trys;
+    if(!_done){ _done=true,_trys=4;
+        _idx=0;_items=['green','blue','red','yellow'],_cables=['red','green','yellow','blue'];
+        ({_items,_cables}=window.story.state.tmp.args[0]); 
+    }
+    function foo(id){
+        let _msg="";
+        window.gm.sex.beginScene();
+        if(_items[_idx]===id){
+            _idx+=1,_cables=_cables.filter(x=>(x!=id));
+            _msg="Nothing terrible happened - yet. "+ window.gm.printPassageLink('Continue','DngLT_FixCables');
+        }else{
+            _trys-=1;
+            if(_trys<=0) {
+                window.gm.printTalkLink("div#select10","div#choice10c")
+                _msg="Ouch. That was wrong and you received a shocking jolt. "//+ window.gm.printLink('Give up for now','_done=false,window.story.show("_back_")');
+            } else {
+                _msg="Ouch. That was wrong and you received a shocking jolt. "+ window.gm.printPassageLink('Continue','DngLT_FixCables');
+            }
+        }
+        window.gm.printOutput(_msg);
+    }
+    function foo2(){
+         if(_idx>=_items.length) {
+            window.story.state.DngLT.tmp.qFixConsole|=1;
+            window.gm.printTalkLink("div#select10","div#choice10b")
+        } else {
+            window.gm.sex.beginScene();
+            window.gm.printOutput("What cable should be connected to "+(_idx+1)+".terminal?</br>");
+            for(var _i=_cables.length-1;_i>=0;_i--){
+                window.gm.sex.createButton(_cables[_i],function(id){const _id=id;return(foo.bind(null,_id));}(_cables[_i]));
+            }
+        }
+    }
+    foo2();
+}
+</script>
+
+
 :: DngLT_F3_Screen
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 Your babble companion translates the symbols on the screen.

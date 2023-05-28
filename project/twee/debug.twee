@@ -95,7 +95,7 @@ var oldTime = 1200;
 function change(){
   var menu = document.getElementById("progress-value");
   var n = SVG("#wheel")//document.querySelector("#wheel")
-  var y,y2,x=n.node.ownerSVGElement.width.baseVal.value/2;//n.ownerSVGElement.width.baseVal.value/2;
+  var y,y2,x=n.node.ownerSVGElement.viewBox.baseVal.x+n.node.ownerSVGElement.viewBox.baseVal.width/2;//n.ownerSVGElement.width.baseVal.value/2;
   y=(oldTime-1200)*360/2400;y2=(menu.value-oldTime)*360/2400;
   if((menu.value-oldTime)<0){n.rotate(-360,x,x),y2+=360};
   n.animate().rotate(y2,x,x);//use SVG.js

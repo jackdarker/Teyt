@@ -105,7 +105,7 @@ window.gm.navEvent = function(to,from){
             if(evt.state===0) _targ=dng+"_Meet_Dog";
             if(_targ!=='') return(_targ);
         }
-        evt = evts["sbot"];
+        evt = evts["spiderbot"];
         if(evt){//&& window.gm.getDeltaTime(_now,evt.tick)>400){
             if(evt.state===0) evt.tick=_now,_targ=dng+"_Spider",window.story.state.tmp.args=[evt,dng+'_'+_from,dng+'_'+_to];
             if(_targ!=='') return(_targ);

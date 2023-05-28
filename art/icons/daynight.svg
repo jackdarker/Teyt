@@ -2,13 +2,15 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="200"
-   height="200"
-   viewBox="25 0 100 100"
+   width="100%"
+   height="70%"
+   viewBox="25 0 50 50"
    version="1.1"
    id="svg5"
    inkscape:version="1.1 (c68e22c387, 2021-05-23)"
    sodipodi:docname="daynight.svg"
+   note="modify width &amp; height &amp; viewbox to only display portion of the clock"
+   note2="w=100%,h=70%, vb= 25 0 50 50; wrap into &lt;div width=&quot;200px&quot;&gt;"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -30,15 +32,15 @@
      inkscape:snap-bbox-midpoints="true"
      inkscape:bbox-paths="true"
      inkscape:snap-global="false"
-     inkscape:zoom="2.823747"
-     inkscape:cx="202.92187"
-     inkscape:cy="111.0227"
+     inkscape:zoom="1.4118735"
+     inkscape:cx="212.83776"
+     inkscape:cy="195.1308"
      inkscape:window-width="1920"
      inkscape:window-height="1017"
      inkscape:window-x="1912"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
-     inkscape:current-layer="wheel"
+     inkscape:current-layer="layer1"
      fit-margin-top="0"
      fit-margin-left="0"
      fit-margin-right="0"
@@ -256,17 +258,17 @@
        cy="78.68174"
        fx="4.0105429"
        fy="78.68174"
-       r="20.558396"
+       r="20.558395"
        gradientTransform="matrix(0.20627467,0.02383973,-0.01592356,0.1377796,20.097886,29.506968)"
        gradientUnits="userSpaceOnUse" />
   </defs>
   <g
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
-     id="layer1"
-     transform="translate(25)">
+     id="layer1">
     <g
-       id="wheel">
+       id="wheel"
+       style="display:inline">
       <path
          id="path846"
          style="fill:url(#radialGradient953);fill-rule:evenodd;stroke-width:4.64694;stroke-linecap:round;paint-order:fill markers stroke;stop-color:#000000"
