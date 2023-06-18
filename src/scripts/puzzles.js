@@ -1371,6 +1371,12 @@ window.gm.startReactTest=function(bar, speed, stopCB, startCB,areas){
     };*/
     return(data);
   }
+
+  /*TODO
+  * the player has to press the displayed arrow. On success the bar fills. If he waits, the bar drains slowly. If he misses the bar drains more.
+  * There is no timelimit for pressing (?)
+  * Combo-Counter for consecutive hits.  
+  */
   window.gm.startPong=function(){
     ///// fixed sample from https://svgjs.dev/ ////////
   // define document width and height
