@@ -320,8 +320,22 @@ document.getElementById('btStart').addEventListener("click", _game.start);
 document.querySelector('body').addEventListener("keyup", _game.click);
 </script>
 
+:: ReactionTest3
+<p>Click Start and then keypress Up/down/left/right to fill meter.</p>
+<div class="progressbar" id='clickHere' style='height:1em; width: 100%;'><div id='bar' style="position:relative; width:5%; height:100%; background-color:green;"></div></div>
+<a0 id='btStart'>Start</a><p id='result'></p>
+<p><output id="losgelassen"><output></output></p>
+<script>
+function onStop(value){
+  document.getElementById('result').innerHTML='scored '+value;
+}
+var _game = window.gm.startReactTest3('bar',100,onStop,null,[],'losgelassen');
+document.getElementById('btStart').addEventListener("click", _game.start);
+document.querySelector('body').addEventListener("keyup", _game.click);
+</script>
 
-:: Reactiontest3
+
+:: SVGInteractive
 <p>example on how to create reactive graphics from svg parts</p>
 * Define g-object with id in defs.
 * use-xlink to create instances of those objects

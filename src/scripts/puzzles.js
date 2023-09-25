@@ -1374,9 +1374,120 @@ window.gm.startReactTest=function(bar, speed, stopCB, startCB,areas){
 
   /*TODO
   * the player has to press the displayed arrow. On success the bar fills. If he waits, the bar drains slowly. If he misses the bar drains more.
-  * There is no timelimit for pressing (?)
-  * Combo-Counter for consecutive hits.  
+  * Win on reaching 100% , loss if hitting 0%
+  * There is no timelimit for pressing or after some time without press, it counts as pressing the wrong button ?
+  * Combo-Counter for consecutive hits?  
   */
+  window.gm.startReactTest3=function(bar, speed, stopCB, startCB,areas,indicator){
+    /**
+     * starts the game
+     */
+    function start(){ 
+      data.stop();
+      data.run=true;
+      data.bargraph.style.left = data.value+'%'; //dont start in between; speed would be slowed down to maintain transition time
+      var width =window.getComputedStyle(data.bargraph).getPropertyValue('width');
+      var total = window.getComputedStyle(data.bargraph.parentNode).getPropertyValue('width');
+      //calculate barsize relative to total width (necessary if windowsize changed in between )
+      data.barsize=100*parseFloat(width.split('px'))/parseFloat(total.split('px')); 
+      //data.bargraph.style.transition = "left "+data.speed+"ms linear"; //configure transition for animation
+      if(data.startCB) data.startCB(); //called before transition-start!
+      //data.bargraph.ontransitionend(); //start transition
+      data.value=20, data.speed2 =1;
+      updateIndicator(),tick();
+      data.intervalID = window.setInterval( tick,data.speed);
+    }
+    /**
+     * this stops the game and returns the index of hit area; use click() instead !
+     */
+    function stop(){
+      if(data.intervalID) window.clearInterval(data.intervalID);
+      var computedStyle = window.getComputedStyle(data.bargraph);
+      var left = computedStyle.getPropertyValue('left');
+      data.bargraph.style.left=left;
+      data.bargraph.style.transition = null; // disable transition AFTER fetching computed value !
+      data.run=false;
+    }
+    function tick(){
+        data.value= Math.max(0,data.value-data.speed2);
+        data.bargraph.style.left=data.value+'%';
+    }
+    function updateIndicator(){
+      data.indicator.innerHTML=data.indicators[data.seq[data.seqidx]];
+    }
+    /**
+     * this needs to be bound to eventhandler for user input detection
+     * document.querySelector('body').addEventListener("keyup", _game.click);
+     */
+    function click(evt){
+      if(!data.run) return;
+      let hit=-1;
+      switch(evt.key){
+        case 'a':
+        case 'ArrowLeft':
+          hit=0;break;
+        case 'd':
+        case 'ArrowRight':
+          hit=1;break;
+        case 'w':
+        case 'ArrowUp':
+          hit=2;break;
+        case 's':
+        case 'ArrowDown':
+          hit=3;break;
+        default: 
+          break;
+      }
+      if(hit==data.seq[data.seqidx]){ //proper hit
+        data.value+=15;
+      } else { //fail
+        data.value-=30;
+      }
+      data.bargraph.style.left=data.value+'%';
+      data.seqidx=(data.seqidx+1) % data.seq.length;
+
+      var res =-1; //detect stop
+      if(data.value>=100){
+        res=1;
+      } else if(data.value<=0) {
+        res=0;
+      }
+      if(res!=-1){
+        stop();
+        if(data.stopCB) data.stopCB(res);
+      } else {
+        updateIndicator();
+      }
+    }
+    let data ={ //internal state of game
+      bargraph : document.getElementById(bar),  //this is the moving element
+      indicator: document.getElementById(indicator), //this element shows the button to press
+      indicators: ["<-","->","^","v"],
+      run:false, //game started?
+      value: 0, //actual setpoint in%
+      seq: [0,1,0,1,2,0,1,3,2,3,2,1], //sequence of buttons to push, //todo randomized if null 
+      seqidx:0, //current seq. position
+      barsize: 5, //width of hitbox relative to total width in %
+      areas:areas,  //list of areas to hit in %;
+      speed:speed, //transition time in ms
+      speed2 : 1,  //recovery speed in % of barwidth
+      stopCB: stopCB, //callback after user trigger 
+      startCB: startCB, //callback after start
+      start: start, //ref to start-function
+      stop: stop, //ref to stop-func
+      click: click, //ref to click-func
+      intervalID: null
+    }
+    /** TODO ??
+     * instead of using timers rely on css-transition handling and events
+     */
+    /*data.bargraph.ontransitionend = () => {
+      data.value = (data.value===0)?100-data.barsize:0;
+      data.bargraph.style.left=data.value+'%'; //this should trigger css-transition
+    };*/
+    return(data);
+  }
+
   window.gm.startPong=function(){
     ///// fixed sample from https://svgjs.dev/ ////////
   // define document width and height

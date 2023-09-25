@@ -85,6 +85,7 @@ You might see a lot of links that are formated red-strikethrough. Those are curr
 <p class='author'>[[Fetishes ! (spoiler alert)|List_Fetish]]</p></br></br><hr>
 <p>Finding yourself in a futuristic bunker, you need to make your escape... </br></p>
 <p><a0 onclick='start();'>Escape from the pod...</a></p><hr>
+</br>[[ReactionTest3]]
 </article>
 <script> function start(){
     window.story.state.DngSY.remainingNights=0,window.story.state.DngSY.dngLevel=0;

@@ -42,6 +42,8 @@ feral insects
 - spider/tarantula
 - glyphid swarmers/ Brood hive
 - glyphid soldiers
+- eggclutch spawns reinforcement until destroid; chance to release swarm
+- swarm of...; cant be killed with one hit, only one by one ("One of the flys is knocked out but there are 3 left")
 
 anthro insect
 - drider
