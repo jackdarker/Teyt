@@ -3,7 +3,7 @@
 //grid = grid =[{room:'H2', dirs:['H3','I2']},...]
 window.gm.gridToGraph=function(grid){
   let _r,n,dir,_rooms= new Map();
-  for(n of grid){
+  for(n of grid.values()){
       _rooms.set(n.room,{name:n.room, neighbours:[]});
   }
   for(n of grid){
@@ -123,21 +123,25 @@ window.gm.navEvent = function(to,from){
     }
     return(_targ);
 }
+//which other tiles is this room connected to
 window.gm.getRoomDirections=function(from){
-    let rooms=window.story.state.DngSY.dngMap.grid
-    for(var i=rooms.length-1;i>=0;i--){
-        if(rooms[i].room===from){
+    let _from=from.replace(window.story.state.DngSY.dng+"_",""); //DngNG_A1 or A1
+    let dirs=[],rooms=window.story.state.DngSY.dngMap.grid;
+    let _to=rooms.get(_from);
+    if(_to) dirs=_to.dirs;
+    /*for(var i=rooms.length-1;i>=0;i--){
+        if(rooms[i].room===_from){
             return(rooms[i].dirs)
         }
-    }
-    return([]);
+    }*/
+    return(dirs);
 };
 window.gm.mobAI = function(mob){
     var _now=window.gm.getTime();
     if(mob.state!==0 || mob.tick===''){mob.tick=_now;return;}
     if(window.gm.getDeltaTime(_now,mob.tick)>30){
         mob.tick=_now;
-        var _to = getRoomDirections(mob.pos).filter(_x=> mob.path.includes(_x.dir));
+        var _to = window.gm.getRoomDirections(mob.pos).filter(_x=> mob.path.includes(_x.dir));
         if(_to.length>0){
             mob.pos=_to[_.random(0,_to.length-1)].dir;
             //alert(mob.id+' now moving to '+mob.pos);
@@ -333,7 +337,7 @@ window.gm.build_DngPC=function(){
         '|       |   |           |         ',
         'D6  E6--F6--G6--H6--I6--J6  K6--L6'];
     function _d(dir){return({dir:dir,exp:0});}
-    let grid =[
+    let _grid =[
     {room:'D2', dirs:[_d('E2')]},
     {room:'E2', dirs:[_d('F2')]},
     {room:'F2', dirs:[_d('E2'),_d('F3')]},
@@ -379,7 +383,7 @@ window.gm.build_DngPC=function(){
     {room:'J6', dirs:[_d('J5'),_d('I6')]},
     {room:'K6', dirs:[_d('L6')]},
     {room:'L6', dirs:[_d('K6')]}];
-    let data,map={grid:grid,width:14,height:8,legend:'S=Start  B=Boss'}
+    let data,map={grid:new Map(_grid.map((x)=>{return([x.room,x]);})),width:14,height:8,legend:'S=Start  B=Boss'}
     var s = window.story.state;    
     const version=3;                            // <== increment this if you change anything below - it will reinitialize data !
     if(s.DngPC && s.DngPC.version===version){

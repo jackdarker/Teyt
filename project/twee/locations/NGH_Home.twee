@@ -25,6 +25,4 @@ This is the main hall. Where would you like to go?</br>
 [[Check on your comrades]] [[Manage Items]]
 Or get some rest before your [[next trial|DngNG_Respawn]] starts.
 
-</br><a0 id='map' onclick='(function($event){document.querySelector("#"+id+"~p").toggleAttribute("hidden");})(this);'>Hint</a>
-<p hidden> Mot.</p>
 </article><article id="LogPanel"></article></section>

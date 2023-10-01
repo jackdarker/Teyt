@@ -732,8 +732,9 @@ window.gm.roll=function(n,sides){ //rolls n x dies with sides
   return(rnd); 
 }
 //expects DOM like <section><article>..<div id='output'></div>..</article></section>
-window.gm.printOutput= function(text,where="section article div#output"){
-  document.querySelector(where).innerHTML = text;
+window.gm.printOutput= function(text,where="section article div#output",append=false){
+  let n=document.querySelector(where);
+  n.innerHTML = (append?n.innerHTML:"")+text;
 };
 //connect to onclick to toggle selected-style for element + un-hiding related text
 //the elmnt (f.e.<img>) needs to be inside a parentnode f.e. <div id="choice">
@@ -776,7 +777,7 @@ window.gm.printPassageLink= function(label,target){
 //prints a link where target is a expression called onClick. Use \" instead of " or ' !
 window.gm.printLink= function(label,target,params){
   let _params=params||{}
-  _params.class=(params&&params.class)?params.class:"";
+  _params.class=(params&&params.class)?params.class:"";  //CSS-class
   return('<a href=\'javascript:void(0)\' class=\''+_params.class+'\' onclick=\''+target+'\'>'+label+'</a>');
 };
 

@@ -14,11 +14,11 @@ window.gm.build_DngNG=function(){
         '|       |   |           |         ',
         'D6  E6--F6--G6--H6--I6--J6  K6--L6'];
     function _d(dir){return({dir:dir,exp:0});}
-    let grid =[
+    let _grid =[
     {room:'D2', dirs:[_d('E2')]},
     {room:'E2', dirs:[_d('D2'),_d('F2')]},
     {room:'F2', dirs:[_d('G2'),_d('F3')]},
-    {room:'G2', dirs:[_d('F2'),_d('H2')]},
+    {room:'G2', dirs:[_d('F2'),_d('H2')], name:"corridor"},
     {room:'H2', dirs:[_d('G2'),_d('I2'),_d('H3')]},
     {room:'I2', dirs:[_d('I3'),_d('J2'),_d('H2')]},
     {room:'J2', dirs:[_d('I2'),_d('J3')]},
@@ -60,7 +60,8 @@ window.gm.build_DngNG=function(){
     {room:'J6', dirs:[_d('J5'),_d('I6')]},
     {room:'K6', dirs:[_d('L6')]},
     {room:'L6', dirs:[_d('K6')]}];
-    let data,map={grid:grid,width:14,height:8,legend:''}
+    let data,map={grid:new Map(_grid.map((x)=>{return([x.room,x]);})),
+        width:14,height:8,legend:''}
     var s = window.story.state;    
     const version=1;                            // <== increment this if you change anything below - it will reinitialize data !
     if(s.DngNG && s.DngNG.version===version){
@@ -89,9 +90,13 @@ window.gm.build_DngNG=function(){
         }
         data.tmp.evtSpawn = { //respawn evts 
         }
-        data.tmp.mobs = [ //wandering mobs pos=current tile
-            {id:"Ruff",mob:"Ruff",pos:"G3",path:["G3"],state:0,tick:'',aggro:0}
-          ]
+        data.tmp.mobs = [ //wandering mobs pos=current tile, path = walk area, nogo = dont enter here,
+            //state = 0:normal, 1:removed   //TODO passed out/sleeping
+            //aggro = ; unused if mob is unique
+            //tick = last time updated
+            {id:"Ruff",mob:"Ruff",pos:"G3",path:["G3"],state:0,tick:'',aggro:0},
+            {id:"SlimeG2",mob:"slime",pos:"G2",path:["G2"],state:0,tick:'',aggro:0}
+          ];
         data.task = {},data.rolledTask=[]; //active task
         data.tasks = { //task list 
         };
@@ -107,9 +112,48 @@ window.gm.build_DngNG=function(){
         }
         return(res);
     }
+    //add some helper funcs
+    data.getMobById=function(id){
+        for(var i=data.tmp.mobs.length-1;i>=0;i--){
+            if(data.tmp.mobs[i].id===id) return(data.tmp.mobs[i]);
+        }
+        return(null);
+    }
     return({map:map,data:data});
 };
 
+//build message+actions for NPC around player.
+//returns {msg,attitudeToPlayer}
+//attitude = 0=indifferent|1=friendly|-1=unfriendly|-2=hostile; 
+//hostile=attack on sight ; this indicates to trigger combat
+window.gm.build_NPCInfo=function(mob,position){
+    let att=-2, msg,_mob =window.story.state[mob.id]; //only unique mobs are stored here TODO 
+    msg = "A "+mob.id+" is here."; //TODO what is the mob doing? sleeping/hiding/lurking
+    if(_mob instanceof Mob) {
+        msg = _mob.unique?(mob.id+" is around."):msg;
+        //Todo interaction depends on mob (can talk, detects player, is cloaked) and player (crawl toward)
+        att=0;  //Todo calc attitude by history/relation and player-state (vulnerable or not)
+        msg+= window.gm.printPassageLink("Talk to"+mob.id,"DngNG_"+mob.id+"_Talk");
+    } else {
+            //Todo how do we know something about mob if its not unique
+    }
+    return({msg:msg,att:att});
+};
+//build message about NPC in surrounding tiles; adjoining tiles are connected to this position
+window.gm.build_NPCProximity=function(position){
+    let msg ="", mob,_d=window.story.state[window.story.state.DngSY.dng].tmp;
+    let rooms= window.gm.getRoomDirections(position).map((x)=>{return(x.dir);});
+    for(var i=_d.mobs.length-1;i>=0;i--){ // go through list of mobs and check if they are in rooms around position
+        mob=_d.mobs[i];
+        if(mob.state!==0) continue;
+        if(rooms.indexOf(mob.pos)<0) continue;
+        msg+="There seems to be someone in "+mob.pos;
+    }
+    
+    //translate _to in north/south/above...
+    //Was there some noise coming from western direction? You hear something shuffling around east of here | Ruff might be hunting north of here 
+    return(msg)
+}
 class CraftMaterial extends Item {
     constructor(){ super('CraftMaterial');
         this.addTags([window.gm.ItemTags.Material]); this.price=this.basePrice=10;   

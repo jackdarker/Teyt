@@ -60,7 +60,7 @@ window.gm.initGame= function(forceReset,NGP=null){
     if (!s.Cyril||forceReset){  //
       let ch = new Character()
       ch.name=ch.id="Cyril";
-      ch.faction="Player";
+      ch.faction="Player";ch.unique=true;
       //add some basic inventory
       ch.Outfit.addItem(new BaseHumanoid());
       ch.Outfit.addItem(new SkinHuman());
@@ -85,13 +85,13 @@ window.gm.initGame= function(forceReset,NGP=null){
     }
     if (!s.Trent||forceReset){  //the horse-bully from the bridge
       let ch = new Trent()
-      ch.name=ch.id="Trent";
+      ch.name=ch.id="Trent";ch.unique=true;
       s.Trent = ch;
     }
     if (!s.PlayerVR||forceReset){  
       let ch = new Character();
       ch.id="PlayerVR";
-      ch.name="Zeph";
+      ch.name="Zeph";ch.unique=true;
       ch.faction="Player";
       //body
       ch.Outfit.addItem(new BaseHumanoid());
@@ -121,7 +121,7 @@ window.gm.initGame= function(forceReset,NGP=null){
     if (!s.PlayerRL||forceReset){  
         let ch = new Character();
         ch.id="PlayerRL";
-        ch.name="Andrew";
+        ch.name="Andrew";ch.unique=true;
         ch.faction="Player";
         //ch.Effects.addItem(new skCooking());
         //add some basic inventory
@@ -460,11 +460,11 @@ window.gm.printNav=function(label,dir,args=null){
       break;
     default: return('');
   }
-  let grid=window.story.state.DngSY.dngMap.grid,found=false;
-  for(i=grid.length-1;i>=0;i--){
-    if(grid[i].room===here){
-      for(k=grid[i].dirs.length-1;k>=0;k--){
-        if(grid[i].dirs[k].dir===to){found=true;break;}
+  let room,grid=window.story.state.DngSY.dngMap.grid.values(),found=false;
+  for(room of grid){
+    if(room.room===here){
+      for(k=room.dirs.length-1;k>=0;k--){
+        if(room.dirs[k].dir===to){found=true;break;}
       }
       if(found) break;
     }
@@ -573,9 +573,8 @@ window.gm.printMap2=function(dng,playerTile,reveal,visitedTiles){
     visitedTiles.push(playerTile);
   }
   let _rA,i,k,xy,room,dir;
-  let xyB,dx,dy;
-  for(i=dng.grid.length-1;i>=0;i--){// foreach room create room
-    room=dng.grid[i];
+  let xyB,dx,dy,_grid=dng.grid.values();
+  for(room of _grid){// foreach room create room
     xy=nameToXY(room.room);
     _rA=lRoom.use('tmplRoom').attr({id:room.room, title:room.room}).move(xy.x, xy.y);
     //var link = document.createElement('title');    link.textContent=room.room;    _rA.put(link);// appendchild is unknown // adding title to use dosnt work - would have to add to template

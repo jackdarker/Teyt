@@ -34,22 +34,34 @@ Depending on your ranking you receive some prize - or punishment:
 
 :: DngNG_Encounters
 <script>function tick(){
-    let here = window.gm.player.location,_d=window.story.state.DngNG.tmp;
-    if(here===_d.tickPass) return;
-    _d.tickPass=here;
+    let _info,here = window.gm.player.location,_d=window.story.state.DngNG.tmp;
+    let fightMobs=[];
+    //if(here===_d.tickPass) return;
+    //_d.tickPass=here;
     for(var i=_d.mobs.length-1;i>=0;i--){ //check persistent mobs
       var mob=_d.mobs[i];
       window.gm.mobAI(mob);
       if(window.story.state.DngSY.dng+"_"+mob.pos===here){
-        //if mob is at same position as player: trigger passage or just show note
+        //if mob is at same position as player and alive: trigger passage or just show note
         if(mob.state===0){
-          window.gm.encounters[mob.mob]({noStart:true});
-          var _oldVictory=window.gm.Encounter.onVictory.bind(window.gm.Encounter);
-          window.gm.Encounter.onVictory= function(){mob.state=1;return(_oldVictory());}
-          window.gm.Encounter.initCombat(); return;
+            _info = window.gm.build_NPCInfo(mob,here);
+            window.gm.printOutput(_info.msg,"section article div#output",true);
+            if(_info.att<=-2) fightMobs.push(mob);
+        } else if(mob.state===1){
+            window.gm.printOutput("A "+mob.mob+" was once possibly around. ","section article div#output",true);
         }
       }
     }
+    //there might be mobs forcing a fight
+    if(fightMobs.length>0) {
+        window.gm.encounters[fightMobs[0].mob]({noStart:true});
+        var _oldVictory=window.gm.Encounter.onVictory.bind(window.gm.Encounter);
+        window.gm.Encounter.onVictory= function(){fightMobs[0].state=1;return(_oldVictory());}
+        window.gm.Encounter.initCombat(); return;
+    }
+    window.gm.printOutput(window.gm.build_NPCProximity(here),"section article div#output",true);
+    if(here===_d.tickPass) return; //dont retrigger on rerender
+    _d.tickPass=here;
     let _t=_d.tier,_allChances=0,_choice=[];
     switch(here){//foes; traps are handled in window.gm.navEvent, there might also be evtLeave added elsewhere
         default:
@@ -73,12 +85,26 @@ Depending on your ranking you receive some prize - or punishment:
 tick();
 </script>
 
+:: DngNG_Ruff_Talk [_back_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+Ruff is just growling menacingly at you.</br> Maybe if you would have something tasty for him...
+<a0 onclick='foo()'>Get closer</a>
+</br>[[Back|_back_]]</br>
+</article><article id="LogPanel"></article></section>
+<script> function foo(){
+    window.gm.encounters["Ruff"]({noStart:true});
+    var _oldVictory=window.gm.Encounter.onVictory.bind(window.gm.Encounter);
+    window.gm.Encounter.onVictory= function(){window.story.state.DngNG.getMobById("Ruff").state=1;return(_oldVictory());}
+    window.gm.Encounter.initCombat(); return;
+}</script>
 
 :: DngNG_A1
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 Somewhere in the dungeon.</br>
-<%=window.gm.renderRoom(window.passage.name)%></br><%=window.story.render('DngNG_Action')%></br><%=window.gm.printNav2()%>
+<%=window.gm.renderRoom(window.passage.name)%></br>
+<div id='output'></div>
+</br><%=window.story.render('DngNG_Action')%></br><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
 <%=window.story.render("DngNG_Encounters")%>
 
