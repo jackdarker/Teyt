@@ -60,10 +60,11 @@ window.gm.build_DngNG=function(){
     {room:'J6', dirs:[_d('J5'),_d('I6')]},
     {room:'K6', dirs:[_d('L6')]},
     {room:'L6', dirs:[_d('K6')]}];
-    let data,map={grid:new Map(_grid.map((x)=>{return([x.room,x]);})),
+    let s = window.story.state,data,map={grid:new Map(_grid.map((x)=>{return([x.room,x]);})),
         width:14,height:8,legend:''}
-    var s = window.story.state;    
-    const version=1;                            // <== increment this if you change anything below - it will reinitialize data !
+    /////// --!!!!
+    const version=1;
+    ////// -- !!!!                          // <== increment this if you change anything below - it will reinitialize data !
     if(s.DngNG && s.DngNG.version===version){
         data=s.DngNG;
     } else {
@@ -91,11 +92,11 @@ window.gm.build_DngNG=function(){
         data.tmp.evtSpawn = { //respawn evts 
         }
         data.tmp.mobs = [ //wandering mobs pos=current tile, path = walk area, nogo = dont enter here,
-            //state = 0:normal, 1:removed   //TODO passed out/sleeping
-            //aggro = ; unused if mob is unique
+            //state = see window.gm.mobAI
+            //timerA & B = ; used for mobAI
             //tick = last time updated
-            {id:"Ruff",mob:"Ruff",pos:"G3",path:["G3"],state:0,tick:'',aggro:0},
-            {id:"SlimeG2",mob:"slime",pos:"G2",path:["G2"],state:0,tick:'',aggro:0}
+            {id:"Ruff",mob:"Ruff",pos:"G3",path:["G3"],state:0,tick:'',att:0,timerA:0,timerB:0},
+            {id:"SlimeG2",mob:"slime",pos:"G2",path:["G2"],state:0,tick:'',att:0,timerA:0,timerB:0}
           ];
         data.task = {},data.rolledTask=[]; //active task
         data.tasks = { //task list 
@@ -112,6 +113,9 @@ window.gm.build_DngNG=function(){
         }
         return(res);
     }
+    data.tmp.graph = window.gm.gridToGraph(_grid);  //for pathfinding
+
+    let path = window.astar.search(data.tmp.graph,"F2","I2",null,{heuristic:(function(a,b){return(1);})})
     //add some helper funcs
     data.getMobById=function(id){
         for(var i=data.tmp.mobs.length-1;i>=0;i--){
@@ -127,8 +131,8 @@ window.gm.build_DngNG=function(){
 //attitude = 0=indifferent|1=friendly|-1=unfriendly|-2=hostile; 
 //hostile=attack on sight ; this indicates to trigger combat
 window.gm.build_NPCInfo=function(mob,position){
-    let att=-2, msg,_mob =window.story.state[mob.id]; //only unique mobs are stored here TODO 
-    msg = "A "+mob.id+" is here."; //TODO what is the mob doing? sleeping/hiding/lurking
+    let att=mob.att, msg,_mob =window.story.state[mob.id]; //only unique mobs are stored here TODO 
+    msg = "A "+mob.mob+" is here."; //TODO what is the mob doing? sleeping/hiding/lurking
     if(_mob instanceof Mob) {
         msg = _mob.unique?(mob.id+" is around."):msg;
         //Todo interaction depends on mob (can talk, detects player, is cloaked) and player (crawl toward)
@@ -136,7 +140,12 @@ window.gm.build_NPCInfo=function(mob,position){
         msg+= window.gm.printPassageLink("Talk to"+mob.id,"DngNG_"+mob.id+"_Talk");
     } else {
             //Todo how do we know something about mob if its not unique
+        if(mob.state===4 || mob.state===3){ 
+            att+=(att>-2)?-1:0;
+            msg+="You better not get closer."
+        }
     }
+    mob.att=att;
     return({msg:msg,att:att});
 };
 //build message about NPC in surrounding tiles; adjoining tiles are connected to this position
@@ -145,9 +154,10 @@ window.gm.build_NPCProximity=function(position){
     let rooms= window.gm.getRoomDirections(position).map((x)=>{return(x.dir);});
     for(var i=_d.mobs.length-1;i>=0;i--){ // go through list of mobs and check if they are in rooms around position
         mob=_d.mobs[i];
-        if(mob.state!==0) continue;
+        if(mob.state<0) continue;
         if(rooms.indexOf(mob.pos)<0) continue;
-        msg+="There seems to be someone in "+mob.pos;
+        msg+=(mob.state===3)?"Something is approaching from "+mob.pos:"There seems to be someone in "+mob.pos;
+        msg+=".<br>"
     }
     
     //translate _to in north/south/above...

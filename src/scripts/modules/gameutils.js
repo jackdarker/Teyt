@@ -203,13 +203,12 @@ window.gm.initGameFlags = function(forceReset,NGP=null){
   let DngHC = dataPrototype();
   let DngPC = dataPrototype();
   if(s.DngPC){ //update if exist
-    ({map,data}=window.gm.build_DngPC());
+    window.gm.build_DngPC();
     s.DngPC=window.gm.util.mergePlainObject(DngPC,s.DngPC);
   }
   let DngNG = dataPrototype();
-  DngNG
   if(s.DngNG){ //update if exist
-    ({map,data}=window.gm.build_DngNG());
+    window.gm.build_DngNG();
     s.DngNG=window.gm.util.mergePlainObject(DngNG,s.DngNG);
   }
   let DngLB = dataPrototype();

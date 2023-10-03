@@ -1,6 +1,6 @@
 "use strict";
 //used for pathfinding in map not using dungeon
-//grid = grid =[{room:'H2', dirs:['H3','I2']},...]
+//grid = grid =[{room:'H2', dirs:['H3','I2']},...]  TODO  new dirs:[{dir:"A3"}]
 window.gm.gridToGraph=function(grid){
   let _r,n,dir,_rooms= new Map();
   for(n of grid.values()){
@@ -9,7 +9,7 @@ window.gm.gridToGraph=function(grid){
   for(n of grid){
       _r = _rooms.get(n.room);
       for(dir of n.dirs){
-          _r.neighbours.push(_rooms.get(dir));
+          _r.neighbours.push(_rooms.get(dir.dir));
       }
       _rooms.set(n.room,_r);
   }
@@ -25,7 +25,7 @@ window.gm.gridToGraph=function(grid){
   };
   graph.areNodesEqual=function(nodeA,nodeB){return(nodeA.origNode.name===nodeB.origNode.name)};
   return(graph)
-}
+};
 window.gm.printNav2=function(label,to){
     let args = { func: function(to){return('window.gm.navHere(\"'+to+'\")');}};
     return(window.gm.printNav(label,to,args));
@@ -136,17 +136,53 @@ window.gm.getRoomDirections=function(from){
     }*/
     return(dirs);
 };
+//mob.state = -2:passedout 0:resting, 1:guarding 2:alerted 3:hunting 4:attacking  
+//mob.timerA = time until switching back to guard if no player detected
+//mob.timerB = thinking time
 window.gm.mobAI = function(mob){
-    var _now=window.gm.getTime();
-    if(mob.state!==0 || mob.tick===''){mob.tick=_now;return;}
-    if(window.gm.getDeltaTime(_now,mob.tick)>30){
+    let _now=window.gm.getTime(), timeR=30; //Todo timeRate depends on Mob?
+    let _d=window.story.state[window.story.state.DngSY.dng].tmp,goalpos;
+    if(mob.state<0 || mob.tick===''){mob.tick=_now;return;}
+    if(window.gm.getDeltaTime(_now,mob.tick)>timeR){ 
         mob.tick=_now;
-        var _to = window.gm.getRoomDirections(mob.pos).filter(_x=> mob.path.includes(_x.dir));
-        if(_to.length>0){
-            mob.pos=_to[_.random(0,_to.length-1)].dir;
-            //alert(mob.id+' now moving to '+mob.pos);
+        if(mob.pos===stripRoom(window.gm.player.location)){  //TODO && !player.hiding
+            if(mob.state===2) { //activate attacking
+                mob.timerA=2*timeR;mob.state=4; //reset after time||fight
+
+            }else if(mob.state!==2 && mob.state!==4){ //detect player
+                mob.state=2,mob.timerB=timeR;mob.timerA=2*timeR;
+            }
+        } else if(mob.state===1){ //move around
+            var _to = window.gm.getRoomDirections(mob.pos).filter(_x=> mob.path.includes(_x.dir));
+            if(_to.length>0){
+                mob.pos=_to[_.random(0,_to.length-1)].dir;
+                //alert(mob.id+' now moving to '+mob.pos);
+            } else {
+                mob.state=0;//if hunting brought us outside mobpath we are stuck 
+            }
+        } else if(mob.state===2){ //alerted
+            mob.timerB-=timeR;
+            if(mob.timerB<=0){  //TODO likelines to hunt
+                mob.timerA=4*timeR;mob.state=3;
+            }
+        } else if(mob.state===3){ //hunt
+            mob.timerB-=timeR;
+            if(mob.timerB<=0){
+                goalpos=stripRoom(window.gm.player.location); 
+                let path = window.astar.search(_d.graph, mob.pos, goalpos, null,{heuristic:(function(a,b){return(1);})})
+                if(path.length>0){
+                    mob.pos=path[0].origNode.name;
+                    window.gm.pushLog(mob.id+" goes "+mob.pos,window.story.state._gm.dbgShowMoreInfo);
+                } else {
+                    mob.state=1;
+                }
+                mob.timerB=2*timeR;
+            }
+        } else if(mob.state===4){ //attacking but player gone
+            mob.timerA=2*timeR;mob.state=3;mob.timerB=0;
         }
     }
+    function stripRoom(name){return(name.replace(window.story.state.DngSY.dng+"_",""));} //Dng_A1 -> A1
 }
 //dynamic room description 
 window.gm.renderRoom= function(room){
