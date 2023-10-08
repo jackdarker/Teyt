@@ -31,22 +31,27 @@ window.gm.printNav2=function(label,to){
     return(window.gm.printNav(label,to,args));
 }
 window.gm.navHere = function(to){
+    let _d= window.story.state[window.story.state.DngSY.dng];
     window.story.state.DngSY.prevLocation=window.gm.player.location;
     window.story.state.DngSY.nextLocation=to;
-    to=window.gm.navEvent(to,window.story.state.DngSY.prevLocation);
-    if(to==="") { to=window.story.state.DngSY.nextLocation; }
-    else{ window.gm.addTime(30);}
+    if(_d.tmp.inCombat===true){ //cannot escape in fight
+        to=window.gm.player.location;
+    } else {
+        to=window.gm.navEvent(to,window.story.state.DngSY.prevLocation);
+        if(to==="") { to=window.story.state.DngSY.nextLocation; }
+    }
     window.gm.addTime(30);
     window.story.show(to);
 }
 window.gm.navEvent = function(to,from){
     let _targ = '',dir,dirs,evt,evts,dng=window.story.state.DngSY.dng;
+    let _d=window.story.state[dng];
     let _to=to.replace(dng+"_",""),_from=from.replace(dng+"_","");
     let _addTime=0,_room=to.replace(dng+"_","");
     //tick = timestamp  
     //state: 0-active  1-inactive  
     let _chance,_chances=[],_leaveChance=0,_allChances=0,_now=window.gm.getTime(), _rnd=_.random(0,100);
-    evts = window.story.state[dng].tmp.evtLeave[_from+'_'+_to]; 
+    evts = _d.tmp.evtLeave[_from+'_'+_to]; 
     if(evts){ //leave-check
         dir=null,dirs=window.gm.getRoomDirections(_from);
         for(var i=dirs.length-1;i>=0;i--){
@@ -84,7 +89,7 @@ window.gm.navEvent = function(to,from){
     }
     ///////  door-check
     evt=null;
-    let doors=window.story.state[dng].tmp.doors[_from],doors2=window.story.state[dng].tmp.doors[_to];
+    let doors=_d.tmp.doors[_from],doors2=_d.tmp.doors[_to];
     if(doors) {
         evt = doors[_to];
     } else if(doors2) {
@@ -98,7 +103,7 @@ window.gm.navEvent = function(to,from){
         if(_targ!=='') return(_targ);
     }
     //////enter
-    evts = window.story.state[dng].tmp.evtEnter[_room];
+    evts = _d.tmp.evtEnter[_room];
     if(evts){
         evt = evts["dog"];
         if(evt){

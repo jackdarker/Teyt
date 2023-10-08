@@ -777,8 +777,9 @@ window.gm.printPassageLink= function(label,target){
 //prints a link where target is a expression called onClick. Use \" instead of " or ' !
 window.gm.printLink= function(label,target,params){
   let _params=params||{}
+  _params.once = (params&&params.once)?params.once:false; //auto disable  doesnt work if the Link was added to page dynamical as it has no parent??
   _params.class=(params&&params.class)?params.class:"";  //CSS-class
-  return('<a href=\'javascript:void(0)\' class=\''+_params.class+'\' onclick=\''+target+'\'>'+label+'</a>');
+  return('<a href=\'javascript:void(0)\' class=\''+_params.class+'\' onclick=\''+target+';'+(_params.once?'this.remove(this);':'')+'\'>'+label+'</a>');
 };
 
 //prints a link that when clicked picksup an item and places it in the inventory, if itemleft is <0, no link appears

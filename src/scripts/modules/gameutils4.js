@@ -71,6 +71,7 @@ window.gm.build_DngNG=function(){
         data=s.DngNG,data.version=version;
         data.tmp={tickPass:'', tier:0
             ,powerLevel:0
+            ,inCombat:false
         };
         data.tmp.evtLeave = { //events on tile-leave
             A1_B1: [{id:"Trap_Gas",type:'encounter',tick:window.gm.getTime(),state:0,chance:100 }, //todo cannot assign fct here because saveing
@@ -94,9 +95,11 @@ window.gm.build_DngNG=function(){
         data.tmp.mobs = [ //wandering mobs pos=current tile, path = walk area, nogo = dont enter here,
             //state = see window.gm.mobAI
             //timerA & B = ; used for mobAI
+            //att = 0=indifferent|1=friendly|-1=unfriendly|-2=hostile;
             //tick = last time updated
-            {id:"Ruff",mob:"Ruff",pos:"G3",path:["G3"],state:0,tick:'',att:0,timerA:0,timerB:0},
-            {id:"SlimeG2",mob:"slime",pos:"G2",path:["G2"],state:0,tick:'',att:0,timerA:0,timerB:0}
+            {id:"Ruff",mob:"Ruff",pos:"G3",path:["G3"],state:0,tick:'',att:0,timerA:0,timerB:0}
+            ,{id:"SlimeG2",mob:"slime",pos:"G2",path:["G2"],state:0,hp:15,tick:'',att:-1,timerA:0,timerB:0}
+            ,{id:"SlimeI2",mob:"slime",pos:"I2",path:["I2"],state:0,hp:15,tick:'',att:-2,timerA:0,timerB:0}
           ];
         data.task = {},data.rolledTask=[]; //active task
         data.tasks = { //task list 
@@ -113,9 +116,7 @@ window.gm.build_DngNG=function(){
         }
         return(res);
     }
-    data.tmp.graph = window.gm.gridToGraph(_grid);  //for pathfinding
-
-    let path = window.astar.search(data.tmp.graph,"F2","I2",null,{heuristic:(function(a,b){return(1);})})
+    data.tmp.graph = window.gm.gridToGraph(_grid);  //for pathfinding  let path = window.astar.search(data.tmp.graph,"F2","I2",null,{heuristic:(function(a,b){return(1);})})
     //add some helper funcs
     data.getMobById=function(id){
         for(var i=data.tmp.mobs.length-1;i>=0;i--){
@@ -128,7 +129,7 @@ window.gm.build_DngNG=function(){
 
 //build message+actions for NPC around player.
 //returns {msg,attitudeToPlayer}
-//attitude = 0=indifferent|1=friendly|-1=unfriendly|-2=hostile; 
+// 
 //hostile=attack on sight ; this indicates to trigger combat
 window.gm.build_NPCInfo=function(mob,position){
     let att=mob.att, msg,_mob =window.story.state[mob.id]; //only unique mobs are stored here TODO 
@@ -148,7 +149,8 @@ window.gm.build_NPCInfo=function(mob,position){
     mob.att=att;
     return({msg:msg,att:att});
 };
-//build message about NPC in surrounding tiles; adjoining tiles are connected to this position
+
+//build message about NPC in surrounding tiles(tiles connected to this position)
 window.gm.build_NPCProximity=function(position){
     let msg ="", mob,_d=window.story.state[window.story.state.DngSY.dng].tmp;
     let rooms= window.gm.getRoomDirections(position).map((x)=>{return(x.dir);});
@@ -309,3 +311,95 @@ window.gm.canOpenDoor=function(from,to) {
     }
     return(res);
 };
+
+window.gm.doMobAi=function(){
+    let _info,here = window.gm.player.location,_d=window.story.state[window.story.state.DngSY.dng].tmp;
+    let fightMobs=[],interactMobs=[];
+    for(var i=_d.mobs.length-1;i>=0;i--){ //check persistent mobs
+      var mob=_d.mobs[i];
+      window.gm.mobAI(mob);
+      if(window.story.state.DngSY.dng+"_"+mob.pos===here){
+        //if mob is at same position as player and alive: trigger passage or just show note
+        if(mob.state>=0){
+            if(mob.att<=-2) { fightMobs.push(mob);
+            } else {
+                interactMobs.push(mob);
+            }
+        } else {
+            window.gm.printOutput("A "+mob.mob+" was once possibly around. ","section article div#output",true);
+        }
+      }
+    }
+    _d.inCombat=false;
+    if(fightMobs.length>0) {     //there might be mobs forcing a fight
+        //TODO make this trapquest-style: pictures to click on with cmds; mmore foes ould approach!
+        //after click calc turn
+        //switch scene after defeat
+        _d.inCombat=true;
+        for(var i=fightMobs.length-1;i>=0;i--){
+            _info = window.gm.build_NPCCombat(fightMobs[i],here);
+            window.gm.printOutput(_info.msg,"section article div#output",true);
+        }
+        /*window.gm.encounters[fightMobs[0].mob]({noStart:true});
+        var _oldVictory=window.gm.Encounter.onVictory.bind(window.gm.Encounter);
+        window.gm.Encounter.onVictory= function(){fightMobs[0].state=-1;return(_oldVictory());}
+        window.gm.Encounter.initCombat(); return;*/
+    } else {
+        for(var i=interactMobs.length-1;i>=0;i--){
+            _info = window.gm.build_NPCInfo(interactMobs[i],here);
+            window.gm.printOutput(_info.msg,"section article div#output",true);
+        }
+    }
+    window.gm.printOutput(window.gm.build_NPCProximity(here),"section article div#output",true);
+    if(here===_d.tickPass) return; //dont retrigger on rerender
+    _d.tickPass=here;
+    let _t=_d.tier,_allChances=0,_choice=[];
+    switch(here){//foes; traps are handled in window.gm.navEvent, there might also be evtLeave added elsewhere
+        default:
+    }  
+    _choice.forEach(x=>(_allChances+=x.chance));
+    if(_allChances>0){//choose rnd enemy
+        var _rnd=_.random(0,_allChances-0.01);
+        for(var i = _choice.length-1;i>=0;i--){ 
+            if(_rnd<_allChances && _rnd>=(_allChances-_choice[i].chance)){
+                if(false && ['_Lectern'].includes(_choice[i].id)){ //scene
+                    window.story.show(window.story.state.DngSY.dng+_choice[i].id);
+                } else { //foe
+                    window.gm.encounters[_choice[i].id]({type:_choice[i].type, amount:_choice[i].amount,levelUp:_choice[i].levelUp,noFlee:true});  
+                }          
+                break;
+            }
+            _allChances-=_choice[i].chance;
+        }
+    }
+};
+//mob does act, desc & list of player choices is returned
+window.gm.build_NPCCombat=function(mob,position){
+    let msg, dmg=10;
+    msg = mob.mob+" attacks you:";
+    msg+= "-"+dmg.toFixed(0)+'dmg</br>';
+    window.gm.player.Stats.increment("health",dmg*-1);
+    if(window.gm.player.isDead()) {
+        msg+= window.gm.printLink("Accept your defeat",'window.gm.respawn({keepInventory:true});');
+    }else {
+        msg+= window.gm.printLink("Slap it",'window.gm.slapMob(\"'+mob.id+'\")');
+    }
+    return({msg:msg});
+};
+window.gm.slapMob=function(id){
+    let msg,dmg=4;
+    let mob=window.story.state[window.story.state.DngSY.dng].getMobById(id);
+    mob.hp-=dmg;
+    msg="You punch toward the "+mob.mob+" and hit it for "+dmg.toFixed(0)+"dmg."; 
+    if(mob.hp<=0) {
+        msg+=window.gm.mobDefeat(mob);
+    }
+    msg+=window.gm.printLink('Next','window.story.show(window.gm.player.location)'); 
+    window.gm.printOutput(msg,"section article div#output");//<= overwrite output!
+};
+window.gm.mobDefeat=function(mob) {
+    let msg="";
+    mob.state=-2; //knocked out
+    msg=mob.mob+" got knocked out."; 
+    return(msg);
+}
