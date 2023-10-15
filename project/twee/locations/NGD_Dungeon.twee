@@ -6,7 +6,7 @@
 
 :: DngNG_Action
 <%if(window.passage.name==="DngNG_F3"){%><a0 onclick=''>Bang against the door to let you out of this place.</a><%}%>
-[[place snare trap]]  <a0 onclick=''>Hide</a> <a0 onclick='window.gm.addTime(30);window.gm.refreshAllPanel()'>Wait</a>
+[[place snare trap]]  <a0 onclick='window.gm.addTime(30);window.gm.refreshAllPanel()'>Wait</a>
 
 :: DngNG_Encounters
 <script>window.gm.doMobAi();</script>
@@ -62,7 +62,7 @@ Ruff is just growling menacingly at you.</br> Maybe if you would have something 
 Somewhere in the dungeon.</br>
 <%=window.gm.renderRoom(window.passage.name)%></br>
 <div id='output'></div>
-</br><%=window.story.render('DngNG_Action')%></br><%=window.gm.printNav2()%>
+</br><%=window.story.render('DngNG_Action')%></br><div id="navpanel"><%=window.gm.printNav2()%></div>
 </article><article id="LogPanel"></article></section>
 <%=window.story.render("DngNG_Encounters")%>
 

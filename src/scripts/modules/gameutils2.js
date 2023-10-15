@@ -1,14 +1,14 @@
 "use strict";
 //used for pathfinding in map not using dungeon
-//grid = grid =[{room:'H2', dirs:['H3','I2']},...]  TODO  new dirs:[{dir:"A3"}]
+//grid = Array or Map of [{room:'H2', dirs:['H3','I2']},...]  TODO  new dirs:[{dir:"A3"}]
 window.gm.gridToGraph=function(grid){
   let _r,n,dir,_rooms= new Map();
-  for(n of grid.values()){
+  for(n of grid.values()){ //copy grid to new Map
       _rooms.set(n.room,{name:n.room, neighbours:[]});
   }
-  for(n of grid){
+  for(n of grid.values()){ //for every room
       _r = _rooms.get(n.room);
-      for(dir of n.dirs){
+      for(dir of n.dirs){ //add neigbors
           _r.neighbours.push(_rooms.get(dir.dir));
       }
       _rooms.set(n.room,_r);
@@ -34,12 +34,8 @@ window.gm.navHere = function(to){
     let _d= window.story.state[window.story.state.DngSY.dng];
     window.story.state.DngSY.prevLocation=window.gm.player.location;
     window.story.state.DngSY.nextLocation=to;
-    if(_d.tmp.inCombat===true){ //cannot escape in fight
-        to=window.gm.player.location;
-    } else {
-        to=window.gm.navEvent(to,window.story.state.DngSY.prevLocation);
-        if(to==="") { to=window.story.state.DngSY.nextLocation; }
-    }
+    to=window.gm.navEvent(to,window.story.state.DngSY.prevLocation);
+    if(to==="") { to=window.story.state.DngSY.nextLocation; }
     window.gm.addTime(30);
     window.story.show(to);
 }
@@ -174,7 +170,9 @@ window.gm.mobAI = function(mob){
             mob.timerB-=timeR;
             if(mob.timerB<=0){
                 goalpos=stripRoom(window.gm.player.location); 
-                let path = window.astar.search(_d.graph, mob.pos, goalpos, null,{heuristic:(function(a,b){return(1);})})
+                let path = window.astar.search(
+                    window.gm.gridToGraph(window.story.state.DngSY.dngMap.grid), //TODO dont rebuild everytime
+                    mob.pos, goalpos, null,{heuristic:(function(a,b){return(1);})})
                 if(path.length>0){
                     mob.pos=path[0].origNode.name;
                     window.gm.pushLog(mob.id+" goes "+mob.pos,window.story.state._gm.dbgShowMoreInfo);

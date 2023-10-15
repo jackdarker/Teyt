@@ -194,7 +194,7 @@ for(var i=0;i<maxSlots;i++){
 Here you can check and modify several options: </br>
 Your outfit can only be changed by using a wardrobe.</br>
 <%if(window.story.state._gm.playerParty.length>1){%>
-  Your party consist of <%=(function(){var msg=[];for(var n of window.story.state._gm.playerParty){msg.push(window.story.state[n].name);}return(msg);}()).join(',')%></br>
+  Your party consist of <%=(function(){var msg=[];for(var n of window.story.state._gm.playerParty){msg.push(window.story.state.chars[n].name);}return(msg);}()).join(',')%></br>
 <%}%>
 [[Back|_back_]] [[Status]] [[Levelup]] [[View|Mirror]] [[Inventory]] [[Relations]] [[QuestList]]</br>
 </article><article id="LogPanel"></article></section>
@@ -310,17 +310,17 @@ Status of <%=char.name%>:   [[Back|_back_]]</br>
 <div id='output'></div>
 </article><article id="LogPanel"></article></section>
 <script>function levelUp(char){
-  window.story.state[char].levelUp(1);
+  window.story.state.chars[char].levelUp(1);
   window.gm.refreshAllPanel();
 }
 function statUp(statid,charname){
-  let char =window.story.state[charname];
+  let char =window.story.state.chars[charname];
   char.Stats.increment(statid,1);
   char._data.unspentStat-=1; //todo ugly
   window.gm.refreshAllPanel();
 }
 function showStats(charname){
-  let char =window.story.state[charname];
+  let char =window.story.state.chars[charname];
   let _wheights = char.autolevelWheight();
   let msg='';
   if(char._data.unspentStat>0){

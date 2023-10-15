@@ -347,12 +347,15 @@ window.gm.initGame= function(forceReset,NGP=null){
         msg: ''   // memorizes a message to display when returning from _back-passage; please clear it when leaving the passage
       }
     }
-    if (!s.GlobalChest||forceReset){  
+    if(!s.chars||forceReset){
+      s.chars={};
+    }
+    if (!s.chars.GlobalChest||forceReset){  
       let ch = new Character();
       ch.id="GlobalChest";
       ch.name="GlobalChest";
       ch.faction="Player";
-      s.GlobalChest=ch;
+      s.chars.GlobalChest=ch;
     }
     if (!s.combat||forceReset){ //see encounter & combat.js
       s.combat = {
@@ -665,7 +668,7 @@ window.gm.restorePage=function(){
 //changes the active player and will add him to party!
 window.gm.switchPlayer = function(playername){
   var s = window.story.state;
-  window.gm.player= s[playername];
+  window.gm.player= s.chars[playername];
   s._gm.activePlayer = playername;
   window.gm.addToParty(playername);
 }
@@ -675,7 +678,7 @@ window.gm.removeFromParty= function(name){
   if(i>=0) s._gm.playerParty.splice(i,1);
 }
 //adds the character to the party
-//there has to be a CharacterObject for window.story.state[name]
+//there has to be a CharacterObject for window.story.state.chars[name]
 window.gm.addToParty= function(name){
   var s=window.story.state;
   if(s._gm.playerParty.indexOf(name)<0)
@@ -966,17 +969,17 @@ window.gm.printEffectSummary= function(who='player',what){
   _what.showskill =(what&&what.showskill)?what.showskill:false;
   let elmt='', s= window.story.state, result ='';
   result+='<table>';
-  let ids =window.story.state[who].Stats.getAllIds();
+  let ids =window.story.state.chars[who].Stats.getAllIds();
   ids.sort(); //Todo better sort
   for(var k=0;k<ids.length;k++){
-      var data = window.story.state[who].Stats.get(ids[k])
+      var data = window.story.state.chars[who].Stats.get(ids[k])
       let isFetish = (data.id.slice(0,2)==='ft'), isSkill=(data.id.slice(0,3)==='sk_'); //Fetish starts with ft
       let isResistance = (data.id.slice(0,4)==='rst_')||(data.id.slice(0,4)==='arm_'); //
       if(data.hidden!==4){
         if(isFetish && _what.showfetish && !(data.id.slice(-4,-2)==='_M') ){
           //expects names of fetish like ftXXX and limits ftXXX_Min ftXXX_Max
-          let min = window.story.state[who].Stats.get(ids[k]+"_Min");
-          let max = window.story.state[who].Stats.get(ids[k]+"_Max");
+          let min = window.story.state.chars[who].Stats.get(ids[k]+"_Min");
+          let max = window.story.state.chars[who].Stats.get(ids[k]+"_Max");
           result+='<tr><td>'+((data.hidden & 0x1)?'???':data.id)+':</td><td>'+((data.hidden & 0x2)?'???':data.value)+'</td>';
           result+='<td>'+((data.hidden & 0x2)?'???':'('+(min.value+' to '+max.value))+')</td></tr>';
         }
@@ -988,10 +991,10 @@ window.gm.printEffectSummary= function(who='player',what){
   }
   result+='</table>';
   result+='</br>Active Effects:<table>'
-  ids = window.story.state[who].Effects.getAllIds();
+  ids = window.story.state.chars[who].Effects.getAllIds();
   ids.sort(); //Todo better sort
   for(var i=0;i<ids.length;i++){
-      var data = window.story.state[who].Effects.get(ids[i]);
+      var data = window.story.state.chars[who].Effects.get(ids[i]);
       if(data.hidden!==4){
       result+='<tr><td>'+((data.hidden & 0x1)?'???':data.name)+':</td><td>'+((data.hidden & 0x1)?'???':data.desc)+'</td><td>'+((data.hidden & 0x2)?'???':data.data.duration)+'h left</td></tr>';
       }

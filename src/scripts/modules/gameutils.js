@@ -57,7 +57,7 @@ window.gm.initGame= function(forceReset,NGP=null){
         foodMaxStore : 4
       };
     }
-    if (!s.Cyril||forceReset){  //
+    if (!s.chars.Cyril||forceReset){  //
       let ch = new Character()
       ch.name=ch.id="Cyril";
       ch.faction="Player";ch.unique=true;
@@ -71,24 +71,24 @@ window.gm.initGame= function(forceReset,NGP=null){
       ch.Outfit.addItem(new Jeans());
       ch.Outfit.addItem(new TankShirt());
       ch.Stats.increment('strength',3);
-      s.Cyril = ch;
+      s.chars.Cyril = ch;
     }
-    if (!s.Carlia||forceReset){  //the cat/dog-woman
+    if (!s.chars.Carlia||forceReset){  //the cat/dog-woman
       let ch = new Carlia()
-      s.Carlia = ch;
+      s.chars.Carlia = ch;
     }
-    if (!s.Ruff||forceReset){  //Ruff the wolf
-      s.Ruff = new Ruff()
+    if (!s.chars.Ruff||forceReset){  //Ruff the wolf
+      s.chars.Ruff = new Ruff()
     }
-    if (!s.Clyde||forceReset){  //Clyde the foxman
-      s.Clyde = new Clyde()
+    if (!s.chars.Clyde||forceReset){  //Clyde the foxman
+      s.chars.Clyde = new Clyde()
     }
-    if (!s.Trent||forceReset){  //the horse-bully from the bridge
+    if (!s.chars.Trent||forceReset){  //the horse-bully from the bridge
       let ch = new Trent()
       ch.name=ch.id="Trent";ch.unique=true;
       s.Trent = ch;
     }
-    if (!s.PlayerVR||forceReset){  
+    if (!s.chars.PlayerVR||forceReset){  
       let ch = new Character();
       ch.id="PlayerVR";
       ch.name="Zeph";ch.unique=true;
@@ -116,9 +116,9 @@ window.gm.initGame= function(forceReset,NGP=null){
         ch.Skills.addItem(new SkillSubmit());
       }
       //ch.Effects.addItem(effMutator.factory("")); //Mutationlogic
-      s.PlayerVR=ch;
+      s.chars.PlayerVR=ch;
     }
-    if (!s.PlayerRL||forceReset){  
+    if (!s.chars.PlayerRL||forceReset){  
         let ch = new Character();
         ch.id="PlayerRL";
         ch.name="Andrew";ch.unique=true;
@@ -147,7 +147,7 @@ window.gm.initGame= function(forceReset,NGP=null){
         //special skills
         ch.Effects.addItem(new effNotTired()); //depending on sleep Tired will be set to NotTired or Tired
         //ch.Skills.addItem(SkillCallHelp.factory('Mole'));
-        s.PlayerRL=ch;
+        s.chars.PlayerRL=ch;
     }
     /*let dngs = [BeeHive,ShatteredCity]; //add your dngs here !
     for(var n of dngs){
@@ -343,7 +343,7 @@ window.gm.postDefeat=function(){
 //after passing out: heal player and remove inventory {keepInventory=false,location=''}
 window.gm.respawn=function(conf={keepInventory:false}){
   for(var name of window.story.state._gm.playerParty){
-      let _x=window.story.state[name];
+      let _x=window.story.state.chars[name];
       _x.Stats.increment("energy",9999);_x.Stats.increment("will",9999);_x.Stats.increment("health",9999);
   }
   window.gm.player.Stats.increment("energy",9999);
