@@ -58,10 +58,10 @@ window.gm.initGame= function(forceReset,NGP=null){
         foodMaxStore : 4
       };
     }
-    if (!s.Cyril||forceReset){  //
+    if (!s.chars.Cyril||forceReset){  //
       let ch = new Character()
       ch.name=ch.id="Cyril";
-      ch.faction="Player";
+      ch.faction="Player";ch.unique=true;
       //add some basic inventory
       ch.Outfit.addItem(new BaseHumanoid());
       ch.Outfit.addItem(new SkinHuman());
@@ -72,27 +72,27 @@ window.gm.initGame= function(forceReset,NGP=null){
       ch.Outfit.addItem(new Jeans());
       ch.Outfit.addItem(new TankShirt());
       ch.Stats.increment('strength',3);
-      s.Cyril = ch;
+      s.chars.Cyril = ch;
     }
-    if (!s.Carlia||forceReset){  //the cat/dog-woman
+    if (!s.chars.Carlia||forceReset){  //the cat/dog-woman
       let ch = new Carlia()
-      s.Carlia = ch;
+      s.chars.Carlia = ch;
     }
-    if (!s.Ruff||forceReset){  //Ruff the wolf
-      s.Ruff = new Ruff()
+    if (!s.chars.Ruff||forceReset){  //Ruff the wolf
+      s.chars.Ruff = new Ruff()
     }
-    if (!s.Clyde||forceReset){  //Clyde the foxman
-      s.Clyde = new Clyde()
+    if (!s.chars.Clyde||forceReset){  //Clyde the foxman
+      s.chars.Clyde = new Clyde()
     }
-    if (!s.Trent||forceReset){  //the horse-bully from the bridge
+    if (!s.chars.Trent||forceReset){  //the horse-bully from the bridge
       let ch = new Trent()
-      ch.name=ch.id="Trent";
+      ch.name=ch.id="Trent";ch.unique=true;
       s.Trent = ch;
     }
-    if (!s.PlayerVR||forceReset){  
+    if (!s.chars.PlayerVR||forceReset){  
       let ch = new Character();
       ch.id="PlayerVR";
-      ch.name="Zeph";
+      ch.name="Zeph";ch.unique=true;
       ch.faction="Player";
       //body
       ch.Outfit.addItem(new BaseHumanoid());
@@ -117,12 +117,12 @@ window.gm.initGame= function(forceReset,NGP=null){
         ch.Skills.addItem(new SkillSubmit());
       }
       //ch.Effects.addItem(effMutator.factory("")); //Mutationlogic
-      s.PlayerVR=ch;
+      s.chars.PlayerVR=ch;
     }
-    if (!s.PlayerRL||forceReset){  
+    if (!s.chars.PlayerRL||forceReset){  
         let ch = new Character();
         ch.id="PlayerRL";
-        ch.name="Andrew";
+        ch.name="Andrew";ch.unique=true;
         ch.faction="Player";
         //ch.Effects.addItem(new skCooking());
         //add some basic inventory
@@ -148,7 +148,7 @@ window.gm.initGame= function(forceReset,NGP=null){
         //special skills
         ch.Effects.addItem(new effNotTired()); //depending on sleep Tired will be set to NotTired or Tired
         //ch.Skills.addItem(SkillCallHelp.factory('Mole'));
-        s.PlayerRL=ch;
+        s.chars.PlayerRL=ch;
     }
     /*let dngs = [BeeHive,ShatteredCity]; //add your dngs here !
     for(var n of dngs){
@@ -169,7 +169,7 @@ window.gm.initGameFlags = function(forceReset,NGP=null){
   function dataPrototype(){return({visitedTiles:[],mapReveal:[],tmp:{},version:0});}
   if (forceReset){  
     s.Settings=s.DngCV=s.DngDF=s.DngAM=s.DngSY=s.DngMN=s.DngAT=null; 
-    s.DngFM=s.DngSC=s.DngLB=s.DngHC=s.DngPC=s.DngLT=null;
+    s.DngFM=s.DngSC=s.DngLB=s.DngHC=s.DngPC=s.DngNG=s.DngLT=null;
     s.Know = {}
   }
   let Know = {};
@@ -204,19 +204,19 @@ window.gm.initGameFlags = function(forceReset,NGP=null){
   let DngHC = dataPrototype();
   let DngPC = dataPrototype();
   if(s.DngPC){ //update if exist
-    ({map,data}=window.gm.build_DngPC());
+    window.gm.build_DngPC();
     s.DngPC=window.gm.util.mergePlainObject(DngPC,s.DngPC);
   }
-  let DngLT = dataPrototype();
-  DngLT
-  if(s.DngLT){ //update if exist
-    ({map,data}=window.gm.build_DngLT());
-    s.DngLT=window.gm.util.mergePlainObject(DngLT,s.DngLT);
+  let DngNG = dataPrototype();
+  if(s.DngNG){ //update if exist
+    window.gm.build_DngNG();
+    s.DngNG=window.gm.util.mergePlainObject(DngNG,s.DngNG);
   }
   let DngLB = dataPrototype();
   let DngSC = dataPrototype();
   let DngCV = dataPrototype();
   let DngMN = dataPrototype();DngMN.page={}; //which bookpages got collected
+  let DngLT = dataPrototype();
   //see comment in rebuildFromSave why this is done
   s.Settings=window.gm.util.mergePlainObject(Settings,s.Settings);
   s.Know=window.gm.util.mergePlainObject(Know,s.Know);
@@ -231,6 +231,7 @@ window.gm.initGameFlags = function(forceReset,NGP=null){
   s.DngHC=window.gm.util.mergePlainObject(DngHC,s.DngHC);
   s.DngLB=window.gm.util.mergePlainObject(DngLB,s.DngLB);
   s.DngPC=window.gm.util.mergePlainObject(DngPC,s.DngPC);
+  s.DngNG=window.gm.util.mergePlainObject(DngNG,s.DngNG);
   s.DngLT=window.gm.util.mergePlainObject(DngLT,s.DngLT);
   //todo cleanout obsolete data ( filtering those not defined in template) 
 };
@@ -345,7 +346,7 @@ window.gm.postDefeat=function(){
 //after passing out: heal player and remove inventory {keepInventory=false,location=''}
 window.gm.respawn=function(conf={keepInventory:false}){
   for(var name of window.story.state._gm.playerParty){
-      let _x=window.story.state[name];
+      let _x=window.story.state.chars[name];
       _x.Stats.increment("energy",9999);_x.Stats.increment("will",9999);_x.Stats.increment("health",9999);
   }
   window.gm.player.Stats.increment("energy",9999);
@@ -461,11 +462,11 @@ window.gm.printNav=function(label,dir,args=null){
       break;
     default: return('');
   }
-  let grid=window.story.state.DngSY.dngMap.grid,found=false;
-  for(i=grid.length-1;i>=0;i--){
-    if(grid[i].room===here){
-      for(k=grid[i].dirs.length-1;k>=0;k--){
-        if(grid[i].dirs[k].dir===to){found=true;break;}
+  let room,grid=window.story.state.DngSY.dngMap.grid.values(),found=false;
+  for(room of grid){
+    if(room.room===here){
+      for(k=room.dirs.length-1;k>=0;k--){
+        if(room.dirs[k].dir===to){found=true;break;}
       }
       if(found) break;
     }
@@ -574,9 +575,8 @@ window.gm.printMap2=function(dng,playerTile,reveal,visitedTiles){
     visitedTiles.push(playerTile);
   }
   let _rA,i,k,xy,room,dir;
-  let xyB,dx,dy;
-  for(i=dng.grid.length-1;i>=0;i--){// foreach room create room
-    room=dng.grid[i];
+  let xyB,dx,dy,_grid=dng.grid.values();
+  for(room of _grid){// foreach room create room
     xy=nameToXY(room.room);
     _rA=lRoom.use('tmplRoom').attr({id:room.room, title:room.room}).move(xy.x, xy.y);
     //var link = document.createElement('title');    link.textContent=room.room;    _rA.put(link);// appendchild is unknown // adding title to use dosnt work - would have to add to template

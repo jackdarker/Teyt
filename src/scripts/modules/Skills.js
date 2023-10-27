@@ -739,7 +739,7 @@ class SkillSubmit extends Skill {
             result.OK = true;
             let rnd = _.random(1,100);
             if(rnd >0){ //Todo fleeing chance calculation
-                result.msg += "You submit to your foe.";
+                //result.msg += "You submit to your foe.";
                 window.story.state.combat.playerSubmitting = true;  //just setting the flag, you have to take care of handling!
             } else {
                 result.msg += "Your attempts to submit failed.";

@@ -59,7 +59,7 @@ Those are very present through the game and in the main-story (also check the se
 </article>
 
 :: Intro_KH
-<article><%window.gm.initGame();window.gm.player.location=window.passage.name;%>
+<article><%window.gm.initGame(true);window.gm.player.location=window.passage.name;%>
 <p class='author'>You might see a lot of links that are formated red-strikethrough. Those are currently broken and you shouldnt use them.</p>
 <p class="author">Player name and start gender are currently unchangeable.</p>
 <p class='author'>Loading of savegame is only possible in game. Saving might be disabled in some locations.</p>
@@ -78,7 +78,7 @@ Those are very present through the game and in the main-story (also check the se
 
 
 :: Intro
-<article><%window.gm.initGame();window.gm.player.location=window.passage.name;%>
+<article><%window.gm.initGame(true);window.gm.player.location=window.passage.name;%>
 <p class='author'>Note that there is no back-button implemented. Pressing the back button of your browser will get your game aborted.</br>
 You might see a lot of links that are formated red-strikethrough. Those are currently broken and you shouldnt use them.</p>
 <p class='author'>Loading of savegame is only possible in game. Saving might be disabled in some locations.</p>
@@ -96,7 +96,7 @@ You might see a lot of links that are formated red-strikethrough. Those are curr
 
 
 :: Intro_SY
-<article><%window.gm.initGame();window.gm.player.location=window.passage.name;%>
+<article><%window.gm.initGame(true);window.gm.player.location=window.passage.name;%>
 <p class='author'>Note that there is no back-button implemented. Pressing the back button of your browser will get your game aborted.</br>
 You might see a lot of links that are formated red-strikethrough. Those are currently broken and you shouldnt use them.</p>
 <p class="author">Player name and start gender are currently unchangeable.</p>
@@ -153,7 +153,7 @@ This is for testing purpose with some configurable settings.
 </script>
 
 :: Intro_DLC
-<article><%window.gm.initGame();window.gm.player.location=window.passage.name;%>
+<article><%window.gm.initGame(true);window.gm.player.location=window.passage.name;%>
 <p>Welcome to Meason, a town somewhere in these days. </br>
 You are a student in the local university and live in a shared house with some other fellows. </br></p>
 <p class='author'>You might see a lot of links that are formated red-strikethrough. Those are currently broken and you shouldnt use them.</p>

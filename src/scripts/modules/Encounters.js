@@ -16,6 +16,10 @@ window.gm.encounters._setup= function(params){
     window.gm.Encounter.sceneDecoy= _params.sceneDecoy;
     return(_params)
 };
+//TODO Howto dynamic encounters like dryad + wolf?  
+//window.gm.encounters.generic({foes:[{amount:1,type:"Wolf",sub:"AlphaWolf"},{amount:1,type:"Dryad"}],...,noStart:true}) 
+//window.gm.Encounter.onSubmit=function...
+
 //params = {location:window.passage.name, amount:1};
 //params={[{amount:1,type:"Wolf",sub:"AlphaWolf", location:"cave", levelUp:3}]} but how to assign submit/defeat??
 window.gm.encounters.mole = function(params){
