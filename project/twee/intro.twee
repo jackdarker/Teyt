@@ -59,7 +59,7 @@ Those are very present through the game and in the main-story (also check the se
 </article>
 
 :: Intro_KH
-<article><%window.gm.initGame();window.gm.player.location=window.passage.name;%>
+<article><%window.gm.initGame(true);window.gm.player.location=window.passage.name;%>
 <p class='author'>You might see a lot of links that are formated red-strikethrough. Those are currently broken and you shouldnt use them.</p>
 <p class="author">Player name and start gender are currently unchangeable.</p>
 <p class='author'>Loading of savegame is only possible in game. Saving might be disabled in some locations.</p>
@@ -78,13 +78,32 @@ Those are very present through the game and in the main-story (also check the se
 
 
 :: Intro
-<article><%window.gm.initGame();window.gm.player.location=window.passage.name;%>
+<article><%window.gm.initGame(true);window.gm.player.location=window.passage.name;%>
 <p class='author'>Note that there is no back-button implemented. Pressing the back button of your browser will get your game aborted.</br>
 You might see a lot of links that are formated red-strikethrough. Those are currently broken and you shouldnt use them.</p>
 <p class='author'>Loading of savegame is only possible in game. Saving might be disabled in some locations.</p>
 <p class='author'>[[Fetishes ! (spoiler alert)|List_Fetish]]</p></br></br><hr>
 <p>This is a kind of remake of NightgamesMod. I wasnt able to mod it in Java, so I started from scratch. </br></p>
 <p><a0 onclick='start();'>Start</a></p><hr>
+<p><a0 onclick='startRandom();'>random Dng</a>
+<label>length:
+    <select id="length">
+        <option value="1">1</option><option value="2" >2</option><option value="3" >3</option><option value="4" selected>4</option>
+        <option value="5" >5</option><option value="6" >6</option><option value="7" >7</option><option value="8" >8</option>
+    </select>
+</label>
+<label>add doors:
+    <select id="extradoors">
+        <option value="0">0</option><option value="1" selected>1</option><option value="2" >2</option><option value="3" >3</option><option value="4" >4</option>
+    </select>
+</label>
+<label>naming:
+    <select id="naming">
+        <option value="A1" selected>A1</option><option value="-12_1">-12_1</option><option value="-12_+01" >-12_+01</option>
+    </select>
+</label>
+</p><hr>
+<hr><div id='canvas'style='max-height: 256px;overflow: auto;'></div><div id='svgpopup'></div></br>
 </article>
 <script> function start(){
     window.story.state.DngSY.remainingNights=0,window.story.state.DngSY.dngLevel=0;
@@ -93,10 +112,18 @@ You might see a lot of links that are formated red-strikethrough. Those are curr
     window.gm.player.autoLeveling();
     window.gm.player.Outfit.removeItem("StaffWodden");window.gm.player.Inv.removeItem("StaffWodden");
 }
-
+function startRandom(){
+    window.story.state.DngSY.remainingNights=0,window.story.state.DngSY.dngLevel=0;
+    window.story.state.vars.spawnAt="DngNG_Home";
+    var selLength=document.getElementById('length'),selDoors=document.getElementById('extradoors'),selName=document.getElementById('naming');
+    var length=selLength.options[selLength.selectedIndex].value,doors=selDoors.options[selDoors.selectedIndex].value,naming=selName.options[selName.selectedIndex].value;
+    window.story.state.tmp = window.GenerateDng.DngGen.generate({length:length,doors:doors,naming:naming});
+    window.gm.printMap2(window.story.state.tmp,'','',null);
+}
+</script>
 
 :: Intro_SY
-<article><%window.gm.initGame();window.gm.player.location=window.passage.name;%>
+<article><%window.gm.initGame(true);window.gm.player.location=window.passage.name;%>
 <p class='author'>Note that there is no back-button implemented. Pressing the back button of your browser will get your game aborted.</br>
 You might see a lot of links that are formated red-strikethrough. Those are currently broken and you shouldnt use them.</p>
 <p class="author">Player name and start gender are currently unchangeable.</p>
@@ -153,7 +180,7 @@ This is for testing purpose with some configurable settings.
 </script>
 
 :: Intro_DLC
-<article><%window.gm.initGame();window.gm.player.location=window.passage.name;%>
+<article><%window.gm.initGame(true);window.gm.player.location=window.passage.name;%>
 <p>Welcome to Meason, a town somewhere in these days. </br>
 You are a student in the local university and live in a shared house with some other fellows. </br></p>
 <p class='author'>You might see a lot of links that are formated red-strikethrough. Those are currently broken and you shouldnt use them.</p>

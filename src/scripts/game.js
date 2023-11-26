@@ -479,10 +479,33 @@ window.gm.forwardTime=function(until){
 // use: child._parent = window.gm.util.refToParent(parent);
 window.gm.util.refToParent = function(me){ return function(){return(me);}};  //todo causes problem with replaceState??
 //since there is no builtin function to format numbers here is one: formatNumber(-1002.4353,2) -> 1,002.44  
-window.gm.util.formatNumber = function(n, dp){
-  var s = ''+(Math.floor(n)), d = Math.abs(n % 1), i = s.length, r = '';
+window.gm.util.formatNumber = function(n, dp,sign=false){
+  var out='',s = ''+((dp>0)?((n>0)?Math.floor(n):Math.ceil(n)):Math.round(n)),d = Math.abs(n % 1), i = s.length, r = '';
   while ( (i -= 3) > 0 ){ r = ',' + s.substr(i, 3) + r; }  //todo . & , is hardcoded
-  return s.substr(0, i + 3) + r + (dp>0 ? '.' +(d ? Math.round(d * Math.pow(10, dp || 2)) : '0'.repeat(dp)) : '');
+  out= s.substr(0, i + 3) + r;
+  if(sign){
+    out=((n>=0)?'+':'')+out;
+  }
+  return(out + (dp>0 ? '.' +(d ? Math.round(d * Math.pow(10, dp )) : '0'.repeat(dp)) : ''));
+};
+/** formatInt is meant for formating integer to string; n may be decimal and gets rounded
+ * sign: if true prepend + if positive 
+ * width: if not null prepend 0s to stuff; disables 1000s indicator
+ * <%=window.gm.util.formatInt(-1234.66,true,5)%> -01235</br>
+*  <%=window.gm.util.formatInt(1234.66,true,5)%> +01235</br>
+ */
+window.gm.util.formatInt = function(n,sign=false, width=null){
+  var out='',s = ''+(Math.abs(Math.round(n))), i = s.length, r = '';
+  if(width!=null) {
+    out='0'.repeat(Math.max(0,width-i))+s;
+  } else {
+    while ( (i -= 3) > 0 ){ r = ',' + s.substr(i, 3) + r; }  //1000s marking; todo . & , is hardcoded
+    out= s.substr(0, i + 3) + r;
+  } 
+  if(sign){
+    out=((n>=0)?'+':'-')+out;
+  }
+  return(out);
 };
 //---------------------------------------------------------------------------------
 //TODO 
