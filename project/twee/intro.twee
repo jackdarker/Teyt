@@ -101,6 +101,11 @@ You might see a lot of links that are formated red-strikethrough. Those are curr
     <select id="naming">
         <option value="A1" selected>A1</option><option value="-12_1">-12_1</option><option value="-12_+01" >-12_+01</option>
     </select>
+</label></br>
+<label>branches:
+    <select id="branches">
+        <option value="0" selected>0</option><option value="1">1</option><option value="2" >2</option>
+    </select>
 </label>
 </p><hr>
 <hr><div id='canvas'style='max-height: 256px;overflow: auto;'></div><div id='svgpopup'></div></br>
@@ -116,8 +121,10 @@ function startRandom(){
     window.story.state.DngSY.remainingNights=0,window.story.state.DngSY.dngLevel=0;
     window.story.state.vars.spawnAt="DngNG_Home";
     var selLength=document.getElementById('length'),selDoors=document.getElementById('extradoors'),selName=document.getElementById('naming');
+    var selBranches=document.getElementById('branches')
     var length=selLength.options[selLength.selectedIndex].value,doors=selDoors.options[selDoors.selectedIndex].value,naming=selName.options[selName.selectedIndex].value;
-    window.story.state.tmp = window.GenerateDng.DngGen.generate({length:length,doors:doors,naming:naming});
+    var branches=selBranches.options[selBranches.selectedIndex].value;
+    window.story.state.tmp = window.GenerateDng.DngGen.generate({length:length,doors:doors,naming:naming,branches:branches});
     window.gm.printMap2(window.story.state.tmp,'','',null);
 }
 </script>
