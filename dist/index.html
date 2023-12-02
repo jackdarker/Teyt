@@ -1086,18 +1086,24 @@ define([],factory);//define(['b'], factory);
 module.exports=factory();//module.exports = factory(require('b'));
 }else{// Browser globals (root is window)
 root.GenerateDng=factory();//root.returnExports = factory(root.b);
-}})(typeof self!=='undefined'?self:void 0,function(){//function (b) {
-// Use b in some fashion.
-var Room=/*#__PURE__*/function(){function Room(){_classCallCheck(this,Room);this.pos=[0,0];this.sectiles=[[0,0],[0,-1],[0,1],[-1,0],[1,0]];this.dirs=[];this.setPosition(this.pos);}_createClass(Room,[{key:"setPosition",value:function setPosition(pos){var _this3=this;this.pos=pos;this.tiles=this.sectiles.map(function(x){return[x[0]+_this3.pos[0],x[1]+_this3.pos[1]];});}},{key:"getAddress",value:function getAddress(){return this.pos[0]+'_'+this.pos[1];}}]);return Room;}();/** Generates a map made from cross-patterned rooms 
+}})(typeof self!=='undefined'?self:void 0,function(){//function (b) {// Use b in some fashion.
+var Room=/*#__PURE__*/function(){//a room here means 5 tiles arranged as a cross
+function Room(){_classCallCheck(this,Room);this.pos=[0,0];this.sectiles=[[0,0],[0,-1],[0,1],[-1,0],[1,0]];//tile coord. relativ to maintile
+this.dirs=[];this.setPosition(this.pos);}_createClass(Room,[{key:"setPosition",value:function setPosition(pos){var _this3=this;this.pos=pos;this.tiles=this.sectiles.map(function(x){return[x[0]+_this3.pos[0],x[1]+_this3.pos[1]];});//tile coord. absolute
+}},{key:"getAddress",value:function getAddress(){return this.pos[0]+'_'+this.pos[1];}}]);return Room;}();/** Generates a map made from cross-patterned rooms 
     * 
     */var Generator=/*#__PURE__*/function(){function Generator(){_classCallCheck(this,Generator);}//resets state of generator
 _createClass(Generator,[{key:"reset",value:function reset(){this.length=1;this.minX=0,this.minY=0;this.mainrooms=[];this.doors=[];//[ [ [1,1],[0,1] ],... ]
-this.room=new Room();this.grid=new Map();this.placeRoom(this.room);}},{key:"intersects",value:function intersects(newRoom){var inter=[],rooms=Array.from(this.grid.values()),newtiles=newRoom.tiles;for(var i=rooms.length-1;i>=0;i--){var tiles=rooms[i].tiles;for(var k=newtiles.length-1;k>=0;k--){for(var l=tiles.length-1;l>=0;l--){if(newtiles[k][0]===tiles[l][0]&&newtiles[k][1]===tiles[l][1]){return true;}}}}return false;}},{key:"placeRoom",value:function placeRoom(newRoom){this.grid.set(newRoom.getAddress(),newRoom);for(var k=newRoom.tiles.length-1;k>=0;k--){//add doors to templates
+this.room=new Room();this.grid=new Map();this.placeRoom(this.room);}},{key:"intersects",value:function intersects(newRoom){//is the new structure intersecting with existing ones?   
+var inter=[],rooms=Array.from(this.grid.values()),newtiles=newRoom.tiles;for(var i=rooms.length-1;i>=0;i--){var tiles=rooms[i].tiles;for(var k=newtiles.length-1;k>=0;k--){for(var l=tiles.length-1;l>=0;l--){if(newtiles[k][0]===tiles[l][0]&&newtiles[k][1]===tiles[l][1]){return true;}}}}return false;}},{key:"placeRoom",value:function placeRoom(newRoom){//place a roomtemplate on grid
+this.grid.set(newRoom.getAddress(),newRoom);for(var k=newRoom.tiles.length-1;k>=0;k--){//add doors to templates
 this.minX=Math.min(this.minX,newRoom.tiles[k][0]),this.minY=Math.min(this.minY,newRoom.tiles[k][1]);for(var l=newRoom.tiles.length-1;l>=0;l--){if(this.isNeighbour(newRoom.tiles[k],newRoom.tiles[l])){//tiles directly beside each other?
-this.doors.push([newRoom.tiles[k],newRoom.tiles[l]]);}}}this.mainrooms.push(newRoom.getAddress());}},{key:"isNeighbour",value:function isNeighbour(tileA,tileB){//yes: [1,0] & [1,-1]     [2,-1] & [1,-1]
+this.doors.push([newRoom.tiles[k],newRoom.tiles[l]]);}}}this.mainrooms.push(newRoom.getAddress());}},{key:"isNeighbour",value:function isNeighbour(tileA,tileB){//are 2 tiles neigbors
+//yes: [1,0] & [1,-1]     [2,-1] & [1,-1]
 //no:   [-1,0] & [1,-1]
 var tx=tileA[0]-tileB[0],ty=tileA[1]-tileB[1];if(tx===0&&(ty===1||ty===-1)||ty===0&&(tx===1||tx===-1))return true;return false;}},{key:"sanitizeDoors",value:function sanitizeDoors(){//remove double entries of doors
-var _sane=[];var _iterator25=_createForOfIteratorHelper(this.doors.values()),_step25;try{var _loop=function _loop(){var y=_step25.value;if(_sane.find(function(el){return y[0]===el[0]&&y[1]===el[1]||y[0]===el[1]&&y[1]===el[0];})){return"continue";}_sane.push(y);};for(_iterator25.s();!(_step25=_iterator25.n()).done;){var _ret=_loop();if(_ret==="continue")continue;}}catch(err){_iterator25.e(err);}finally{_iterator25.f();}}},{key:"toCoord",value:function toCoord(tile){var X=['A','B','C','D','E','F','G','H','I','J','K','L','M','N'];var Y=['0','1','2','3','4','5','6','7','8','9'];switch(this.params.naming){case'A1':return X[tile[0]-this.minX]+Y[tile[1]-this.minY];//returns 'E5', also shifts Position as smallest value is A1
+var _sane=[];var _iterator25=_createForOfIteratorHelper(this.doors.values()),_step25;try{var _loop=function _loop(){var y=_step25.value;if(_sane.find(function(el){return y[0]===el[0]&&y[1]===el[1]||y[0]===el[1]&&y[1]===el[0];})){return"continue";}_sane.push(y);};for(_iterator25.s();!(_step25=_iterator25.n()).done;){var _ret=_loop();if(_ret==="continue")continue;}}catch(err){_iterator25.e(err);}finally{_iterator25.f();}}},{key:"toCoord",value:function toCoord(tile){//
+var X=['A','B','C','D','E','F','G','H','I','J','K','L','M','N'];var Y=['0','1','2','3','4','5','6','7','8','9'];switch(this.params.naming){case'A1':return X[tile[0]-this.minX]+Y[tile[1]-this.minY];//returns 'E5', also shifts Position as smallest value is A1
 break;case'-12_1':return tile[0]-this.minX+'_'+(tile[1]-this.minY);break;case'-12_+01':return window.gm.util.formatInt(tile[0]-this.minX,true,2)+'_'+window.gm.util.formatInt(tile[1]-this.minY,true,2);break;}}/**
          *  generates new map and returns it
          * @memberof Generator
@@ -1108,46 +1114,23 @@ break;case'-12_1':return tile[0]-this.minX+'_'+(tile[1]-this.minY);break;case'-1
          * doors: additional doors between template, default none
          * naming: namingstyle of rooms: A1 (default, max = K9); -12_1 ; -12_+01
          * branches: defines if mainrooms can branch out: default 0; 2 means there could be 2 forks
-         */},{key:"generate",value:function generate(params){this.params=params||{};this.params.length=this.params.length?this.params.length:4;this.params.doors=this.params.doors?this.params.doors:0;this.params.naming=this.params.naming?this.params.naming:'A1';this.params.branches=this.params.branches?this.params.branches:0;this.params.progress=this.params.progress?this.params.progress:function(){};this.reset();var pos,n,branched=0;var slots=[[-2,-1],[2,1],[-2,1],[2,-1],[-1,-2],[1,-2],[-1,2],[1,2]];while(this.length<this.params.length){n=Array.from(slots);n.sort(function(){return Math.random()-0.5;});// scramble array
+         */},{key:"generate",value:function generate(params){this.params=params||{};this.params.length=this.params.length?this.params.length:4;this.params.doors=this.params.doors?this.params.doors:0;this.params.naming=this.params.naming?this.params.naming:'A1';this.params.branches=this.params.branches?this.params.branches:0;this.params.progress=this.params.progress?this.params.progress:function(){};this.reset();var pos,n,branched=0;var slots=[[-2,-1],[2,1],[-2,1],[2,-1],[-1,-2],[1,-2],[-1,2],[1,2]];//relative coord. around a cross-pattern where new patterns could be placed
+while(this.length<this.params.length){n=Array.from(slots);n.sort(function(){return Math.random()-0.5;});// scramble array TODO could be used to control where the next room is added like placing them as line or spiral
 var newRoom=new Room();while(true){pos=n.pop();newRoom.setPosition([pos[0]+this.room.pos[0],pos[1]+this.room.pos[1]]);//check if newRoom would intersect with present rooms
 if(!this.intersects(newRoom)){this.placeRoom(newRoom);//find neigboring tiles of new and previous room and build main doors 
 var brk=false;for(var k=newRoom.tiles.length-1;k>=0&&brk===false;k--){for(var l=this.room.tiles.length-1;l>=0&&brk===false;l--){if(this.isNeighbour(newRoom.tiles[k],this.room.tiles[l])){//tiles directly beside each other?
-this.doors.push([newRoom.tiles[k],this.room.tiles[l]]);brk=true;}}}this.length+=1;//todo create branch
+this.doors.push([newRoom.tiles[k],this.room.tiles[l]]);brk=true;}}}this.length+=1;//create branch
 //after adding a room, there is a chance to select a previous mainroom to continue on instead of extending from current mainroom
 if(branched<this.params.branches){var x=Math.round((this.params.length-1)*Math.random());//likelyness to branch should increase with length
 if(x<this.mainrooms.length-1){this.room=this.grid.get(this.mainrooms[x]);branched+=1;}else this.room=newRoom;}else this.room=newRoom;//memorize for next iter
-break;}}}//add doors to templates
-/*for(var i=this.mainrooms.length-1;i>=0;i--){
-                let ra=this.grid.get(this.mainrooms[i]);
-                for(var k=ra.tiles.length-1;k>=0;k--){
-                    minX=Math.min(minX,ra.tiles[k][0]),minY=Math.min(minY,ra.tiles[k][1]);
-                    for(var l=ra.tiles.length-1;l>=0;l--){
-                        if( this.isNeighbour(ra.tiles[k],ra.tiles[l])){ //tiles directly beside each other?
-                            this.doors.push([ra.tiles[k],ra.tiles[l]]);
-                        }
-                    }
-                }
-            }
-            //find neigboring tiles of new and previous room and build main doors  
-            for(var i=1;i<this.mainrooms.length;i++){
-                let brk,ra=this.grid.get(this.mainrooms[i-1]),rb=this.grid.get(this.mainrooms[i]);
-                brk=false;
-                for(var k=ra.tiles.length-1;k>=0 && brk===false ;k--){
-                    for(var l=rb.tiles.length-1;l>=0 && brk===false;l--){
-                        if( this.isNeighbour(ra.tiles[k],rb.tiles[l])){ //tiles directly beside each other?
-                            this.doors.push([ra.tiles[k],rb.tiles[l]]);
-                            brk=true;
-                        }
-                    }
-                }
-            }*/var _allrooms=[];var _iterator26=_createForOfIteratorHelper(this.grid.values()),_step26;try{for(_iterator26.s();!(_step26=_iterator26.n()).done;){var _x3=_step26.value;var _iterator29=_createForOfIteratorHelper(_x3.tiles.values()),_step29;try{for(_iterator29.s();!(_step29=_iterator29.n()).done;){var y=_step29.value;_allrooms.push(y);}}catch(err){_iterator29.e(err);}finally{_iterator29.f();}}//build additional doors between templates
+break;}}}var _allrooms=[];var _iterator26=_createForOfIteratorHelper(this.grid.values()),_step26;try{for(_iterator26.s();!(_step26=_iterator26.n()).done;){var _x3=_step26.value;var _iterator29=_createForOfIteratorHelper(_x3.tiles.values()),_step29;try{for(_iterator29.s();!(_step29=_iterator29.n()).done;){var y=_step29.value;_allrooms.push(y);}}catch(err){_iterator29.e(err);}finally{_iterator29.f();}}//build additional doors between templates
 }catch(err){_iterator26.e(err);}finally{_iterator26.f();}for(var i=1;i<this.mainrooms.length;i++){//walk each mainroom
 var _brk=void 0,ra=this.grid.get(this.mainrooms[i]);var _n3=this.params.doors,tiles=ra.tiles;var _iterator27=_createForOfIteratorHelper(_allrooms.values()),_step27;try{for(_iterator27.s();!(_step27=_iterator27.n()).done;){var _x2=_step27.value;for(var k=tiles.length-1;k>=0&&_n3>0;k--){//select a random tile and check neighbours from other mainrooms
 if(tiles.includes(_x2))continue;//only tiles from others
 if(this.isNeighbour(tiles[k],_x2)){//create door to neighbour, if there is already one skip ahead
 this.doors.push([tiles[k],_x2]);_n3--;if(_n3<=0)break;}//repeat n times or no more tiles
-}}}catch(err){_iterator27.e(err);}finally{_iterator27.f();}}this.sanitizeDoors();//list rooms by ?? and assign interior, all rooms with main doors have to be used
-//remove unused rooms with single door
+}}}catch(err){_iterator27.e(err);}finally{_iterator27.f();}}this.sanitizeDoors();//TODO list rooms by ?? and assign interior, all rooms with main doors have to be used
+//TODO remove unused rooms with single door
 //restructure to:
 //{grid:new Map(_grid.map((x)=>{return([x.room,x]);})),width:14,height:8,legend:''}
 //where x= {room:'D2', dirs:[{dir:'E2'}]},
@@ -3902,7 +3885,7 @@ window.storage.registerConstructor(Stat);window.storage.registerConstructor(stHe
 window.storage.registerConstructor(effCallHelp);window.storage.registerConstructor(effCombatRecovery);window.storage.registerConstructor(effDamage);window.storage.registerConstructor(effDetermined);window.storage.registerConstructor(effHunger);window.storage.registerConstructor(effLibido);window.storage.registerConstructor(effSanity);window.storage.registerConstructor(effFlying);window.storage.registerConstructor(effBleed);window.storage.registerConstructor(effCombined);window.storage.registerConstructor(effFairyLight);window.storage.registerConstructor(effGrappled);window.storage.registerConstructor(effGrappling);window.storage.registerConstructor(effUngrappling);window.storage.registerConstructor(effEnergized);window.storage.registerConstructor(effNotTired);window.storage.registerConstructor(effPillEffect);window.storage.registerConstructor(effPoiseDamage);window.storage.registerConstructor(effTeaseDamage);window.storage.registerConstructor(effTired);window.storage.registerConstructor(effStunned);window.storage.registerConstructor(effTransformSelf);window.storage.registerConstructor(effGuard);window.storage.registerConstructor(effProtect);window.storage.registerConstructor(effHeal);window.storage.registerConstructor(effMasochist);window.storage.registerConstructor(effEnergyDrain);window.storage.registerConstructor(effHorsePower);window.storage.registerConstructor(effLapineSpeed);window.storage.registerConstructor(effMutateBunny);window.storage.registerConstructor(effMutateHorse);window.storage.registerConstructor(effMutateWolf);window.storage.registerConstructor(effMutateCat);window.storage.registerConstructor(effMutateHuman);window.storage.registerConstructor(effGrowBreast);window.storage.registerConstructor(effGrowVulva);window.storage.registerConstructor(effLewdMark);window.storage.registerConstructor(effInHeat);window.storage.registerConstructor(effInRut);window.storage.registerConstructor(effSpermDecay);window.storage.registerConstructor(effButtPlugged);window.storage.registerConstructor(effVaginalFertil);window.storage.registerConstructor(effVaginalPregnant);//non-combat skills
 window.storage.registerConstructor(Ability);StatsLib.Ability=Ability;return StatsLib;}(window.gm.StatsLib||{});
 /* twine-user-script #2: "Story JavaScript" */
-</script><tw-tag name="_noshortkey_" color="brown"></tw-tag><tw-tag name="_fragm_" color="blue"></tw-tag><tw-tag name="template" color="orange"></tw-tag><tw-tag name="_back_" color="gray"></tw-tag><tw-tag name="_nosave_" color="yellow"></tw-tag><tw-tag name="_nodeffered_" color="yellow"></tw-tag><tw-tag name="_isdeffered_" color="brown"></tw-tag><tw-passagedata pid="1" name="Info_Jake" tags="_back_" position="100,100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
+</script><tw-tag name="_nosave_" color="yellow"></tw-tag><tw-tag name="_nodeffered_" color="yellow"></tw-tag><tw-tag name="_isdeffered_" color="brown"></tw-tag><tw-tag name="_noshortkey_" color="brown"></tw-tag><tw-tag name="_fragm_" color="blue"></tw-tag><tw-tag name="template" color="orange"></tw-tag><tw-tag name="_back_" color="gray"></tw-tag><tw-passagedata pid="1" name="Info_Jake" tags="_back_" position="100,100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 Jake is here.&lt;/br&gt;
 You barely know anything about him.&lt;/br&gt;
 [[Back|_back_]]&lt;/br&gt;&lt;/br&gt;

@@ -13,18 +13,17 @@
         // Browser globals (root is window)
         root.GenerateDng = factory();//root.returnExports = factory(root.b);
     }
-}(typeof self !== 'undefined' ? self : this, function () {//function (b) {
-    // Use b in some fashion.
-    class Room{
+}(typeof self !== 'undefined' ? self : this, function () {//function (b) {// Use b in some fashion.
+    class Room{ //a room here means 5 tiles arranged as a cross
         constructor(){
             this.pos = [0,0];
-            this.sectiles =[[0,0],[0,-1],[0,1],[-1,0],[1,0]];
+            this.sectiles =[[0,0],[0,-1],[0,1],[-1,0],[1,0]]; //tile coord. relativ to maintile
             this.dirs =[];
             this.setPosition(this.pos);
         }
         setPosition(pos){
             this.pos=pos;
-            this.tiles = this.sectiles.map((x)=>{return([x[0]+this.pos[0],x[1]+this.pos[1]])});
+            this.tiles = this.sectiles.map((x)=>{return([x[0]+this.pos[0],x[1]+this.pos[1]])}); //tile coord. absolute
         }
         getAddress(){return(this.pos[0]+'_'+this.pos[1]);}
     }
@@ -32,8 +31,7 @@
     * 
     */
     class Generator {
-        constructor(){
-        }
+        constructor(){  }
         //resets state of generator
         reset(){
             this.length=1;
@@ -44,7 +42,7 @@
             this.grid = new Map();
             this.placeRoom(this.room);            
         };
-        intersects(newRoom){
+        intersects(newRoom){ //is the new structure intersecting with existing ones?   
             let inter=[],rooms = Array.from(this.grid.values()),newtiles=newRoom.tiles;
             for(var i=rooms.length-1;i>=0;i--){
                 let tiles=rooms[i].tiles;
@@ -58,7 +56,7 @@
             }
             return(false);
         }
-        placeRoom(newRoom){
+        placeRoom(newRoom){ //place a roomtemplate on grid
             this.grid.set(newRoom.getAddress(),newRoom);
             for(var k=newRoom.tiles.length-1;k>=0;k--){//add doors to templates
                 this.minX=Math.min(this.minX,newRoom.tiles[k][0]),this.minY=Math.min(this.minY,newRoom.tiles[k][1]);
@@ -70,7 +68,7 @@
             }
             this.mainrooms.push(newRoom.getAddress());
         }
-        isNeighbour(tileA,tileB){
+        isNeighbour(tileA,tileB){ //are 2 tiles neigbors
             //yes: [1,0] & [1,-1]     [2,-1] & [1,-1]
             //no:   [-1,0] & [1,-1]
             let tx=tileA[0]-tileB[0],ty=tileA[1]-tileB[1];
@@ -86,7 +84,7 @@
                 _sane.push(y);
             }
         }
-        toCoord(tile){ 
+        toCoord(tile){ //
             const X=['A','B','C','D','E','F','G','H','I','J','K','L','M','N'];
             const Y=['0','1','2','3','4','5','6','7','8','9'];
             switch(this.params.naming){
@@ -119,10 +117,10 @@
             this.params.progress = (this.params.progress)?this.params.progress:function(){};
             this.reset();
             let pos,n,branched=0;
-            let slots =[[-2,-1],[2,1],[-2,1],[2,-1],[-1,-2],[1,-2],[-1,2],[1,2]];
+            let slots =[[-2,-1],[2,1],[-2,1],[2,-1],[-1,-2],[1,-2],[-1,2],[1,2]]; //relative coord. around a cross-pattern where new patterns could be placed
             while(this.length<this.params.length){
                 n = Array.from(slots); 
-                n.sort(() => Math.random() - 0.5);// scramble array
+                n.sort(() => Math.random() - 0.5);// scramble array TODO could be used to control where the next room is added like placing them as line or spiral
                 let newRoom= new Room();
                 while(true){
                     pos = n.pop();
@@ -141,7 +139,7 @@
                             }
                         }
                         this.length+=1;
-                        //todo create branch
+                        //create branch
                         //after adding a room, there is a chance to select a previous mainroom to continue on instead of extending from current mainroom
                         if(branched<this.params.branches) {
                             var x = Math.round((this.params.length-1)*Math.random()); //likelyness to branch should increase with length
@@ -153,33 +151,7 @@
                         break;
                     }
                 }
-            }
-            //add doors to templates
-            /*for(var i=this.mainrooms.length-1;i>=0;i--){
-                let ra=this.grid.get(this.mainrooms[i]);
-                for(var k=ra.tiles.length-1;k>=0;k--){
-                    minX=Math.min(minX,ra.tiles[k][0]),minY=Math.min(minY,ra.tiles[k][1]);
-                    for(var l=ra.tiles.length-1;l>=0;l--){
-                        if( this.isNeighbour(ra.tiles[k],ra.tiles[l])){ //tiles directly beside each other?
-                            this.doors.push([ra.tiles[k],ra.tiles[l]]);
-                        }
-                    }
-                }
-            }
-            //find neigboring tiles of new and previous room and build main doors  
-            for(var i=1;i<this.mainrooms.length;i++){
-                let brk,ra=this.grid.get(this.mainrooms[i-1]),rb=this.grid.get(this.mainrooms[i]);
-                brk=false;
-                for(var k=ra.tiles.length-1;k>=0 && brk===false ;k--){
-                    for(var l=rb.tiles.length-1;l>=0 && brk===false;l--){
-                        if( this.isNeighbour(ra.tiles[k],rb.tiles[l])){ //tiles directly beside each other?
-                            this.doors.push([ra.tiles[k],rb.tiles[l]]);
-                            brk=true;
-                        }
-                    }
-                }
-            }*/
-            
+            }           
             let _allrooms = [];
             for (let x of this.grid.values()){
                 for (let y of x.tiles.values()){
@@ -204,9 +176,9 @@
                 }
             }
             this.sanitizeDoors();
-            //list rooms by ?? and assign interior, all rooms with main doors have to be used
+            //TODO list rooms by ?? and assign interior, all rooms with main doors have to be used
 
-            //remove unused rooms with single door
+            //TODO remove unused rooms with single door
 
             //restructure to:
             //{grid:new Map(_grid.map((x)=>{return([x.room,x]);})),width:14,height:8,legend:''}
@@ -228,7 +200,6 @@
                 }
             }
             _grid = new Map(_grid.map((x)=>{return([x.room,x]);}));
-
             return({grid:_grid,width:20,height:20,legend:''});
         }
 
