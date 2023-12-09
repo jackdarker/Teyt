@@ -434,30 +434,57 @@ window.gm.printNav=function(label,dir,args=null){
   }
   let foo= (args!==null && args.func)?args.func:(function(to){return('window.story.show(\"'+to+'\");');}); 
   let here = window.passage.name.replace(window.story.state.DngSY.dng+'_','');
-  let to,k,i=0;
+  let to,k,i=0,split;
   const X=['A','B','C','D','E','F','G','H','I','J','K','L','M','N'],Y=['0','1','2','3','4','5','6','7','8','9'];
-  switch(dir){
-    case 'north':
-      i=Y.findIndex((_x)=>{return(_x===here[1]);});
-      if(i<0||i<=0) return('');
-      to = here[0]+Y[i-1];
-      break;
-    case 'south':
-      i=Y.findIndex((_x)=>{return(_x===here[1]);});
-      if(i<0||i>=Y.length-1) return('');
-      to = here[0]+Y[i+1];
-      break;
-    case 'east':
-      i=X.findIndex((_x)=>{return(_x===here[0]);});
-      if(i<0||i>=X.length-1) return('');
-      to = X[i+1]+here[1];
-      break;
-    case 'west':
-      i=X.findIndex((_x)=>{return(_x===here[0]);});
-      if(i<0||i<=0) return('');
-      to = X[i-1]+here[1];
-      break;
-    default: return('');
+  if(X.findIndex((_x)=>{return(_x===here[0]);})>=0){ //checkerboard-style A1
+    switch(dir){
+      case 'north':
+        i=Y.findIndex((_x)=>{return(_x===here[1]);});
+        if(i<0||i<=0) return('');
+        to = here[0]+Y[i-1];
+        break;
+      case 'south':
+        i=Y.findIndex((_x)=>{return(_x===here[1]);});
+        if(i<0||i>=Y.length-1) return('');
+        to = here[0]+Y[i+1];
+        break;
+      case 'east':
+        i=X.findIndex((_x)=>{return(_x===here[0]);});
+        if(i<0||i>=X.length-1) return('');
+        to = X[i+1]+here[1];
+        break;
+      case 'west':
+        i=X.findIndex((_x)=>{return(_x===here[0]);});
+        if(i<0||i<=0) return('');
+        to = X[i-1]+here[1];
+        break;
+      default: return('');
+    }
+  } else { //coord-style 01_05
+    split = here.split("_");
+    switch(dir){
+      case 'north':
+        i= parseInt(split[1]);
+        if(i<0||i<=0) return('');
+        to = split[0]+'_'+window.gm.util.formatInt(i-1,false,2);
+        break;
+      case 'south':
+        i= parseInt(split[1]);
+        if(i<0||i>99) return('');
+        to = split[0]+'_'+window.gm.util.formatInt(i+1,false,2);
+        break;
+      case 'east':
+        i= parseInt(split[0]);
+        if(i<0||i>99) return('');
+        to = window.gm.util.formatInt(i+1,false,2)+'_'+split[1];
+        break;
+      case 'west':
+        i= parseInt(split[0]);
+        if(i<0||i<=0) return('');
+        to = window.gm.util.formatInt(i-1,false,2)+'_'+split[1];
+        break;
+      default: return('');
+    }
   }
   let room,grid=window.story.state.DngSY.dngMap.grid.values(),found=false;
   for(room of grid){
@@ -548,7 +575,7 @@ window.gm.printMap2=function(dng,playerTile,reveal,visitedTiles){
     if(coostyle==='') { //detect coord name style once
       _x=X.findIndex((el)=>{return(el===name[0]);});
       if(_x>-1) { coostyle='A1';}
-      else if(name.split('_').length===2){ coostyle="-12_+01";}
+      else if(name.split('_').length===2){ coostyle="12_01";}
       else throw new Error("cannot detect coord style");
     }
     switch(coostyle){
@@ -556,7 +583,7 @@ window.gm.printMap2=function(dng,playerTile,reveal,visitedTiles){
         _x=Y.findIndex((el)=>{return(el===name[1]);});
         _y=X.findIndex((el)=>{return(el===name[0]);});
       break;
-      case "-12_+01":
+      case "12_01":
         coord=name.split('_');
         _x=parseInt(coord[0],10);
         _y=parseInt(coord[1],10);

@@ -76,8 +76,8 @@ window.gm.build_DngNG=function(){
     {room:'J6', dirs:[_d('J5'),_d('I6')]},
     {room:'K6', dirs:[_d('L6')]},
     {room:'L6', dirs:[_d('K6')]}];
-    let s = window.story.state,data,map={grid:new Map(_grid.map((x)=>{return([x.room,x]);})),
-        width:14,height:8,legend:''}
+    let s = window.story.state,data;//,map={grid:new Map(_grid.map((x)=>{return([x.room,x]);})),width:14,height:8,legend:''};
+    
     /////// --!!!!
     const version=1;
     ////// -- !!!!                          // <== increment this if you change anything below - it will reinitialize data !
@@ -85,6 +85,9 @@ window.gm.build_DngNG=function(){
         data=s.DngNG;
     } else {
         data=s.DngNG,data.version=version;
+        data.map= window.GenerateDng.DngGen.generate({length:5,doors:2,naming:"12_01",branches:2})
+        let x = Object.keys(data.map.grid);
+        data.Exit="DngNG_"+data.map.grid.entries().next().value[0];
         data.tmp={tickPass:'', tier:0
             ,powerLevel:0
             ,inCombat:false
@@ -139,7 +142,7 @@ window.gm.build_DngNG=function(){
         return(null);
     }
     data.addMob=addMob;
-    return({map:map,data:data});
+    return({map:data.map,data:data});
 };
 
 //build message+actions for NPC around player.

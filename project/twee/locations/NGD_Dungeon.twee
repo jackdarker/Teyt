@@ -32,7 +32,7 @@ Depending on your ranking you receive some prize - or punishment:
 </br>- the first can select a punishment for any partipicant except himself
 </br>- the second can select a punishment for the last one
 
-</br></br><a0 onclick= 'window.story.state.tmp.msg="",window.story.show("DngNG_F3")'>Get hunting</a>
+</br></br><a0 onclick= 'window.story.state.tmp.msg="",window.story.show(window.story.state.DngNG.Exit)'>Get hunting</a>
 </article><article id="LogPanel"></article></section>
 <script>
     var s = window.story.state,map,data;
@@ -55,6 +55,500 @@ Ruff is just growling menacingly at you.</br> Maybe if you would have something 
     window.gm.Encounter.onVictory= function(){window.story.state.DngNG.getMobById("Ruff").state=-1;return(_oldVictory());}
     window.gm.Encounter.initCombat(); return;
 }</script>
+
+
+:: DngNG_Tmpl
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
+Somewhere in the dungeon.</br>
+<%=window.gm.renderRoom(window.passage.name)%></br>
+<div id='output'></div>
+</br><%=window.story.render('DngNG_Action')%></br><div id="navpanel"><%=window.gm.printNav2()%></div>
+</article><article id="LogPanel"></article></section>
+
+:: DngNG_00_00
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_00_01
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_00_02
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_00_03
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_00_04
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_00_05
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_00_06
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_00_07
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_00_08
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_00_09
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_00_10
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_01_00
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_01_01
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_01_02
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_01_03
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_01_04
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_01_05
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_01_06
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_01_07
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_01_08
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_01_09
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_01_10
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_02_00
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_02_01
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_02_02
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_02_03
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_02_04
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_02_05
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_02_06
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_02_07
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_02_08
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_02_09
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_02_10
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_03_00
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_03_01
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_03_02
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_03_03
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_03_04
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_03_05
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_03_06
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_03_07
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_03_08
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_03_09
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_03_10
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_04_00
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_04_01
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_04_02
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_04_03
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_04_04
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_04_05
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_04_06
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_04_07
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_04_08
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_04_09
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_04_10
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_05_00
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_05_01
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_05_02
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_05_03
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_05_04
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_05_05
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_05_06
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_05_07
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_05_08
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_05_09
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_05_10
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_06_00
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_06_01
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_06_02
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_06_03
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_06_04
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_06_05
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_06_06
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_06_07
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_06_08
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_06_09
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_06_10
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_07_00
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_07_01
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_07_02
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_07_03
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_07_04
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_07_05
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_07_06
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_07_07
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_07_08
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_07_09
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_07_10
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_08_00
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_08_01
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_08_02
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_08_03
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_08_04
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_08_05
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_08_06
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_08_07
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_08_08
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_08_09
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_08_10
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_09_00
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_09_01
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_09_02
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_09_03
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_09_04
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_09_05
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_09_06
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_09_07
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_09_08
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_09_09
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_09_10
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_10_00
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_10_01
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_10_02
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_10_03
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_10_04
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_10_05
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_10_06
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_10_07
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_10_08
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_10_09
+<%=window.story.render('DngNG_Tmpl')%>
+
+
+:: DngNG_10_10
+<%=window.story.render('DngNG_Tmpl')%>
+
 
 :: DngNG_A1
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>

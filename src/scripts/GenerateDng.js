@@ -35,7 +35,7 @@
         //resets state of generator
         reset(){
             this.length=1;
-            this.minX=0,this.minY=0;
+            this.minX=0,this.minY=0,this.maxX=0,this.maxY=0;
             this.mainrooms = [];
             this.doors =[]; //[ [ [1,1],[0,1] ],... ]
             this.room = new Room();
@@ -60,6 +60,7 @@
             this.grid.set(newRoom.getAddress(),newRoom);
             for(var k=newRoom.tiles.length-1;k>=0;k--){//add doors to templates
                 this.minX=Math.min(this.minX,newRoom.tiles[k][0]),this.minY=Math.min(this.minY,newRoom.tiles[k][1]);
+                this.maxX=Math.max(this.maxX,newRoom.tiles[k][0]),this.maxY=Math.min(this.maxY,newRoom.tiles[k][1]);
                 for(var l=newRoom.tiles.length-1;l>=0;l--){
                     if( this.isNeighbour(newRoom.tiles[k],newRoom.tiles[l])){ //tiles directly beside each other?
                         this.doors.push([newRoom.tiles[k],newRoom.tiles[l]]);
@@ -84,16 +85,18 @@
                 _sane.push(y);
             }
         }
-        toCoord(tile){ //
+        toCoord(tile){ //translates the numeric coord. into a name
             const X=['A','B','C','D','E','F','G','H','I','J','K','L','M','N'];
             const Y=['0','1','2','3','4','5','6','7','8','9'];
             switch(this.params.naming){
                 case 'A1': return(X[tile[0]-this.minX]+Y[tile[1]-this.minY]); //returns 'E5', also shifts Position as smallest value is A1
                 break;
-                case '-12_1': return((tile[0]-this.minX)+'_'+(tile[1]-this.minY));
+                case '12_1': return((tile[0]-this.minX)+'_'+(tile[1]-this.minY)); //smallest value is 0, no negatives
                 break;
-                case '-12_+01': return(window.gm.util.formatInt(tile[0]-this.minX,true,2)+
-                    '_'+window.gm.util.formatInt(tile[1]-this.minY,true,2));
+                case '12_01': return(window.gm.util.formatInt(tile[0]-this.minX,false,2)+
+                    '_'+window.gm.util.formatInt(tile[1]-this.minY,false,2));    //smallest value is 00, no negatives
+                case '-12_+01': return(window.gm.util.formatInt(tile[0],true,2)+
+                    '_'+window.gm.util.formatInt(tile[1],true,2));              //negatives can occur
                 break;
             }
         } 
@@ -105,16 +108,16 @@
          * parameter options:
          * length: length of rooms chained, default 4
          * doors: additional doors between template, default none
-         * naming: namingstyle of rooms: A1 (default, max = K9); -12_1 ; -12_+01
+         * naming: namingstyle of rooms , see toCoord: A1 (max = N9 ! ); 12_1 ; 12_01 (default); -12_+01
          * branches: defines if mainrooms can branch out: default 0; 2 means there could be 2 forks
          */
         generate(params){
             this.params=params||{};
             this.params.length = (this.params.length)?this.params.length:4;
             this.params.doors = (this.params.doors)?this.params.doors:0;
-            this.params.naming = (this.params.naming)?this.params.naming:'A1';
+            this.params.naming = (this.params.naming)?this.params.naming:'12_01';
             this.params.branches = (this.params.branches)?this.params.branches:0;
-            this.params.progress = (this.params.progress)?this.params.progress:function(){};
+            this.params.progress = (this.params.progress)?this.params.progress:function(){}; //TODO display generation progress 
             this.reset();
             let pos,n,branched=0;
             let slots =[[-2,-1],[2,1],[-2,1],[2,-1],[-1,-2],[1,-2],[-1,2],[1,2]]; //relative coord. around a cross-pattern where new patterns could be placed
@@ -177,7 +180,7 @@
             }
             this.sanitizeDoors();
             //TODO list rooms by ?? and assign interior, all rooms with main doors have to be used
-
+            
             //TODO remove unused rooms with single door
 
             //restructure to:
