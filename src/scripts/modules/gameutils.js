@@ -437,8 +437,9 @@ window.gm.printNav=function(label,dir,args=null){
   }
   let foo= (args!==null && args.func)?args.func:(function(to){return('window.story.show(\"'+to+'\");');}); 
   let here = window.passage.name.replace(window.story.state.DngSY.dng+'_','');
-  let to,k,i=0;
+  let to,k,i=0,split;
   const X=['A','B','C','D','E','F','G','H','I','J','K','L','M','N'],Y=['0','1','2','3','4','5','6','7','8','9'];
+  if(X.findIndex((_x)=>{return(_x===here[0]);})>=0){ //checkerboard-style A1
   switch(dir){
     case 'north':
       i=Y.findIndex((_x)=>{return(_x===here[1]);});
@@ -461,6 +462,32 @@ window.gm.printNav=function(label,dir,args=null){
       to = X[i-1]+here[1];
       break;
     default: return('');
+  }
+  } else { //coord-style 01_05
+    split = here.split("_");
+    switch(dir){
+      case 'north':
+        i= parseInt(split[1]);
+        if(i<0||i<=0) return('');
+        to = split[0]+'_'+window.gm.util.formatInt(i-1,false,2);
+        break;
+      case 'south':
+        i= parseInt(split[1]);
+        if(i<0||i>99) return('');
+        to = split[0]+'_'+window.gm.util.formatInt(i+1,false,2);
+        break;
+      case 'east':
+        i= parseInt(split[0]);
+        if(i<0||i>99) return('');
+        to = window.gm.util.formatInt(i+1,false,2)+'_'+split[1];
+        break;
+      case 'west':
+        i= parseInt(split[0]);
+        if(i<0||i<=0) return('');
+        to = window.gm.util.formatInt(i-1,false,2)+'_'+split[1];
+        break;
+      default: return('');
+    }
   }
   let room,grid=window.story.state.DngSY.dngMap.grid.values(),found=false;
   for(room of grid){
@@ -532,8 +559,8 @@ window.gm.printMap=function(MapName,playerTile,reveal,visitedTiles){
 * constructs map from template and dng-data
 */
 window.gm.printMap2=function(dng,playerTile,reveal,visitedTiles){
-  if(!window.story.state.Settings.showDungeonMap) return;
-  var step=32, width=step*(dng.width||12),height=step*(dng.height||8);
+  if(!window.story.state.Settings.showDungeonMap) return; //disabled
+  var step=32, width=step*(dng.width||12),height=step*(dng.height||8),coostyle='';
   const X=['A','B','C','D','E','F','G','H','I','J','K','L','M','N'],Y=['0','1','2','3','4','5','6','7','8','9'];
   var mypopup = document.getElementById("svgpopup"); //todo popup-functions as parameters
   function showPopup(evt){
@@ -547,11 +574,24 @@ window.gm.printMap2=function(dng,playerTile,reveal,visitedTiles){
     mypopup.style.display = "none";
   }
   function nameToXY(name){
-    let i,pos={x:0,y:0};
-    i=Y.findIndex((_x)=>{return(_x===name[1]);});
-    pos.y=i*step;//if(i<0||i>=Y.length-1) return('');
-    i=X.findIndex((_x)=>{return(_x===name[0]);});
-    pos.x=i*step;//if(i<0||i>=Y.length-1) return('');
+    let _x,_y,coord,pos={x:0,y:0};
+    if(coostyle==='') { //detect coord name style once
+      _x=X.findIndex((el)=>{return(el===name[0]);});
+      if(_x>-1) { coostyle='A1';}
+      else if(name.split('_').length===2){ coostyle="12_01";}
+      else throw new Error("cannot detect coord style");
+    }
+    switch(coostyle){
+      case 'A1':
+        _x=Y.findIndex((el)=>{return(el===name[1]);});
+        _y=X.findIndex((el)=>{return(el===name[0]);});
+      break;
+      case "12_01":
+        coord=name.split('_');
+        _x=parseInt(coord[0],10);
+        _y=parseInt(coord[1],10);
+    }
+    pos.y=_y*step; pos.x=_x*step;
     return(pos);
   }  
   function addAnno(){//add up to 4 annotation-letters
@@ -581,7 +621,7 @@ window.gm.printMap2=function(dng,playerTile,reveal,visitedTiles){
     _rA=lRoom.use('tmplRoom').attr({id:room.room, title:room.room}).move(xy.x, xy.y);
     //var link = document.createElement('title');    link.textContent=room.room;    _rA.put(link);// appendchild is unknown // adding title to use dosnt work - would have to add to template
     _rA.node.addEventListener("mouseover", showPopup);_rA.node.addEventListener("mouseout", hidePopup);
-    if(visitedTiles.indexOf(room.room)<0){
+    if(visitedTiles!=null && visitedTiles.indexOf(room.room)<0){
       if(reveal.indexOf(room.room)<0){_rA.addClass('roomNotFound');}
       else {_rA.addClass('roomFound'); addAnno();}
     }else {

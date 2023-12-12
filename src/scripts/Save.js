@@ -257,6 +257,27 @@ window.storage = {
     }
   }
 };
+
+Map.prototype.toJSON=function(){ //map doesnt have keys so we cant use window.storage.Generic_toJSON("Map", this);   TODO someone could do myMap.myValue="xx" and it wouldnt be saved
+  var data, index, key;
+  data = {};
+  this.forEach(function (value, key, map) {
+    data[key] = value;
+  });
+  return {ctor: "Map", data: data};
+};
+Map.fromJSON=function(value){
+//return(window.storage.Generic_fromJSON(Map, value.data));
+  var obj, name, setter, data=value.data;
+  
+  obj = new Map();
+  for (name in data){
+    obj.set(name,data[name]);
+  }
+  return obj;
+};
+window.storage.registerConstructor(Map);
+
 /*  //save demo
 window.gm.testsaveReviver = function (){
   window.storage.registerConstructor(Bar);
