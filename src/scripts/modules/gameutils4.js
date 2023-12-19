@@ -17,6 +17,16 @@ window.gm.build_DngNG=function(){
             id:_id,
             mob:type,pos:pos,path:[pos],state:0,tick:'',att:0,timerA:0,timerB:0});
     }
+    function getTilesByVisual(visual){
+        let _r=[];
+        for (let value of data.map.grid.values()) {
+            if(value.visuals===visual) { 
+                _r.push(value);
+            }
+        }
+        if(_r.length===0) throw new Error("no room with visual "+visual);
+        return(_r);
+    }
     const _m=[
         'D1  E1  F1--G1--H1--I1--J1--K1--L1',
         '                                  ',
@@ -86,8 +96,7 @@ window.gm.build_DngNG=function(){
     } else {
         data=s.DngNG,data.version=version;
         data.map= window.GenerateDng.DngGen.generate({length:5,doors:2,naming:"12_01",branches:2})
-        let x = Object.keys(data.map.grid);
-        data.Exit="DngNG_"+data.map.grid.entries().next().value[0];
+        data.Exit="DngNG_"+getTilesByVisual("entry")[0].room;// data.map.grid.entries().next().value[0];
         data.tmp={tickPass:'', tier:0
             ,powerLevel:0
             ,inCombat:false
@@ -110,14 +119,23 @@ window.gm.build_DngNG=function(){
             //H4:{I4:{state:0 }},
             //E5:{F5:{state:0 }},
         }
-        data.tmp.evtSpawn = { //respawn evts 
-        }
         data.tmp.mobs = [ //wandering mobs pos=current tile, path = walk area, nogo = dont enter here,
             //{id:"Ruff",mob:"Ruff",pos:"G3",path:["G3"],state:0,tick:'',att:0,timerA:0,timerB:0}
             //,{id:"SlimeG2",mob:"slime",pos:"G2",path:["G2"],state:0,hp:15,tick:'',att:0,timerA:0,timerB:0}
             //,{id:"SlimeI2",mob:"slime",pos:"I2",path:["I2"],state:0,hp:15,tick:'',att:-2,timerA:0,timerB:0}
           ];
-        addMob("Ruff","G3"),addMob("Slime","I2"),addMob("Slime","G2");
+        data.tmp.evtSpawn = { }//respawn evts 
+        data.tmp.evtSpawn["DngNG_"+getTilesByVisual("mushroom")[0].room]={ mushroom:{tick:window.gm.getTime(),state:0,loot:"BrownMushroom" }};
+        let _adr,_tiles=getTilesByVisual("bushes").concat(getTilesByVisual("trees")).sort(() => Math.random() - 0.5);;
+        for(var i=_tiles.length-1;i>=0;i--){
+            _adr="DngNG_"+_tiles[i].room;
+            data.tmp.evtSpawn[_adr]=data.tmp.evtSpawn[_adr]||{};
+            data.tmp.evtSpawn[_adr].lectern={tick:window.gm.getTime(),state:0};
+            if(i===0) addMob("Ruff",_tiles[i].room);  
+            if(i===1) addMob("Slime",_tiles[i].room);//TODO spawn generic mobs inplay
+        }
+        
+        //addMob("Ruff","G3"),addMob("Slime","I2"),addMob("Slime","G2");
         data.task = {},data.rolledTask=[]; //active task
         data.tasks = { //task list 
         };
@@ -144,7 +162,37 @@ window.gm.build_DngNG=function(){
     data.addMob=addMob;
     return({map:data.map,data:data});
 };
-
+window.gm.renderRoomNG= function(room){ //see also window.gm.renderRoom
+    let msg="",s=window.story.state, dng=s.DngSY.dng;
+    let _c=room.replace(dng+"_",""), _v=s.DngNG.map.grid.get(_c).visuals;
+    switch(_v){
+        case "trees":
+            msg+="There is a group of smaller trees."
+            break;
+        case "bushes":
+            msg+="Bushes of different sizes are growing close to each other."
+            break;
+        case 'bigtree':
+            msg+="The area here lies in the shadow of a huge tree."
+            break;
+        case 'meadow':
+            msg+="The sun shines down on the meadow, casting a warm and inviting glow over the entire area."
+            break;
+        default:
+            break;
+    }
+    switch(_v){
+        case "appletree":
+            msg+=window.story.render(dng+'_'+_v);
+            break;
+        case "entry":
+            msg+=window.story.render(dng+'_'+_v);
+            break;
+        default:
+            break;
+    }
+    return(msg);
+}
 //build message+actions for NPC around player.
 //returns {msg,attitudeToPlayer}
 // 
@@ -346,7 +394,7 @@ window.gm.doMobAi=function(){
                 interactMobs.push(mob);
             }
         } else {
-            window.gm.printOutput("A "+mob.mob+" was once possibly around. ","section article div#output",true);
+            window.gm.printOutput("A "+mob.mob+" was once possibly around. ",node,true);
         }
       }
     }

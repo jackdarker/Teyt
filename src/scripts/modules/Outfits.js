@@ -316,6 +316,26 @@ class Gag extends Equipment {
     unequipText(){return("You removed the gadget .");}
     equipText(){return("That "+this.name+" protect your mouth.");}
 }
+class RingFinger extends Equipment {
+    static factory(style){let x = new RingFinger();x.style=style;return(x); }
+    constructor(){
+        super('RingFinger');
+        this.addTags(['jewellery']);
+        this.slotUse = ['uLHand'];    //TODO how to be able to equip L or R? detect free slot and redefine slotUse?
+        this.style = 0;   
+        this.lossOnRespawn = false;
+    }
+    toJSON(){return window.storage.Generic_toJSON("RingFinger", this); }
+    static fromJSON(value){return(window.storage.Generic_fromJSON(RingFinger, value.data));}
+    set style(style){ 
+        this._style = style; 
+    }
+    get style(){return this._style;}
+    get desc(){ 
+        if(this.style===10) return('thin gold ring');
+        return('thin silver ring');
+    }
+}
 class PiercingEars extends Equipment {
     static factory(style){let x = new PiercingEars();x.style=style;return(x); }
     constructor(){
@@ -1117,6 +1137,7 @@ window.gm.ItemsLib = (function (ItemsLib){
     window.storage.registerConstructor(ChastityBelt);
     window.storage.registerConstructor(CockRing);
     window.storage.registerConstructor(Collar);
+    window.storage.registerConstructor(RingFinger);
     window.storage.registerConstructor(Gag);
     window.storage.registerConstructor(DaggerSteel);
     window.storage.registerConstructor(HarnessRubber);
@@ -1146,6 +1167,7 @@ window.gm.ItemsLib = (function (ItemsLib){
     ItemsLib['AnalPlugMed'] = function(){ let x= new AnalPlug();x.style=100;return(x); };
     ItemsLib['BikiniBottomLeather'] = function(){ return new BikiniBottomLeather();};
     ItemsLib['BikiniTopLeather'] = function(){ return new BikiniTopLeather();};
+    ItemsLib['RingFinger'] = function(){let x= new RingFinger();x.style=0;return(x);};
     ItemsLib['FaceWrap'] = function(){let x= new Gag();x.style=0;return(x);};
     ItemsLib['Muzzle'] = function(){let x= new Gag();x.style=10;return(x);};
     ItemsLib['BallGag'] = function(){let x= new Gag();x.style=20;return(x);};

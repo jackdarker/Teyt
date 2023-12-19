@@ -36,10 +36,10 @@
         reset(){
             this.length=1;
             this.minX=0,this.minY=0,this.maxX=0,this.maxY=0;
-            this.mainrooms = [];
+            this.mainrooms = [];  // [ '1_3',... ]
             this.doors =[]; //[ [ [1,1],[0,1] ],... ]
             this.room = new Room();
-            this.grid = new Map();
+            this.grid = new Map(); //structure depends on state of generation!
             this.placeRoom(this.room);            
         };
         intersects(newRoom){ //is the new structure intersecting with existing ones?   
@@ -60,7 +60,7 @@
             this.grid.set(newRoom.getAddress(),newRoom);
             for(var k=newRoom.tiles.length-1;k>=0;k--){//add doors to templates
                 this.minX=Math.min(this.minX,newRoom.tiles[k][0]),this.minY=Math.min(this.minY,newRoom.tiles[k][1]);
-                this.maxX=Math.max(this.maxX,newRoom.tiles[k][0]),this.maxY=Math.min(this.maxY,newRoom.tiles[k][1]);
+                this.maxX=Math.max(this.maxX,newRoom.tiles[k][0]),this.maxY=Math.max(this.maxY,newRoom.tiles[k][1]);
                 for(var l=newRoom.tiles.length-1;l>=0;l--){
                     if( this.isNeighbour(newRoom.tiles[k],newRoom.tiles[l])){ //tiles directly beside each other?
                         this.doors.push([newRoom.tiles[k],newRoom.tiles[l]]);
@@ -76,13 +76,37 @@
             if( (tx===0 && (ty===1 || ty ===-1)) || (ty===0 && (tx===1 || tx ===-1)))return(true);
             return(false);
         }
-        sanitizeDoors(){    //remove double entries of doors
-            let _sane =[];
-            for (let y of this.doors.values()){
-                if(_sane.find((el)=>{return((y[0]===el[0] && y[1]===el[1]) || (y[0]===el[1] && y[1]===el[0]))})) {
-                    continue;
+
+        furnishRooms(){ //furnish the rooms
+            let _r,i=0,k=0,visuals = ['bigtree','bushes','meadow','trees']
+            let uniques = ['entry','appletree','brokencabin','totem','hollowtreestump','mushroom']
+
+            let _UnusedRooms = Array.from(this.grid);
+
+            //scatter uniques semi-randomly:
+            while(uniques.length>0){ //repeat until uniques done
+                i=_.random(0,_UnusedRooms.length-1);
+                _r=_UnusedRooms.splice(i,1)[0][1]; //splice returns array [key,value] !
+                _r.visuals=uniques.pop();
+                if(_r.visuals==="entry") _r.anno='E';
+                //this.grid.set(_r.room,_r);
+            }
+            //remaining unused rooms get other visuals but make sure that each visual occurs at least once
+            k=visuals.length;
+            if(k>0){
+                while(k>0){ //repeat until uniques done
+                    k--;
+                    i=_.random(0,_UnusedRooms.length-1);
+                    _r=_UnusedRooms.splice(i,1)[0][1];         //TODO Exception if not enough room
+                    _r.visuals=visuals[k];
+                    //this.grid.set(_r.room,_r);
                 }
-                _sane.push(y);
+                while(_UnusedRooms.length>0){ //repeat until done
+                    k=_.random(0,visuals.length-1);
+                    _r=_UnusedRooms.pop()[1];
+                    _r.visuals=visuals[k];
+                    //this.grid.set(_r.room,_r);
+                }
             }
         }
         toCoord(tile){ //translates the numeric coord. into a name
@@ -100,25 +124,16 @@
                 break;
             }
         } 
-        /**
-         *  generates new map and returns it
-         * @memberof Generator
-         * @param {params} params
-         * 
-         * parameter options:
-         * length: length of rooms chained, default 4
-         * doors: additional doors between template, default none
-         * naming: namingstyle of rooms , see toCoord: A1 (max = N9 ! ); 12_1 ; 12_01 (default); -12_+01
-         * branches: defines if mainrooms can branch out: default 0; 2 means there could be 2 forks
-         */
-        generate(params){
-            this.params=params||{};
-            this.params.length = (this.params.length)?this.params.length:4;
-            this.params.doors = (this.params.doors)?this.params.doors:0;
-            this.params.naming = (this.params.naming)?this.params.naming:'12_01';
-            this.params.branches = (this.params.branches)?this.params.branches:0;
-            this.params.progress = (this.params.progress)?this.params.progress:function(){}; //TODO display generation progress 
-            this.reset();
+        sanitizeDoors(){    //remove double entries of doors
+            let _sane =[];
+            for (let y of this.doors.values()){
+                if(_sane.find((el)=>{return((y[0]===el[0] && y[1]===el[1]) || (y[0]===el[1] && y[1]===el[0]))})) {
+                    continue;
+                }
+                _sane.push(y);
+            }
+        }
+        carveRooms(){  //
             let pos,n,branched=0;
             let slots =[[-2,-1],[2,1],[-2,1],[2,-1],[-1,-2],[1,-2],[-1,2],[1,2]]; //relative coord. around a cross-pattern where new patterns could be placed
             while(this.length<this.params.length){
@@ -179,10 +194,6 @@
                 }
             }
             this.sanitizeDoors();
-            //TODO list rooms by ?? and assign interior, all rooms with main doors have to be used
-            
-            //TODO remove unused rooms with single door
-
             //restructure to:
             //{grid:new Map(_grid.map((x)=>{return([x.room,x]);})),width:14,height:8,legend:''}
             //where x= {room:'D2', dirs:[{dir:'E2'}]},
@@ -202,8 +213,35 @@
                     _grid.push({room:pos,dirs:dirs})
                 }
             }
-            _grid = new Map(_grid.map((x)=>{return([x.room,x]);}));
-            return({grid:_grid,width:20,height:20,legend:''});
+            this.grid = new Map(_grid.map((x)=>{return([x.room,x]);}));
+        }
+        /**
+         *  generates new map and returns it
+         * @memberof Generator
+         * @param {params} params
+         * 
+         * parameter options:
+         * length: length of rooms chained, default 4
+         * doors: additional doors between template, default none
+         * naming: namingstyle of rooms , see toCoord: A1 (max = N9 ! ); 12_1 ; 12_01 (default); -12_+01
+         * branches: defines if mainrooms can branch out: default 0; 2 means there could be 2 forks
+         */
+        generate(params){
+            this.params=params||{};
+            this.params.length = (this.params.length)?this.params.length:4;
+            this.params.doors = (this.params.doors)?this.params.doors:0;
+            this.params.naming = (this.params.naming)?this.params.naming:'12_01';
+            this.params.branches = (this.params.branches)?this.params.branches:0;
+            this.params.progress = (this.params.progress)?this.params.progress:function(){}; //TODO display generation progress 
+            this.reset();
+            this.carveRooms();
+            this.furnishRooms();
+            //TODO remove unused rooms with single door
+
+
+
+            return({grid:this.grid,width:this.maxX-this.minX+1,
+                height:this.maxY-this.minY+1,legend:'E:Exit  B:Boss'});
         }
 
     }
