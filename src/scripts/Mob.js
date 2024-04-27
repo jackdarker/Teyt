@@ -14,8 +14,11 @@ class Mob extends Character {
         this.fconv = null; //lazy init because descfixer depends on gm.player
     }
     toJSON(){return window.storage.Generic_toJSON("Mob", this); }
-    static fromJSON(value){return(window.storage.Generic_fromJSON(Mob, value.data));}
-    rebuildAfterLoad(){super.rebuildAfterLoad();}
+    static fromJSON(value){ 
+        var _x = window.storage.Generic_fromJSON(Mob, value.data);
+        _x.rebuildAfterLoad();
+        return(_x);
+    };
     //override to return the next move to execute
     //OK = false if no action, else true
     //msg should contain a message formatted for view (move description )g 

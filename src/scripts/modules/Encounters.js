@@ -327,7 +327,7 @@ window.gm.encounters.dryad = function(params){
 window.gm.encounters.Carlia = function(params){
     let _params=window.gm.encounters._setup(params);
     window.gm.Encounter.EnemyFunc = (function(){ 
-        let x = window.story.state.Carlia;
+        let x = window.story.state.chars.Carlia;
         x.name=x.baseName;
         x.Stats.increment("health",9999); x.Stats.increment("energy",9999);x.Stats.increment("will",9999);
         return([x]);});
@@ -353,7 +353,7 @@ window.gm.encounters.Carlia = function(params){
 window.gm.encounters.Trent = function(params){
     let _params=window.gm.encounters._setup(params);
     window.gm.Encounter.EnemyFunc = (function(){ 
-        let x = window.story.state.Trent; 
+        let x = window.story.state.chars.Trent; 
         x.name=x.baseName;
         x.Stats.increment("health",9999); x.Stats.increment("energy",9999);x.Stats.increment("will",9999); 
         return([x]);});
@@ -368,7 +368,7 @@ window.gm.encounters.Trent = function(params){
 window.gm.encounters.Ruff = function(params){
     let _params=window.gm.encounters._setup(params);
     window.gm.Encounter.EnemyFunc = (function(){ 
-        let x = window.story.state.Ruff; 
+        let x = window.story.state.chars.Ruff; 
         x.name=x.baseName;
         x.Stats.increment("health",9999); x.Stats.increment("energy",9999);x.Stats.increment("will",9999); 
         return([x]);});

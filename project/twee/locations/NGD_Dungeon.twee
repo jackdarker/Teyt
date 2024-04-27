@@ -75,7 +75,7 @@ A scrawny appletree is growing here.
 The path here winds back to the city.
 However, you first have to solve your task which is: TODO
 else
-With your task solved you might return to the city.
+With your task solved you might [[leave this place|DngNG_ReturnFromHunt]]</br>.
 
 :: DngNG_Mushroom [_fragm_]
 </br><%if(window.story.state.DngNG.tmp.evtSpawn[window.passage.name]["mushroom"].state===0){%>There is a <%=window.story.state.DngNG.tmp.evtSpawn[window.passage.name]["mushroom"].loot%>. Do you collect it?

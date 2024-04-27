@@ -53,7 +53,7 @@ initCombat(){
   s.combat.enemyParty = this.EnemyFunc();
   s.combat.playerParty = [];
   for(let n of s._gm.playerParty){
-    s.combat.playerParty.push(s[n]);
+    s.combat.playerParty.push(s.chars[n]);
   }
   s.combat.turnStack = [];
   s.combat.actor = s.combat.target = s.combat.action = null;

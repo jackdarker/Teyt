@@ -86,7 +86,7 @@ window.gm.initGame= function(forceReset,NGP=null){
     if (!s.chars.Trent||forceReset){  //the horse-bully from the bridge
       let ch = new Trent()
       ch.name=ch.id="Trent";ch.unique=true;
-      s.Trent = ch;
+      s.chars.Trent = ch;
     }
     if (!s.chars.PlayerVR||forceReset){  
       let ch = new Character();
