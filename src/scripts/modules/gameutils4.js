@@ -1,5 +1,5 @@
 "use strict";
-//stuff for Nightgames
+//stuff for Hunter Hunted
 class CraftMaterial extends Item {
     constructor(){ super('CraftMaterial');
         this.addTags([window.gm.ItemTags.Material]); this.price=this.basePrice=10;   

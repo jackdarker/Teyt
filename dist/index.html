@@ -1566,7 +1566,57 @@ gradient+='#80808000 0 '+n.a+'%, '+n.color+' '+n.a+'%,'+n.color+' '+n.b+'%,#8080
      */ /*data.bargraph.ontransitionend = () => {
       data.value = (data.value===0)?100-data.barsize:0;
       data.bargraph.style.left=data.value+'%'; //this should trigger css-transition
-    };*/return data;};window.gm.startPong=function(){///// fixed sample from https://svgjs.dev/ ////////
+    };*/return data;};/**
+   * you have fill a bar by pressing the indicated button (wasd or arrows). If you press the wrong button, the bar gets drained somewhat. 
+   * the bar will slowly slide back to origin without proper input.
+   * When the bar is filled you win, when its empty you loose.
+   * options: see _params
+   * Note: negate timeDrain,passFill,missDrain  to make bar move in opposite direction
+   * 
+   * @param {*} bar : the element-id to move
+   * @param {*} speed : recovery rate in ms 
+   * @param {*} stopCB 
+   * @param {*} startCB 
+   * 
+   */window.gm.startReactTest3=function(bar,keyIds,specialKeyIds,stopCB,startCB,comboChange,valueTrigger){//todo timeout starts after first click
+var data={//internal state of game
+bargraph:document.getElementById(bar),leftKey:document.getElementById(keyIds[0]),rightKey:document.getElementById(keyIds[1]),upKey:document.getElementById(keyIds[2]),downKey:document.getElementById(keyIds[3]),specialKeys:[],run:false,//game started?
+value:0,//actual setpoint in%
+miss:false,//internal use
+valid:false,//internal use
+comboStep:0,comboLevel:0,maxCombo:0,params:null,//parameters
+tickSpeed:50,//interval of tick
+drainTimer:0,//internal use
+nextTimer:0,//internal use
+stopCB:stopCB,//callback after user trigger 
+startCB:startCB,//callback after start
+valueTrigger:valueTrigger,comboChange:comboChange,start:start,//ref to start-function
+stop:stop,//ref to stop-func
+click:click,//ref to input-func
+intervalID:null,//internal use
+validKey:''//internal use
+};specialKeyIds.forEach(function(element){data.specialKeys.push(document.getElementById(element));});/**
+     * starts the game
+     */function start(params){var _params$drainSpeed,_params$comboSteps,_params$comboLevels,_params$comboBoost,_params$timeDrain,_params$missDrain,_params$passFill,_params$startValue;//
+data.stop();var _params=params||{};_params.drainSpeed=(_params$drainSpeed=_params.drainSpeed)!==null&&_params$drainSpeed!==void 0?_params$drainSpeed:2000;_params.comboSteps=(_params$comboSteps=_params.comboSteps)!==null&&_params$comboSteps!==void 0?_params$comboSteps:0;//if >0: after that number of consecutive correct input, the combo multiplier is increased
+_params.comboLevels=(_params$comboLevels=_params.comboLevels)!==null&&_params$comboLevels!==void 0?_params$comboLevels:1;//how many times a combo multiplier an be increased
+_params.comboBoost=(_params$comboBoost=_params.comboBoost)!==null&&_params$comboBoost!==void 0?_params$comboBoost:0.2;//this factor gets added to the combo multiplier on increase; bar increase=pass fill*multiplier   
+_params.timeDrain=(_params$timeDrain=_params.timeDrain)!==null&&_params$timeDrain!==void 0?_params$timeDrain:5;// how much the bar is drained over time (in %)
+_params.missDrain=(_params$missDrain=_params.missDrain)!==null&&_params$missDrain!==void 0?_params$missDrain:_params.timeDrain*3;//how much the bar is drained on wrong key (in %)
+_params.passFill=(_params$passFill=_params.passFill)!==null&&_params$passFill!==void 0?_params$passFill:_params.timeDrain*2;// how much the bar is fill on correct key (in %)
+_params.startValue=(_params$startValue=_params.startValue)!==null&&_params$startValue!==void 0?_params$startValue:20;//how much the bar is filled (in %) at start
+data.params=_params;data.run=true;data.miss=false;data.valid=false;data.drainTimer=0;data.comboLevel=data.comboStep=data.maxCombo=0;var width=window.getComputedStyle(data.bargraph).getPropertyValue('width');var total=window.getComputedStyle(data.bargraph.parentNode).getPropertyValue('width');//data.bargraph.style.transition = "left "+data.speed+"ms linear"; //configure transition for animation
+if(data.startCB)data.startCB();//called before transition-start!
+//data.bargraph.ontransitionend(); //start transition
+data.value=data.params.startValue;data.bargraph.style.left=data.value+'%';randomizeKey();tick();data.intervalID=window.setInterval(tick,data.tickSpeed);}/**
+     * this stops the game and returns the index of hit area; use click() instead !
+     */function stop(){if(data.intervalID)window.clearInterval(data.intervalID);var computedStyle=window.getComputedStyle(data.bargraph);var left=computedStyle.getPropertyValue('left');data.bargraph.style.left=left;data.bargraph.style.transition=null;// disable transition AFTER fetching computed value !
+data.run=false;}function tick(){var valueOld=data.value;data.drainTimer+=data.tickSpeed;data.nextTimer+=data.nextTimer>=0?data.tickSpeed:0;if(data.miss==true){data.miss=false;if(data.comboChange&&data.comboLevel>0){data.comboChange(0);}data.comboStep=data.comboLevel=0;data.drainTimer=0;data.nextTimer=0;data.value=Math.max(0,data.value-data.params.missDrain);data.bargraph.style.left=data.value+'%';blipKey();}else if(data.valid==true){data.valid=false;data.drainTimer=0;data.nextTimer=0;data.comboStep+=1;if(data.params.comboSteps>0&&data.comboStep>=data.params.comboSteps){data.comboStep=0;data.comboLevel=Math.min(data.comboLevel+1,data.params.comboLevels);data.maxCombo=Math.max(data.maxCombo,data.comboLevel);if(data.comboChange){data.comboChange(data.comboLevel);}}data.value=Math.min(100,Math.max(0,data.value+data.params.passFill*(1+data.comboLevel*data.params.comboBoost)));data.bargraph.style.left=data.value+'%';blipKey();}else if(data.drainTimer>data.params.drainSpeed){data.drainTimer=0;data.value=Math.max(0,data.value-data.params.timeDrain);data.bargraph.style.left=data.value+'%';}if(data.nextTimer>=200){data.nextTimer=-1;randomizeKey();}if(data.valueTrigger&&data.value!=valueOld)data.valueTrigger(data.value,valueOld,data.comboLevel);if(data.value<=0||data.value>=100){stop();if(data.stopCB)data.stopCB(data.value,data.maxCombo);}}var KEYS=['leftKey','rightKey',"upKey","downKey"];function randomizeKey(){data.validKey=KEYS[_.random(0,KEYS.length-1)];data.validKey2=-1;//TODO _.random(-1,data.specialKeys.length-1);
+data.leftKey.src="assets\\icons\\arrow_left"+(data.validKey==KEYS[0]?"_on":"")+".png";data.rightKey.src="assets\\icons\\arrow_right"+(data.validKey==KEYS[1]?"_on":"")+".png";data.upKey.src="assets\\icons\\arrow_up"+(data.validKey==KEYS[2]?"_on":"")+".png";data.downKey.src="assets\\icons\\arrow_down"+(data.validKey==KEYS[3]?"_on":"")+".png";data.specialKeys.forEach(function(element,index){element.src="assets\\icons\\"+(index==data.validKey2?"arrow_up_on":"none")+".png";});}function blipKey(){//
+data.leftKey.src="assets\\icons\\arrow_left.png";data.rightKey.src="assets\\icons\\arrow_right.png";data.upKey.src="assets\\icons\\arrow_up.png";data.downKey.src="assets\\icons\\arrow_down.png";data.specialKeys.forEach(function(element){element.src="assets\\icons\\none.png";});}/**
+     * this can be bound to eventhandler for user input detection to trigger stop and will call stop-CB
+     */function click(evt){if(!data.run)return;if(data.validKey==KEYS[0]&&(evt.key==='a'||evt.key==='ArrowLeft')||data.validKey==KEYS[1]&&(evt.key==='d'||evt.key==='ArrowRight')||data.validKey==KEYS[2]&&(evt.key==='w'||evt.key==='ArrowUp')||data.validKey==KEYS[3]&&(evt.key==='s'||evt.key==='ArrowDown')){data.valid=true;}else if(data.validKey2==0&&evt.key===' '){//ShiftRight ShiftLeft
+alert();}else{data.miss=true;}}return data;};window.gm.startPong=function(){///// fixed sample from https://svgjs.dev/ ////////
 // define document width and height
 var width=450,height=300;// create SVG document and set its size
 var draw=SVG().addTo('#pong').size(width,height);draw.viewbox(0,0,450,300);// draw background
@@ -3912,7 +3962,7 @@ window.storage.registerConstructor(Stat);window.storage.registerConstructor(stHe
 window.storage.registerConstructor(effCallHelp);window.storage.registerConstructor(effCombatRecovery);window.storage.registerConstructor(effDamage);window.storage.registerConstructor(effDetermined);window.storage.registerConstructor(effHunger);window.storage.registerConstructor(effLibido);window.storage.registerConstructor(effSanity);window.storage.registerConstructor(effFlying);window.storage.registerConstructor(effBleed);window.storage.registerConstructor(effCombined);window.storage.registerConstructor(effFairyLight);window.storage.registerConstructor(effGrappled);window.storage.registerConstructor(effGrappling);window.storage.registerConstructor(effUngrappling);window.storage.registerConstructor(effEnergized);window.storage.registerConstructor(effNotTired);window.storage.registerConstructor(effPillEffect);window.storage.registerConstructor(effPoiseDamage);window.storage.registerConstructor(effTeaseDamage);window.storage.registerConstructor(effTired);window.storage.registerConstructor(effStunned);window.storage.registerConstructor(effTransformSelf);window.storage.registerConstructor(effGuard);window.storage.registerConstructor(effProtect);window.storage.registerConstructor(effHeal);window.storage.registerConstructor(effMasochist);window.storage.registerConstructor(effEnergyDrain);window.storage.registerConstructor(effHorsePower);window.storage.registerConstructor(effLapineSpeed);window.storage.registerConstructor(effMutateBunny);window.storage.registerConstructor(effMutateHorse);window.storage.registerConstructor(effMutateWolf);window.storage.registerConstructor(effMutateCat);window.storage.registerConstructor(effMutateHuman);window.storage.registerConstructor(effGrowBreast);window.storage.registerConstructor(effGrowVulva);window.storage.registerConstructor(effLewdMark);window.storage.registerConstructor(effInHeat);window.storage.registerConstructor(effInRut);window.storage.registerConstructor(effSpermDecay);window.storage.registerConstructor(effButtPlugged);window.storage.registerConstructor(effVaginalFertil);window.storage.registerConstructor(effVaginalPregnant);//non-combat skills
 window.storage.registerConstructor(Ability);StatsLib.Ability=Ability;return StatsLib;}(window.gm.StatsLib||{});
 /* twine-user-script #2: "Story JavaScript" */
-</script><tw-tag name="_back_" color="gray"></tw-tag><tw-tag name="_nosave_" color="yellow"></tw-tag><tw-tag name="_nodeffered_" color="yellow"></tw-tag><tw-tag name="_isdeffered_" color="brown"></tw-tag><tw-tag name="_noshortkey_" color="brown"></tw-tag><tw-tag name="_fragm_" color="blue"></tw-tag><tw-tag name="template" color="orange"></tw-tag><tw-passagedata pid="1" name="Info_Jake" tags="_back_" position="100,100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
+</script><tw-tag name="_isdeffered_" color="brown"></tw-tag><tw-tag name="_noshortkey_" color="brown"></tw-tag><tw-tag name="_fragm_" color="blue"></tw-tag><tw-tag name="template" color="orange"></tw-tag><tw-tag name="_back_" color="gray"></tw-tag><tw-tag name="_nosave_" color="yellow"></tw-tag><tw-tag name="_nodeffered_" color="yellow"></tw-tag><tw-passagedata pid="1" name="Info_Jake" tags="_back_" position="100,100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 Jake is here.&lt;/br&gt;
 You barely know anything about him.&lt;/br&gt;
 [[Back|_back_]]&lt;/br&gt;&lt;/br&gt;
@@ -6055,7 +6105,9 @@ document.getElementById(&#39;result&#39;).innerHTML=&#39;scored &#39;+value;
 var _game = window.gm.startCounterChargeCombat(),_game2 = window.gm.startDominoCombat();
 document.getElementById(&#39;btstartCounterChargeCombat&#39;).addEventListener(&quot;click&quot;, _game.start);
 document.getElementById(&#39;btstartDominoCombat&#39;).addEventListener(&quot;click&quot;, _game2.start);
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="115" name="OmeterCombat" tags="_nosave_" position="600,1475" size="100,100">&lt;div style=&#39;background-color:gray;&#39;  id=&#39;canvas&#39;&gt;
+&lt;/script&gt;
+
+&lt;div style=&#39;background-color:gray;&#39;  id=&#39;canvas&#39;&gt;
 &lt;div id=&quot;panel2&quot;&gt;&lt;/div&gt;&lt;/br&gt;
 &lt;div id=&quot;panel&quot;&gt;&lt;/div&gt;&lt;/br&gt;
 &lt;div id=&#39;output&#39;&gt;&lt;/div&gt;&lt;/br&gt;
@@ -6168,9 +6220,9 @@ function(){
   _game.start([ [window.gm.util.deepCloneObj(foeDict[&#39;human&#39;])],[window.gm.util.deepCloneObj(foeDict[document.getElementById(&#39;Foe&#39;).value])] ],
     [document.getElementById(&#39;AI1&#39;).value,document.getElementById(&#39;AI2&#39;).value],
     {display:document.getElementById(&#39;debug2&#39;).checked,staminaOff:document.getElementById(&#39;debug1&#39;).checked});});
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="116" name="Pong" tags="" position="725,1475" size="100,100">&lt;div id=&quot;pong&quot;&gt;&lt;/div&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="115" name="Pong" tags="" position="600,1475" size="100,100">&lt;div id=&quot;pong&quot;&gt;&lt;/div&gt;
 &lt;a0 id=&#39;btStart&#39;&gt;Start&lt;/a&gt;&lt;p id=&#39;result&#39;&gt;&lt;/p&gt;
-&lt;script&gt;window.gm.startPong();&lt;/script&gt;</tw-passagedata><tw-passagedata pid="117" name="ReactionTest" tags="" position="850,1475" size="100,100">&lt;p&gt;Click Start and then click somewhere on the bar to stop the green rectangle in the yellow hit-area.&lt;/p&gt;
+&lt;script&gt;window.gm.startPong();&lt;/script&gt;</tw-passagedata><tw-passagedata pid="116" name="ReactionTest" tags="" position="725,1475" size="100,100">&lt;p&gt;Click Start and then click somewhere on the bar to stop the green rectangle in the yellow hit-area.&lt;/p&gt;
 &lt;div id=&#39;canvas&#39;&gt;&lt;/div&gt;
 &lt;div class=&quot;progressbar&quot; id=&#39;clickHere&#39; style=&#39;height:1em; width: 100%;&#39;&gt;&lt;div id=&#39;bar&#39; style=&quot;position:relative; width:5%; height:100%; background-color:green;&quot;&gt;&lt;/div&gt;&lt;/div&gt;
 &lt;a0 id=&#39;btStart&#39;&gt;Start&lt;/a&gt;&lt;p id=&#39;result&#39;&gt;&lt;/p&gt;
@@ -6181,7 +6233,7 @@ document.getElementById(&#39;result&#39;).innerHTML=&#39;scored &#39;+value;
 var _game = window.gm.startReactTest(&#39;bar&#39;,2000,onStop,null,[{a:40,b:60,color:&#39;orange&#39;},{a:90,b:100,color:&#39;yellow&#39;}]);
 document.getElementById(&#39;btStart&#39;).addEventListener(&quot;click&quot;, _game.start);
 document.getElementById(&#39;clickHere&#39;).addEventListener(&quot;click&quot;, _game.click);
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="118" name="ReactionTest2" tags="" position="975,1475" size="100,100">&lt;p&gt;Click Start and then keypress A/D to fill meter.&lt;/p&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="117" name="ReactionTest2" tags="" position="850,1475" size="100,100">&lt;p&gt;Click Start and then keypress A/D to fill meter.&lt;/p&gt;
 &lt;div class=&quot;progressbar&quot; id=&#39;clickHere&#39; style=&#39;height:1em; width: 100%;&#39;&gt;&lt;div id=&#39;bar&#39; style=&quot;position:relative; width:5%; height:100%; background-color:green;&quot;&gt;&lt;/div&gt;&lt;/div&gt;
 &lt;a0 id=&#39;btStart&#39;&gt;Start&lt;/a&gt;&lt;p id=&#39;result&#39;&gt;&lt;/p&gt;
 &lt;p&gt;&lt;output id=&quot;losgelassen&quot;&gt;&lt;output&gt;&lt;/output&gt;&lt;/p&gt;
@@ -6191,6 +6243,107 @@ function onStop(value){
 }
 var _game = window.gm.startReactTest2(&#39;bar&#39;,100,onStop,null,[{a:40,b:60,color:&#39;orange&#39;},{a:90,b:100,color:&#39;yellow&#39;}]);
 document.getElementById(&#39;btStart&#39;).addEventListener(&quot;click&quot;, _game.start);
+document.querySelector(&#39;body&#39;).addEventListener(&quot;keyup&quot;, _game.click);
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="118" name="ReactionTest3" tags="" position="975,1475" size="100,100">&lt;article style=&quot;background-color: antiquewhite;display:flex; flex-flow: row wrap;&quot;&gt;
+&lt;aside style=&quot;flex: 1 1 0%;&quot;&gt;&lt;p&gt;Click Start and then keypress displayed arrows to fill meter.&lt;/p&gt;&lt;a0 id=&#39;btStart&#39;&gt;Start&lt;/a&gt;&lt;/br&gt;
+&lt;label for=&quot;drainSpeed&quot;&gt;drainSpeed&lt;/label&gt;&lt;input id=&quot;drainSpeed&quot; type=&quot;number&quot; title=&quot;time until drain&quot; min=&quot;10&quot; max=&quot;10000&quot; value=&quot;500&quot; /&gt;
+&lt;label for=&quot;passFill&quot;&gt;passFill&lt;/label&gt;&lt;input id=&quot;passFill&quot; type=&quot;number&quot; title=&quot;gain&quot; min=&quot;1&quot; max=&quot;10000&quot; value=&quot;5&quot; /&gt;
+&lt;label for=&quot;comboSteps&quot;&gt;comboSteps&lt;/label&gt;&lt;input id=&quot;comboSteps&quot; type=&quot;number&quot; title=&quot;comboSteps&quot; min=&quot;2&quot; max=&quot;10000&quot; value=&quot;3&quot; /&gt;
+&lt;label for=&quot;comboLevels&quot;&gt;comboLevels&lt;/label&gt;&lt;input id=&quot;comboLevels&quot; type=&quot;number&quot; title=&quot;comboLevels&quot; min=&quot;0&quot; max=&quot;10000&quot; value=&quot;2&quot; /&gt;
+&lt;label for=&quot;comboBoost&quot;&gt;comboBoost&lt;/label&gt;&lt;input id=&quot;comboBoost&quot; type=&quot;number&quot; title=&quot;comboBoost&quot; min=&quot;0&quot; step=&quot;0.1&quot; max=&quot;2&quot; value=&quot;1&quot; /&gt;
+&lt;label&gt;what does change when you fill the bar:
+		&lt;select id=&quot;style&quot;&gt;
+			&lt;option value=&quot;movetrack&quot; selected&gt;loop different parts of video&lt;/option&gt;
+      &lt;option value=&quot;switchvideo&quot;&gt;switch displayed video&lt;/option&gt;
+      &lt;option value=&quot;imageswap&quot;&gt;swap poster image (no video)&lt;/option&gt;
+		&lt;/select&gt;
+&lt;/label&gt;
+&lt;p id=&#39;result&#39;&gt;
+&lt;/aside&gt;
+&lt;article style=&quot;flex: 3 1 0%;&quot;&gt;
+    &lt;div style=&quot;position: relative; place-content: center;display: flex;&quot;&gt;
+    &lt;img id=&quot;myImage&quot; src=&quot;&quot; style=&quot;width=100%; max-height:80vH&quot;&gt;&lt;/img&gt;
+    &lt;video controls playsinline muted loop id=&quot;myVideo&quot; poster=&quot;&quot; src=&quot;&quot; style=&quot;width=100%; max-height:80vH&quot;&gt;&lt;/video&gt;
+      &lt;div id=&quot;controls&quot; style=&quot;position: absolute;top: 50%;width: 100%;&quot; hidden&gt;
+      &lt;p style=&quot;display: flex;	align-items: center; justify-content: center;margin: 0px;&quot;&gt;&lt;input id=&quot;spKey2&quot; type=&quot;image&quot; src=&quot;assets/icons/none.png /&gt;&lt;input id=&quot;upKey&quot; type=&quot;image&quot; src=&quot;assets/icons/arrow_up.png&quot; /&gt;&lt;input id=&quot;spKey&quot; type=&quot;image&quot; src=&quot;assets/icons/none.png /&gt;&lt;/p&gt;
+      &lt;p style=&quot;display: flex;	align-items: center; justify-content: center;margin: 0px;&quot;&gt;&lt;input id=&quot;leftKey&quot; type=&quot;image&quot; src=&quot;assets/icons/arrow_left.png&quot; /&gt;&lt;input id=&quot;downKey&quot; type=&quot;image&quot; src=&quot;assets/icons/arrow_down.png&quot; /&gt;&lt;input id=&quot;rightKey&quot; type=&quot;image&quot; src=&quot;assets/icons/arrow_right.png&quot; /&gt;&lt;/p&gt;
+    &lt;div class=&quot;progressbar&quot; id=&#39;clickHere&#39; style=&#39;height:1em; width: 100%;&#39;&gt;&lt;div id=&#39;bar&#39; style=&quot;position:relative; width:5%; height:100%; background-color:green;&quot;&gt;&lt;/div&gt;&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/article&gt;
+&lt;/article&gt;
+&lt;script&gt;
+var ssvid=document.getElementById(&#39;myVideo&#39;),imgid=document.getElementById(&#39;myImage&#39;);
+var oldtrack=track=maxValue=0,style;
+function onStop(value,maxcombo) {
+  ssvid.pause();
+  document.getElementById(&#39;controls&#39;).setAttribute(&#39;hidden&#39;,&quot;&quot;)
+  document.getElementById(&#39;result&#39;).innerHTML=(value&gt;99)?&#39;You WON ! maxCombo=&#39;+maxcombo:&quot;You FAILED !&quot;;
+}
+function onStart() {
+  ssvid.currentTime=0;oldtrack=-1;track=maxValue=0;
+  ssvid.src=&quot;assets/workout.mp4&quot;; 
+  if(style!=&quot;imageswap&quot;) {
+    ssvid.play();
+  } else modifyVideo()
+  document.getElementById(&#39;result&#39;).innerHTML=&#39;GO !!&#39;;
+}
+function onComboUp(value) {
+  if(value==0) document.getElementById(&#39;result&#39;).innerHTML=&#39;combo broken !&#39;;
+  else  document.getElementById(&#39;result&#39;).innerHTML=&#39;combo-up &#39;+value;
+}
+function onTrigger(valueNew,valueOld,combo) {
+  if(valueNew&gt;maxValue) { maxValue=valueNew;
+    track=Math.floor(valueNew/30);
+  }
+  if(style==&quot;imageswap&quot; &amp;&amp; track!=oldtrack) modifyVideo();
+  document.getElementById(&#39;result&#39;).innerHTML=&#39;track=&#39;+track;
+}
+function start(){
+  document.getElementById(&#39;controls&#39;).removeAttribute(&#39;hidden&#39;);
+  style=document.querySelector(&quot;#style&quot;).value;
+  _game.start({drainSpeed:parseInt(document.querySelector(&quot;#drainSpeed&quot;).value),
+    passFill:parseInt(document.querySelector(&quot;#passFill&quot;).value),
+    comboSteps:parseInt(document.querySelector(&quot;#comboSteps&quot;).value),
+    comboLevels:parseInt(document.querySelector(&quot;#comboLevels&quot;).value),
+    comboBoost:parseInt(document.querySelector(&quot;#comboBoost&quot;).value)
+     });
+}
+ssvid.addEventListener(&#39;timeupdate&#39;, modifyVideo);//Note timeupdate is only fired when video plays
+function modifyVideo() {
+  //since I cannot modify video.videoTracks directly, I fallback to currentTime. But timeUpdate might called every 250ms only.
+  //changing track will be delayed until current track is done
+    var time = ssvid.currentTime; 
+    switch(style){
+      case &quot;imageswap&quot;:
+        if(track!=oldtrack){
+          imgid.src=&quot;assets/bg/&quot;+([&quot;bg_ruin_1.png&quot;,&quot;bg_ruin_2.png&quot;,&quot;bg_ruin_3.png&quot;,&quot;bg_sewer_1.png&quot;][track]); 
+          oldtrack=track;
+        }
+        break;
+      case &quot;switchvideo&quot;:
+        if(track!=oldtrack){
+          ssvid.src=&quot;assets/&quot;+([&quot;workout.mp4&quot;,&quot;Monsterhunter Now My first fight JR 9.mp4&quot;,&quot;workout.mp4&quot;,&quot;workout.mp4&quot;][track]);
+          ssvid.play();  
+          oldtrack=track;
+        }
+      break;
+      default:
+        if(track==0 &amp;&amp; time&gt;3.0){
+          ssvid.currentTime=1.0;
+        } else if(track==1 &amp;&amp; time&gt;5.0) {
+          ssvid.currentTime=3.0;
+        } else if(track==2 &amp;&amp; time&gt;7.0) {
+          ssvid.currentTime=5.0;
+        }
+    }
+}
+//
+/*ssvid.addEventListener(&#39;pause&#39;, function(e) {
+    //when using timerange, we could listen to onpause and set the next src but
+    //if setting src=&quot;assets/workout.mp4#t=0,3.3&quot; , this causes to reload the video and the video gets interrupted !
+  });*/
+var _game = window.gm.startReactTest3(&#39;bar&#39;,[&quot;leftKey&quot;,&quot;rightKey&quot;,&quot;upKey&quot;,&quot;downKey&quot;],[&quot;spKey&quot;],onStop,onStart,onComboUp,onTrigger);
+document.getElementById(&#39;btStart&#39;).addEventListener(&quot;click&quot;, start);
 document.querySelector(&#39;body&#39;).addEventListener(&quot;keyup&quot;, _game.click);
 &lt;/script&gt;</tw-passagedata><tw-passagedata pid="119" name="Reactiontest3" tags="" position="1100,1475" size="100,100">&lt;p&gt;example on how to create reactive graphics from svg parts&lt;/p&gt;
 * Define g-object with id in defs.
@@ -7180,49 +7333,15 @@ Those are very present through the game and in the main-story (also check the se
 You might see a lot of links that are formated red-strikethrough. Those are currently broken and you shouldnt use them.&lt;/p&gt;
 &lt;p class=&#39;author&#39;&gt;Loading of savegame is only possible in game. Saving might be disabled in some locations.&lt;/p&gt;
 &lt;p class=&#39;author&#39;&gt;[[Fetishes ! (spoiler alert)|List_Fetish]]&lt;/p&gt;&lt;/br&gt;&lt;/br&gt;&lt;hr&gt;
-&lt;p&gt;This is a kind of remake of NightgamesMod. I wasnt able to mod it in Java, so I started from scratch. &lt;/br&gt;&lt;/p&gt;
+&lt;p&gt;TODO Game primer. &lt;/br&gt;&lt;/p&gt;
 &lt;p&gt;&lt;a0 onclick=&#39;start();&#39;&gt;Start&lt;/a&gt;&lt;/p&gt;&lt;hr&gt;
-&lt;p&gt;&lt;a0 onclick=&#39;startRandom();&#39;&gt;random Dng&lt;/a&gt;
-&lt;label&gt;length:
-    &lt;select id=&quot;length&quot;&gt;
-        &lt;option value=&quot;1&quot;&gt;1&lt;/option&gt;&lt;option value=&quot;2&quot; &gt;2&lt;/option&gt;&lt;option value=&quot;3&quot; &gt;3&lt;/option&gt;&lt;option value=&quot;4&quot; selected&gt;4&lt;/option&gt;
-        &lt;option value=&quot;5&quot; &gt;5&lt;/option&gt;&lt;option value=&quot;6&quot; &gt;6&lt;/option&gt;&lt;option value=&quot;7&quot; &gt;7&lt;/option&gt;&lt;option value=&quot;8&quot; &gt;8&lt;/option&gt;
-    &lt;/select&gt;
-&lt;/label&gt;
-&lt;label&gt;add doors:
-    &lt;select id=&quot;extradoors&quot;&gt;
-        &lt;option value=&quot;0&quot;&gt;0&lt;/option&gt;&lt;option value=&quot;1&quot; selected&gt;1&lt;/option&gt;&lt;option value=&quot;2&quot; &gt;2&lt;/option&gt;&lt;option value=&quot;3&quot; &gt;3&lt;/option&gt;&lt;option value=&quot;4&quot; &gt;4&lt;/option&gt;
-    &lt;/select&gt;
-&lt;/label&gt;
-&lt;label&gt;naming:
-    &lt;select id=&quot;naming&quot;&gt;
-        &lt;option value=&quot;A1&quot; selected&gt;A1&lt;/option&gt;&lt;option value=&quot;-12_1&quot;&gt;-12_1&lt;/option&gt;&lt;option value=&quot;-12_+01&quot; &gt;-12_+01&lt;/option&gt;
-    &lt;/select&gt;
-&lt;/label&gt;&lt;/br&gt;
-&lt;label&gt;branches:
-    &lt;select id=&quot;branches&quot;&gt;
-        &lt;option value=&quot;0&quot; selected&gt;0&lt;/option&gt;&lt;option value=&quot;1&quot;&gt;1&lt;/option&gt;&lt;option value=&quot;2&quot; &gt;2&lt;/option&gt;
-    &lt;/select&gt;
-&lt;/label&gt;
-&lt;/p&gt;&lt;hr&gt;
-&lt;hr&gt;&lt;div id=&#39;canvas&#39;style=&#39;max-height: 256px;overflow: auto;&#39;&gt;&lt;/div&gt;&lt;div id=&#39;svgpopup&#39;&gt;&lt;/div&gt;&lt;/br&gt;
 &lt;/article&gt;
 &lt;script&gt; function start(){
     window.story.state.DngSY.remainingNights=0,window.story.state.DngSY.dngLevel=0;
-    window.story.state.vars.spawnAt=&quot;DngNG_Home&quot;;
+    window.story.state.vars.spawnAt=&quot;KH_NextDay&quot;;
     window.gm.enterVR();
     window.gm.player.autoLeveling();
     window.gm.player.Outfit.removeItem(&quot;StaffWodden&quot;);window.gm.player.Inv.removeItem(&quot;StaffWodden&quot;);
-}
-function startRandom(){
-    window.story.state.DngSY.remainingNights=0,window.story.state.DngSY.dngLevel=0;
-    window.story.state.vars.spawnAt=&quot;DngNG_Home&quot;;
-    var selLength=document.getElementById(&#39;length&#39;),selDoors=document.getElementById(&#39;extradoors&#39;),selName=document.getElementById(&#39;naming&#39;);
-    var selBranches=document.getElementById(&#39;branches&#39;)
-    var length=selLength.options[selLength.selectedIndex].value,doors=selDoors.options[selDoors.selectedIndex].value,naming=selName.options[selName.selectedIndex].value;
-    var branches=selBranches.options[selBranches.selectedIndex].value;
-    window.story.state.tmp = window.GenerateDng.DngGen.generate({length:length,doors:doors,naming:naming,branches:branches});
-    window.gm.printMap2(window.story.state.tmp,&#39;&#39;,&#39;&#39;,null);
 }
 &lt;/script&gt;</tw-passagedata><tw-passagedata pid="158" name="Intro_SY" tags="" position="975,1975" size="100,100">&lt;article&gt;&lt;%window.gm.initGame(true);window.gm.player.location=window.passage.name;%&gt;
 &lt;p class=&#39;author&#39;&gt;Note that there is no back-button implemented. Pressing the back button of your browser will get your game aborted.&lt;/br&gt;
@@ -9744,7 +9863,140 @@ There is a vendor that sells some wares.
 Steal - He sees to be sleeping most of the time, maybe you can pick something small when he closes his eyes
       - that stolen goods where cursed; some kind of theft counter measures?
 &lt;/br&gt;[[Leave|DngHC_G5]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="371" name="Home" tags="name:your_dorms_hallway" position="100,4725" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="371" name="KH_Intro_Inn" tags="" position="100,4725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+You&#39;ve upset your count because he caught you poaching in his forest. Just in time you managed to escape his henchmen and then fled across the border.&lt;/br&gt;
+At sunset you come across this inn near a crossroad. 
+&quot;Lets see if I can get a rest here and something to eat and drink.&quot;
+... the few people here arent that talkative but after some beer and time they seem to loosen up.
+   
+&lt;/br&gt;[[KH_Intro_Wanted]]
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="372" name="KH_Intro_Wanted" tags="" position="225,4725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&quot;The Jarl has put a bounty on a beast.&quot;&lt;/br&gt;
+...
+The other guests mock you: &quot;You are an amateur&quot;.
+You puff yourself up, they underestimate you. You&#39;ve already killed a few things.&lt;/br&gt;
+
+&quot;You lousy old bags, I&#39;ll show you. I&#39;ll have that critter in no time.&quot;&lt;/br&gt;
+&quot;Hah, you young thing wouldn&#39;t know a lead if it poked you in the nose.&quot;&lt;/br&gt;
+&lt;div id=&#39;select1&#39; &gt;
+&lt;a0 onclick=&#39;window.gm.printTalkLink(&quot;div#select1&quot;,&quot;div#choice1a&quot;)&#39;&gt;I will try my luck&lt;/a&gt;&lt;/br&gt;
+&lt;a0 onclick=&#39;window.gm.printTalkLink(&quot;div#select1&quot;,&quot;div#choice1b&quot;)&#39;&gt;I will do it within 5 days &lt;/a&gt;&lt;/br&gt;
+&lt;/div&gt;&lt;div id=&#39;choice1a&#39; hidden&gt;&lt;/br&gt;
+    &quot;Hoho.&quot;
+    [[KH_Intro_WantedDone]] 
+&lt;/div&gt;
+&lt;div id=&#39;choice1b&#39; hidden&gt;&lt;/br&gt;
+    &quot;That sounds like a bet, big mouth. If you do it within 5 days I will give you my fine hunting bow.&quot;
+    &quot;Deal&quot;&lt;/br&gt;
+    &quot;But what are you offering if you loose?&quot;&lt;/br&gt;
+    &quot;Then you get my bow!&quot;&lt;/br&gt;
+    &quot;No,no,no. Your crappy bow isn&#39;t woth anything. And you for sure you dont look like you having anything of value. So I propose...hm... I dont know. Lets just say you have to do something humiliating. I have to think about that.&quot;
+    &lt;/br&gt;&quot;That would be unfair if I do not know what I am getting into.&quot;
+    &lt;/br&gt;&quot;My, my. Didnt you brag you are sure to get it done? So you dont have to bother about.&quot;
+    [[KH_Intro_WantedDone]] 
+&lt;/div&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="373" name="KH_Intro_WantedDone" tags="" position="350,4725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+You already hunted any game living in the counts&#39;s forest. Be it duck, deer or wolf. That beast will be brought down in no time.&lt;/br&gt;
+Even if you actually dont exactly know what it is....&lt;/br&gt;
+With that you go catch some sleep.&lt;/br&gt;
+&lt;/br&gt;[[KH_NextDay]]
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="374" name="KH_Town_Entrance" tags="" position="475,4725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+You are at the entrance of Seaside-Town. A wodden palisade fences off the surrounding area, but the dorrs are wide open.
+Close by you can find [[Smith]] [[Trader|KH_VisitMerchant]] [[The Rusty Anchor|KH_VisitInn]]
+[[Empire Trading Company]] [[The Briddled Seehorse]] [[KH_VisitResearcher]] [[KH_VisitHunter]]
+&lt;/br&gt;further West is [[Amelias Ranch]] or [[Return Home|DngNG_Home]]
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="375" name="KH_NextDay" tags="" position="600,4725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+A new day started and you need to decide how to move along.&lt;/br&gt;
+&lt;/br&gt;[[KH_ProgressDay]]
+At least you can decide for yourself and don&#39;t have to do what others say.
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
+&lt;script&gt;
+if(window.story.state.DngSY.dngLevel&lt;=0){window.story.state.DngSY.dngLevel=1;window.story.show(&quot;KH_Intro_Inn&quot;);}
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="376" name="KH_ProgressDay" tags="" position="725,4725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;a0 id=&#39;howtoplay&#39; onclick=&#39;(function($event){document.querySelector(&quot;#&quot;+id+&quot;~p&quot;).toggleAttribute(&quot;hidden&quot;);})(this);&#39;&gt;Hint&lt;/a&gt;
+&lt;p hidden&gt;Every day you can choose multiple actions that will require time and energy.
+Keep an eye on your health and hunger-bar.&lt;/p&gt;
+&lt;/br&gt;[[Check on your Tasks|KH_Quest]]
+&lt;/br&gt;[[Expedition|KH_Scout]]
+&lt;a0 id=&#39;helpscout&#39; onclick=&#39;(function($event){document.querySelector(&quot;#&quot;+id+&quot;~p&quot;).toggleAttribute(&quot;hidden&quot;);})(this);&#39;&gt;Hint&lt;/a&gt;
+&lt;p hidden&gt;Go into the woods to familarize yourself with the surrounding. Maybe you can find something of value.&lt;/p&gt;
+&lt;a0 id=&#39;helpscavenge&#39; onclick=&#39;(function($event){document.querySelector(&quot;#&quot;+id+&quot;~p&quot;).toggleAttribute(&quot;hidden&quot;);})(this);&#39;&gt;Hint&lt;/a&gt;
+&lt;p hidden&gt;Revisit locations you already know and try to find some specific resource or hunt some game. 
+Hunting can provide something to eat or furrs that can be sold for money. You will get a small skill gain and better skill provide better result. But you need the proper equipment like arrows and traps.&lt;/p&gt;
+&lt;/br&gt;[[Visit Seaside-Town|KH_Town_Entrance]] [[Enter your house]] 
+&lt;/br&gt;[[Crafting-shack]]  [[Barn]] 
+&lt;/br&gt;[[Manage Loadout|KH_Loadout]]
+&lt;/br&gt;&lt;a0 onclick=&#39;($(&quot;tw-passage&quot;).fadeOut(1000,function(){window.gm.addTime(60);window.story.show(&quot;KH_ProgressDay&quot;);}));&#39;&gt;Nap 1hour&lt;/a&gt;
+&lt;%if(window.gm.getTimeStruct().hour&lt;11){ %&gt;
+&lt;a0 onclick=&#39;($(&quot;tw-passage&quot;).fadeOut(1000,function(){window.gm.player.sleep(1800);window.story.show(&quot;KH_Sleep&quot;);}));&#39;&gt;Sleep Until Evening&lt;/a&gt; 
+&lt;%} else {%&gt;
+&lt;a0 onclick=&#39;($(&quot;tw-passage&quot;).fadeOut(1000,function(){window.gm.player.sleep(700);window.story.show(&quot;KH_Sleep&quot;);}));&#39;&gt;Sleep Until Morning&lt;/a&gt;
+&lt;%}%&gt;
+&lt;a0 id=&#39;helpsleep&#39; onclick=&#39;(function($event){document.querySelector(&quot;#&quot;+id+&quot;~p&quot;).toggleAttribute(&quot;hidden&quot;);})(this);&#39;&gt;Hint&lt;/a&gt;
+&lt;p hidden&gt;Pass time by resting or sleep up until a new day. Both recovers some portion of health&amp; energy. But your hunger might increase too.&lt;/p&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="377" name="KH_Sleep" tags="" position="850,4725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+You drift of to sleep dreaming of....&lt;/br&gt;
+
+&lt;/br&gt;[[KH_NextDay]]
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="378" name="KH_Loadout" tags="" position="975,4725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;%window.gm.player.location=window.passage.name;%&gt;&lt;/br&gt;
+TODO Configure what gear you want to use on your next journey. &lt;a0 id=&#39;helploadout&#39; onclick=&#39;(function($event){document.querySelector(&quot;#&quot;+id+&quot;~p&quot;).toggleAttribute(&quot;hidden&quot;);})(this);&#39;&gt;Hint&lt;/a&gt;
+&lt;p hidden&gt;
+ &lt;/br&gt;
+&lt;/p&gt;
+Choosen:&lt;/br&gt;
+&lt;hr&gt;
+consumables:&lt;/br&gt;
+standard-wearables:&lt;/br&gt;
+standard-weapons:&lt;/br&gt;
+Tools:&lt;/br&gt;
+
+&lt;/br&gt;[[Back|DngNG_Home]]
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="379" name="KH_Quest" tags="" position="1100,4725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+Sitting down for a moment you contemplate what lies behind you and what you should do next.&lt;/br&gt; 
+&lt;/br&gt;- was es für eine Bestie ist
+&lt;/br&gt;- wo sie sich aufhält
+&lt;/br&gt;- wie man sie fängt
+
+&lt;/br&gt;[[KH_ProgressDay]]
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="380" name="KH_Scout" tags="" position="1225,4725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+Grabbing your gear you walk into the woods. Where are you going?&lt;/br&gt;
+&lt;a0 onclick=&#39;&#39;&gt;Woods Level 1&lt;/a&gt;
+&lt;a0 onclick=&#39;&#39;&gt;Woods Level 2&lt;/a&gt;
+
+&lt;/br&gt;[[Back|KH_ProgressDay]]
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="381" name="KH_VisitInn" tags="" position="100,4850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;a0 id=&#39;helpinn&#39; onclick=&#39;(function($event){document.querySelector(&quot;#&quot;+id+&quot;~p&quot;).toggleAttribute(&quot;hidden&quot;);})(this);&#39;&gt;Hint&lt;/a&gt;
+&lt;p hidden&gt;- catch up some rumors
+&lt;/br&gt;- dance for some cash
+&lt;/br&gt;- fetch some side tasks
+&lt;/br&gt;- sell firewood&lt;/p&gt;
+
+[[KH_Town_Entrance]]
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="382" name="KH_VisitMerchant" tags="" position="225,4850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;a0 id=&#39;helpmerchant&#39; onclick=&#39;(function($event){document.querySelector(&quot;#&quot;+id+&quot;~p&quot;).toggleAttribute(&quot;hidden&quot;);})(this);&#39;&gt;Hint&lt;/a&gt;
+&lt;p hidden&gt;The merchant trades some wares that could be of use and buys furrs and other resources gained from hunting.&lt;/p&gt;
+
+[[KH_Town_Entrance]]
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="383" name="KH_VisitResearcher" tags="" position="350,4850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;a0 id=&#39;helpalchemist&#39; onclick=&#39;(function($event){document.querySelector(&quot;#&quot;+id+&quot;~p&quot;).toggleAttribute(&quot;hidden&quot;);})(this);&#39;&gt;Hint&lt;/a&gt;
+&lt;p hidden&gt;&lt;/p&gt;
+
+[[KH_Town_Entrance]]
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="384" name="KH_VisitHunter" tags="" position="475,4850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;a0 id=&#39;helptrainer&#39; onclick=&#39;(function($event){document.querySelector(&quot;#&quot;+id+&quot;~p&quot;).toggleAttribute(&quot;hidden&quot;);})(this);&#39;&gt;Hint&lt;/a&gt;
+&lt;p hidden&gt;For a fee, you can train here your hunting skills.&lt;/p&gt;
+
+[[KH_Town_Entrance]]
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="385" name="KH_ReturnFromHunt" tags="" position="600,4850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;%window.gm.player.location=window.passage.name;%&gt;&lt;/br&gt;
+TODO&lt;/br&gt;
+Either you returned by fainting, using the escape-rune or
+because you solved your mission.
+&lt;/br&gt;
+Sum up what you found and lost.
+&lt;/br&gt;[[Next|KH_ProgressDay]]
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="386" name="Home" tags="name:your_dorms_hallway" position="725,4850" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 &lt;%window.gm.quests.addQuest(&quot;qFindGarden&quot;,1);window.gm.quests.addQuest(&quot;qStudy&quot;,1); %&gt;
@@ -9762,7 +10014,7 @@ function checkQuest(){
 	}
 }
 checkQuest();
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="372" name="Kitchen" tags="" position="1231,613" size="100,100">&lt;section&gt; 
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="387" name="Kitchen" tags="" position="1231,613" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 You are in the kitchen. &lt;/br&gt;
@@ -9779,7 +10031,7 @@ Mom will take care to resupply the fridge. But she might be disappointed if you 
 &lt;%}%&gt;
 Where would you like to go?&lt;/br&gt;
 [[Living_Room]]   [[Hallway|Home]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="373" name="Melanies Bedroom" tags="" position="350,4725" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="388" name="Melanies Bedroom" tags="" position="975,4850" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 This is the bedroom of Melanie.
@@ -9810,7 +10062,7 @@ function inviteChar(elmnt){
 		elmnt.outerHTML=(&quot;&lt;div class=&#39;red&#39;&gt;Cyril added to your team. &lt;/div&gt;&quot;);
 	}
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="374" name="moms_treasure" tags="_back_" position="475,4725" size="100,100">&lt;section&gt; 
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="389" name="moms_treasure" tags="_back_" position="1100,4850" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 In one of the nightstand you find some handcuffs.They look thorough but you think they just might be used for some bedplay.&lt;/br&gt;
 &lt;a0 onclick=&#39;useHandcuff(this)&#39;&gt;Play with them&lt;/a&gt;&lt;/br&gt;
@@ -9822,7 +10074,7 @@ function useHandcuff(elmnt){
 	window.gm.player.Outfit.addItem(new Handcuffs());
 	elmnt.replaceWith(&quot;&lt;div class=&#39;red&#39;&gt;Playing around with the cuffs you suddenly find yourself locked up with them. You panick as you find the locking-mechanic quite tight. You need a key and maybe some help to unlock them!&lt;/div&gt;&quot;);
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="375" name="Your Bedroom" tags="" position="1033,470" size="100,100">&lt;section&gt; 
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="390" name="Your Bedroom" tags="" position="1033,470" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%window.gm.player.location=window.passage.name; 
 window.gm.quests.addQuest(&quot;qMyPleasure&quot;,1);%&gt;
@@ -9851,7 +10103,7 @@ There is a large bed for sleeping with a nightstand aside. &lt;/br&gt;
 &lt;% } else { %&gt;
 Where do you want to go ? &lt;/br&gt;
 [[Hallway|Home]]&lt;/br&gt; &lt;%}%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="376" name="Sleep" tags="" position="725,4725" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="391" name="Sleep" tags="" position="100,4975" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 You fall into your bedsheets and sleep until your smartphone buzzes you out of your dreams.&lt;/br&gt;
 &lt;/br&gt;&lt;div id=&#39;output&#39;&gt;&lt;/div&gt;
@@ -9872,7 +10124,7 @@ function checkJob(){
 	return(text);
 }
 window.gm.printOutput(checkJob());
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="377" name="Living_Room" tags="" position="850,4725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="392" name="Living_Room" tags="" position="225,4975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 The living room that you share with your mom is sparsely decorated (until now).&lt;/br&gt;
 An old wooden table with 4 chairs rests on a wornout green carpet.&lt;/br&gt;
 Some money is laying on the table. Maybe mom forgot it there.&lt;/br&gt;
@@ -9909,11 +10161,11 @@ function getMoney(elmnt,val){
 function touchCatIdol(elmnt){
 	elmnt.replaceWith(&quot;Its just a simple statue.&quot;); //elmnt.replaceWith(&quot;There is a tickling feeling in your hand.&quot;);
 }
-&lt;/script&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="378" name="Cabinet" tags="" position="975,4725" size="100,100">&lt;section&gt; 
+&lt;/script&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="393" name="Cabinet" tags="" position="350,4975" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 There is nothing here
 [[Living_Room]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="379" name="Garden" tags="" position="1100,4725" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="394" name="Garden" tags="" position="475,4975" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;window.gm.quests.tick();%&gt;
 The garden behind the house is quite a mess. &lt;/br&gt;
@@ -9930,17 +10182,17 @@ You remember that you took the shovel from here.&lt;/br&gt;
 &lt;%}%&gt;
 Where would you like to go?&lt;/br&gt;
 [[Hallway|Home]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="380" name="Cellar" tags="" position="1225,4725" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="395" name="Cellar" tags="" position="600,4975" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 The portal is still active. Do you dare to [[enter|Cellar_Portal]] it? &lt;/br&gt;&lt;/br&gt;
 Where would you like to go?&lt;/br&gt;
 [[Hallway|Home]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="381" name="Cellar_PortalReverse" tags="" position="100,4850" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="396" name="Cellar_PortalReverse" tags="" position="725,4975" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 The portal spits you out in the dim light of your cellar.&lt;/br&gt;&lt;/br&gt;
 [[Next|Cellar]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="382" name="Cellar_Portal" tags="" position="225,4850" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="397" name="Cellar_Portal" tags="" position="850,4975" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 A blinding light engulfs you just for a second and then a deafening darkness.  &lt;/br&gt;&lt;/br&gt;
 Its impossible to tell what else happens or how long the process takes.&lt;/br&gt;&lt;/br&gt;
@@ -9948,7 +10200,7 @@ As you come back to your senses you find yourself cowering on the floor, still c
 Time to move on.&lt;/br&gt;&lt;/br&gt;&lt;/br&gt;
 Where would you like to go?&lt;/br&gt;
 [[Home|Cellar_PortalReverse]] [[Mall|Mall 0F (postapocalypse)]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="383" name="HairGrow" tags="deferred" position="350,4850" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="398" name="HairGrow" tags="deferred" position="975,4975" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 A blinding light engulfs you just for a second and then a deafening darkness.  &lt;/br&gt;&lt;/br&gt;
 Its impossible to tell what else happens or how long the process takes.&lt;/br&gt;&lt;/br&gt;
@@ -9956,123 +10208,15 @@ As you come back to your senses you find yourself cowering on the floor, still c
 Time to move on.&lt;/br&gt;&lt;/br&gt;&lt;/br&gt;
 Where would you like to go?&lt;/br&gt;
 [[Next|&lt;%=window.gm.player.location%&gt;]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="384" name="Home_Study" tags="" position="475,4850" size="100,100">&lt;section&gt; 
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="399" name="Home_Study" tags="" position="1100,4975" size="100,100">&lt;section&gt; 
 &lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;% window.gm.player.Stats.increment(&#39;energy&#39;,-20);window.gm.addTime(120);window.gm.quests.forceQuestMilestone(&quot;qStudy&quot;,100,1);%&gt;
 You sit down with your books and scriblings and try to get some sense out of it.&lt;/br&gt;
 [[Give up|&lt;%=window.gm.player.location%&gt;]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="385" name="KH_Intro_Inn" tags="" position="600,4850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
-You&#39;ve upset your count because he caught you poaching in his forest. Just in time you managed to escape his henchmen and then fled across the border.&lt;/br&gt;
-At sunset you come across this inn near a crossroad. 
-&quot;Lets see if I can get a rest here and something to eat and drink.&quot;
-... the few people here arent that talkative but after some beer and time they seem to loosen up.
-   
-&lt;/br&gt;[[KH_Intro_Wanted]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="386" name="KH_Intro_Wanted" tags="" position="725,4850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
-&quot;The Jarl has put a bounty on a beast.&quot;&lt;/br&gt;
-...
-The other guests mock you: &quot;You are an amateur&quot;.
-You puff yourself up, they underestimate you. You&#39;ve already killed a few things.&lt;/br&gt;
-
-&quot;You lousy old bags, I&#39;ll show you. I&#39;ll have that critter in no time.&quot;&lt;/br&gt;
-&quot;Hah, you young thing wouldn&#39;t know a lead if it poked you in the nose.&quot;&lt;/br&gt;
-&lt;div id=&#39;select1&#39; &gt;
-&lt;a0 onclick=&#39;window.gm.printTalkLink(&quot;div#select1&quot;,&quot;div#choice1a&quot;)&#39;&gt;I will try my luck&lt;/a&gt;&lt;/br&gt;
-&lt;a0 onclick=&#39;window.gm.printTalkLink(&quot;div#select1&quot;,&quot;div#choice1b&quot;)&#39;&gt;I will do it within 5 days &lt;/a&gt;&lt;/br&gt;
-&lt;/div&gt;&lt;div id=&#39;choice1a&#39; hidden&gt;&lt;/br&gt;
-    &quot;Hoho.&quot;
-    [[KH_Intro_WantedDone]] 
-&lt;/div&gt;
-&lt;div id=&#39;choice1b&#39; hidden&gt;&lt;/br&gt;
-    &quot;That sounds like a bet, big mouth. If you do it within 5 days I will give you my fine hunting bow.&quot;
-    &quot;Deal&quot;&lt;/br&gt;
-    &quot;But what are you offering if you loose?&quot;&lt;/br&gt;
-    &quot;Then you get my bow!&quot;&lt;/br&gt;
-    &quot;No,no,no. Your crappy bow isn&#39;t woth anything. And you for sure you dont look like you having anything of value. So I propose...hm... I dont know. Lets just say you have to do something humiliating. I have to think about that.&quot;
-    &lt;/br&gt;&quot;That would be unfair if I do not know what I am getting into.&quot;
-    &lt;/br&gt;&quot;My, my. Didnt you brag you are sure to get it done? So you dont have to bother about.&quot;
-    [[KH_Intro_WantedDone]] 
-&lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="387" name="KH_Intro_WantedDone" tags="" position="850,4850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
-You already hunted any game living in the counts&#39;s forest. Be it duck, deer or wolf. That beast will be brought down in no time.&lt;/br&gt;
-Even if you actually dont exactly know what it is....&lt;/br&gt;
-With that you go catch some sleep.&lt;/br&gt;
-&lt;/br&gt;[[KH_NextDay]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="388" name="KH_NextDay" tags="" position="975,4850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
-A new day started and you need to decide how to move along.&lt;/br&gt;
-&lt;/br&gt;[[KH_ProgressDay]]
-At least you can decide for yourself and don&#39;t have to do what others say.
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
-&lt;script&gt;
-if(window.story.state.DngSY.dngLevel&lt;=0){window.story.state.DngSY.dngLevel=1;window.story.show(&quot;KH_Intro_Inn&quot;);}
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="389" name="KH_ProgressDay" tags="" position="1100,4850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
-A new day started and you need to decide how to move along.
-&lt;a0 id=&#39;howtoplay&#39; onclick=&#39;(function($event){document.querySelector(&quot;#&quot;+id+&quot;~p&quot;).toggleAttribute(&quot;hidden&quot;);})(this);&#39;&gt;Hint&lt;/a&gt;
-&lt;p hidden&gt;Every day you can choose multiple actions that will require time and energy.
-Keep an eye on your health and hunger-bar.&lt;/p&gt;
-&lt;/br&gt;[[KH_Quest]]
-&lt;/br&gt;[[scout]]
-&lt;a0 id=&#39;helpscout&#39; onclick=&#39;(function($event){document.querySelector(&quot;#&quot;+id+&quot;~p&quot;).toggleAttribute(&quot;hidden&quot;);})(this);&#39;&gt;Hint&lt;/a&gt;
-&lt;p hidden&gt;Go into the woods to familarize yourself with the surrounding. Maybe you can find something of value.&lt;/p&gt;
-[[find resource]] [[hunt]]
-&lt;a0 id=&#39;helpscavenge&#39; onclick=&#39;(function($event){document.querySelector(&quot;#&quot;+id+&quot;~p&quot;).toggleAttribute(&quot;hidden&quot;);})(this);&#39;&gt;Hint&lt;/a&gt;
-&lt;p hidden&gt;Revisit locations you already know and try to find some specific resource or hunt some game. 
-Hunting can provide something to eat or furrs that can be sold for money. You will get a small skill gain and better skill provide better result. But you need the proper equipment like arrows and traps.&lt;/p&gt;
-&lt;/br&gt;[[KH_VisitInn]]
-[[KH_VisitMerchant]]
-[[KH_VisitAlchemist]]
-[[KH_VisitHunter]]
-&lt;/br&gt;&lt;a0 onclick=&#39;($(&quot;tw-passage&quot;).fadeOut(1000,function(){window.gm.addTime(60);window.story.show(&quot;KH_ProgressDay&quot;);}));&#39;&gt;Nap 1hour&lt;/a&gt;
-&lt;%if(window.gm.getTimeStruct().hour&lt;11){ %&gt;
-&lt;a0 onclick=&#39;($(&quot;tw-passage&quot;).fadeOut(1000,function(){window.gm.player.sleep(1800);window.story.show(&quot;KH_Sleep&quot;);}));&#39;&gt;Sleep Until Evening&lt;/a&gt; 
-&lt;%} else {%&gt;
-&lt;a0 onclick=&#39;($(&quot;tw-passage&quot;).fadeOut(1000,function(){window.gm.player.sleep(700);window.story.show(&quot;KH_Sleep&quot;);}));&#39;&gt;Sleep Until Morning&lt;/a&gt;
-&lt;%}%&gt;
-&lt;a0 id=&#39;helpsleep&#39; onclick=&#39;(function($event){document.querySelector(&quot;#&quot;+id+&quot;~p&quot;).toggleAttribute(&quot;hidden&quot;);})(this);&#39;&gt;Hint&lt;/a&gt;
-&lt;p hidden&gt;Pass time by resting or sleep up until a new day. Both recovers some portion of health&amp; energy. But your hunger might increase too.&lt;/p&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="390" name="KH_Sleep" tags="" position="1225,4850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
-You drift of to sleep dreaming of....&lt;/br&gt;
-
-&lt;/br&gt;[[KH_NextDay]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="391" name="KH_Quest" tags="" position="100,4975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
-Sitting down for a moment you contemplate what lies behind you and what you should do next.&lt;/br&gt; 
-&lt;/br&gt;- was es für eine Bestie ist
-&lt;/br&gt;- wo sie sich aufhält
-&lt;/br&gt;- wie man sie fängt
-
-&lt;/br&gt;[[KH_ProgressDay]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="392" name="KH_Scout" tags="" position="225,4975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
-Grabbing your gear you walk into the woods. &lt;/br&gt;
-
-
-&lt;/br&gt;[[KH_ProgressDay]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="393" name="KH_VisitInn" tags="" position="350,4975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
-&lt;a0 id=&#39;helpinn&#39; onclick=&#39;(function($event){document.querySelector(&quot;#&quot;+id+&quot;~p&quot;).toggleAttribute(&quot;hidden&quot;);})(this);&#39;&gt;Hint&lt;/a&gt;
-&lt;p hidden&gt;- catch up some rumors
-&lt;/br&gt;- dance for some cash
-&lt;/br&gt;- fetch some side tasks
-&lt;/br&gt;- sell firewood&lt;/p&gt;
-
-[[KH_ProgressDay]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="394" name="KH_VisitMerchant" tags="" position="475,4975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
-&lt;a0 id=&#39;helpmerchant&#39; onclick=&#39;(function($event){document.querySelector(&quot;#&quot;+id+&quot;~p&quot;).toggleAttribute(&quot;hidden&quot;);})(this);&#39;&gt;Hint&lt;/a&gt;
-&lt;p hidden&gt;The merchant trades some wares that could be of use and buys furrs and other resources gained from hunting.&lt;/p&gt;
-
-[[KH_ProgressDay]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="395" name="KH_VisitAlchemist" tags="" position="600,4975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
-&lt;a0 id=&#39;helpalchemist&#39; onclick=&#39;(function($event){document.querySelector(&quot;#&quot;+id+&quot;~p&quot;).toggleAttribute(&quot;hidden&quot;);})(this);&#39;&gt;Hint&lt;/a&gt;
-&lt;p hidden&gt;Against a fee the alchemist can brew you something. He might also request some rare ingredieents.&lt;/p&gt;
-
-[[KH_ProgressDay]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="396" name="KH_VisitHunter" tags="" position="725,4975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
-&lt;a0 id=&#39;helptrainer&#39; onclick=&#39;(function($event){document.querySelector(&quot;#&quot;+id+&quot;~p&quot;).toggleAttribute(&quot;hidden&quot;);})(this);&#39;&gt;Hint&lt;/a&gt;
-&lt;p hidden&gt;For a fee, you can train here your hunting skills.&lt;/p&gt;
-
-[[KH_ProgressDay]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="397" name="DngLB_MAP" tags="_back_" position="850,4975" size="100,100">&lt;hr&gt;&lt;div id=&#39;canvas&#39;&gt;&lt;/div&gt;&lt;div id=&#39;svgpopup&#39;&gt;&lt;/div&gt;&lt;/br&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="400" name="DngLB_MAP" tags="_back_" position="1225,4975" size="100,100">&lt;hr&gt;&lt;div id=&#39;canvas&#39;&gt;&lt;/div&gt;&lt;div id=&#39;svgpopup&#39;&gt;&lt;/div&gt;&lt;/br&gt;
 &lt;script&gt; window.gm.printMap2(window.story.state.DngSY.dngMap,window.gm.player.location.replace(window.story.state.DngSY.dng+&#39;_&#39;,&#39;&#39;),
     window.story.state.DngLB.mapReveal,window.story.state.DngLB.visitedTiles);
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="398" name="DngLB_Entry" tags="" position="975,4975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="401" name="DngLB_Entry" tags="" position="100,5100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 TODO Appear at bog.
 &lt;/br&gt;&lt;p&gt; [[Next|DngLB_J4]] &lt;/br&gt;&lt;/p&gt;
@@ -10125,7 +10269,7 @@ function buildRooms(){
     s.vars.spawnAt=&quot;DngSY_Recover_Death&quot;;
     s.DngLB.tmp={bovus:[], tickPass:&#39;&#39;};
     buildRooms();
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="399" name="DngLB_Encounters" tags="" position="1100,4975" size="100,100">&lt;script&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="402" name="DngLB_Encounters" tags="" position="225,5100" size="100,100">&lt;script&gt;
 function tick(){
     let here = window.passage.name;
     if(here===window.story.state.DngMN.tmp.tickPass) return;
@@ -10152,7 +10296,7 @@ function explore(){
     }
 }
 tick();
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="400" name="DngLB_J4" tags="" position="1225,4975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="403" name="DngLB_J4" tags="" position="350,5100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;&lt;%=window.story.render(window.story.state.DngSY.dng+&quot;_MAP&quot;)%&gt;
 A sludgy swamp&lt;/br&gt; 
 &lt;%if(window.story.state.DngSY.dngLevel===4 &amp;&amp; window.gm.player.Inv.countItem(&#39;BogBovus&#39;)&gt;=4){%&gt;
@@ -10162,7 +10306,7 @@ A sludgy swamp&lt;/br&gt;
     &lt;p class=&quot;tPC&quot;&gt;&#39;I need to gather 4 mushrooms (purple cap with yellow splotches) before I&#39;m allowed to return.&#39;&lt;/p&gt;&lt;/br&gt;
 &lt;%}%&gt; 
 &lt;%=window.gm.printNav()%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="401" name="OBSOLETEDngNG_Door_Closed" tags="_nosave_" position="100,5100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="404" name="OBSOLETEDngNG_Door_Closed" tags="_nosave_" position="475,5100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 There is a gate in front of you but it is locked.&lt;/br&gt;
 &lt;div id=&#39;output&#39;&gt;&lt;/div&gt;
 &lt;a0 onclick=&#39;window.story.show(window.story.state.DngSY.prevLocation)&#39;&gt;Go back&lt;/a&gt;. 
@@ -10174,13 +10318,13 @@ There is a gate in front of you but it is locked.&lt;/br&gt;
     window.gm.printOutput(door.msg+&quot;&lt;/br&gt;&quot;);
 }
 requiredKey()
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="402" name="DngNG_Timeout" tags="_nosave_" position="225,5100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="405" name="DngNG_Timeout" tags="_nosave_" position="600,5100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;div id=&quot;panel&quot;&gt;&lt;/div&gt;&lt;/br&gt;
 todo you failed to finish the given task and get punished &lt;/br&gt;
 get 2xmoney deducted if bringMoney task&lt;/br&gt;
 get one of your items cursed &lt;/br&gt;
 &lt;p&gt;[[Back|DngNG_D4]]&lt;/p&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="403" name="DngNG_Entry" tags="" position="350,5100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="406" name="DngNG_Entry" tags="" position="725,5100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 Finding yourself in a futuristic bunker, you need to make your escape.&lt;/br&gt;
 Exit cryopod.
@@ -10193,14 +10337,14 @@ wearing fullbody coverall.
     s.DngNG=data;
     s.DngSY.dngMap=map;s.DngSY.dng=&#39;DngNG&#39;;
     s.vars.spawnAt=&quot;DngNG_Respawn&quot;;
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="404" name="DngNG_A1" tags="" position="475,5100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="407" name="DngNG_A1" tags="" position="850,5100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;&lt;%=window.story.render(window.story.state.DngSY.dng+&quot;_MAP&quot;)%&gt;&lt;div id=&quot;panel&quot;&gt;&lt;/div&gt;&lt;/br&gt;
 Somewhere in the dungeon.&lt;/br&gt;
 &lt;%=window.gm.renderRoom(window.passage.name)%&gt;&lt;/br&gt;
 &lt;div id=&#39;output&#39;&gt;&lt;/div&gt;
 &lt;/br&gt;&lt;%=window.story.render(&#39;DngNG_Action&#39;)%&gt;&lt;/br&gt;&lt;div id=&quot;navpanel&quot;&gt;&lt;%=window.gm.printNav2()%&gt;&lt;/div&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
-&lt;%=window.story.render(&quot;DngNG_Encounters&quot;)%&gt;</tw-passagedata><tw-passagedata pid="405" name="DngNG_F3" tags="" position="600,5100" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="406" name="DngNG_G3" tags="" position="725,5100" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="407" name="DngNG_D4" tags="" position="850,5100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;%=window.story.render(&quot;DngNG_Encounters&quot;)%&gt;</tw-passagedata><tw-passagedata pid="408" name="DngNG_F3" tags="" position="975,5100" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="409" name="DngNG_G3" tags="" position="1100,5100" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="410" name="DngNG_D4" tags="" position="1225,5100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;&lt;%=window.story.render(window.story.state.DngSY.dng+&quot;_MAP&quot;)%&gt;&lt;div id=&quot;panel&quot;&gt;&lt;/div&gt;&lt;/br&gt;
 &lt;div id=&#39;select10&#39; &lt;%=((s.DngNG.tmp.qBabble&lt;=0)?&quot;&quot;:&quot;hidden&quot;)%&gt;&gt;
 &lt;a0 onclick=&#39;window.story.state.DngNG.tmp.qBabble=1;window.gm.printTalkLink(&quot;div#select10&quot;,&quot;div#choice10a&quot;);&#39;&gt;pick up datapad&lt;/a&gt;
@@ -10225,26 +10369,26 @@ Somewhere in the dungeon.&lt;/br&gt;
     }
 }
 checkTask();
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="408" name="DngNG_E4" tags="" position="975,5100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="411" name="DngNG_E4" tags="" position="100,5225" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;&lt;%=window.story.render(window.story.state.DngSY.dng+&quot;_MAP&quot;)%&gt;&lt;div id=&quot;panel&quot;&gt;&lt;/div&gt;&lt;/br&gt;
 A small corridor with only 2 doors.&lt;/br&gt;
 There is some kind of a &lt;a0 onclick=&#39;window.story.show(&quot;DngNG_ChangeBooth&quot;)&#39;&gt;round booth&lt;/a&gt; with a display next to it. It reminds you of a changing cubicle in a clothing store or a shower cabine .
 &lt;/br&gt;There is a hatch in the wall next to the booth, maybe it can be opened.&lt;/br&gt; 
 &lt;%=window.gm.renderRoom(window.passage.name)%&gt;&lt;%=window.gm.printNav2()%&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
-&lt;%=window.story.render(&quot;DngNG_Encounters&quot;)%&gt;</tw-passagedata><tw-passagedata pid="409" name="DngNG_DngNG_E4DngNG_E5" tags="_nosave_" position="1100,5100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;%=window.story.render(&quot;DngNG_Encounters&quot;)%&gt;</tw-passagedata><tw-passagedata pid="412" name="DngNG_DngNG_E4DngNG_E5" tags="_nosave_" position="225,5225" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%if(s.DngNG.tmp.qKeyBlue===0){%&gt;
     The hatch is securely closed. There is a slot with a blue colored border and some runes around it. Could this be a keyhole?&lt;/br&gt; 
 &lt;%}else{ s.DngNG.tmp.doors[&quot;E4&quot;][&quot;E5&quot;].state=1; %&gt;
     The blue keycard in your possesion fits in the colored slot on the hatch.    
 &lt;%}%&gt;
 &lt;a0 onclick=&#39;window.story.show(window.story.state.DngSY.prevLocation)&#39;&gt;Next&lt;/a&gt;. 
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="410" name="DngNG_F4" tags="" position="1225,5100" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="411" name="DngNG_F4_Explore" tags="_back_" position="100,5225" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="413" name="DngNG_F4" tags="" position="350,5225" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="414" name="DngNG_F4_Explore" tags="_back_" position="475,5225" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 You scanned this place for anything useful but your effort was a waste of time.
 &lt;p&gt;[[Next|_back_]]&lt;/p&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
 &lt;script&gt;
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="412" name="DngNG_G4" tags="" position="225,5225" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="413" name="DngNG_DngNG_G4DngNG_G5" tags="_nosave_" position="350,5225" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="415" name="DngNG_G4" tags="" position="600,5225" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="416" name="DngNG_DngNG_G4DngNG_G5" tags="_nosave_" position="725,5225" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 There is a password entry on that door. Its just 4 digits.&lt;/br&gt;
 &lt;p class=&quot;tPC&quot;&gt;&quot;I need a passcode here. Maybe I should look around if I find a clue.&quot;&lt;/p&gt;
 TODO: there are 4 hints scattered around, but if you try to get them all you get badend.
@@ -10262,7 +10406,7 @@ TODO: there are 4 hints scattered around, but if you try to get them all you get
 &lt;%}else{%&gt;
     &lt;a0 onclick=&#39;window.story.show(window.story.state.DngSY.prevLocation)&#39;&gt;Next&lt;/a&gt;. 
 &lt;%}%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="414" name="DngNG_DngNG_G4DngNG_G3" tags="_nosave_" position="475,5225" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="417" name="DngNG_DngNG_G4DngNG_G3" tags="_nosave_" position="850,5225" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%if(window.gm.player.Outfit.countItem(&quot;CollarID&quot;)&gt;0){%&gt;
     &quot;Scanning...&quot; a voice chirps &quot;ID valid - access granted&quot; and the door in front of you opens. &lt;/br&gt;
     Better &lt;a0 onclick=&#39;window.story.show(window.story.state.DngSY.nextLocation)&#39;&gt;move on&lt;/a&gt; before it closes again.
@@ -10271,7 +10415,7 @@ TODO: there are 4 hints scattered around, but if you try to get them all you get
     &lt;p class=&quot;tPC&quot;&gt;&#39;So I need to find some ID-badge to get through this door?&#39;&lt;/p&gt; 
     &lt;a0 onclick=&#39;window.story.show(window.story.state.DngSY.prevLocation)&#39;&gt;Leave the door for now&lt;/a&gt;. 
 &lt;%}%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="415" name="DngNG_H4" tags="" position="600,5225" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="416" name="DngNG_DngNG_H4DngNG_I4" tags="_nosave_" position="725,5225" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="418" name="DngNG_H4" tags="" position="975,5225" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="419" name="DngNG_DngNG_H4DngNG_I4" tags="_nosave_" position="1100,5225" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 There is another locked bulkdoor and you are pretty sure it blocks your route to leaving this place.
 &lt;p class=&quot;tNPC1&quot;&gt;&quot;This is a security gate that has been locked because some power brown out. You need to restore power, reset the door locks and get an ID-Tag to open it.&quot;&lt;/p&gt;
 &lt;%if(s.DngNG.tmp.powerLevel&lt;=0){%&gt;
@@ -10307,7 +10451,7 @@ There is another locked bulkdoor and you are pretty sure it blocks your route to
     The id-tag you have should grant you access.&lt;/br&gt;
 &lt;%}%&gt;
 &lt;/br&gt;&lt;a0 onclick=&#39;window.story.show(window.story.state.DngSY.prevLocation)&#39;&gt;Next&lt;/a&gt;.
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="417" name="DngNG_I4" tags="" position="850,5225" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="418" name="DngNG_J4" tags="" position="975,5225" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="419" name="DngNG_D5" tags="" position="1100,5225" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="420" name="DngNG_DngNG_E5DngNG_F5" tags="_nosave_" position="1225,5225" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="420" name="DngNG_I4" tags="" position="1225,5225" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="421" name="DngNG_J4" tags="" position="100,5350" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="422" name="DngNG_D5" tags="" position="225,5350" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="423" name="DngNG_DngNG_E5DngNG_F5" tags="_nosave_" position="350,5350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 The crawlspace gets thighter here.
 &lt;%if(false){ s.DngNG.tmp.doors[&quot;E5&quot;][&quot;F5&quot;].state=1;%&gt;
@@ -10316,12 +10460,12 @@ The crawlspace gets thighter here.
     As with your size, you are not comfortable to try to slip into that tight opening.&lt;/br&gt;
     &lt;a0 onclick=&#39;window.story.show(window.story.state.DngSY.prevLocation)&#39;&gt;Next&lt;/a&gt;. 
 &lt;%}%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="421" name="DngNG_E5" tags="" position="100,5350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="424" name="DngNG_E5" tags="" position="475,5350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;&lt;%=window.story.render(window.story.state.DngSY.dng+&quot;_MAP&quot;)%&gt;
 Behind the hatch in the ajoining room you find a crawlspace with leading left and right.&lt;/br&gt;
 There is also some kind of [[switchbox|DngNG_E5_Switch]] with a display on it.&lt;/br&gt;
 &lt;%=window.gm.renderRoom(window.passage.name)%&gt;&lt;%=window.gm.printNav2()%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="422" name="DngNG_F5" tags="" position="225,5350" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="423" name="DngNG_G5" tags="" position="350,5350" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="424" name="DngNG_H5" tags="" position="475,5350" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="425" name="DngNG_I5" tags="" position="600,5350" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="426" name="DngNG_J5" tags="" position="725,5350" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="427" name="DngNG_D6" tags="" position="850,5350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="425" name="DngNG_F5" tags="" position="600,5350" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="426" name="DngNG_G5" tags="" position="725,5350" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="427" name="DngNG_H5" tags="" position="850,5350" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="428" name="DngNG_I5" tags="" position="975,5350" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="429" name="DngNG_J5" tags="" position="1100,5350" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="430" name="DngNG_D6" tags="" position="1225,5350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;&lt;%=window.story.render(window.story.state.DngSY.dng+&quot;_MAP&quot;)%&gt;
 This seems to be an abandoned storage.&lt;/br&gt; Crude equipment and boxes are lined up on the shelves. 
 &lt;/br&gt;
@@ -10330,7 +10474,7 @@ This seems to be an abandoned storage.&lt;/br&gt; Crude equipment and boxes are 
 &lt;/div&gt;&lt;div id=&#39;choice10a&#39; hidden&gt;&lt;/br&gt; Without knowing what to look for, this seems just a waste of time. Most of it seems to be rubble anyway.
 &lt;/div&gt;
 &lt;%=window.gm.renderRoom(window.passage.name)%&gt;&lt;%=window.gm.printNav2()%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="428" name="DngNG_E6" tags="" position="975,5350" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="429" name="DngNG_F6" tags="" position="1100,5350" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="430" name="DngNG_Meet_Dog" tags="_nosave_" position="1225,5350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="431" name="DngNG_E6" tags="" position="100,5475" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="432" name="DngNG_F6" tags="" position="225,5475" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="433" name="DngNG_Meet_Dog" tags="_nosave_" position="350,5475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 There is some kind of robot shuffling around. &lt;/br&gt;
 It looks like some of those robotic pet dogs you saw in a science show. It just looks a little bigger, around half a meter. And its movements are much more fluid and natural.&lt;/br&gt;&lt;/br&gt;
 
@@ -10355,11 +10499,11 @@ It looks like some of those robotic pet dogs you saw in a science show. It just 
 &lt;%}%&gt;
 You may try your luck and &lt;a0 onclick=&#39;dogEncounter();&#39;&gt;walk further&lt;/a&gt; in its direction but maybe its wise to  
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
-&lt;%=window.story.render(&quot;DngHC_Encounters&quot;)%&gt;</tw-passagedata><tw-passagedata pid="431" name="DngNG_Sleep" tags="" position="100,5475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
+&lt;%=window.story.render(&quot;DngHC_Encounters&quot;)%&gt;</tw-passagedata><tw-passagedata pid="434" name="DngNG_Sleep" tags="" position="475,5475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 Get some rest on that bunk.&lt;/br&gt;
 &lt;/br&gt;&lt;div id=&#39;output&#39;&gt;&lt;/div&gt;
 &lt;/br&gt;&lt;a0 onclick=&#39;window.story.show(&quot;DngNG_D4&quot;)&#39;&gt;Next&lt;/a&gt;&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="432" name="DngNG_Trap_Dehair" tags="_nosave_" position="225,5475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="435" name="DngNG_Trap_Dehair" tags="_nosave_" position="600,5475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 Scanner triggers and laser turret shots.&lt;/br&gt; You just triggered a trap! &lt;/br&gt;
 &lt;div id=&#39;select10&#39; hidden&gt;&lt;/div&gt;
 &lt;div id=&#39;choice10a&#39; hidden&gt;&lt;/br&gt;Your attempt to evade the ray failed. As your upper gets hit, you can feel the heat on your back. Checking on yourself after you have rolled into cover, you find your upper clothing beeing damaged.&lt;/br&gt;
@@ -10387,13 +10531,13 @@ The &lt;%=(&quot;...&quot;)%&gt; that covers your body now is &lt;%=(&quot;sligh
         }
     }
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="433" name="InspectPlayer" tags="_back_" position="350,5475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="436" name="InspectPlayer" tags="_back_" position="725,5475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 [[Back|_back_]]&lt;/br&gt; Checking on yourself you find..&lt;/br&gt;
 &lt;div id=&#39;output&#39;&gt;&lt;%=window.gm.InspectSelf(window.gm.player,true)%&gt;&lt;div&gt;
 &lt;/br&gt;[[Back|_back_]]&lt;/br&gt;
 &lt;!--todo: set height depending on browsersize--&gt;
 &lt;!--&lt;div id=&#39;Canvas&#39; style=&#39;height: 30em;background: url(&quot;assets/doll/doll_small_xcf-Skirt.png&quot;) no-repeat center,url(&quot;assets/doll/doll_small_xcf-Body.png&quot;) no-repeat center, url(&lt;%=window.gm.getScenePic(window.gm.player.location)%&gt;)no-repeat center;color:black;&#39;&gt;&lt;/div&gt;--&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="434" name="DngNG_Spider" tags="_nosave_" position="475,5475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="437" name="DngNG_Spider" tags="_nosave_" position="850,5475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 &lt;%if(true){%&gt;
     Hearing something clicking and clacking, you look around in the new room to find its source.&lt;/br&gt;
     Its caused by a small bot with spider like appearance. Its as big as 2 hands.
@@ -10410,13 +10554,13 @@ The &lt;%=(&quot;...&quot;)%&gt; that covers your body now is &lt;%=(&quot;sligh
     Another of those spider bots is busy here. Lets see what you can do about that.
     &lt;/br&gt;&lt;a0 onclick=&#39;window.story.show(&quot;DngNG_SpiderFight&quot;)&#39;&gt;Smash it&lt;/a&gt;
 &lt;%}%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="435" name="DngNG_F3_Screen" tags="" position="600,5475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="438" name="DngNG_F3_Screen" tags="" position="975,5475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 Your babble companion translates the symbols on the screen.
 &lt;%if()%&gt;
 &lt;p class=&quot;tNPC1&quot;&gt;&quot;main power interrupted ; switchover to spare relais failed du to electrical failure in switchboard SS+02&quot;&lt;/p&gt;
 &lt;p class=&quot;tPC&quot;&gt;&#39;Maybe there is a problem in one of those cabinets?&#39;&lt;/p&gt;
 &lt;a0 onclick=&#39;window.story.show(window.story.state.DngSY.prevLocation)&#39;&gt;retreat&lt;/a&gt;.
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="436" name="DngNG_E5_Switch" tags="_nosave_" position="725,5475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="439" name="DngNG_E5_Switch" tags="_nosave_" position="1100,5475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 With the help of your companion you decypher the display on the switch box.&lt;/br&gt;
 &lt;%if(window.story.state.DngNG.tmp.qPowRoute===0){%&gt;
 &lt;p class=&quot;tNPC1&quot;&gt;&quot;Constructor unit Cro-4E5D in maintenance mode. Reason: power conservation due to power failure.&quot;&lt;/p&gt;
@@ -10433,7 +10577,7 @@ Some options are listed, maybe you can activate the constructor.
 &lt;%}%&gt;
 
 &lt;a0 onclick=&#39;window.story.show(window.gm.player.location)&#39;&gt;leave&lt;/a&gt;.
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="437" name="DngNG_ChangeBooth" tags="_nosave_" position="850,5475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="440" name="DngNG_ChangeBooth" tags="_nosave_" position="1225,5475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 Your AI-companion decyphers the symbols on the panel:
 &lt;p&gt;&quot;Devices disabled for maintenance. Normal operation requires disabling of maintenance mode.&quot;&lt;/p&gt;
 &quot;There should be a maintenance terminal somewhere, just look around.&quot;
@@ -10445,7 +10589,7 @@ Seems the booth is working again.
 &lt;a0 onclick=&#39;window.story.show(&quot;DngNG_ChangeBoothShop&quot;)&#39;&gt;Step into the booth&lt;/a&gt;.
 
 &lt;a0 onclick=&#39;window.story.show(window.gm.player.location)&#39;&gt;leave&lt;/a&gt;.
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="438" name="DngNG_ChangeBoothFitID" tags="_nosave_" position="975,5475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="441" name="DngNG_ChangeBoothFitID" tags="_nosave_" position="100,5600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 The door of the booth swishes closed after you have stepped inside.
 &quot;Scanning - please adjust position to markings&quot; 
 
@@ -10479,7 +10623,7 @@ Its made from shiny black material with a metalic clasp.
     &lt;a0 onclick=&#39;window.story.show(&quot;DngNG_ChangeBooth&quot;)&#39;&gt;Next&lt;/a&gt;.
 &lt;/div&gt;
 
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="439" name="DngNG_ChangeBoothShop" tags="_nosave_" position="1100,5475" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="442" name="DngNG_ChangeBoothShop" tags="_nosave_" position="225,5600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 The door of the booth swishes closed after you have stepped inside.
 &quot;Scanning - please adjust position to markings&quot; 
 
@@ -10492,7 +10636,7 @@ Get Latexitus removed. with coverall
 &quot;I guess we will need to get some of those materials or I will end up running around naked.&quot;
 
 [[DngNG_ChangeBooth]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="440" name="PowerupIntro" tags="" position="1225,5475" size="100,100">&lt;p class=&quot;tPC&quot;&gt;&quot;That was awesome ! How did I do that?&quot;&lt;/p&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="443" name="PowerupIntro" tags="" position="350,5600" size="100,100">&lt;p class=&quot;tPC&quot;&gt;&quot;That was awesome ! How did I do that?&quot;&lt;/p&gt;
 &lt;p class=&quot;tNPC1&quot;&gt;&quot;Its in the technology of those attachements.&quot;&lt;/p&gt;
 &lt;p class=&quot;tNPC1&quot;&gt;&quot;Most of those are prototypes, so they might have a flaw or two. And they need lots of energy.&quot;&lt;/p&gt;
 &lt;p class=&quot;tPC&quot;&gt;&quot;So I have to carry lots of batteries with me?&quot;&lt;/p&gt;
@@ -10503,7 +10647,7 @@ Get Latexitus removed. with coverall
 &lt;p class=&quot;tPC&quot;&gt;&quot;So I just need to scrap some of those metall guys to get the stuff.&quot;&lt;/p&gt;
 &lt;p class=&quot;tNPC1&quot;&gt;&quot;That I would not recommend. It could alert maintenance supervisors if they detect some uncommon loss of bots. But if you cut off a little bit here and there, it might go unnoticed.&quot;&lt;/p&gt;
 &lt;p class=&quot;tNPC1&quot;&gt;&quot;Lets see what kind of ways we can get by.&quot;&lt;/p&gt;
-&lt;/br&gt;</tw-passagedata><tw-passagedata pid="441" name="MaintenanceIntro" tags="" position="100,5600" size="100,100">&lt;p class=&quot;tNPC1&quot;&gt;&quot;Your augments got damaged and need to be repaired. There are service stations all around.&quot;&lt;/p&gt;
+&lt;/br&gt;</tw-passagedata><tw-passagedata pid="444" name="MaintenanceIntro" tags="" position="475,5600" size="100,100">&lt;p class=&quot;tNPC1&quot;&gt;&quot;Your augments got damaged and need to be repaired. There are service stations all around.&quot;&lt;/p&gt;
 &lt;p class=&quot;tPC&quot;&gt;&quot;Wont they recognize me as human?&quot;&lt;/p&gt;
 &lt;p class=&quot;tNPC1&quot;&gt;&quot;Maybe. But they will just try to repair your broken mechanic. There could be a diiferent issue.&quot; &lt;/p&gt;
 &lt;p class=&quot;tNPC1&quot;&gt;&quot;Well, its sometimes cheaper to scrap a damaged machine and build it anew instead of trying to patch it up. So if your maintenance is expensive, it might cost you extra.&quot;&lt;/p&gt;
@@ -10512,17 +10656,17 @@ Get Latexitus removed. with coverall
 &lt;p class=&quot;tPC&quot;&gt;&quot;And if I dont have the matter?&quot;&lt;/p&gt;
 &lt;p class=&quot;tNPC1&quot;&gt;&quot;If you are a \&quot;good, helpful drone\&quot;, the repair-AI might give a maintenace for free. ;)&quot;&lt;/p&gt;
 &lt;p class=&quot;tPC&quot;&gt;&quot;That wink was kinda unsettling. What do you mean with good and helpful?&quot;&lt;/p&gt;
-&lt;p class=&quot;tNPC1&quot;&gt;&quot;I will explain later. Lets get going and get you fixed.&quot;&lt;/p&gt;</tw-passagedata><tw-passagedata pid="442" name="RepairDroneDestroyer" tags="" position="225,5600" size="100,100">&quot;Hey, someone has repaired those controls.&quot;
+&lt;p class=&quot;tNPC1&quot;&gt;&quot;I will explain later. Lets get going and get you fixed.&quot;&lt;/p&gt;</tw-passagedata><tw-passagedata pid="445" name="RepairDroneDestroyer" tags="" position="600,5600" size="100,100">&quot;Hey, someone has repaired those controls.&quot;
 &quot;Yes. May I remember you about those small bots all around. Its their job to fix things.&quot;
 &quot;I cant be at multiple places at the same time. So how can we make stop them repairing it.&quot;
 &quot;Multiple approaches possible:&quot;
 &quot;a) damage enough of those drones. But that might alert supervisors&quot;
 &quot;b) alter their work parameters. It might not be possible to make them stop repairing things completely. But if they get a bit lazzy no one should note immediatly.&quot;
 Destroyed bots regrow, so you have to act quickly. More fight-drids appear.
-Altering programm requires terminal access, requires security, requires restraints?</tw-passagedata><tw-passagedata pid="443" name="DngMN_MAP" tags="_back_" position="350,5600" size="100,100">&lt;hr&gt;&lt;div id=&#39;canvas&#39;&gt;&lt;/div&gt;&lt;div id=&#39;svgpopup&#39;&gt;&lt;/div&gt;&lt;/br&gt;
+Altering programm requires terminal access, requires security, requires restraints?</tw-passagedata><tw-passagedata pid="446" name="DngMN_MAP" tags="_back_" position="725,5600" size="100,100">&lt;hr&gt;&lt;div id=&#39;canvas&#39;&gt;&lt;/div&gt;&lt;div id=&#39;svgpopup&#39;&gt;&lt;/div&gt;&lt;/br&gt;
 &lt;script&gt; window.gm.printMap2(window.story.state.DngSY.dngMap,window.gm.player.location.replace(window.story.state.DngSY.dng+&#39;_&#39;,&#39;&#39;),
     window.story.state.DngMN.mapReveal,window.story.state.DngMN.visitedTiles);
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="444" name="DngMN_Entry" tags="" position="475,5600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="447" name="DngMN_Entry" tags="" position="850,5600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 The other side of the portal exits on a large slab of rock. It is located at the upper end of a cliff.
 From here you have a great view of the lower valley and a large waterfall on the other side of the crevasse.&lt;/br&gt; 
@@ -10575,7 +10719,7 @@ function buildRooms(){
     s.DngSY.dng=&#39;DngMN&#39;;
     s.DngMN.tmp={page:[], tickPass:&#39;&#39;};
     buildRooms();
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="445" name="DngMN_Encounters" tags="" position="600,5600" size="100,100">&lt;script&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="448" name="DngMN_Encounters" tags="" position="975,5600" size="100,100">&lt;script&gt;
 function tick(){
     let here = window.passage.name;
     if(here===window.story.state.DngMN.tmp.tickPass) return;
@@ -10613,7 +10757,7 @@ function explore(){
     }
 }
 tick();
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="446" name="DngMN_Success" tags="" position="725,5600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="449" name="DngMN_Success" tags="" position="1100,5600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 Finally, you got all the pages and can step through the portal.&lt;/br&gt;
 Cyril is already there waiting for you.&lt;/br&gt;
@@ -10667,7 +10811,7 @@ As you enter the hall, you notice Kumala and Leon already waiting there.
     window.story.state.DngSY.remainingNights=2;
     window.story.show(&quot;DngSY_Your_Room&quot;);
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="447" name="DngMN_F1" tags="" position="850,5600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="450" name="DngMN_F1" tags="" position="1225,5600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;&lt;%=window.story.render(window.story.state.DngSY.dng+&quot;_MAP&quot;)%&gt;
 A large nest is enthroned on a rocky peak that protrudes from the rock face a few dozen meters above you.
 &lt;p class=&quot;tPC&quot;&gt;&quot;Oh my thats quite a big collection of sticks up there.&quot;&lt;/p&gt;
@@ -10679,30 +10823,30 @@ A large nest is enthroned on a rocky peak that protrudes from the rock face a fe
 &lt;/div&gt;
 &lt;%}else{%&gt;&lt;%=window.gm.printNav()%&gt;&lt;%}%&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
-&lt;%=window.story.render(&quot;DngMN_Encounters&quot;)%&gt;</tw-passagedata><tw-passagedata pid="448" name="DngMN_F2" tags="" position="975,5600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;%=window.story.render(&quot;DngMN_Encounters&quot;)%&gt;</tw-passagedata><tw-passagedata pid="451" name="DngMN_F2" tags="" position="100,5725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;&lt;%=window.story.render(window.story.state.DngSY.dng+&quot;_MAP&quot;)%&gt;
 
 &lt;%=window.gm.printNav()%&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
-&lt;%=window.story.render(&quot;DngMN_Encounters&quot;)%&gt;</tw-passagedata><tw-passagedata pid="449" name="DngMN_G2" tags="" position="1100,5600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;%=window.story.render(&quot;DngMN_Encounters&quot;)%&gt;</tw-passagedata><tw-passagedata pid="452" name="DngMN_G2" tags="" position="225,5725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;&lt;%=window.story.render(window.story.state.DngSY.dng+&quot;_MAP&quot;)%&gt;
 
 &lt;%=window.gm.printNav()%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="450" name="DngMN_H2" tags="" position="1225,5600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="453" name="DngMN_H2" tags="" position="350,5725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;&lt;%=window.story.render(window.story.state.DngSY.dng+&quot;_MAP&quot;)%&gt;
 A wolf seems to follow you in your track. You should &lt;a0 onclick=&#39;fightWolf();&#39;&gt;show it&lt;/a&gt; that you want to be left alone. 
 &lt;%=window.gm.printNav()%&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
-&lt;%=window.story.render(&quot;DngMN_Encounters&quot;)%&gt;</tw-passagedata><tw-passagedata pid="451" name="DngMN_I2" tags="" position="100,5725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;%=window.story.render(&quot;DngMN_Encounters&quot;)%&gt;</tw-passagedata><tw-passagedata pid="454" name="DngMN_I2" tags="" position="475,5725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;&lt;%=window.story.render(window.story.state.DngSY.dng+&quot;_MAP&quot;)%&gt;
 You wonder if you could &lt;a0 onclick=&#39;explore()&#39;&gt;find&lt;/a&gt; something useful here.&lt;/br&gt;
 &lt;%=window.gm.printNav()%&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
-&lt;%=window.story.render(&quot;DngMN_Encounters&quot;)%&gt;</tw-passagedata><tw-passagedata pid="452" name="DngMN_J2" tags="" position="225,5725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;%=window.story.render(&quot;DngMN_Encounters&quot;)%&gt;</tw-passagedata><tw-passagedata pid="455" name="DngMN_J2" tags="" position="600,5725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;&lt;%=window.story.render(window.story.state.DngSY.dng+&quot;_MAP&quot;)%&gt;
 
 &lt;%=window.gm.printNav()%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="453" name="DngMN_I3" tags="" position="350,5725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="456" name="DngMN_I3" tags="" position="725,5725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;&lt;%=window.story.render(window.story.state.DngSY.dng+&quot;_MAP&quot;)%&gt;
 The portal is located near the edge of a deep canyon that has carved itself into the bottom of a valley surrounded by high mountains.
 From here you have a great view of the lower valley and a large waterfall on the other side of the crevasse.&lt;/br&gt; 
@@ -10713,23 +10857,23 @@ From here you have a great view of the lower valley and a large waterfall on the
     &lt;/br&gt;Once you have at least 2 pages from a missing book, the portal should reapear opening your way back to the sanctuary.&lt;/br&gt;
 &lt;%}%&gt; 
 &lt;%=window.gm.printNav()%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="454" name="DngMN_J3" tags="" position="475,5725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="457" name="DngMN_J3" tags="" position="850,5725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;&lt;%=window.story.render(window.story.state.DngSY.dng+&quot;_MAP&quot;)%&gt;
 
 &lt;%=window.gm.printNav()%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="455" name="DngMN_K3" tags="" position="600,5725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="458" name="DngMN_K3" tags="" position="975,5725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;&lt;%=window.story.render(window.story.state.DngSY.dng+&quot;_MAP&quot;)%&gt;
 
 &lt;%=window.gm.printNav()%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="456" name="DngMN_K4" tags="" position="725,5725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="459" name="DngMN_K4" tags="" position="1100,5725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;&lt;%=window.story.render(window.story.state.DngSY.dng+&quot;_MAP&quot;)%&gt;
 This rickety, wooden bridge has seen better days. Hopefully it won&#39;t fall into the canyon when you cross it.
 &lt;%=window.gm.printNav()%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="457" name="DngMN_H5" tags="" position="850,5725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="460" name="DngMN_H5" tags="" position="1225,5725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;&lt;%=window.story.render(window.story.state.DngSY.dng+&quot;_MAP&quot;)%&gt;
 
 &lt;%=window.gm.printNav()%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="458" name="DngMN_I5" tags="" position="975,5725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="461" name="DngMN_I5" tags="" position="100,5850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;&lt;%=window.story.render(window.story.state.DngSY.dng+&quot;_MAP&quot;)%&gt;
 A log cabin stands in a clearing. A few sheds stand leaning askew against the trees. 
 &lt;%if(!window.story.state.DngMN.tmp.page[&#39;DngMN_I5&#39;]){%&gt;
@@ -10816,7 +10960,7 @@ A crooked pine tree grows near the hut. It would be easy enough to climb and the
 &lt;%}else{%&gt;
 &lt;%=window.gm.printNav()%&gt;
 &lt;%}%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="459" name="DngMN_I5_TalkPaper" tags="" position="1100,5725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="462" name="DngMN_I5_TalkPaper" tags="" position="225,5850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;
 Todo: 
 You explain him that your task is to get that scrap paper. You will get it if you help him fixing the roof. It was broken anyway and it is much easier to do it if 2 people work together.
@@ -10824,17 +10968,17 @@ You explain him that your task is to get that scrap paper. You will get it if yo
 &lt;a0 onclick=&#39;window.story.state.DngMN.tmp.page[&quot;DngMN_I5&quot;]=true;window.gm.player.Inv.addItem(new window.gm.ItemsLib[&quot;IgneumPage&quot;]());window.gm.printTalkLink(&quot;div#select5&quot;,&quot;div#choice5a&quot;)&#39;&gt;Grab the page&lt;/a&gt;&lt;/br&gt;
 &lt;/div&gt;&lt;div id=&#39;choice5a&#39; hidden&gt; &lt;/br&gt;You got a page.&lt;p&gt;[[Leave|DngMN_J5]]&lt;/p&gt;
 &lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="460" name="DngMN_J5" tags="" position="1225,5725" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="463" name="DngMN_J5" tags="" position="350,5850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;&lt;%=window.story.render(window.story.state.DngSY.dng+&quot;_MAP&quot;)%&gt;
 
 &lt;%=window.gm.printNav()%&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
-&lt;%=window.story.render(&quot;DngMN_Encounters&quot;)%&gt;</tw-passagedata><tw-passagedata pid="461" name="DngMN_K5" tags="" position="100,5850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;%=window.story.render(&quot;DngMN_Encounters&quot;)%&gt;</tw-passagedata><tw-passagedata pid="464" name="DngMN_K5" tags="" position="475,5850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;&lt;%=window.story.render(window.story.state.DngSY.dng+&quot;_MAP&quot;)%&gt;
 This seems to be a crossroad adorned by a roten signpost:
 East:&quot;Lowlands&quot;,North:&quot;Highlands&quot;,West: you cant read that 
 &lt;%=window.gm.printNav()%&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="462" name="DngMN_L5" tags="" position="225,5850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="465" name="DngMN_L5" tags="" position="600,5850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;&lt;%=window.story.render(window.story.state.DngSY.dng+&quot;_MAP&quot;)%&gt;
 In eastern direction, the path winds further down the valley.
 &lt;div id=&#39;select1&#39; &gt;
@@ -10850,14 +10994,14 @@ In eastern direction, the path winds further down the valley.
 &lt;div id=&#39;choice1b&#39; hidden&gt;
 &lt;%=window.gm.printNav()%&gt;
 &lt;/div&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="463" name="DngNG_MAP" tags="_back_" position="350,5850" size="100,100">&lt;hr&gt;&lt;div id=&#39;canvas&#39; style=&#39;max-height: 256px;overflow: auto;&#39;&gt;&lt;/div&gt;&lt;div id=&#39;svgpopup&#39;&gt;&lt;/div&gt;&lt;/br&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="466" name="DngNG_MAP" tags="_back_" position="725,5850" size="100,100">&lt;hr&gt;&lt;div id=&#39;canvas&#39; style=&#39;max-height: 256px;overflow: auto;&#39;&gt;&lt;/div&gt;&lt;div id=&#39;svgpopup&#39;&gt;&lt;/div&gt;&lt;/br&gt;
 &lt;script&gt; window.gm.printMap2(window.story.state.DngSY.dngMap,window.gm.player.location.replace(window.story.state.DngSY.dng+&#39;_&#39;,&#39;&#39;),
     window.story.state.DngNG.mapReveal,window.story.state.DngNG.visitedTiles);
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="464" name="DngNG_Action" tags="" position="475,5850" size="100,100">&lt;%if(window.passage.name===&quot;DngNG_F3&quot;){%&gt;&lt;a0 onclick=&#39;&#39;&gt;Bang against the door to let you out of this place.&lt;/a&gt;&lt;%}%&gt;
-&lt;a0 onclick=&#39;window.gm.addTime(30);window.gm.refreshAllPanel()&#39;&gt;Wait&lt;/a&gt;</tw-passagedata><tw-passagedata pid="465" name="DngNG_Encounters" tags="" position="600,5850" size="100,100">&lt;script&gt;window.gm.doMobAi();&lt;/script&gt;</tw-passagedata><tw-passagedata pid="466" name="DngNG_Retreat" tags="" position="725,5850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="467" name="DngNG_Action" tags="" position="850,5850" size="100,100">&lt;%if(window.passage.name===&quot;DngNG_F3&quot;){%&gt;&lt;a0 onclick=&#39;&#39;&gt;Bang against the door to let you out of this place.&lt;/a&gt;&lt;%}%&gt;
+&lt;a0 onclick=&#39;window.gm.addTime(30);window.gm.refreshAllPanel()&#39;&gt;Wait&lt;/a&gt;</tw-passagedata><tw-passagedata pid="468" name="DngNG_Encounters" tags="" position="975,5850" size="100,100">&lt;script&gt;window.gm.doMobAi();&lt;/script&gt;</tw-passagedata><tw-passagedata pid="469" name="DngNG_Retreat" tags="" position="1100,5850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 It felt like taking forever to get that gate open until you are able to squeeze through it.
 &lt;/br&gt;[[Leave this place|DngNG_Home]]&lt;/br&gt;
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="467" name="DngNG_Respawn" tags="_nosave_ _nodeffered_" position="850,5850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="470" name="DngNG_Respawn" tags="_nosave_ _nodeffered_" position="1225,5850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 You find yourself in the middle of a facility. &lt;/br&gt;
 Walk aroound an keep a watchful eye for anyone that pounce you. Or pounce them and try to make them submit.&lt;/br&gt;
 When the clock reaches 7AM, the game ends and the ranking will be calculated depending on your performance:
@@ -10879,7 +11023,7 @@ Depending on your ranking you receive some prize - or punishment:
     s.DngNG=data;
     s.DngSY.dngMap=map;s.DngSY.dng=&#39;DngNG&#39;;
     s.vars.spawnAt=&quot;DngNG_Respawn&quot;;
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="468" name="DngNG_Ruff_Talk" tags="_back_" position="975,5850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="471" name="DngNG_Ruff_Talk" tags="_back_" position="100,5975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 Ruff is just growling menacingly at you.&lt;/br&gt; Maybe if you would have something tasty for him...
 &lt;a0 onclick=&#39;foo()&#39;&gt;Get closer&lt;/a&gt;
 &lt;/br&gt;[[Back|_back_]]&lt;/br&gt;
@@ -10889,7 +11033,7 @@ Ruff is just growling menacingly at you.&lt;/br&gt; Maybe if you would have some
     var _oldVictory=window.gm.Encounter.onVictory.bind(window.gm.Encounter);
     window.gm.Encounter.onVictory= function(){window.story.state.DngNG.getMobById(&quot;Ruff&quot;).state=-1;return(_oldVictory());}
     window.gm.Encounter.initCombat(); return;
-}&lt;/script&gt;</tw-passagedata><tw-passagedata pid="469" name="DngNG_Tmpl" tags="" position="1100,5850" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+}&lt;/script&gt;</tw-passagedata><tw-passagedata pid="472" name="DngNG_Tmpl" tags="" position="225,5975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;&lt;%=window.story.render(window.story.state.DngSY.dng+&quot;_MAP&quot;)%&gt;&lt;div id=&quot;panel&quot;&gt;&lt;/div&gt;&lt;/br&gt;
 Somewhere in the dungeon.&lt;/br&gt;
 &lt;%=window.gm.renderRoomNG(window.passage.name)%&gt;&lt;/br&gt;
@@ -10897,17 +11041,17 @@ Somewhere in the dungeon.&lt;/br&gt;
 &lt;div id=&#39;output&#39;&gt;&lt;/div&gt;
 &lt;/br&gt;&lt;%=window.story.render(&#39;DngNG_Action&#39;)%&gt;&lt;/br&gt;&lt;div id=&quot;navpanel&quot;&gt;&lt;%=window.gm.printNav2()%&gt;&lt;/div&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
-&lt;script&gt;window.gm.doMobAi();&lt;/script&gt;</tw-passagedata><tw-passagedata pid="470" name="DngNG_appletree" tags="_fragm_" position="1225,5850" size="100,100">A scrawny appletree is growing here.</tw-passagedata><tw-passagedata pid="471" name="DngNG_entry" tags="_fragm_" position="100,5975" size="100,100">The path here winds back to the city.
+&lt;script&gt;window.gm.doMobAi();&lt;/script&gt;</tw-passagedata><tw-passagedata pid="473" name="DngNG_appletree" tags="_fragm_" position="350,5975" size="100,100">A scrawny appletree is growing here.</tw-passagedata><tw-passagedata pid="474" name="DngNG_entry" tags="_fragm_" position="475,5975" size="100,100">The path here winds back to the city.
 However, you first have to solve your task which is: TODO
 else
-With your task solved you might [[leave this place|DngNG_ReturnFromHunt]]&lt;/br&gt;.</tw-passagedata><tw-passagedata pid="472" name="DngNG_Mushroom" tags="_fragm_" position="225,5975" size="100,100">&lt;/br&gt;&lt;%if(window.story.state.DngNG.tmp.evtSpawn[window.passage.name][&quot;mushroom&quot;].state===0){%&gt;There is a &lt;%=window.story.state.DngNG.tmp.evtSpawn[window.passage.name][&quot;mushroom&quot;].loot%&gt;. Do you collect it?
+With your task solved you might [[leave this place|DngNG_ReturnFromHunt]]&lt;/br&gt;.</tw-passagedata><tw-passagedata pid="475" name="DngNG_Mushroom" tags="_fragm_" position="600,5975" size="100,100">&lt;/br&gt;&lt;%if(window.story.state.DngNG.tmp.evtSpawn[window.passage.name][&quot;mushroom&quot;].state===0){%&gt;There is a &lt;%=window.story.state.DngNG.tmp.evtSpawn[window.passage.name][&quot;mushroom&quot;].loot%&gt;. Do you collect it?
 &lt;div id=&#39;select992&#39; &gt;
 &lt;a0 onclick=&#39;var _evt=window.story.state.DngNG.tmp.evtSpawn[window.passage.name][&quot;mushroom&quot;];_evt.state=1;_evt.tick=window.gm.getTime();window.gm.player.changeInventory(window.gm.ItemsLib[_evt.loot](),1);window.gm.printTalkLink(&quot;div#select992&quot;,&quot;div#choice992a&quot;)&#39;&gt;Yes&lt;/a&gt;&lt;/br&gt;
 &lt;/div&gt;&lt;div id=&#39;choice992a&#39; hidden&gt;&lt;/br&gt; You collected some mushroom.
 &lt;/div&gt;
 &lt;%}else{%&gt;
 No mushrooms growing here right now.
-&lt;%}%&gt;</tw-passagedata><tw-passagedata pid="473" name="DngNG_Lectern_Take" tags="_nosave_" position="350,5975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;%}%&gt;</tw-passagedata><tw-passagedata pid="476" name="DngNG_Lectern_Take" tags="_nosave_" position="725,5975" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;div id=&#39;select1&#39;&gt;&lt;div id=&#39;output&#39;&gt;&lt;/div&gt;&lt;/br&gt;
 &lt;/div&gt;&lt;div id=&#39;choice1a&#39; hidden&gt;&lt;/br&gt;&lt;/div&gt;
 &lt;div id=&#39;choice1b&#39; hidden&gt;&lt;/br&gt;
@@ -10959,7 +11103,7 @@ if(loot===&quot;ring&quot;){
 }
 pickupno=function(){window.story.show(window.gm.player.location);};
 window.gm.printOutput(msg);
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="474" name="DngNG_Lectern" tags="_nosave_" position="475,5975" size="100,100">&lt;script&gt; function randomLoot(){ //generate loot[0]= item , loot[1]= effect //see combinations above
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="477" name="DngNG_Lectern" tags="_nosave_" position="850,5975" size="100,100">&lt;script&gt; function randomLoot(){ //generate loot[0]= item , loot[1]= effect //see combinations above
 //loot depends on tier and present fetishs/gear
     var rnd=_.random(0,100),rnd2=_.random(0,100),where=window.gm.player.location;
     var loot=[],trap=[&#39;arouse&#39;,&#39;pierce&#39;,&#39;ravage&#39;,&#39;drug&#39;,&#39;bound&#39;,&#39;cursed&#39;]
@@ -10975,44 +11119,12 @@ window.gm.printOutput(msg);
 }
 randomLoot();
 window.story.show(&quot;DngNG_Lectern_Take&quot;)
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="475" name="DngNG_00_00" tags="" position="600,5975" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="476" name="DngNG_00_01" tags="" position="725,5975" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="477" name="DngNG_00_02" tags="" position="850,5975" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="478" name="DngNG_00_03" tags="" position="975,5975" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="479" name="DngNG_00_04" tags="" position="1100,5975" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="480" name="DngNG_00_05" tags="" position="1225,5975" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="481" name="DngNG_00_06" tags="" position="100,6100" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="482" name="DngNG_00_07" tags="" position="225,6100" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="483" name="DngNG_00_08" tags="" position="350,6100" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="484" name="DngNG_00_09" tags="" position="475,6100" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="485" name="DngNG_00_10" tags="" position="600,6100" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="486" name="DngNG_01_00" tags="" position="725,6100" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="487" name="DngNG_01_01" tags="" position="850,6100" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="488" name="DngNG_01_02" tags="" position="975,6100" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="489" name="DngNG_01_03" tags="" position="1100,6100" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="490" name="DngNG_01_04" tags="" position="1225,6100" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="491" name="DngNG_01_05" tags="" position="100,6225" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="492" name="DngNG_01_06" tags="" position="225,6225" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="493" name="DngNG_01_07" tags="" position="350,6225" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="494" name="DngNG_01_08" tags="" position="475,6225" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="495" name="DngNG_01_09" tags="" position="600,6225" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="496" name="DngNG_01_10" tags="" position="725,6225" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="497" name="DngNG_02_00" tags="" position="850,6225" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="498" name="DngNG_02_01" tags="" position="975,6225" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="499" name="DngNG_02_02" tags="" position="1100,6225" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="500" name="DngNG_02_03" tags="" position="1225,6225" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="501" name="DngNG_02_04" tags="" position="100,6350" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="502" name="DngNG_02_05" tags="" position="225,6350" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="503" name="DngNG_02_06" tags="" position="350,6350" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="504" name="DngNG_02_07" tags="" position="475,6350" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="505" name="DngNG_02_08" tags="" position="600,6350" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="506" name="DngNG_02_09" tags="" position="725,6350" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="507" name="DngNG_02_10" tags="" position="850,6350" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="508" name="DngNG_03_00" tags="" position="975,6350" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="509" name="DngNG_03_01" tags="" position="1100,6350" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="510" name="DngNG_03_02" tags="" position="1225,6350" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="511" name="DngNG_03_03" tags="" position="100,6475" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="512" name="DngNG_03_04" tags="" position="225,6475" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="513" name="DngNG_03_05" tags="" position="350,6475" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="514" name="DngNG_03_06" tags="" position="475,6475" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="515" name="DngNG_03_07" tags="" position="600,6475" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="516" name="DngNG_03_08" tags="" position="725,6475" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="517" name="DngNG_03_09" tags="" position="850,6475" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="518" name="DngNG_03_10" tags="" position="975,6475" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="519" name="DngNG_04_00" tags="" position="1100,6475" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="520" name="DngNG_04_01" tags="" position="1225,6475" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="521" name="DngNG_04_02" tags="" position="100,6600" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="522" name="DngNG_04_03" tags="" position="225,6600" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="523" name="DngNG_04_04" tags="" position="350,6600" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="524" name="DngNG_04_05" tags="" position="475,6600" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="525" name="DngNG_04_06" tags="" position="600,6600" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="526" name="DngNG_04_07" tags="" position="725,6600" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="527" name="DngNG_04_08" tags="" position="850,6600" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="528" name="DngNG_04_09" tags="" position="975,6600" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="529" name="DngNG_04_10" tags="" position="1100,6600" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="530" name="DngNG_05_00" tags="" position="1225,6600" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="531" name="DngNG_05_01" tags="" position="100,6725" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="532" name="DngNG_05_02" tags="" position="225,6725" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="533" name="DngNG_05_03" tags="" position="350,6725" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="534" name="DngNG_05_04" tags="" position="475,6725" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="535" name="DngNG_05_05" tags="" position="600,6725" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="536" name="DngNG_05_06" tags="" position="725,6725" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="537" name="DngNG_05_07" tags="" position="850,6725" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="538" name="DngNG_05_08" tags="" position="975,6725" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="539" name="DngNG_05_09" tags="" position="1100,6725" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="540" name="DngNG_05_10" tags="" position="1225,6725" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="541" name="DngNG_06_00" tags="" position="100,6850" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="542" name="DngNG_06_01" tags="" position="225,6850" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="543" name="DngNG_06_02" tags="" position="350,6850" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="544" name="DngNG_06_03" tags="" position="475,6850" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="545" name="DngNG_06_04" tags="" position="600,6850" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="546" name="DngNG_06_05" tags="" position="725,6850" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="547" name="DngNG_06_06" tags="" position="850,6850" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="548" name="DngNG_06_07" tags="" position="975,6850" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="549" name="DngNG_06_08" tags="" position="1100,6850" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="550" name="DngNG_06_09" tags="" position="1225,6850" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="551" name="DngNG_06_10" tags="" position="100,6975" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="552" name="DngNG_07_00" tags="" position="225,6975" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="553" name="DngNG_07_01" tags="" position="350,6975" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="554" name="DngNG_07_02" tags="" position="475,6975" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="555" name="DngNG_07_03" tags="" position="600,6975" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="556" name="DngNG_07_04" tags="" position="725,6975" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="557" name="DngNG_07_05" tags="" position="850,6975" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="558" name="DngNG_07_06" tags="" position="975,6975" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="559" name="DngNG_07_07" tags="" position="1100,6975" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="560" name="DngNG_07_08" tags="" position="1225,6975" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="561" name="DngNG_07_09" tags="" position="100,7100" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="562" name="DngNG_07_10" tags="" position="225,7100" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="563" name="DngNG_08_00" tags="" position="350,7100" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="564" name="DngNG_08_01" tags="" position="475,7100" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="565" name="DngNG_08_02" tags="" position="600,7100" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="566" name="DngNG_08_03" tags="" position="725,7100" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="567" name="DngNG_08_04" tags="" position="850,7100" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="568" name="DngNG_08_05" tags="" position="975,7100" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="569" name="DngNG_08_06" tags="" position="1100,7100" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="570" name="DngNG_08_07" tags="" position="1225,7100" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="571" name="DngNG_08_08" tags="" position="100,7225" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="572" name="DngNG_08_09" tags="" position="225,7225" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="573" name="DngNG_08_10" tags="" position="350,7225" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="574" name="DngNG_09_00" tags="" position="475,7225" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="575" name="DngNG_09_01" tags="" position="600,7225" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="576" name="DngNG_09_02" tags="" position="725,7225" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="577" name="DngNG_09_03" tags="" position="850,7225" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="578" name="DngNG_09_04" tags="" position="975,7225" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="579" name="DngNG_09_05" tags="" position="1100,7225" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="580" name="DngNG_09_06" tags="" position="1225,7225" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="581" name="DngNG_09_07" tags="" position="100,7350" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="582" name="DngNG_09_08" tags="" position="225,7350" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="583" name="DngNG_09_09" tags="" position="350,7350" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="584" name="DngNG_09_10" tags="" position="475,7350" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="585" name="DngNG_10_00" tags="" position="600,7350" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="586" name="DngNG_10_01" tags="" position="725,7350" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="587" name="DngNG_10_02" tags="" position="850,7350" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="588" name="DngNG_10_03" tags="" position="975,7350" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="589" name="DngNG_10_04" tags="" position="1100,7350" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="590" name="DngNG_10_05" tags="" position="1225,7350" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="591" name="DngNG_10_06" tags="" position="100,7475" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="592" name="DngNG_10_07" tags="" position="225,7475" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="593" name="DngNG_10_08" tags="" position="350,7475" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="594" name="DngNG_10_09" tags="" position="475,7475" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="595" name="DngNG_10_10" tags="" position="600,7475" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="596" name="DngNG_F2" tags="" position="725,7475" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="597" name="DngNG_G2" tags="" position="850,7475" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="598" name="DngNG_H2" tags="" position="975,7475" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="599" name="DngNG_I2" tags="" position="1100,7475" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="600" name="DngNG_J2" tags="" position="1225,7475" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="601" name="DngNG_H3" tags="" position="100,7600" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="602" name="DngNG_I3" tags="" position="225,7600" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="603" name="DngNG_J3" tags="" position="350,7600" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="604" name="DngNG_Home" tags="" position="475,7600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="478" name="DngNG_00_00" tags="" position="975,5975" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="479" name="DngNG_00_01" tags="" position="1100,5975" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="480" name="DngNG_00_02" tags="" position="1225,5975" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="481" name="DngNG_00_03" tags="" position="100,6100" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="482" name="DngNG_00_04" tags="" position="225,6100" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="483" name="DngNG_00_05" tags="" position="350,6100" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="484" name="DngNG_00_06" tags="" position="475,6100" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="485" name="DngNG_00_07" tags="" position="600,6100" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="486" name="DngNG_00_08" tags="" position="725,6100" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="487" name="DngNG_00_09" tags="" position="850,6100" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="488" name="DngNG_00_10" tags="" position="975,6100" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="489" name="DngNG_01_00" tags="" position="1100,6100" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="490" name="DngNG_01_01" tags="" position="1225,6100" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="491" name="DngNG_01_02" tags="" position="100,6225" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="492" name="DngNG_01_03" tags="" position="225,6225" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="493" name="DngNG_01_04" tags="" position="350,6225" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="494" name="DngNG_01_05" tags="" position="475,6225" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="495" name="DngNG_01_06" tags="" position="600,6225" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="496" name="DngNG_01_07" tags="" position="725,6225" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="497" name="DngNG_01_08" tags="" position="850,6225" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="498" name="DngNG_01_09" tags="" position="975,6225" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="499" name="DngNG_01_10" tags="" position="1100,6225" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="500" name="DngNG_02_00" tags="" position="1225,6225" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="501" name="DngNG_02_01" tags="" position="100,6350" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="502" name="DngNG_02_02" tags="" position="225,6350" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="503" name="DngNG_02_03" tags="" position="350,6350" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="504" name="DngNG_02_04" tags="" position="475,6350" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="505" name="DngNG_02_05" tags="" position="600,6350" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="506" name="DngNG_02_06" tags="" position="725,6350" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="507" name="DngNG_02_07" tags="" position="850,6350" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="508" name="DngNG_02_08" tags="" position="975,6350" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="509" name="DngNG_02_09" tags="" position="1100,6350" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="510" name="DngNG_02_10" tags="" position="1225,6350" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="511" name="DngNG_03_00" tags="" position="100,6475" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="512" name="DngNG_03_01" tags="" position="225,6475" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="513" name="DngNG_03_02" tags="" position="350,6475" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="514" name="DngNG_03_03" tags="" position="475,6475" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="515" name="DngNG_03_04" tags="" position="600,6475" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="516" name="DngNG_03_05" tags="" position="725,6475" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="517" name="DngNG_03_06" tags="" position="850,6475" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="518" name="DngNG_03_07" tags="" position="975,6475" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="519" name="DngNG_03_08" tags="" position="1100,6475" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="520" name="DngNG_03_09" tags="" position="1225,6475" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="521" name="DngNG_03_10" tags="" position="100,6600" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="522" name="DngNG_04_00" tags="" position="225,6600" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="523" name="DngNG_04_01" tags="" position="350,6600" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="524" name="DngNG_04_02" tags="" position="475,6600" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="525" name="DngNG_04_03" tags="" position="600,6600" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="526" name="DngNG_04_04" tags="" position="725,6600" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="527" name="DngNG_04_05" tags="" position="850,6600" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="528" name="DngNG_04_06" tags="" position="975,6600" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="529" name="DngNG_04_07" tags="" position="1100,6600" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="530" name="DngNG_04_08" tags="" position="1225,6600" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="531" name="DngNG_04_09" tags="" position="100,6725" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="532" name="DngNG_04_10" tags="" position="225,6725" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="533" name="DngNG_05_00" tags="" position="350,6725" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="534" name="DngNG_05_01" tags="" position="475,6725" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="535" name="DngNG_05_02" tags="" position="600,6725" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="536" name="DngNG_05_03" tags="" position="725,6725" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="537" name="DngNG_05_04" tags="" position="850,6725" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="538" name="DngNG_05_05" tags="" position="975,6725" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="539" name="DngNG_05_06" tags="" position="1100,6725" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="540" name="DngNG_05_07" tags="" position="1225,6725" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="541" name="DngNG_05_08" tags="" position="100,6850" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="542" name="DngNG_05_09" tags="" position="225,6850" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="543" name="DngNG_05_10" tags="" position="350,6850" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="544" name="DngNG_06_00" tags="" position="475,6850" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="545" name="DngNG_06_01" tags="" position="600,6850" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="546" name="DngNG_06_02" tags="" position="725,6850" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="547" name="DngNG_06_03" tags="" position="850,6850" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="548" name="DngNG_06_04" tags="" position="975,6850" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="549" name="DngNG_06_05" tags="" position="1100,6850" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="550" name="DngNG_06_06" tags="" position="1225,6850" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="551" name="DngNG_06_07" tags="" position="100,6975" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="552" name="DngNG_06_08" tags="" position="225,6975" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="553" name="DngNG_06_09" tags="" position="350,6975" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="554" name="DngNG_06_10" tags="" position="475,6975" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="555" name="DngNG_07_00" tags="" position="600,6975" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="556" name="DngNG_07_01" tags="" position="725,6975" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="557" name="DngNG_07_02" tags="" position="850,6975" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="558" name="DngNG_07_03" tags="" position="975,6975" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="559" name="DngNG_07_04" tags="" position="1100,6975" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="560" name="DngNG_07_05" tags="" position="1225,6975" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="561" name="DngNG_07_06" tags="" position="100,7100" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="562" name="DngNG_07_07" tags="" position="225,7100" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="563" name="DngNG_07_08" tags="" position="350,7100" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="564" name="DngNG_07_09" tags="" position="475,7100" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="565" name="DngNG_07_10" tags="" position="600,7100" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="566" name="DngNG_08_00" tags="" position="725,7100" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="567" name="DngNG_08_01" tags="" position="850,7100" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="568" name="DngNG_08_02" tags="" position="975,7100" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="569" name="DngNG_08_03" tags="" position="1100,7100" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="570" name="DngNG_08_04" tags="" position="1225,7100" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="571" name="DngNG_08_05" tags="" position="100,7225" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="572" name="DngNG_08_06" tags="" position="225,7225" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="573" name="DngNG_08_07" tags="" position="350,7225" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="574" name="DngNG_08_08" tags="" position="475,7225" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="575" name="DngNG_08_09" tags="" position="600,7225" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="576" name="DngNG_08_10" tags="" position="725,7225" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="577" name="DngNG_09_00" tags="" position="850,7225" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="578" name="DngNG_09_01" tags="" position="975,7225" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="579" name="DngNG_09_02" tags="" position="1100,7225" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="580" name="DngNG_09_03" tags="" position="1225,7225" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="581" name="DngNG_09_04" tags="" position="100,7350" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="582" name="DngNG_09_05" tags="" position="225,7350" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="583" name="DngNG_09_06" tags="" position="350,7350" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="584" name="DngNG_09_07" tags="" position="475,7350" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="585" name="DngNG_09_08" tags="" position="600,7350" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="586" name="DngNG_09_09" tags="" position="725,7350" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="587" name="DngNG_09_10" tags="" position="850,7350" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="588" name="DngNG_10_00" tags="" position="975,7350" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="589" name="DngNG_10_01" tags="" position="1100,7350" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="590" name="DngNG_10_02" tags="" position="1225,7350" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="591" name="DngNG_10_03" tags="" position="100,7475" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="592" name="DngNG_10_04" tags="" position="225,7475" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="593" name="DngNG_10_05" tags="" position="350,7475" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="594" name="DngNG_10_06" tags="" position="475,7475" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="595" name="DngNG_10_07" tags="" position="600,7475" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="596" name="DngNG_10_08" tags="" position="725,7475" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="597" name="DngNG_10_09" tags="" position="850,7475" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="598" name="DngNG_10_10" tags="" position="975,7475" size="100,100">&lt;%=window.story.render(&#39;DngNG_Tmpl&#39;)%&gt;</tw-passagedata><tw-passagedata pid="599" name="DngNG_F2" tags="" position="1100,7475" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="600" name="DngNG_G2" tags="" position="1225,7475" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="601" name="DngNG_H2" tags="" position="100,7600" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="602" name="DngNG_I2" tags="" position="225,7600" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="603" name="DngNG_J2" tags="" position="350,7600" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="604" name="DngNG_H3" tags="" position="475,7600" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="605" name="DngNG_I3" tags="" position="600,7600" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="606" name="DngNG_J3" tags="" position="725,7600" size="100,100">&lt;%=window.story.render(&quot;DngNG_A1&quot;)%&gt;</tw-passagedata><tw-passagedata pid="607" name="DngNG_LootTrader" tags="" position="850,7600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;&lt;/br&gt;
-This is the main hall. Where would you like to go?&lt;/br&gt;
-[[Loot Trader|DngNG_LootTrader]] [[Gear Trader|DngNG_GearTrader]] 
-&lt;/br&gt;[[Crafting]]  [[Temple of divination|DngNG_Temple]]
-&lt;/br&gt;[[Check on your comrades]] [[Manage Loadout|DngNG_Loadout]]
-Or get some rest before your hunt starts.
-&lt;hr&gt;
-What locattion should you search next ?
-&lt;/br&gt;&lt;a0 onclick= &#39;window.story.state.tmp.msg=&quot;&quot;,window.story.show(window.story.state.DngNG.Exit)&#39;&gt;the forest&lt;/a&gt;
-&lt;/br&gt;the plains - need to sell items worth 1000gold first
-&lt;/br&gt;??? 
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;
-&lt;script&gt;
-    var s = window.story.state,map,data;
-    ({map,data}=window.gm.build_DngNG());
-    s.DngNG=data;
-    s.DngSY.dngMap=map;s.DngSY.dng=&#39;DngNG&#39;;
-    s.vars.spawnAt=&quot;DngNG_Respawn&quot;;
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="605" name="DngNG_ReturnFromHunt" tags="" position="600,7600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
-&lt;%window.gm.player.location=window.passage.name;%&gt;&lt;/br&gt;
-TODO&lt;/br&gt;
-Either you returned by fainting, using the escape-rune or
-because you solved your mission.
-&lt;/br&gt;
-Sum up what you found and lost.
-&lt;/br&gt;[[Next|DngNG_Home]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="606" name="DngNG_LootTrader" tags="" position="725,7600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
-&lt;%window.gm.player.location=window.passage.name;%&gt;&lt;/br&gt;
-TODO Here you see a list of trinkets you carry that you could possibly sell or ask for other services.&lt;a0 id=&#39;helploottrader&#39; onclick=&#39;(function($event){document.querySelector(&quot;#&quot;+id+&quot;~p&quot;).toggleAttribute(&quot;hidden&quot;);})(this);&#39;&gt;Hint&lt;/a&gt;
-&lt;p hidden&gt;
-&lt;/br&gt; SELL: the trinket is removed and you get the displayed number of gold. You cannot rebuy the item.
-&lt;/br&gt; UNBIND: spend some money to unbind the trinket. This means you can unequip/equip it freely and keep it for yourself.
-&lt;/p&gt;
-Trinkets equipped: &lt;/br&gt;
-Trinkets inventory: &lt;/br&gt;
+TODO sell resources and hunting spoils
+
 &lt;/br&gt;[[Back|DngNG_Home]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="607" name="DngNG_GearTrader" tags="" position="850,7600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="608" name="DngNG_GearTrader" tags="" position="975,7600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;&lt;/br&gt;
 TODO Browse the wares of the different traders. &lt;a0 id=&#39;helpgeartrader&#39; onclick=&#39;(function($event){document.querySelector(&quot;#&quot;+id+&quot;~p&quot;).toggleAttribute(&quot;hidden&quot;);})(this);&#39;&gt;Hint&lt;/a&gt;
 &lt;p hidden&gt; Weapons are used in combat (or to intimidate someone to avoid combat). &lt;/br&gt;
@@ -11023,30 +11135,11 @@ Consumables available/owned: scroll of identificaton, clothing-patchkit, health-
 Weapons: &lt;/br&gt;
 Wearables:&lt;/br&gt;
 &lt;/br&gt;[[Back|DngNG_Home]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="608" name="DngNG_Temple" tags="" position="975,7600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
+&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="609" name="DngNG_Temple" tags="" position="1100,7600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.player.location=window.passage.name;%&gt;&lt;/br&gt;
 TODO Lets see what the acolyte of the temple can do for you.&lt;/br&gt;&lt;a0 id=&#39;helptemple&#39; onclick=&#39;(function($event){document.querySelector(&quot;#&quot;+id+&quot;~p&quot;).toggleAttribute(&quot;hidden&quot;);})(this);&#39;&gt;Hint&lt;/a&gt;
 &lt;p hidden&gt;
-&lt;/br&gt; DONATE: Offer some gold. Maybe the gods look benevolently at you. (Chance to temporary increase a stat on your next run)
-&lt;/br&gt; UNCURSE: For a donation, removes a (active,negative) effect from a trinket. But it might also break the positive spell bound to the curse.   
-&lt;/br&gt; INFUSE: Infuse a trinket into your body to increase a stat. There might be sideeffects if the trinket is cursed. 
-&lt;/br&gt; C: buy potions and scrolls that you can use on your journey.
 &lt;/p&gt;
-&lt;/br&gt;[[Back|DngNG_Home]]
-&lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="609" name="DngNG_Loadout" tags="" position="1100,7600" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
-&lt;%window.gm.player.location=window.passage.name;%&gt;&lt;/br&gt;
-TODO Configure what gear you want to use on your next journey. &lt;a0 id=&#39;helploadout&#39; onclick=&#39;(function($event){document.querySelector(&quot;#&quot;+id+&quot;~p&quot;).toggleAttribute(&quot;hidden&quot;);})(this);&#39;&gt;Hint&lt;/a&gt;
-&lt;p hidden&gt;
-You can buy standard-gear from gear-traders and you only need to buy once. If you loose it on your journey, it will respawn here.&lt;/br&gt;
-Also, trinkets you own will respawn here if you loose them. But if they get cursed, the curse will stick to them.&lt;/br&gt;
-You can take a limited number of consumables with you. &lt;/br&gt;
-&lt;/p&gt;
-
-consumables:&lt;/br&gt;
-standard-wearables:&lt;/br&gt;
-standard-weapons:&lt;/br&gt;
-trinkets:&lt;/br&gt;
-
 &lt;/br&gt;[[Back|DngNG_Home]]
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="610" name="DngPC_MAP" tags="_back_" position="1225,7600" size="100,100">&lt;hr&gt;&lt;div id=&#39;canvas&#39;&gt;&lt;/div&gt;&lt;div id=&#39;svgpopup&#39;&gt;&lt;/div&gt;&lt;/br&gt;
 &lt;script&gt; window.gm.printMap2(window.story.state.DngSY.dngMap,window.gm.player.location.replace(window.story.state.DngSY.dng+&#39;_&#39;,&#39;&#39;),
