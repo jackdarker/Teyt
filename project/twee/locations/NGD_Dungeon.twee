@@ -60,7 +60,6 @@ Ruff is just growling menacingly at you.</br> Maybe if you would have something 
 :: DngNG_Tmpl
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
-Somewhere in the dungeon.</br>
 <%=window.gm.renderRoomNG(window.passage.name)%></br>
 <%=window.gm.renderRoom(window.passage.name)%></br>
 <div id='output'></div>
