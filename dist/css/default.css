@@ -1,6 +1,6 @@
 
 body {
-  background-image:url('assets/bg_hex.jpg');
+  background-image:url('../assets/bg/bg_hex.jpg');
   color:black;
   padding:0;
   margin:0;

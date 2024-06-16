@@ -362,6 +362,7 @@ This seems to be an abandoned storage.</br> Crude equipment and boxes are lined 
 <a0 onclick='window.gm.printTalkLink("div#select10","div#choice10a")'>Look for something useful</a></br>
 </div><div id='choice10a' hidden></br> Without knowing what to look for, this seems just a waste of time. Most of it seems to be rubble anyway.
 </div>
+<a0 onclick='window.story.state.tmp.args=[(function(){window.gm.FightStomperBot(null);}),{state:0}];window.story.show("GenericPassage");'>Odd Bot</a>
 <%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
 

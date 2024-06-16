@@ -209,8 +209,8 @@ window.gm.initGameFlags = function(forceReset,NGP=null){
   }
   let DngNG = dataPrototype();
   if(s.DngNG){ //update if exist
-    window.gm.build_DngNG();
-    s.DngNG=window.gm.util.mergePlainObject(DngNG,s.DngNG);
+    //window.gm.build_DngNG();
+    //s.DngNG=window.gm.util.mergePlainObject(DngNG,s.DngNG);
   }
   let DngLB = dataPrototype();
   let DngSC = dataPrototype();
@@ -583,8 +583,8 @@ window.gm.printMap2=function(dng,playerTile,reveal,visitedTiles){
     }
     switch(coostyle){
       case 'A1':
-        _x=Y.findIndex((el)=>{return(el===name[1]);});
-        _y=X.findIndex((el)=>{return(el===name[0]);});
+        _y=Y.findIndex((el)=>{return(el===name[1]);});
+        _x=X.findIndex((el)=>{return(el===name[0]);});
       break;
       case "12_01":
         coord=name.split('_');

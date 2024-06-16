@@ -63,9 +63,19 @@ window.gm.sex.beginScene=function(){
         $("div#choice")[0].removeChild($("div#choice")[0].childNodes[i]);
     }
 };
+//set header-description to panel
+window.gm.sex.updatePanel2=function(entry){
+    let node=$("div#panel2")[0];
+    node.replaceChild(entry,node.childNodes[0]); 
+};
 //add scenedescription to panel
 window.gm.sex.updateScene=function(entry){
-    $("div#panel")[0].appendChild(entry); 
+    let node=$("div#panel")[0],_count=node.childNodes.length-5,i=0;
+    //limit childs to n by removing old childs
+    for(;i<_count-1;i++ ){
+        node.removeChild(node.childNodes[i]);
+    }
+    node.appendChild(entry); 
 };
 /*
 * calculates which of the generic scenes can play after a battle

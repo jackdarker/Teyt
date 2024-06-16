@@ -62,6 +62,7 @@ You cant hold any longer and shoot your jizzm inside her.
 :: GenericPassage [_nosave_]
 <!--call this passage after setting tmp.args !-->
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<div id='panel2'></div><!--description2 is rendered here-->
 <div id='panel'></div><!--description is rendered here-->
 <div id='choice'></div> <!--choice is rendered here-->
 </article><article id="LogPanel"></article></section>

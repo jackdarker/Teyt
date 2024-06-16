@@ -332,100 +332,74 @@ window.gm.canOpenDoor=function(from,to) {
     return(res);
 };
 
-window.gm.doMobAi=function(){
-    let _info,msg="",here = window.gm.player.location,_d=window.story.state[window.story.state.DngSY.dng].tmp;
-    let fightMobs=[],interactMobs=[];
-    let node="section article div#output";
-    for(var i=_d.mobs.length-1;i>=0;i--){ //check persistent mobs
-      var mob=_d.mobs[i];
-      window.gm.mobAI(mob);
-      //TODO if mob is with other mob, they might interact; if they are with player he will witness, if they are closely around, he will hear something 
-      if(window.story.state.DngSY.dng+"_"+mob.pos===here){
-        //if mob is at same position as player and alive: trigger passage or just show note
-        if(mob.state>=0){
-            if(mob.att<=-2) { fightMobs.push(mob);
-            } else {
-                interactMobs.push(mob);
-            }
+window.gm.FightStomperBot=function(data){ //todo
+    if(data!=null) { window.story.state.tmp.args[1]=data;} //*1) hack: for if visiting other passage and returning here
+    data=window.story.state.tmp.args[1];
+
+    let foo = window.gm.FightStomperBot,createButton=window.gm.sex.createButton;;
+    let entry,newdata,player = window.gm.player;
+    let menu = function(data){
+        let newdata;
+        newdata = {},Object.assign(newdata,data);
+        newdata.state="lookAt", newdata.position = 'Inspect Bot';
+        createButton(newdata.position,foo.bind(null,newdata));
+        newdata = {},Object.assign(newdata,data);
+        newdata.state="punchBody", newdata.position = 'Punch with fist';
+        createButton(newdata.position,foo.bind(null,newdata));
+    }
+    window.gm.sex.beginScene();
+    if(data.state<0){ //quit if scene is done
+        window.story.show(window.gm.player.location); 
+        return;
+    } 
+    //player acts
+    entry = document.createElement('p');
+    if(data.state===0){ //start-menu
+        //if(player.Stats.get('arousal').value>40){
+            entry.innerHTML ="A large mechanical construct with 2 arms attached at each side. The elbow-joints seems rather big, maybe they have some special function. The arms end in some massive feet the bot is walking on.";
+            data.bot={hp:3};data.player={hitchance:30,hp:3};
+            data.turn=data.pturn=1;
+            menu(data);
+    } else if(data.bot.hp<=0){
+        entry.innerHTML ="Bot is defeated";
+        newdata = {},Object.assign(newdata,data);
+        newdata.state=-1;
+        createButton("Leave",foo.bind(null,newdata));
+    } else if(data.player.hp<=0){
+        entry.innerHTML ="You are defeated";
+        newdata = {},Object.assign(newdata,data);
+        newdata.state=-1;
+        createButton("Crawl away",foo.bind(null,newdata));
+    } else if(data.state==='lookAt'){ 
+        if(data.player.hitchance<40) {
+            data.player.hitchance+=30;
+            entry.innerHTML ="<br><br>You can make out some areas on the bot that seem to be vulnerable";
+        } else entry.innerHTML ="<br><br>You look thorougly for a week spot but find none";
+        menu(data);
+    } else if(data.state==='punchBody'){ 
+        _rnd=_.random(0,100);
+        if(data.player.hitchance>_rnd){
+            data.bot.hp-=1;
+            entry.innerHTML ="<br><br>You hit it in the face";
         } else {
-            window.gm.printOutput("A "+mob.mob+" was once possibly around. ","section article div#output",true);
+            entry.innerHTML ="<br><br>Punching its steel-face doesnt do anything.";
         }
-      }
-    }
-    _d.inCombat=false;
-    if(fightMobs.length>0) {     //there might be mobs forcing a fight
-        //TODO make this trapquest-style: pictures to click on with cmds; mmore foes ould approach!
-        //after click calc turn
-        //switch scene after defeat
-        _d.inCombat=true;
-        for(var i=fightMobs.length-1;i>=0;i--){
-            _info = window.gm.build_NPCCombat(fightMobs[i],here);
-            window.gm.printOutput(_info.msg,node,true);
+        if(data.player.hitchance>40) data.player.hitchance-=10;
+        menu(data);
+    } else menu(data) //*1)
+    window.gm.sex.updateScene(entry); 
+    //bot acts?
+    let _rnd=_.random(0,100);
+    if(data.state!=0){
+        entry = document.createElement('p');
+        entry.innerHTML ="<br>bot status:"+data.bot.hp+
+            "<br>your status:"+data.player.hp+" hitchance:"+data.player.hitchance;
+        if(_rnd>50){
+            entry.innerHTML +="<br><br>The bot trys to squish you under its foot."
+            entry.innerHTML +="<br>You can barely evade."
+            
         }
-        document.getElementById("navpanel").replaceChildren("You cant escape");
-        /*window.gm.encounters[fightMobs[0].mob]({noStart:true});
-        var _oldVictory=window.gm.Encounter.onVictory.bind(window.gm.Encounter);
-        window.gm.Encounter.onVictory= function(){fightMobs[0].state=-1;return(_oldVictory());}
-        window.gm.Encounter.initCombat(); return;*/
-    } else {
-        for(var i=interactMobs.length-1;i>=0;i--){
-            _info = window.gm.build_NPCInfo(interactMobs[i],here);
-            window.gm.printOutput(_info.msg,node,!_info.clear);
-        }
+        window.gm.sex.updateScene(entry);
     }
-    if(_d.inCombat==false && _d.hiding==false){
-        msg+= window.gm.printLink("Hide",'window.gm.tryHide()');
-    } else if(_d.hiding==true) {
-        msg+= "You are hidden, but maybe its time to "+window.gm.printLink("leave your hiding spot.",'window.gm.tryUnhide()');
-    }
-    window.gm.printOutput(msg,node,true);
-    window.gm.printOutput(window.gm.build_NPCProximity(here),node,true);
+    data.state=''; //*1)
 };
-//mob does act, desc & list of player choices is returned
-window.gm.build_NPCCombat=function(mob,position){
-    let msg, dmg=_.random(2,10), clear=false,_d=window.story.state[window.story.state.DngSY.dng].tmp;
-    _d.hiding=false; //mob found you
-    msg = mob.mob+" attacks you:";
-    msg+= "-"+dmg.toFixed(0)+'dmg</br>';
-    window.gm.player.Stats.increment("health",dmg*-1);
-    if(window.gm.player.isDead()) {
-        msg+= window.gm.printLink("Accept your defeat",'window.gm.respawn({keepInventory:true});');
-        clear=true; //remove actions from prev combatants
-    }else {
-        msg+= window.gm.printLink("Slap it",'window.gm.slapMob(\"'+mob.id+'\")');
-    }
-    return({msg:msg,clear:clear});
-};
-//player acts, then press button for next turn
-window.gm.slapMob=function(id){
-    let msg,dmg=5,_d=window.story.state[window.story.state.DngSY.dng].tmp;
-    let mob=window.story.state[window.story.state.DngSY.dng].getMobById(id);
-    _d.hiding=false; //TODO suprise attack
-    mob.hp-=dmg;
-    msg="You punch toward the "+mob.mob+" and hit it for "+dmg.toFixed(0)+"dmg (now "+ mob.hp.toFixed(0)+"HP)."; 
-    if(mob.hp<=0) {
-        msg+=window.gm.mobDefeat(mob);
-    }
-    msg+=window.gm.printLink('Next','window.story.show(window.gm.player.location)'); 
-    window.gm.printOutput(msg,"section article div#output");//<= overwrite output!
-};
-window.gm.tryHide=function(){
-    let _d=window.story.state[window.story.state.DngSY.dng].tmp,msg="";
-    _d.hiding=true; //TODO trying to hide while someone is around fails
-    msg+="TODO You hide somewhere. ";
-    msg+=window.gm.printLink('Stay quiet','window.story.show(window.gm.player.location)'); 
-    window.gm.printOutput(msg,"section article div#output");
-};
-window.gm.tryUnhide=function(){
-    let _d=window.story.state[window.story.state.DngSY.dng].tmp,msg="";
-    _d.hiding=false; //TODO option for suprise attack
-    msg+="You get out of your hidingspot. ";
-    msg+=window.gm.printLink('Next','window.story.show(window.gm.player.location)'); 
-    window.gm.printOutput(msg,"section article div#output");
-};
-window.gm.mobDefeat=function(mob) {
-    let msg="";
-    mob.state=-2; //knocked out
-    msg=mob.mob+" got knocked out."; 
-    return(msg);
-}
