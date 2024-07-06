@@ -18,8 +18,11 @@ section {
   grid-template-rows: 80% 20%;
   height:100vh;
   /*width:95vw;*/ /*scrollbars*/  }
-.section_swap {
+.log_fullview { /*log is 2.row of flexgrid*/
   grid-template-rows: 2% ;
+}
+.log_hideview {
+  grid-template-rows: 95% ;
 }
 
 section h2 {
