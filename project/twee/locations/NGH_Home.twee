@@ -18,94 +18,40 @@ Links that have [x] attached can be triggered by pressing key x on the keyboard.
 :: DngNG_Home
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%></br>
-This is the main hall. Where would you like to go?</br>
-[[Loot Trader|DngNG_LootTrader]] [[Gear Trader|DngNG_GearTrader]] 
-</br>[[Crafting]]  [[Temple of divination|DngNG_Temple]]
-</br>[[Check on your comrades]] [[Manage Loadout|DngNG_Loadout]]
-Or get some rest before your hunt starts.
+You are at home when a new emergency broadcast is received by your radio:</br>
+<p class="tNPC1">"To all citizen: please move to the evacuation beacons closest to your location...."</p>
+[[Configure your run|DngNG_NGPShop]] 
 <hr>
-What locattion should you search next ?
-</br><a0 onclick= 'window.story.state.tmp.msg="",window.story.show(window.story.state.DngNG.Exit)'>the forest</a>
-</br>the plains - need to sell items worth 1000gold first
-</br>??? 
+</br><a0 onclick= 'window.story.state.tmp.msg="",window.story.show(window.story.state.DngNG.Exit)'>Move on !</a>
 </article><article id="LogPanel"></article></section>
 <script>
     var s = window.story.state,map,data;
-    ({map,data}=window.gm.build_DngNG());
+    ({map,data}=window.gm.build_DngNG("Appartments"));
     s.DngNG=data;
     s.DngSY.dngMap=map;s.DngSY.dng='DngNG';
     s.vars.spawnAt="DngNG_Respawn";
 </script>
-
-:: DngNG_ReturnFromHunt
-<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%window.gm.player.location=window.passage.name;%></br>
-TODO</br>
-Either you returned by fainting, using the escape-rune or
-because you solved your mission.
-</br>
-Sum up what you found and lost.
-</br>[[Next|DngNG_Home]]
-</article><article id="LogPanel"></article></section>
-
-:: DngNG_LootTrader
-<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%window.gm.player.location=window.passage.name;%></br>
-TODO Here you see a list of trinkets you carry that you could possibly sell or ask for other services.<a0 id='helploottrader' onclick='(function($event){document.querySelector("#"+id+"~p").toggleAttribute("hidden");})(this);'>Hint</a>
-<p hidden>
-</br> SELL: the trinket is removed and you get the displayed number of gold. You cannot rebuy the item.
-</br> UNBIND: spend some money to unbind the trinket. This means you can unequip/equip it freely and keep it for yourself.
-</p>
-Trinkets equipped: </br>
-Trinkets inventory: </br>
-</br>[[Back|DngNG_Home]]
-</article><article id="LogPanel"></article></section>
-
 
 :: DngNG_GearTrader
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%></br>
 TODO Browse the wares of the different traders. <a0 id='helpgeartrader' onclick='(function($event){document.querySelector("#"+id+"~p").toggleAttribute("hidden");})(this);'>Hint</a>
 <p hidden> Weapons are used in combat (or to intimidate someone to avoid combat). </br>
-Wearables are clothing or armor and improve your stats or at least they cover privates. They have a limited durability.</br> 
-More gear gets unlocked on progress.</br></p>
 
-Consumables available/owned: scroll of identificaton, clothing-patchkit, health-potion,...  </br>
-Weapons: </br>
-Wearables:</br>
-</br>[[Back|DngNG_Home]]
+</br>[[Back|DngNG_MissionDebriefing]]
 </article><article id="LogPanel"></article></section>
 
 
-:: DngNG_Temple
+:: DngNG_MissionDebriefing
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%></br>
-TODO Lets see what the acolyte of the temple can do for you.</br><a0 id='helptemple' onclick='(function($event){document.querySelector("#"+id+"~p").toggleAttribute("hidden");})(this);'>Hint</a>
-<p hidden>
-</br> DONATE: Offer some gold. Maybe the gods look benevolently at you. (Chance to temporary increase a stat on your next run)
-</br> UNCURSE: For a donation, removes a (active,negative) effect from a trinket. But it might also break the positive spell bound to the curse.   
-</br> INFUSE: Infuse a trinket into your body to increase a stat. There might be sideeffects if the trinket is cursed. 
-</br> CLENSE: Remove a blemish (tattoo,??) from your body.
-</p>
-</br>[[Back|DngNG_Home]]
-</article><article id="LogPanel"></article></section>
-
-
-:: DngNG_Loadout
-<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%window.gm.player.location=window.passage.name;%></br>
-TODO Configure what gear you want to use on your next journey. <a0 id='helploadout' onclick='(function($event){document.querySelector("#"+id+"~p").toggleAttribute("hidden");})(this);'>Hint</a>
-<p hidden>
-You can buy standard-gear from gear-traders and you only need to buy once. If you loose it on your journey, it will respawn here.</br>
-Also, trinkets you own will respawn here if you loose them. But if they get cursed, the curse will stick to them.</br>
-You can take a limited number of consumables with you. </br>
-</p>
-Choosen:</br>
+<p>You escaped from xxx and an take a breather. But you cant stay here to long. Check your gear and fix yourself up and then move on.</p>
+</br>[[Trade Items|DngNG_GearTrader]]
+</br>TODO Take care of your "needs"
 <hr>
-consumables:</br>
-standard-wearables:</br>
-standard-weapons:</br>
-trinkets:</br>
-
-</br>[[Back|DngNG_Home]]
+<p>Choose which path you want to follow: </p>
+TODO show region-progress
+TODO depending on progress and difficulty show list of next target
+</br>
 </article><article id="LogPanel"></article></section>
+

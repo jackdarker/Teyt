@@ -1,5 +1,5 @@
 "use strict";
-//stuff for Nightgames
+//stuff for ISurive
 class CraftMaterial extends Item {
     constructor(){ super('CraftMaterial');
         this.addTags([window.gm.ItemTags.Material]); this.price=this.basePrice=10;   
@@ -101,20 +101,11 @@ window.gm.ItemsLib = (function (ItemsLib){
     window.storage.registerConstructor(CraftMaterial);
     window.storage.registerConstructor(Gun);
     ItemsLib['Jlorb'] = function(){ let x= new CraftMaterial();x.style=0;return(x);}
-    ItemsLib['Shlack'] = function(){ let x= new CraftMaterial();x.style=5;return(x);}
-    ItemsLib['Glib'] = function(){ let x= new CraftMaterial();x.style=10;return(x);}
-    ItemsLib['Gorb'] = function(){ let x= new CraftMaterial();x.style=20;return(x);}
-    ItemsLib['Igent'] = function(){ let x= new CraftMaterial();x.style=30;return(x);}
-    ItemsLib['Remk'] = function(){ let x= new CraftMaterial();x.style=40;return(x);}
-    ItemsLib['Murk'] = function(){ let x= new CraftMaterial();x.style=50;return(x);}
-    ItemsLib['Taser'] = function(){ let x= new Gun();x.style=0;return(x);}
-    ItemsLib['Blaster'] = function(){ let x= new Gun();x.style=100;return(x);}
-    ItemsLib['BlasterMK2'] = function(){ let x= new Gun();x.style=105;return(x);}
-    ItemsLib['Cryonizer'] = function(){ let x= new Gun();x.style=120;return(x);}
+
 return ItemsLib; 
 }(window.gm.ItemsLib || {}));
 
-window.gm.build_DngNG=function(){
+window.gm.build_DngNG=function(regionType){
     function addMob(type,pos){
         //type refers either to a unique char existing in s.chars
         //or is generic mob, then we have to append idcounter and create instance
@@ -150,49 +141,22 @@ window.gm.build_DngNG=function(){
         data=s.DngNG;
     } else {
         data=s.DngNG,data.version=version;
-        data.map= window.GenerateDng.DngGen.generate({length:5,doors:2,naming:"12_01",branches:2})
-        data.Exit="DngNG_"+getTilesByVisual("entry")[0].room;// data.map.grid.entries().next().value[0];
-        data.tmp={tickPass:'', tier:0
-            ,powerLevel:0
-            ,inCombat:false
-            ,hiding:false
-        };
+        //roll locations
+        data.map= [
+             "DngNG_00_00",
+             "DngNG_00_01",
+             "DngNG_00_02",
+             "DngNG_00_01",
+             "DngNG_00_99"
+        ];//window.GenerateDng.DngGen.generate({length:5,doors:2,naming:"12_01",branches:2})
+        //data.Exit="DngNG_"+getTilesByVisual("entry")[0].room;// data.map.grid.entries().next().value[0];
+        data.tmp={tickPass:'', tier:0 , room:-1 };
         data.tmp.evtLeave = { //events on tile-leave
-            A1_B1: [{id:"Trap_Gas",type:'encounter',tick:window.gm.getTime(),state:0,chance:100 }, //todo cannot assign fct here because saveing
-                {id:"Box",type:'encounter',tick:window.gm.getTime(),state:0,chance:100 },
-                {id:"Fungus",type:'encounter',tick:window.gm.getTime(),state:0,chance:100 }],
             F4_G4: [{id:"Trap_Dehair",type:'encounter',tick:window.gm.getTime(),state:0,chance:100 }],
             I4_H4: null
         }
-        data.tmp.evtEnter = { //events on tile-enter
-             //F4: {sbot:{tick:window.gm.getTime(),state:0 }}
-            //,H4: {gas:{tick:window.gm.getTime(),state:0 }}
-        }
-        data.tmp.doors = { //doors 2way
-            //E4:{E5:{state:0 }},
-            //G4:{G3:{state:0 },G5:{state:0 }},
-            //H4:{I4:{state:0 }},
-            //E5:{F5:{state:0 }},
-        }
-        data.tmp.mobs = [ //wandering mobs pos=current tile, path = walk area, nogo = dont enter here,
-            //{id:"Ruff",mob:"Ruff",pos:"G3",path:["G3"],state:0,tick:'',att:0,timerA:0,timerB:0}
-            //,{id:"SlimeG2",mob:"slime",pos:"G2",path:["G2"],state:0,hp:15,tick:'',att:0,timerA:0,timerB:0}
-            //,{id:"SlimeI2",mob:"slime",pos:"I2",path:["I2"],state:0,hp:15,tick:'',att:-2,timerA:0,timerB:0}
-          ];
-        data.tmp.evtSpawn = { }//respawn evts 
-        data.tmp.evtSpawn["DngNG_"+getTilesByVisual("mushroom")[0].room]={ mushroom:{tick:window.gm.getTime(),state:0,loot:"BrownMushroom" }};
-        let _adr,_tiles=getTilesByVisual("bushes").concat(getTilesByVisual("trees")).sort(() => Math.random() - 0.5);;
-        for(var i=_tiles.length-1;i>=0;i--){
-            _adr="DngNG_"+_tiles[i].room;
-            data.tmp.evtSpawn[_adr]=data.tmp.evtSpawn[_adr]||{};
-            data.tmp.evtSpawn[_adr].lectern={tick:window.gm.getTime(),state:0};
-            if(i===0) addMob("Ruff",_tiles[i].room);  
-            if(i===1) addMob("Slime",_tiles[i].room);//TODO spawn generic mobs inplay
-        }
-        
-        //addMob("Ruff","G3"),addMob("Slime","I2"),addMob("Slime","G2");
         data.task = {},data.rolledTask=[]; //active task
-        data.tasks = { //task list 
+        data.tasks = { //tasks you did
         };
     }
     //install function to calculate chance of evtLeave
@@ -206,6 +170,19 @@ window.gm.build_DngNG=function(){
         }
         return(res);
     }
+    window.gm.toNextRoom=function(){
+        let s=window.story.state;
+        if(s.DngNG.tmp.room<0){ //Start
+            s.DngNG.tmp.room=0;
+        } else {
+        s.DngNG.tmp.room++;
+            if(s.DngNG.tmp.room>=s.DngNG.map.length){ //this room should either have a exit or we start from begin
+                s.DngNG.tmp.room=0;
+            }
+        }
+        window.gm.addTime(120);
+        window.story.show(s.DngNG.map[s.DngNG.tmp.room])
+    }
     //TODO cannot save graph due circular neigbours data.tmp.graph = window.gm.gridToGraph(_grid);  //for pathfinding  let path = window.astar.search(data.tmp.graph,"F2","I2",null,{heuristic:(function(a,b){return(1);})})
     //add some helper funcs
     data.getMobById=function(id){
@@ -217,6 +194,11 @@ window.gm.build_DngNG=function(){
     data.addMob=addMob;
     return({map:data.map,data:data});
 };
+//TODO override postVictory
+window.gm.postTrial=function(data){
+    //proceed to next room
+    //or get punished
+}
 window.gm.renderRoomNG= function(room){ //see also window.gm.renderRoom
     let msg="",s=window.story.state, dng=s.DngSY.dng;
     let _c=room.replace(dng+"_",""), _v=s.DngNG.map.grid.get(_c).visuals;
@@ -232,6 +214,12 @@ window.gm.renderRoomNG= function(room){ //see also window.gm.renderRoom
             break;
         case 'meadow':
             msg+="The sun shines down on the meadow, casting a warm and inviting glow over the entire area."
+            break;
+        case 'garage':
+            msg+="A garage with a slightly open door.Maybe you can find some tools there."
+            break;
+        case 'trailer':
+            msg+="A rundown trailer with a messy kitchen corner and a unfolded bed."
             break;
         default:
             break;
@@ -285,134 +273,4 @@ window.gm.build_NPCProximity=function(position){
     //translate _to in north/south/above...
     //Was there some noise coming from western direction? You hear something shuffling around east of here | Ruff might be hunting north of here 
     return(msg)
-}
-
-window.gm.simpleCombatInit=function(instance) {
-    var s = window.story.state;
-    s.combat.tmp={};
-    var tmp=s.combat.tmp;
-    tmp.inst=instance;
-    tmp.now="";
-}
-window.gm.simpleCombatCleanup=function() {
-    var s = window.story.state,tmp=s.combat.tmp;
-
-    s.combat.tmp={};
-}
-//overrides for Latec
-window.gm.InspectSelf = function() {
-    let msg="",s=window.story.state;
-    if(s.DngNG.tmp.qBabble===1){ msg+= "</br>A datapad is in your possession."; }
-    if(s.DngNG.tmp.qBabble===2){msg+= "</br>The babble companion is talking by an in-ear speaker to you.";}
-    msg += window.gm.printBodyDescription(window.gm.player,true);
-    return msg+"</br>"
-}
-window.gm.canOpenDoor=function(from,to) {
-    let s=window.story.state,res={OK:false,msg:''};
-    if(from==='E4' && to==='E5') {
-        if(s.DngNG.tmp.qKeyBlue!==0) { res.OK=true; 
-            s.DngNG.tmp.doors[from][to].state=1;
-            res.msg= "</br>With the blue keycard in your possesion, you can open the door.";
-        } else res.msg= "</br>There is a sl.";
-    }
-    return(res);
-};
-
-window.gm.doMobAi=function(){
-    let _info,msg="",here = window.gm.player.location,_d=window.story.state[window.story.state.DngSY.dng].tmp;
-    let fightMobs=[],interactMobs=[];
-    let node="section article div#output";
-    for(var i=_d.mobs.length-1;i>=0;i--){ //check persistent mobs
-      var mob=_d.mobs[i];
-      window.gm.mobAI(mob);
-      //TODO if mob is with other mob, they might interact; if they are with player he will witness, if they are closely around, he will hear something 
-      if(window.story.state.DngSY.dng+"_"+mob.pos===here){
-        //if mob is at same position as player and alive: trigger passage or just show note
-        if(mob.state>=0){
-            if(mob.att<=-2) { fightMobs.push(mob);
-            } else {
-                interactMobs.push(mob);
-            }
-        } else {
-            window.gm.printOutput("A "+mob.mob+" was once possibly around. ",node,true);
-        }
-      }
-    }
-    _d.inCombat=false;
-    if(fightMobs.length>0) {     //there might be mobs forcing a fight
-        //TODO make this trapquest-style: pictures to click on with cmds; mmore foes could approach!
-        //after click calc turn
-        //switch scene after defeat
-        _d.inCombat=true;
-        for(var i=fightMobs.length-1;i>=0;i--){
-            _info = window.gm.build_NPCCombat(fightMobs[i],here);
-            window.gm.printOutput(_info.msg,node,true);
-        }
-        document.getElementById("navpanel").replaceChildren("You cant escape");
-        /*window.gm.encounters[fightMobs[0].mob]({noStart:true});
-        var _oldVictory=window.gm.Encounter.onVictory.bind(window.gm.Encounter);
-        window.gm.Encounter.onVictory= function(){fightMobs[0].state=-1;return(_oldVictory());}
-        window.gm.Encounter.initCombat(); return;*/
-    } else {
-        for(var i=interactMobs.length-1;i>=0;i--){
-            _info = window.gm.build_NPCInfo(interactMobs[i],here);
-            window.gm.printOutput(_info.msg,node,!_info.clear);
-        }
-    }
-    if(_d.inCombat==false && _d.hiding==false){
-        msg+= window.gm.printLink("Hide",'window.gm.tryHide()');
-    } else if(_d.hiding==true) {
-        msg+= "You are hidden, but maybe its time to "+window.gm.printLink("leave your hiding spot.",'window.gm.tryUnhide()');
-    }
-    window.gm.printOutput(msg,node,true);
-    window.gm.printOutput(window.gm.build_NPCProximity(here),node,true);
-};
-//mob does act, desc & list of player choices is returned
-window.gm.build_NPCCombat=function(mob,position){
-    let msg, dmg=_.random(2,10), clear=false,_d=window.story.state[window.story.state.DngSY.dng].tmp,_mob =window.story.state.chars[mob.id];;
-    _d.hiding=false; //mob found you
-    msg = mob.mob+" attacks you:";
-    msg+= "-"+dmg.toFixed(0)+'dmg</br>';
-    msg+=window.gm.images._sizeTo(window.gm.images[_mob.pic](),200,200)
-    window.gm.player.Stats.increment("health",dmg*-1);
-    if(window.gm.player.isDead()) {
-        msg+= window.gm.printLink("Accept your defeat",'window.gm.respawn({keepInventory:true});');
-        clear=true; //remove actions from prev combatants
-    }else {
-        msg+= window.gm.printLink("Slap it",'window.gm.slapMob(\"'+mob.id+'\")');
-    }
-    return({msg:msg,clear:clear});
-};
-//player acts, then press button for next turn
-window.gm.slapMob=function(mobid){
-    let msg,dmg=5,_d=window.story.state[window.story.state.DngSY.dng].tmp;
-    let mob=window.story.state[window.story.state.DngSY.dng].getMobById(mobid),_mob=window.story.state.chars[mob.id];//window.story.state[window.story.state.DngSY.dng].getMobById(id);
-    _d.hiding=false; //TODO suprise attack
-    _mob.Stats.increment("health",-1*dmg);
-    msg="You punch toward the "+_mob.baseName+" and hit it for "+dmg.toFixed(0)+"dmg (now "+ _mob.health().value.toFixed(0)+"HP)."; 
-    if(_mob.health().value<=0) {
-        msg+=window.gm.mobDefeat(mob);
-    }
-    msg+=window.gm.printLink('Next','window.story.show(window.gm.player.location)'); 
-    window.gm.printOutput(msg,"section article div#output");//<= overwrite output!
-};
-window.gm.tryHide=function(){
-    let _d=window.story.state[window.story.state.DngSY.dng].tmp,msg="";
-    _d.hiding=true; //TODO trying to hide while someone is around fails
-    msg+="TODO You hide somewhere. ";
-    msg+=window.gm.printLink('Stay quiet','window.story.show(window.gm.player.location)'); 
-    window.gm.printOutput(msg,"section article div#output");
-};
-window.gm.tryUnhide=function(){
-    let _d=window.story.state[window.story.state.DngSY.dng].tmp,msg="";
-    _d.hiding=false; //TODO option for suprise attack
-    msg+="You get out of your hidingspot. ";
-    msg+=window.gm.printLink('Next','window.story.show(window.gm.player.location)'); 
-    window.gm.printOutput(msg,"section article div#output");
-};
-window.gm.mobDefeat=function(mob) {
-    let msg="";
-    mob.state=-2; //knocked out
-    msg=mob.mob+" got knocked out."; 
-    return(msg);
 }

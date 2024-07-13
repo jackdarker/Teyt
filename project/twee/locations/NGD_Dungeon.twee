@@ -4,44 +4,6 @@
     window.story.state.DngNG.mapReveal,window.story.state.DngNG.visitedTiles);
 </script>
 
-:: DngNG_Action
-<%if(window.passage.name==="DngNG_F3"){%><a0 onclick=''>Bang against the door to let you out of this place.</a><%}%>
-<a0 onclick='window.gm.addTime(30);window.gm.refreshAllPanel()'>Wait</a>
-
-:: DngNG_Encounters
-<script>window.gm.doMobAi();</script>
-
-:: DngNG_Retreat
-<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
-It felt like taking forever to get that gate open until you are able to squeeze through it.
-</br>[[Leave this place|DngNG_Home]]</br>
-</article><article id="LogPanel"></article></section>
-
-:: DngNG_Respawn [_nosave_ _nodeffered_]
-<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-You find yourself in the middle of a facility. </br>
-Walk aroound an keep a watchful eye for anyone that pounce you. Or pounce them and try to make them submit.</br>
-When the clock reaches 7AM, the game ends and the ranking will be calculated depending on your performance:
-</br>- how many underwear you were able to steal (minus the one you lost)  
-</br>- how many foes you subdued
-</br>- if you fullfilled the special task  
-
-Depending on your ranking you receive some prize - or punishment:
-</br>- money from the pot. First gets 40%, second 20%, third 10% and the others have to share the rest.  
-</br>- every combatant gets their participation bonus
-</br>- the first can select a punishment for any partipicant except himself
-</br>- the second can select a punishment for the last one
-
-</br></br><a0 onclick= 'window.story.state.tmp.msg="",window.story.show(window.story.state.DngNG.Exit)'>Get hunting</a>
-</article><article id="LogPanel"></article></section>
-<script>
-    var s = window.story.state,map,data;
-    ({map,data}=window.gm.build_DngNG());
-    s.DngNG=data;
-    s.DngSY.dngMap=map;s.DngSY.dng='DngNG';
-    s.vars.spawnAt="DngNG_Respawn";
-</script>
-
 
 :: DngNG_Ruff_Talk [_back_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
@@ -69,12 +31,6 @@ Ruff is just growling menacingly at you.</br> Maybe if you would have something 
 
 :: DngNG_appletree [_fragm_]
 A scrawny appletree is growing here.
-
-:: DngNG_entry [_fragm_]
-The path here winds back to the city.
-However, you first have to solve your task which is: TODO
-else
-With your task solved you might [[leave this place|DngNG_ReturnFromHunt]]</br>.
 
 :: DngNG_Mushroom [_fragm_]
 </br><%if(window.story.state.DngNG.tmp.evtSpawn[window.passage.name]["mushroom"].state===0){%>There is a <%=window.story.state.DngNG.tmp.evtSpawn[window.passage.name]["mushroom"].loot%>. Do you collect it?
@@ -162,20 +118,112 @@ window.story.show("DngNG_Lectern_Take")
 </script>
 
 
-:: DngNG_00_00
-<%=window.story.render('DngNG_Tmpl')%>
+:: DngNG_Encounters
+<script>
+function fightLapine(){
+    window.gm.encounters.lapine({amount:1, noStart:true});
+    var _oldVictory=window.gm.Encounter.onVictory.bind(window.gm.Encounter);
+    //window.gm.Encounter.onVictory= function(){;return(_oldVictory());}
+    window.gm.Encounter.initCombat();
+}
+function openBox(){
+    window.story.state.tmp.args[1]=["HealthPotionSmall"];
+    window.story.show("DngNG_BoxOpened");
+}
+</script>
 
+:: DngNG_entry
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%><div>
+You start your journey in the appartment block you called home all your live.</div>
+<a0 onclick='window.gm.toNextRoom();'>Go on</a></br>
+</article><article id="LogPanel"></article></section>
+<%=window.story.render("DngNG_Encounters")%>
+
+:: DngNG_BoxOpened [_nosave_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+You open the box and find...<div id='output'></div></br>
+<a0 onclick='foo()'>Take all</a>
+</article><article id="LogPanel"></article></section>
+<script>
+var foo,msg='',Items=[],rnd=window.story.state.tmp.args[1];
+function addLoot(){
+  for(let n of Items){ msg+=n.name+", ";};
+  foo=function(){ window.story.state.tmp.args=[];
+    for(let n of Items){window.gm.player.changeInventory(n,1);}
+    window.gm.toNextRoom(); //adding to inventory only if player is leaving the passage, otherwise he could glitch if switching to status-pane and back
+  }
+}
+if(rnd.length>0) { //either rnd is string-array or rnd-number
+    for(var _itm of rnd){
+        Items.push(window.gm.ItemsLib[_itm]());
+    }
+    addLoot();
+} else if(rnd<10){
+  Items.push(window.gm.ItemsLib.HorsePotion());
+  addLoot();
+} else if(rnd>40){
+  Items.push(window.gm.ItemsLib.HealthPotionSmall());
+  if(rnd>60){
+    Items.push(window.gm.ItemsLib.HorsePotion());
+  }
+  addLoot();
+} else {
+  msg+='nothing !';foo=function(){window.story.show(next);};
+  /*foo=(function(){ window.story.state.tmp.args=[]; 
+    window.gm.fightArena("mole",{amount:2},[{id:"Money",count:30}],next);});*/
+}
+window.gm.printOutput(msg);
+</script>
+
+:: DngNG_00_00
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%><div>
+You are at the entrance of a flat. There is someone lounging on a bench.</br>
+What are you going to do?</br>
+<a0 onclick='window.gm.toNextRoom();'>Ignore them</a></br>
+<a0 onclick=';'>Walk over and talk to them</a></br>
+<a0 onclick='fightLapine();'>Sneak by</a></br>
+<a0 onclick='fightLapine();'>Strike first</a></br></div>
+</article><article id="LogPanel"></article></section>
+<%=window.story.render("DngNG_Encounters")%>
 
 :: DngNG_00_01
-<%=window.story.render('DngNG_Tmpl')%>
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%><div>
+Someone has hidden cardboard boxes behind a dumpster ? Maybe you can find something useful.</br>
+<a0 onclick='openBox();'>Check their content</a></br>
+<a0 onclick='window.gm.toNextRoom();'>Ignore them</a></br></div>
+</article><article id="LogPanel"></article></section>
+<%=window.story.render("DngNG_Encounters")%>
 
 
 :: DngNG_00_02
-<%=window.story.render('DngNG_Tmpl')%>
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%><div>
+<!--prepare repairscreen-->
+</article><article id="LogPanel"></article></section>
+<%=window.story.render("DngNG_Encounters")%>
+<script>window.story.state.tmp.args[1]=1;window.story.show("DngNG_Workbench");</script>
+
+:: DngNG_Workbench
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%><div>
+The door to the janitors repairshop is open. There might be enough time to repair <%=window.story.state.tmp.args[1]%> gadget.</br>
+<dif id="choice"></div>
+<a0 onclick='openBox();'>Repair</a></br>
+<a0 onclick='window.gm.toNextRoom();'>Pass on</a></br></div>
+</article><article id="LogPanel"></article></section>
+<script>window.gm.printOutput("nothing to repair","#choice")
+</script>
 
 
-:: DngNG_00_03
-<%=window.story.render('DngNG_Tmpl')%>
+:: DngNG_00_99
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%><div>
+<!-- EXIT -->
+</article><article id="LogPanel"></article></section>
+<script>window.story.show("DngNG_MissionDebriefing")</script>
 
 
 :: DngNG_00_04
@@ -644,59 +692,3 @@ window.story.show("DngNG_Lectern_Take")
 
 :: DngNG_10_10
 <%=window.story.render('DngNG_Tmpl')%>
-
-
-:: DngNG_A1
-<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
-Somewhere in the dungeon.</br>
-<%=window.gm.renderRoom(window.passage.name)%></br>
-<div id='output'></div>
-</br><%=window.story.render('DngNG_Action')%></br><div id="navpanel"><%=window.gm.printNav2()%></div>
-</article><article id="LogPanel"></article></section>
-<%=window.story.render("DngNG_Encounters")%>
-
-:: DngNG_F2
-<%=window.story.render("DngNG_A1")%>
-
-:: DngNG_G2
-<%=window.story.render("DngNG_A1")%>
-
-:: DngNG_H2
-<%=window.story.render("DngNG_A1")%>
-
-:: DngNG_I2
-<%=window.story.render("DngNG_A1")%>
-
-:: DngNG_J2
-<%=window.story.render("DngNG_A1")%>
-
-:: DngNG_F3
-<%=window.story.render("DngNG_A1")%>
-
-:: DngNG_G3
-<%=window.story.render("DngNG_A1")%>
-
-:: DngNG_H3
-<%=window.story.render("DngNG_A1")%>
-
-:: DngNG_I3
-<%=window.story.render("DngNG_A1")%>
-
-:: DngNG_J3
-<%=window.story.render("DngNG_A1")%>
-
-:: DngNG_F4
-<%=window.story.render("DngNG_A1")%>
-
-:: DngNG_G4
-<%=window.story.render("DngNG_A1")%>
-
-:: DngNG_H4
-<%=window.story.render("DngNG_A1")%>
-
-:: DngNG_I4
-<%=window.story.render("DngNG_A1")%>
-
-:: DngNG_J4
-<%=window.story.render("DngNG_A1")%>

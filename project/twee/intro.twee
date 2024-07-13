@@ -82,10 +82,12 @@ Those are very present through the game and in the main-story (also check the se
 <p class='author'>Note that there is no back-button implemented. Pressing the back button of your browser will get your game aborted.</br>
 You might see a lot of links that are formated red-strikethrough. Those are currently broken and you shouldnt use them.</p>
 <p class='author'>Loading of savegame is only possible in game. Saving might be disabled in some locations.</p>
-<p class='author'>[[Fetishes ! (spoiler alert)|List_Fetish]]</p></br></br><hr>
-<p>This is a kind of remake of NightgamesMod. I wasnt able to mod it in Java, so I started from scratch. </br></p>
+<p class='author'>[[Fetishes ! (spoiler alert)|List_Fetishxxx]]</p></br></br><hr>
+<p>The city is overrun by a nanite-infection that transform people. You need to make your escape by reaching a beacon somewhere in the city.</br>
+You need to fight your way through different parts of the city and try to stay clear of the infection - or not.</br></br>
+The game is meant to be played multiple times, each playthrough might unlock more stuff. F.e. people you meet will remember how you acted before.  
+</p>
 <p><a0 onclick='start();'>Start</a></p><hr>
-<p><a0 onclick='startRandom();'>random Dng</a>
 <label>length:
     <select id="length">
         <option value="1">1</option><option value="2" >2</option><option value="3" >3</option><option value="4" selected>4</option>
@@ -111,8 +113,12 @@ You might see a lot of links that are formated red-strikethrough. Those are curr
 <hr><div id='canvas'style='max-height: 256px;overflow: auto;'></div><div id='svgpopup'></div></br>
 </article>
 <script> function start(){
-    window.story.state.DngSY.remainingNights=0,window.story.state.DngSY.dngLevel=0;
-    window.story.state.vars.spawnAt="DngNG_Home";
+    var s = window.story.state,map,data;
+    s.DngSY.remainingNights=0,s.DngSY.dngLevel=0;
+    ({map,data}=window.gm.build_DngNG());
+    s.DngNG=data;
+    s.DngSY.dngMap=map;s.DngSY.dng='DngNG';
+    s.vars.spawnAt="DngNG_entry";
     window.gm.enterVR();
     window.gm.player.autoLeveling();
     window.gm.player.Outfit.removeItem("StaffWodden");window.gm.player.Inv.removeItem("StaffWodden");
