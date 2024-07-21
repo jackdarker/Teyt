@@ -168,7 +168,8 @@ window.gm.initGameFlags = function(forceReset,NGP=null){
   function dataPrototype(){return({visitedTiles:[],mapReveal:[],tmp:{},version:0});}
   if (forceReset){  
     s.Settings=s.DngCV=s.DngDF=s.DngAM=s.DngSY=s.DngMN=s.DngAT=null; 
-    s.DngFM=s.DngSC=s.DngLB=s.DngHC=s.DngPC=s.DngNG=null;
+    s.DngFM=s.DngSC=s.DngLB=s.DngHC=s.DngNG=null;
+    s.NGP = {};
     s.Know = {}
   }
   let Know = {};
@@ -201,10 +202,8 @@ window.gm.initGameFlags = function(forceReset,NGP=null){
   DngDF.lapine={};
   let DngFM = dataPrototype();
   let DngHC = dataPrototype();
-  let DngPC = dataPrototype();
-  if(s.DngPC){ //update if exist
-    window.gm.build_DngPC();
-    s.DngPC=window.gm.util.mergePlainObject(DngPC,s.DngPC);
+  if(s.NGP && NGP!=null){ //update if exist
+    s.NGP=window.gm.util.mergePlainObject(NGP,s.NGP);
   }
   let DngNG = dataPrototype();
   if(s.DngNG){ //update if exist
@@ -228,7 +227,6 @@ window.gm.initGameFlags = function(forceReset,NGP=null){
   s.DngSC=window.gm.util.mergePlainObject(DngSC,s.DngSC);
   s.DngHC=window.gm.util.mergePlainObject(DngHC,s.DngHC);
   s.DngLB=window.gm.util.mergePlainObject(DngLB,s.DngLB);
-  s.DngPC=window.gm.util.mergePlainObject(DngPC,s.DngPC);
   s.DngNG=window.gm.util.mergePlainObject(DngNG,s.DngNG);
   //todo cleanout obsolete data ( filtering those not defined in template) 
 };

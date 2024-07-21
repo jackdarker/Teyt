@@ -7,13 +7,8 @@ class CraftMaterial extends Item {
     }
     set style(style){ 
         this._style = style; 
-        if(style===0) this.id=this.name='Jlorb';
-        else if(style===5) this.id=this.name='Shlack';
-        else if(style===10) this.id=this.name='Glib';
-        else if(style===20) this.id=this.name='Gorb';
-        else if(style===30) this.id=this.name='Igent';
-        else if(style===40) this.id=this.name='Remk';
-        else if(style===50) this.id=this.name='Murk';
+        if(style===0) this.id=this.name='Shards';
+        else if(style===1) this.id=this.name='SilverShards';
         else throw new Error(this.id +' doesnt know '+style);
     }
     get style(){return this._style;}
@@ -21,13 +16,10 @@ class CraftMaterial extends Item {
         let msg ='';
         switch(this._style){
             case 0: 
-            case 5: 
-            case 10: 
-            case 20: 
-            case 30: 
-            case 40:
-            case 50:
                 msg ='some strange material';
+                break;
+            case 1: 
+                msg ='similiar to normal shards but with a silvery glitter';
                 break;
             default: throw new Error(this.id +' doesnt know '+style);
         }
@@ -100,12 +92,13 @@ class Gun extends Weapon {
 window.gm.ItemsLib = (function (ItemsLib){
     window.storage.registerConstructor(CraftMaterial);
     window.storage.registerConstructor(Gun);
-    ItemsLib['Jlorb'] = function(){ let x= new CraftMaterial();x.style=0;return(x);}
+    ItemsLib['Shards'] = function(){ let x= new CraftMaterial();x.style=0;return(x);}
+    ItemsLib['SilverShards'] = function(){ let x= new CraftMaterial();x.style=1;return(x);}
 
 return ItemsLib; 
 }(window.gm.ItemsLib || {}));
 
-window.gm.build_DngNG=function(regionType){
+window.gm.build_DngNG=function(){
     function addMob(type,pos){
         //type refers either to a unique char existing in s.chars
         //or is generic mob, then we have to append idcounter and create instance
@@ -122,18 +115,8 @@ window.gm.build_DngNG=function(regionType){
             id:_id,
             mob:type,pos:pos,path:[pos],state:0,tick:'',att:0,timerA:0,timerB:0});
     }
-    function getTilesByVisual(visual){
-        let _r=[];
-        for (let value of data.map.grid.values()) {
-            if(value.visuals===visual) { 
-                _r.push(value);
-            }
-        }
-        if(_r.length===0) throw new Error("no room with visual "+visual);
-        return(_r);
-    }
     let s = window.story.state,data;
-    
+
     /////// --!!!!
     const version=1;
     ////// -- !!!!                          // <== increment this if you change anything below - it will reinitialize data !
@@ -141,23 +124,44 @@ window.gm.build_DngNG=function(regionType){
         data=s.DngNG;
     } else {
         data=s.DngNG,data.version=version;
-        //roll locations
-        data.map= [
-             "DngNG_00_00",
-             "DngNG_00_01",
-             "DngNG_00_02",
-             "DngNG_00_01",
-             "DngNG_00_99"
-        ];//window.GenerateDng.DngGen.generate({length:5,doors:2,naming:"12_01",branches:2})
-        //data.Exit="DngNG_"+getTilesByVisual("entry")[0].room;// data.map.grid.entries().next().value[0];
-        data.tmp={tickPass:'', tier:0 , room:-1 };
-        data.tmp.evtLeave = { //events on tile-leave
-            F4_G4: [{id:"Trap_Dehair",type:'encounter',tick:window.gm.getTime(),state:0,chance:100 }],
-            I4_H4: null
-        }
-        data.task = {},data.rolledTask=[]; //active task
-        data.tasks = { //tasks you did
-        };
+        //this defines the possible region layouts; one of it is selected
+        //questtypes
+        const qExit = "exit"    //just reach exit
+        const qFind = "find"    //find a weapon
+        data.Regions = [ //database of region-layouts
+            {region: "Appartmentblock",  
+                quest: [qExit], //
+                minTier: 0, 
+                maxTier: 1, 
+                tiles:[{id:"DngNG_00_00"},
+                {id:"DngNG_00_01"},
+                {id:"DngNG_00_02"},
+                {id:"DngNG_00_01"},
+                {id:"DngNG_00_99"}]
+            },
+            {region: "Appartmentblock",  
+                quest: [qExit], //
+                minTier: 0, 
+                maxTier: 1, 
+                tiles:[{id:"DngNG_00_03"},
+                {id:"DngNG_00_02"},
+                {id:"DngNG_00_01"},
+                {id:"DngNG_00_00"},
+                {id:"DngNG_00_99"}]
+            },
+            {region: "Suburbs",  
+                quest: [qExit], //
+                minTier: 1, 
+                maxTier: 1, 
+                tiles:[{id:"DngNG_01_03"},
+                {id:"DngNG_01_02"},
+                {id:"DngNG_01_01"},
+                {id:"DngNG_01_00"},
+                {id:"DngNG_01_99"}]
+            }
+        ]
+        data.map= []; //the actual region-map
+        data.tmp={tickPass:'', tier:0 ,region:"", room:-1 };
     }
     //install function to calculate chance of evtLeave
     window.gm.encounterChance=function(evt){
@@ -183,6 +187,23 @@ window.gm.build_DngNG=function(regionType){
         window.gm.addTime(120);
         window.story.show(s.DngNG.map[s.DngNG.tmp.room])
     }
+    data.rerollTiles=function(region,tier){
+        //select map from database
+        let list=[],n;
+        this.Regions.forEach(x=>{if(x.region==region && (x.minTier<=tier && x.maxTier>=tier)){list.push(x);}});
+        n=_.random(0,list.length-1);
+        this.map=list[n].tiles.map(y=>{return(y.id);});
+        this.tmp.region=list[n].region;
+    }
+    data.rerollRegion=function(){
+        //select the next region; it shouldnt be the same region as the last one
+        let list=[],n;
+        this.Regions.forEach(x=>{if(x.region!=this.tmp.region && (x.minTier<=this.tmp.tier && x.maxTier>=this.tmp.tier)){list.push(x);}});
+        if(list.length>0){
+            n=_.random(0,list.length-1);
+            this.tmp.region=list[n].region;
+        } else this.tmp.region=""; 
+    }
     //TODO cannot save graph due circular neigbours data.tmp.graph = window.gm.gridToGraph(_grid);  //for pathfinding  let path = window.astar.search(data.tmp.graph,"F2","I2",null,{heuristic:(function(a,b){return(1);})})
     //add some helper funcs
     data.getMobById=function(id){
@@ -192,6 +213,7 @@ window.gm.build_DngNG=function(regionType){
         return(null);
     }
     data.addMob=addMob;
+    
     return({map:data.map,data:data});
 };
 //TODO override postVictory
