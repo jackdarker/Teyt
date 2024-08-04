@@ -45,14 +45,15 @@ document.querySelector('#LinkO').addEventListener('click', function(){window.sto
 <div><%=window.gm.util.printLocationName(window.gm.player.location)%></br><%=window.gm.getTimeString()%></br><%=window.gm.getDateString()%></br></div><hr>
 <div><%=window.gm.player.name%></br>
 <%=window.gm.util.statsbar("health")%><%=window.gm.util.statsbar("energy")%><%=window.gm.util.statsbar("will")%>
+<%=window.gm.util.statsbar("arousal")%>
 <%if(s._gm.debug& 0x1>0){%>
-<%=window.gm.util.statsbar("arousal")%><%=window.gm.util.statsbar("satiation")%><%=window.gm.util.statsbar("savageness")%></div>
+<%=window.gm.util.statsbar("corruption")%></div>
 <%}%>
 <div></div>
 <!--<div <%=window.gm.player.canLevelUp?"class=\"green\"":""%>>XP/Level: <%=window.gm.player._data.XP+"/"+window.gm.player._data.level%></div>-->
 <hr>
 <form>
-<button type="button" id="LinkS" onclick='window.story.show("InspectPlayer");'>Status<sup>[s]</sup></button>
+<button type="button" id="LinkS" onclick='window.story.show("Status");'>Status<sup>[s]</sup></button>
 <button type="button" id="LinkI" onclick='window.story.show("Inventory");'>Inventory<sup>[i]</sup></button>
 <hr>
 <button type="button" id="save" onclick='window.gm.toggleDialog("#dialog_save");' style="width: 80%">Save/load</button>

@@ -213,7 +213,93 @@ window.gm.build_DngNG=function(){
         return(null);
     }
     data.addMob=addMob;
-    
+    {   //stuff for upgrades
+        function NOP(){return({OK:true,msg:""});}
+        function exclude(itmIdList){ 
+            var s=window.story.state;
+            let res={OK:true,msg:""};
+            for(var i=itmIdList.length-1;i>=0;i--){
+                if(s.NGP.hasOwnProperty(itmIdList[i])){
+                    res.OK=false,res.msg+="Cannot be used with "+itmIdList[i]+".";
+                }
+            }
+            return(res);
+        }
+        function include(itmIdList){ 
+            var s=window.story.state;
+            let res={OK:true,msg:""};
+            for(var i=itmIdList.length-1;i>=0;i--){
+                if(!s.NGP.hasOwnProperty(itmIdList[i])){
+                    res.OK=false,res.msg+="requires also "+itmIdList[i]+".";
+                }
+            }
+            return(res);
+        }
+        window.gm.achievementsInfo={ //see window.gm.achievements //this is kept separate to not bloat savegame
+            //hidden bitmask: 0= all visisble, 1= hide Name, 2= hide Todo
+            looseEnd: {hidden:3, name:"loose end", descToDo:"Find a loose end.",descDone:"Found a link without target."}, //
+            firstRun: {hidden:0, name:"first run", descToDo:"Get to the extit in the first region",descDone:"Finished the first region."} 
+        }
+        window.gm.NGP=window.gm.NGP||{}
+        window.gm.NGP.catalog = [ //this defines the buyable upgrades
+            {catId:"slots",desc:"slots",
+            items:[
+                {itmId:"BSlot1",name:"Benefit Slot A",cost:{token:1},disabled:false,slot:["A"],req:NOP,desc:"A benefit-slot where you can equip cards of type A"},
+                {itmId:"BSlot2",name:"Benefit Slot B",cost:{token:14},disabled:false,slot:["B"],req:NOP,desc:"A benefit-slot where you can equip cards of type B"},
+                {itmId:"TSlot1",name:"Tradeoff Slot A",cost:{token:5},disabled:false,slot:["A"],req:NOP,desc:"A tradeoff-slot where you can equip cards of type A"},
+                {itmId:"TSlot2",name:"Tradeoff Slot B",cost:{token:10},disabled:false,slot:["B"],req:NOP,desc:"A tradeoff-slot where you can equip cards of type B"},
+            {itmId:"TSlot3",name:"Tradeoff Slot A/B",cost:{token:10},disabled:false,slot:["A","B"],req:NOP,desc:"A tradeoff-slot where you can equip cards of type A or B"}
+            ]},
+            {catId:"startgear",desc:"Starting Gear",
+            items:[
+                {itmId:"Compass",name:"Compass",cost:{token:1},disabled:false,slot:['A'],req:NOP,desc:"a compass that makes it easier to navigate in some areas"},
+                {itmId:"ProteinBars",name:"a dozen proteinbars",cost:{token:1},disabled:false,slot:['A'],req:NOP,desc:"a package of powerbars so you dont need something you dont want"}
+            ]},
+            {catId:"transformation",desc:"transformation boons",
+            items:[
+                {itmId:"transformWeakOnly",name:"transformWeakOnly",cost:{token:2},disabled:false,slot:['B'],req:NOP,desc:"Transformations only take place in a weakend state."}
+            ]},
+            {catId:"itemMods",desc:"Item Mods",
+            items:[
+                {itmId:"decreasedClothDurability",name:"decreased clothing durability",cost:{token:1},disabled:false,slot:['B'],req:exclude.bind(null,["increasedClothDurability"]),desc:"Clothes tend to break faster. Might help to get rid of some undesired things faster."},
+                {itmId:"increasedClothDurability",name:"increased clothing durability",cost:{token:1},disabled:false,slot:['B'],req:exclude.bind(null,["decreasedClothDurability"]),desc:"Clothes are much more durable, especially specific ones."}
+            ]},
+            {catId:"eventMods",desc:"Event Mods",
+            items:[
+                {itmId:"moreHealItems",name:"increased drop rate of healing items",cost:{token:1},disabled:false,slot:['B'],req:NOP,desc:"You will have more luck in findig healing-items at the expenso of other items."}
+                //increases the number of locations you have to pass through with a good chance that there is loot;  
+            ]},
+            {catId:"weirdMods",desc:"Mods that dont require slots",
+            items:[
+                {itmId:"noTierUp",name:"manually select if you increase tier or not (doesnt require card-slot!)",cost:{token:15},disabled:false,slot:[],req:NOP,desc:"After successful completion of a region, the tier usually increases automatically. This mod gives you the option to bypass this."},
+                {itmId:"noRegionTier",name:"removes the region-restriction by tier (doesnt require card-slot!)",cost:{token:15},disabled:false,slot:[],req:NOP,desc:"Usually the selected region is restricted by tier (thatswhy you always start in Appartmentblock). This mod gives you the option to remove the restriction."},
+            ]}
+        ];
+        window.gm.NGP.catalogToList=function(){ //converts catalog tree into flat item list
+            let itm=null,list=[];
+            for(var cat of window.gm.NGP.catalog){
+                for(var it of cat.items){
+                    it.catId=cat.catId;
+                    list.push(it);
+                }
+            }
+            return(list);
+        }
+        window.gm.NGP.findItem=function(itmId){ //returns an item (not category) from catalaog
+            let itm=null;
+            for(var cat of window.gm.NGP.catalog){
+                for(var it of cat.items){
+                    if(it.itmId===itmId) {
+                        it.catId=cat.catId;
+                        return(it);
+                    }
+                }
+            }
+            if(itm===null) throw new Error("unknown item " + itmId);
+            return(itm);
+        }
+    }
+
     return({map:data.map,data:data});
 };
 //TODO override postVictory

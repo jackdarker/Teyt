@@ -162,6 +162,18 @@ window.gm.util.addShortKeyHandler=function(){
     }
   });
 };
+//returns normal distributed random value, mu= mean, 0 by default; sigma= stdev, 1 by default; nsamples= more samples creates better approximation, 3 by default
+window.gm.util.randomNormal=function(mu, sigma, nsamples){ // using central limit
+  if(!nsamples) nsamples = 3
+  if(!sigma) sigma = 1
+  if(!mu) mu=0
+
+  var run_total = 0
+  for(var i=0 ; i<nsamples ; i++){
+     run_total += Math.random()
+  }
+  return sigma*(run_total - nsamples/2)/(nsamples/2) + mu
+}
 window.gm.util.selRandom=function(list){//picks element from []
   let _i=list.length;
   if(_i>0) return(list[_.random(0,_i-1)]);
@@ -757,6 +769,8 @@ window.gm.roll=function(n,sides){ //rolls n x dies with sides
   return(rnd); 
 }
 //expects DOM like <section><article>..<div id='output'></div>..</article></section>
+//Tip if you have to setup functions: string should be in '  and use \' and \" consistently 
+//'<button type=\"button\" onclick=\'equip(\"'+y.itmId+'\",\"'+itm2.itmId+'\");\'>'+y.name+'</button>'
 window.gm.printOutput= function(text,where="section article div#output",append=false){
   let n=document.querySelector(where);
   n.innerHTML = (append?n.innerHTML:"")+text;

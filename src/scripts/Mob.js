@@ -44,9 +44,11 @@ class Mob extends Character {
     }
     //return false if skill should be manually selected
     get isAIenabled(){ return(true);}
-    //override to adjust the mobs attributes to player level
+    //randomize mob level around target-level but not below min-level: +-20%;
     scaleLevel(lvl){ 
-        let x = Math.max(this.level_min,_.random(lvl-3,lvl+3));
+        let x;
+        x=Math.round(window.gm.util.randomNormal(lvl,lvl*0.2));
+        x = Math.max(this.level_min,x);
         x=x-this.level;   
         if(x>0){
             this.levelUp(x);

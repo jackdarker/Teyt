@@ -25,6 +25,7 @@ You are at home when a new emergency broadcast is received by your radio:</br>
 </article><article id="LogPanel"></article></section>
 <script> function start(){
     var s = window.story.state;
+    s.vars.spawnAt="DngNG_Defeat";
     s.DngNG.rerollTiles("Appartmentblock",s.DngNG.tmp.tier); 
     window.story.show("DngNG_Preparation");
 }
@@ -68,7 +69,7 @@ TODO Sell/buy items from loadout and global chest. <a0 id='helpgeartrader' oncli
 TODO show region-progress
 TODO depending on progress and difficulty show list of next target
 </br>
-<a0 onclick='start()'>" I'm ready,lets go.'</a>
+<a0 onclick='start()'>Let's prepare for the next area.</a>
 </article><article id="LogPanel"></article></section>
 <script> function start(){
     var s = window.story.state;
@@ -106,6 +107,97 @@ This area you know pretty well because you live here a couple of years now. Comm
 </article><article id="LogPanel"></article></section>
 
 
+:: DngNG_Loadout [_back_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%></br>
+<h2>Active loadout</h2>
+[[Back|_back_]] [[Unlocked Mods|DngNG_OwnedNGP]]
+<a0 onclick='(function($event){document.querySelector("#"+id+"~p").toggleAttribute("hidden");})(this);'>Hint</a>
+<p hidden> To activate a NGP-card, you need a compatible free slot.</br>
+There are different kind of slots:</br>
+- Tradeoff-Slots: cards placed here will enable the effect according to their description</br>
+- Benefit-Slots:  the adverse effect of the card is removed or at least reduced while the beneficial stays the same</br>
+- slots also have a compatibility marker; a slot with marker "A, B" can hold only cards marked with either A or B</br>
+</p>
+</br><hr><div id="slotuse"></div><br><hr><div id="output"></div><br><hr><br><div id="cards" style="display:flex; flex-flow: row wrap;"></div>
+[[Back|_back_]]
+</article><article id="LogPanel"></article></section>
+<script>
+function update(){
+    let s=window.story.state;
+    let msg="",printslot="",printcard="",printbuttons="",list,_card,listslots=[];
+    list=window.gm.NGP.catalogToList();
+    debugger
+    list.forEach(x=>{
+        if(x.catId=="slots"){   //slots
+            _card=s.NGP[x.itmId];
+            if(_card!=0 && _card!=null && _card!=undefined){ //slot owned
+                listslots.push(x);
+                if(_card>0 || _card==""){ //owned but empty
+                    itm2=null;
+                } else {
+                    itm2=window.gm.NGP.findItem(_card); //slot contains itmId
+                    //todo button to clear card
+                }
+                printslot+='<p class="speech"><b>'+x.name+':   '+(itm2?itm2.name:"")+'</b></p>';
+            }
+        }
+    });
+    list.forEach(x=>{
+        if(x.catId!="slots"){   //cards
+            _card=s.NGP[x.itmId];
+            if(_card!=0 && _card!=null && _card!=undefined){ //card owned
+                itm2=window.gm.NGP.findItem(x.itmId);
+                //create buttons for slots if slot owned
+                printbuttons="";
+                listslots.forEach(y=>{  // [A,B] [B,D] -> OK
+                    if(y.slot.some(z=>{return(itm2.slot.includes(z));})){
+                        if(s.NGP[y.itmId]==itm2.itmId){//todo: show "equipped" if already assigned to this slot
+                            printbuttons+='EQUIPPED';
+                        }else{
+                            printbuttons+='<button type=\"button\" onclick=\'equip(\"'+y.itmId+'\",\"'+itm2.itmId+'\");\'>'+y.name+'</button>';
+                        }
+                    }
+                })
+                printcard+='<p class="speech" id="'+itm2.itmId+'"><b>'+itm2.name+':</b> '+itm2.desc+'</br>'+printbuttons+'</p>'
+            }
+        }
+    });
+    window.gm.printOutput(printslot,'div#slotuse');
+    window.gm.printOutput(printcard,'div#cards');
+}
+function equip(slotId,itemId){
+    let s=window.story.state,itm,_rst;
+    itm=window.gm.NGP.findItem(itemId);
+    //if requirements failed
+    _rst=itm.req();
+    if(_rst.OK!=true){
+        window.gm.printOutput(_rst.msg,'div#output');   //print output
+    } else {     //assign to slot and redraw
+        s.NGP[slotId]=itemId;
+        window.gm.printOutput("",'div#output');
+        update();
+    }
+}
+update();
+</script>
+
+:: DngNG_OwnedNGP [_back_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%></br>
+<h2>Things you have unlocked</h2>
+<div id="output"></div>
+[[Back|_back_]]
+</article><article id="LogPanel"></article></section>
+<script>function foo(){
+    let list=Object.keys(window.story.state.NGP);
+    list.forEach(x=>{let itm=window.gm.NGP.findItem(x);
+        window.gm.printOutput("<p><b>"+itm.name+"</b> - "+ itm.desc +
+            " </p>","section article div#output",true)})
+    }
+foo();
+</script>
+
 :: DngNG_NGPShop
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%></br><%window.gm.player.location=window.passage.name;%>
 <h2>Upgrades shop</h2>
@@ -125,70 +217,16 @@ Here you can buy upgrades that you then can equip in your loadout.</br>
 </form>
 </br><a0 onclick="start()"> All Done</a> !</br>
 <div id="output2"></div></br>
-
 </p>
 </article><article id="LogPanel"></article></section>
 <script>
-function NOP(){return({OK:true,msg:""});}
-function exclude(itmIdList){ 
-    var s=window.story.state;
-    let res={OK:true,msg:""};
-    for(var i=itmIdList.length-1;i>=0;i--){
-        if(s.NGP.hasOwnProperty(itmIdList[i])){
-            res.OK=false,res.msg+="Cannot be used with "+itmIdList[i]+".";
-        }
-    }
-    return(res);
-}
-function include(itmIdList){ 
-    var s=window.story.state;
-    let res={OK:true,msg:""};
-    for(var i=itmIdList.length-1;i>=0;i--){
-        if(!s.NGP.hasOwnProperty(itmIdList[i])){
-            res.OK=false,res.msg+="requires also "+itmIdList[i]+".";
-        }
-    }
-    return(res);
-}
 var /*NGP,*/ctrlCat,ctrlItem;
-var catalog = [ //this defines the buyable upgrades
-    {catId:"slots",desc:"slots",
-    items:[
-        {itmId:"BSlotA",name:"Benefit Slot A",cost:{token:1},disabled:false,req:NOP,desc:"A benefit-slot where you can equip cards of type A"},
-        {itmId:"BSlotB",name:"Benefit Slot B",cost:{token:14},disabled:false,req:NOP,desc:"A benefit-slot where you can equip cards of type B"},
-        {itmId:"TSlotA",name:"Tradeoff Slot A",cost:{token:5},disabled:false,req:NOP,desc:"A tradeoff-slot where you can equip cards of type A"},
-        {itmId:"TSlotB",name:"Tradeoff Slot B",cost:{token:10},disabled:false,req:NOP,desc:"A tradeoff-slot where you can equip cards of type B"},
-       {itmId:"TSlotAB",name:"Tradeoff Slot A/B",cost:{token:10},disabled:false,req:NOP,desc:"A tradeoff-slot where you can equip cards of type A or B"}
-    ]},
-    {catId:"startgear",desc:"Starting Gear",
-    items:[
-        {itmId:"Compass",name:"Compass",cost:{token:1},disabled:false,req:NOP,desc:"a compass that makes it easier to navigate in some areas"},
-        {itmId:"ProteinBars",name:"a dozen proteinbars",cost:{token:1},disabled:false,req:NOP,desc:"a package of powerbars so you dont need something you dont want"}
-    ]},
-    {catId:"transformation",desc:"transformation boons",
-    items:[
-        {itmId:"transformWeakOnly",name:"transformWeakOnly",cost:{token:2},disabled:false,req:NOP,desc:"Transformations only take place in a weakend state."}
-    ]},
-    {catId:"itemMods",desc:"Item Mods",
-    items:[
-        {itmId:"decreasedClothDurability",name:"decreased clothing durability",cost:{token:1},disabled:false,req:exclude.bind(null,["increasedClothDurability"]),desc:"Clothes tend to break faster. Might help to get rid of some undesired things faster."},
-        {itmId:"increasedClothDurability",name:"increased clothing durability",cost:{token:1},disabled:false,req:exclude.bind(null,["decreasedClothDurability"]),desc:"Clothes are much more durable, especially specific ones."}
-    ]},
-    {catId:"eventMods",desc:"Event Mods",
-    items:[
-        {itmId:"moreHealItems",name:"increased drop rate of healing items",cost:{token:1},disabled:false,req:NOP,desc:"You will have more luck in findig healing-items at the expenso of other items."}
-    ]},
-    {catId:"weirdMods",desc:"other Mods",
-    items:[
-        {itmId:"noTierUp",name:"manually select if you increase tier or not (doesnt require card-slot!)",cost:{token:15},disabled:false,req:NOP,desc:"After successful completion of a region, the tier usually increases automatically. This mod gives you the option to bypass this."}
-    ]}
-];
 function resetAll(){
     let tk=0,x=window.gm.achievements;
     //convert achievements to token here or unhide options
     //depends on your game ....
     if(x.healer>=1)tk++;
-    else findItem("moreHealItems").disabled=true;
+    else window.gm.NGP.findItem("moreHealItems").disabled=true;
     //----
     //s.NGP = {token:tk,tokenUsed:0};
     ctrlCat.value="";
@@ -200,6 +238,7 @@ function updateText(event) {
     window.gm.printOutput("Shards left:"+(window.gm.player.Inv.countItem('Shards') /*s.NGP.token-s.NGP.tokenUsed*/),"#tokens");
 }
 function buy(){
+    let s=window.story.state;
     let res,itm=ctrlItem.selectedObject, freeToken=window.gm.player.Inv.countItem('Shards');//s.NGP.token-s.NGP.tokenUsed;
     if(itm && !s.NGP[itm.itmId]) {
         res=itm.req();
@@ -217,16 +256,6 @@ function buy(){
     window.gm.printOutput("Shards left:"+(window.gm.player.Inv.countItem('Shards') /*s.NGP.token-s.NGP.tokenUsed*/),"#tokens");
     window.gm.printOutput(JSON.stringify(s.NGP),"#output2");
 }
-function findItem(itmId){
-    let itm=null;
-    for(var cat of catalog){
-        for(var it of cat.items){
-            if(it.itmId===itmId) return(it);
-        }
-    }
-    if(itm===null) throw new Error("unknown item " + itmId);
-    return(itm);
-}
 function init(){
     var selCat = document.getElementById("category"),selItem = document.getElementById("item");
     ctrlCat = new window.gm.util.SelectionController(selCat), ctrlItem = new window.gm.util.SelectionController(selItem,ctrlCat);
@@ -238,48 +267,16 @@ function init(){
     }
     ctrlItem.getValueList=function(cat,sel) {
         return cat.items.map(item => ({value: item.itmId,
-            text: item.name+ " ("+((item.cost.token>0)?item.cost.token+" shards":"free")+")",
-            disabled:item.disabled})); //todo: remove item instead 
+            text: (window.story.state.NGP[item.itmId]>0?"sold out - ":"") +
+                item.name+ " ("+((item.cost.token>0)?item.cost.token+" shards":"free")+")",
+            disabled:(item.disabled||window.story.state.NGP[item.itmId]>0)})); //todo: remove item instead 
     }
     ctrlItem.getValue=function(cat, sel) {
         return cat.items.find(item => item.itmId == sel);
     }
-    ctrlCat.mapData(catalog);
+    ctrlCat.mapData(window.gm.NGP.catalog);
     ctrlItem.addEventListener("change", updateText);
     //resetAll();
 }
 init();
 </script>
-
-:: DngNG_Loadout [_back_]
-<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%window.gm.player.location=window.passage.name;%></br>
-<h2>Active loadout</h2>
-[[Unlocked Mods|DngNG_OwnedNGP]]
-<a0 onclick='(function($event){document.querySelector("#"+id+"~p").toggleAttribute("hidden");})(this);'>Hint</a>
-<p hidden> To activate a NGP-card, you need a compatible free slot.</br>
-There are different kind of slots:</br>
-- Tradeoff-Slots: cards placed here will enable the effect according to their description</br>
-- Benefit-Slots:  the adverse effect of the card is removed or at least reduced while the beneficial stays the same</br>
-- slots also have a compatibility marker; a slot with marker "A, B" can hold only cards marked with either A or B</br>
-</p>
-</br></br><form>
-<label>Benefit-Slot A:
-	<select id="BSlotA"><option value="0">select something</option></select>
-</label></br>
-<label>Benefit-Slot B:
-	<select id="BSlotB"><option value="0">select something</option></select>
-</label><hr></br>
-<div id="output"></div><hr></br>
-</form>
-[[Back|_back_]]
-</article><article id="LogPanel"></article></section>
-
-
-:: DngNG_OwnedNGP [_back_]
-<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%window.gm.player.location=window.passage.name;%></br>
-<h2>Things you have unlocked</h2>
-TODO
-[[Back|_back_]]
-</article><article id="LogPanel"></article></section>

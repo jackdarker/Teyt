@@ -234,10 +234,6 @@ window.gm.resetAchievements = function() { //declare achievements here
   window.gm.achievements={
       looseEnd: 0 
     }
-    window.gm.achievementsInfo={ //this is kept separate to not bloat savegame
-        //hidden bitmask: 0= all visisble, 1= Name ???, 2= Todo ???
-        looseEnd: {set:1, hidden:3, name:"loose end", descToDo:"Find a loose end.",descDone:"Found a link without target. Gained a NGPtoken."} //
-    }
 }
 // update non-class-objects of previous savegame
 let _origRebuildObjects = window.gm.rebuildObjects;

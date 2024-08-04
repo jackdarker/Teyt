@@ -121,7 +121,7 @@ The game is meant to be played multiple times, each playthrough might unlock mor
     s.DngSY.dngMap=map;s.DngSY.dng='DngNG';
     s.vars.spawnAt="DngNG_Home";
     window.gm.enterVR();
-    window.gm.player.autoLeveling();
+    window.gm.player.levelUp(5);window.gm.player.autoLeveling();
     window.gm.player.Outfit.removeItem("StaffWodden");window.gm.player.Inv.removeItem("StaffWodden");
 }
 function startRandom(){

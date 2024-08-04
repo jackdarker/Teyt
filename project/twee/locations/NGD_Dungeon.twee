@@ -132,9 +132,9 @@ function openBox(){
 }
 </script>
 
-:: DngNG_Defeat
+:: DngNG_Defeat [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%window.gm.player.location=window.passage.name;%><div>
+<div>
 - can you spend an extra life to repeat location?
 - can you spend a continue to repeat region
 </div>
