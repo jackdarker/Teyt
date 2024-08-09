@@ -2,7 +2,7 @@
 class Item {
     constructor(name){
         this.id = this.name = name;  //id is unique in database(no whitespace !); name is for display
-        this.tags = [];this.stackLimit=0;
+        this.tags = [];this._stackLimit=0;
         this.bonus =[]; //Curse or Bonus assigned to item   //todo can ITEMS be cursed too?
         this.price=this.basePrice=10; //how much worth it is
     }
@@ -46,7 +46,7 @@ class Item {
             if(!this.tags.includes(tags[i])) this.tags.push(tags[i]);
         }
     }
-    get stackLimit(){return(this.stackLimit);} //0:infinite 
+    get stackLimit(){return(this._stackLimit);} //0:infinite 
     //returns the svg-piture name to display in inventory or wardrobe
     get pictureInv(){return ("unknown")}
     //implement this for description

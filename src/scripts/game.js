@@ -336,6 +336,7 @@ window.gm.initGame= function(forceReset,NGP=null){
         activePlayer : '', //id of the character that the player controls currently
         nosave : false,
         nokeys : false,
+        enablePoise : false, //enables Poise-System
         playerParty: [],  //names of NPC in playerParty 
         debug : false,    //globally enables debug
         dbgShowCombatRoll : false,  //log combat calculation details

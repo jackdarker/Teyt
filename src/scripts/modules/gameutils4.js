@@ -274,7 +274,8 @@ window.gm.build_DngNG=function(){
             ]},
             {catId:"eventMods",desc:"Event Mods",
             items:[
-                {itmId:"moreHealItems",name:"increased drop rate of healing items",cost:{token:1},disabled:false,slot:['B'],req:NOP,desc:"You will have more luck in findig healing-items at the expenso of other items."}
+                {itmId:"moreHealItems",name:"increased drop rate of healing items",cost:{token:1},disabled:false,slot:['B'],req:NOP,desc:"You will have more luck in findig healing-items at the expenso of other items."},
+                {itmId:"postCombatHeal",name:"post combat healing",cost:{token:3},disabled:false,slot:['C'],req:NOP,desc:"After a fight, your health is restored somewhat but healing items are less effective."}
                 //increases the number of locations you have to pass through with a good chance that there is loot;  
             ]},
             {catId:"weirdMods",desc:"Mods that dont require slots",

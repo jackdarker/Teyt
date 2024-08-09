@@ -184,12 +184,43 @@ window.gm.printOutput(msg);
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><div>
 The door to the janitors repairshop is open. There might be enough time to repair <%=window.story.state.tmp.args[1]%> gadget.</br>
-<dif id="choice"></div>
+<div id="choice"></div>
 <a0 onclick=';'>Repair</a></br>
 <a0 onclick='window.gm.toNextRoom();'>Pass on</a></br></div>
 </article><article id="LogPanel"></article></section>
 <script>window.gm.printOutput("nothing to repair","#choice")
 </script>
+
+:: DngNG_PickupWeapon
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%><div>
+Inspecting the <%=window.story.state.tmp.args[1]%> , you guess it has <%=window.story.state.tmp.args[2]%>% durability and... </br>
+<div id="choice"></div>
+<br>You could drop and replace your current lefthand/ righthand weapon with this.
+| As you are right now barehanded, you should call yourself happy to use this as a weapon of choice.
+| Unfortunatly you are missing proper hands to make use of this thing.
+| You could also add it to your [[inventory|DngNG_LocalChest]].
+<br>The window.story.state.tmp.args[1] that you already use as a weapon cant be further repaired with this new one.
+| The window.story.state.tmp.args[1] that you already use could be <a0 onclick=';'>repaired by % </a> dishelving this one.</br>
+<a0 onclick='window.gm.toNextRoom();'>Leave it alone</a></br></div>
+</article><article id="LogPanel"></article></section>
+<script>window.gm.printOutput("nothing to repair","#choice")
+</script>
+
+:: DngNG_LocalChest [_back_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%><div>
+<a0 id='hint' onclick='(function($event){document.querySelector("#"+id+"~p").toggleAttribute("hidden");})(this);'>Hint</a>
+<p class='speech' hidden>The left column shows the items currently present in this location, the right one your inventory.<br>
+Use the arrows to move the items between the columns but remember: the space in your inventory might be limited.<br>
+When you leave the location, all items you didnt store in your inentory are lost.  
+</p>
+
+<br>[[Done|_back_]]
+</article><article id="LogPanel"></article></section>
+<script>//updateTable
+</script>
+
 
 :: DngNG_00_00 [Appartment]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
@@ -248,6 +279,17 @@ You pass a small store that doesn't seem to have been looted yet. The reason for
 </div>
 </article><article id="LogPanel"></article></section>
 <%=window.story.render("DngNG_Encounters")%>
+
+:: DngNG_00_05 [Appartment]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%><div>
+As you hurry down some stairs you nearly trip about something and can barely avoid falling down heads over.<br>
+Its a wodden staff that caused your misfortune. Maybe you should 
+<a0 onclick='window.story.state.tmp.args[1]="StaffWodden";window.story.state.tmp.args[2]=50%;window.story.show("DngNG_PickupWeapon");'>take it with you</a>, it might be helpful to push off some troublemaker. 
+<a0 onclick='window.gm.toNextRoom();'>Ignore it</a></br>
+</article><article id="LogPanel"></article></section>
+<%=window.story.render("DngNG_Encounters")%>
+
 
 :: DngNG_00_99 [Appartment]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>

@@ -73,11 +73,14 @@ document.querySelector('#LinkO').addEventListener('click', function(){window.sto
 :: LogPanel
 <!--<button type="button" id="toggleview" onclick=toggleview()><i class="fa fa-compress"></i></button>
 <button type="button" id="clearview" onclick=clearview()><i class="fa fa-trash-alt"></i></button>-->
-<div><a0 onclick=toggleview()>toggle view</a><a0 onclick=clearview()>clear log</a></div>
+<div style="font-size: smaller;"><a0 onclick=toggleview()>toggle view</a><a0 onclick=clearview()>clear log</a></div>
 <div class="scroll" style="font-size: smaller;"><%=window.gm.getLog()%></br></div>
 <script>
 function toggleview(){
-  document.querySelector("section").classList.toggle("section_swap");
+  let list=document.querySelector("section").classList;
+  if(list.contains("log_fullview")) list.toggle("log_fullview"),list.toggle("log_hideview");
+  else if(list.contains("log_hideview")) list.toggle("log_hideview");
+  else list.toggle("log_fullview");
 }
 function clearview(){
   window.gm.clearLog();window.gm.refreshAllPanel();
