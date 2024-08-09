@@ -235,6 +235,19 @@ What are you going to do?</br>
 </article><article id="LogPanel"></article></section>
 <%=window.story.render("DngNG_Encounters")%>
 
+:: DngNG_00_04 [Appartment]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%><div>
+You pass a small store that doesn't seem to have been looted yet. The reason for this seems to be the massive rolling grille in front of the door and shop window. However, a window on the second floor seems to be ajar. If you could somehow lower the fire escape, you could get in.</br>
+<a0 onclick='window.gm.toNextRoom();'>Ignore it</a></br>
+<% if(window.gm.player.Inv.countItem("Rope")>0){ %>
+<a0 onclick=';'>Use a piece of rope to catch on the ladder. (While you are busy with this someone might sneak up to you)</a></br>
+<% }else{ %>
+<div>Actually you dont have an idea how to reach that high up.</div><br>
+<% } %>
+</div>
+</article><article id="LogPanel"></article></section>
+<%=window.story.render("DngNG_Encounters")%>
 
 :: DngNG_00_99 [Appartment]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>

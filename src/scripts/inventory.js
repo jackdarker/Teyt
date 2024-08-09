@@ -2,7 +2,7 @@
 class Item {
     constructor(name){
         this.id = this.name = name;  //id is unique in database(no whitespace !); name is for display
-        this.tags = [];
+        this.tags = [];this.stackLimit=0;
         this.bonus =[]; //Curse or Bonus assigned to item   //todo can ITEMS be cursed too?
         this.price=this.basePrice=10; //how much worth it is
     }
@@ -46,6 +46,7 @@ class Item {
             if(!this.tags.includes(tags[i])) this.tags.push(tags[i]);
         }
     }
+    get stackLimit(){return(this.stackLimit);} //0:infinite 
     //returns the svg-piture name to display in inventory or wardrobe
     get pictureInv(){return ("unknown")}
     //implement this for description
@@ -110,6 +111,13 @@ class Inventory {
         }
         return(ids);
     }
+    /** 
+    // override this
+    canAddItem(item,force){
+        let _rst={OK:true,msg:""};
+        return(_rst);
+    }
+     */
     addItem(item,count=1){
         var _i = this.findItemSlot(item.id);
         item._parent=window.gm.util.refToParent(this);
@@ -118,6 +126,7 @@ class Inventory {
         }
         else this.list[_i].count+=count;
         this.postItemChange(item.name,"added","");
+        //TODO return remaining items if >stackLimit
     }
     removeItem(id,count=1){
         var _i = this.findItemSlot(id);

@@ -89,6 +89,14 @@ class Gun extends Weapon {
     }*/
 }
 
+/**Infection
+ * "Some infection seems to root in your limbs/torso. It might have something to do with the bunny you met before."
+ * add Infection by POSTSEX, 
+ * after DELAY trigger mutation in X
+ * mutation MIGHT trigger infection in Y (depends on magnitude)  
+ * infection might be STOPPED or DELAYED by something
+ * infection in X might be overwritten or increased in magnitude (replace/merge)
+ */
 window.gm.ItemsLib = (function (ItemsLib){
     window.storage.registerConstructor(CraftMaterial);
     window.storage.registerConstructor(Gun);

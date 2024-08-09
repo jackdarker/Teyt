@@ -363,10 +363,15 @@ window.gm.initGame= function(forceReset,NGP=null){
     }
     if (!s.chars.GlobalChest||forceReset){  
       let ch = new Character();
-      ch.id="GlobalChest";
-      ch.name="GlobalChest";
+      ch.id=ch.name="GlobalChest";
       ch.faction="Player";
       s.chars.GlobalChest=ch;
+    }
+    if (!s.chars.LocalChest||forceReset){  //
+      let ch = new Character();
+      ch.id=ch.name="LocalChest";
+      ch.faction="Player";
+      s.chars.LocalChest=ch;
     }
     if (!s.combat||forceReset){ //see encounter & combat.js
       s.combat = {
