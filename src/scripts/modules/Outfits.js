@@ -789,14 +789,40 @@ class Skirt extends Equipment {
 }
 //this is an Inventory-item, not wardrobe
 class Crowbar extends Weapon {
-    constructor(){
-        super();this.id=this.name='Crowbar';
-        this.addTags(['tool', 'weapon']);
-        this.slotUse = ['RHand'];
-        this.lossOnRespawn = true;
+    static factory(style){
+        let x = new Crowbar();
+        x.style=style;
+        return(x);
     }
-    descLong(fconv){return(fconv('$[I]$ $[hold]$ a crowbar.'));}
-    get desc(){ return 'durable crowbar.';}
+    constructor(){
+        super();
+        this.addTags(['tool']);
+        this.slotUse = ['LHand'];
+        this.lossOnRespawn = true;
+        this.style=0;
+    }
+    set style(style){ 
+        this._style = style; 
+        if(style===0) this.id='Crowbar',this.name='Crowbar';
+        if(style===10) this.id='PipeWrench',this.name='Pipe Wrench';
+        if(style===20) this.id='Hammer',this.name='Hammer';
+        else throw new Error(this.id +' doesnt know '+style);
+    }
+    get style(){return this._style;}
+    get desc(){ 
+        let msg ='a crowbar';
+        switch(this._style){
+            case 10:
+                msg=('a heavy wrench');
+                break;
+            case 20:
+                msg=('a mechanicans hammer');
+                break;
+            default:
+        }
+        return(msg);
+    }
+    descLong(fconv){return(fconv('$[I]$ $[hold]$ a '+this.name+'.'));}
     toJSON(){return window.storage.Generic_toJSON("Crowbar", this); }
     static fromJSON(value){return(window.storage.Generic_fromJSON(Crowbar, value.data));}
 }
@@ -804,7 +830,7 @@ class Crowbar extends Weapon {
 class Shovel extends Weapon {
     constructor(){
         super();this.id=this.name='Shovel';
-        this.addTags(['tool', 'weapon']);
+        this.addTags(['tool']);
         this.slotUse = ['RHand','LHand'];
         this.lossOnRespawn = true;
     }
@@ -1209,6 +1235,7 @@ window.gm.ItemsLib = (function (ItemsLib){
     ItemsLib['GlovesRubber'] = function(){ let x= new BracerLeather();x.style=200;return(x); };
     //special wardrobe-item combination
     ItemsLib['Crowbar']  = function(){ return new Crowbar();};
+    ItemsLib['PipeWrench'] = function(){return(new Crowbar.factory(10));};
     ItemsLib['Shovel']  = function(){ return new Shovel();};
     ItemsLib['StaffWodden']  = function(){ return new StaffWodden();};
     ItemsLib['Handcuffs'] = function(){ return new HandCuffs();};

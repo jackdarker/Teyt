@@ -187,7 +187,7 @@ class Equipment extends Item {
 
 class Weapon extends Equipment {
     constructor(){
-        super();this.addTags(['weapon']);
+        super();this.addTags([window.gm.ItemTags.Weapon]);
     }
     usable(context){return(this.canEquip(context));}
     use(context){ //context here is inventory not outfit
@@ -406,7 +406,7 @@ class Outfit { //extends Inventory{
         //unequipped items go into wardrobe except bodyparts
         if(_item.hasTag('body')){
             //dont store bodyparts 
-        }else if(_item.hasTag('weapon')){
+        }else if(_item.hasTag(window.gm.ItemTags.Weapon)){
             this.parent.Inv.addItem(_item);
         } else {
             this.parent.Wardrobe.addItem(_item);

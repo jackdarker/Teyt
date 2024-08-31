@@ -357,6 +357,18 @@ for(var i=0;window.gm.shop.WaresToSell.length>i;i++){
 }
 </script>
 
+:: LocalChest [_back_ _nosave_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<a0 id='hint' onclick='(function($event){document.querySelector("#"+id+"~p").toggleAttribute("hidden");})(this);'>Hint</a>
+<p class='speech' hidden>The left column shows the items currently present in this location, the right one your inventory.<br>
+Use the arrows to move the items between the columns but remember: the space in your inventory might be limited.<br>
+When you leave the location, all items you didnt store in your inventory are lost.  
+</p>[[Done|_back_]]<p id="choice"></p><br><p id="output"></p>
+<br>[[Done|_back_]]
+</article><article id="LogPanel"></article></section>
+<script>window.gm.shop.printItemTransfer(window.story.state.chars.LocalChest,window.gm.player);
+</script>
+
 
 :: listbuy
 <!--this fragment can be used to setup a list of items to buy:

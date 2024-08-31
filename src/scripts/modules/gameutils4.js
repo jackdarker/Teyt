@@ -29,64 +29,42 @@ class CraftMaterial extends Item {
     static fromJSON(value){ return window.storage.Generic_fromJSON(CraftMaterial, value.data);};
 }
 
-class Gun extends Weapon {
+class PaddleWood extends Weapon {
     static factory(style){
-        let x = new Gun();
+        let x = new PaddleWood();
         x.style=style;
         return(x);
     }
+    toJSON(){return window.storage.Generic_toJSON("PaddleWood", this); }
+    static fromJSON(value){return(window.storage.Generic_fromJSON(PaddleWood, value.data));}
     constructor(){
         super();
         this.slotUse = ['RHand'];
-        this.style=0;
+        this.lossOnRespawn = true;this.style=0;
     }
     set style(style){ 
         this._style = style; 
-        if(style===0) this.id=this.name='Taser';
-        else if(style===100) this.id=this.name='Blaster';
-        else if(style===105) this.id=this.name='BlasterMK2';
-        else if(style===120) this.id=this.name='Cryonizer';
+        if(style===0) this.id='PaddleWood',this.name='Wooden Paddle';
         else throw new Error(this.id +' doesnt know '+style);
     }
     get style(){return this._style;}
     get desc(){ 
-        let msg ='';
+        let msg ='a steel dagger';
         switch(this._style){
-            case 0: msg+=(' pistol-like plastic tool that shocks someone with 30kV');  
-            break;
-            case 100: msg+=('scifi-revolver that fires a plasma-fireball');  
-            break;
-            case 105: msg+=('scifi-revolver that fires a bigger plasma-fireball');  
-            break;
-            case 120: msg+=('looks like a hair-dryer but can deep freeze something on short distance');  
-            break;
+            case 10:
+                msg=('a syringe filled with mysterious liquid');
+                break;
             default:
         }
         return(msg);
     }
-    toJSON(){return window.storage.Generic_toJSON("Gun", this); }
-    static fromJSON(value){return(window.storage.Generic_fromJSON(Gun, value.data));}
-    onEquip(context){
-        let res=super.onEquip(context);
-        if(res.OK){
-            let sk = new SkillSpark();
-            sk.weapon = this.id;
-            this.parent.parent.Skills.addItem(sk);  //todo
-        }
-        return(res);
-    }
-    onUnequip(context){
-        super.onUnequip(context)
-        this.parent.parent.Skills.removeItem('Spark');
-        return({OK:true, msg:'unequipped'});
-    }
-    /*attackMod(target){  //todo
+    attackMod(target){
         let mod = new SkillMod();
-        mod.onHit = [{ target:target, eff: [effDamage.factory(11,'blunt')]}];
-        mod.critChance=5;
-        mod.onCrit = [{ target:target, eff: [effDamage.factory(11,'blunt'), new effStunned()]}];
+        mod.onHit = [{ target:target, eff: [effDamage.factory(5,'blunt')]}];
+        mod.critChance=50;
+        mod.onCrit = [{ target:target, eff: [effDamage.factory(10,'blunt')]}];
         return(mod);
-    }*/
+    }
 }
 
 /**Infection
@@ -99,7 +77,7 @@ class Gun extends Weapon {
  */
 window.gm.ItemsLib = (function (ItemsLib){
     window.storage.registerConstructor(CraftMaterial);
-    window.storage.registerConstructor(Gun);
+    window.storage.registerConstructor(PaddleWood);
     ItemsLib['Shards'] = function(){ let x= new CraftMaterial();x.style=0;return(x);}
     ItemsLib['SilverShards'] = function(){ let x= new CraftMaterial();x.style=1;return(x);}
 
@@ -141,16 +119,16 @@ window.gm.build_DngNG=function(){
                 quest: [qExit], //
                 minTier: 0, 
                 maxTier: 1, 
-                tiles:[{id:"DngNG_00_00"},
+                tiles:[{id:"DngNG_00_05"},
                 {id:"DngNG_00_01"},
                 {id:"DngNG_00_02"},
-                {id:"DngNG_00_01"},
+                {id:"DngNG_00_05"},
                 {id:"DngNG_00_99"}]
             },
             {region: "Appartmentblock",  
                 quest: [qExit], //
-                minTier: 0, 
-                maxTier: 1, 
+                minTier: 1, 
+                maxTier: 2, 
                 tiles:[{id:"DngNG_00_03"},
                 {id:"DngNG_00_02"},
                 {id:"DngNG_00_01"},
@@ -160,7 +138,7 @@ window.gm.build_DngNG=function(){
             {region: "Suburbs",  
                 quest: [qExit], //
                 minTier: 1, 
-                maxTier: 1, 
+                maxTier: 2, 
                 tiles:[{id:"DngNG_01_03"},
                 {id:"DngNG_01_02"},
                 {id:"DngNG_01_01"},
@@ -171,6 +149,22 @@ window.gm.build_DngNG=function(){
         data.map= []; //the actual region-map
         data.tmp={tickPass:'', tier:0 ,region:"", room:-1 };
     }
+    //override to limit how much items player can pickup
+    window.story.state.chars.PlayerVR.Inv.canAddItem=function(item,count,force=false){
+        let list,_count=0,_rst={OK:true,msg:"",count:count};
+        if(item.hasTag(window.gm.ItemTags.Heal)){
+            list=this.findItemByTag(window.gm.ItemTags.Heal);
+            list.forEach(X=>{_count+=X.count();});
+            _rst.count=Math.max(0,Math.min((  3  -_count),_rst.count));
+            if(_rst.count<=0) {
+                _rst.OK=false;
+                _rst.msg="You cant carry more of those healing items.";
+            } else if(_rst.count<count){ 
+                _rst.msg="You can carry only some more of those healing items.";
+            }
+        }
+        return(_rst);
+    };
     //install function to calculate chance of evtLeave
     window.gm.encounterChance=function(evt){
         let res=100.0,s=window.story.state,dng=window.story.state.DngSY.dng;
@@ -253,35 +247,43 @@ window.gm.build_DngNG=function(){
             {catId:"slots",desc:"slots",
             items:[
                 {itmId:"BSlot1",name:"Benefit Slot A",cost:{token:1},disabled:false,slot:["A"],req:NOP,desc:"A benefit-slot where you can equip cards of type A"},
-                {itmId:"BSlot2",name:"Benefit Slot B",cost:{token:14},disabled:false,slot:["B"],req:NOP,desc:"A benefit-slot where you can equip cards of type B"},
+                {itmId:"BSlot2",name:"Benefit Slot B",cost:{token:15},disabled:false,slot:["B"],req:NOP,desc:"A benefit-slot where you can equip cards of type B"},
+                {itmId:"BSlot3",name:"Benefit Slot C",cost:{token:30},disabled:false,slot:["C"],req:NOP,desc:"A benefit-slot where you can equip cards of type C"},
                 {itmId:"TSlot1",name:"Tradeoff Slot A",cost:{token:5},disabled:false,slot:["A"],req:NOP,desc:"A tradeoff-slot where you can equip cards of type A"},
                 {itmId:"TSlot2",name:"Tradeoff Slot B",cost:{token:10},disabled:false,slot:["B"],req:NOP,desc:"A tradeoff-slot where you can equip cards of type B"},
             {itmId:"TSlot3",name:"Tradeoff Slot A/B",cost:{token:10},disabled:false,slot:["A","B"],req:NOP,desc:"A tradeoff-slot where you can equip cards of type A or B"}
             ]},
             {catId:"startgear",desc:"Starting Gear",
             items:[
-                {itmId:"Compass",name:"Compass",cost:{token:1},disabled:false,slot:['A'],req:NOP,desc:"a compass that makes it easier to navigate in some areas"},
-                {itmId:"ProteinBars",name:"a dozen proteinbars",cost:{token:1},disabled:false,slot:['A'],req:NOP,desc:"a package of powerbars so you dont need something you dont want"}
+                {itmId:"Compass",name:"Compass",cost:{token:1},disabled:false,slot:['A','C'],req:NOP,desc:"a compass that makes it easier to navigate in some areas"},
+                {itmId:"ProteinBars",name:"a couple proteinbars",cost:{token:1},disabled:false,slot:['A'],req:NOP,desc:"a package of powerbars to restore your energy"},
+                {itmId:"HealtPotion",name:"a couple small healthpotions",cost:{token:1},disabled:false,slot:['A','C'],req:NOP,desc:"a package of drinks to restore some health"}
+                //tool like crowbar
+                //replace standard outfit with ...
+                //grinder that converts unsused gear to money
             ]},
             {catId:"transformation",desc:"transformation boons",
             items:[
-                {itmId:"transformWeakOnly",name:"transformWeakOnly",cost:{token:2},disabled:false,slot:['B'],req:NOP,desc:"Transformations only take place in a weakend state."}
+                {itmId:"transformWeakOnly",name:"transformWeakOnly",cost:{token:2},disabled:true,slot:['B'],req:NOP,desc:"Transformations only take place in a weakend state."}
             ]},
             {catId:"itemMods",desc:"Item Mods",
             items:[
                 {itmId:"decreasedClothDurability",name:"decreased clothing durability",cost:{token:1},disabled:false,slot:['B'],req:exclude.bind(null,["increasedClothDurability"]),desc:"Clothes tend to break faster. Might help to get rid of some undesired things faster."},
                 {itmId:"increasedClothDurability",name:"increased clothing durability",cost:{token:1},disabled:false,slot:['B'],req:exclude.bind(null,["decreasedClothDurability"]),desc:"Clothes are much more durable, especially specific ones."}
+                //...but wear you find is already in bad shape 
             ]},
             {catId:"eventMods",desc:"Event Mods",
             items:[
                 {itmId:"moreHealItems",name:"increased drop rate of healing items",cost:{token:1},disabled:false,slot:['B'],req:NOP,desc:"You will have more luck in findig healing-items at the expenso of other items."},
                 {itmId:"postCombatHeal",name:"post combat healing",cost:{token:3},disabled:false,slot:['C'],req:NOP,desc:"After a fight, your health is restored somewhat but healing items are less effective."}
-                //increases the number of locations you have to pass through with a good chance that there is loot;  
+                //increases the number of locations you have to pass through with a good chance that there is loot;
+                //reduced risk to get suprised but ...  
             ]},
             {catId:"weirdMods",desc:"Mods that dont require slots",
             items:[
                 {itmId:"noTierUp",name:"manually select if you increase tier or not (doesnt require card-slot!)",cost:{token:15},disabled:false,slot:[],req:NOP,desc:"After successful completion of a region, the tier usually increases automatically. This mod gives you the option to bypass this."},
                 {itmId:"noRegionTier",name:"removes the region-restriction by tier (doesnt require card-slot!)",cost:{token:15},disabled:false,slot:[],req:NOP,desc:"Usually the selected region is restricted by tier (thatswhy you always start in Appartmentblock). This mod gives you the option to remove the restriction."},
+                {itmId:"displayCorruption",name:"display Corruption-Stat (doesnt require card-slot!)",cost:{token:100},disabled:false,slot:[],req:NOP,desc:"enables the Corruption Indicator to give an indication why your corruption increases"}
             ]}
         ];
         window.gm.NGP.catalogToList=function(){ //converts catalog tree into flat item list
@@ -311,10 +313,9 @@ window.gm.build_DngNG=function(){
 
     return({map:data.map,data:data});
 };
-//TODO override postVictory
-window.gm.postTrial=function(data){
-    //proceed to next room
-    //or get punished
+//override postVictory
+window.gm.postVictory=function(params){
+    window.gm.toNextRoom();
 }
 window.gm.renderRoomNG= function(room){ //see also window.gm.renderRoom
     let msg="",s=window.story.state, dng=s.DngSY.dng;

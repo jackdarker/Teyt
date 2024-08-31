@@ -863,11 +863,14 @@ window.gm.printItem= function( id,descr,carrier,useOn=null ){
  * prints a list of items/wardrobe and buttons to transfer them
  * @param {*} from 
  * @param {*} to 
- */
+ */   // see also window.gm.shop.printItemTransfer
 window.gm.printItemTransfer = function(from,to,wardrobe){
   let listFrom,listTo;
-  if(wardrobe) listFrom=from.Wardrobe.getAllIds(), listTo=to.Wardrobe.getAllIds(); 
-  else listFrom=from.Inv.getAllIds(), listTo=to.Inv.getAllIds();
+  if(wardrobe) {
+    listFrom=from.Wardrobe.getAllIds(), listTo=to.Wardrobe.getAllIds(); 
+  } else {
+    listFrom=from.Inv.getAllIds(), listTo=to.Inv.getAllIds();
+  }
   let allIds = new Map();
   for(let n of listTo){
     allIds.set(n,{name:wardrobe?to.Wardrobe.getItem(n).name:to.Inv.getItem(n).name});
@@ -909,7 +912,7 @@ window.gm.printItemTransfer = function(from,to,wardrobe){
     g.href='javascript:void(0)',g.textContent='take all';
     g.addEventListener("click",give.bind(null,id,count,to,from));
     if(count>0) entry.appendChild(g)
-    $("div#choice")[0].appendChild(entry);      // <- requires this node in html
+    document.getElementById('choice').appendChild(entry);      // <- requires this node in html
   }
 }
 //prints an equipment with description; used in wardrobe

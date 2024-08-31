@@ -120,6 +120,17 @@ window.story.show("DngNG_Lectern_Take")
 
 :: DngNG_Encounters
 <script>
+function escapeTreasure(){
+  var s=window.story.state;
+  var shards = s.DngNG.tmp.room*(1+s.DngNG.tmp.tier); //TODO
+  window.story.state.tmp.args[1]=shards;
+  window.gm.printOutput('As a reward you get '+shards+' shards.');
+}
+function escapedRegion(){
+  window.gm.player.Inv.addItem(window.gm.ItemsLib.Shards(),window.story.state.tmp.args[1])
+  window.story.state.DngNG.tmp.tier++;
+  window.story.show("DngNG_MissionDebriefing")
+}
 function fightLapine(){
     window.gm.encounters.lapine({amount:1,levelUp:-3, noStart:true});
     var _oldVictory=window.gm.Encounter.onVictory.bind(window.gm.Encounter);
@@ -199,26 +210,12 @@ Inspecting the <%=window.story.state.tmp.args[1]%> , you guess it has <%=window.
 <br>You could drop and replace your current lefthand/ righthand weapon with this.
 | As you are right now barehanded, you should call yourself happy to use this as a weapon of choice.
 | Unfortunatly you are missing proper hands to make use of this thing.
-| You could also add it to your [[inventory|DngNG_LocalChest]].
+| You could also add it to your [[inventory|LocalChest]].
 <br>The window.story.state.tmp.args[1] that you already use as a weapon cant be further repaired with this new one.
 | The window.story.state.tmp.args[1] that you already use could be <a0 onclick=';'>repaired by % </a> dishelving this one.</br>
 <a0 onclick='window.gm.toNextRoom();'>Leave it alone</a></br></div>
 </article><article id="LogPanel"></article></section>
 <script>window.gm.printOutput("nothing to repair","#choice")
-</script>
-
-:: DngNG_LocalChest [_back_]
-<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%window.gm.player.location=window.passage.name;%><div>
-<a0 id='hint' onclick='(function($event){document.querySelector("#"+id+"~p").toggleAttribute("hidden");})(this);'>Hint</a>
-<p class='speech' hidden>The left column shows the items currently present in this location, the right one your inventory.<br>
-Use the arrows to move the items between the columns but remember: the space in your inventory might be limited.<br>
-When you leave the location, all items you didnt store in your inentory are lost.  
-</p>
-
-<br>[[Done|_back_]]
-</article><article id="LogPanel"></article></section>
-<script>//updateTable
 </script>
 
 
@@ -285,8 +282,29 @@ You pass a small store that doesn't seem to have been looted yet. The reason for
 <%window.gm.player.location=window.passage.name;%><div>
 As you hurry down some stairs you nearly trip about something and can barely avoid falling down heads over.<br>
 Its a wodden staff that caused your misfortune. Maybe you should 
-<a0 onclick='window.story.state.tmp.args[1]="StaffWodden";window.story.state.tmp.args[2]=50%;window.story.show("DngNG_PickupWeapon");'>take it with you</a>, it might be helpful to push off some troublemaker. 
+<a0 onclick='foo();'>take it with you</a>, it might be helpful to push off some troublemaker. 
 <a0 onclick='window.gm.toNextRoom();'>Ignore it</a></br>
+</article><article id="LogPanel"></article></section>
+<%=window.story.render("DngNG_Encounters")%>
+<script>function foo(){
+  window.story.state.chars.LocalChest.Inv.removeAll();
+  window.story.state.chars.LocalChest.Wardrobe.removeAll();
+  window.story.state.chars.LocalChest.changeInventory(window.gm.ItemsLib["StaffWodden"](),1);
+  window.story.state.chars.LocalChest.changeInventory(window.gm.ItemsLib["ShortsDenim"](),1);
+  window.story.state.chars.LocalChest.changeInventory(window.gm.ItemsLib["HealthPotionSmall"](),4);
+  window.story.state.tmp.args[1]="StaffWodden";
+  window.story.state.tmp.args[2]=50;
+  window.story.show("DngNG_PickupWeapon");
+}
+</script>
+
+
+:: DngNG_00_06 [Appartment]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%><div>
+Passing through a shady passage, you have the feeling that something threadful is waiting for you.<br>
+Should you <a0 onclick='window.gm.toNextRoom();'>make haste</a> to get through this area or better <a0> move carefully</a> ?</br>
+</div>
 </article><article id="LogPanel"></article></section>
 <%=window.story.render("DngNG_Encounters")%>
 
@@ -296,16 +314,11 @@ Its a wodden staff that caused your misfortune. Maybe you should
 <%window.gm.player.location=window.passage.name;%><div>
 You have finally arrived at the border of the <%=window.story.state.DngNG.tmp.region%>.</br>
 <div id='output'></div>
-<a0 onclick='foo();'>Next</a></br></div>
+<a0 onclick='escapedRegion();'>Next</a></br></div>
 </article><article id="LogPanel"></article></section>
-<script>function foo(){
-  window.gm.player.Inv.addItem(window.gm.ItemsLib.Shards(),shards)
-  window.story.state.DngNG.tmp.tier++;
-  window.story.show("DngNG_MissionDebriefing")
-}
-var s=window.story.state;
-var shards = s.DngNG.tmp.room*(1+s.DngNG.tmp.tier); //TODO 
-window.gm.printOutput('As a reward you get '+shards+' shards.');
+<%=window.story.render("DngNG_Encounters")%>
+<script>
+escapeTreasure();
 </script>
 
 
@@ -352,12 +365,27 @@ Someone is running down the walkway. Maybe its just a jogger, but it could also 
 <%=window.story.render("DngNG_Encounters")%>
 
 
+:: DngNG_01_04
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%><div>
+<!--TODO -->
+While squezzing through a fence your ... got stuck and you are at risk of damaging or even breaking it if you arent careful. </br>
+</br>
+<a0 onclick='window.gm.toNextRoom();'>Just force your way through and risk the damage</a></br>
+<a0 onclick=';'>Avoid damage even if it causes some hurt</a></br>
+<a0 onclick=';'>Leave the garment behind</a></br></div>
+</article><article id="LogPanel"></article></section>
+<%=window.story.render("DngNG_Encounters")%>
+<script></script>
+
 :: DngNG_01_99
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><div>
-<!-- EXIT -->
+You have finally arrived at the border of the <%=window.story.state.DngNG.tmp.region%>.</br>
+<div id='output'></div>
+<a0 onclick='escapedRegion();'>Next</a></br></div>
 </article><article id="LogPanel"></article></section>
+<%=window.story.render("DngNG_Encounters")%>
 <script>
-window.story.state.DngNG.tmp.tier++;
-window.story.show("DngNG_MissionDebriefing")
+escapeTreasure();
 </script>

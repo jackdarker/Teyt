@@ -491,7 +491,7 @@ function findWares(){
         }
     }
     window.gm.shop.WaresToBuy = list2;
-    window.gm.shop.findWaresToSell([window.gm.ItemTags.Ingredient]);
+    window.gm.shop.findWaresToSell(window.gm.player,[window.gm.ItemTags.Ingredient]);
 }
 findWares();
 if(_sell){renderToSelector("#panel", "listsell") }else{ renderToSelector("#panel", "listbuy")};
