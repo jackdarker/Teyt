@@ -173,7 +173,7 @@ window.gm.shop.printItemTransfer = function(whom1,whom2,TagsAllowed,TagsNotAllow
   }
   function equip(item,amount,charA,charB){
     let item2 = window.gm.util.deepClone(item);//item = window.gm.ItemsLib[id](); doesnt work for dynamic created items
-    let _rst=charB.Wardrobe.addItem(item2);
+    let _rst=charB.changeInventory(item2,amount);
     _rst=charB.Outfit.addItem(item2);
     charA.changeInventory(item,-1*amount);
     window.gm.refreshAllPanel();
@@ -191,12 +191,12 @@ window.gm.shop.printItemTransfer = function(whom1,whom2,TagsAllowed,TagsNotAllow
     entry.appendChild(button);
     if(X.item.canEquip){
       button=document.createElement('button');
-      button.textContent="equip other";
+      button.textContent="equip "+whom2.name;
       button.addEventListener("click",equip.bind(null,X.item,1,whom1,whom2));
       entry.appendChild(button);
     } else if(X.item.usable){
       button=document.createElement('button');
-      button.textContent="use other";
+      button.textContent="use on "+whom2.name;
       button.addEventListener("click",use.bind(null,X.item,1,whom1,whom2));
       entry.appendChild(button);
     }

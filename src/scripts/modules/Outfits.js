@@ -449,7 +449,7 @@ class RobesZealot extends Equipment {
     }
     constructor(){
         super('RobesZealot');
-        this.addTags(['cloth']);
+        this.addTags(['cloth',window.gm.ItemTags.Wear]);
         this.slotUse = ['Breast','Stomach'];//,'Hips','Legs'];
         this.slotCover = ['bBreast','uBreast','pNipples','bPenis','bVulva','bBalls','bClit','bAnus','pPenis','pClit'];    
         this.lossOnRespawn = true;this.style=0;
@@ -478,7 +478,7 @@ class RobesZealot extends Equipment {
 class HarnessRubber extends Equipment {
     constructor(){
         super('HarnessRubber');
-        this.addTags(['rubber']);
+        this.addTags(['rubber',window.gm.ItemTags.Wear]);
         this.slotUse = ['Breast','Stomach'];
         this.slotCover = ['bBreast','uBreast'];    
         this.lossOnRespawn = true;
@@ -495,7 +495,7 @@ class Briefs extends Equipment {
     }
     constructor(){
         super('Briefs');
-        this.addTags(['cloth']);
+        this.addTags(['cloth',window.gm.ItemTags.Wear]);
         this.slotUse = ['uHips'];
         this.slotCover = ['bPenis','bVulva','bBalls','bClit','bAnus','pPenis','pClit'];    
         this.lossOnRespawn = true;this.style=0;
@@ -531,7 +531,7 @@ class AnalPlug extends Equipment {
     constructor(){
         super('AnalPlug');
         this.addTags(['ButtPlug']);
-        this.slotUse = ['uAnus'];
+        this.slotUse = ['uAnus',window.gm.ItemTags.Wear];
         this.slotCover = [];    
         this.lossOnRespawn = false;
         this.style=0,this.lewd.slut = 3;
@@ -579,7 +579,7 @@ class CockRing extends Equipment {
     constructor(){
         super('CockRing');
         this.addTags(['lewd']);
-        this.slotUse = ['uPenis'];
+        this.slotUse = ['uPenis',window.gm.ItemTags.Wear];
         this.slotCover = [];    
         this.lossOnRespawn = false;
         this.style=0,this.lewd.slut = 1;
@@ -612,7 +612,7 @@ class ChastityBelt extends Equipment {
     }
     constructor(){
         super('ChastityBelt');
-        this.addTags(['steel']);
+        this.addTags(['steel',window.gm.ItemTags.Wear]);
         this.slotUse = ['uPenis','uVulva'];
         this.slotCover = ['bPenis','bVulva','bClit','pPenis','pClit'];    
         this.lossOnRespawn = false;
@@ -646,7 +646,7 @@ class BikiniBottomLeather extends Equipment {
     }
     constructor(){
         super('BikiniBottomLeather');
-        this.addTags(['cloth']);
+        this.addTags(['cloth',window.gm.ItemTags.Wear]);
         this.slotUse = ['uHips'];
         this.slotCover = ['bPenis','bVulva','bBalls','bClit','bAnus','pPenis','pClit'];    
         this.lossOnRespawn = true;this.style=0;
@@ -678,7 +678,7 @@ class BikiniTopLeather extends Equipment {
     }
     constructor(){
         super('BikiniTopLeather');
-        this.addTags(['cloth']);
+        this.addTags(['cloth',window.gm.ItemTags.Wear]);
         this.slotUse = ['uBreast'];
         this.slotCover = ['pNipples'];    
         this.lossOnRespawn = true;this.style=0;
@@ -712,7 +712,7 @@ class ShortsLeather extends Equipment {
     }
     constructor(){
         super();
-        this.addTags(['cloth']);
+        this.addTags(['cloth',window.gm.ItemTags.Wear]);
         this.slotUse = ['Hips','Legs'];
         this.slotCover = ['bPenis','bVulva','bBalls','bClit','bAnus','pPenis','pClit'];   
         this.lossOnRespawn = true;this.style=0;
@@ -760,7 +760,7 @@ class Skirt extends Equipment {
     }
     constructor(){
         super();
-        this.addTags(['cloth']);
+        this.addTags(['cloth',window.gm.ItemTags.Wear]);
         this.slotUse = ['Hips','Legs'];
         this.slotCover = ['bPenis','bVulva','bBalls','bClit','bAnus','pPenis','pClit'];   
         this.lossOnRespawn = true;this.style=0;

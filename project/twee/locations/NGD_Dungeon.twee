@@ -137,19 +137,37 @@ function fightLapine(){
     //window.gm.Encounter.onVictory= function(){;return(_oldVictory());}
     window.gm.Encounter.initCombat();
 }
+function fightCat(){
+    window.gm.encounters.cat({amount:1,levelUp:-2, noStart:true});
+    var _oldVictory=window.gm.Encounter.onVictory.bind(window.gm.Encounter);
+    //window.gm.Encounter.onVictory= function(){;return(_oldVictory());}
+    window.gm.Encounter.initCombat();
+}
 function openBox(){
     window.story.state.tmp.args[1]=["HealthPotionSmall"];
     window.story.show("DngNG_BoxOpened");
 }
 </script>
 
+:: DngNG_GameOver [_nosave_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<div> Your travel comes to an end .... TODO flavour
+</div>
+<p>But you might try [[another time|DngNG_Home]]</p>
+<a0 onclick='(function($event){document.querySelector("#"+id+"~p").toggleAttribute("hidden");})(this);'>Hint</a>
+<p hidden>Keep your unlocks but loose all items.</p>
+<a0 onclick='window.gm.toNextRoom();'>Go on</a></br>
+</article><article id="LogPanel"></article></section>
+<%=window.story.render("DngNG_Encounters")%>
+
+
 :: DngNG_Defeat [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <div>
-- can you spend an extra life to repeat location?
-- can you spend a continue to repeat region
+- can you spend an extra life to repeat location?<br>
+- can you spend a continue to repeat region<br>
 </div>
-<p>otherwise game over with flavour and back to [[DngNG_Home]]
+<p>otherwise <a0 onclick='window.story.state.DngNG.TimesDefeat++;window.story.show("DngNG_GameOver");'>Game Over</a>
 </p>
 <a0 onclick='window.gm.toNextRoom();'>Go on</a></br>
 </article><article id="LogPanel"></article></section>
@@ -211,8 +229,8 @@ Inspecting the <%=window.story.state.tmp.args[1]%> , you guess it has <%=window.
 | As you are right now barehanded, you should call yourself happy to use this as a weapon of choice.
 | Unfortunatly you are missing proper hands to make use of this thing.
 | You could also add it to your [[inventory|LocalChest]].
-<br>The window.story.state.tmp.args[1] that you already use as a weapon cant be further repaired with this new one.
-| The window.story.state.tmp.args[1] that you already use could be <a0 onclick=';'>repaired by % </a> dishelving this one.</br>
+<br>The <%=window.story.state.tmp.args[1]%> that you already use as a weapon cant be further repaired with this new one.<br>
+| The <%=window.story.state.tmp.args[1]%> that you already use could be <a0 onclick=';'>repaired by % </a> dishelving this one.</br>
 <a0 onclick='window.gm.toNextRoom();'>Leave it alone</a></br></div>
 </article><article id="LogPanel"></article></section>
 <script>window.gm.printOutput("nothing to repair","#choice")
@@ -343,7 +361,7 @@ The door to a garage is open. Do you dare look inside to see if there is somethi
 <%=window.story.render("DngNG_Encounters")%>
 
 
-:: DngNG_01_02
+:: DngNG_01_02 [Suburbs]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><div>
 <!--prepare repairscreen-->
@@ -352,7 +370,7 @@ The door to a garage is open. Do you dare look inside to see if there is somethi
 <script>window.story.state.tmp.args[1]=1;window.story.show("DngNG_Workbench");</script>
 
 
-:: DngNG_01_03
+:: DngNG_01_03 [Suburbs]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><div>
 Someone is running down the walkway. Maybe its just a jogger, but it could also be a threat.</br>
@@ -365,7 +383,7 @@ Someone is running down the walkway. Maybe its just a jogger, but it could also 
 <%=window.story.render("DngNG_Encounters")%>
 
 
-:: DngNG_01_04
+:: DngNG_01_04 [Suburbs]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><div>
 <!--TODO -->
@@ -378,7 +396,15 @@ While squezzing through a fence your ... got stuck and you are at risk of damagi
 <%=window.story.render("DngNG_Encounters")%>
 <script></script>
 
-:: DngNG_01_99
+:: DngNG_01_05 [Suburbs]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%><div>
+As you stroll along, you nearly topple about your feet as something <a0 onclick="fightCat()">hit you in the back</a>.</br>
+</br>
+</article><article id="LogPanel"></article></section>
+<%=window.story.render("DngNG_Encounters")%>
+
+:: DngNG_01_99 [Suburbs]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><div>
 You have finally arrived at the border of the <%=window.story.state.DngNG.tmp.region%>.</br>

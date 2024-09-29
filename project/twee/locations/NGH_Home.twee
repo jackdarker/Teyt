@@ -39,15 +39,23 @@ Beeing quiete in a hurry you dont think alot of what to take with you and just l
 <%}else{%>
 Checking on your city-map you guess the next region you pass through is <%=window.story.state.DngNG.tmp.region%> at tier of <%=window.story.state.DngNG.tmp.tier%>
 </br>TODO Take care of your "needs"
+<%}%>
+<%if(window.story.state.DngNG.TimesDefeat>0 || window.story.state.DngNG.TimesVictory>0 || window.story.state.DngNG.tmp.tier>=1){%>
 </br>Think about what you should take with you on your travel:
 </br>[[Check the upgrade-shop|DngNG_NGPShop]] 
 </br>Or you just [[trade common items|DngNG_GearTrader]].
 </br>[[Configure your loadout|DngNG_Loadout]]
-<%}%>
+</br><a0 onclick='($("tw-passage").fadeOut(1000, function(){sleep()}));'>Sleep</a> 
 <hr></br>
-[[Start your journey|DngNG_RegionIntro]]</a></br>
+[[Continue your journey|DngNG_RegionIntro]]</a></br>
 </article><article id="LogPanel"></article></section>
-
+<script> function sleep(){
+    window.gm.player.this.Stats.increment("health",9999);
+    window.gm.player.this.Stats.increment('energy',9999);
+    window.gm.player.this.Stats.increment('will',9999);
+    window.story.show(window.passage.name);
+}
+</script>
 
 :: DngNG_GearTrader [_back_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
@@ -63,7 +71,7 @@ TODO Sell/buy items from loadout and global chest. <a0 id='helpgeartrader' oncli
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%></br>
 <p>You escaped from <%=window.story.state.DngNG.tmp.region%> and may take a breather. But you cant stay here to long. Check your gear and fix yourself up and then move on.</p>
-<p>Having earned xx shards, you might think of upgrading your skills.</p>
+<p>Having earned some shards, you might think of upgrading your skills.</p>
 <hr>
 <p>Choose which path you want to follow: </p>
 TODO show region-progress
@@ -73,6 +81,7 @@ TODO depending on progress and difficulty show list of next target
 </article><article id="LogPanel"></article></section>
 <script> function start(){
     var s = window.story.state;
+    s.DngNG.tmp.room=0;
     s.DngNG.rerollRegion();
     if(s.DngNG.tmp.region!="") {
         s.DngNG.rerollTiles(s.DngNG.tmp.region,s.DngNG.tmp.tier); 
@@ -84,6 +93,7 @@ TODO depending on progress and difficulty show list of next target
 :: DngNG_RegionIntro
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%></br>
+Ahead of you lies <%=window.story.state.DngNG.tmp.region%>.<br>
 <% if(window.story.state.DngNG.tmp.region=="Appartmentblock"){%>
 This area you know pretty well because you live here a couple of years now. Commoners ... 
 <%} else if(window.story.state.DngNG.tmp.region=="Suburbs"){%>
@@ -153,9 +163,9 @@ function update(){
                 listslots.forEach(y=>{  // [A,B] [B,D] -> OK
                     if(y.slot.some(z=>{return(itm2.slot.includes(z));})){
                         if(s.NGP[y.itmId]==itm2.itmId){//todo: show "equipped" if already assigned to this slot
-                            printbuttons+='EQUIPPED';
+                            printbuttons+='<button type=\"button\" onclick=\'equip(\"'+y.itmId+'\",\"'+itm2.itmId+'\");\'>Unequip</button>';
                         }else{
-                            printbuttons+='<button type=\"button\" onclick=\'equip(\"'+y.itmId+'\",\"'+itm2.itmId+'\");\'>'+y.name+'</button>';
+                            printbuttons+='<button type=\"button\" onclick=\'equip(\"'+y.itmId+'\",\"'+itm2.itmId+'\");\'>Equip '+y.name+'</button>';
                         }
                     }
                 })
@@ -166,8 +176,14 @@ function update(){
     window.gm.printOutput(printslot,'div#slotuse');
     window.gm.printOutput(printcard,'div#cards');
 }
-function equip(slotId,itemId){
+function equip(slotId,itemId){  //NGP.BSlot1="ProteinBars"  or NGP.BSlot1=1   
     let s=window.story.state,itm,_rst;
+    if(s.NGP[slotId]==itemId){ //uneqip
+        s.NGP[slotId]=1;
+        window.gm.printOutput("",'div#output');
+        update();
+        return;
+    }
     itm=window.gm.NGP.findItem(itemId);
     //if requirements failed
     _rst=itm.req();
@@ -233,7 +249,13 @@ function resetAll(){
     window.gm.printOutput("","#output2");
 }
 function updateText(event) {
-    let msg=(!!ctrlItem.selectedObject?ctrlItem.selectedObject.desc:"");
+    let msg="";
+    if(!!ctrlItem.selectedObject){
+        msg=ctrlItem.selectedObject.desc+'\n';
+        let slots = ctrlItem.selectedObject.slot;
+        if(slots.length>0) msg+='compatible slots: '+slots.toString();
+        else msg="doesnt need a slot";
+    }
     window.gm.printOutput(msg,"#output");
     window.gm.printOutput("Shards left:"+(window.gm.player.Inv.countItem('Shards') /*s.NGP.token-s.NGP.tokenUsed*/),"#tokens");
 }

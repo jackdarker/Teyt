@@ -102,7 +102,7 @@ window.gm.build_DngNG=function(){
             mob:type,pos:pos,path:[pos],state:0,tick:'',att:0,timerA:0,timerB:0});
     }
     let s = window.story.state,data;
-
+    
     /////// --!!!!
     const version=1;
     ////// -- !!!!                          // <== increment this if you change anything below - it will reinitialize data !
@@ -110,45 +110,48 @@ window.gm.build_DngNG=function(){
         data=s.DngNG;
     } else {
         data=s.DngNG,data.version=version;
-        //this defines the possible region layouts; one of it is selected
-        //questtypes
-        const qExit = "exit"    //just reach exit
-        const qFind = "find"    //find a weapon
-        data.Regions = [ //database of region-layouts
-            {region: "Appartmentblock",  
-                quest: [qExit], //
-                minTier: 0, 
-                maxTier: 1, 
-                tiles:[{id:"DngNG_00_05"},
-                {id:"DngNG_00_01"},
-                {id:"DngNG_00_02"},
-                {id:"DngNG_00_05"},
-                {id:"DngNG_00_99"}]
-            },
-            {region: "Appartmentblock",  
-                quest: [qExit], //
-                minTier: 1, 
-                maxTier: 2, 
-                tiles:[{id:"DngNG_00_03"},
-                {id:"DngNG_00_02"},
-                {id:"DngNG_00_01"},
-                {id:"DngNG_00_00"},
-                {id:"DngNG_00_99"}]
-            },
-            {region: "Suburbs",  
-                quest: [qExit], //
-                minTier: 1, 
-                maxTier: 2, 
-                tiles:[{id:"DngNG_01_03"},
-                {id:"DngNG_01_02"},
-                {id:"DngNG_01_01"},
-                {id:"DngNG_01_00"},
-                {id:"DngNG_01_99"}]
-            }
-        ]
+        data.TimesDefeat=0;data.TimesVictory=0;
         data.map= []; //the actual region-map
         data.tmp={tickPass:'', tier:0 ,region:"", room:-1 };
     }
+    //this defines the possible region layouts; one of it is selected
+    //questtypes
+    const qExit = "exit"    //just reach exit
+    const qFind = "find"    //find a weapon
+    data.Regions = [ //database of region-layouts
+        {region: "Appartmentblock",  
+            quest: [qExit], //
+            minTier: 0, 
+            maxTier: 1, 
+            tiles:[{id:"DngNG_00_05"},
+            {id:"DngNG_00_01"},
+            {id:"DngNG_00_02"},
+            {id:"DngNG_00_05"},
+            {id:"DngNG_00_99"}]
+        },
+        {region: "Appartmentblock",  
+            quest: [qExit], //
+            minTier: 1, 
+            maxTier: 2, 
+            tiles:[{id:"DngNG_00_03"},
+            {id:"DngNG_00_02"},
+            {id:"DngNG_00_01"},
+            {id:"DngNG_00_00"},
+            {id:"DngNG_01_05"},
+            {id:"DngNG_00_99"}]
+        },
+        {region: "Suburbs",  
+            quest: [qExit], //
+            minTier: 1, 
+            maxTier: 2, 
+            tiles:[{id:"DngNG_01_03"},
+            {id:"DngNG_01_02"},
+            {id:"DngNG_01_01"},
+            {id:"DngNG_01_00"},
+            {id:"DngNG_01_05"},
+            {id:"DngNG_01_99"}]
+        }
+    ]
     //override to limit how much items player can pickup
     window.story.state.chars.PlayerVR.Inv.canAddItem=function(item,count,force=false){
         let list,_count=0,_rst={OK:true,msg:"",count:count};
@@ -158,9 +161,9 @@ window.gm.build_DngNG=function(){
             _rst.count=Math.max(0,Math.min((  3  -_count),_rst.count));
             if(_rst.count<=0) {
                 _rst.OK=false;
-                _rst.msg="You cant carry more of those healing items.";
+                _rst.msg=this.parent.name+" cant carry more of those healing items.";
             } else if(_rst.count<count){ 
-                _rst.msg="You can carry only some more of those healing items.";
+                _rst.msg=this.parent.name+" can carry only some more of those healing items.";
             }
         }
         return(_rst);

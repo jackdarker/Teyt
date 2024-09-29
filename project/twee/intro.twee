@@ -88,30 +88,7 @@ You might see a lot of links that are formated red-strikethrough. Those are curr
 You need to fight your way through different parts of the city and try to stay clear of the infection - or not.</br></br>
 The game is meant to be played multiple times, each playthrough might unlock more stuff. F.e. people you meet will remember how you acted before.  
 </p>
-<p><a0 onclick='start();'>Start</a></p><hr>
-<label>length:
-    <select id="length">
-        <option value="1">1</option><option value="2" >2</option><option value="3" >3</option><option value="4" selected>4</option>
-        <option value="5" >5</option><option value="6" >6</option><option value="7" >7</option><option value="8" >8</option>
-    </select>
-</label>
-<label>add doors:
-    <select id="extradoors">
-        <option value="0">0</option><option value="1" selected>1</option><option value="2" >2</option><option value="3" >3</option><option value="4" >4</option>
-    </select>
-</label>
-<label>naming:
-    <select id="naming">
-        <option value="A1" selected>A1</option><option value="-12_1">-12_1</option><option value="-12_+01" >-12_+01</option>
-    </select>
-</label></br>
-<label>branches:
-    <select id="branches">
-        <option value="0" selected>0</option><option value="1">1</option><option value="2" >2</option>
-    </select>
-</label>
-</p><hr>
-<hr><div id='canvas'style='max-height: 256px;overflow: auto;'></div><div id='svgpopup'></div></br>
+<p><a0 onclick='start();'>Start</a></p>
 </article>
 <script> function start(){
     var s = window.story.state,map,data;
@@ -123,16 +100,6 @@ The game is meant to be played multiple times, each playthrough might unlock mor
     window.gm.enterVR();
     window.gm.player.levelUp(5);window.gm.player.autoLeveling();
     window.gm.player.Outfit.removeItem("StaffWodden");window.gm.player.Inv.removeItem("StaffWodden");
-}
-function startRandom(){
-    window.story.state.DngSY.remainingNights=0,window.story.state.DngSY.dngLevel=0;
-    window.story.state.vars.spawnAt="DngNG_Home";
-    var selLength=document.getElementById('length'),selDoors=document.getElementById('extradoors'),selName=document.getElementById('naming');
-    var selBranches=document.getElementById('branches')
-    var length=selLength.options[selLength.selectedIndex].value,doors=selDoors.options[selDoors.selectedIndex].value,naming=selName.options[selName.selectedIndex].value;
-    var branches=selBranches.options[selBranches.selectedIndex].value;
-    window.story.state.tmp = window.GenerateDng.DngGen.generate({length:length,doors:doors,naming:naming,branches:branches});
-    window.gm.printMap2(window.story.state.tmp,'','',null);
 }
 </script>
 
