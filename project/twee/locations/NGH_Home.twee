@@ -45,24 +45,25 @@ Checking on your city-map you guess the next region you pass through is <%=windo
 </br>[[Check the upgrade-shop|DngNG_NGPShop]] 
 </br>Or you just [[trade common items|DngNG_GearTrader]].
 </br>[[Configure your loadout|DngNG_Loadout]]
-</br><a0 onclick='($("tw-passage").fadeOut(1000, function(){sleep()}));'>Sleep</a> 
+</br><a0 onclick='($("tw-passage").fadeOut(1000, function(){sleep()}));'>Sleep</a>
+<%}%>
 <hr></br>
 [[Continue your journey|DngNG_RegionIntro]]</a></br>
 </article><article id="LogPanel"></article></section>
 <script> function sleep(){
-    window.gm.player.this.Stats.increment("health",9999);
-    window.gm.player.this.Stats.increment('energy',9999);
-    window.gm.player.this.Stats.increment('will',9999);
+    window.gm.player.Stats.increment("health",9999);
+    window.gm.player.Stats.increment('energy',9999);
+    window.gm.player.Stats.increment('will',9999);
     window.story.show(window.passage.name);
 }
 </script>
+
 
 :: DngNG_GearTrader [_back_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%></br>
 TODO Sell/buy items from loadout and global chest. <a0 id='helpgeartrader' onclick='(function($event){document.querySelector("#"+id+"~p").toggleAttribute("hidden");})(this);'>Hint</a>
 <p hidden> Weapons are used in combat (or to intimidate someone to avoid combat). </br>
-
 </br>[[Back|_back_]]
 </article><article id="LogPanel"></article></section>
 
