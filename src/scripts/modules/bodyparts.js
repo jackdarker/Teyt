@@ -146,6 +146,8 @@ class FaceHuman extends BodyPart {
                 break;
             case 'elve':
                 break;
+            case 'imp':
+                break;
             default:
                 throw new Error("unknown Face-style "+id);
         }
@@ -156,7 +158,7 @@ class FaceHuman extends BodyPart {
     toJSON(){return window.storage.Generic_toJSON("FaceHuman", this); };
     static fromJSON(value){return(window.storage.Generic_fromJSON(FaceHuman, value.data));}
     descLong(fconv){
-        return(fconv('$[My]$ face ressembles that of a human.'));
+        return(fconv('$[My]$ face ressembles that of a '+this.data.style +'.'));
     }
 }
 class FaceWolf extends BodyPart {
@@ -1227,6 +1229,7 @@ class PenisHuman extends BodyPart {
             case 'wolf':
             case 'fox':
             case 'bunny':
+            case 'imp':
                 break;
             case 'lizard':    
                 break;

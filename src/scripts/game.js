@@ -17,7 +17,6 @@ class IDGenerator {//extends Singleton{
   toJSON(){return window.storage.Generic_toJSON("IDGenerator", this); }
   static fromJSON(value){return(window.storage.Generic_fromJSON(IDGenerator, value.data));}
 }
-
 // helper for publisher/subscriber-pattern; myObject.ps =PubSub(); myObject.ps.subscribe(...
 // !! warning, dont use for objects that need to be loaded from savegame
 // the reviver calls constructor of nested objects multiple times which lead to multiple registrations with partially incomplete objects in the PubSub;
@@ -163,6 +162,18 @@ window.gm.util.addShortKeyHandler=function(){
     }
   });
 };
+//returns normal distributed random value, mu= mean, 0 by default; sigma= stdev, 1 by default; nsamples= more samples creates better approximation, 3 by default
+window.gm.util.randomNormal=function(mu, sigma, nsamples){ // using central limit
+  if(!nsamples) nsamples = 3
+  if(!sigma) sigma = 1
+  if(!mu) mu=0
+
+  var run_total = 0
+  for(var i=0 ; i<nsamples ; i++){
+     run_total += Math.random()
+  }
+  return sigma*(run_total - nsamples/2)/(nsamples/2) + mu
+}
 window.gm.util.selRandom=function(list){//picks element from []
   let _i=list.length;
   if(_i>0) return(list[_.random(0,_i-1)]);
@@ -325,6 +336,7 @@ window.gm.initGame= function(forceReset,NGP=null){
         activePlayer : '', //id of the character that the player controls currently
         nosave : false,
         nokeys : false,
+        enablePoise : false, //enables Poise-System
         playerParty: [],  //names of NPC in playerParty 
         debug : false,    //globally enables debug
         dbgShowCombatRoll : false,  //log combat calculation details
@@ -347,12 +359,20 @@ window.gm.initGame= function(forceReset,NGP=null){
         msg: ''   // memorizes a message to display when returning from _back-passage; please clear it when leaving the passage
       }
     }
-    if (!s.GlobalChest||forceReset){  
+    if(!s.chars||forceReset){
+      s.chars={};
+    }
+    if (!s.chars.GlobalChest||forceReset){  
       let ch = new Character();
-      ch.id="GlobalChest";
-      ch.name="GlobalChest";
+      ch.id=ch.name="GlobalChest";
       ch.faction="Player";
-      s.GlobalChest=ch;
+      s.chars.GlobalChest=ch;
+    }
+    if (!s.chars.LocalChest||forceReset){  //
+      let ch = new Character();
+      ch.id=ch.name="LocalChest";
+      ch.faction="Player";
+      s.chars.LocalChest=ch;
     }
     if (!s.combat||forceReset){ //see encounter & combat.js
       s.combat = {
@@ -476,10 +496,33 @@ window.gm.forwardTime=function(until){
 // use: child._parent = window.gm.util.refToParent(parent);
 window.gm.util.refToParent = function(me){ return function(){return(me);}};  //todo causes problem with replaceState??
 //since there is no builtin function to format numbers here is one: formatNumber(-1002.4353,2) -> 1,002.44  
-window.gm.util.formatNumber = function(n, dp){
-  var s = ''+(Math.floor(n)), d = Math.abs(n % 1), i = s.length, r = '';
+window.gm.util.formatNumber = function(n, dp,sign=false){
+  var out='',s = ''+((dp>0)?((n>0)?Math.floor(n):Math.ceil(n)):Math.round(n)),d = Math.abs(n % 1), i = s.length, r = '';
   while ( (i -= 3) > 0 ){ r = ',' + s.substr(i, 3) + r; }  //todo . & , is hardcoded
-  return s.substr(0, i + 3) + r + (dp>0 ? '.' +(d ? Math.round(d * Math.pow(10, dp || 2)) : '0'.repeat(dp)) : '');
+  out= s.substr(0, i + 3) + r;
+  if(sign){
+    out=((n>=0)?'+':'')+out;
+  }
+  return(out + (dp>0 ? '.' +(d ? Math.round(d * Math.pow(10, dp )) : '0'.repeat(dp)) : ''));
+};
+/** formatInt is meant for formating integer to string; n may be decimal and gets rounded
+ * sign: if true prepend + if positive 
+ * width: if not null prepend 0s to stuff; disables 1000s indicator
+ * <%=window.gm.util.formatInt(-1234.66,true,5)%> -01235</br>
+*  <%=window.gm.util.formatInt(1234.66,true,5)%> +01235</br>
+ */
+window.gm.util.formatInt = function(n,sign=false, width=null){
+  var out='',s = ''+(Math.abs(Math.round(n))), i = s.length, r = '';
+  if(width!=null) {
+    out='0'.repeat(Math.max(0,width-i))+s;
+  } else {
+    while ( (i -= 3) > 0 ){ r = ',' + s.substr(i, 3) + r; }  //1000s marking; todo . & , is hardcoded
+    out= s.substr(0, i + 3) + r;
+  } 
+  if(sign){
+    out=((n>=0)?'+':'-')+out;
+  }
+  return(out);
 };
 //---------------------------------------------------------------------------------
 //TODO 
@@ -665,7 +708,7 @@ window.gm.restorePage=function(){
 //changes the active player and will add him to party!
 window.gm.switchPlayer = function(playername){
   var s = window.story.state;
-  window.gm.player= s[playername];
+  window.gm.player= s.chars[playername];
   s._gm.activePlayer = playername;
   window.gm.addToParty(playername);
 }
@@ -675,7 +718,7 @@ window.gm.removeFromParty= function(name){
   if(i>=0) s._gm.playerParty.splice(i,1);
 }
 //adds the character to the party
-//there has to be a CharacterObject for window.story.state[name]
+//there has to be a CharacterObject for window.story.state.chars[name]
 window.gm.addToParty= function(name){
   var s=window.story.state;
   if(s._gm.playerParty.indexOf(name)<0)
@@ -732,8 +775,11 @@ window.gm.roll=function(n,sides){ //rolls n x dies with sides
   return(rnd); 
 }
 //expects DOM like <section><article>..<div id='output'></div>..</article></section>
-window.gm.printOutput= function(text,where="section article div#output"){
-  document.querySelector(where).innerHTML = text;
+//Tip if you have to setup functions: string should be in '  and use \' and \" consistently 
+//'<button type=\"button\" onclick=\'equip(\"'+y.itmId+'\",\"'+itm2.itmId+'\");\'>'+y.name+'</button>'
+window.gm.printOutput= function(text,where="section article div#output",append=false){
+  let n=document.querySelector(where);
+  n.innerHTML = (append?n.innerHTML:"")+text;
 };
 //connect to onclick to toggle selected-style for element + un-hiding related text
 //the elmnt (f.e.<img>) needs to be inside a parentnode f.e. <div id="choice">
@@ -776,8 +822,9 @@ window.gm.printPassageLink= function(label,target){
 //prints a link where target is a expression called onClick. Use \" instead of " or ' !
 window.gm.printLink= function(label,target,params){
   let _params=params||{}
-  _params.class=(params&&params.class)?params.class:"";
-  return('<a href=\'javascript:void(0)\' class=\''+_params.class+'\' onclick=\''+target+'\'>'+label+'</a>');
+  _params.once = (params&&params.once)?params.once:false; //auto disable  doesnt work if the Link was added to page dynamical as it has no parent??
+  _params.class=(params&&params.class)?params.class:"";  //CSS-class
+  return('<a href=\'javascript:void(0)\' class=\''+_params.class+'\' onclick=\''+target+';'+(_params.once?'this.remove(this);':'')+'\'>'+label+'</a>');
 };
 
 //prints a link that when clicked picksup an item and places it in the inventory, if itemleft is <0, no link appears
@@ -816,11 +863,14 @@ window.gm.printItem= function( id,descr,carrier,useOn=null ){
  * prints a list of items/wardrobe and buttons to transfer them
  * @param {*} from 
  * @param {*} to 
- */
+ */   // see also window.gm.shop.printItemTransfer
 window.gm.printItemTransfer = function(from,to,wardrobe){
   let listFrom,listTo;
-  if(wardrobe) listFrom=from.Wardrobe.getAllIds(), listTo=to.Wardrobe.getAllIds(); 
-  else listFrom=from.Inv.getAllIds(), listTo=to.Inv.getAllIds();
+  if(wardrobe) {
+    listFrom=from.Wardrobe.getAllIds(), listTo=to.Wardrobe.getAllIds(); 
+  } else {
+    listFrom=from.Inv.getAllIds(), listTo=to.Inv.getAllIds();
+  }
   let allIds = new Map();
   for(let n of listTo){
     allIds.set(n,{name:wardrobe?to.Wardrobe.getItem(n).name:to.Inv.getItem(n).name});
@@ -862,7 +912,7 @@ window.gm.printItemTransfer = function(from,to,wardrobe){
     g.href='javascript:void(0)',g.textContent='take all';
     g.addEventListener("click",give.bind(null,id,count,to,from));
     if(count>0) entry.appendChild(g)
-    $("div#choice")[0].appendChild(entry);      // <- requires this node in html
+    document.getElementById('choice').appendChild(entry);      // <- requires this node in html
   }
 }
 //prints an equipment with description; used in wardrobe
@@ -964,17 +1014,17 @@ window.gm.printEffectSummary= function(who='player',what){
   _what.showskill =(what&&what.showskill)?what.showskill:false;
   let elmt='', s= window.story.state, result ='';
   result+='<table>';
-  let ids =window.story.state[who].Stats.getAllIds();
+  let ids =window.story.state.chars[who].Stats.getAllIds();
   ids.sort(); //Todo better sort
   for(var k=0;k<ids.length;k++){
-      var data = window.story.state[who].Stats.get(ids[k])
+      var data = window.story.state.chars[who].Stats.get(ids[k])
       let isFetish = (data.id.slice(0,2)==='ft'), isSkill=(data.id.slice(0,3)==='sk_'); //Fetish starts with ft
       let isResistance = (data.id.slice(0,4)==='rst_')||(data.id.slice(0,4)==='arm_'); //
       if(data.hidden!==4){
         if(isFetish && _what.showfetish && !(data.id.slice(-4,-2)==='_M') ){
           //expects names of fetish like ftXXX and limits ftXXX_Min ftXXX_Max
-          let min = window.story.state[who].Stats.get(ids[k]+"_Min");
-          let max = window.story.state[who].Stats.get(ids[k]+"_Max");
+          let min = window.story.state.chars[who].Stats.get(ids[k]+"_Min");
+          let max = window.story.state.chars[who].Stats.get(ids[k]+"_Max");
           result+='<tr><td>'+((data.hidden & 0x1)?'???':data.id)+':</td><td>'+((data.hidden & 0x2)?'???':data.value)+'</td>';
           result+='<td>'+((data.hidden & 0x2)?'???':'('+(min.value+' to '+max.value))+')</td></tr>';
         }
@@ -986,10 +1036,10 @@ window.gm.printEffectSummary= function(who='player',what){
   }
   result+='</table>';
   result+='</br>Active Effects:<table>'
-  ids = window.story.state[who].Effects.getAllIds();
+  ids = window.story.state.chars[who].Effects.getAllIds();
   ids.sort(); //Todo better sort
   for(var i=0;i<ids.length;i++){
-      var data = window.story.state[who].Effects.get(ids[i]);
+      var data = window.story.state.chars[who].Effects.get(ids[i]);
       if(data.hidden!==4){
       result+='<tr><td>'+((data.hidden & 0x1)?'???':data.name)+':</td><td>'+((data.hidden & 0x1)?'???':data.desc)+'</td><td>'+((data.hidden & 0x2)?'???':data.data.duration)+'h left</td></tr>';
       }

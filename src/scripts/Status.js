@@ -337,8 +337,7 @@ class Effect {
     get duration(){return(this.data.duration);}
     get hidden(){return(this.data.hidden);}
     get desc(){return(this.name);}
-    get shortDesc(){return(this.name);}
-        
+    get shortDesc(){return(this.name);} 
     //
     /**
      *is called when a effect is applied to check if the new effect can be combined with an exisitng one
@@ -391,6 +390,26 @@ class CombatEffect extends Effect {
      * @memberof CombatEffect
      */
     get shortDesc(){return(this.desc+" for " + this.data.duration+" turns");}  //duration in turns !
+
+    /**
+     * returns SVG representing the effect
+     *
+     * @readonly
+     * @memberof CombatEffect
+     */
+    get icon(){return("");}
+    /**
+     * returns icon with duration and tooltip for effect-list in combat
+     *
+     * @readonly
+     * @memberof CombatEffect
+     */
+    get iconTooltip(){
+        let _icon=this.icon;
+        //Note: css-class take care of formating        TODO show tooltip on hover/click
+        if(_icon=="") return('<div class="combateff"><div class="combaticon">'+window.gm.images.ic_unknown()+'</div>'+ this.shortDesc+'</div>');
+        return('<div class="combateff"><div class="combaticon">'+_icon+'</div>'+ this.data.duration+'</div>');
+    }
     /**
      *shown when casting the effect
      *

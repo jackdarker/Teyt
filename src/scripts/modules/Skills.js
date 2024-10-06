@@ -508,6 +508,59 @@ class SkillTease extends Skill {
         return(this.msg);
     }
 }
+class SkillLustMagic extends Skill {
+    static factory(coolDown=3){
+        let sk = new SkillLustMagic();
+        sk.startDelay=2,sk.defCoolDown=coolDown;
+        return(sk);
+    }
+    constructor(){
+        super("LustMagic");
+        this.msg = '',this.style=0;
+        this.cost.energy=15;
+    }
+    toJSON(){return window.storage.Generic_toJSON("SkillLustMagic", this); }
+    static fromJSON(value){return(window.storage.Generic_fromJSON(SkillLustMagic, value.data));}
+    targetFilter(targets){
+        return(this.targetFilterEnemy(this.targetFilterAlive(targets)));
+    }
+    set style(style){ //skilllevel
+        this._style = style;
+    }
+    get style(){return this._style;}
+    get desc(){ 
+        let msg ="LustMagic Lv"+this.style;
+        return(msg);
+    }
+    previewCast(targets){
+        var result = new SkillResult();
+        result.skill =this;
+        result.source = this.caster;
+        result.targets = targets;
+        this.msg = '';
+        let fconv =window.gm.util.descFixer(this.parent.parent),_tmp='';
+        if(this.isValidTarget(targets)){
+            result.OK = true;
+            let dmg =5*(1+this.style/5); //teaseproficiency +20%/level
+            this.msg = fconv('$[I]$ $[make]$ a sudden arcane gesture.'); //todo
+            for(var target of targets){
+                let attack =window.gm.combat.defaultAttackData();
+                let lewds ={slut:0}; //ignore outfit 
+                attack.mod= new SkillMod();
+                _tmp = fconv(target.name+" $[feel]$ strangely warm. ");
+                attack.mod.onHit=[{target:target, eff:[effTeaseDamage.factory(dmg,'slut',lewds,_tmp)]}];
+                attack.mod.onCrit=[{target:target, eff:[effTeaseDamage.factory(dmg*2,'slut',lewds,_tmp)]}];
+                let result2 = window.gm.combat.calcTeaseAttack(this.caster,target,attack);
+                this.msg+=result2.msg;
+                result.effects = result.effects.concat(attack.effects); 
+            }
+        }
+        return result
+    }
+    getCastDescription(result){
+        return(this.msg);
+    }
+}
 class SkillStun extends Skill {
     //execute stun attack
     constructor(){  super("Stun");  
@@ -739,7 +792,7 @@ class SkillSubmit extends Skill {
             result.OK = true;
             let rnd = _.random(1,100);
             if(rnd >0){ //Todo fleeing chance calculation
-                result.msg += "You submit to your foe.";
+                //result.msg += "You submit to your foe.";
                 window.story.state.combat.playerSubmitting = true;  //just setting the flag, you have to take care of handling!
             } else {
                 result.msg += "Your attempts to submit failed.";
@@ -1050,11 +1103,18 @@ class SkillCallHelp extends Skill {
         sk.item = item,sk.id+=item,sk.name+=' '+item;
         sk.defCoolDown=cooldown;
         sk.cost.will =25; 
-        //todo delay,cost and cooldown
+        //todo delay,cost and cooldown      TODO despawn if spawner killed?
         return(sk);
     }
     constructor(){
         super("CallHelp");this.item='';
+    }
+    isEnabled(){
+        let res= super.isEnabled();
+        if(res.OK===false) return(res);
+        let _itm=this.parent.parent.Effects.findEffect(effCallHelp.name)[0];
+        if(_itm && _itm.data.spawns.length>0) return({OK:false,msg:'already active'});
+        return(res);
     }
     get desc(){ return("Summon "+this.item);}
     toJSON(){return window.storage.Generic_toJSON("SkillCallHelp", this); }
@@ -1136,6 +1196,7 @@ window.gm.SkillsLib = (function (Lib){
     window.storage.registerConstructor(SkillSting);
     window.storage.registerConstructor(SkillStruggle);
     window.storage.registerConstructor(SkillTailWhip);
+    window.storage.registerConstructor(SkillLustMagic);
     window.storage.registerConstructor(SkillTease);
     window.storage.registerConstructor(SkillUltraKill);
     window.storage.registerConstructor(SkillUseItem);
@@ -1145,8 +1206,10 @@ window.gm.SkillsLib = (function (Lib){
 }(window.gm.SkillsLib || {}));
 
 /*todo 
-//Todo: disarm/disrobe  ArmorMelting
-//Enrage +50%damage -25% armor
+//Todo: 
+disarm/disrobe  ArmorMelting
+
+Enraged +50%damage -25% armor  consumes energy each turn
 
 Slash: (weapontype) causes slash-damage; chance to cause bleed on critical (on non-constructs/conjuration)
 

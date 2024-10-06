@@ -83,6 +83,52 @@ class Mole extends Mob {
         this.Stats.increment('healthMax',-0.5*(this.health().max));
     }
 }
+class Cat extends Mob {
+    static factory(type){
+        let foe = new Cat();
+        if(type==='Panther'){
+            foe.baseName = foe.id = 'Panther';
+            foe.Stats.increment('healthMax',0.3*(foe.health().max));
+        } 
+        return foe;
+    }
+    constructor(){
+        super();
+        this.baseName = this.id = 'Cat';
+        this.pic= "FeralCat";
+        this.level_min =3;
+        this.loot= [{id:'WolfTooth',chance:25,amount:1},{id:'Money',chance:25,amount:20}];
+        this.Outfit.addItem(new BaseQuadruped());
+        this.Outfit.addItem(SkinFur.factory('cat','gray'));
+        this.Outfit.addItem(HandsPaw.factory('cat'));
+        this.Outfit.addItem(PenisHuman.factory('cat'));
+        this.Outfit.addItem(AnusHuman.factory('cat'));
+        this.Outfit.addItem(TailWolf.factory('cat'));
+        this.Outfit.addItem(FaceWolf.factory('cat'));
+        this.Stats.increment('arm_blunt',5);
+    }
+    calcCombatMove(enemys,friends){
+        let result = {OK:true,msg:''};//this._canAct();
+        let rnd = _.random(1,100);
+        let spawn="CallHelpWolf";
+        if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
+        result.action =result.target= null;
+        if(window.story.state.combat.turnCount%2===0){
+            rnd = _.random(0,enemys.length-1);
+            result.action = "Bite";
+            result.target = [enemys[rnd]];
+            result.msg =this.name+" snaps at "+result.target[0].name+".</br>"+result.msg;
+            return(result);
+        } else {
+            rnd = _.random(0,enemys.length-1);
+            result.action = "Attack";
+            result.target = [enemys[rnd]];
+            result.msg =this.name+" claws at "+result.target[0].name+".</br>"+result.msg;
+            return(result);
+        }
+        return(super.calcCombatMove(enemys,friends));
+    }
+}
 class Wolf extends Mob {
     static factory(type){
         let foe = new Wolf();
@@ -163,7 +209,7 @@ class Slime extends Mob {
     static factory(type){
         let foe = new Slime();
         foe.Outfit.addItem(WeaponSlobber.factory('slime'));
-        foe.baseName = foe.id = ((type===undefined)?'Slime':type);
+        foe.baseName = foe.id = ((type===0||type===undefined)?'Slime':type);
         if(type ==='SlimeTentacled'){
             //todo add tentacles and grappling
             foe.pic='Blob3';
@@ -244,7 +290,7 @@ class Slug extends Mob {
 class Spider extends Mob { 
     static factory(type){
         let foe = new Spider();
-        foe.baseName = foe.id = ((type===undefined)?'Spider':type);
+        foe.baseName = foe.id = ((type===0||type===undefined)?'Spider':type);
         if(type ==='spiderswarm'){
             foe.pic='spider3';
             foe.Stats.increment('healthMax',-0.3*(foe.health().max));
@@ -492,6 +538,48 @@ class Lapine extends Mob {
             rnd = _.random(0,enemys.length-1);
             result.target = [enemys[rnd]];
             result.msg =this.name+" prepares for a powerful jump-kick.</br>"+result.msg;
+            return(result);
+        }
+        return(super.calcCombatMove(enemys,friends));
+    }
+}
+class Imp extends Mob {
+    static factory(type){
+        let foe = new Imp();
+        if(type==='implord'){
+            foe.Outfit.addItem(window.gm.ItemsLib['SpearStone']());
+        } else {
+            //foe.Outfit.addItem(new DaggerSteel());
+            foe.loot= [{id:'GreenPill',chance:25,amount:1},{id:'Money',chance:25,amount:5}];
+        }
+        return foe;
+    }
+    constructor(){
+        super();
+        this.baseName = this.id = 'Imp';
+        this.pic= 'Imp1';
+        this.Outfit.addItem(new BaseHumanoid());
+        this.Outfit.addItem(SkinHuman.factory('human'));
+        this.Outfit.addItem(HandsHuman.factory('human'));
+        this.Outfit.addItem(BreastHuman.factory('human'));
+        this.Outfit.addItem(FaceHuman.factory('imp'));
+        this.Outfit.addItem(AnusHuman.factory('bunny'));
+        this.Outfit.addItem(PenisHuman.factory('imp'));
+        this.Outfit.addItem(ShortsLeather.factory(100));
+        let sk = SkillLustMagic.factory(2);
+        this.Skills.addItem(sk);
+    }
+    calcCombatMove(enemys,friends){
+        let result = {OK:true,msg:''};
+        if(!this.fconv) this.fconv = window.gm.util.descFixer(this);
+        let rnd = _.random(1,100);
+        result.action =result.target= null;
+        let skill = this.Skills.getItem("LustMagic");
+        if(window.story.state.combat.turnCount>2 && rnd>50 && skill.isEnabled().OK){
+            result.action = skill.name;
+            rnd = _.random(0,enemys.length-1);
+            result.target = [enemys[rnd]];
+            result.msg =this.name+" makes a sudden arcane gesture.</br>"+result.msg;
             return(result);
         }
         return(super.calcCombatMove(enemys,friends));
@@ -853,6 +941,7 @@ class Naga extends Mob {
 class Wisp extends Mob {
     static factory(type){
         let foe = new Wisp();
+        foe.Stats.increment('healthMax',-0.6*(foe.health().max));
         if(type==='WispShield'){
             foe.baseName = foe.id = 'WispShield';
             foe.Skills.addItem(SkillProtect.factory(0));
@@ -891,14 +980,13 @@ class Wisp extends Mob {
 class Carlia extends Mob {
   constructor(){
       super();
-      this.baseName = this.id = 'Carlia';
+      this.baseName = this.id = 'Carlia';this.unique=true;
       this.pic= 'unknown';
       this.Outfit.addItem(new BaseHumanoid());
       this.Outfit.addItem(new SkinHuman());
       this.Outfit.addItem(HandsHuman.factory('cat'));
       this.Outfit.addItem(FaceWolf.factory('cat'));
       this.Outfit.addItem(BreastHuman.factory('human'));
-      CSS
       this.Outfit.addItem(VulvaHuman.factory('human'));
       this.Outfit.addItem(new BikiniBottomLeather());
       this.Outfit.addItem(new BikiniTopLeather());
@@ -909,7 +997,7 @@ class Carlia extends Mob {
 class Ruff extends Mob {
     constructor(){
         super();
-        this.baseName = this.id = 'Ruff';
+        this.baseName = this.id = 'Ruff';this.unique=true;
         this.Outfit.addItem(new BaseQuadruped());
         this.Outfit.addItem(SkinFur.factory('wolf','black'));
         this.Outfit.addItem(HandsPaw.factory('wolf'));
@@ -959,7 +1047,7 @@ class Ruff extends Mob {
 class Clyde extends AnthroFox {
     constructor(){
         super();
-        this.baseName = this.id = 'Clyde';
+        this.baseName = this.id = 'Clyde';this.unique=true;
         this.Outfit.addItem(AnusHuman.factory('wolf'));
         this.Outfit.addItem(PenisHuman.factory('wolf'));
         this.levelUp(7);
@@ -969,7 +1057,7 @@ class Clyde extends AnthroFox {
 class Trent extends Mob {
     constructor(){
         super();
-        this.baseName = this.id = 'Trent';
+        this.baseName = this.id = 'Trent';this.unique=true;
         this.pic= 'unknown';
         this.Outfit.addItem(new BaseHumanoid());
         this.Outfit.addItem(SkinFur.factory('horse', 'brown'));
@@ -990,6 +1078,7 @@ window.gm.Mobs = (function (Mobs){
     window.storage.registerConstructor(Mob);//some characters derive from Mob
     window.storage.registerConstructor(Ruff);
     //
+    Mobs.Cat = Cat.factory;
     Mobs.AnthroCat = function(){ return function(param){return(AnthroCat.factory(param));}("AnthroCat")};
     Mobs.AnthroFox = function(){ return function(param){return(AnthroCat.factory(param));}("AnthroFox")};
     Mobs.Fungus = Fungus.factory;
@@ -1009,6 +1098,7 @@ window.gm.Mobs = (function (Mobs){
     Mobs.Leech = Leech.factory;  
     Mobs.Slug = Slug.factory;
     Mobs.Spider = Spider.factory;
+    Mobs.Imp = Imp.factory;
     Mobs.Succubus = Succubus.factory;
     Mobs.Dryad = Dryad.factory; 
     Mobs.Vine = Vine.factory; 
