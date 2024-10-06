@@ -1,5 +1,7 @@
 Another testgame.
 Dont use !
+I'm trying to rebuilt (a modded version of) CoC because flash isn't supported anymore. 
+
 
 ### Structure of storydata
 twee-files are locatd in project\twee

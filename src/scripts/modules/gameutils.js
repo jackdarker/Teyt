@@ -30,33 +30,10 @@ window.gm.initGame= function(forceReset,NGP=null){
     if (!s.vars||forceReset){ // storage of variables that doesnt fit player
         s.vars = {
         inVR: false,
-        spawnAt: 'ForestRespawnPodExit',
+        spawnAt: '',
         playerPartyVR:[], //names of chars
         playerPartyRL:[],
-        //flags for global states
-        qDogSit : 0,   // see park
-        qUnlockCampus : 0,  //see passage into city
-        qUnlockPark : 0,
-        qUnlockMall : 0,
-        qUnlockBeach : 0,
-        qUnlockDowntown : 0,
-        qUnlockNorthlake : 0,
-        qUnlockRedlight : 0,
-        qUnlockBeach : 0,
-        crowBarLeft: 1,
-        //VR flags todo character specific ?
-        wolfKnowledge: 0,
-        wolfSubmit: 0,
-        wolfVictory: 0
         }; 
-    }
-    if (!s.mom||forceReset){
-      s.mom = {
-        location : "Kitchen",
-        coffeeStore : 5,
-        foodStore : 3,
-        foodMaxStore : 4
-      };
     }
     if (!s.chars.Cyril||forceReset){  //
       let ch = new Character()
@@ -159,17 +136,15 @@ window.gm.initGame= function(forceReset,NGP=null){
     
     window.gm.initGameFlags(forceReset,NGP);
     window.gm.switchPlayer("PlayerRL");
-    //take over flags for newgameplus
-    if(NGP){ window.story.state.vars.crowBarLeft = NGP.crowBarLeft; }
+    //TODO take over flags for newgameplus  if(NGP){ window.story.state.vars.crowBarLeft = NGP.crowBarLeft; }
     NGP=null; //release memory
 };
 //this initialises game-objects that are not class-based
 window.gm.initGameFlags = function(forceReset,NGP=null){
   let s= window.story.state,map,data;
-  function dataPrototype(){return({visitedTiles:[],mapReveal:[],tmp:{},version:0});}
+  function dataPrototype(){return({visitedTiles:[],mapReveal:[],tmp:{},version:0,explored:0,tasks:{}});}
   if (forceReset){  
-    s.Settings=s.DngCV=s.DngDF=s.DngAM=s.DngSY=s.DngMN=s.DngAT=null; 
-    s.DngFM=s.DngSC=s.DngLB=s.DngHC=s.DngPC=s.DngLT=null;
+    s.Settings=s.DngNF=s.DngSY=s.DngMN=null; 
     s.NGP = {};
     s.Know = {}
   }
@@ -184,51 +159,37 @@ window.gm.initGameFlags = function(forceReset,NGP=null){
     window.gm.resetAchievements();
   }
   window.storage.loadAchivementsFromBrowser();
-  let DngSY = {
-      remainingNights: 0,
-      dngLevel: 1, //tracks the mainquest you have finished
-      dngOW: false, //if this flag is set while in dng, player is here for some freeplay (no quest)  
-      dildo:0, //1 small oraltraining,
-      pussy:0,
-      //////////////////////////
-      visitedTiles: [],mapReveal: [],
-      dng:'', //current dungeon name
-      prevLocation:'', nextLocation:'', //used for nav-logic
-      dngMap:{} //dungeon map info
-  };
-  let DngAM = dataPrototype();
-  let DngAT = dataPrototype();
-  let DngDF = dataPrototype();
-  DngDF.plum={},//which plums got collected
-  DngDF.lapine={};
-  let DngFM = dataPrototype();
-  let DngHC = dataPrototype();
+  let DngSY = dataPrototype();     //sanctuary/general info
+  DngSY.dng='', //current dungeon name
+  DngSY.prevLocation='', DngSY.nextLocation='', //used for nav-logic
+  DngSY.dngMap={} //dungeon map info
+
+  let DngNF = dataPrototype();  //Near forest
+  if(true){//define events for explore
+    DngNF.tasks.DngNF_FindStick={
+      chance:function(){if(window.gm.player.Outfit.getItemForSlot("RHand")==null)return((window.gm.player.level<6)?200:25); else return(0)},
+      call:function(){
+        window.story.state.chars.LocalChest.Inv.removeAll();
+        window.story.state.chars.LocalChest.Wardrobe.removeAll();
+        window.story.state.chars.LocalChest.changeInventory(window.gm.ItemsLib["StaffWodden"](),1);
+      },tick:0,cnt:0}
+    DngNF.tasks.DngNF_Imp={chance:function(){return(100)},tick:0,cnt:0}
+    DngNF.tasks.DngNF_TripRoot={chance:function(){return(100)},tick:0,cnt:0}
+    DngNF.tasks.DngNF_Wolf={chance:function(){return((window.gm.player.level<6)?25:100)},tick:0,cnt:0}
+    DngNF.tasks.DngNF_Mushroom={chance:function(){return(100)},tick:0,cnt:0}
+  }
+  let DngNL = dataPrototype();  //Near Lake
+
   if(s.NGP && NGP!=null){ //update if exist
     s.NGP=window.gm.util.mergePlainObject(NGP,s.NGP);
   }
-  let DngPC = dataPrototype();
-  if(s.DngPC){ //update if exist
-    window.gm.build_DngPC();
-    s.DngNG=window.gm.util.mergePlainObject(DngPC,s.DngPC);
-  }
-  let DngLB = dataPrototype();
-  let DngSC = dataPrototype();
-  let DngCV = dataPrototype();
-  let DngMN = dataPrototype();DngMN.page={}; //which bookpages got collected
+
   //see comment in rebuildFromSave why this is done
   s.Settings=window.gm.util.mergePlainObject(Settings,s.Settings);
   s.Know=window.gm.util.mergePlainObject(Know,s.Know);
-  s.DngDF=window.gm.util.mergePlainObject(DngDF,s.DngDF);
-  s.DngAM=window.gm.util.mergePlainObject(DngAM,s.DngAM);
   s.DngSY=window.gm.util.mergePlainObject(DngSY,s.DngSY);
-  s.DngCV=window.gm.util.mergePlainObject(DngCV,s.DngCV);
-  s.DngMN=window.gm.util.mergePlainObject(DngMN,s.DngMN);
-  s.DngAT=window.gm.util.mergePlainObject(DngAT,s.DngAT);
-  s.DngFM=window.gm.util.mergePlainObject(DngFM,s.DngFM);
-  s.DngSC=window.gm.util.mergePlainObject(DngSC,s.DngSC);
-  s.DngHC=window.gm.util.mergePlainObject(DngHC,s.DngHC);
-  s.DngLB=window.gm.util.mergePlainObject(DngLB,s.DngLB);
-  s.DngPC=window.gm.util.mergePlainObject(DngPC,s.DngPC);
+  s.DngNF=window.gm.util.mergePlainObject(DngNF,s.DngNF);
+  s.DngNL=window.gm.util.mergePlainObject(DngNL,s.DngNL);
   //todo cleanout obsolete data ( filtering those not defined in template) 
 };
 window.gm.resetAchievements = function() { //declare achievements here
@@ -375,18 +336,18 @@ window.gm.respawn=function(conf={keepInventory:false}){
       window.story.show('YouDiedWithCursedGear');
   } else {*/
     let robes;
-    if(window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib.Breast)===null){
+    if(false /*TODO*/&& window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib.Breast)===null){
       robes = window.gm.ItemsLib['PrisonerCloths']();
       window.gm.makeCursedItem(robes,{minItems:2,convert:'HarnessRubber'});
       window.gm.player.Wardrobe.addItem(robes);
       window.gm.player.Outfit.addItem(robes);
     }
-    if(window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib.uHips)===null){
+    if(false /*TODO*/&& window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib.uHips)===null){
       robes = window.gm.ItemsLib['Knickers']();
       window.gm.player.Wardrobe.addItem(robes);
       window.gm.player.Outfit.addItem(robes);
     }
-    if(window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib.LHand)===null){
+    if(false /*TODO*/&& window.gm.player.Outfit.getItemForSlot(window.gm.OutfitSlotLib.LHand)===null){
       let staff = new window.storage.constructors['StaffWodden']();
       //window.gm.player.Inv.addItem(staff);
       window.gm.player.Outfit.addItem(staff);
@@ -510,14 +471,6 @@ window.gm.rollExploreCity= function(){
   r = _.random(1, places.length)-1; //chances are equal
   window.gm.addTime(20);
   window.story.show(places[r]);
-};
-window.gm.giveCyrilFood= function(){
-    if(window.gm.player.Inv.countItem('SimpleFood')>0){
-        var res=window.gm.player.Inv.use('SimpleFood', window.story.state.Cyril);
-        window.gm.printOutput(res.msg);
-    } else {
-        window.gm.printOutput("you have no food to spare");
-    }
 };
 /*
 * prints a (svg-) map  

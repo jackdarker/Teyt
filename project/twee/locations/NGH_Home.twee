@@ -1,0 +1,304 @@
+:: Help_background [_back_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+TODO</br>
+</br>[[Back|_back_]]</br>
+</article><article id="LogPanel"></article></section>
+
+:: Help_Basics [_back_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+<hr></br>
+<hr></br>Navigating the dungeon</br>
+<hr></br>Combat</br>
+TODO</br>
+<hr></br>Keyboardcontrols</br>
+Links that have [x] attached can be triggered by pressing key x on the keyboard.
+</br><hr></br>[[Back|_back_]]</br>
+</article><article id="LogPanel"></article></section>
+
+:: DngNG_Home
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%></br>
+You are at home when a new emergency broadcast is received by your radio:</br>
+<p class="tNPC1">"To all citizen: please move to the evacuation beacons closest to your location...."</p>
+<hr></br>
+<a0 onclick='start()'>You need to prep before you leave.</a></br>
+</article><article id="LogPanel"></article></section>
+<script> function start(){
+    var s = window.story.state;
+    s.vars.spawnAt="DngNG_Defeat";
+    s.DngNG.rerollTiles("Appartmentblock",s.DngNG.tmp.tier); 
+    window.story.show("DngNG_Preparation");
+}
+</script>
+
+:: DngNG_Preparation
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%></br>
+<%if(window.story.state.DngNG.tmp.tier<1){%>
+Beeing quiete in a hurry you dont think alot of what to take with you and just leave you home.
+<%}else{%>
+Checking on your city-map you guess the next region you pass through is <%=window.story.state.DngNG.tmp.region%> at tier of <%=window.story.state.DngNG.tmp.tier%>
+</br>TODO Take care of your "needs"
+<%}%>
+<%if(window.story.state.DngNG.TimesDefeat>0 || window.story.state.DngNG.TimesVictory>0 || window.story.state.DngNG.tmp.tier>=1){%>
+</br>Think about what you should take with you on your travel:
+</br>[[Check the upgrade-shop|DngNG_NGPShop]] 
+</br>Or you just [[trade common items|DngNG_GearTrader]].
+</br>[[Configure your loadout|DngNG_Loadout]]
+</br><a0 onclick='($("tw-passage").fadeOut(1000, function(){sleep()}));'>Sleep</a> 
+<hr></br>
+[[Continue your journey|DngNG_RegionIntro]]</a></br>
+</article><article id="LogPanel"></article></section>
+<script> function sleep(){
+    window.gm.player.this.Stats.increment("health",9999);
+    window.gm.player.this.Stats.increment('energy',9999);
+    window.gm.player.this.Stats.increment('will',9999);
+    window.story.show(window.passage.name);
+}
+</script>
+
+:: DngNG_GearTrader [_back_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%></br>
+TODO Sell/buy items from loadout and global chest. <a0 id='helpgeartrader' onclick='(function($event){document.querySelector("#"+id+"~p").toggleAttribute("hidden");})(this);'>Hint</a>
+<p hidden> Weapons are used in combat (or to intimidate someone to avoid combat). </br>
+
+</br>[[Back|_back_]]
+</article><article id="LogPanel"></article></section>
+
+
+:: DngNG_MissionDebriefing
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%></br>
+<p>You escaped from <%=window.story.state.DngNG.tmp.region%> and may take a breather. But you cant stay here to long. Check your gear and fix yourself up and then move on.</p>
+<p>Having earned some shards, you might think of upgrading your skills.</p>
+<hr>
+<p>Choose which path you want to follow: </p>
+TODO show region-progress
+TODO depending on progress and difficulty show list of next target
+</br>
+<a0 onclick='start()'>Let's prepare for the next area.</a>
+</article><article id="LogPanel"></article></section>
+<script> function start(){
+    var s = window.story.state;
+    s.DngNG.tmp.room=0;
+    s.DngNG.rerollRegion();
+    if(s.DngNG.tmp.region!="") {
+        s.DngNG.rerollTiles(s.DngNG.tmp.region,s.DngNG.tmp.tier); 
+        window.story.show("DngNG_Preparation");
+    } else window.story.show("DngNG_GamePassed");
+}
+</script>
+
+:: DngNG_RegionIntro
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%></br>
+Ahead of you lies <%=window.story.state.DngNG.tmp.region%>.<br>
+<% if(window.story.state.DngNG.tmp.region=="Appartmentblock"){%>
+This area you know pretty well because you live here a couple of years now. Commoners ... 
+<%} else if(window.story.state.DngNG.tmp.region=="Suburbs"){%>
+<%}%>
+</br> You passed through here xx times and failed xx. 
+<hr></br>
+<a0 onclick='window.gm.toNextRoom();'>Move on</a></br>
+</article><article id="LogPanel"></article></section>
+
+
+:: DngNG_GamePassed
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%></br>
+<p class="author">Well done, you finished the game or at least there are no higher tier regions to explore right now.</p>
+</br>Your made it up to tier <%=window.story.state.DngNG.tmp.tier %>
+<hr></br>
+<p>If you want you can push the button below to reset your tier and start all over again. But you keep what you have collected.</p>
+<p>Otherwise you could also restart with a complete new game and you will have to unlock everything again. </p>
+<a0 onclick='window.story.state.DngNG.tmp.tier=0;window.story.show("DngNG_Home");'>Reset tier but not unlocks.</a></br>
+<a0 onclick=''>Reset tier AND unlocks.</a></br>
+</article><article id="LogPanel"></article></section>
+
+
+:: DngNG_Loadout [_back_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%></br>
+<h2>Active loadout</h2>
+[[Back|_back_]] [[Unlocked Mods|DngNG_OwnedNGP]]
+<a0 onclick='(function($event){document.querySelector("#"+id+"~p").toggleAttribute("hidden");})(this);'>Hint</a>
+<p hidden> To activate a NGP-card, you need a compatible free slot.</br>
+There are different kind of slots:</br>
+- Tradeoff-Slots: cards placed here will enable the effect according to their description</br>
+- Benefit-Slots:  the adverse effect of the card is removed or at least reduced while the beneficial stays the same</br>
+- slots also have a compatibility marker; a slot with marker "A, B" can hold only cards marked with either A or B</br>
+</p>
+</br><hr><div id="slotuse"></div><br><hr><div id="output"></div><br><hr><br><div id="cards" style="display:flex; flex-flow: row wrap;"></div>
+[[Back|_back_]]
+</article><article id="LogPanel"></article></section>
+<script>
+function update(){
+    let s=window.story.state;
+    let msg="",printslot="",printcard="",printbuttons="",list,_card,listslots=[];
+    list=window.gm.NGP.catalogToList();
+    debugger
+    list.forEach(x=>{
+        if(x.catId=="slots"){   //slots
+            _card=s.NGP[x.itmId];
+            if(_card!=0 && _card!=null && _card!=undefined){ //slot owned
+                listslots.push(x);
+                if(_card>0 || _card==""){ //owned but empty
+                    itm2=null;
+                } else {
+                    itm2=window.gm.NGP.findItem(_card); //slot contains itmId
+                    //todo button to clear card
+                }
+                printslot+='<p class="speech"><b>'+x.name+':   '+(itm2?itm2.name:"")+'</b></p>';
+            }
+        }
+    });
+    list.forEach(x=>{
+        if(x.catId!="slots"){   //cards
+            _card=s.NGP[x.itmId];
+            if(_card!=0 && _card!=null && _card!=undefined){ //card owned
+                itm2=window.gm.NGP.findItem(x.itmId);
+                //create buttons for slots if slot owned
+                printbuttons="";
+                listslots.forEach(y=>{  // [A,B] [B,D] -> OK
+                    if(y.slot.some(z=>{return(itm2.slot.includes(z));})){
+                        if(s.NGP[y.itmId]==itm2.itmId){//todo: show "equipped" if already assigned to this slot
+                            printbuttons+='<button type=\"button\" onclick=\'equip(\"'+y.itmId+'\",\"'+itm2.itmId+'\");\'>Unequip</button>';
+                        }else{
+                            printbuttons+='<button type=\"button\" onclick=\'equip(\"'+y.itmId+'\",\"'+itm2.itmId+'\");\'>Equip '+y.name+'</button>';
+                        }
+                    }
+                })
+                printcard+='<p class="speech" id="'+itm2.itmId+'"><b>'+itm2.name+':</b> '+itm2.desc+'</br>'+printbuttons+'</p>'
+            }
+        }
+    });
+    window.gm.printOutput(printslot,'div#slotuse');
+    window.gm.printOutput(printcard,'div#cards');
+}
+function equip(slotId,itemId){  //NGP.BSlot1="ProteinBars"  or NGP.BSlot1=1   
+    let s=window.story.state,itm,_rst;
+    if(s.NGP[slotId]==itemId){ //uneqip
+        s.NGP[slotId]=1;
+        window.gm.printOutput("",'div#output');
+        update();
+        return;
+    }
+    itm=window.gm.NGP.findItem(itemId);
+    //if requirements failed
+    _rst=itm.req();
+    if(_rst.OK!=true){
+        window.gm.printOutput(_rst.msg,'div#output');   //print output
+    } else {     //assign to slot and redraw
+        s.NGP[slotId]=itemId;
+        window.gm.printOutput("",'div#output');
+        update();
+    }
+}
+update();
+</script>
+
+:: DngNG_OwnedNGP [_back_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%></br>
+<h2>Things you have unlocked</h2>
+<div id="output"></div>
+[[Back|_back_]]
+</article><article id="LogPanel"></article></section>
+<script>function foo(){
+    let list=Object.keys(window.story.state.NGP);
+    list.forEach(x=>{let itm=window.gm.NGP.findItem(x);
+        window.gm.printOutput("<p><b>"+itm.name+"</b> - "+ itm.desc +
+            " </p>","section article div#output",true)})
+    }
+foo();
+</script>
+
+:: DngNG_NGPShop
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%></br><%window.gm.player.location=window.passage.name;%>
+<h2>Upgrades shop</h2>
+Here you can buy upgrades that you then can equip in your loadout.</br>
+<a0 onclick='(function($event){document.querySelector("#"+id+"~p").toggleAttribute("hidden");})(this);'>Hint</a>
+<p hidden> Use Shards to buy options. Options with questionmarks need first to be unlocked by solving some connected achievement.</p>
+</br></br><form>
+<label>Category:
+	<select id="category"><option value="0">select something</option></select>
+</label></br>
+<label>Item:
+	<select id="item"><option value="0">select category then item</option></select>
+</label><hr></br>
+<div id="output"></div><hr></br>
+<button type="button" onclick="buy()">activate</button> <div id="tokens"></div></br>
+<button type="button" onclick="resetAll()" hidden>reset all</button>
+</form>
+</br><a0 onclick="start()"> All Done</a> !</br>
+<div id="output2"></div></br>
+</p>
+</article><article id="LogPanel"></article></section>
+<script>
+var /*NGP,*/ctrlCat,ctrlItem;
+function resetAll(){
+    let tk=0,x=window.gm.achievements;
+    //convert achievements to token here or unhide options
+    //depends on your game ....
+    if(x.healer>=1)tk++;
+    else window.gm.NGP.findItem("moreHealItems").disabled=true;
+    //----
+    //s.NGP = {token:tk,tokenUsed:0};
+    ctrlCat.value="";
+    window.gm.printOutput("","#output2");
+}
+function updateText(event) {
+    let msg="";
+    if(!!ctrlItem.selectedObject){
+        msg=ctrlItem.selectedObject.desc+'\n';
+        let slots = ctrlItem.selectedObject.slot;
+        if(slots.length>0) msg+='compatible slots: '+slots.toString();
+        else msg="doesnt need a slot";
+    }
+    window.gm.printOutput(msg,"#output");
+    window.gm.printOutput("Shards left:"+(window.gm.player.Inv.countItem('Shards') /*s.NGP.token-s.NGP.tokenUsed*/),"#tokens");
+}
+function buy(){
+    let s=window.story.state;
+    let res,itm=ctrlItem.selectedObject, freeToken=window.gm.player.Inv.countItem('Shards');//s.NGP.token-s.NGP.tokenUsed;
+    if(itm && !s.NGP[itm.itmId]) {
+        res=itm.req();
+        if(!res.OK){
+            window.gm.printOutput(res.msg,"#output");
+        }else if(itm.cost.token>freeToken){
+            window.gm.printOutput("not enough token","#output");
+        }else{
+            //set a flag...
+            s.NGP[itm.itmId]=1;   //s.NGP.ProteinBars
+            window.gm.player.Inv.removeItem("Shards",itm.cost.token);//s.NGP.tokenUsed+=itm.cost.token;
+            //...then at ?? we check the flag and add items or effects to the player  
+        }
+    }
+    window.gm.printOutput("Shards left:"+(window.gm.player.Inv.countItem('Shards') /*s.NGP.token-s.NGP.tokenUsed*/),"#tokens");
+    window.gm.printOutput(JSON.stringify(s.NGP),"#output2");
+}
+function init(){
+    var selCat = document.getElementById("category"),selItem = document.getElementById("item");
+    ctrlCat = new window.gm.util.SelectionController(selCat), ctrlItem = new window.gm.util.SelectionController(selItem,ctrlCat);
+    ctrlCat.getValueList=function(cat,sel) {
+        return cat.map(item => ({value: item.catId,text: item.desc,disabled:false}));
+    }
+    ctrlCat.getValue=function(cat, sel) {
+        return cat.find(item => item.catId == sel);
+    }
+    ctrlItem.getValueList=function(cat,sel) {
+        return cat.items.map(item => ({value: item.itmId,
+            text: (window.story.state.NGP[item.itmId]>0?"sold out - ":"") +
+                item.name+ " ("+((item.cost.token>0)?item.cost.token+" shards":"free")+")",
+            disabled:(item.disabled||window.story.state.NGP[item.itmId]>0)})); //todo: remove item instead 
+    }
+    ctrlItem.getValue=function(cat, sel) {
+        return cat.items.find(item => item.itmId == sel);
+    }
+    ctrlCat.mapData(window.gm.NGP.catalog);
+    ctrlItem.addEventListener("change", updateText);
+    //resetAll();
+}
+init();
+</script>

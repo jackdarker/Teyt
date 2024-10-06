@@ -359,6 +359,33 @@ window.gm.getAvailableTasks=function(){
     }
     window.gm.printOutput(msg,'#choice');
 };
+//select from encounter-list  encounter.imp={chance:f(),tick:0,cnt:0}
+window.gm.rollEncounter=function(encounters){
+    var _tasks=[],_task,_allChances=0,rolledTask=null,_tns=Object.keys(encounters);
+    for(var i=_tns.length-1;i>=0;i--){
+        var _tk=encounters[_tns[i]],_chance=_tk.chance();
+        if(_tk.tick!==''){ //reduce chance for recent tasks or done ones
+            var _dt=window.gm.getDeltaTime(window.gm.getTime(),_tk.tick);
+            if(_dt<1440 || _tk.cnt>7) _chance*=0.5;
+            else if(_dt<2880 || _tk.cnt>4) _chance*=0.3;
+        }
+        _task={id:_tns[i],chance:_chance}
+        _tasks.push(_task);
+        _allChances+=_chance;
+    }
+    if(_allChances>0.0){//choose rnd tasks
+        var _rnd=_.random(0,_allChances-0.001);
+        for(var i = _tasks.length-1;i>=0;i--){ 
+            if(_rnd<_allChances && _rnd>=(_allChances-_tasks[i].chance)){
+                rolledTask=encounters[_tasks[i].id];    
+                rolledTask.id=_tasks[i].id;
+                break;
+            }
+            _allChances-=_tasks[i].chance;
+        }
+    }
+    return(rolledTask);
+};
 window.gm.know = function(what){
     let _n=window.story.state.Know[what];
     if(_n===null || _n===undefined) {

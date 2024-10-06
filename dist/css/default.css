@@ -15,7 +15,7 @@ section {
   background: #ffffff;
   display: grid;
   grid-template-columns: 0.2fr 1fr 1fr 1fr;
-  grid-template-rows: 80% 20%;
+  grid-template-rows: 95% 5%;
   height:100vh;
   /*width:95vw;*/ /*scrollbars*/  }
 
@@ -23,7 +23,7 @@ section {
   grid-template-rows: 2% ;
 }
 .log_hideview {
-  grid-template-rows: 95% ;
+  grid-template-rows: 80% ;
 }
 
 section h2 {
@@ -104,19 +104,6 @@ dialog::backdrop, #backdrop {
   position: absolute;
   left: -6px;
   top: 6px;
-}
-.combateff {
-  line-height:32px;
-}
-.combateff > .combaticon {
-  float: left;
-  margin-right:0.1em;
-}
-
-.combateff > .combaticon > svg {
-  width: 32px;
-  height: 32px;
-  vertical-align: top;
 }
 .popup {
   position: relative;

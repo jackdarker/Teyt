@@ -1,4 +1,4 @@
-:: sidebar
+:: sidebar_old {"position":"375,500"}
 <h3><%=window.story.name%> V<%=window.gm.getSaveVersion().toString().replaceAll(",",".")%></h3>
 <img src='<%=window.gm.getSidebarPic()%>' width="256" height="256">
 <div><%=window.gm.util.printLocationName(window.gm.player.location)%></br><%=window.gm.getTimeString()%></br><%=window.gm.getDateString()%></br></div><hr>
@@ -39,7 +39,7 @@ document.querySelector('#settings').addEventListener('click', function(){window.
 document.querySelector('#LinkO').addEventListener('click', function(){window.story.show('Wardrobe');}); 
 </script>
 
-:: sidebar_old
+:: sidebar
 <h3><%=window.story.name%> V<%=window.gm.getSaveVersion().toString().replaceAll(",",".")%></h3>
 <img src='<%=window.gm.getSidebarPic()%>' width="256" height="256">
 <div><%=window.gm.util.printLocationName(window.gm.player.location)%></br><%=window.gm.getTimeString()%></br><%=window.gm.getDateString()%></br></div><hr>
@@ -73,7 +73,7 @@ document.querySelector('#LinkO').addEventListener('click', function(){window.sto
 :: LogPanel
 <!--<button type="button" id="toggleview" onclick=toggleview()><i class="fa fa-compress"></i></button>
 <button type="button" id="clearview" onclick=clearview()><i class="fa fa-trash-alt"></i></button>-->
-<div style="font-size: smaller;"><a0 onclick=toggleview()>toggle view</a><a0 onclick=clearview()>clear log</a></div>
+<div style="font-size: smaller;"><a0 onclick=toggleview() data-nokey="true">toggle view</a><a0 onclick=clearview() data-nokey="true">clear log</a></div>
 <div class="scroll" style="font-size: smaller;"><%=window.gm.getLog()%></br></div>
 <script>
 function toggleview(){
@@ -296,7 +296,7 @@ Status of <%=char.name%>:   [[Back|_back_]]</br>
 <a0 onclick='window.gm.printOutput(window.gm.printEffectSummary("<%=char.id%>",{showstats:true}));'>Stats</a>
 <a0 onclick='window.gm.printOutput(window.gm.printEffectSummary("<%=char.id%>",{showresistance:true}));'>Resistance</a>
 <a0 onclick='window.gm.printOutput(window.gm.printEffectSummary("<%=char.id%>",{showskill:true}));'>Skills</a>
-<a0 onclick='window.gm.printOutput(window.gm.printEffectSummary("<%=char.id%>",{showfetish:true}));'>Traits</a>
+<a0 onclick='window.gm.printOutput(window.gm.printEffectSummary("<%=char.id%>",{showfetish:true}));'>Fetish</a>
 </br><div id='output'></div></br>   <!--message is rendered here-->
 [[Back|_back_]]</br>
 </article><article id="LogPanel"></article></section>

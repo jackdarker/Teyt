@@ -1,10 +1,10 @@
 :: StoryTitle
-SanctumPortal
+CocEntwined
 
 
 :: StoryData
 {
-	"ifid": "A440E3EC-8B67-4FD6-B38B-0CCB4FCD4A96",	"ifid_name":"SanctumPortal",
+	"ifid": "0D5669D2-19D4-45E7-85C0-74D2348369F9","ifid_name":"TwistedTrinkets",
 	"format": "Snowman",
 	"format-version": "2.0.2",
 	"Start": "Intro",
@@ -21,20 +21,3 @@ SanctumPortal
 }
 
 :: Story JavaScript [script]
-
-:: Start
-Select a Link:
-<ul>
-    <li>[[_SuperSimpleStory_]]</li>
-	<li>[[_ImagesAndOtherMedia_]]</li>
-    <li>[[_VariablesAndScript_]]</li>
-	<li>[[_ControlElements_]]</li>
-    <li>[[_Inventory_]]</li>
-    <li>[[_SaveAndRestore_]]</li>
-    <li>[[StartPage]]</li>
-</ul>
-
-:: NewGamePlus
-You finished the game in some way but maybe you have missed something. </br>
-Would you like to start a new game while taking some of your equipment/skills with you?</br>
-<a0 onclick='window.gm.newGamePlus()'>Start new game plus</a></br>
