@@ -179,6 +179,37 @@ window.gm.util.selRandom=function(list){//picks element from []
   if(_i>0) return(list[_.random(0,_i-1)]);
   else throw new Error("empty list")
 }
+//exchange inner text of ctrl ;connect it with onclick of a link/button. 
+//list = [ ['red','1','classRed'],['green','2','classGreen'] ]  text,datavalue,css-class (notice space between [ [ !)
+//f.e. <p>This is really a <a0 onclick="window.gm.util.swapText(this,[ ['red Color','1','red'],['green color','2','green'] ])">blue</a> game.</p>
+//you will have to query data-value or use the callback to get the choice: document.getElementById('myButton').getAttribute("data-value")
+window.gm.util.swapText=function(ctrl,list,params){
+  let _params=params||{}
+  _params.rnd = (_params.rnd)?? false;  //if the next value is randomly picked
+  _params.retrys = (_params.retrys)?? -1; //how many times until locked
+  //_params.onchange  callback
+  let _list = [],i;
+  let x=ctrl.getAttribute("data-retrys");
+  x=parseInt(x);
+  if(isNaN(x)) x=0;
+  if(params.retrys>0 && (_params.retrys-x)<=0)return;
+  x++;
+  list.forEach(function(element,index){
+    _list.push(element[1]);
+    ctrl.classList.remove(element[2]); //remove all formatting
+  });
+  if(_params.rnd===false) {
+    i=_list.indexOf(ctrl.getAttribute("data-value"));
+    if(i==-1 || i==_list.length-1) i=0;
+    else i++;
+  }
+  //Todo changing text removes keyboard links 
+  //Todo need to memorize data- for restorePage
+  ctrl.innerText = list[i][0] +((_params.retrys>0)?(" ◌"+(_params.retrys-x).toString()):"");  //◌= display number of retrys
+  ctrl.setAttribute("data-value",list[i][1]);
+  ctrl.setAttribute("data-retrys",(x).toString());
+  ctrl.classList.add(list[i][2]);
+}
 //create pretty name for passage; requires a tag (replace space with _ !) [name:"My_Room"]
 window.gm.util.printLocationName=function(passage){
   let tags = window.story.passage(passage).tags;
@@ -807,13 +838,12 @@ window.gm.onSelect = function(elmnt,ex_choice,ex_info){
 //call this onclick to make the connected element vanish and to unhide another one (if the passage is revisited the initial state will be restored)
 //unhidethis needs to be jquery-path to a div,span,.. that is initially set to hidden
 //cb can be a function(elmt) that gets called
-//todo: if navigating to a back-page and return, the initial page will be reset to default; how to memorize and restore the hidden-flags
 window.gm.printTalkLink =function(elmt,unhideThis,cb=null){
   $(elmt)[0].setAttribute("hidden","");
   if(cb!==null) cb($(elmt)[0]);
   $(unhideThis)[0].removeAttribute("hidden");
   $(unhideThis)[0].scrollIntoView({behavior: "smooth"});
-  window.story.state.tmp.flags[elmt]='hidden',window.story.state.tmp.flags[unhideThis]='unhide';
+  window.story.state.tmp.flags[elmt]='hidden',window.story.state.tmp.flags[unhideThis]='unhide';  //if navigating to a back-page and return, the initial page will be reset to default-> memorize and restore the hidden-flags (see restorePage)
 }
 //prints the same kind of link like [[Next]] but can be called from code
 window.gm.printPassageLink= function(label,target){

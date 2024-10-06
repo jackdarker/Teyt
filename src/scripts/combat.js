@@ -208,7 +208,7 @@ printCombatEffects(char){
       }
     }
   }
-  return((list.reduce((sum, current) => sum + current, ''));//(list.reduce((sum, current) => sum + current +', ', '')).slice(0,-2));
+  return((list.reduce((sum, current) => sum + current, '')));//(list.reduce((sum, current) => sum + current +', ', '')).slice(0,-2));
 }
 statsline(whom,mark){
   let msg='',bargraph=window.gm.util.bargraph;
