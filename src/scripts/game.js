@@ -13,7 +13,12 @@ class IDGenerator {//extends Singleton{
       if(!IDGenerator._instance){return new IDGenerator(); }
       return IDGenerator._instance;
   }
-  createID() {this._idCounter++;return(this._idCounter);}
+  static resetID(useID){ //this should be only called after reload
+    //hack: reloading save causes constructor calls causes calls to createID which would increase counter (the ids are reverted by merging loaded data into the constructed objects)
+    //so we need a way to revert this increase
+    IDGenerator.instance()._idCounter=useID;
+  }
+  static createID() {let x=IDGenerator.instance()._idCounter++;return("_"+x);} //add _ or queryselector() might not work if id starts with number ?!
   toJSON(){return window.storage.Generic_toJSON("IDGenerator", this); }
   static fromJSON(value){return(window.storage.Generic_fromJSON(IDGenerator, value.data));}
 }
@@ -185,14 +190,14 @@ window.gm.util.selRandom=function(list){//picks element from []
 //you will have to query data-value or use the callback to get the choice: document.getElementById('myButton').getAttribute("data-value")
 window.gm.util.swapText=function(ctrl,list,params){
   let _params=params||{}
-  _params.rnd = (_params.rnd)?? false;  //if the next value is randomly picked
+  _params.rnd = (_params.rnd)?? false;  //function to randomize next pick; false to non-random
   _params.retrys = (_params.retrys)?? -1; //how many times until locked
   //_params.onchange  callback
   let _list = [],i;
   let x=ctrl.getAttribute("data-retrys");
   x=parseInt(x);
   if(isNaN(x)) x=0;
-  if(params.retrys>0 && (_params.retrys-x)<=0)return;
+  if(_params.retrys>0 && (_params.retrys-x)<=0)return;
   x++;
   list.forEach(function(element,index){
     _list.push(element[1]);
@@ -358,6 +363,7 @@ window.gm.initGame= function(forceReset,NGP=null){
         version : window.gm.getSaveVersion(),
         style: 'default', //css profile to use
         log : [],
+        IDGenBkup:0,
         IDGen: new IDGenerator(),
         passageStack : [], //used for passage [back] functionality
         defferedStack : [], //used for deffered events
@@ -430,9 +436,15 @@ window.gm.newGamePlus = function(){
 window.gm.rebuildObjects= function(){ 
   var s = window.story.state;
   s._gm.nokeys=false;
+  IDGenerator.resetID(s.IDGenBkup);
   window.styleSwitcher.loadStyle(); //since style is loaded from savegame
   window.gm.quests.setQuestData(s.quests); //necessary for load support
   window.gm.switchPlayer(s._gm.activePlayer);
+}
+//called before data is serialized
+window.gm.preSave=function(){
+  var s = window.story.state;
+  s.IDGenBkup=IDGenerator.instance()._idCounter;
 }
 //--------------- time management --------------
 //returns timestamp since start of game

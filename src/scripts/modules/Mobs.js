@@ -1013,7 +1013,7 @@ class Ruff extends Mob {
     toJSON(){return window.storage.Generic_toJSON("Ruff", this); }
     static fromJSON(value){
         let _x=window.storage.Generic_fromJSON(Ruff, value.data);
-        _x.rebuildAfterLoad();
+        _x._relinkItems();
         /*_x.Effects._relinkItems();
         _x.Stats._relinkItems();
         _x.Inv._relinkItems();

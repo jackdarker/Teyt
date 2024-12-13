@@ -155,6 +155,7 @@ window.storage = {
     return(true);  //todo how to make async
   },
   saveFile: function(){
+    window.gm.preSave();
     var hash = JSON.stringify({state:window.story.state,
       history:window.story.history,checkpointName:window.story.checkpointName});
     var ahash = window.storage.getAchievements();
@@ -169,6 +170,7 @@ window.storage = {
   saveBrowser: function(slot){
     //var hash= window.story.save();    this call somehow messes up html and I had to copy the following from snowman script
     //always compress or storage could be full soon !
+    window.gm.preSave();
     var hash = LZString.compressToBase64(JSON.stringify({state:window.story.state,
         history:window.story.history,checkpointName:window.story.checkpointName}));
     var ahash = LZString.compressToBase64(window.storage.getAchievements());

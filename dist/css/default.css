@@ -35,6 +35,11 @@ a {
     margin-left:0.25em;
     margin-right:0.25em;
 }
+.nolink {
+  /*makes a link look like plain texr*/
+  color: unset;
+  text-decoration:unset;
+}
 a:hover {
     color: #008929;
     text-decoration-color: #008929;

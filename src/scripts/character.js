@@ -61,10 +61,10 @@ class Character {
     toJSON(){return window.storage.Generic_toJSON("Character", this); }
     static fromJSON(value){ 
         var _x = window.storage.Generic_fromJSON(Character, value.data);
-        _x.rebuildAfterLoad();
+        _x._relinkItems();
         return(_x);
     };
-    rebuildAfterLoad(){
+    _relinkItems(){
         //need to recreate parent links
         this.Effects._relinkItems();
         this.Stats._relinkItems();

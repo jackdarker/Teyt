@@ -16,7 +16,7 @@ class Mob extends Character {
     toJSON(){return window.storage.Generic_toJSON("Mob", this); }
     static fromJSON(value){ 
         var _x = window.storage.Generic_fromJSON(Mob, value.data);
-        _x.rebuildAfterLoad();
+        _x._relinkItems();
         return(_x);
     };
     //override to return the next move to execute

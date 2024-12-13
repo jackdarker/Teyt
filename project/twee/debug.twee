@@ -137,6 +137,8 @@ Theme:
 <div><input id="progress-value" type="number" placeholder="Enter desired percentage" min="0" max="100" value="7" />
 	<input type="button" value="Change" onclick="change()"/></div>
 <hr>
+<p>This <a0 onclick='window.gm.util.swapText(this,[ ["red Color","1","red"],["green color","2","green"] ]);alert(this.getAttribute("data-value"))' data-value="0">blue</a> link can be toggled onclick.</p>
+<p>This is a<a0 class="nolink" data-nokey="true" onclick='window.gm.util.swapText(this,[ ["red Color","1","red"],["green color","2","green"] ]);' data-value="0">secret</a> link that can be toggled onclick.</p>
 <label>[hint]<input type="checkbox"  style="display: none;" >
   <span role='tooltip'>hkljj  fdggfdsf gf   dfsd afsdafgdae sgfegf</span>
 </label>       <label> <input type="checkbox" >
