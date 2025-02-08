@@ -13,6 +13,7 @@ window.gm.initGame= function(forceReset,NGP=null){
   window.gm.images = imagesEquip(window.gm.images);
   window.gm.images = imagesIcons(window.gm.images);
   window.gm.images = imagesScenes(window.gm.images);
+  window.gm.images = imagesItems(window.gm.images);
   //if svg have no size set, they use whole space, use this to force them to fit into a box
   window.gm.images._sizeTo = function(_pic,width,height){ 
     var node = SVG(_pic);
@@ -169,6 +170,7 @@ window.gm.initGameFlags = function(forceReset,NGP=null){
   if (forceReset){  
     s.Settings=s.DngCV=s.DngDF=s.DngAM=s.DngSY=s.DngMN=s.DngAT=null; 
     s.DngFM=s.DngSC=s.DngLB=s.DngHC=s.DngPC=s.DngNG=null;
+    s.NGP = {};
     s.Know = {}
   }
   let Know = {};
@@ -201,6 +203,9 @@ window.gm.initGameFlags = function(forceReset,NGP=null){
   DngDF.lapine={};
   let DngFM = dataPrototype();
   let DngHC = dataPrototype();
+  if(s.NGP && NGP!=null){ //update if exist
+    s.NGP=window.gm.util.mergePlainObject(NGP,s.NGP);
+  }
   let DngPC = dataPrototype();
   if(s.DngPC){ //update if exist
     window.gm.build_DngPC();
@@ -580,8 +585,8 @@ window.gm.printMap2=function(dng,playerTile,reveal,visitedTiles){
     }
     switch(coostyle){
       case 'A1':
-        _x=Y.findIndex((el)=>{return(el===name[1]);});
-        _y=X.findIndex((el)=>{return(el===name[0]);});
+        _x=X.findIndex((el)=>{return(el===name[0]);});
+        _y=Y.findIndex((el)=>{return(el===name[1]);});
       break;
       case "12_01":
         coord=name.split('_');

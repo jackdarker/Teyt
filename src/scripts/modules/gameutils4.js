@@ -120,7 +120,7 @@ window.gm.build_DngNG=function(){
         //or is generic mob, then we have to append idcounter and create instance
         let _id=type;
         if(!window.story.state.chars[type]) {
-            _id=type+IDGenerator.instance().createID();
+            _id=type+IDGenerator.createID();
             window.story.state.chars[_id]=window.gm.Mobs[type]();
         }
         //state = see window.gm.mobAI

@@ -3,6 +3,12 @@
 You are facing one of  those spider bots.
 Try to hit it with your <a0 onclick='window.story.show(window.story.state.combat.tmp.inst+"Melee")'>bare hands</a> 
 or <a0 onclick='window.story.show(window.story.state.combat.tmp.inst+"Flee")'>run away</a>?
+<div hidden>
+->melee-click ->
+->calculate success based on attribute & status; select passage and store roll in tmp ->
+->print passage + tmp
+</div>
+
 </article><article id="LogPanel"></article></section>
 <script>function initCombat(){
     window.gm.simpleCombatInit("DngNG_Spider");
@@ -95,7 +101,7 @@ foo();
 :: DngNG_SpiderVictory [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
 <div id='select10' >
-</div><div id='choice10a' hidden></br> As the bot hurries away, you notice it lost some SCRUB that you collect as your prize.
+</div><div id='choice10a' hidden></br> As the bot hurries away, you notice it lost something that you collect as your prize: <div id='output'></div>
 </div>
 <div id='choice10b' hidden></br> 
 </div>
@@ -107,6 +113,7 @@ foo();
     tmp.now=window.passage.name;
     var _dmg=0,_rng=_.random(0,100);
     if(_rng>50) {
+        window.gm.player.Inv.addItem(window.gm.ItemsLib.Gorb());
         window.gm.printTalkLink("div#select10","div#choice10a")
     } else {
         window.gm.printTalkLink("div#select10","div#choice10b")

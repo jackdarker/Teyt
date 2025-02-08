@@ -105,6 +105,17 @@ window.gm.encounters.slugLeech = function(params){
         return(mobs);});
     if(!_params.noStart) window.gm.Encounter.initCombat();
 }
+window.gm.encounters.imp = function(params){
+    let _params=window.gm.encounters._setup(params);
+    window.gm.Encounter.EnemyFunc = (function(){ 
+        let mobs =[];
+        for(var i=_params.amount;i>0;i-=1){
+            let x = window.gm.Mobs.Imp(_params.type); x.scaleLevel(window.gm.player.level+_params.levelUp);
+            x.name=x.baseName+'#'+i;mobs.push(x);
+        }
+        return(mobs);});
+    if(!_params.noStart) window.gm.Encounter.initCombat();
+}
 window.gm.encounters.succubus = function(params){
     let _params=window.gm.encounters._setup(params);
     window.gm.Encounter.EnemyFunc = (function(){ 
@@ -206,6 +217,20 @@ window.gm.encounters.naga = function(params){
         let mobs =[];
         for(var i=_params.amount;i>0;i-=1){
             let x = window.gm.Mobs.naga(_params.type); x.scaleLevel(window.gm.player.level+_params.levelUp);
+            x.name=x.baseName+'#'+i;mobs.push(x);
+        }
+        return(mobs);});
+    if(!_params.noStart) window.gm.Encounter.initCombat();
+}
+window.gm.encounters.cat = function(params){
+    let _params=window.gm.encounters._setup(params);
+    window.gm.Encounter.EnemyFunc = (function(){ 
+        let mobs =[];
+        for(var i=_params.amount;i>0;i-=1){
+            let x = window.gm.Mobs.Cat(_params.type); x.scaleLevel(window.gm.player.level+_params.levelUp);
+            if(_.random(1,100)>50){
+                window.gm.MutationsLib.swapGender(x,window.storage.constructors["VulvaHuman"]);
+            }
             x.name=x.baseName+'#'+i;mobs.push(x);
         }
         return(mobs);});

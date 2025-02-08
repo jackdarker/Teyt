@@ -127,7 +127,7 @@ Items you store in this magic chest dont get lost if you are knocked out.
 <div id="choice"></div>
 </br>[[Back|_back_]]</br>
 </article><article id="LogPanel"></article></section>
-<script>window.gm.printItemTransfer(window.gm.player,window.story.state.GlobalChest,false);</script>
+<script>window.gm.printItemTransfer(window.gm.player,window.story.state.chars.GlobalChest,false);</script>
 
 
 :: GlobalChestWardrobe [_nosave_ _back_]
@@ -137,7 +137,7 @@ Items you store in this magic chest dont get lost if you are knocked out.</br>On
 <div id="choice"></div>
 </br>[[Items...|_back_]]</br>
 </article><article id="LogPanel"></article></section>
-<script>window.gm.printItemTransfer(window.gm.player,window.story.state.GlobalChest,true);</script>
+<script>window.gm.printItemTransfer(window.gm.player,window.story.state.chars.GlobalChest,true);</script>
 
 
 :: NOP_VR [_nosave_ _back_]

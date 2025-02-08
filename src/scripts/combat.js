@@ -204,18 +204,18 @@ printCombatEffects(char){
     for(let i=effects.length-1; i>=0; i--){
       let effect = char.Effects.get(effects[i]);
       if(effect.onCombatEnd!==null && effect.onCombatEnd!==undefined){
-        list.push(effect.shortDesc);
+        list.push(effect.iconTooltip);//'<div class="combateff"><div class="combaticon">'+effect.icon+'</div>'+ effect.shortDesc+'</div>');
       }
     }
   }
-  return(list.reduce((sum, current) => sum + current +', ', ''));
+  return((list.reduce((sum, current) => sum + current, '')));//(list.reduce((sum, current) => sum + current +', ', '')).slice(0,-2));
 }
 statsline(whom,mark){
   let msg='',bargraph=window.gm.util.bargraph;
   if(mark) msg = "<td style=\"border-style:dotted;border-color:darkorchid;border-width:0.3em;\">";
   else msg = "<td>";
   msg+=whom.name+" Lv"+whom.level+"</td><td>"+bargraph(whom.health().value,whom.health().max,"lightcoral")
-    +"</td><td>"+bargraph(whom.Stats.get("poise").value,whom.Stats.get("poiseMax").value,"darkgrey")+bargraph(whom.Stats.get("arousal").value,whom.Stats.get("arousalMax").value,"lightpink")
+    +"</td><td>"+((window.story.state._gm.enablePoise)?bargraph(whom.Stats.get("poise").value,whom.Stats.get("poiseMax").value,"darkgrey"):"")+bargraph(whom.Stats.get("arousal").value,whom.Stats.get("arousalMax").value,"lightpink")
     +"</td><td>"+bargraph(whom.energy().value,whom.energy().max,"lightyellow")+bargraph(whom.Stats.get("will").value,whom.Stats.get("willMax").value,"lightblue")
     +"</td>";
   return(msg);
@@ -232,7 +232,7 @@ printStats(){
       player2 50/100  10/20      Ork2  20/20   10/100
   */
  let elmt = '<table id=\"combatstats\"><tbody>';
-  elmt += "<tr><th>Player</th><th>Health</th><th>Poise</br>Arousal</th><th>Energy</br>Will</th><th>   </th><th>Enemys</th><th>Health</th><th>Poise</br>Arousal</th><th>Energy</br>Will</th></tr>";
+  elmt += "<tr><th>Player</th><th>Health</th><th>"+((s._gm.enablePoise)?"Poise</br>":"")+"Arousal</th><th>Energy</br>Will</th><th>   </th><th>Enemys</th><th>Health</th><th>"+((s._gm.enablePoise)?"Poise</br>":"")+"Arousal</th><th>Energy</br>Will</th></tr>";
   for(let i=0;(i<players.length || i<enemys.length);i++){
     elmt += "<tr>";
     if(i<players.length){
@@ -247,12 +247,12 @@ printStats(){
     }
     elmt += "</tr><tr>";
     if(i<players.length){ //effects as additional row
-      elmt += "<td></td><td colspan='3' style=\"font-size:smaller\">"+players[i].Stance.id+" "+window.gm.Encounter.printCombatEffects(players[i])+"</td>";
+      elmt += "<td></td><td colspan='3' style=\"font-size:smaller\">"+((s._gm.enablePoise)?players[i].Stance.id:"")+" "+window.gm.Encounter.printCombatEffects(players[i])+"</td>";
     } else {
       elmt += "<td></td><td></td><td></td><td></td>";
     }
     if(i<enemys.length){
-      elmt += "<td></td><td></td><td colspan='3' style=\"font-size:smaller\">"+enemys[i].Stance.id+" "+window.gm.Encounter.printCombatEffects(enemys[i])+"</td>";
+      elmt += "<td></td><td></td><td colspan='3' style=\"font-size:smaller\">"+((s._gm.enablePoise)?enemys[i].Stance.id:"")+" "+window.gm.Encounter.printCombatEffects(enemys[i])+"</td>";
     } else {
       elmt += "<td></td><td></td><td></td><td></td><td></td>";
     }
@@ -608,7 +608,7 @@ selectMove(){
       result.OK=false;
     } else {
       this.printSkillList();
-      result.OK=true, result.msg=stateDesc.msg+"</br>Choose action for "+s.combat.actor.name+"!</br>";
+      result.OK=true, result.msg=stateDesc.msg+"</br></br>Choose action for "+s.combat.actor.name+"!</br>";
     }
   }
   return(result);
@@ -777,12 +777,12 @@ window.gm.combat.calcAbsorb=function(attacker,defender, attack){
   let result = {OK:true,msg:''}
   let rnd = _.random(1,100);
   if(attack.mod.onCrit.length>0 && ((rnd<attack.mod.critChance) || attack.crit===true)){  //is critical
-    attack.crit=true, result.msg = '</br>'+defender.name +' got critical hit by '+attacker.name+" "+attack.mod.msg+'. ';
+    attack.crit=true, result.msg = '</br>'+defender.name +' got critical hit by '+attacker.name+" "+attack.mod.msg+'.</br>';
     for(var n of attack.mod.onCrit){
         attack.effects.push( {target:n.target, eff:n.eff}); //n.eff is []
     }
   } else {
-    result.msg = '</br>'+defender.name +' got hit by '+attacker.name+" "+attack.mod.msg+'. ';
+    result.msg = '</br>'+defender.name +' got hit by '+attacker.name+" "+attack.mod.msg+'.</br>';
     for(var n of attack.mod.onHit){
         attack.effects.push( {target:n.target, eff:n.eff});
     }
