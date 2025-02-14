@@ -602,6 +602,7 @@ window.gm.ItemTags = { //
     Money   : 'money', //...for trading
     Ingredient : 'ingred',
     Material : 'material',
+    Loot    :   'loot',
     Drink   : 'drink',
     Food    : 'food',
     Heal    : 'heal',

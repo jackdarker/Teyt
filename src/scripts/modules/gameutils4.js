@@ -195,6 +195,22 @@ window.gm.build_DngNG=function(){
         data.tasks = { //task list 
         };
     }
+    //override to limit how much items player can pickup
+    window.story.state.chars.PlayerVR.Inv.canAddItem=function(item,count,force=false){
+        let list,_count=0,_rst={OK:true,msg:"",count:count};
+        if(item.hasTag(window.gm.ItemTags.Heal)){
+            list=this.findItemByTag(window.gm.ItemTags.Heal);
+            list.forEach(X=>{_count+=X.count();});
+            _rst.count=Math.max(0,Math.min((  3  -_count),_rst.count));
+            if(_rst.count<=0) {
+                _rst.OK=false;
+                _rst.msg=this.parent.name+" cant carry more of those healing items.";
+            } else if(_rst.count<count){ 
+                _rst.msg=this.parent.name+" can carry only some more of those healing items.";
+            }
+        }
+        return(_rst);
+    };
     //install function to calculate chance of evtLeave
     window.gm.encounterChance=function(evt){
         let res=100.0,s=window.story.state,dng=window.story.state.DngSY.dng;

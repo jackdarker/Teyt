@@ -358,6 +358,10 @@ window.gm.initGame= function(forceReset,NGP=null){
       window.gm.quests.setQuestData(s.quests);
       window.gm.quests.pubSub.subscribe("change",function(data){window.gm.toasty.info("Quest "+data.questId+" updated")});
     }
+    if(!s.AiMem || forceReset){ //AI memory database
+      s.AiMem =  new AIMemoryData();
+      window.gm.AI = new AIManager(s.AiMem);
+    }
     if (!s._gm||forceReset){
       s._gm = {
         version : window.gm.getSaveVersion(),
