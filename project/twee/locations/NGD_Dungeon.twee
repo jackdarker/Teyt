@@ -56,6 +56,12 @@ Ruff is just growling menacingly at you.</br> Maybe if you would have something 
     window.gm.Encounter.initCombat(); return;
 }</script>
 
+:: DngNG_Ruff_Friendly_Talk [_back_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
+Ruff is happy to see you.</br> 
+</br>[[Back|_back_]]</br>
+</article><article id="LogPanel"></article></section>
+
 
 :: DngNG_Tmpl
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>

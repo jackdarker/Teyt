@@ -880,7 +880,8 @@ $("tw-passage").fadeIn(500);//fade in if was previously faded out
 $(document).on('sm.passage.shown',function(ev,eventObject){window.gm.refreshSidePanel();window.gm.restorePage();});$(window).on('sm.story.error',function(event,eventObject){// window.story
 console.log(eventObject);});if(!window.gm.timeEvent||forceReset){window.gm.timeEvent=window.gm.util.PubSub();//subscribe to "change" event to receive time updates
 // !! make sure to reregister after load !
-}if(!s.quests||forceReset){s.quests=new QuestData();window.gm.quests=new QuestManager(window.gm.questDef);window.gm.quests.setQuestData(s.quests);window.gm.quests.pubSub.subscribe("change",function(data){window.gm.toasty.info("Quest "+data.questId+" updated");});}if(!s._gm||forceReset){s._gm={version:window.gm.getSaveVersion(),style:'default',//css profile to use
+}if(!s.quests||forceReset){s.quests=new QuestData();window.gm.quests=new QuestManager(window.gm.questDef);window.gm.quests.setQuestData(s.quests);window.gm.quests.pubSub.subscribe("change",function(data){window.gm.toasty.info("Quest "+data.questId+" updated");});}if(!s.AiMem||forceReset){//AI memory database
+s.AiMem=new AIMemoryData();window.gm.AI=new AIManager(s.AiMem);}if(!s._gm||forceReset){s._gm={version:window.gm.getSaveVersion(),style:'default',//css profile to use
 log:[],IDGenBkup:0,IDGen:new IDGenerator(),passageStack:[],//used for passage [back] functionality
 defferedStack:[],//used for deffered events
 onholdStack:[],//used for deffered events
@@ -1222,7 +1223,58 @@ value:function calcCombatMove(enemys,friends){var rnd=_.random(1,100);var result
 },{key:"scaleLevel",//randomize mob level around target-level but not below min-level: +-20%;
 value:function scaleLevel(lvl){var x;x=Math.round(window.gm.util.randomNormal(lvl,lvl*0.2));x=Math.max(this.level_min,x);x=x-this.level;if(x>0){this.levelUp(x);this.autoLeveling();}//refill gained stats 
 this.Stats.increment("health",99999);this.Stats.increment("energy",99999);this.Stats.increment("will",99999);}},{key:"levelUp",value:function levelUp(add){_get(_getPrototypeOf(Mob.prototype),"levelUp",this).call(this,add);this.baseXPReward=this.level*20;//todo baseXP = sum of statpoints + skills ?
-}},{key:"isAIenabled",get:function get(){return true;}}],[{key:"fromJSON",value:function fromJSON(value){var _x=window.storage.Generic_fromJSON(Mob,value.data);_x._relinkItems();return _x;}}]);return Mob;}(Character);"use strict";/* a player has an outfit describing which Equipment (wardrobe,utilities,..) he has equiped
+}},{key:"findInteraction",value:function findInteraction(IDOther){return null;}},{key:"isAIenabled",get:function get(){return true;}}],[{key:"fromJSON",value:function fromJSON(value){var _x=window.storage.Generic_fromJSON(Mob,value.data);_x._relinkItems();return _x;}}]);return Mob;}(Character);//data separated for save/load
+var AIMemoryData=/*#__PURE__*/function(){function AIMemoryData(){_classCallCheck(this,AIMemoryData);this.ST=[];//short-time memory
+this.LT=[];//long-term memory
+this.IT=[];//active Interactions
+window.storage.registerConstructor(AIMemoryData);}_createClass(AIMemoryData,[{key:"toJSON",value:function toJSON(){return window.storage.Generic_toJSON("AIMemoryData",this);}}],[{key:"fromJSON",value:function fromJSON(value){var _x=window.storage.Generic_fromJSON(AIMemoryData,value.data);return _x;}},{key:"STentry",value:function STentry(IDWho,IDOther){//short-time memory
+return{timestamp:window.gm.getTime(),//time of interaction
+importance:1.0,//see updateSTmem     0.0=delete quickly, 1=normal, 2=memorize 2xtimes longer
+iDWho:IDWho,//id of character
+iDOther:IDOther,//who they interacted with:  Player, Crow#2
+type:0,//how they interacted:         Fight, Conversation, Watching
+scene:"",details:{},//details of interaction:        who started the fight, theme of conversation   
+result:{}//result of interaction:          defeat, aggreement
+};}},{key:"LTentry",value:function LTentry(){//long-term memory
+return{//TODO for 2 chars there are 2 entrys or one?
+iDWho:"",//id of character
+iDOther:"",//who they interacted with:  Player, Crow#2
+aff:0,//affection     -100=hates,0=neutral,100=loves
+ass:0//assertiveness   -100=submits, 100=dominates
+};}},{key:"IEntry",value:function IEntry(IDWho,IDOther){//state of interaction
+return{iDWho:IDWho,iDOther:IDOther,type:0,//conversation/combat/evasion
+scene:"",details:{}//conversation-dialog /      
+};}},{key:"TYPE_COMBAT",get:function get(){return 1;}},{key:"TYPE_DIALOG",get:function get(){return 2;}},{key:"TYPE_FORCEDIALOG",get:function get(){return 3;}//scene has to point to (back-)passage; make sure not to be stuck in loop by repeating interaction !
+}]);return AIMemoryData;}();//contains functions for AI-related tasks
+var AIManager=/*#__PURE__*/function(){function AIManager(AIMemoryData){_classCallCheck(this,AIManager);this.maxSTEntrys=10;//limit entrys per IDWho
+this.AIMemoryData=AIMemoryData;}//appends data by replacing old one
+_createClass(AIManager,[{key:"updateSTMem",value:function updateSTMem(STEntry){var array=this.AIMemoryData.ST,_x,_i;for(var i=0;i<array.length;i++){_x=array[i];if(_x.idWho===STEntry.idWho&&_x.idOther===STEntry.idOther&&_x.scene==STEntry.scene){_i=i;break;}}if(_i>=0)array[_i]=STEntry;else array.push(STEntry);//if to much entrys clear out old one; 
+//for this sort entrys by timedelta and importance   dt/Math.max(0.1,importance)
+}},{key:"updateLTMem",value:function updateLTMem(LTentry){}//returns Entrys for participants
+},{key:"getSTMemByIDWho",value:function getSTMemByIDWho(IDWho,IDOther){}//returns Entrys for participants
+},{key:"getLTMemByIDWho",value:function getLTMemByIDWho(IDWho,IDOther){}//removes entrys with character ID that doesnt exist anymore
+},{key:"sanitizeMem",value:function sanitizeMem(){//walk table backwards and delete entrys with invalid ids
+//optional ??
+//sort the ids
+//sorted by IDWho>IDother>dt/importance
+//this.AIMemoryData.ST.sort((a,b) => {a-b});
+}//checks which interactable a Mob sees at its current place (other characters); 
+//returns a priorized list of options; options are filterd by interactions logged in STmem (dont repeat most recent action)  
+//
+//this uses the dungeon mob data?! 
+},{key:"findInteraction",value:function findInteraction(mob){var _mob,IDOther,IA=null;//priorize by Danger>Opportunity>Common
+//check personal LT-affection & faction -> isEnemy?
+//player around?
+//mob.pos==(window.gm.player.location.replace(window.story.state.DngSY.dng+"_",""));
+IDOther=window.gm.player.id;//player not busy with interaction
+var _i=this._findById(this.AIMemoryData,"IDOther",window.gm.player.id);if(_i<0)_i=this._findById(this.AIMemoryData,"IDWho",window.gm.player.id);if(_i>=0)return IA;//what interaction could the mob have with player; requires a instance of the mob
+_mob=window.story.state.chars[mob.id];if(!_mob)return IA;IA=_mob.findInteraction(IDOther);if(!IA)return IA;return IA;}//starts the desired interaction
+},{key:"startInteraction",value:function startInteraction(IEntry,renderfct){var STEntry;//if TYPE_DIALOG offer Talk-button
+if(IEntry.type==AIMemoryData.TYPE_FORCEDIALOG){//skip to scene; also set STMem
+STEntry=AIMemoryData.STentry(IEntry.iDWho,IEntry.iDOther);STEntry.type=IEntry.type,STEntry.details=IEntry.details;this._setInteraction(IEntry);this.updateSTMem(STEntry);window.story.show(IEntry.scene);}//if TYPE_COMBAT continue combat
+}/* get the current interaction progress; returns null if nothing found
+     */},{key:"getInteraction",value:function getInteraction(IDWho){var IA=this.AIMemoryData.IT.find(function(x){return x.IDWho===IDWho;});return IA;}//updates/adds the interaction
+},{key:"_setInteraction",value:function _setInteraction(IEntry){var _i=this._findById(this.AIMemoryData.IT,"IDWho",IEntry.IDWho);if(_i<0)this.AIMemoryData.IT.push(IEntry);else this.AIMemoryData.IT[_i]=IEntry;}},{key:"abortInteraction",value:function abortInteraction(IDWho){}},{key:"_findById",value:function _findById(array,idname,idvalue){for(var i=0;i<array.length;i++){if(array[i][idname]===idvalue)return i;}return-1;}}]);return AIManager;}();"use strict";/* a player has an outfit describing which Equipment (wardrobe,utilities,..) he has equiped
 */ //this is a lookuptable for the equipmentslots
 //basially you could create your own slotdefinition, the string is used to lookup properties assigned to list 
 window.gm.OutfitSlotLib={//b.. = bodyparts  (separated for mutation-slots)
@@ -2775,7 +2827,7 @@ function showPopup(evt){//var iconPos = evt.getBoundingClientRect();
 mypopup.style.left=evt.x+12+"px";//(iconPos.right + 20) + "px";
 mypopup.style.top=evt.y-12+"px";//(window.scrollY + iconPos.top - 60) + "px";
 mypopup.textContent=evt.currentTarget.id;mypopup.style.display="block";}function hidePopup(evt){mypopup.style.display="none";}function nameToXY(name){var _x,_y,coord,pos={x:0,y:0};if(coostyle===''){//detect coord name style once
-_x=X.findIndex(function(el){return el===name[0];});if(_x>-1){coostyle='A1';}else if(name.split('_').length===2){coostyle="12_01";}else throw new Error("cannot detect coord style");}switch(coostyle){case'A1':_x=Y.findIndex(function(el){return el===name[1];});_y=X.findIndex(function(el){return el===name[0];});break;case"12_01":coord=name.split('_');_x=parseInt(coord[0],10);_y=parseInt(coord[1],10);}pos.y=_y*step;pos.x=_x*step;return pos;}function addAnno(){//add up to 4 annotation-letters
+_x=X.findIndex(function(el){return el===name[0];});if(_x>-1){coostyle='A1';}else if(name.split('_').length===2){coostyle="12_01";}else throw new Error("cannot detect coord style");}switch(coostyle){case'A1':_x=X.findIndex(function(el){return el===name[0];});_y=Y.findIndex(function(el){return el===name[1];});break;case"12_01":coord=name.split('_');_x=parseInt(coord[0],10);_y=parseInt(coord[1],10);}pos.y=_y*step;pos.x=_x*step;return pos;}function addAnno(){//add up to 4 annotation-letters
 var dx2=[6,6,-6,-6],dy2=[0,10,10,0];//
 for(k=room.anno?room.anno.length-1:-1;k>=0;k--){if(k>3)continue;lRoom.text(function(add){add.tspan(room.anno[k]);}).addClass('textLabel').ax(_rA.cx()+ox+dx2[k]).ay(_rA.cy()+oy+dy2[k]);}}var draw=document.querySelector("#canvas svg");if(!draw)draw=SVG().addTo('#canvas').size(width,height);else draw=SVG(draw);//recover svg document instead appending new one
 draw.rect(width,height).attr({fill:'#303030'});var node=SVG(window.gm.images['template3']());//get the source-svg
@@ -2864,11 +2916,12 @@ var dirs=[],rooms=window.story.state.DngSY.dngMap.grid;var _to=rooms.get(_from);
         if(rooms[i].room===_from){
             return(rooms[i].dirs)
         }
-    }*/return dirs;};//mob.state = -2:passedout 0:resting, 1:guarding 2:alerted 3:hunting 4:attacking  
+    }*/return dirs;};//makes the mob move around and hunt player
+//mob.state = -2:passedout 0:resting, 1:guarding 2:alerted 3:hunting 4:attacking  
 //mob.timerA = time until switching back to guard if no player detected
 //mob.timerB = thinking time
 window.gm.mobAI=function(mob){var _now=window.gm.getTime(),timeR=30;//Todo timeRate depends on Mob?
-var _d=window.story.state[window.story.state.DngSY.dng].tmp,goalpos;if(mob.state<0||mob.tick===''){mob.tick=_now;return;}if(window.gm.getDeltaTime(_now,mob.tick)>timeR){mob.tick=_now;if(mob.pos===stripRoom(window.gm.player.location)){//TODO && !player.hiding
+var _IA,_d=window.story.state[window.story.state.DngSY.dng].tmp,goalpos;if(mob.state<0||mob.tick===''){mob.tick=_now;return;}if(window.gm.getDeltaTime(_now,mob.tick)>timeR){mob.tick=_now;_IA=window.gm.AI.getInteraction(mob.id);if(!_IA)_IA=window.gm.AI.findInteraction(mob);if(_IA){window.gm.AI.startInteraction(_IA);}else{}if(mob.pos===stripRoom(window.gm.player.location)){//TODO && !player.hiding
 if(mob.state===2){//activate attacking
 mob.timerA=2*timeR;mob.state=4;//reset after time||fight
 }else if(mob.state!==2&&mob.state!==4){//detect player
@@ -2962,7 +3015,8 @@ data.tmp.evtSpawn["DngNG_"+getTilesByVisual("mushroom")[0].room]={mushroom:{tick
 }//addMob("Ruff","G3"),addMob("Slime","I2"),addMob("Slime","G2");
 data.task={},data.rolledTask=[];//active task
 data.tasks={//task list 
-};}//install function to calculate chance of evtLeave
+};}//override to limit how much items player can pickup
+window.story.state.chars.PlayerVR.Inv.canAddItem=function(item,count){var force=arguments.length>2&&arguments[2]!==undefined?arguments[2]:false;var list,_count=0,_rst={OK:true,msg:"",count:count};if(item.hasTag(window.gm.ItemTags.Heal)){list=this.findItemByTag(window.gm.ItemTags.Heal);list.forEach(function(X){_count+=X.count();});_rst.count=Math.max(0,Math.min(3-_count,_rst.count));if(_rst.count<=0){_rst.OK=false;_rst.msg=this.parent.name+" cant carry more of those healing items.";}else if(_rst.count<count){_rst.msg=this.parent.name+" can carry only some more of those healing items.";}}return _rst;};//install function to calculate chance of evtLeave
 window.gm.encounterChance=function(evt){var res=100.0,s=window.story.state,dng=window.story.state.DngSY.dng;res*=evt.chance/100.0;if(evt.id==='Trap_Dehair'){//Dehair if nude and hair
 //if(window.gm.player.clothLevel()==='naked') {res*=2;}
 if(window.gm.getDeltaTime(window.gm.getTime(),evt.tick)>200)res*=2;else res=0;}return res;};//TODO cannot save graph due circular neigbours data.tmp.graph = window.gm.gridToGraph(_grid);  //for pathfinding  let path = window.astar.search(data.tmp.graph,"F2","I2",null,{heuristic:(function(a,b){return(1);})})
@@ -3034,7 +3088,7 @@ context.removeItem(this.id);if(on instanceof Character){return{OK:true,msg:_txt}
 //Items
 Quest:"quest",//quest-item; dont sell or give away
 Cursed:"cursed",Money:'money',//...for trading
-Ingredient:'ingred',Material:'material',Drink:'drink',Food:'food',Heal:'heal',Poison:'poison',//Outfit
+Ingredient:'ingred',Material:'material',Loot:'loot',Drink:'drink',Food:'food',Heal:'heal',Poison:'poison',//Outfit
 Piercing:"piercing",Tattoo:"tattoo",Armor:"armor",Wear:'wear',//something to cover the body
 //weapons
 Tool:'tool',Weapon:"weapon",Shield:"shield",Melee:"melee",Ranged:"ranged"};window.gm.ItemsLib=function(ItemsLib){window.storage.registerConstructor(Box);window.storage.registerConstructor(LighterDad);window.storage.registerConstructor(Voucher);window.storage.registerConstructor(Money);window.storage.registerConstructor(LaptopPS);window.storage.registerConstructor(Battery);window.storage.registerConstructor(Dildo);window.storage.registerConstructor(Lube);window.storage.registerConstructor(Rope);window.storage.registerConstructor(CanOfCoffee);window.storage.registerConstructor(KeyRestraint);window.storage.registerConstructor(SimpleFood);window.storage.registerConstructor(HealthPotion);window.storage.registerConstructor(HorsePotion);window.storage.registerConstructor(Ingredient);//only need constructor for base-ingredient
@@ -3158,7 +3212,7 @@ result.msg=this.fconv("$[I]$ $[release]$ a cloud of toxic spores into the air.</
 if(_t.length<=0)return _get(_getPrototypeOf(Wisp.prototype),"calcCombatMove",this).call(this,enemys,friends);result.action=skn;result.target=_t[0];result.msg=/*this.fconv(this.name + " will protect."+result.target[0].name+"</br>")+*/result.msg;return result;}return _get(_getPrototypeOf(Wisp.prototype),"calcCombatMove",this).call(this,enemys,friends);}}]);return Wisp;}(Mob);/////////////////////////////////////////////////////////
 // special NPC
 var Carlia=/*#__PURE__*/function(_Mob24){_inherits(Carlia,_Mob24);var _super99=_createSuper(Carlia);function Carlia(){var _this97;_classCallCheck(this,Carlia);_this97=_super99.call(this);_this97.baseName=_this97.id='Carlia';_this97.unique=true;_this97.pic='unknown';_this97.Outfit.addItem(new BaseHumanoid());_this97.Outfit.addItem(new SkinHuman());_this97.Outfit.addItem(HandsHuman.factory('cat'));_this97.Outfit.addItem(FaceWolf.factory('cat'));_this97.Outfit.addItem(BreastHuman.factory('human'));_this97.Outfit.addItem(VulvaHuman.factory('human'));_this97.Outfit.addItem(new BikiniBottomLeather());_this97.Outfit.addItem(new BikiniTopLeather());_this97.levelUp(3);_this97.autoLeveling();return _this97;}return Carlia;}(Mob);var Ruff=/*#__PURE__*/function(_Mob25){_inherits(Ruff,_Mob25);var _super100=_createSuper(Ruff);function Ruff(){var _this98;_classCallCheck(this,Ruff);_this98=_super100.call(this);_this98.baseName=_this98.id='Ruff';_this98.unique=true;_this98.Outfit.addItem(new BaseQuadruped());_this98.Outfit.addItem(SkinFur.factory('wolf','black'));_this98.Outfit.addItem(HandsPaw.factory('wolf'));_this98.Outfit.addItem(PenisHuman.factory('wolf'));_this98.Outfit.addItem(AnusHuman.factory('wolf'));_this98.Outfit.addItem(TailWolf.factory('wolf'));_this98.Outfit.addItem(FaceWolf.factory('wolf'));_this98.Stats.increment('arm_blunt',5);_this98.levelUp(7);_this98.autoLeveling();return _this98;}_createClass(Ruff,[{key:"toJSON",value:function toJSON(){return window.storage.Generic_toJSON("Ruff",this);}},{key:"calcCombatMove",value:function calcCombatMove(enemys,friends){var result={OK:true,msg:''};//this._canAct();
-var rnd=_.random(1,100);var spawn="CallHelpWolf";if(!this.fconv)this.fconv=window.gm.util.descFixer(this);result.action=result.target=null;if(window.story.state.combat.turnCount%2===0){rnd=_.random(0,enemys.length-1);result.action="Bite";result.target=[enemys[rnd]];result.msg=this.name+" snaps at "+result.target[0].name+".</br>"+result.msg;return result;}else if(window.story.state.combat.turnCount>3&&this.Skills.countItem(spawn)>0&&this.Skills.getItem(spawn).isEnabled().OK){result.action=spawn;result.target=[this];result.msg=this.name+" howls to call its pack for support.</br>"+result.msg;return result;}return _get(_getPrototypeOf(Ruff.prototype),"calcCombatMove",this).call(this,enemys,friends);}},{key:"pic",get:function get(){return'wolf3';}}],[{key:"fromJSON",value:function fromJSON(value){var _x=window.storage.Generic_fromJSON(Ruff,value.data);_x._relinkItems();/*_x.Effects._relinkItems();
+var rnd=_.random(1,100);var spawn="CallHelpWolf";if(!this.fconv)this.fconv=window.gm.util.descFixer(this);result.action=result.target=null;if(window.story.state.combat.turnCount%2===0){rnd=_.random(0,enemys.length-1);result.action="Bite";result.target=[enemys[rnd]];result.msg=this.name+" snaps at "+result.target[0].name+".</br>"+result.msg;return result;}else if(window.story.state.combat.turnCount>3&&this.Skills.countItem(spawn)>0&&this.Skills.getItem(spawn).isEnabled().OK){result.action=spawn;result.target=[this];result.msg=this.name+" howls to call its pack for support.</br>"+result.msg;return result;}return _get(_getPrototypeOf(Ruff.prototype),"calcCombatMove",this).call(this,enemys,friends);}},{key:"findInteraction",value:function findInteraction(IDOther){var IA=null;if(IDOther==window.gm.player.id){IA=AIMemoryData.IEntry(this.id,IDOther);IA.type=AIMemoryData.TYPE_FORCEDIALOG;IA.scene="DngNG_Ruff_Talk";}return IA;}},{key:"pic",get:function get(){return'wolf3';}}],[{key:"fromJSON",value:function fromJSON(value){var _x=window.storage.Generic_fromJSON(Ruff,value.data);_x._relinkItems();/*_x.Effects._relinkItems();
         _x.Stats._relinkItems();
         _x.Inv._relinkItems();
         _x.Outfit._relinkItems();
@@ -3984,7 +4038,7 @@ window.storage.registerConstructor(Stat);window.storage.registerConstructor(stHe
 window.storage.registerConstructor(effCallHelp);window.storage.registerConstructor(effCombatRecovery);window.storage.registerConstructor(effDamage);window.storage.registerConstructor(effDetermined);window.storage.registerConstructor(effHunger);window.storage.registerConstructor(effLibido);window.storage.registerConstructor(effSanity);window.storage.registerConstructor(effFlying);window.storage.registerConstructor(effBleed);window.storage.registerConstructor(effCombined);window.storage.registerConstructor(effFairyLight);window.storage.registerConstructor(effGrappled);window.storage.registerConstructor(effGrappling);window.storage.registerConstructor(effUngrappling);window.storage.registerConstructor(effEnergized);window.storage.registerConstructor(effNotTired);window.storage.registerConstructor(effPillEffect);window.storage.registerConstructor(effPoiseDamage);window.storage.registerConstructor(effTeaseDamage);window.storage.registerConstructor(effTired);window.storage.registerConstructor(effStunned);window.storage.registerConstructor(effTransformSelf);window.storage.registerConstructor(effGuard);window.storage.registerConstructor(effProtect);window.storage.registerConstructor(effHeal);window.storage.registerConstructor(effMasochist);window.storage.registerConstructor(effEnergyDrain);window.storage.registerConstructor(effHorsePower);window.storage.registerConstructor(effLapineSpeed);window.storage.registerConstructor(effMutateBunny);window.storage.registerConstructor(effMutateHorse);window.storage.registerConstructor(effMutateWolf);window.storage.registerConstructor(effMutateCat);window.storage.registerConstructor(effMutateHuman);window.storage.registerConstructor(effGrowBreast);window.storage.registerConstructor(effGrowVulva);window.storage.registerConstructor(effLewdMark);window.storage.registerConstructor(effInHeat);window.storage.registerConstructor(effInRut);window.storage.registerConstructor(effSpermDecay);window.storage.registerConstructor(effButtPlugged);window.storage.registerConstructor(effVaginalFertil);window.storage.registerConstructor(effVaginalPregnant);//non-combat skills
 window.storage.registerConstructor(Ability);StatsLib.Ability=Ability;return StatsLib;}(window.gm.StatsLib||{});
 /* twine-user-script #2: "Story JavaScript" */
-</script><tw-tag name="_fragm_" color="blue"></tw-tag><tw-tag name="template" color="orange"></tw-tag><tw-tag name="_back_" color="gray"></tw-tag><tw-tag name="_nosave_" color="yellow"></tw-tag><tw-tag name="_nodeffered_" color="yellow"></tw-tag><tw-tag name="_isdeffered_" color="brown"></tw-tag><tw-tag name="_noshortkey_" color="brown"></tw-tag><tw-passagedata pid="1" name="Info_Jake" tags="_back_" position="100,100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
+</script><tw-tag name="_nosave_" color="yellow"></tw-tag><tw-tag name="_nodeffered_" color="yellow"></tw-tag><tw-tag name="_isdeffered_" color="brown"></tw-tag><tw-tag name="_noshortkey_" color="brown"></tw-tag><tw-tag name="_fragm_" color="blue"></tw-tag><tw-tag name="template" color="orange"></tw-tag><tw-tag name="_back_" color="gray"></tw-tag><tw-passagedata pid="1" name="Info_Jake" tags="_back_" position="100,100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 Jake is here.&lt;/br&gt;
 You barely know anything about him.&lt;/br&gt;
 [[Back|_back_]]&lt;/br&gt;&lt;/br&gt;
@@ -7376,7 +7430,7 @@ Those are very present through the game and in the main-story (also check the se
 You might see a lot of links that are formated red-strikethrough. Those are currently broken and you shouldnt use them.&lt;/p&gt;
 &lt;p class=&#39;author&#39;&gt;Loading of savegame is only possible in game. Saving might be disabled in some locations.&lt;/p&gt;
 &lt;p class=&#39;author&#39;&gt;[[Fetishes ! (spoiler alert)|List_Fetish]]&lt;/p&gt;&lt;/br&gt;&lt;/br&gt;&lt;hr&gt;
-&lt;p&gt;This is a kind of remake of NightgamesMod. I wasnt able to mod it in Java, so I started from scratch. &lt;/br&gt;&lt;/p&gt;
+&lt;p&gt;The crane airfreight transport, which was supposed to deliver the dowry of ToothBack, crashed over the borderlands. An opportunity to make a lot of money - there are said to have been a few nice gems among them. &lt;/br&gt;&lt;/p&gt;
 &lt;p&gt;&lt;a0 onclick=&#39;start();&#39;&gt;Start&lt;/a&gt;&lt;/p&gt;&lt;hr&gt;
 &lt;p&gt;&lt;a0 onclick=&#39;startRandom();&#39;&gt;random Dng&lt;/a&gt;
 &lt;label&gt;length:

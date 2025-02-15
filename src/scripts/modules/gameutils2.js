@@ -137,15 +137,23 @@ window.gm.getRoomDirections=function(from){
     }*/
     return(dirs);
 };
+
+//makes the mob move around and hunt player
 //mob.state = -2:passedout 0:resting, 1:guarding 2:alerted 3:hunting 4:attacking  
 //mob.timerA = time until switching back to guard if no player detected
 //mob.timerB = thinking time
 window.gm.mobAI = function(mob){
     let _now=window.gm.getTime(), timeR=30; //Todo timeRate depends on Mob?
-    let _d=window.story.state[window.story.state.DngSY.dng].tmp,goalpos;
+    let _IA,_d=window.story.state[window.story.state.DngSY.dng].tmp,goalpos;
     if(mob.state<0 || mob.tick===''){mob.tick=_now;return;}
     if(window.gm.getDeltaTime(_now,mob.tick)>timeR){ 
         mob.tick=_now;
+
+        /*_IA=window.gm.AI.getInteraction(mob.id);          
+        if(!_IA)_IA=window.gm.AI.findInteraction(mob);
+        if(_IA) { window.gm.AI.startInteraction(_IA);
+            return;
+        } */
         if(mob.pos===stripRoom(window.gm.player.location)){  //TODO && !player.hiding
             if(mob.state===2) { //activate attacking
                 mob.timerA=2*timeR;mob.state=4; //reset after time||fight

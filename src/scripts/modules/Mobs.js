@@ -1043,6 +1043,22 @@ class Ruff extends Mob {
         }
         return(super.calcCombatMove(enemys,friends));
     }
+    findInteraction(IDOther){
+        let LT=null,IA=null;
+        if(IDOther==window.gm.player.id){
+            LT=window.gm.AI.getLTMemByWho(_this.id,IDOther)
+            if(LT.aff<=10){
+                IA=AIMemoryData.IEntry(this.id,IDOther);
+                IA.type=AIMemoryData.TYPE_FORCEDIALOG
+                IA.scene="DngNG_Ruff_Talk";
+            }else{
+                IA=AIMemoryData.IEntry(this.id,IDOther);
+                IA.type=AIMemoryData.TYPE_FORCEDIALOG
+                IA.scene="DngNG_Ruff_Friendly_Talk";
+            }
+        }
+        return(IA)
+    }
 }
 class Clyde extends AnthroFox {
     constructor(){
