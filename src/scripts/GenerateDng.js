@@ -199,7 +199,7 @@
             //where x= {room:'D2', dirs:[{dir:'E2'}]},
             let _grid=[];
             for (let x of this.grid.values()){
-                let pos,dirs;
+                let pos,dirs,_dirs;
                 for(var i=x.tiles.length-1;i>=0;i--){
                     dirs=[]; //doors defined for this tile?
                     for(var k=this.doors.length-1;k>=0;k--){
@@ -209,6 +209,8 @@
                             dirs.push({dir:this.toCoord(this.doors[k][0])});
                         }
                     }
+                    _dirs=[];
+                    dirs=dirs.filter((x)=>{if(_dirs.indexOf(x.dir)<0){_dirs.push(x.dir);return(true);}else return(false)}) //filter double entries
                     pos=this.toCoord(x.tiles[i]);
                     _grid.push({room:pos,dirs:dirs})
                 }

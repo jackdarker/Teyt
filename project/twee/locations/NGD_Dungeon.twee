@@ -8,8 +8,6 @@
 <%if(window.passage.name==="DngNG_F3"){%><a0 onclick=''>Bang against the door to let you out of this place.</a><%}%>
 <a0 onclick='window.gm.addTime(30);window.gm.refreshAllPanel()'>Wait</a>
 
-:: DngNG_Encounters
-<script>window.gm.doMobAi();</script>
 
 :: DngNG_Retreat
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs") %>
@@ -66,7 +64,7 @@ Somewhere in the dungeon.</br>
 <div id='output'></div>
 </br><%=window.story.render('DngNG_Action')%></br><div id="navpanel"><%=window.gm.printNav2()%></div>
 </article><article id="LogPanel"></article></section>
-<script>window.gm.doMobAi();</script>
+<script></script>
 
 :: DngNG_appletree [_fragm_]
 A scrawny appletree is growing here.
@@ -647,7 +645,7 @@ window.story.show("DngNG_Lectern_Take")
 <%=window.story.render('DngNG_Tmpl')%>
 
 
-:: DngNG_A1
+:: DngNG_A1_old
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 Somewhere in the dungeon.</br>
@@ -655,49 +653,183 @@ Somewhere in the dungeon.</br>
 <div id='output'></div>
 </br><%=window.story.render('DngNG_Action')%></br><div id="navpanel"><%=window.gm.printNav2()%></div>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("DngNG_Encounters")%>
+
+:: DngNG_A0
+<%=window.story.render('DngNG_Tmpl')%>
+
+:: DngNG_B0
+<%=window.story.render('DngNG_Tmpl')%>
+
+:: DngNG_C0
+<%=window.story.render('DngNG_Tmpl')%>
+
+:: DngNG_D0
+<%=window.story.render('DngNG_Tmpl')%>
+
+:: DngNG_E0
+<%=window.story.render('DngNG_Tmpl')%>
+
+:: DngNG_F0
+<%=window.story.render('DngNG_Tmpl')%>
+
+:: DngNG_G0
+<%=window.story.render('DngNG_Tmpl')%>
+
+:: DngNG_H0
+<%=window.story.render('DngNG_Tmpl')%>
+
+:: DngNG_I0
+<%=window.story.render('DngNG_Tmpl')%>
+
+:: DngNG_J0
+<%=window.story.render('DngNG_Tmpl')%>
+
+:: DngNG_A1
+<%=window.story.render('DngNG_Tmpl')%>
+
+:: DngNG_B1
+<%=window.story.render('DngNG_Tmpl')%>
+
+:: DngNG_C1
+<%=window.story.render('DngNG_Tmpl')%>
+
+:: DngNG_D1
+<%=window.story.render('DngNG_Tmpl')%>
+
+:: DngNG_E1
+<%=window.story.render('DngNG_Tmpl')%>
+
+:: DngNG_F1
+<%=window.story.render('DngNG_Tmpl')%>
+
+:: DngNG_G1
+<%=window.story.render('DngNG_Tmpl')%>
+
+:: DngNG_H1
+<%=window.story.render('DngNG_Tmpl')%>
+
+:: DngNG_I1
+<%=window.story.render('DngNG_Tmpl')%>
+
+:: DngNG_J1
+<%=window.story.render('DngNG_Tmpl')%>
+
+:: DngNG_A2
+<%=window.story.render('DngNG_Tmpl')%>
+
+:: DngNG_B2
+<%=window.story.render('DngNG_Tmpl')%>
+
+:: DngNG_C2
+<%=window.story.render('DngNG_Tmpl')%>
+
+:: DngNG_D2
+<%=window.story.render('DngNG_Tmpl')%>
+
+:: DngNG_E2
+<%=window.story.render('DngNG_Tmpl')%>
 
 :: DngNG_F2
-<%=window.story.render("DngNG_A1")%>
+<%=window.story.render('DngNG_Tmpl')%>
 
 :: DngNG_G2
-<%=window.story.render("DngNG_A1")%>
+<%=window.story.render('DngNG_Tmpl')%>
 
 :: DngNG_H2
-<%=window.story.render("DngNG_A1")%>
+<%=window.story.render('DngNG_Tmpl')%>
 
 :: DngNG_I2
-<%=window.story.render("DngNG_A1")%>
+<%=window.story.render('DngNG_Tmpl')%>
 
 :: DngNG_J2
-<%=window.story.render("DngNG_A1")%>
+<%=window.story.render('DngNG_Tmpl')%>
+
+:: DngNG_A3
+<%=window.story.render('DngNG_Tmpl')%>
+
+:: DngNG_B3
+<%=window.story.render('DngNG_Tmpl')%>
+
+:: DngNG_C3
+<%=window.story.render('DngNG_Tmpl')%>
+
+:: DngNG_D3
+<%=window.story.render('DngNG_Tmpl')%>
+
+:: DngNG_E3
+<%=window.story.render('DngNG_Tmpl')%>
 
 :: DngNG_F3
-<%=window.story.render("DngNG_A1")%>
+<%=window.story.render('DngNG_Tmpl')%>
 
 :: DngNG_G3
-<%=window.story.render("DngNG_A1")%>
+<%=window.story.render('DngNG_Tmpl')%>
 
 :: DngNG_H3
-<%=window.story.render("DngNG_A1")%>
+<%=window.story.render('DngNG_Tmpl')%>
 
 :: DngNG_I3
-<%=window.story.render("DngNG_A1")%>
+<%=window.story.render('DngNG_Tmpl')%>
 
 :: DngNG_J3
-<%=window.story.render("DngNG_A1")%>
+<%=window.story.render('DngNG_Tmpl')%>>
+
+:: DngNG_A4
+<%=window.story.render('DngNG_Tmpl')%>
+
+:: DngNG_B4
+<%=window.story.render('DngNG_Tmpl')%>
+
+:: DngNG_C4
+<%=window.story.render('DngNG_Tmpl')%>
+
+:: DngNG_D4
+<%=window.story.render('DngNG_Tmpl')%>
+
+:: DngNG_E4
+<%=window.story.render('DngNG_Tmpl')%>
 
 :: DngNG_F4
-<%=window.story.render("DngNG_A1")%>
+<%=window.story.render('DngNG_Tmpl')%>
 
 :: DngNG_G4
-<%=window.story.render("DngNG_A1")%>
+<%=window.story.render('DngNG_Tmpl')%>
 
 :: DngNG_H4
-<%=window.story.render("DngNG_A1")%>
+<%=window.story.render('DngNG_Tmpl')%>
 
 :: DngNG_I4
-<%=window.story.render("DngNG_A1")%>
+<%=window.story.render('DngNG_Tmpl')%>>
 
 :: DngNG_J4
-<%=window.story.render("DngNG_A1")%>
+<%=window.story.render('DngNG_Tmpl')%>
+
+:: DngNG_A5
+<%=window.story.render('DngNG_Tmpl')%>
+
+:: DngNG_B5
+<%=window.story.render('DngNG_Tmpl')%>
+
+:: DngNG_C5
+<%=window.story.render('DngNG_Tmpl')%>
+
+:: DngNG_D5
+<%=window.story.render('DngNG_Tmpl')%>
+
+:: DngNG_E5
+<%=window.story.render('DngNG_Tmpl')%>
+
+:: DngNG_F5
+<%=window.story.render('DngNG_Tmpl')%>
+
+:: DngNG_G5
+<%=window.story.render('DngNG_Tmpl')%>
+
+:: DngNG_H5
+<%=window.story.render('DngNG_Tmpl')%>
+
+:: DngNG_I5
+<%=window.story.render('DngNG_Tmpl')%>>
+
+:: DngNG_J5
+<%=window.story.render('DngNG_Tmpl')%>

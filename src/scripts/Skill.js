@@ -169,7 +169,7 @@ cast(target){ //execute the skill on the targets
         }
         cost.pay(this.parent.parent);
         this.coolDown=this.defCoolDown;
-        /*result.msg =*/window.gm.printSfx('', this.getCastDescription(result)+" "+result.msg); 
+        /*result.msg =*/window.gm.printSfx('', this.getCastDescription(result)+" "+result.msg+"<br>"); 
     }
     return(result)
 }

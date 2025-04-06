@@ -491,7 +491,7 @@ function findWares(){
         }
     }
     window.gm.shop.WaresToBuy = list2;
-    window.gm.shop.findWaresToSell([window.gm.ItemTags.Ingredient]);
+    window.gm.shop.findWaresToSell(window.gm.player,[window.gm.ItemTags.Ingredient]);
 }
 findWares();
 if(_sell){renderToSelector("#panel", "listsell") }else{ renderToSelector("#panel", "listbuy")};
@@ -525,7 +525,7 @@ You could rest here to recover health and energy. It might also be a good idea t
 You are now in a large hall with adjoining cells set into the walls. One of them is reserved as your private space.</br>
 <a0 id='howtoplay' onclick='(function($event){document.querySelector("#"+id+"~p").toggleAttribute("hidden");})(this);'>Hint</a>
 <p class='speech' hidden>You were send to this dungeon to pay up for your crimes.</br>
-The dungeon consist of several onnected rooms that you have to pass one after another.If you pass the test in the arena, you gain money and loot. </br>
+The dungeon consist of several connected rooms that you have to pass one after another.If you pass the test in the arena, you gain money and loot. </br>
 However, if you are defeated you will loose most of the things you carry with you (except money and "special" gear) and respawn in the starting zone.</br>
 There is a chest in your cell where you can store anything that you dont want to take with you on your trials.</br>
 It might need several attempts to find your way to the next room. Occasional you might find something useful, but there could also be traps or crude magic.</br>
@@ -539,7 +539,7 @@ There are consumables and items to reduce the score and just having a good rest 
 Notice that the maximum might increase in some situations, meaning you can experience more savageness. And thats a good thing, right? </br>
 </p>
 <%=window.gm.renderRoom(window.passage.name)%>
-[[Your cell|DngPC_Cell]] [[Shrine|DngPC_Shrine]] [[Vendor|DngPC_Vendor]] [[Storage Chest|GlobalChest]]</br></br>
+[[Your cell|DngPC_Cell]] [[Shrine|DngPC_Shrine]] [[Vendor|DngPC_Vendor]] </br></br>
 Some heavy doors lead into the dungeon: <%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
 <%=window.story.render("DngPC_Encounters")%>

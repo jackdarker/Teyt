@@ -13,6 +13,7 @@ window.gm.initGame= function(forceReset,NGP=null){
   window.gm.images = imagesEquip(window.gm.images);
   window.gm.images = imagesIcons(window.gm.images);
   window.gm.images = imagesScenes(window.gm.images);
+  window.gm.images = imagesItems(window.gm.images);
   //if svg have no size set, they use whole space, use this to force them to fit into a box
   window.gm.images._sizeTo = function(_pic,width,height){ 
     var node = SVG(_pic);
@@ -169,6 +170,7 @@ window.gm.initGameFlags = function(forceReset,NGP=null){
   if (forceReset){  
     s.Settings=s.DngCV=s.DngDF=s.DngAM=s.DngSY=s.DngMN=s.DngAT=null; 
     s.DngFM=s.DngSC=s.DngLB=s.DngHC=s.DngPC=s.DngNG=null;
+    s.NGP = {};
     s.Know = {}
   }
   let Know = {};
@@ -201,6 +203,9 @@ window.gm.initGameFlags = function(forceReset,NGP=null){
   DngDF.lapine={};
   let DngFM = dataPrototype();
   let DngHC = dataPrototype();
+  if(s.NGP && NGP!=null){ //update if exist
+    s.NGP=window.gm.util.mergePlainObject(NGP,s.NGP);
+  }
   let DngPC = dataPrototype();
   if(s.DngPC){ //update if exist
     window.gm.build_DngPC();
@@ -236,11 +241,7 @@ window.gm.resetAchievements = function() { //declare achievements here
   window.gm.achievements={
       looseEnd: 0 
     }
-    window.gm.achievementsInfo={ //this is kept separate to not bloat savegame
-        //hidden bitmask: 0= all visisble, 1= Name ???, 2= Todo ???
-        looseEnd: {set:1, hidden:3, name:"loose end", descToDo:"Find a loose end.",descDone:"Found a link without target. Gained a NGPtoken."} //
     }
-}
 // update non-class-objects of previous savegame
 let _origRebuildObjects = window.gm.rebuildObjects;
 window.gm.rebuildObjects= function(){ 
@@ -580,8 +581,8 @@ window.gm.printMap2=function(dng,playerTile,reveal,visitedTiles){
     }
     switch(coostyle){
       case 'A1':
-        _x=Y.findIndex((el)=>{return(el===name[1]);});
-        _y=X.findIndex((el)=>{return(el===name[0]);});
+        _x=X.findIndex((el)=>{return(el===name[0]);});
+        _y=Y.findIndex((el)=>{return(el===name[1]);});
       break;
       case "12_01":
         coord=name.split('_');

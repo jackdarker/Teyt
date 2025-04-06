@@ -423,7 +423,8 @@ document.getElementById('btStart').addEventListener("click", start);
 document.querySelector('body').addEventListener("keyup", _game.click);
 </script>
 
-:: Reactiontest3
+
+:: SVGInteractive
 <p>example on how to create reactive graphics from svg parts</p>
 * Define g-object with id in defs.
 * use-xlink to create instances of those objects

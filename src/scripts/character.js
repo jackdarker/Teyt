@@ -61,10 +61,10 @@ class Character {
     toJSON(){return window.storage.Generic_toJSON("Character", this); }
     static fromJSON(value){ 
         var _x = window.storage.Generic_fromJSON(Character, value.data);
-        _x.rebuildAfterLoad();
+        _x._relinkItems();
         return(_x);
     };
-    rebuildAfterLoad(){
+    _relinkItems(){
         //need to recreate parent links
         this.Effects._relinkItems();
         this.Stats._relinkItems();
@@ -220,14 +220,15 @@ class Character {
      * if amount<0 remove itme, else add
      */
     changeInventory(item,amount){
-        if(item.slotUse && !item.hasTag('weapon')){ //equipment goes into wardrobe except weapons
-            if(amount<0) this.Wardrobe.removeItem(item.id,-1*amount);
-            else if(amount>0) this.Wardrobe.addItem(item,amount);
-        } else {
-            if(amount<0) this.Inv.removeItem(item.id,-1*amount); 
-            else if(amount>0) this.Inv.addItem(item,amount); 
+        let Inv=this.Inv,_rst;
+        if(item.slotUse && !item.hasTag(window.gm.ItemTags.Weapon)){ //equipment goes into wardrobe except weapons
+            Inv=this.Wardrobe;
         }
-      }
+        if(amount<0) { _rst=Inv.removeItem(item.id,-1*amount); 
+        } else if(amount>0){ _rst=Inv.addItem(item,amount);
+        } 
+        return(_rst);
+    }
     //combat related
     _canAct(){ //todo even if stunned we should be able to struggle
         var result = {OK:true,msg:''};

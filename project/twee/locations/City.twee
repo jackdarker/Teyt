@@ -124,6 +124,6 @@ Where would you like to go from here?</br>
 [[Back|_back_]]</br>
 </article><article id="LogPanel"></article></section>
 <script>
-window.gm.shop.findWaresToSell([window.gm.ItemTags.Ingredient]);
+window.gm.shop.findWaresToSell(window.gm.player,[window.gm.ItemTags.Ingredient]);
 renderToSelector("#panel", "listsell");
 </script>

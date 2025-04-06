@@ -1,6 +1,6 @@
 
 body {
-  background-image:url('assets/bg_hex.jpg');
+  background-image:url('../assets/bg/bg_hex.jpg');
   color:black;
   padding:0;
   margin:0;
@@ -18,8 +18,12 @@ section {
   grid-template-rows: 80% 20%;
   height:100vh;
   /*width:95vw;*/ /*scrollbars*/  }
-.section_swap {
+
+.log_fullview { /*log is 2.row of flexgrid*/
   grid-template-rows: 2% ;
+}
+.log_hideview {
+  grid-template-rows: 95% ;
 }
 
 section h2 {
@@ -30,6 +34,17 @@ a {
     background-color: transparent;
     margin-left:0.25em;
     margin-right:0.25em;
+}
+.link {
+  /*makes a text look like link*/
+  cursor: pointer;
+  color: rgb(140, 180, 255);
+  text-decoration:underline;
+}
+.nolink {
+  /*makes a link look like plain texr*/
+  color: unset;
+  text-decoration:unset;
 }
 a:hover {
     color: #008929;
@@ -100,6 +115,19 @@ dialog::backdrop, #backdrop {
   position: absolute;
   left: -6px;
   top: 6px;
+}
+.combateff {
+  line-height:32px;
+}
+.combateff > .combaticon {
+  float: left;
+  margin-right:0.1em;
+}
+
+.combateff > .combaticon > svg {
+  width: 32px;
+  height: 32px;
+  vertical-align: top;
 }
 .popup {
   position: relative;
@@ -206,13 +234,16 @@ background:blue;
     display: block;
 background:red;
 }
-
+/* hint-toggle:
+<label>[hint]<input type="checkbox" style="display: none;">
+     <span role='tooltip'>My tooltip</span>
+</label> */
 input:not(checked) ~ span[role=tooltip] {
   display:none;
   visibility:hidden;
 }
 input:checked ~ span[role=tooltip] {
-	display: inline-block;
+	/*
 	position: relative;
 	bottom: 1em;
 	left: 0em;
@@ -221,9 +252,14 @@ input:checked ~ span[role=tooltip] {
 	z-index: 100;
 	color: #000;
 	background-color: #ffebe6;
-	border: solid 1px #c32e04;
-	border-radius: 0.2em;
+  */
+  display: inline-block; 
   visibility:visible;
+  border: solid 1px #c32e04;
+	border-radius: 0.2em;
+	padding: 8px 8px 8px 8px;
+  text-align: left;
+  margin: 8px 8px 8px 8px;
 }
 [type=checkbox], [type=radio] {
   width:1em;
@@ -239,8 +275,8 @@ button {
 	border-radius: 15px;
 	padding: 8px 8px 8px 8px;
 	box-shadow: 5px 5px 3px Black;
-  	text-align: left;
-  	margin: 8px 8px 8px 8px;
+  text-align: left;
+  margin: 8px 8px 8px 8px;
 }
 .avatar {
 	display: block;

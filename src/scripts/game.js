@@ -13,7 +13,12 @@ class IDGenerator {//extends Singleton{
       if(!IDGenerator._instance){return new IDGenerator(); }
       return IDGenerator._instance;
   }
-  createID() {this._idCounter++;return(this._idCounter);}
+  static resetID(useID){ //this should be only called after reload
+    //hack: reloading save causes constructor calls causes calls to createID which would increase counter (the ids are reverted by merging loaded data into the constructed objects)
+    //so we need a way to revert this increase
+    IDGenerator.instance()._idCounter=useID;
+  }
+  static createID() {let x=IDGenerator.instance()._idCounter++;return("_"+x);} //add _ or queryselector() might not work if id starts with number ?!
   toJSON(){return window.storage.Generic_toJSON("IDGenerator", this); }
   static fromJSON(value){return(window.storage.Generic_fromJSON(IDGenerator, value.data));}
 }
@@ -162,10 +167,53 @@ window.gm.util.addShortKeyHandler=function(){
     }
   });
 };
+//returns normal distributed random value, mu= mean, 0 by default; sigma= stdev, 1 by default; nsamples= more samples creates better approximation, 3 by default
+window.gm.util.randomNormal=function(mu, sigma, nsamples){ // using central limit
+  if(!nsamples) nsamples = 3
+  if(!sigma) sigma = 1
+  if(!mu) mu=0
+
+  var run_total = 0
+  for(var i=0 ; i<nsamples ; i++){
+     run_total += Math.random()
+  }
+  return sigma*(run_total - nsamples/2)/(nsamples/2) + mu
+}
 window.gm.util.selRandom=function(list){//picks element from []
   let _i=list.length;
   if(_i>0) return(list[_.random(0,_i-1)]);
   else throw new Error("empty list")
+}
+//exchange inner text of ctrl ;connect it with onclick of a link/button. 
+//list = [ ['red','1','classRed'],['green','2','classGreen'] ]  text,datavalue,css-class (notice space between [ [ !)
+//f.e. <p>This is really a <a0 onclick="window.gm.util.swapText(this,[ ['red Color','1','red'],['green color','2','green'] ])">blue</a> game.</p>
+//you will have to query data-value or use the callback to get the choice: document.getElementById('myButton').getAttribute("data-value")
+window.gm.util.swapText=function(ctrl,list,params){
+  let _params=params||{}
+  _params.rnd = (_params.rnd)?? false;  //function to randomize next pick; false to non-random
+  _params.retrys = (_params.retrys)?? -1; //how many times until locked
+  //_params.onchange  callback
+  let _list = [],i;
+  let x=ctrl.getAttribute("data-retrys");
+  x=parseInt(x);
+  if(isNaN(x)) x=0;
+  if(_params.retrys>0 && (_params.retrys-x)<=0)return;
+  x++;
+  list.forEach(function(element,index){
+    _list.push(element[1]);
+    ctrl.classList.remove(element[2]); //remove all formatting
+  });
+  if(_params.rnd===false) {
+    i=_list.indexOf(ctrl.getAttribute("data-value"));
+    if(i==-1 || i==_list.length-1) i=0;
+    else i++;
+  }
+  //Todo changing text removes keyboard links 
+  //Todo need to memorize data- for restorePage
+  ctrl.innerText = list[i][0] +((_params.retrys>0)?(" ◌"+(_params.retrys-x).toString()):"");  //◌= display number of retrys
+  ctrl.setAttribute("data-value",list[i][1]);
+  ctrl.setAttribute("data-retrys",(x).toString());
+  ctrl.classList.add(list[i][2]);
 }
 //create pretty name for passage; requires a tag (replace space with _ !) [name:"My_Room"]
 window.gm.util.printLocationName=function(passage){
@@ -310,11 +358,16 @@ window.gm.initGame= function(forceReset,NGP=null){
       window.gm.quests.setQuestData(s.quests);
       window.gm.quests.pubSub.subscribe("change",function(data){window.gm.toasty.info("Quest "+data.questId+" updated")});
     }
+    if(!s.AiMem || forceReset){ //AI memory database
+      s.AiMem =  new AIMemoryData();
+      window.gm.AI = new AIManager(s.AiMem);
+    }
     if (!s._gm||forceReset){
       s._gm = {
         version : window.gm.getSaveVersion(),
         style: 'default', //css profile to use
         log : [],
+        IDGenBkup:0,
         IDGen: new IDGenerator(),
         passageStack : [], //used for passage [back] functionality
         defferedStack : [], //used for deffered events
@@ -324,6 +377,7 @@ window.gm.initGame= function(forceReset,NGP=null){
         activePlayer : '', //id of the character that the player controls currently
         nosave : false,
         nokeys : false,
+        enablePoise : false, //enables Poise-System
         playerParty: [],  //names of NPC in playerParty 
         debug : false,    //globally enables debug
         dbgShowCombatRoll : false,  //log combat calculation details
@@ -351,10 +405,15 @@ window.gm.initGame= function(forceReset,NGP=null){
     }
     if (!s.chars.GlobalChest||forceReset){  
       let ch = new Character();
-      ch.id="GlobalChest";
-      ch.name="GlobalChest";
+      ch.id=ch.name="GlobalChest";
       ch.faction="Player";
       s.chars.GlobalChest=ch;
+    }
+    if (!s.chars.LocalChest||forceReset){  //
+      let ch = new Character();
+      ch.id=ch.name="LocalChest";
+      ch.faction="Player";
+      s.chars.LocalChest=ch;
     }
     if (!s.combat||forceReset){ //see encounter & combat.js
       s.combat = {
@@ -381,9 +440,15 @@ window.gm.newGamePlus = function(){
 window.gm.rebuildObjects= function(){ 
   var s = window.story.state;
   s._gm.nokeys=false;
+  IDGenerator.resetID(s.IDGenBkup);
   window.styleSwitcher.loadStyle(); //since style is loaded from savegame
   window.gm.quests.setQuestData(s.quests); //necessary for load support
   window.gm.switchPlayer(s._gm.activePlayer);
+}
+//called before data is serialized
+window.gm.preSave=function(){
+  var s = window.story.state;
+  s.IDGenBkup=IDGenerator.instance()._idCounter;
 }
 //--------------- time management --------------
 //returns timestamp since start of game
@@ -757,6 +822,8 @@ window.gm.roll=function(n,sides){ //rolls n x dies with sides
   return(rnd); 
 }
 //expects DOM like <section><article>..<div id='output'></div>..</article></section>
+//Tip if you have to setup functions: string should be in '  and use \' and \" consistently 
+//'<button type=\"button\" onclick=\'equip(\"'+y.itmId+'\",\"'+itm2.itmId+'\");\'>'+y.name+'</button>'
 window.gm.printOutput= function(text,where="section article div#output",append=false){
   let n=document.querySelector(where);
   n.innerHTML = (append?n.innerHTML:"")+text;
@@ -787,13 +854,12 @@ window.gm.onSelect = function(elmnt,ex_choice,ex_info){
 //call this onclick to make the connected element vanish and to unhide another one (if the passage is revisited the initial state will be restored)
 //unhidethis needs to be jquery-path to a div,span,.. that is initially set to hidden
 //cb can be a function(elmt) that gets called
-//todo: if navigating to a back-page and return, the initial page will be reset to default; how to memorize and restore the hidden-flags
 window.gm.printTalkLink =function(elmt,unhideThis,cb=null){
   $(elmt)[0].setAttribute("hidden","");
   if(cb!==null) cb($(elmt)[0]);
   $(unhideThis)[0].removeAttribute("hidden");
   $(unhideThis)[0].scrollIntoView({behavior: "smooth"});
-  window.story.state.tmp.flags[elmt]='hidden',window.story.state.tmp.flags[unhideThis]='unhide';
+  window.story.state.tmp.flags[elmt]='hidden',window.story.state.tmp.flags[unhideThis]='unhide';  //if navigating to a back-page and return, the initial page will be reset to default-> memorize and restore the hidden-flags (see restorePage)
 }
 //prints the same kind of link like [[Next]] but can be called from code
 window.gm.printPassageLink= function(label,target){
@@ -843,11 +909,14 @@ window.gm.printItem= function( id,descr,carrier,useOn=null ){
  * prints a list of items/wardrobe and buttons to transfer them
  * @param {*} from 
  * @param {*} to 
- */
+ */   // see also window.gm.shop.printItemTransfer
 window.gm.printItemTransfer = function(from,to,wardrobe){
   let listFrom,listTo;
-  if(wardrobe) listFrom=from.Wardrobe.getAllIds(), listTo=to.Wardrobe.getAllIds(); 
-  else listFrom=from.Inv.getAllIds(), listTo=to.Inv.getAllIds();
+  if(wardrobe) {
+    listFrom=from.Wardrobe.getAllIds(), listTo=to.Wardrobe.getAllIds(); 
+  } else {
+    listFrom=from.Inv.getAllIds(), listTo=to.Inv.getAllIds();
+  }
   let allIds = new Map();
   for(let n of listTo){
     allIds.set(n,{name:wardrobe?to.Wardrobe.getItem(n).name:to.Inv.getItem(n).name});
@@ -889,7 +958,7 @@ window.gm.printItemTransfer = function(from,to,wardrobe){
     g.href='javascript:void(0)',g.textContent='take all';
     g.addEventListener("click",give.bind(null,id,count,to,from));
     if(count>0) entry.appendChild(g)
-    $("div#choice")[0].appendChild(entry);      // <- requires this node in html
+    document.getElementById('choice').appendChild(entry);      // <- requires this node in html
   }
 }
 //prints an equipment with description; used in wardrobe

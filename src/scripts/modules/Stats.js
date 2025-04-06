@@ -1383,6 +1383,7 @@ class effDamage extends CombatEffect {
     static fromJSON(value){ return window.storage.Generic_fromJSON(effPoiseDamage, value.data);};
     get desc(){return(effPoiseDamage.name);}
     onApply(){
+        if(!window.story.state._gm.enablePoise) return;
         this.data.duration = 0;
         this.parent.parent.Stats.increment('poise',-1*this.amount);
         if(this.data.duration<1) this.parent.removeItem(this.data.id);  
@@ -1566,6 +1567,7 @@ class effStunned extends CombatEffect {
         if(this.data.duration<=0) this.parent.removeItem(this.data.id);
         return({OK:true,msg:''});
     }
+    get icon(){return(window.gm.images.ic_stun());}
 } 
 class effFlying extends CombatEffect {
     constructor(){
@@ -1681,7 +1683,6 @@ class effCallHelp extends CombatEffect { //summons someone
         this.data.duration-=1;
         if(this.data.duration===0){ //spawn after delay
             this.data.spawns.push(window.gm.Encounter.spawnChar(this.data.item,this.data.faction,this.parent.parent.level));
-            
         } else if(this.data.spawns.length>0){
             //remove effect after spawns are killed
             let remove=true;

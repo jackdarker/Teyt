@@ -1,13 +1,27 @@
+:: DngLT_MAP [_back_]
+<hr><div id='canvas'></div><div id='svgpopup'></div></br>
+<script> window.gm.printMap2(window.story.state.DngSY.dngMap,window.gm.player.location.replace(window.story.state.DngSY.dng+'_',''),
+    window.story.state.DngLT.mapReveal,window.story.state.DngLT.visitedTiles);
+</script>
 
 
-:: OBSOLETEDngNG_Door_Closed [_nosave_]
+:: DngLT_Respawn [_nosave_ _nodeffered_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+It's impossible to say how long you have passed out and how you ended up here. </br>
+But at least you are alive and - mostly - unharmed.</br>
+<%=window.story.state.tmp.msg%>
+</br><a0 onclick= 'window.story.state.tmp.msg="",window.story.show("DngLT_D4")'>Next</a>
+</article><article id="LogPanel"></article></section>
+<%=window.story.render("DngLT_Encounters")%>
+
+:: OBSOLETEDngLT_Door_Closed [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 There is a gate in front of you but it is locked.</br>
 <div id='output'></div>
 <a0 onclick='window.story.show(window.story.state.DngSY.prevLocation)'>Go back</a>. 
 </article><article id="LogPanel"></article></section>
 <script>function requiredKey(){
-    var msg='',dng=window.story.state.DngSY.dng,doors=window.story.state.DngNG.tmp.doors;
+    var msg='',dng=window.story.state.DngSY.dng,doors=window.story.state.DngLT.tmp.doors;
     var x=window.story.state.DngSY.prevLocation.replace(dng+'_',''),y=window.story.state.DngSY.nextLocation.replace(dng+'_','');
     var door = window.gm.canOpenDoor(x,y);
     window.gm.printOutput(door.msg+"</br>");
@@ -16,111 +30,178 @@ requiredKey()
 </script>
 
 
+:: DngLT_Encounters
+<script>function tick(){
+    let here = window.gm.player.location,_d=window.story.state.DngLT.tmp;
+    if(here===_d.tickPass) return;
+    _d.tickPass=here;
+    for(var i=_d.mobs.length-1;i>=0;i--){ //check persistent mobs
+      var mob=_d.mobs[i];
+      window.gm.mobAI(mob);
+      if(window.story.state.DngSY.dng+"_"+mob.pos===here){
+        //if mob is at same position as player: trigger passage or just show note
+        if(mob.state===0){
+          window.gm.encounters[mob.mob]({noStart:true});
+          var _oldVictory=window.gm.Encounter.onVictory.bind(window.gm.Encounter);
+          window.gm.Encounter.onVictory= function(){mob.state=1;return(_oldVictory());}
+          window.gm.Encounter.initCombat(); return;
+        }
+      }
+    }
+    let _t=_d.tier,_allChances=0,_choice=[];
+    switch(here){//foes; traps are handled in window.gm.navEvent, there might also be evtLeave added elsewhere
+        default:
+    }  
+    _choice.forEach(x=>(_allChances+=x.chance));
+    if(_allChances>0){//choose rnd enemy
+        var _rnd=_.random(0,_allChances-0.01);
+        for(var i = _choice.length-1;i>=0;i--){ 
+            if(_rnd<_allChances && _rnd>=(_allChances-_choice[i].chance)){
+                if(false && ['_Lectern'].includes(_choice[i].id)){ //scene
+                    window.story.show(window.story.state.DngSY.dng+_choice[i].id);
+                } else { //foe
+                    window.gm.encounters[_choice[i].id]({type:_choice[i].type, amount:_choice[i].amount,levelUp:_choice[i].levelUp,noFlee:true});  
+                }          
+                break;
+            }
+            _allChances-=_choice[i].chance;
+        }
+    }
+}
+tick();
+</script>
 
-
-:: DngNG_Timeout [_nosave_]
+:: DngLT_Timeout [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <div id="panel"></div></br>
 todo you failed to finish the given task and get punished </br>
 get 2xmoney deducted if bringMoney task</br>
 get one of your items cursed </br>
-<p>[[Back|DngNG_D4]]</p>
+<p>[[Back|DngLT_D4]]</p>
 </article><article id="LogPanel"></article></section>
 
-:: DngNG_Entry
+:: DngLT_Entry
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%>
 Finding yourself in a futuristic bunker, you need to make your escape.</br>
 Exit cryopod.
 wearing fullbody coverall.
-<p> [[Next|DngNG_D4]] </br></p>
+<p> [[Next|DngLT_D4]] </br></p>
 </article><article id="LogPanel"></article></section>
 <script>
     var s = window.story.state,map,data;
-    ({map,data}=window.gm.build_DngNG());
-    s.DngNG=data;
-    s.DngSY.dngMap=map;s.DngSY.dng='DngNG';
-    s.vars.spawnAt="DngNG_Respawn";
+    ({map,data}=window.gm.build_DngLT());
+    s.DngLT=data;
+    s.DngSY.dngMap=map;s.DngSY.dng='DngLT';
+    s.vars.spawnAt="DngLT_Respawn";
 </script>
 
 
 
-:: DngNG_A1
+:: DngLT_A1
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 Another futuristic room</br>
 <%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("DngNG_Encounters")%>
+<%=window.story.render("DngLT_Encounters")%>
 
-:: DngNG_F3
+:: DngLT_F3
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%>
 This room has several switchboards with blinking lights and screens hanging from the wall. Maybe its some kind of control room?
-</br>[[Look at the screen]] [[Open the switchboard]] </br>
+</br>
+<div id='select10' >
+<a0 onclick='window.gm.printTalkLink("div#select10","div#choice10a")'>Look at the screen</a></br>
+</div><div id='choice10a' hidden></br> 
+<%if(s.DngLT.tmp.qFixConsole===0){%> A complex diagram with lines and shapes is displayed.
+    <p class="tPC">"Four of those lines are colored and each ends in a circle with a number."</p>
+    <p>1:green, 2:blue, 3:red, 4:yellow</p>
+<%}else if(window.story.state.DngLT.tmp.qPowerLevel>=1){%> The screen displays a lot of data but the controls seem to be locked out.</br>
+<%}else{%>
+    <div id='select15' >There are now some buttons and sliders on the screen. One of them seems to be labeld "Restart Power-Engine". 
+    <a0 onclick='window.story.state.DngLT.tmp.qPowerLevel=1;window.gm.printTalkLink("div#select15","div#choice15a")'>Press it</a></br>
+    </div><div id='choice15a' hidden></br> Nothing happens after you push the button. Maybe something else needs to be fixed first? ...</br> 
+    While you ponder about your next steps, you notice some noises from deeper down in the building. A hum with increasing frequency and suddenly the lights in the room go on.</br>
+    Seems the power engine just needed some time to start up. </br>
+    Now you have fixed the power issue which should help you as now more of the gadgets in the facility are working again: the lights, doors... 
+    </br> Then you think about the security system and the large bot before the security door....
+    </div>
+<%}%> 
+</div>
+<%if(s.DngLT.tmp.qFixConsole===0){%>
+<div id='select20' >
+<a0 onclick='window.gm.printTalkLink("div#select20","div#choice20a")'>Open the switchboard</a></br>
+</div><div id='choice20a' hidden></br> 
+    <p class="tNPC1">"There is something broken in that wiring."</p> 
+    <a0 onclick='window.story.state.tmp.args = [{_items:["green","blue","red","yellow"],_cables:["red","green","yellow","blue","brown"]}];window.story.show("DngLT_FixCables")'>Fix it</a>
+</div><%}%></br>
+<a0 id='' onclick='(function(me){document.querySelector("#"+id+"~p").toggleAttribute("hidden");})(this);'>data terminal</a><p hidden>
 <%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
 
-:: DngNG_G3
-<%=window.story.render("DngNG_A1")%>
+:: DngLT_G3
+<%=window.story.render("DngLT_A1")%>
 
-:: DngNG_D4
+:: DngLT_D4
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
-<div id='select10' <%=((s.DngNG.tmp.qBabble<=0)?"":"hidden")%>>
-<a0 onclick='window.story.state.DngNG.tmp.qBabble=1;window.gm.printTalkLink("div#select10","div#choice10a");'>pick up datapad</a>
+<div id='select10' <%=((s.DngLT.tmp.qBabble<=0)?"":"hidden")%>><%=window.gm.images._sizeTo(window.gm.images["PC_Pad"](),100,100)%>
+<a0 onclick='window.story.state.DngLT.tmp.qBabble=1;window.gm.printTalkLink("div#select10","div#choice10a");'>pick up datapad</a>
 </div><div id='choice10a' hidden>Aquired a datapad that speaks.
 </div></br>
 <div hidden>You could rest here to recover health and energy. It might also be a good idea to save your progress.
 <%if(window.gm.getTimeStruct().hour<11){ %>
-<a0 onclick='($("tw-passage").fadeOut(1000, function(){window.gm.player.sleep(1800);window.story.show("DngNG_Sleep");}));'>Sleep Until Evening</a> 
+<a0 onclick='($("tw-passage").fadeOut(1000, function(){window.gm.player.sleep(1800);window.story.show("DngLT_Sleep");}));'>Sleep Until Evening</a> 
 <%} else {%>
-<a0 onclick='($("tw-passage").fadeOut(1000, function(){window.gm.player.sleep(700);window.story.show("DngNG_Sleep");}));'>Sleep Until Morning</a>
+<a0 onclick='($("tw-passage").fadeOut(1000, function(){window.gm.player.sleep(700);window.story.show("DngLT_Sleep");}));'>Sleep Until Morning</a>
 <%}%></div>
 <div hidden>[[Storage Chest|GlobalChest]]</br></div></br>
 <%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("DngNG_Encounters")%>
+<%=window.story.render("DngLT_Encounters")%>
 <script>function checkTask(){ //if a task is running but time is over -> punishment
-    let s=window.story.state,_t=s.DngNG.task;
+    let s=window.story.state,_t=s.DngLT.task;
     if(!_t || !_t.id) return;
     if(_t.time!==0,window.gm.getDeltaTime(window.gm.getTime(),_t.start)>_t.time){
-        s.DngNG.task={};
-        window.story.show('DngNG_Timeout');
+        s.DngLT.task={};
+        window.story.show('DngLT_Timeout');
     }
 }
 checkTask();
 </script>
 
-:: DngNG_E4
+:: DngLT_E4
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 A small corridor with only 2 doors.</br>
-There is some kind of a <a0 onclick='window.story.show("DngNG_ChangeBooth")'>round booth</a> with a display next to it. It reminds you of a changing cubicle in a clothing store or a shower cabine .
+There is some kind of a <a0 onclick='window.story.show("DngLT_ChangeBooth")'>round booth</a> with a display next to it. It reminds you of a changing cubicle in a clothing store or a shower cabine .
 </br>There is a hatch in the wall next to the booth, maybe it can be opened.</br> 
 <%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("DngNG_Encounters")%>
+<%=window.story.render("DngLT_Encounters")%>
 
-:: DngNG_DngNG_E4DngNG_E5 [_nosave_]
+:: DngLT_DngLT_E4DngLT_E5 [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%if(s.DngNG.tmp.qKeyBlue===0){%>
+<%if(s.DngLT.tmp.qKeyBlue===0){%>
     The hatch is securely closed. There is a slot with a blue colored border and some runes around it. Could this be a keyhole?</br> 
-<%}else{ s.DngNG.tmp.doors["E4"]["E5"].state=1; %>
+    <%=window.gm.images._sizeTo(window.gm.images["Lock_Blue"](),100,100)%>
+<%}else{ s.DngLT.tmp.doors["E4"]["E5"].state=1; %>
     The blue keycard in your possesion fits in the colored slot on the hatch.    
+    <%=window.gm.images._sizeTo(window.gm.images["Key_Blue"](),100,100)%>
 <%}%>
 <a0 onclick='window.story.show(window.story.state.DngSY.prevLocation)'>Next</a>. 
 </article><article id="LogPanel"></article></section>
 
-:: DngNG_F4
+:: DngLT_F4
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 Another futuristic room</br>
 <%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("DngNG_Encounters")%>
+<%=window.story.render("DngLT_Encounters")%>
 
-:: DngNG_F4_Explore [_back_]
+:: DngLT_F4_Explore [_back_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 You scanned this place for anything useful but your effort was a waste of time.
 <p>[[Next|_back_]]</p>
@@ -129,27 +210,172 @@ You scanned this place for anything useful but your effort was a waste of time.
 </script>
 
 
-:: DngNG_G4
+:: DngLT_G4
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 <%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
 Another futuristic room</br>
-<div id='select10' <%=((s.DngNG.tmp.qKeyBlue<=0)?"":"hidden")%>> On a shelf cut into the wall of the room, you spot something blue. Its a small, rectangular and flat device. Could be some keycard.
-<a0 onclick='window.story.state.DngNG.tmp.qKeyBlue=1;window.gm.printTalkLink("div#select10","div#choice10a");'>get the key</a>
+<div id='select10' <%=((s.DngLT.tmp.qKeyBlue<=0)?"":"hidden")%>> On a shelf cut into the wall of the room, you spot something blue. Its a small, rectangular and flat device. Could be some keycard.
+<%=window.gm.images._sizeTo(window.gm.images["Key_Blue"](),100,100)%>
+<a0 onclick='window.story.state.DngLT.tmp.qKeyBlue=1;window.gm.printTalkLink("div#select10","div#choice10a");'>get the key</a>
 </div><div id='choice10a' hidden>Aquired a blue keycard.
 </div></br>
 <%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
 </article><article id="LogPanel"></article></section>
-<%=window.story.render("DngNG_Encounters")%>
+<%=window.story.render("DngLT_Encounters")%>
 
 
-:: DngNG_DngNG_G4DngNG_G5 [_nosave_]
+:: DngLT_DngLT_G4DngLT_G5 [_nosave_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%if(s.DngLT.tmp.qPowerLevel<=0){%>
+    <p class="tPC">"The door doesnt seem to work as there is not enough power."</p>
+    <a0 onclick='window.story.show(window.story.state.DngSY.prevLocation)'>Leave the door for now</a>. 
+<%}else{ s.DngLT.tmp.doors["G4"]["G5"].state=1;%>
+    The power system is back to a moderate state.</br>
+    <a0 onclick='window.story.show(window.story.state.DngSY.nextLocation)'>Move on</a>.
+<%}%>
+</article><article id="LogPanel"></article></section>
+
+
+:: DngLT_DngLT_G4DngLT_G3 [_nosave_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%if(window.gm.player.Outfit.countItem("CollarID")>0){%>
+    "Scanning..." a voice chirps "ID valid - access granted" and the door in front of you opens. </br>
+    Better <a0 onclick='window.story.show(window.story.state.DngSY.nextLocation)'>move on</a> before it closes again.
+<%}else{%>
+    "Scanning..." a voice chirps "No valid ID detected".</br>
+    <p class="tPC">'So I need to find some ID-badge to get through this door?'</p> 
+    <a0 onclick='window.story.show(window.story.state.DngSY.prevLocation)'>Leave the door for now</a>. 
+<%}%>
+</article><article id="LogPanel"></article></section>
+
+
+:: DngLT_H4
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
+There is a large bot placed in the middle of the room.
+<%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
+</article><article id="LogPanel"></article></section>
+<%=window.story.render("DngLT_Encounters")%>
+
+:: DngLT_DngLT_H4DngLT_I4 [_nosave_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+There is another locked bulkdoor and you are pretty sure it blocks your route to leaving this place.
+<p class="tNPC1">"This is a security gate that has been locked because some power brown out. You need to restore power, reset the door locks and get an ID-Tag to open it."</p>
+<%if(s.DngLT.tmp.qPowerLevel<=0){%>
+    <a0 onclick='window.gm.printTalkLink("div#select10","div#choice10a")'>"I'm not a technican. How should I know how to fix a power system?"</a></br>
+    <div id='select10' > 
+    </div><div id='choice10a' hidden></br> 
+        <p class="tNPC1">"I guess we need some help here. Those spider bots do maintenance jobs. If we get into control of some, I could assign it to work on that issue."</p>
+        <p class="tPC">"Why didnt they fix the power failure already on their own?"</p>
+        <p class="tNPC1">"That I dont know."</p>
+        <p class="tPC">"And how do I remote control such a bot."</p>
+        <p class="tNPC1">"You dont. But I can do that if we are able to get access to its CPU. Try to knock out some but dont deal to much damage."</p>
+    </div>
+<%}else{%>
+    The power system is back to a moderate state.</br>
+<%}%>
+<%if(s.DngLT.tmp.qDoorLock<=0){%>
+    <a0 onclick='window.gm.printTalkLink("div#select20","div#choice20a")'>"How do I unlock this door?"</a></br>
+    <div id='select20' > 
+    </div><div id='choice20a' hidden></br> 
+        <p class="tNPC1">"There has to be some security terminal. I can do the hacking if we find an way to connect this pad to the system."</p>
+        <p class="tNPC1">"This way I can reset the emergency lockdown, but you still have to get a ID-tag."</p>
+    </div>
+<%}else{%>
+    The door locks seem to have disengaged.</br>
+<%}%>
+<%if(window.gm.player.Outfit.countItem("CollarID")<=0){%>
+    <a0 onclick='window.gm.printTalkLink("div#select30","div#choice30a")'>"Where do I get an ID-tag?"</a></br>
+    <div id='select30' > 
+    </div><div id='choice30a' hidden></br> 
+        <p class="tNPC1">"We need to find a bare one that is not attached to any individual. Normally they are molded into the drones. To fit your kind, we should look around if we find some unused garments that has one."</p>
+    </div>
+<%}else{%>
+    The id-tag you have should grant you access.</br>
+<%}%>
+</br><a0 onclick='window.story.show(window.story.state.DngSY.prevLocation)'>Next</a>.
+</article><article id="LogPanel"></article></section>
+
+
+:: DngLT_I4
+<%=window.story.render("DngLT_A1")%>
+
+:: DngLT_J4
+<%=window.story.render("DngLT_A1")%>
+
+:: DngLT_D5
+<%=window.story.render("DngLT_A1")%>
+
+:: DngLT_DngLT_E5DngLT_F5 [_nosave_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%>
+The crawlspace gets thighter here.
+<%if(false){ s.DngLT.tmp.doors["E5"]["F5"].state=1;%>
+    <p class="tPC">"Seems I'm small enough to fit into that pipe."</p>
+<%}else{%>
+    As with your size, you are not comfortable to try to slip into that tight opening.</br>
+    <a0 onclick='window.story.show(window.story.state.DngSY.prevLocation)'>Next</a>. 
+<%}%>
+</article><article id="LogPanel"></article></section>
+
+:: DngLT_E5
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%>
+Behind the hatch in the ajoining room you find a crawlspace with leading left and right.</br>
+There is also some kind of [[switchbox|DngLT_E5_Switch]] with a display on it.</br>
+<%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
+</article><article id="LogPanel"></article></section>
+
+:: DngLT_F5
+<%=window.story.render("DngLT_A1")%>
+
+:: DngLT_G5
+<%=window.story.render("DngLT_A1")%>
+
+:: DngLT_DngLT_G5DngLT_G6 [_nosave_]
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%if(window.gm.player.Outfit.countItem("CollarID")>0){%>
+    "Scanning..." a voice chirps "ID valid - access granted" and the door in front of you opens. </br>
+    Better <a0 onclick='window.story.show(window.story.state.DngSY.nextLocation)'>move on</a> before it closes again.
+<%}else{%>
+    "Scanning..." a voice chirps "No valid ID detected".</br>
+    <p class="tPC">'So I need to find some ID-badge to get through this door?'</p> 
+    <a0 onclick='window.story.show(window.story.state.DngSY.prevLocation)'>Leave the door for now</a>. 
+<%}%>
+</article><article id="LogPanel"></article></section>
+
+:: DngLT_H5
+<%=window.story.render("DngLT_A1")%>
+
+:: DngLT_I5
+<%=window.story.render("DngLT_A1")%>
+
+:: DngLT_J5
+<%=window.story.render("DngLT_A1")%>
+
+:: DngLT_D6
+<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
+<%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%>
+This seems to be an abandoned storage.</br> Crude equipment and boxes are lined up on the shelves. 
+</br>
+<div id='select10' >
+<a0 onclick='window.gm.printTalkLink("div#select10","div#choice10a")'>Look for something useful</a></br>
+</div><div id='choice10a' hidden></br> Without knowing what to look for, this seems just a waste of time. Most of it seems to be rubble anyway.
+</div>
+<%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
+</article><article id="LogPanel"></article></section>
+
+:: DngLT_E6
+<%=window.story.render("DngLT_A1")%>
+
+:: DngLT_DngLT_F6DngLT_E6 [_nosave_]
 <section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
 There is a password entry on that door. Its just 4 digits.</br>
 <p class="tPC">"I need a passcode here. Maybe I should look around if I find a clue."</p>
 TODO: there are 4 hints scattered around, but if you try to get them all you get badend.
-<%if(s.DngNG.tmp.passFail<3){%>
+<%if(s.DngLT.tmp.qPassFail<3){%>
     <div id='select10' > 
-    <a0 onclick='window.story.state.DngNG.tmp.passFail+=1;window.gm.printTalkLink("div#select10","div#choice10a")'>Try a random code</a></br>
+    <a0 onclick='window.story.state.DngLT.tmp.passFail+=1;window.gm.printTalkLink("div#select10","div#choice10a")'>Try a random code</a></br>
     <a0 onclick='window.gm.printTalkLink("div#select10","div#choice10b"),window.story.show(window.story.state.DngSY.prevLocation);'>Stay away</a></br>
     </div><div id='choice10a' hidden></br> Pressing some of the runic letters in random order you expect some negative response.</br>
         And indeed their is a disapproving chirp. </br>
@@ -163,126 +389,5 @@ TODO: there are 4 hints scattered around, but if you try to get them all you get
 <%}%>
 </article><article id="LogPanel"></article></section>
 
-
-:: DngNG_DngNG_G4DngNG_G3 [_nosave_]
-<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%if(window.gm.player.Outfit.countItem("CollarID")>0){%>
-    "Scanning..." a voice chirps "ID valid - access granted" and the door in front of you opens. </br>
-    Better <a0 onclick='window.story.show(window.story.state.DngSY.nextLocation)'>move on</a> before it closes again.
-<%}else{%>
-    "Scanning..." a voice chirps "No valid ID detected".</br>
-    <p class="tPC">'So I need to find some ID-badge to get through this door?'</p> 
-    <a0 onclick='window.story.show(window.story.state.DngSY.prevLocation)'>Leave the door for now</a>. 
-<%}%>
-</article><article id="LogPanel"></article></section>
-
-
-:: DngNG_H4
-<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%><div id="panel"></div></br>
-There is a large bot placed in the middle of the room.
-<%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
-</article><article id="LogPanel"></article></section>
-<%=window.story.render("DngNG_Encounters")%>
-
-:: DngNG_DngNG_H4DngNG_I4 [_nosave_]
-<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-There is another locked bulkdoor and you are pretty sure it blocks your route to leaving this place.
-<p class="tNPC1">"This is a security gate that has been locked because some power brown out. You need to restore power, reset the door locks and get an ID-Tag to open it."</p>
-<%if(s.DngNG.tmp.powerLevel<=0){%>
-    <a0 onclick='window.gm.printTalkLink("div#select10","div#choice10a")'>"I'm not a technican. How should I know how to fix a power system?"</a></br>
-    <div id='select10' > 
-    </div><div id='choice10a' hidden></br> 
-        <p class="tNPC1">"I guess we need some help here. Those spider bots do maintenance jobs. If we get into control of some, I could assign it to work on that issue."</p>
-        <p class="tPC">"Why didnt they fix the power failure already on their own?"</p>
-        <p class="tNPC1">"That I dont know."</p>
-        <p class="tPC">"And how do I remote control such a bot."</p>
-        <p class="tNPC1">"You dont. But I can do that if we are able to get access to its CPU. Try to knock out some but dont deal to much damage."</p>
-    </div>
-<%}else{%>
-    The power system seemsis back to a moderate state.</br>
-<%}%>
-<%if(s.DngNG.tmp.doorLock<=0){%>
-    <a0 onclick='window.gm.printTalkLink("div#select20","div#choice20a")'>"How do I unlock this door?"</a></br>
-    <div id='select20' > 
-    </div><div id='choice20a' hidden></br> 
-        <p class="tNPC1">"There has to be some security terminal. I can do the hacking if we find an way to connect this pad to the system."</p>
-        <p class="tNPC1">"This way I can reset the emergency lockdown, but you still have to get a ID-tag."</p>
-    </div>
-<%}else{%>
-    The door locks seem to have disengaged.</br>
-<%}%>
-<%if(true){%>
-    <a0 onclick='window.gm.printTalkLink("div#select30","div#choice30a")'>"Where do I get an ID-tag?"</a></br>
-    <div id='select30' > 
-    </div><div id='choice30a' hidden></br> 
-        <p class="tNPC1">"We need to find a bare one that is not attached to any individual. Normally they are molded into the drones. To fit your kind, we should look around if we find some unused garments that has one."</p>
-    </div>
-<%}else{%>
-    The id-tag you have should grant you access.</br>
-<%}%>
-</br><a0 onclick='window.story.show(window.story.state.DngSY.prevLocation)'>Next</a>.
-</article><article id="LogPanel"></article></section>
-
-
-:: DngNG_I4
-<%=window.story.render("DngNG_A1")%>
-
-:: DngNG_J4
-<%=window.story.render("DngNG_A1")%>
-
-:: DngNG_D5
-<%=window.story.render("DngNG_A1")%>
-
-:: DngNG_DngNG_E5DngNG_F5 [_nosave_]
-<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%window.gm.player.location=window.passage.name;%>
-The crawlspace gets thighter here.
-<%if(false){ s.DngNG.tmp.doors["E5"]["F5"].state=1;%>
-    <p class="tPC">"Seems I'm small enough to fit into that pipe."</p>
-<%}else{%>
-    As with your size, you are not comfortable to try to slip into that tight opening.</br>
-    <a0 onclick='window.story.show(window.story.state.DngSY.prevLocation)'>Next</a>. 
-<%}%>
-</article><article id="LogPanel"></article></section>
-
-:: DngNG_E5
-<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%>
-Behind the hatch in the ajoining room you find a crawlspace with leading left and right.</br>
-There is also some kind of [[switchbox|DngNG_E5_Switch]] with a display on it.</br>
-<%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
-</article><article id="LogPanel"></article></section>
-
-:: DngNG_F5
-<%=window.story.render("DngNG_A1")%>
-
-:: DngNG_G5
-<%=window.story.render("DngNG_A1")%>
-
-:: DngNG_H5
-<%=window.story.render("DngNG_A1")%>
-
-:: DngNG_I5
-<%=window.story.render("DngNG_A1")%>
-
-:: DngNG_J5
-<%=window.story.render("DngNG_A1")%>
-
-:: DngNG_D6
-<section><aside id="sidebar"></aside><article><%=window.story.render("CenterDialogs")%>
-<%window.gm.player.location=window.passage.name;%><%=window.story.render(window.story.state.DngSY.dng+"_MAP")%>
-This seems to be an abandoned storage.</br> Crude equipment and boxes are lined up on the shelves. 
-</br>
-<div id='select10' >
-<a0 onclick='window.gm.printTalkLink("div#select10","div#choice10a")'>Look for something useful</a></br>
-</div><div id='choice10a' hidden></br> Without knowing what to look for, this seems just a waste of time. Most of it seems to be rubble anyway.
-</div>
-<%=window.gm.renderRoom(window.passage.name)%><%=window.gm.printNav2()%>
-</article><article id="LogPanel"></article></section>
-
-:: DngNG_E6
-<%=window.story.render("DngNG_A1")%>
-
-:: DngNG_F6
-<%=window.story.render("DngNG_A1")%>
+:: DngLT_F6
+<%=window.story.render("DngLT_A1")%>
