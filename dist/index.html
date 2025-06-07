@@ -39,7 +39,7 @@ var SVG=function(){"use strict";const t={},e=[];function n(e,i){if(Array.isArray
 </head>
 	<body>
 		<tw-story tags></tw-story>
-		<!-- UUID://A440E3EC-8B67-4FD6-B38B-0CCB4FCD4A96// --><tw-storydata name="SanctumPortal" startnode="152" creator="Tweego" creator-version="2.1.1+81d1d71" ifid="A440E3EC-8B67-4FD6-B38B-0CCB4FCD4A96" zoom="1" format="snowman" format-version="2.0.3" options="" hidden><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css">/* twine-user-stylesheet #1: "user.min.css" */
+		<!-- UUID://A440E3EC-8B67-4FD6-B38B-0CCB4FCD4A96// --><tw-storydata name="SanctumPortal" startnode="150" creator="Tweego" creator-version="2.1.1+81d1d71" ifid="A440E3EC-8B67-4FD6-B38B-0CCB4FCD4A96" zoom="1" format="snowman" format-version="2.0.3" options="" hidden><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css">/* twine-user-stylesheet #1: "user.min.css" */
 carrots{color:red}carrots{color:#00f}
 /* twine-user-stylesheet #2: "Story Stylesheet" */
 /*cube svg*/
@@ -2927,7 +2927,7 @@ window.storage.registerConstructor(stHealthMax);window.storage.registerConstruct
 window.storage.registerConstructor(effCallHelp);window.storage.registerConstructor(effCombatRecovery);window.storage.registerConstructor(effDamage);window.storage.registerConstructor(effDetermined);window.storage.registerConstructor(effFlying);window.storage.registerConstructor(effBleed);window.storage.registerConstructor(effCombined);window.storage.registerConstructor(effGrappled);window.storage.registerConstructor(effGrappling);window.storage.registerConstructor(effUngrappling);window.storage.registerConstructor(effEnergized);window.storage.registerConstructor(effNotTired);window.storage.registerConstructor(effTeaseDamage);window.storage.registerConstructor(effTired);window.storage.registerConstructor(effStunned);window.storage.registerConstructor(effGuard);window.storage.registerConstructor(effHeal);window.storage.registerConstructor(effMasochist);window.storage.registerConstructor(effEnergyDrain);window.storage.registerConstructor(effHorsePower);window.storage.registerConstructor(effLapineSpeed);window.storage.registerConstructor(effMutateBunny);window.storage.registerConstructor(effMutateHorse);window.storage.registerConstructor(effMutateWolf);window.storage.registerConstructor(effMutateCat);window.storage.registerConstructor(effGrowBreast);window.storage.registerConstructor(effGrowVulva);window.storage.registerConstructor(effLewdMark);window.storage.registerConstructor(effInHeat);window.storage.registerConstructor(effInRut);window.storage.registerConstructor(effSpermDecay);window.storage.registerConstructor(effVaginalFertil);window.storage.registerConstructor(effVaginalPregnant);//
 window.storage.registerConstructor(skCooking);return StatsLib;}(window.gm.StatsLib||{});
 /* twine-user-script #2: "Story JavaScript" */
-</script><tw-tag name="_back_" color="gray"></tw-tag><tw-tag name="_nosave_" color="yellow"></tw-tag><tw-tag name="_nodeffered_" color="yellow"></tw-tag><tw-tag name="_isdeffered_" color="brown"></tw-tag><tw-tag name="template" color="orange"></tw-tag><tw-passagedata pid="1" name="Info_Jake" tags="_back_" position="100,100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
+</script><tw-tag name="template" color="orange"></tw-tag><tw-tag name="_back_" color="gray"></tw-tag><tw-tag name="_nosave_" color="yellow"></tw-tag><tw-tag name="_nodeffered_" color="yellow"></tw-tag><tw-tag name="_isdeffered_" color="brown"></tw-tag><tw-passagedata pid="1" name="Info_Jake" tags="_back_" position="100,100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;) %&gt;
 Jake is here.&lt;/br&gt;
 You barely know anything about him.&lt;/br&gt;
 [[Back|_back_]]&lt;/br&gt;&lt;/br&gt;
@@ -4764,14 +4764,14 @@ Deffered3
 &lt;a0 onclick=&#39;window.gm.pushDeferredEvent(&quot;Deffered3&quot;,[13])&#39;&gt;Deffered1&lt;/a&gt;&lt;/br&gt;
 &lt;a0 onclick= window.story.show(&quot;&quot;)&gt;go on&lt;/a&gt;&lt;/br&gt;&lt;/br&gt;
 &lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="87" name="ForestAlchemistTalk" tags="_nosave_" position="850,1100" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
-&lt;% if(!window.gm.quests.hasActiveQuest(&quot;qPurpleBerry&quot;) || window.gm.quests.getMilestoneState(&quot;qPurpleBerry&quot;).id&lt;1) { 
-    window.story.render(&quot;AlchTalkStartPurpleBerry&quot;); %&gt;
-&lt;% } else if(window.gm.quests.getMilestoneState(&quot;qPurpleBerry&quot;).id===1 &amp;&amp; window.gm.player.Inv.countItem(&quot;PurpleBerry&quot;)&gt;=5) { 
-    window.story.render(&quot;AlchTalkFinishPurpleBerry&quot;); %&gt;
-&lt;% } else if(window.gm.quests.getMilestoneState(&quot;qBondageKink&quot;).id===300) {
-    window.story.render(&quot;AlchTalkFinishPurpleBerry&quot;); %&gt;
-&lt;% } else if(window.gm.quests.getMilestoneState(&quot;qCarlia&quot;).id===700) {
-    window.story.render(&quot;AlchTalkShelterCarlia&quot;); %&gt;
+&lt;% if(!window.gm.quests.hasActiveQuest(&quot;qPurpleBerry&quot;) || window.gm.quests.getMilestoneState(&quot;qPurpleBerry&quot;).id&lt;1) { %&gt;
+    &lt;%=window.story.render(&quot;AlchTalkStartPurpleBerry&quot;); %&gt;
+&lt;% } else if(window.gm.quests.getMilestoneState(&quot;qPurpleBerry&quot;).id===1 &amp;&amp; window.gm.player.Inv.countItem(&quot;PurpleBerry&quot;)&gt;=5) { %&gt;
+    &lt;%=window.story.render(&quot;AlchTalkFinishPurpleBerry&quot;); %&gt;
+&lt;% } else if(window.gm.quests.getMilestoneState(&quot;qBondageKink&quot;).id===300) {%&gt;
+    &lt;%=window.story.render(&quot;AlchTalkFinishPurpleBerry&quot;); %&gt;
+&lt;% } else if(window.gm.quests.getMilestoneState(&quot;qCarlia&quot;).id===700) {%&gt;
+    &lt;%=window.story.render(&quot;AlchTalkShelterCarlia&quot;); %&gt;
 &lt;%} else {%&gt; He seems busy right now. [[Back|ForestAlchemistHut]] &lt;%}%&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="88" name="AlchTalkShelterCarlia" tags="" position="975,1100" size="100,100">todo  Convince Alchemist to take Carlia in.
 &lt;p class=&quot;tPC&quot;&gt;&quot;I&#39;m pretty sure she can help you around; fetching ingredients from the forest, keeping you company...&quot;&lt;/p&gt;
@@ -5849,7 +5849,7 @@ Those are very present through the game and in the main-story (also check the se
 *  Diapers
 *  Child porn
 [[Back|_back_]]
-&lt;/article&gt;</tw-passagedata><tw-passagedata pid="150" name="Intro_SY" tags="" position="1225,1850" size="100,100">&lt;article&gt;&lt;%window.gm.initGame();window.gm.player.location=window.passage.name;%&gt;
+&lt;/article&gt;</tw-passagedata><tw-passagedata pid="150" name="Intro" tags="" position="1225,1850" size="100,100">&lt;article&gt;&lt;%window.gm.initGame();window.gm.player.location=window.passage.name;%&gt;
 &lt;p class=&#39;author&#39;&gt;You might see a lot of links that are formated red-strikethrough. Those are currently broken and you shouldnt use them.&lt;/p&gt;
 &lt;p class=&quot;author&quot;&gt;Player name and start gender are currently unchangeable.&lt;/p&gt;
 &lt;p class=&#39;author&#39;&gt;Loading of savegame is only possible in game. Saving might be disabled in some locations.&lt;/p&gt;
@@ -5884,7 +5884,7 @@ This is for testing purpose with some configurable settings.
     window.gm.player.Stats.increment(&quot;savagenessMax&quot;,100);
     window.story.state.DngSY.dngLevel=10;//todo
 }
-&lt;/script&gt;</tw-passagedata><tw-passagedata pid="152" name="Intro" tags="" position="225,1975" size="100,100">&lt;article&gt;&lt;%window.gm.initGame();window.gm.player.location=window.passage.name;%&gt;
+&lt;/script&gt;</tw-passagedata><tw-passagedata pid="152" name="Intro_DLC" tags="" position="225,1975" size="100,100">&lt;article&gt;&lt;%window.gm.initGame();window.gm.player.location=window.passage.name;%&gt;
 &lt;p&gt;Welcome to Meason, a town somewhere in these days. &lt;/br&gt;
 You are a student in the local university and live in a shared house with some other fellows. &lt;/br&gt;&lt;/p&gt;
 &lt;p class=&#39;author&#39;&gt;You might see a lot of links that are formated red-strikethrough. Those are currently broken and you shouldnt use them.&lt;/p&gt;
@@ -7373,21 +7373,21 @@ You fight your way through the dense undergrowth and realize just in time that y
 &lt;div id=&#39;select1&#39; &gt;
 &lt;a0 onclick=&#39;window.gm.printTalkLink(&quot;div#select1&quot;,&quot;div#choice1a&quot;)&#39;&gt;Peak into the chasm&lt;/a&gt;
 &lt;/div&gt;
-&lt;div id=&#39;choice1a&#39; hidden&gt;
+&lt;div id=&#39;choice1a&#39; hidden&gt;&lt;/br&gt;
 There is a slab of rock from which you should be able to look down quite well.&lt;/br&gt;
 You look carefully over the edge. It&#39;s not a real abyss, but a pretty steep, rocky slope. &lt;/br&gt;
 &#39;I&#39;m not climbing down there now.&#39; you think when you want to go back to the forest. &lt;/br&gt;
 &lt;div id=&#39;select2&#39; &gt;
 &lt;a0 onclick=&#39;window.gm.printTalkLink(&quot;div#select2&quot;,&quot;div#choice2a&quot;)&#39;&gt;Next&lt;/a&gt;
 &lt;/div&gt;
-&lt;div id=&#39;choice2a&#39; hidden&gt;
+&lt;div id=&#39;choice2a&#39; hidden&gt;&lt;/br&gt;
 The rock slab is not so rock-solid and just as you turn around it begins to tip into the abyss. 
 Unfortunatly, your jump-ability isn&#39;t quite good enough. The slab drags you down with it.&lt;/br&gt;
 At some point you see a massive rock coming onto you, reaching out with your hands to stop it squishing you.
 &lt;div id=&#39;select3&#39; &gt;
 &lt;a0 onclick=&#39;window.gm.printTalkLink(&quot;div#select3&quot;,&quot;div#choice3a&quot;)&#39;&gt;Next&lt;/a&gt;
 &lt;/div&gt;
-&lt;div id=&#39;choice3a&#39; hidden&gt;
+&lt;div id=&#39;choice3a&#39; hidden&gt;&lt;/br&gt;
 But of course its futile trying to catch that crushing weight. &lt;/br&gt;  
 You dont feel any pain, everything is just going &lt;a0 onclick=&#39;window.gm.respawn();&#39;&gt;black&lt;/a&gt; as if pulling the cord from a TV.&lt;/br&gt;  
 &lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
@@ -7471,8 +7471,7 @@ Ansonsten gibt es hier nichts.&lt;/br&gt;
 &lt;/article&gt;&lt;article id=&quot;LogPanel&quot;&gt;&lt;/article&gt;&lt;/section&gt;</tw-passagedata><tw-passagedata pid="269" name="ForestAlchemistHut" tags="name:shaby_hut" position="1100,3350" size="100,100">&lt;section&gt;&lt;aside id=&quot;sidebar&quot;&gt;&lt;/aside&gt;&lt;article&gt;&lt;%=window.story.render(&quot;CenterDialogs&quot;)%&gt;
 &lt;%window.gm.moveHere();%&gt;
 &lt;p class=&quot;tPC&quot;&gt;&lt;/p&gt;&#39;Puh, what a stink. I shouldnt stay here for long for I might suffocate&#39;&lt;/p&gt;
-&quot;About that cake we talked earlier - what kind of cake are we speaking about.&quot;
-&lt;p class=&#39;tPC&#39;&gt;NOO CAKE !&lt;/p&gt;
+&lt;!--&quot;About that cake we talked earlier - what kind of cake are we speaking about.&quot;&lt;p class=&#39;tPC&#39;&gt;NOO CAKE !&lt;/p&gt;--&gt;
 &lt;a0 onclick=&#39;window.gm.player.Inv.addItem(new window.gm.ItemsLib[&quot;KeyRestraintA&quot;]());&#39;&gt;pickup small key&lt;/a&gt;
 &lt;% if(window.gm.quests.getMilestoneState(&quot;qPurpleBerry&quot;).id&gt;=100) {%&gt;
 &lt;a0 onclick=&#39;window.gm.player.Inv.removeItem(&quot;PurpleBerry&quot;,5);window.gm.player.Inv.addItem(new window.gm.ItemsLib[&quot;HealthPotionSmall&quot;](),1);window.gm.refreshAllPanel();&#39; &lt;%=(window.gm.player.Inv.countItem(&quot;PurpleBerry&quot;)&gt;=5)?(&quot;&quot;):(&quot;hidden&quot;)%&gt;&gt;Trade 5 purple berries for 1 health-potion&lt;/a&gt;&lt;/br&gt;
